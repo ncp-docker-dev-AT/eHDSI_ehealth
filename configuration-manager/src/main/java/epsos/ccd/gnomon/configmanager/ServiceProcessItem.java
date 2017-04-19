@@ -1,5 +1,6 @@
 package epsos.ccd.gnomon.configmanager;
 
+import java.util.Arrays;
 
 public class ServiceProcessItem { 
 	private String[] eventName;
@@ -25,7 +26,7 @@ public class ServiceProcessItem {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "ServiceProcessItem: " + eventName + ":" +eventNumber;
+		return "ServiceProcessItem: " + Arrays.toString(eventName) + ":" + Arrays.toString(eventNumber);
 	}
 	
 	
