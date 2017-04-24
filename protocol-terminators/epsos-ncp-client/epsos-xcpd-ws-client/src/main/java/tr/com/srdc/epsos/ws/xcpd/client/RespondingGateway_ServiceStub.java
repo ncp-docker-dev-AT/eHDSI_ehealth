@@ -110,7 +110,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     private void populateAxisService() {
 
         // creating the Service with a unique name
-        _service = new org.apache.axis2.description.AxisService("RespondingGatewayA" + getUniqueSuffix());
+        _service = new org.apache.axis2.description.AxisService("RespondingGateway_Service" + getUniqueSuffix());
         addAnonymousOperations();
 
         // creating the operations
