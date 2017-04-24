@@ -1,22 +1,30 @@
 package epsos.ccd.gnomon.configmanager;
 
+import eu.epsos.util.net.ProxyCredentials;
+import eu.epsos.util.net.ProxyUtil;
 import java.io.FileInputStream;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
+import eu.europa.ec.dynamicdiscovery.core.fetcher.impl.DefaultURLFetcher;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
+import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.Endpoint;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import org.w3c.dom.Document;
 
 /**
  * This is the class which integrates the SMLSMP discovery client from the EU commission 
@@ -29,31 +37,26 @@ public class SMLSMPClient {
 	
 	/** The logger. */
 	private final static Logger L = LoggerFactory.getLogger(SMLSMPClient.class);
-	
-	/** 
-	 * This is a hashtable which contains the mapping between the epSOS transactions
-	 * to the SMP document identifiers.  
-	 */
-	private final static ConcurrentHashMap<String, String> docIdentifiers = new ConcurrentHashMap<>();
-	
-	/**
-	 * Table initializer. TODO: make it shared with the SMPEditor and finish it. 
-	 */
-	static {
-		docIdentifiers.put("ITI-55",
-				"urn:ehealth:PatientIdentificationAndAuthentication::XCPD::CrossGatewayPatientDiscovery##ITI-55");
-	}
+        
+        /** Static constants for SMP identifiers */
+        private static final String PARTICIPANT_IDENTIFIER_SCHEME = "ehealth-participantid-qns";
+        private static final String PARTICIPANT_IDENTIFIER_VALUE = "urn:ehealth:%2s:ncpb-idp";
+        private static final String DOCUMENT_IDENTIFIER_SCHEME = "ehealth-resid-qns";
+        
 	/** The certificate of the remote endpoint. */
 	private X509Certificate certificate;
 	
 	/** The URL address of the remote endpoint. */
 	private URL address;
+        
+        /** The XML contained in the Extension (used by search masks). */
+        private Document extension;
 
 	/**
 	 * Lookup in the SMP, using the SML for a given country code and document type. 
 	 * And example query for, e.g., Portugal and XCPD is the following
 	 * <pre>
-	 * lookup("pt", "ITI-55");
+	 * lookup("pt", "urn:ehealth:PatientIdentificationAndAuthentication::XCPD::CrossGatewayPatientDiscovery##ITI-55");
 	 * </pre>
 	 * then the methods {@link #getCertificate()} and {@link #getEndpointReference()} can be used. 
 	 * <b>Note</b> that this class is using a keystore to validate the signature of the SMP record, and 
@@ -61,43 +64,18 @@ public class SMLSMPClient {
 	 * <br/><br/>
 	 * TODO: Make the keystores configurable. 
 	 * <br/><br/>
-	 * @param countryCode The country code 
-	 * @param documentType The document type. Its format is given by the audit trail table and the {@link #docIdentifiers}.
+	 * @param countryCode The lowercase two-letter country code (ISO 3166-1 alpha-2)
+	 * @param documentType The document type. Its format is given by the Document Identifiers defined in the CP-eHealthDSI-002 for SMP/SML capabilities.
 	 * @throws SMLSMPClientException For any error (including not found)
 	 */
 	public void lookup(String countryCode, String documentType) throws SMLSMPClientException {
 		try {
-			KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-
-			ks.load(new FileInputStream("/Users/max/Downloads/smp.jks"), "spirit".toCharArray());
-
+			KeyStore ks = this.loadTrustStore();
 			
-			
-			L.debug("Instantiating the smpClient.");
-			L.warn("TODO: make configurable the keystore and the SML domain");
-			
-			// Instantiate the DIGIT client using our customized signature validator. This is due to 
-			// the fact that we need to evaluate our signature as well. 
-			DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
-					.locator(new DefaultBDXRLocator("ehealth.acc.edelivery.tech.ec.europa.eu"))
-					.reader(new CustomizedBDXRReader(new CustomizedSignatureValidator(ks))).build();
-
-			
-			String processIdentifier = "urn:ehealth:" + countryCode + ":ncpb-idp";
-			L.debug("Querying for process identifier " + processIdentifier);
-			ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(processIdentifier,
-					"ehealth-participantid-qns");
-
-			String finalDocumentIdentifier = docIdentifiers.get(documentType);
-			L.debug("Found documentIdentifier " + finalDocumentIdentifier);
-			if (finalDocumentIdentifier == null) {
-				throw new SMLSMPClientException(
-						"No documentidentifier found in the translation table for: " + documentType);
-			}
-
-			L.debug("Querying for service metadata");
-			ServiceMetadata sm = smpClient.getServiceMetadata(participantIdentifier,
-					new DocumentIdentifier(finalDocumentIdentifier, "ehealth-resid-qns"));
+			DynamicDiscovery smpClient = this.createDynamicDiscoveryClient(ks);
+                        
+                        String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
+			ServiceMetadata sm = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
 
 			List<Endpoint> endpoints = sm.getEndpoints();
 
@@ -112,7 +90,7 @@ public class SMLSMPClient {
 			Endpoint e = endpoints.get(0);
 			String address = e.getAddress();
 			if (address==null) {
-				throw new Exception("No address found for: " + finalDocumentIdentifier + ":" + processIdentifier);
+				throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
 			}
 			URL urlAddress = new URL(address);
 			
@@ -129,6 +107,49 @@ public class SMLSMPClient {
 		}
 
 	}
+        
+        /**
+	 * Lookup for a search mask in the SMP, using the SML for a given country code and document type. 
+	 * This will be called directly by the Portal to fetch a search mask when it's not found.
+         * And example query for, e.g., Portugal and ISM is the following
+	 * <pre>
+	 * lookup("pt", "urn:ehealth:ISM::InternationalSearchMask##ehealth-107");
+	 * </pre>
+	 * then the method {@link #getExtension()} can be used. 
+	 * <b>Note</b> that this class is using a keystore to validate the signature of the SMP record, and 
+	 * it should use another one to validate the signature. 
+	 * <br/><br/>
+	 * TODO: Make the keystores configurable. 
+	 * <br/><br/>
+	 * @param countryCode The lowercase two-letter country code (ISO 3166-1 alpha-2)
+	 * @param documentType The document type. Its format is given by the Document Identifiers defined in the CP-eHealthDSI-002 for SMP/SML capabilities.
+	 * @throws SMLSMPClientException For any error (including not found)
+	 */
+        public void fetchSearchMask(String countryCode, String documentType) throws SMLSMPClientException {
+            try {
+                KeyStore ks = this.loadTrustStore();
+
+                DynamicDiscovery smpClient = this.createDynamicDiscoveryClient(ks);
+                
+                String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
+                ServiceMetadata sm = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
+                
+                List<Endpoint> endpoints = sm.getEndpoints();
+                /*
+                * Constraint: here I think I have just one endpoint
+                */
+               int size = endpoints.size();
+               if (size != 1) {
+                       throw new Exception("Invalid number of endpoints found ("+size+"). This implementation works just with 1.");
+               }
+               Endpoint e = endpoints.get(0);
+               
+               // TODO: when DDC 1.3 is released: obtain the Extension of the Endpoint and read the search mask into the Document
+               
+            } catch (Exception e) {
+                    throw new SMLSMPClientException(e);
+            }
+        }
 
 	/**
 	 * Set the certificate of the newly discovered endpoint.
@@ -162,5 +183,91 @@ public class SMLSMPClient {
 	public URL getEndpointReference() {
 		return this.address;
 	}
+        
+        /**
+	 * Set the extension of the newly discovered resource (e.g., search masks).
+	 * @param extension the XML extension as a Document
+	 */
+        private synchronized void setExtension(Document extension) {
+            this.extension = extension;
+        }
+        
+        /**
+         * After calling the {@link #lookup(String, String)}, this method returns the XML of the extension 
+         * @return the XML of the extension
+         */
+        public Document getExtension() {
+            return this.extension;
+        }
+        
+        /**
+         * Loads the truststore containing the certificate used by the SMP server 
+         * to sign SMP files, to be used when building the Dynamic Discovery Client.
+         * @return The truststore containing the certificate used by the SMP server to sign SMP files
+         * @throws KeyStoreException
+         * @throws IOException
+         * @throws NoSuchAlgorithmException
+         * @throws CertificateException 
+         */
+        private KeyStore loadTrustStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+
+            ks.load(new FileInputStream(ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PATH")),
+                    ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+            return ks;
+        }
+        
+        /**
+         * Creates an instance of the Dynamic Discovery Client with a custom validator for validating
+         * both the SMP server signature and the eHealth specific national authority signature of the
+         * SMP file. OpenNCP proxy settings are also taken into account.
+         * @param ks The truststore containing the certificate used by SMP server to sign SMP files.
+         * @return The Dynamic Discovery Client ready to use.
+         * @throws TechnicalException 
+         */
+        private DynamicDiscovery createDynamicDiscoveryClient(KeyStore ks) throws TechnicalException {
+            L.debug("Instantiating the smpClient.");
+            L.warn("TODO: make configurable the keystore");
+
+            // Instantiate the DIGIT client using our customized signature validator. This is due to 
+            // the fact that we need to evaluate our signature as well. We also instantiate proxy credentials
+            // in case they're needed.
+            DynamicDiscovery smpClient = null;
+            ProxyCredentials proxyCredentials = null;
+            if (ProxyUtil.isProxyAnthenticationMandatory()) {
+                proxyCredentials = ProxyUtil.getProxyCredentials();
+            }
+            if (proxyCredentials != null) {
+                smpClient = DynamicDiscoveryBuilder.newInstance()
+                        .locator(new DefaultBDXRLocator(ConfigurationManagerService.getInstance().getProperty("SML_DOMAIN")))
+                        .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(), proxyCredentials.getProxyPassword())))
+                        .reader(new CustomizedBDXRReader(new CustomizedSignatureValidator(ks))).build();
+            } else {
+                smpClient = DynamicDiscoveryBuilder.newInstance()
+                        .locator(new DefaultBDXRLocator(ConfigurationManagerService.getInstance().getProperty("SML_DOMAIN")))
+                        .reader(new CustomizedBDXRReader(new CustomizedSignatureValidator(ks))).build();
+            }
+            return smpClient;
+        }
+        
+        /**
+         * Fetches the ServiceMetadata from the SMP server based on the 
+         * combination of the country code and document identifier.
+         * @param smpClient The Dynamic Discovery Client ready to be used
+         * @param participantIdentifierValue The SMP Participant Identifier
+         * @param documentType The SMP Document Identifier
+         * @return The ServiceMetadata for the requested ParticipantIdentifier and Document Identifier 
+         * @throws TechnicalException 
+         */
+        private ServiceMetadata getServiceMetadata(DynamicDiscovery smpClient, String participantIdentifierValue, String documentType) throws TechnicalException {
+            L.debug("Querying for participant identifier " + participantIdentifierValue);
+            ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue,
+                            PARTICIPANT_IDENTIFIER_SCHEME);
+
+            L.debug("Querying for service metadata");
+            ServiceMetadata sm = smpClient.getServiceMetadata(participantIdentifier,
+                            new DocumentIdentifier(documentType, DOCUMENT_IDENTIFIER_SCHEME));
+            return sm;
+        }
 
 }

@@ -24,18 +24,20 @@ import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 public class TestSMP {
 	private static final String ns = "http://busdox.org/serviceMetadata/publishing/1.0/";
 
-	@BeforeClass
-	public static void setup() {
-		Logger rootLogger = Logger.getRootLogger();
-		if (!rootLogger.getAllAppenders().hasMoreElements()) {
-			rootLogger.setLevel(Level.OFF);
-
-			Logger hornetLogger = rootLogger.getLoggerRepository().getLogger("org.hornetq.core.server");
-			hornetLogger.setLevel(Level.OFF);
-			hornetLogger.addAppender(new ConsoleAppender(new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN)));
-
-		}
-	}
+        /* Joao: I commented this because I was having errors after pulling and AFAIK, 
+        log4j was dropped in favour of logback. We can analyse this after merging the branches */
+//	@BeforeClass
+//	public static void setup() {
+//		Logger rootLogger = Logger.getRootLogger();
+//		if (!rootLogger.getAllAppenders().hasMoreElements()) {
+//			rootLogger.setLevel(Level.OFF);
+//
+//			Logger hornetLogger = rootLogger.getLoggerRepository().getLogger("org.hornetq.core.server");
+//			hornetLogger.setLevel(Level.OFF);
+//			hornetLogger.addAppender(new ConsoleAppender(new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN)));
+//
+//		}
+//	}
 
 	@Test
 	public void testNormalFlow() {
