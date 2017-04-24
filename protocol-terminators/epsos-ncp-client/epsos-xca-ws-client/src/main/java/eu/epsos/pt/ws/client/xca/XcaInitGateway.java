@@ -85,6 +85,7 @@ public class XcaInitGateway {
             stub.setAddr(epr);
             stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
             EventLogClientUtil.createDummyMustUnderstandHandler(stub);
+            stub.setCountryCode(countryCode);
 
             /* queryRespose */
             AdhocQueryResponse queryResponse = stub.respondingGateway_CrossGatewayQuery(queryRequest, idAssertion, trcAssertion, documentCode.getValue());   // Request

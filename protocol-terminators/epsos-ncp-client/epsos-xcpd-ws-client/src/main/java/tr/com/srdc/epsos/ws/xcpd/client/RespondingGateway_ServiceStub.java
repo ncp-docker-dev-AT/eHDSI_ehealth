@@ -23,6 +23,7 @@ import com.spirit.epsos.cc.adc.EadcEntry;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
+import epsos.ccd.gnomon.configmanager.ConfigurationManagerSMP;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xcpd.XCPDConstants;
@@ -32,6 +33,7 @@ import eu.epsos.validation.services.XcpdValidationService;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -46,6 +48,11 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.OperationClient;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.httpclient.HttpClient;
@@ -90,7 +97,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
     }
-
+    
     private static synchronized String getUniqueSuffix() {
         // reset the counter if it is greater than 99999
         if (counter > 99999) {
@@ -103,7 +110,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     private void populateAxisService() {
 
         // creating the Service with a unique name
-        _service = new org.apache.axis2.description.AxisService("RespondingGateway_Service" + getUniqueSuffix());
+        _service = new org.apache.axis2.description.AxisService("RespondingGatewayA" + getUniqueSuffix());
         addAnonymousOperations();
 
         // creating the operations
@@ -175,7 +182,6 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
      * @param pRPA_IN201305UV02
      * @param idAssertion
      * @return
-     * @throws java.rmi.RemoteException
      */
     public org.hl7.v3.PRPAIN201306UV02 respondingGateway_PRPA_IN201305UV02(PRPAIN201305UV02 pRPA_IN201305UV02, Assertion idAssertion) {
         org.apache.axis2.context.MessageContext _messageContext = null;
@@ -281,7 +287,59 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
             /* execute the operation client */
             transactionStartTime = new Date();
-            operationClient.execute(true);
+            try {
+                operationClient.execute(true);
+            } catch (AxisFault e) {
+                LOG.error("Axis Fault error: " + e.getMessage());
+                LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
+                ConfigurationManagerSMP configManagerSMP = ConfigurationManagerSMP.getInstance();
+                String key = this.countryCode.toLowerCase(Locale.ENGLISH) + ".PatientIdentificationService.WSE";
+                configManagerSMP.deleteKeyFromHashMap(key);
+                String value = configManagerSMP.getProperty(key);
+                if (value != null) {
+                    /* if we get something from the Central Services, then we retry the request */
+                    /* correctly sets the Transport information with the new endpoint */
+                    LOG.debug("Retrying the request with the new configurations: [" + value + "]");
+                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value)); 
+
+                    /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
+                    OperationClient newOperationClient = _serviceClient.createClient(_operations[0].getName());
+                    newOperationClient.getOptions().setAction(XCPDConstants.SOAP_HEADERS.REQUEST_ACTION);
+                    newOperationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
+                    addPropertyToOperationClient(newOperationClient, org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+
+                    SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
+
+                    /* we need to create a new SOAP payload so that the wsa:To header is correctly set 
+                    (i.e., copied from the Transport information to the wsa:To during the running of the Addressing Phase,
+                    as defined by the global engagement of the addressing module in axis2.xml). The old payload still contains the old endpoint. */
+                    org.apache.axiom.soap.SOAPEnvelope newEnv;
+                    newEnv = toEnvelope(newSoapFactory,
+                            pRPA_IN201305UV02,
+                            optimizeContent(new javax.xml.namespace.QName(XCPDConstants.SOAP_HEADERS.NAMESPACE_URI, XCPDConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART)));
+
+                    /* we set the previous headers in the new SOAP envelope */
+                    _serviceClient.addHeadersToEnvelope(newEnv);
+
+                    /* we create a new Message Context with the new SOAP envelope */
+                    org.apache.axis2.context.MessageContext newMessageContext = new org.apache.axis2.context.MessageContext();
+                    newMessageContext.setEnvelope(newEnv);
+
+                    /* add the new message contxt to the new operation client */
+                    newOperationClient.addMessageContext(newMessageContext);
+                    /* we retry the request */
+                    newOperationClient.execute(true);
+                    /* we need to reset the previous variables with the new content, to be used later */
+                    operationClient = newOperationClient;
+                    messageContext = newMessageContext;
+                    env = newEnv;
+                    LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
+                } else {
+                    /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
+                    LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
+                    throw e;
+                }
+           }
 
             org.apache.axis2.context.MessageContext _returnMessageContext = operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             org.apache.axiom.soap.SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();

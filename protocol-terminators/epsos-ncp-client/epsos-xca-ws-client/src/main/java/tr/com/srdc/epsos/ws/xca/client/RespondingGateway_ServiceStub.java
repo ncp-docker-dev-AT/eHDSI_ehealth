@@ -23,22 +23,21 @@ import com.spirit.epsos.cc.adc.EadcEntry;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
-import epsos.ccd.gnomon.auditmanager.EventType;
+import epsos.ccd.gnomon.configmanager.ConfigurationManagerSMP;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.pt.transformation.TMServices;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.xca.XCAConstants;
+import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XcaValidationService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
-import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
@@ -48,14 +47,13 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.exception.ExceptionUtils;
-import org.joda.time.DateTime;
 import org.opensaml.saml2.core.Assertion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -227,11 +225,16 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
             id.addChild(node2);
 
-            SOAPHeaderBlock to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
-            OMNode node3 = factory.createOMText(addr);
-            to.addChild(node3);
-            OMAttribute att2 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
-            to.addAttribute(att2);
+            /* I think this is useless as the global engaging of WS-Addressing module is done in axis2.xml
+            and takes care of adding the wsa:To header based on the endpoint value from the transport. But
+            I'm not 100% sure, as the axis2.xml is on the client-connector, not on the ws-client.
+            TODO: agree on this in order to clean or uncomment the code. Discussion in JIRA issue EHNCP-1141.
+            */
+//            SOAPHeaderBlock to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+//            OMNode node3 = factory.createOMText(addr);
+//            to.addChild(node3);
+//            OMAttribute att2 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
+//            to.addAttribute(att2);
 
             SOAPHeaderBlock replyTo = new SOAP12HeaderBlockImpl("ReplyTo", ns2, soapFactory);
             OMElement address = new SOAP12HeaderBlockImpl("Address", ns2, soapFactory);
@@ -239,7 +242,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             address.addChild(node4);
             replyTo.addChild(address);
 
-            _serviceClient.addHeader(to);
+//            _serviceClient.addHeader(to);
             _serviceClient.addHeader(action);
             _serviceClient.addHeader(id);
             _serviceClient.addHeader(replyTo);
@@ -312,7 +315,84 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
              * Execute Operation
              */
             transactionStartTime = new Date();
-            _operationClient.execute(true);
+            try {
+                _operationClient.execute(true);
+            } catch (AxisFault e) {
+                LOG.error("Axis Fault error: " + e.getMessage());
+                LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
+                ConfigurationManagerSMP configManagerSMP = ConfigurationManagerSMP.getInstance();
+                String service = null;
+                LOG.debug("ClassCode: " + classCode);
+                switch (classCode) {
+                    case Constants.PS_CLASSCODE:
+                        service = ".PatientService.WSE";
+                        break;
+                    case Constants.EP_CLASSCODE:
+                        service = ".OrderService.WSE";
+                        break;
+                    default: break;
+                }
+                String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
+                configManagerSMP.deleteKeyFromHashMap(key);
+                String value = configManagerSMP.getProperty(key);
+                if (value != null) {
+                    /* if we get something from the Central Services, then we retry the request */
+                    /* correctly sets the Transport information with the new endpoint */
+                    LOG.debug("Retrying the request with the new configurations: [" + value + "]");
+                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value)); 
+
+                    /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
+                    org.apache.axis2.client.OperationClient newOperationClient = _serviceClient.createClient(_operations[0].getName());
+		    newOperationClient.getOptions().setAction(XCAConstants.SOAP_HEADERS.QUERY.REQUEST_ACTION);
+		    newOperationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
+                    addPropertyToOperationClient(newOperationClient, org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+
+                    SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
+
+                    /* we need to create a new SOAP payload so that the wsa:To header is correctly set 
+                    (i.e., copied from the Transport information to the wsa:To during the running of the Addressing Phase,
+                    as defined by the global engagement of the addressing module in axis2.xml). The old payload still contains the old endpoint. */
+                    org.apache.axiom.soap.SOAPEnvelope newEnv;
+                    newEnv = toEnvelope(newSoapFactory,
+                            adhocQueryRequest,
+                            optimizeContent(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.QUERY.NAMESPACE_REQUEST_LOCAL_PART)));
+
+                    /* Note: if we run the following block of code, it won't overwrite the addressing:To header with the new endpoint and
+                    add it to the SOAP envelope together with the set the previous headers. Instead it'll add a second addressing:To header
+                    with the new endpoint, which will cause a SOAP Fault since WS-Addressing specification forbids the existence of 
+                    more than 1 addressing:To header. Defining the new endpoint for the _serviceClient.options.To works if we let axis2
+                    handle by itself the WS-Addressing. So for now, we comment this as well as the same block in the initial request, and let the axis2
+                    addressing module take care of adding the wsa:To header with the correct endpoint (which is the correct way, IMHO). 
+                    TODO: discuss WSA handling (JIRA issue EHNCP-1141). */
+//                    SOAPHeaderBlock newTo = new SOAP12HeaderBlockImpl("To", ns2, newSoapFactory);
+//                    OMNode newNode3 = newSoapFactory.createOMText(value);
+//                    newTo.addChild(newNode3);
+//                    OMAttribute newAtt2 = newSoapFactory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, newEnv.getNamespace(), "1");
+//                    newTo.addAttribute(newAtt2);
+                    
+//                    _serviceClient.addHeader(newTo);
+                    _serviceClient.addHeadersToEnvelope(newEnv);
+
+                    /* we create a new Message Context with the new SOAP envelope */
+                    org.apache.axis2.context.MessageContext newMessageContext = new org.apache.axis2.context.MessageContext();
+                    newMessageContext.setEnvelope(newEnv);
+
+                    /* add the new message contxt to the new operation client */
+                    newOperationClient.addMessageContext(newMessageContext);
+                    /* we retry the request */
+                    newOperationClient.execute(true);
+                    /* we need to reset the previous variables with the new content, to be used later */
+                    _operationClient = newOperationClient;
+                    _messageContext = newMessageContext;
+                    env = newEnv;
+                    LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
+                } else {
+                    /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
+                    LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
+                    throw e;
+                }
+           }
+            
             org.apache.axis2.context.MessageContext _returnMessageContext = _operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             org.apache.axiom.soap.SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
@@ -511,9 +591,14 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
             id.addChild(node2);
 
-            OMElement to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
-            OMNode node3 = factory.createOMText(addr);
-            to.addChild(node3);
+            /* I think this is useless as the global engaging of WS-Addressing module is done in axis2.xml
+            and takes care of adding the wsa:To header based on the endpoint value from the transport. But
+            I'm not 100% sure, as the axis2.xml is on the client-connector, not on the ws-client.
+            TODO: agree on this in order to clean or uncomment the code. Discussion in JIRA issue EHNCP-1141.
+            */
+//            OMElement to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+//            OMNode node3 = factory.createOMText(addr);
+//            to.addChild(node3);
 
             //OMAttribute att2 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
             //to.addAttribute(att2);
@@ -523,7 +608,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             address.addChild(node4);
             replyTo.addChild(address);
 
-            _serviceClient.addHeader(to);
+//            _serviceClient.addHeader(to);
             _serviceClient.addHeader(action);
             _serviceClient.addHeader(id);
             _serviceClient.addHeader(replyTo);
@@ -581,7 +666,82 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
              */
             transactionStartTime = new Date();
             org.apache.axiom.soap.SOAPEnvelope returnEnv;
-            _operationClient.execute(true);
+            try {
+                _operationClient.execute(true);
+            } catch (AxisFault e) {
+                LOG.error("Axis Fault error: " + e.getMessage());
+                LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
+                ConfigurationManagerSMP configManagerSMP = ConfigurationManagerSMP.getInstance();
+                String service = null;
+                LOG.debug("ClassCode: " + classCode);
+                switch (classCode) {
+                    case Constants.PS_CLASSCODE:
+                        service = ".PatientService.WSE";
+                        break;
+                    case Constants.EP_CLASSCODE:
+                        service = ".OrderService.WSE";
+                        break;
+                    default: break;
+                }
+                String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
+                configManagerSMP.deleteKeyFromHashMap(key);
+                String value = configManagerSMP.getProperty(key);
+                if (value != null) {
+                    /* if we get something from the Central Services, then we retry the request */
+                    /* correctly sets the Transport information with the new endpoint */
+                    LOG.debug("Retrying the request with the new configurations: [" + value + "]");
+                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value)); 
+
+                    /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
+                    org.apache.axis2.client.OperationClient newOperationClient = _serviceClient.createClient(_operations[1].getName());
+		    newOperationClient.getOptions().setAction(XCAConstants.SOAP_HEADERS.RETRIEVE.REQUEST_ACTION);
+		    newOperationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
+                    addPropertyToOperationClient(newOperationClient, org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+		    addPropertyToOperationClient(newOperationClient, org.apache.axis2.Constants.Configuration.ENABLE_MTOM, org.apache.axis2.Constants.VALUE_TRUE);
+
+                    SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
+
+                    /* we need to create a new SOAP payload so that the wsa:To header is correctly set 
+                    (i.e., copied from the Transport information to the wsa:To during the running of the Addressing Phase,
+                    as defined by the global engagement of the addressing module in axis2.xml). The old payload still contains the old endpoint. */
+                    org.apache.axiom.soap.SOAPEnvelope newEnv;
+                    newEnv = toEnvelope(newSoapFactory,
+                            retrieveDocumentSetRequest,
+                            optimizeContent(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.RETRIEVE.NAMESPACE_REQUEST_LOCAL_PART)));
+
+                    /* Note: if we run the following block of code, it won't overwrite the addressing:To header with the new endpoint and
+                    add it to the SOAP envelope together with the set the previous headers. Instead it'll add a second addressing:To header
+                    with the new endpoint, which will cause a SOAP Fault since WS-Addressing specification forbids the existence of 
+                    more than 1 addressing:To header. Defining the new endpoint for the _serviceClient.options.To works if we let axis2
+                    handle by itself the WS-Addressing. So for now, we comment this as well as the same block in the initial request, and let the axis2
+                    addressing module take care of adding the wsa:To header with the correct endpoint (which is the correct way, IMHO). 
+                    TODO: discuss WSA handling (JIRA issue EHNCP-1141). */
+//                    SOAPHeaderBlock newTo = new SOAP12HeaderBlockImpl("To", ns2, newSoapFactory);
+//                    OMNode newNode3 = newSoapFactory.createOMText(value);
+//                    newTo.addChild(newNode3);
+                    
+//                    _serviceClient.addHeader(newTo);
+                    _serviceClient.addHeadersToEnvelope(newEnv);
+
+                    /* we create a new Message Context with the new SOAP envelope */
+                    org.apache.axis2.context.MessageContext newMessageContext = new org.apache.axis2.context.MessageContext();
+                    newMessageContext.setEnvelope(newEnv);
+
+                    /* add the new message contxt to the new operation client */
+                    newOperationClient.addMessageContext(newMessageContext);
+                    /* we retry the request */
+                    newOperationClient.execute(true);
+                    /* we need to reset the previous variables with the new content, to be used later */
+                    _operationClient = newOperationClient;
+                    _messageContext = newMessageContext;
+                    env = newEnv;
+                    LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
+                } else {
+                    /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
+                    LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
+                    throw e;
+                }
+            }
             org.apache.axis2.context.MessageContext _returnMessageContext;
             _returnMessageContext = _operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             returnEnv = _returnMessageContext.getEnvelope();
