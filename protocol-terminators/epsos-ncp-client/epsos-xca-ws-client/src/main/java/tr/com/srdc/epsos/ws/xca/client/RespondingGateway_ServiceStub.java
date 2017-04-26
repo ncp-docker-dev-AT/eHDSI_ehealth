@@ -28,13 +28,13 @@ import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.xca.XCAConstants;
-import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XcaValidationService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -51,7 +51,6 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.log4j.Logger;
 import org.opensaml.saml2.core.Assertion;
@@ -225,16 +224,11 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
             id.addChild(node2);
 
-            /* I think this is useless as the global engaging of WS-Addressing module is done in axis2.xml
-            and takes care of adding the wsa:To header based on the endpoint value from the transport. But
-            I'm not 100% sure, as the axis2.xml is on the client-connector, not on the ws-client.
-            TODO: agree on this in order to clean or uncomment the code. Discussion in JIRA issue EHNCP-1141.
-            */
-//            SOAPHeaderBlock to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
-//            OMNode node3 = factory.createOMText(addr);
-//            to.addChild(node3);
-//            OMAttribute att2 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
-//            to.addAttribute(att2);
+            SOAPHeaderBlock to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+            OMNode node3 = factory.createOMText(addr);
+            to.addChild(node3);
+            OMAttribute att2 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
+            to.addAttribute(att2);
 
             SOAPHeaderBlock replyTo = new SOAP12HeaderBlockImpl("ReplyTo", ns2, soapFactory);
             OMElement address = new SOAP12HeaderBlockImpl("Address", ns2, soapFactory);
@@ -242,7 +236,12 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             address.addChild(node4);
             replyTo.addChild(address);
 
-//            _serviceClient.addHeader(to);
+            /* We are manually adding all WSA headers (To, Action, MessageID). Other IHE service clients (XCPD and XDR) skip the addition of the To header 
+            and let the client-connector axis2 configurations take care of it (through the global engaging of WS-Addressing module in axis2.xml, which sets 
+            the To with the endpoint value from the transport information), but we cannot assume that these IHE Service clients will always be coupled with 
+            the client-connector (and that it'll always be based on Axis2). See issues EHNCP-1141 and EHNCP-1168.
+            */
+            _serviceClient.addHeader(to);
             _serviceClient.addHeader(action);
             _serviceClient.addHeader(id);
             _serviceClient.addHeader(replyTo);
@@ -349,28 +348,31 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
                     SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
 
-                    /* we need to create a new SOAP payload so that the wsa:To header is correctly set 
-                    (i.e., copied from the Transport information to the wsa:To during the running of the Addressing Phase,
-                    as defined by the global engagement of the addressing module in axis2.xml). The old payload still contains the old endpoint. */
+                    /* As there's no simple way of replacing the previously set WSA To header (still containing the old endpoint) we need to create a new SOAP 
+                    payload so that the wsa:To header is correctly set. Here we have 2 situations. If we rely on the client-connector axis2.xml configurations,
+                    then the new endpoint will be copied from the Transport information to the wsa:To during the running of the Addressing Phase,
+                    as defined by the global engagement of the addressing module in axis2.xml. But we're not doing it since these IHE service clients should be 
+                    decoupled from client-connector, thus we manually add the new WSA To header to the new SOAP envelope. See issues EHNCP-1141 and EHNCP-1168. */
                     org.apache.axiom.soap.SOAPEnvelope newEnv;
                     newEnv = toEnvelope(newSoapFactory,
                             adhocQueryRequest,
                             optimizeContent(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.QUERY.NAMESPACE_REQUEST_LOCAL_PART)));
-
-                    /* Note: if we run the following block of code, it won't overwrite the addressing:To header with the new endpoint and
-                    add it to the SOAP envelope together with the set the previous headers. Instead it'll add a second addressing:To header
-                    with the new endpoint, which will cause a SOAP Fault since WS-Addressing specification forbids the existence of 
-                    more than 1 addressing:To header. Defining the new endpoint for the _serviceClient.options.To works if we let axis2
-                    handle by itself the WS-Addressing. So for now, we comment this as well as the same block in the initial request, and let the axis2
-                    addressing module take care of adding the wsa:To header with the correct endpoint (which is the correct way, IMHO). 
-                    TODO: discuss WSA handling (JIRA issue EHNCP-1141). */
-//                    SOAPHeaderBlock newTo = new SOAP12HeaderBlockImpl("To", ns2, newSoapFactory);
-//                    OMNode newNode3 = newSoapFactory.createOMText(value);
-//                    newTo.addChild(newNode3);
-//                    OMAttribute newAtt2 = newSoapFactory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, newEnv.getNamespace(), "1");
-//                    newTo.addAttribute(newAtt2);
                     
-//                    _serviceClient.addHeader(newTo);
+                    /* Creating the new WSA To header with the new endpoint */
+                    to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+                    node3 = newSoapFactory.createOMText(value);
+                    to.addChild(node3);
+                    to.addAttribute(att2);
+                    
+                    /* There's no way to remove a single header (and WS-Addressing specification forbids the existence of 
+                    more than 1 addressing:To header), so we need to remove all the old headers and add them again to _serviceClient
+                    (including the new To header with the right endpoint), from which they'll be copied into the final SOAP envelope */
+                    _serviceClient.removeHeaders();
+                    _serviceClient.addHeader(to);
+                    _serviceClient.addHeader(action);
+                    _serviceClient.addHeader(id);
+                    _serviceClient.addHeader(replyTo);
+                    _serviceClient.addHeader(security);
                     _serviceClient.addHeadersToEnvelope(newEnv);
 
                     /* we create a new Message Context with the new SOAP envelope */
@@ -591,14 +593,9 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
             id.addChild(node2);
 
-            /* I think this is useless as the global engaging of WS-Addressing module is done in axis2.xml
-            and takes care of adding the wsa:To header based on the endpoint value from the transport. But
-            I'm not 100% sure, as the axis2.xml is on the client-connector, not on the ws-client.
-            TODO: agree on this in order to clean or uncomment the code. Discussion in JIRA issue EHNCP-1141.
-            */
-//            OMElement to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
-//            OMNode node3 = factory.createOMText(addr);
-//            to.addChild(node3);
+            OMElement to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+            OMNode node3 = factory.createOMText(addr);
+            to.addChild(node3);
 
             //OMAttribute att2 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
             //to.addAttribute(att2);
@@ -608,7 +605,12 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             address.addChild(node4);
             replyTo.addChild(address);
 
-//            _serviceClient.addHeader(to);
+            /* We are manually adding all WSA headers (To, Action, MessageID). Other IHE service clients (XCPD and XDR) skip the addition of the To header 
+            and let the client-connector axis2 configurations take care of it (through the global engaging of WS-Addressing module in axis2.xml, which sets 
+            the To with the endpoint value from the transport information), but we cannot assume that these IHE Service clients will always be coupled with 
+            the client-connector (and that it'll always be based on Axis2). See issues EHNCP-1141 and EHNCP-1168.
+            */
+            _serviceClient.addHeader(to);
             _serviceClient.addHeader(action);
             _serviceClient.addHeader(id);
             _serviceClient.addHeader(replyTo);
@@ -701,26 +703,34 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
                     SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
 
-                    /* we need to create a new SOAP payload so that the wsa:To header is correctly set 
-                    (i.e., copied from the Transport information to the wsa:To during the running of the Addressing Phase,
-                    as defined by the global engagement of the addressing module in axis2.xml). The old payload still contains the old endpoint. */
+                    /* As there's no simple way of replacing the previously set WSA To header (still containing the old endpoint) we need to create a new SOAP 
+                    payload so that the wsa:To header is correctly set. Here we have 2 situations. If we rely on the client-connector axis2.xml configurations,
+                    then the new endpoint will be copied from the Transport information to the wsa:To during the running of the Addressing Phase,
+                    as defined by the global engagement of the addressing module in axis2.xml. But we're not doing it since these IHE service clients should be 
+                    decoupled from client-connector, thus we manually add the new WSA To header to the new SOAP envelope. In this specific case of the XCA Retrieve,
+                    since the manual WSA headers are being added under the http://www.w3.org/2005/08/addressing/anonymous namespace and not under the usual http://www.w3.org/2005/08/addressing 
+                    namespace, both the manually added headers and the automatically added ones from client-connector's axis2 configurations will be added. This needs to be analysed.
+                    See issues EHNCP-1141 and EHNCP-1168. */
                     org.apache.axiom.soap.SOAPEnvelope newEnv;
                     newEnv = toEnvelope(newSoapFactory,
                             retrieveDocumentSetRequest,
                             optimizeContent(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.RETRIEVE.NAMESPACE_REQUEST_LOCAL_PART)));
 
-                    /* Note: if we run the following block of code, it won't overwrite the addressing:To header with the new endpoint and
-                    add it to the SOAP envelope together with the set the previous headers. Instead it'll add a second addressing:To header
-                    with the new endpoint, which will cause a SOAP Fault since WS-Addressing specification forbids the existence of 
-                    more than 1 addressing:To header. Defining the new endpoint for the _serviceClient.options.To works if we let axis2
-                    handle by itself the WS-Addressing. So for now, we comment this as well as the same block in the initial request, and let the axis2
-                    addressing module take care of adding the wsa:To header with the correct endpoint (which is the correct way, IMHO). 
-                    TODO: discuss WSA handling (JIRA issue EHNCP-1141). */
-//                    SOAPHeaderBlock newTo = new SOAP12HeaderBlockImpl("To", ns2, newSoapFactory);
-//                    OMNode newNode3 = newSoapFactory.createOMText(value);
-//                    newTo.addChild(newNode3);
+                    /* Creating the new WSA To header with the new endpoint */
+                    to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+                    node3 = newSoapFactory.createOMText(value);
+                    to.addChild(node3);
+//                    to.addAttribute(att2);
                     
-//                    _serviceClient.addHeader(newTo);
+                    /* There's no way to remove a single header (and WS-Addressing specification forbids the existence of 
+                    more than 1 addressing:To header), so we need to remove all the old headers and add them again to _serviceClient
+                    (including the new To header with the right endpoint), from which they'll be copied into the final SOAP envelope */
+                    _serviceClient.removeHeaders();
+                    _serviceClient.addHeader(to);
+                    _serviceClient.addHeader(action);
+                    _serviceClient.addHeader(id);
+                    _serviceClient.addHeader(replyTo);
+                    _serviceClient.addHeader(security);
                     _serviceClient.addHeadersToEnvelope(newEnv);
 
                     /* we create a new Message Context with the new SOAP envelope */

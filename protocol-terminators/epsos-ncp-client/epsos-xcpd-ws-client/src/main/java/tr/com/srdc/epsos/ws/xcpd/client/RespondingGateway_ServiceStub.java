@@ -226,6 +226,11 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (Exception ex) {
                 LOG.error(ex.getLocalizedMessage(), ex);
             }
+            /* The WSA To header is not being manually added, it's added by the client-connector axis2.xml configurations 
+            (which globally engages the addressing module, adding the wsa:To header based on the endpoint value from the transport) 
+            based on the assumption that these IHE Service clients will always be coupled with client-connector, which may not be 
+            the case in the future. When that happens, we may need to revisit this code to add the To header like it's done in the IHE XCA service client. 
+            See issues EHNCP-1141 and EHNCP-1168. */
             _serviceClient.addHeader(action);
             _serviceClient.addHeader(id);
             _serviceClient.addHeadersToEnvelope(env);
@@ -318,14 +323,17 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                             pRPA_IN201305UV02,
                             optimizeContent(new javax.xml.namespace.QName(XCPDConstants.SOAP_HEADERS.NAMESPACE_URI, XCPDConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART)));
 
-                    /* we set the previous headers in the new SOAP envelope */
+                    /* we set the previous headers in the new SOAP envelope. Note: the wsa:To header is not manually set (only Action and MessageID are) but instead handled by the
+                    axis2 configuration of client-connector (my assumption). This may have impact if we decouple client-connector from the IHE service clients. If 
+                    they are decoupled, we most probably have to add the To header manually like it's done in the IHE XCA client, both here and in the initial
+                    request. See issues EHNCP-1141 and EHNCP-1168. */
                     _serviceClient.addHeadersToEnvelope(newEnv);
 
                     /* we create a new Message Context with the new SOAP envelope */
                     org.apache.axis2.context.MessageContext newMessageContext = new org.apache.axis2.context.MessageContext();
                     newMessageContext.setEnvelope(newEnv);
 
-                    /* add the new message contxt to the new operation client */
+                    /* add the new message context to the new operation client */
                     newOperationClient.addMessageContext(newMessageContext);
                     /* we retry the request */
                     newOperationClient.execute(true);
