@@ -34,7 +34,6 @@ import eu.epsos.validation.services.XcaValidationService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -737,7 +736,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     org.apache.axis2.context.MessageContext newMessageContext = new org.apache.axis2.context.MessageContext();
                     newMessageContext.setEnvelope(newEnv);
 
-                    /* add the new message contxt to the new operation client */
+                    /* add the new message context to the new operation client */
                     newOperationClient.addMessageContext(newMessageContext);
                     /* we retry the request */
                     newOperationClient.execute(true);

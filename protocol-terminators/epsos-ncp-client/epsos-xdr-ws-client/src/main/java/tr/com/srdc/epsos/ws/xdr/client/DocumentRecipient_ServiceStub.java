@@ -331,7 +331,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                     org.apache.axis2.context.MessageContext newMessageContext = new org.apache.axis2.context.MessageContext();
                     newMessageContext.setEnvelope(newEnv);
 
-                    /* add the new message contxt to the new operation client */
+                    /* add the new message context to the new operation client */
                     newOperationClient.addMessageContext(newMessageContext);
                     /* we retry the request */
                     newOperationClient.execute(true);
