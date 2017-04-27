@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.tsam.sync.converter;
 
-import eu.europa.ec.sante.ehdsi.termservice.common.web.rest.model.CodeSystemVersionModel;
+import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.CodeSystemVersionModel;
 import eu.europa.ec.sante.ehdsi.tsam.sync.domain.CodeSystemVersion;
 import org.springframework.core.convert.converter.Converter;
 
@@ -20,8 +20,9 @@ public class CodeSystemVersionConverter implements Converter<CodeSystemVersionMo
             return null;
         }
 
-        if (cache.containsKey(source.getId())) {
-            return cache.get(source.getId());
+        String versionKey = source.getCodeSystem().getId() + "-" + source.getVersionId();
+        if (cache.containsKey(versionKey)) {
+            return cache.get(versionKey);
         }
 
         CodeSystemVersion target = new CodeSystemVersion();
@@ -36,7 +37,7 @@ public class CodeSystemVersionConverter implements Converter<CodeSystemVersionMo
         target.setSource(source.getSource());
         target.setCodeSystem(codeSystemConverter.convert(source.getCodeSystem()));
 
-        cache.put(source.getId(), target);
+        cache.put(versionKey, target);
 
         return target;
     }

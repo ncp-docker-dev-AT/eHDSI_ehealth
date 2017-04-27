@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.util.StopWatch;
 
 @SpringBootApplication
 public class TsamSyncApplication {
@@ -19,6 +20,12 @@ public class TsamSyncApplication {
         logger.info("JVM: {} ({})", System.getProperty("java.vm.version"), System.getProperty("java.vm.name"));
 
         TsamSyncManager manager = context.getBean(TsamSyncManager.class);
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        logger.info("Start synchronization process");
         manager.synchronize();
+        stopWatch.stop();
+        logger.info("Synchronization done in {} s", stopWatch.getTotalTimeSeconds());
     }
 }

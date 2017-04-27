@@ -15,19 +15,19 @@ import java.time.format.DateTimeFormatter;
 @Profile("mysql")
 public class MySqlDatabaseBackupTool implements DatabaseBackupTool {
 
-    @Value("${application.database.host}")
+    @Value("${openncp.ltrdb.host}")
     private String host;
 
-    @Value("${application.database.port}")
+    @Value("${openncp.ltrdb.port}")
     private String port;
 
-    @Value("${application.database.username}")
+    @Value("${openncp.ltrdb.username}")
     private String username;
 
-    @Value("${application.database.password}")
+    @Value("${openncp.ltrdb.password}")
     private String password;
 
-    @Value("${application.database.database-name}")
+    @Value("${openncp.ltrdb.database-name}")
     private String database;
 
     @Override

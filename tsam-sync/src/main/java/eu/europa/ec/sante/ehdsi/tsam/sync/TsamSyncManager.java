@@ -1,7 +1,7 @@
 package eu.europa.ec.sante.ehdsi.tsam.sync;
 
-import eu.europa.ec.sante.ehdsi.termservice.common.web.rest.model.ValueSetVersionModel;
-import eu.europa.ec.sante.ehdsi.termservice.common.web.rest.model.sync.ValueSetCatalogSyncModel;
+import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.ValueSetCatalogModel;
+import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.ValueSetVersionModel;
 import eu.europa.ec.sante.ehdsi.tsam.sync.client.TermServerClient;
 import eu.europa.ec.sante.ehdsi.tsam.sync.converter.CodeSystemEntityConverter;
 import eu.europa.ec.sante.ehdsi.tsam.sync.converter.ValueSetVersionConverter;
@@ -27,25 +27,33 @@ import java.util.stream.Collectors;
 public class TsamSyncManager {
 
     private final Logger logger = LoggerFactory.getLogger(TsamSyncManager.class);
+
     private final ValueSetVersionConverter valueSetVersionConverter = new ValueSetVersionConverter();
     private final CodeSystemEntityConverter codeSystemEntityConverter = new CodeSystemEntityConverter();
-    @Autowired
-    private TermServerClient termServerClient;
-    @Autowired
-    private DatabaseBackupTool databaseBackupTool;
-    @Autowired
-    private CodeSystemRepository codeSystemRepository;
-    @Autowired
-    private CodeSystemEntityRepository codeSystemEntityRepository;
-    @Autowired
-    private ValueSetRepository valueSetRepository;
-    @Autowired
-    private ValueSetVersionRepository valueSetVersionRepository;
 
+    private final TermServerClient termServerClient;
+    private final DatabaseBackupTool databaseBackupTool;
+    private final CodeSystemRepository codeSystemRepository;
+    private final CodeSystemEntityRepository codeSystemEntityRepository;
+    private final ValueSetRepository valueSetRepository;
+    private final ValueSetVersionRepository valueSetVersionRepository;
+
+    @Autowired
+    public TsamSyncManager(TermServerClient termServerClient, DatabaseBackupTool databaseBackupTool,
+                           CodeSystemRepository codeSystemRepository, CodeSystemEntityRepository codeSystemEntityRepository,
+                           ValueSetRepository valueSetRepository, ValueSetVersionRepository valueSetVersionRepository) {
+        this.termServerClient = termServerClient;
+        this.databaseBackupTool = databaseBackupTool;
+        this.codeSystemRepository = codeSystemRepository;
+        this.codeSystemEntityRepository = codeSystemEntityRepository;
+        this.valueSetRepository = valueSetRepository;
+        this.valueSetVersionRepository = valueSetVersionRepository;
+    }
+
+    @SuppressWarnings("WeakerAccess")
     @Transactional
     public void synchronize() {
         StopWatch stopWatch = new StopWatch();
-        logger.info("Start synchronization process");
 
         stopWatch.start("Authentication");
         termServerClient.authenticate();
@@ -55,14 +63,15 @@ public class TsamSyncManager {
 
         stopWatch.start("Checking for updates");
         logger.info("Checking for value set catalog/agreement updates...");
-        Optional<ValueSetCatalogSyncModel> updatedValueSetCatalog = termServerClient.retrieveValueSetCatalog(null);
+
+        Optional<ValueSetCatalogModel> updatedValueSetCatalog = termServerClient.retrieveValueSetCatalog(null);
         stopWatch.stop();
         logger.trace("Task: {} / Elapsed time: {} ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
 
         if (!updatedValueSetCatalog.isPresent()) {
             logger.info("Nothing to synchronize");
         } else {
-            ValueSetCatalogSyncModel valueSetCatalog = updatedValueSetCatalog.get();
+            ValueSetCatalogModel valueSetCatalog = updatedValueSetCatalog.get();
             logger.info("A new value set catalog/agreement has been found [name={},agreementDate={}]", valueSetCatalog.getName(), valueSetCatalog.getAgreementDate());
 
             logger.info("Backuping database");
@@ -84,10 +93,10 @@ public class TsamSyncManager {
             int valueSetVersionsCount = valueSetCatalog.getValueSetVersions().size();
             int index = 0;
 
-            for (ValueSetVersionModel valueSetVersionDto : valueSetCatalog.getValueSetVersions()) {
+            for (ValueSetVersionModel valueSetVersionModel : valueSetCatalog.getValueSetVersions()) {
                 stopWatch.start("Process value set version");
 
-                ValueSetVersion valueSetVersion = valueSetVersionConverter.convert(valueSetVersionDto);
+                ValueSetVersion valueSetVersion = valueSetVersionConverter.convert(valueSetVersionModel);
                 valueSetVersionRepository.save(valueSetVersion);
 
                 boolean hasNext = true;
@@ -96,7 +105,7 @@ public class TsamSyncManager {
 
                 while (hasNext) {
                     List<CodeSystemEntity> concepts =
-                            termServerClient.retrieveConcepts(valueSetVersionDto.getValueSet().getId(), valueSetVersionDto.getId(), page, 250)
+                            termServerClient.retrieveConcepts(valueSetVersionModel.getValueSet().getId(), valueSetVersionModel.getVersionId(), page, 250)
                                     .stream()
                                     .map(codeSystemEntityConverter::convert)
                                     .collect(Collectors.toList());
@@ -105,7 +114,7 @@ public class TsamSyncManager {
                     codeSystemEntityRepository.save(concepts);
 
                     total += concepts.size();
-                    if (concepts.size() < 500) {
+                    if (concepts.size() < 250) {
                         hasNext = false;
                     } else {
                         page++;
@@ -115,10 +124,8 @@ public class TsamSyncManager {
                 stopWatch.stop();
                 logger.trace("Task: {} / Elapsed time: {} ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
 
-                logger.info("[{}/{}] Value set version '{}' processed ({} concepts)", ++index, valueSetVersionsCount, valueSetVersionDto.getName(), total);
+                logger.info("[{}/{}] Value set version '{}' processed ({} concepts)", ++index, valueSetVersionsCount, valueSetVersionModel.getValueSet().getName(), total);
             }
-
-            logger.info("Synchronization done in {} s", stopWatch.getTotalTimeSeconds());
         }
     }
 }

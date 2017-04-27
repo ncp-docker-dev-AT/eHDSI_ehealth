@@ -1,7 +1,7 @@
 package eu.europa.ec.sante.ehdsi.tsam.sync.client;
 
-import eu.europa.ec.sante.ehdsi.termservice.common.web.rest.model.CodeSystemEntityModel;
-import eu.europa.ec.sante.ehdsi.termservice.common.web.rest.model.sync.ValueSetCatalogSyncModel;
+import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.CodeSystemConceptModel;
+import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.ValueSetCatalogModel;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +11,7 @@ public interface TermServerClient {
 
     void authenticate() throws AuthenticationException;
 
-    Optional<ValueSetCatalogSyncModel> retrieveValueSetCatalog(LocalDateTime currentAgreementDate);
+    Optional<ValueSetCatalogModel> retrieveValueSetCatalog(LocalDateTime currentAgreementDate);
 
-    List<CodeSystemEntityModel> retrieveConcepts(String valueSetId, String valueSetVersionId, int page, int maxToReturn);
+    List<CodeSystemConceptModel> retrieveConcepts(String valueSetId, String valueSetVersionId, int page, int maxToReturn);
 }

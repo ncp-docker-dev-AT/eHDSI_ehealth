@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.tsam.sync.converter;
 
-import eu.europa.ec.sante.ehdsi.termservice.common.web.rest.model.DesignationModel;
+import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.DesignationModel;
 import eu.europa.ec.sante.ehdsi.tsam.sync.domain.Designation;
 import org.springframework.core.convert.converter.Converter;
 

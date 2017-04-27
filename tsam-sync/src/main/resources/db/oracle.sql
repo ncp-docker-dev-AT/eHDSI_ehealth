@@ -1,3 +1,14 @@
+DROP TABLE x_concept_value_set;
+DROP TABLE value_set_version;
+DROP TABLE value_set;
+DROP TABLE designation;
+DROP TABLE transcoding_association;
+DROP TABLE code_system_concept;
+DROP TABLE code_system_version;
+DROP TABLE code_system;
+
+DROP SEQUENCE hibernate_sequence;
+
 CREATE TABLE code_system (
   id          NUMBER(19) NOT NULL,
   oid         VARCHAR2(255 CHAR),

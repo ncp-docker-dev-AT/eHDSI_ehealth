@@ -1,7 +1,7 @@
 package eu.europa.ec.sante.ehdsi.tsam.sync.client.impl;
 
-import eu.europa.ec.sante.ehdsi.termservice.common.web.rest.model.CodeSystemEntityModel;
-import eu.europa.ec.sante.ehdsi.termservice.common.web.rest.model.sync.ValueSetCatalogSyncModel;
+import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.CodeSystemConceptModel;
+import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.ValueSetCatalogModel;
 import eu.europa.ec.sante.ehdsi.tsam.sync.client.AuthenticationException;
 import eu.europa.ec.sante.ehdsi.tsam.sync.client.TermServerClient;
 import org.apache.commons.lang3.StringUtils;
@@ -34,13 +34,13 @@ public class SimpleTermServerClient implements TermServerClient {
 
     private final RestTemplate template;
 
-    @Value("${application.client.base-url}")
+    @Value("${ehealth.termserver.base-url}")
     private String baseUrl;
 
-    @Value("${application.client.username}")
+    @Value("${ehealth.termserver.username}")
     private String username;
 
-    @Value("${application.client.password}")
+    @Value("${ehealth.termserver.password}")
     private String password;
 
     public SimpleTermServerClient() {
@@ -66,17 +66,17 @@ public class SimpleTermServerClient implements TermServerClient {
     }
 
     @Override
-    public Optional<ValueSetCatalogSyncModel> retrieveValueSetCatalog(LocalDateTime currentAgreementDate) {
-        ResponseEntity<ValueSetCatalogSyncModel> response =
-                template.getForEntity(baseUrl + "/api/sync/valuesetcatalog?agreementDate={agreementDate}", ValueSetCatalogSyncModel.class, currentAgreementDate);
+    public Optional<ValueSetCatalogModel> retrieveValueSetCatalog(LocalDateTime currentAgreementDate) {
+        ResponseEntity<ValueSetCatalogModel> response =
+                template.getForEntity(baseUrl + "/api/sync/valuesetcatalog?agreementDate={agreementDate}", ValueSetCatalogModel.class, currentAgreementDate);
         return Optional.of(response.getBody());
     }
 
     @Override
-    public List<CodeSystemEntityModel> retrieveConcepts(String valueSetId, String valueSetVersionId, int page, int maxToReturn) {
-        CodeSystemEntityModel[] codeSystemConcepts =
+    public List<CodeSystemConceptModel> retrieveConcepts(String valueSetId, String valueSetVersionId, int page, int maxToReturn) {
+        CodeSystemConceptModel[] codeSystemConcepts =
                 template.getForObject(baseUrl + "/api/sync/valueset/{valuesetid}/valuesetdefinition/{valuesetdefinition}/entries?page={page}&maxtoreturn={maxToReturn}",
-                        CodeSystemEntityModel[].class, valueSetId, valueSetVersionId, page, maxToReturn);
+                        CodeSystemConceptModel[].class, valueSetId, valueSetVersionId, page, maxToReturn);
         return Arrays.asList(codeSystemConcepts);
     }
 }
