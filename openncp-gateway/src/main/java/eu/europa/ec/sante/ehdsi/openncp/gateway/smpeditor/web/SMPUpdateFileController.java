@@ -312,8 +312,8 @@ public class SMPUpdateFileController {
             smpfileupdate.setTechnicalInformationUrl(endpoint.getTechnicalInformationUrl());
 
             if (smpfields.getExtension().isEnable()) {
-                try {
-                    String content = new Scanner(smpfileupdate.getUpdateFile().getInputStream()).useDelimiter("\\Z").next();
+                try (Scanner scanner = new Scanner(smpfileupdate.getUpdateFile().getInputStream())) {
+                    String content = scanner.useDelimiter("\\Z").next();
                     String capturedString = content.substring(content.indexOf("<Extension>"), content.indexOf("</Extension>"));
                     String[] endA = capturedString.split("<Extension>");
                     logger.debug("\n*****Content from Extension 1 : \n" + endA[1]);

@@ -7,6 +7,7 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.EndpointType;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.RedirectType;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.ServiceMetadata;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -42,7 +43,7 @@ public class SMPSignFileController {
     private final SMPConverter smpconverter = new SMPConverter();
     @Autowired
     private final XMLValidator xmlValidator = new XMLValidator();
-    org.slf4j.Logger logger = LoggerFactory.getLogger(SMPSignFileController.class);
+    private Logger logger = LoggerFactory.getLogger(SMPSignFileController.class);
     @Autowired
     private Environment env;
     @Autowired
@@ -432,8 +433,9 @@ public class SMPSignFileController {
                 smpfile.setTechnicalInformationUrl(endpoint.getTechnicalInformationUrl());
 
                 if (smpfields.getExtension().isEnable()) {
-                    try {
-                        String content = new Scanner(smpfile.getSignFile().getInputStream()).useDelimiter("\\Z").next();
+                    try (Scanner scanner = new Scanner(smpfile.getSignFile().getInputStream())) {
+                        //String content = new Scanner(smpfile.getSignFile().getInputStream()).useDelimiter("\\Z").next();
+                        String content = scanner.useDelimiter("\\Z").next();
                         String capturedString = content.substring(content.indexOf("<Extension>"), content.indexOf("</Extension>"));
                         String[] endA = capturedString.split("<Extension>");
                         smpfile.setExtensionContent(endA[1]);

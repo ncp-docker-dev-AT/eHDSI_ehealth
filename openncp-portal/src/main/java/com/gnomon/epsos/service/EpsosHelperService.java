@@ -1307,7 +1307,7 @@ public class EpsosHelperService {
 
                 String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
                 log.info("KEY ALIAS: " + KEY_ALIAS);
-                String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
+                //String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
 
                 signSAMLAssertion(assertion, KEY_ALIAS);
                 AssertionMarshaller marshaller = new AssertionMarshaller();
