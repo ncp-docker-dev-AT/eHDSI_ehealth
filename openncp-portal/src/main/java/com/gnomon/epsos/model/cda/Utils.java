@@ -1,29 +1,15 @@
 package com.gnomon.epsos.model.cda;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
@@ -35,20 +21,21 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class Utils {
 
-    private static Logger _log = LoggerFactory.getLogger("UTILS");
     private static final String HmacMD5 = "HmacMD5";
+    private static Logger _log = LoggerFactory.getLogger("UTILS");
 
     public static String checkString(Object s) {
         String refStr = " ";
@@ -387,11 +374,12 @@ public class Utils {
     }
 
     public static void WriteXMLToFile(String xml, String filename) {
-        try {
+
+        try (FileWriter fstream = new FileWriter(filename)) {
             // Create file
             File dir1 = new File(".");
             //FileWriter fstream = new FileWriter(dir1.getCanonicalFile() + "/logs/files/" + filename);
-            FileWriter fstream = new FileWriter(filename);
+
             BufferedWriter out = new BufferedWriter(fstream);
             out.write(xml);
             //Close the output stream
@@ -557,7 +545,7 @@ public class Utils {
         return InetAddress.getByName(request.getRemoteAddr());
     }
 
-//
+    //
 //	public static String getProperty(Configuration cfg, String key)
 //	{
 //		String value = "";

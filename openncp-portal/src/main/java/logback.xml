@@ -14,11 +14,11 @@
         </encoder>
     </appender>
 
-    <logger name="com.gnomon.epsos.servlet" level="INFO" additivity="false">
+    <logger name="com.gnomon.epsos" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="com.gnomon.epsos" level="INFO" additivity="false">
+    <logger name="com.gnomon.epsos.servlet" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

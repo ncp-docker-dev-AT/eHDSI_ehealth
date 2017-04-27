@@ -195,6 +195,34 @@ public class EDDetail {
         this.medicinePackageFormCodeDescription = medicinePackageFormCodeDescription;
     }
 
+    @Override
+    public String toString() {
+        return "EDDetail{" +
+                "relativePrescriptionLineId='" + relativePrescriptionLineId + '\'' +
+                ", dispensedQuantity='" + dispensedQuantity + '\'' +
+                ", dispensedQuantityUnit='" + dispensedQuantityUnit + '\'' +
+                ", medicineBarcode='" + medicineBarcode + '\'' +
+                ", medicineTainiaGnisiotitas='" + medicineTainiaGnisiotitas + '\'' +
+                ", medicineEofCode='" + medicineEofCode + '\'' +
+                ", medicineCommercialName='" + medicineCommercialName + '\'' +
+                ", medicinePackageFormCode='" + medicinePackageFormCode + '\'' +
+                ", medicinePackageFormCodeDescription='" + medicinePackageFormCodeDescription + '\'' +
+                ", medicineFormCode='" + medicineFormCode + '\'' +
+                ", medicineFormCodeDescription='" + medicineFormCodeDescription + '\'' +
+                ", medicineCapacityQuantity='" + medicineCapacityQuantity + '\'' +
+                ", medicineDrastikiATCCode='" + medicineDrastikiATCCode + '\'' +
+                ", medicineDrastikiName='" + medicineDrastikiName + '\'' +
+                ", patientInstructions='" + patientInstructions + '\'' +
+                ", medicinePrice='" + medicinePrice + '\'' +
+                ", medicineRefPrice='" + medicineRefPrice + '\'' +
+                ", patientParticipation='" + patientParticipation + '\'' +
+                ", tameioParticipation='" + tameioParticipation + '\'' +
+                ", patientDifference='" + patientDifference + '\'' +
+                ", medicineExecutionCase='" + medicineExecutionCase + '\'' +
+                ", substituted=" + substituted +
+                '}';
+    }
+
     /**
      * A method returning if the detail is substituted.
      *
@@ -212,4 +240,6 @@ public class EDDetail {
     public void setSubstituted(boolean substituted) {
         this.substituted = substituted;
     }
+
+
 }

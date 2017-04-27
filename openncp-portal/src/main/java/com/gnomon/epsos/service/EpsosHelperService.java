@@ -36,7 +36,6 @@ import org.allcolor.yahp.converter.IHtmlToPdfTransformer.CHeaderFooter;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.apache.tools.ant.util.DateUtils;
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
@@ -59,6 +58,7 @@ import org.opensaml.xml.schema.XSURI;
 import org.opensaml.xml.security.SecurityConfiguration;
 import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.security.credential.Credential;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
@@ -125,11 +125,10 @@ public class EpsosHelperService {
     public static final String PORTAL_CUSTODIAN_OID = "PORTAL_CUSTODIAN_OID";
     public static final String PORTAL_LEGAL_AUTHENTICATOR_PERSON_OID = "PORTAL_LEGAL_AUTHENTICATOR_PERSON_OID";
     public static final String PORTAL_LEGAL_AUTHENTICATOR_ORG_OID = "PORTAL_LEGAL_AUTHENTICATOR_ORG_OID";
-
-    private static final Logger log = LoggerFactory.getLogger(EpsosHelperService.class.getName());
-    private static final Base64 decode = new Base64();
     public final static SimpleDateFormat dateMetaDataFormat = new SimpleDateFormat(
             "yyyyMMdd");
+    private static final Logger log = LoggerFactory.getLogger(EpsosHelperService.class.getName());
+    private static final Base64 decode = new Base64();
 
     public EpsosHelperService() {
         super();
@@ -1381,9 +1380,9 @@ public class EpsosHelperService {
         }
         java.security.cert.Certificate cert = null;
         String name = "";
-        try {
+        try (FileInputStream is = new FileInputStream(KEYSTORE_LOCATION)) {
             // Load the keystore in the user's home directory
-            FileInputStream is = new FileInputStream(KEYSTORE_LOCATION);
+
             KeyStore keystore = KeyStore.getInstance("JKS");
             keystore.load(is, KEY_STORE_PASS.toCharArray());
             log.info("Keystore loaded ...");
