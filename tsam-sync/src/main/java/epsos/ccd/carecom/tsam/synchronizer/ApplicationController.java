@@ -28,16 +28,14 @@ public final class ApplicationController {
      * Holds the name of the default system property, whose value points to the location of a log file.
      */
     public static final String DEFAULT_SETTING_LOG_SETTINGS = "java.util.logging.config.file";
-
-    /*
-     * Standard date string
-     */
-    private static final String syncdate = "MMM dd yyyy hh:mm:ss";
     /**
      * This is the main log class used for logging by this application.
      */
     public final static Logger LOG = LoggerFactory.getLogger("TSAM.Synchronizer");
-
+    /*
+     * Standard date string
+     */
+    private static final String syncdate = "MMM dd yyyy hh:mm:ss";
     /**
      * Default text used when shutting the application down.
      */
@@ -162,7 +160,7 @@ public final class ApplicationController {
                     Settings.getInstance().getSettingValue("sync.auditmanager.infoseverity"));
         }
 
-        System.exit(1);
+        //System.exit(1);
     }
 
     /**
@@ -173,8 +171,8 @@ public final class ApplicationController {
 
         File pidFile = getPidFile();
         String pid = "This file helps the TSAM Synchronizer to determine if an instance is running.";
-        try {
-            FileWriter fw = new FileWriter(pidFile);
+        try (FileWriter fw = new FileWriter(pidFile)) {
+
             fw.write(pid);
             fw.flush();
             fw.close();

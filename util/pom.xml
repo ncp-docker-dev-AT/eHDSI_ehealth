@@ -178,7 +178,8 @@
                             <wsdlFiles>
                                 <wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/CDAValidatorWS.xml</wsdlFile>
                             </wsdlFiles>
-                            <wsdlLocation>https://gazelle.ihe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
+                            <wsdlLocation>
+                                https://gazelle.ihe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
                             </wsdlLocation>
                             <staleFile>${project.build.directory}/jaxws/stale/CDAValidatorWS.stale</staleFile>
                             <verbose>false</verbose>
@@ -266,14 +267,12 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-            <scope>test</scope>
+            <version>2.5</version>
         </dependency>
     </dependencies>
 
     <!-- ================== Properties ================== -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--<javaxServletVersion>2.3</javaxServletVersion>-->
     </properties>
 </project>

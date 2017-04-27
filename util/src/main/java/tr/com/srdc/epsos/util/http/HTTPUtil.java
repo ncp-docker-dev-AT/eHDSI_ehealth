@@ -22,6 +22,7 @@ package tr.com.srdc.epsos.util.http;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.util.proxy.CustomProxySelector;
 import eu.epsos.util.proxy.ProxyCredentials;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
@@ -45,7 +46,7 @@ import java.security.cert.X509Certificate;
 
 public class HTTPUtil {
 
-    public static Logger logger = LoggerFactory.getLogger(HTTPUtil.class);
+    public static final Logger logger = LoggerFactory.getLogger(HTTPUtil.class);
 
     public static String getClientCertificate(HttpServletRequest req) {
         String result;
@@ -69,7 +70,7 @@ public class HTTPUtil {
     }
 
     public static String getServerCertificate(String endpoint) {
-        logger.info("Trying to find certificate from : " + endpoint);
+        logger.info("Trying to find certificate from : '{}'", endpoint);
         String result = "";
         HttpsURLConnection con = null;
         try {
@@ -83,7 +84,7 @@ public class HTTPUtil {
                 con = (HttpsURLConnection) url.openConnection();
                 con.setSSLSocketFactory(sslsocketfactory);
                 con.connect();
-                Certificate certs[] = con.getServerCertificates();
+                Certificate[] certs = con.getServerCertificates();
 
                 // Get the first certificate
                 //
@@ -109,8 +110,10 @@ public class HTTPUtil {
     }
 
     public static String getSubjectDN(boolean isProvider) {
-        FileInputStream is;
+
+        FileInputStream is = null;
         Certificate cert;
+
         try {
             if (isProvider) {
                 is = new FileInputStream(Constants.SP_KEYSTORE_PATH);
@@ -128,10 +131,7 @@ public class HTTPUtil {
 
                 // Get subject
                 Principal principal = x509cert.getSubjectDN();
-                String subjectDn = principal.getName();
-
-                return subjectDn;
-
+                return principal.getName();
             }
         } catch (FileNotFoundException e) {
             logger.error("", e);
@@ -143,6 +143,8 @@ public class HTTPUtil {
             logger.error("", e);
         } catch (IOException e) {
             logger.error("", e);
+        } finally {
+            IOUtils.closeQuietly(is);
         }
         return "";
     }

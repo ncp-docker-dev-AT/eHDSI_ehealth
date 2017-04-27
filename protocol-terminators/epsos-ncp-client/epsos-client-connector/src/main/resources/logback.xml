@@ -57,6 +57,16 @@
         <appender-ref ref="DB"/>
     </logger>
 
+    <!--<logger name="epsos.ccd.posam.tsam.service" level="DEBUG" additivity="false">-->
+    <!--<appender-ref ref="FILE"/>-->
+    <!--&lt;!&ndash;<appender-ref ref="DB"/>&ndash;&gt;-->
+    <!--</logger>-->
+
+    <!--<logger name="epsos.ccd.posam.tm.service" level="DEBUG" additivity="false">-->
+    <!--<appender-ref ref="FILE"/>-->
+    <!--&lt;!&ndash;<appender-ref ref="DB"/>&ndash;&gt;-->
+    <!--</logger>-->
+
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>

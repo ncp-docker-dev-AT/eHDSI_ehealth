@@ -883,10 +883,9 @@ public class MyBean implements Serializable {
         document.setFormatCode(formatCode);
         document.setBase64Binary(xml.getBytes());
 
-        SubmitDocumentResponse resp = proxy.submitDocument(hcpAssertion,
+        return proxy.submitDocument(hcpAssertion,
                 trcAssertion, selectedCountry, document,
                 selectedPatient.getPatientDemographics());
-        return resp;
     }
 
     public String getPurposeOfUseForPS() {
@@ -897,15 +896,17 @@ public class MyBean implements Serializable {
         createTRCA("ps", purposeOfUse);
     }
 
+    /**
+     * @throws ConsentException
+     */
     private void getEPDocs() throws ConsentException {
+
         consentExists = true;
         PatientId patientId = null;
         try {
-            patientPrescriptions = new ArrayList<PatientDocument>();
+            patientPrescriptions = new ArrayList<>();
             String serviceUrl = EpsosHelperService
-                    .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL); // serviceUrl
-            // =
-            // LiferayUtils.getFromPrefs("client_connector_url");
+                    .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
             ClientConnectorConsumer clientConectorConsumer = MyServletContextListener
                     .getClientConnectorConsumer();
 
@@ -930,8 +931,7 @@ public class MyBean implements Serializable {
                 log.error(ExceptionUtils.getStackTrace(e));
             }
 
-            log.info("EP QUERY: Getting ep documents for : "
-                    + patientId.getExtension() + " from " + selectedCountry);
+            log.info("EP QUERY: Getting ePrescription documents for: {} from {}.", patientId.getExtension(), selectedCountry);
             List<EpsosDocument1> queryDocuments = clientConectorConsumer
                     .queryDocuments(hcpAssertion, trcAssertion,
                             selectedCountry, patientId, classCode);
@@ -946,9 +946,7 @@ public class MyBean implements Serializable {
             } catch (Exception e) {
                 log.error(ExceptionUtils.getStackTrace(e));
             }
-
-            log.info("EP QUERY: Found " + queryDocuments.size() + " for : "
-                    + patientId.getExtension() + " from " + selectedCountry);
+            log.info("EP QUERY: Found {} document for : {} from {}.", queryDocuments.size(), patientId.getExtension(), selectedCountry);
             showEP = true;
             for (EpsosDocument1 aux : queryDocuments) {
                 PatientDocument document = EpsosHelperService.populateDocument(
@@ -957,8 +955,10 @@ public class MyBean implements Serializable {
             }
             queryPrescriptionsException = LiferayUtils.getPortalTranslation(
                     "document.empty.list", FacesService.getPortalLanguage());
-            log.info("Documents are " + queryDocuments.size());
+            log.info("Documents are {}", queryDocuments.size());
         } catch (Exception ex) {
+
+            log.error("Exception: {}", ex.getMessage(), ex);
             try {
                 EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
                         "NI_DQ_EP", new DateTime(),

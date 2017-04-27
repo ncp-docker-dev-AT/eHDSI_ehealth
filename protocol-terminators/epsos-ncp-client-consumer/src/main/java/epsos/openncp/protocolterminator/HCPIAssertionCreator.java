@@ -362,11 +362,11 @@ public class HCPIAssertionCreator {
                     (Provider) Class.forName(providerName).newInstance());
 
             // Set keyStore
-            FileInputStream is = new FileInputStream(Constants.SC_KEYSTORE_PATH);
-            keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(is, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
-            is.close();
-
+            try (FileInputStream is = new FileInputStream(Constants.SC_KEYSTORE_PATH)) {
+                keyStore = KeyStore.getInstance("JKS");
+                keyStore.load(is, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
+                is.close();
+            }
             PasswordProtection pp = new PasswordProtection(Constants.SC_PRIVATEKEY_PASSWORD.toCharArray());
             PrivateKeyEntry entry = (PrivateKeyEntry) keyStore.getEntry(Constants.SC_PRIVATEKEY_ALIAS, pp);
 
@@ -431,5 +431,4 @@ public class HCPIAssertionCreator {
 
         return assertion;
     }
-
 }

@@ -28,6 +28,7 @@ import epsos.ccd.gnomon.utils.SerializableMessage;
 import epsos.ccd.gnomon.utils.Utils;
 import eu.epsos.util.audit.AuditLogSerializer;
 import net.RFC3881.AuditMessage;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ import javax.net.ssl.SSLSocket;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
@@ -55,12 +57,6 @@ import java.util.TimeZone;
 public class MessageSender extends java.lang.Thread {
 
     private static final Logger log = LoggerFactory.getLogger(MessageSender.class);
-
-    private AuditLogSerializer auditLogSerializer;
-    private AuditMessage auditmessage;
-    private String facility;
-    private String severity;
-
     private static String enabledProtocols[] = {"TLSv1"};
     private static String AUDIT_REPOSITORY_URL = "audit.repository.url";
     private static String AUDIT_REPOSITORY_PORT = "audit.repository.port";
@@ -69,6 +65,10 @@ public class MessageSender extends java.lang.Thread {
     private static String TRUSTSTORE = "TRUSTSTORE_PATH";
     private static String TRUSTSTORE_PWD = "TRUSTSTORE_PASSWORD";
     private static String KEY_ALIAS = "NCP_SIG_PRIVATEKEY_ALIAS";
+    private AuditLogSerializer auditLogSerializer;
+    private AuditMessage auditmessage;
+    private String facility;
+    private String severity;
 
     public MessageSender(AuditLogSerializer auditLogSerializer, AuditMessage auditmessage, String facility, String severity) {
         super();
@@ -147,6 +147,8 @@ public class MessageSender extends java.lang.Thread {
         }
 
         if (log.isTraceEnabled()) {
+
+            InputStream stream = null;
             try {
                 KeyStore ks = KeyStore.getInstance("JKS");
                 ks.load(Utils.fullStream(cms.getProperty(KEYSTORE_FILE)), cms.getProperty(KEYSTORE_PWD).toCharArray());
@@ -154,7 +156,8 @@ public class MessageSender extends java.lang.Thread {
                 log.debug("KEYSTORE");
                 log.debug(cert.toString());
                 KeyStore ks1 = KeyStore.getInstance("JKS");
-                ks1.load(Utils.fullStream(cms.getProperty(TRUSTSTORE)), cms.getProperty(TRUSTSTORE_PWD).toCharArray());
+                stream = Utils.fullStream(cms.getProperty(TRUSTSTORE));
+                ks1.load(stream, cms.getProperty(TRUSTSTORE_PWD).toCharArray());
                 Enumeration<String> enu = ks1.aliases();
                 int i = 0;
                 while (enu.hasMoreElements()) {
@@ -165,6 +168,8 @@ public class MessageSender extends java.lang.Thread {
                 }
             } catch (Exception e) {
                 log.error("Error logging keystore file", e);
+            } finally {
+                IOUtils.closeQuietly(stream);
             }
         }
 

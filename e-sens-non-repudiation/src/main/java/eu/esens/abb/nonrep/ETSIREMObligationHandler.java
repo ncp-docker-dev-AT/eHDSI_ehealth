@@ -19,6 +19,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
+import javax.xml.transform.TransformerException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -87,7 +88,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
     }
 
     private void makeETSIREM() throws DatatypeConfigurationException, JAXBException, CertificateEncodingException,
-            NoSuchAlgorithmException, IOException, SOAPException, ParserConfigurationException, XMLSecurityException {
+            NoSuchAlgorithmException, IOException, SOAPException, ParserConfigurationException, XMLSecurityException, TransformerException {
         int size = obligations.size();
         JAXBContext jc = JAXBContext.newInstance("eu.esens.abb.nonrep.etsi.rem");
 
@@ -220,7 +221,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
     }
 
     private void mapToIso(REMEvidenceType type)
-            throws CertificateEncodingException, NoSuchAlgorithmException, DatatypeConfigurationException, IOException, SOAPException {
+            throws CertificateEncodingException, NoSuchAlgorithmException, DatatypeConfigurationException, IOException, SOAPException, TransformerException {
 
         // The flag f1 is the AcceptanceRejection (the evidence type)
         // This is the A field the originator

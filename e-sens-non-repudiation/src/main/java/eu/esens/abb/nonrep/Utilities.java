@@ -1,7 +1,5 @@
 package eu.esens.abb.nonrep;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import com.sun.xml.messaging.saaj.soap.ver1_2.SOAPMessageFactory1_2Impl;
 import org.opensaml.Configuration;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -18,17 +16,28 @@ import org.opensaml.xml.io.MarshallerFactory;
 import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.schema.impl.XSDateTimeMarshaller;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.xml.soap.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 
 public class Utilities {
+
+    private static Logger logger = LoggerFactory.getLogger(Utilities.class);
+
+    private Utilities() {
+    }
 
     public static void checkForNull(final NodeList nl, final String toCheck, final Logger l) throws MalformedIHESOAPException {
 
@@ -63,14 +72,14 @@ public class Utilities {
 
         if (marshaller == null) {
 
-            // The XACMLPolicyStatementType needs a separate marhsaller
+            // The XACMLPolicyStatementType needs a separate marshaller
             if (a instanceof XACMLPolicyStatementType) {
                 Marshaller policyStmtMarshaller = marshallerFactory
                         .getMarshaller(XACMLPolicyStatementType.DEFAULT_ELEMENT_NAME_XACML20);
 
                 try {
-                    Element policyEl = policyStmtMarshaller.marshall(a);
-                    return policyEl;
+                    return policyStmtMarshaller.marshall(a);
+
                 } catch (MarshallingException e) {
                     throw new TOElementException(e);
                 }
@@ -78,18 +87,18 @@ public class Utilities {
             throw new TOElementException("No marshaller found for the xmlobject");
         }
 
-        Element assertionElement = null;
+        Element assertionElement;
         try {
             assertionElement = marshaller.marshall(a);
             return assertionElement;
-        } catch (Throwable e1) {
-            e1.printStackTrace();
+        } catch (Exception e1) {
+            logger.error("Exception: {}", e1.getMessage(), e1);
             throw new TOElementException("Unable to marshall the assertion: "
                     + e1.getMessage(), e1);
         }
     }
 
-    public static void serialize(Element request) throws IOException {
+    public static void serialize(Element request) throws TransformerException {
         serialize(request, System.out);
     }
 
@@ -100,49 +109,63 @@ public class Utilities {
      * @param out
      * @throws IOException
      */
-    public static void serialize(Element request, OutputStream out) throws IOException {
-        OutputFormat format = new OutputFormat();
+    public static void serialize(Element request, OutputStream out) throws TransformerException {
 
-        format.setLineWidth(65);
-        format.setIndenting(false);
-        format.setIndent(2);
-        format.setEncoding("UTF-8");
-        format.setOmitComments(true);
-        format.setOmitXMLDeclaration(false);
-        format.setVersion("1.0");
-        format.setStandalone(true);
+        //TODO: @DG Sante - Validate this serialization
+        //OutputFormat format = new OutputFormat();
+        //format.setIndenting(false);
+        //format.setEncoding("UTF-8");
+        //format.setOmitXMLDeclaration(false);
+        //format.setVersion("1.0");
+        //format.setStandalone(true);
+        //XMLSerializer serializer = new XMLSerializer(out, format);
+        //serializer.serialize(request.getOwnerDocument());
 
-        XMLSerializer serializer = new XMLSerializer(out, format);
-        serializer.serialize(request.getOwnerDocument());
+//        format.setLineWidth(65);
+//        format.setIndent(2);
+//        format.setOmitComments(true);
+
+        DOMSource source = new DOMSource(request);
+        StreamResult result = new StreamResult(out);
+
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "no");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
+        transformer.transform(source, result);
     }
 
+    /**
+     * @param doc
+     * @param requestMimeHeaders
+     * @return
+     * @throws SOAPException
+     */
     public synchronized static SOAPMessage toSoap(Document doc, MimeHeaders requestMimeHeaders) throws SOAPException {
+
         MessageFactory messageFactory = new SOAPMessageFactory1_2Impl();
         SOAPMessage message = messageFactory.createMessage();
 
         DOMSource domSource = new DOMSource(doc);
         message.getSOAPPart().setContent(domSource);
 
-        System.out.println("Checking if I need to add mime headers");
+        logger.info("Checking if I need to add mime headers");
 
         // If I have some mime headers, I have to remove them first.
         if (requestMimeHeaders != null) {
 
-//	            System.out.println("I have to add mime headers, removing them first");
-//	            Iterator<?> removerIterator = message.getMimeHeaders().getAllHeaders();
-//	            while (removerIterator.hasNext()) {
-//	                MimeHeader t = (MimeHeader) removerIterator.next();
-//	                message.getMimeHeaders().removeHeader(t.getName());
-//	                System.out.println("Removed: " + t.getName());
-//	            }
-            System.out.println("Now adding the ones requested");
+            logger.info("Now adding the ones requested");
             Iterator<?> it = requestMimeHeaders.getAllHeaders();
             while (it.hasNext()) {
                 MimeHeader mimeItem = (MimeHeader) it.next();
 
                 String retValue = mimeItem.getValue().replace("Multipart/Related", "multipart/related");
 
-                System.out.println("ADDING MIME: " + mimeItem.getName() + ": " + retValue);
+                logger.info("ADDING MIME: '{}' : '{}'", mimeItem.getName(), retValue);
                 message.getMimeHeaders().addHeader(mimeItem.getName(), retValue);
 
             }
@@ -151,7 +174,7 @@ public class Utilities {
 
         }
         if (message.saveRequired()) {
-            System.out.println("Saving changes");
+            logger.info("Saving changes");
             message.saveChanges();
         }
 
