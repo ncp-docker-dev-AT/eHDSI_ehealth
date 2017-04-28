@@ -44,162 +44,160 @@ public class CDAServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        try (OutputStream stream = res.getOutputStream()) {
+        try {
             log.info("Rendering CDA Diplay view");
             String exportType = ParamUtil.getString(req, "exportType");
             String cda;
             byte[] output;
 
+            String uuid = req.getParameter("uuid");
+            String repositoryId = req.getParameter("repositoryid");
+            String hcid = req.getParameter("hcid");
+
+            log.info("Retrieving XML document");
+            log.info("uuid: '{}'", uuid);
+            log.info("repositoryId: '{}'", repositoryId);
+            log.info("hcid: '{}'", hcid);
+
+            EpsosDocument selectedEpsosDocument = new EpsosDocument();
+            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
+            ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
+
+            HttpSession session = req.getSession();
+            log.info("Getting assertions from session");
+            Assertion hcpAssertion = (Assertion) session.getAttribute("hcpAssertion");
+            Assertion trcAssertion = (Assertion) session.getAttribute("trcAssertion");
+            String selectedCountry = (String) session.getAttribute("selectedCountry");
+            log.info("HCP ASS: '{}'", hcpAssertion.getID());
+            log.info("TRCA ASS: " + trcAssertion.getID());
+            log.info("SELECTED COUNTRY: '{}'", selectedCountry);
+
+            User user = (User) session.getAttribute("user");
+            if (Validator.isNotNull(user)) {
+                log.info("USER IS: " + user.getScreenName());
+            }
+            log.info("try to set the document going to be retrieved");
+            DocumentId documentId = DocumentId.Factory.newInstance();
+            log.info("Setting DocumenUniqueID '{}'", uuid);
+            documentId.setDocumentUniqueId(uuid);
+            log.info("Setting RepositoryUniqueId '{}'", repositoryId);
+            documentId.setRepositoryUniqueId(repositoryId);
+
+            String docType = req.getParameter("docType");
+            GenericDocumentCode classCode = generateDocumentCode(docType);
+            log.info("Document : '{}' is {}", uuid, docType);
+
+            //TODO: Fix languages management - or _.
+            log.info("selectedCountry: '{}'", selectedCountry);
+            log.info("classCode: '{}", classCode);
+
+            String lang;
+            String ltrlang = ParamUtil.getString(req, "lang");
+            if (Validator.isNull(ltrlang)) {
+                lang = user.getLanguageId();
+            } else {
+                lang = ltrlang;
+            }
+
+            String lang1 = lang.replace("_", "-");
+            lang1 = lang1.replace("en-US", "en");
+
+            log.info("Portal language is : '{}-{}'", lang, lang1);
+
             try {
-                String uuid = req.getParameter("uuid");
-                String repositoryId = req.getParameter("repositoryid");
-                String hcid = req.getParameter("hcid");
+                EvidenceUtils.createEvidenceREMNRO(classCode.toString(), "NI_DR" + classCode.getValue(),
+                        new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+                        "NI_DR_" + classCode.getValue() + "_REQ", trcAssertion.getID());
+            } catch (Exception e) {
+                log.error(ExceptionUtils.getStackTrace(e));
+            }
 
-                log.info("Retrieving XML document");
-                log.info("uuid: '{}'", uuid);
-                log.info("repositoryId: '{}'", repositoryId);
-                log.info("hcid: '{}'", hcid);
+            EpsosDocument1 eps = clientConectorConsumer.retrieveDocument(hcpAssertion, trcAssertion, selectedCountry,
+                    documentId, hcid, classCode, lang1);
 
-                EpsosDocument selectedEpsosDocument = new EpsosDocument();
-                String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-                ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
+            createEvidenceREMNRR(eps, classCode, trcAssertion);
 
-                HttpSession session = req.getSession();
-                log.info("Getting assertions from session");
-                Assertion hcpAssertion = (Assertion) session.getAttribute("hcpAssertion");
-                Assertion trcAssertion = (Assertion) session.getAttribute("trcAssertion");
-                String selectedCountry = (String) session.getAttribute("selectedCountry");
-                log.info("HCP ASS: '{}'", hcpAssertion.getID());
-                log.info("TRCA ASS: " + trcAssertion.getID());
-                log.info("SELECTED COUNTRY: '{}'", selectedCountry);
-
-                User user = (User) session.getAttribute("user");
-                if (Validator.isNotNull(user)) {
-                    log.info("USER IS: " + user.getScreenName());
-                }
-                log.info("try to set the document going to be retrieved");
-                DocumentId documentId = DocumentId.Factory.newInstance();
-                log.info("Setting DocumenUniqueID '{}'", uuid);
-                documentId.setDocumentUniqueId(uuid);
-                log.info("Setting RepositoryUniqueId '{}'", repositoryId);
-                documentId.setRepositoryUniqueId(repositoryId);
-
-                String docType = req.getParameter("docType");
-                GenericDocumentCode classCode = generateDocumentCode(docType);
-                log.info("Document : '{}' is {}", uuid, docType);
-
-                //TODO: Fix languages management - or _.
-                log.info("selectedCountry: '{}'", selectedCountry);
-                log.info("classCode: '{}", classCode);
-
-                String lang;
-                String ltrlang = ParamUtil.getString(req, "lang");
-                if (Validator.isNull(ltrlang)) {
-                    lang = user.getLanguageId();
-                } else {
-                    lang = ltrlang;
-                }
-
-                String lang1 = lang.replace("_", "-");
-                lang1 = lang1.replace("en-US", "en");
-
-                log.info("Portal language is : '{}-{}'", lang, lang1);
-
-                try {
-                    EvidenceUtils.createEvidenceREMNRO(classCode.toString(), "NI_DR" + classCode.getValue(),
-                            new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            "NI_DR_" + classCode.getValue() + "_REQ", trcAssertion.getID());
-                } catch (Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
-
-                EpsosDocument1 eps = clientConectorConsumer.retrieveDocument(hcpAssertion, trcAssertion, selectedCountry,
-                        documentId, hcid, classCode, lang1);
-
-                createEvidenceREMNRR(eps, classCode, trcAssertion);
-
-                selectedEpsosDocument.setAuthor(eps.getAuthor() + "");
-                try {
-                    selectedEpsosDocument.setCreationDate(eps.getCreationDate());
-                } catch (Exception ex) {
-                    log.error(ExceptionUtils.getStackTrace(ex));
-                }
-                selectedEpsosDocument.setDescription(eps.getDescription());
-                selectedEpsosDocument.setTitle(eps.getTitle());
-
-                String xmlfile = new String(eps.getBase64Binary(), "UTF-8");
-                log.debug("#### CDA XML Start");
-                log.debug(xmlfile);
-                log.debug("#### CDA XML End");
-
-                boolean isCDA = false;
-
-                try {
-                    Document doc1 = Utils.createDomFromString(xmlfile);
-                    isCDA = EpsosHelperService.isCDA(doc1);
-                    log.info("### Document created");
-                    log.info("########## IS CDA '{}'", isCDA);
-                } catch (Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
-                String actionURL = "dispenseServlet";
-                String convertedcda = "";
-                if (isCDA) {
-                    log.info("The document is EPSOS CDA");
-                    log.info("########### Styling the document that is CDA: '{}' using EPSOS xsl", isCDA);
-                    // display it using cda display tool
-                    convertedcda = EpsosHelperService.styleDoc(xmlfile, lang1, false, actionURL);
-                } else {
-                    log.info(("The document is CCD"));
-                    log.info("########### Styling the document that is CDA: '{}' using standard xsl", isCDA);
-                    convertedcda = EpsosHelperService.styleDoc(xmlfile, lang1, true, "");
-                }
-
-                session.setAttribute("epBytes", xmlfile.getBytes());
-                cda = convertedcda;
-
-                if (StringUtils.equals(exportType, "xml")) {
-                    output = xmlfile.getBytes();
-                } else {
-                    output = cda.getBytes();
-                }
-
-                ByteArrayOutputStream baos;
-
-                if (StringUtils.equals(exportType, "pdf")) {
-                    String fontpath = getServletContext().getRealPath("/") + "/WEB-INF/fonts/";
-                    baos = EpsosHelperService.ConvertHTMLtoPDF(convertedcda, serviceUrl, fontpath);
-                    output = baos.toByteArray();
-                    res.setContentType("application/pdf");
-                    res.setHeader("Content-Disposition", "attachment; filename=cda.pdf");
-
-                } else if (StringUtils.equals(exportType, "xml")) {
-                    res.setHeader("Content-Disposition", "attachment; filename=cda.xml");
-                    res.setContentType("text/xml");
-
-                } else {
-                    res.setContentType("text/html");
-                }
-
-                res.setHeader("Cache-Control", "no-cache");
-                res.setDateHeader("Expires", 0);
-                res.setHeader("Pragma", "No-cache");
-
-                stream.write(output);
-                stream.flush();
-                stream.close();
-
+            selectedEpsosDocument.setAuthor(eps.getAuthor() + "");
+            try {
+                selectedEpsosDocument.setCreationDate(eps.getCreationDate());
             } catch (Exception ex) {
-                res.setContentType("text/html");
-                res.setHeader("Cache-Control", "no-cache");
-                res.setDateHeader("Expires", 0);
-                res.setHeader("Pragma", "No-cache");
-
-                stream.write(ex.getMessage().getBytes());
-                stream.flush();
-                stream.close();
                 log.error(ExceptionUtils.getStackTrace(ex));
             }
+            selectedEpsosDocument.setDescription(eps.getDescription());
+            selectedEpsosDocument.setTitle(eps.getTitle());
+
+            String xmlfile = new String(eps.getBase64Binary(), "UTF-8");
+            log.debug("#### CDA XML Start");
+            log.debug(xmlfile);
+            log.debug("#### CDA XML End");
+
+            boolean isCDA = false;
+
+            try {
+                Document doc1 = Utils.createDomFromString(xmlfile);
+                isCDA = EpsosHelperService.isCDA(doc1);
+                log.info("### Document created");
+                log.info("########## IS CDA '{}'", isCDA);
+            } catch (Exception e) {
+                log.error(ExceptionUtils.getStackTrace(e));
+            }
+            String actionURL = "dispenseServlet";
+            String convertedcda = "";
+            if (isCDA) {
+                log.info("The document is EPSOS CDA");
+                log.info("########### Styling the document that is CDA: '{}' using EPSOS xsl", isCDA);
+                // display it using cda display tool
+                convertedcda = EpsosHelperService.styleDoc(xmlfile, lang1, false, actionURL);
+            } else {
+                log.info(("The document is CCD"));
+                log.info("########### Styling the document that is CDA: '{}' using standard xsl", isCDA);
+                convertedcda = EpsosHelperService.styleDoc(xmlfile, lang1, true, "");
+            }
+
+            session.setAttribute("epBytes", xmlfile.getBytes());
+            cda = convertedcda;
+
+            if (StringUtils.equals(exportType, "xml")) {
+                output = xmlfile.getBytes();
+            } else {
+                output = cda.getBytes();
+            }
+
+            ByteArrayOutputStream baos;
+
+            if (StringUtils.equals(exportType, "pdf")) {
+                String fontpath = getServletContext().getRealPath("/") + "/WEB-INF/fonts/";
+                baos = EpsosHelperService.ConvertHTMLtoPDF(convertedcda, serviceUrl, fontpath);
+                output = baos.toByteArray();
+                res.setContentType("application/pdf");
+                res.setHeader("Content-Disposition", "attachment; filename=cda.pdf");
+
+            } else if (StringUtils.equals(exportType, "xml")) {
+                res.setHeader("Content-Disposition", "attachment; filename=cda.xml");
+                res.setContentType("text/xml");
+
+            } else {
+                res.setContentType("text/html");
+            }
+
+            res.setHeader("Cache-Control", "no-cache");
+            res.setDateHeader("Expires", 0);
+            res.setHeader("Pragma", "No-cache");
+            OutputStream stream = res.getOutputStream();
+            stream.write(output);
+            stream.flush();
+            stream.close();
+
+        } catch (Exception ex) {
+            res.setContentType("text/html");
+            res.setHeader("Cache-Control", "no-cache");
+            res.setDateHeader("Expires", 0);
+            res.setHeader("Pragma", "No-cache");
+            OutputStream stream = res.getOutputStream();
+            stream.write(ex.getMessage().getBytes());
+            stream.flush();
+            stream.close();
+            log.error(ExceptionUtils.getStackTrace(ex));
         }
     }
 

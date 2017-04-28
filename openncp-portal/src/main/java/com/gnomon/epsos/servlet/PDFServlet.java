@@ -172,6 +172,5 @@ public class PDFServlet extends HttpServlet {
             OutStream.close();
             log.error(ExceptionUtils.getStackTrace(ex));
         }
-
     }
 }

@@ -41,10 +41,13 @@ import java.util.UUID;
  */
 public class EvidenceUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(EvidenceUtils.class);
     public static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
     public static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
     public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
+    private static Logger logger = LoggerFactory.getLogger(EvidenceUtils.class);
+
+    private EvidenceUtils() {
+    }
 
     private static boolean checkCorrectnessofIHEXCA(final MessageType messageType) {
         return true;
@@ -120,14 +123,14 @@ public class EvidenceUtils {
         /*
          * Now create the XACML request
          */
-        LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> actionList = new LinkedList<>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
         action.setIdentifier(new URI("urn:eSENS:outcome"));
         actionList.add(action);
         action.setValue(statusmsg);
 
-        LinkedList<XACMLAttributes> environmentList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
         environment.setDataType(new URI(DATATYPE_DATETIME));
         environment.setIdentifier(new URI("urn:esens:2014:event"));
@@ -139,14 +142,15 @@ public class EvidenceUtils {
 
         Element request = requestCreator.getRequest();
 
+        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
         // just some printouts
         Utilities.serialize(request);
 
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
 
         enforcePolicy.decide(request);
-        Utilities.serialize(enforcePolicy.getResponseAsDocument()
-                .getDocumentElement());
+        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
+        Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
 
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
 
@@ -173,14 +177,13 @@ public class EvidenceUtils {
         List<ObligationHandler> handlers = handlerFactory.createHandler(
                 messageType, obligations, context);
 
-        int handlersSize = handlers.size();
-        for (int j = 0; j < handlersSize; j++) {
-            ObligationHandler oh = handlers.get(j);
+        for (ObligationHandler oh : handlers) {
             oh.discharge();
-            Utilities.serialize(handlers.get(j).getMessage().getDocumentElement());
-            String oblString = XMLUtil.DocumentToString(handlers.get(j).getMessage());
+            //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
+            Utilities.serialize(oh.getMessage().getDocumentElement());
+            String oblString = XMLUtil.DocumentToString(oh.getMessage());
             if (title == null || title.isEmpty()) {
-                title = getPath() + "nrr/" + getDocumentTitle(msguuid, handlers.get(j).toString()) + ".xml";
+                title = getPath() + "nrr/" + getDocumentTitle(msguuid, oh.toString()) + ".xml";
             } else {
                 title = getPath() + "nrr/" + getDocumentTitle(msguuid, title) + ".xml";
             }
@@ -303,6 +306,7 @@ public class EvidenceUtils {
                 messageType, null, null, actionList, environmentList);
 
         Element request = requestCreator.getRequest();
+        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
         Utilities.serialize(request);
 
         /*
@@ -313,8 +317,8 @@ public class EvidenceUtils {
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
 
         enforcePolicy.decide(request);
-        Utilities.serialize(enforcePolicy.getResponseAsDocument()
-                .getDocumentElement());
+        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
+        Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
 
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
 
@@ -343,14 +347,14 @@ public class EvidenceUtils {
 
         // Here I discharge manually. This behavior is to let free an
         // implementation
-        int handlersSize = handlers.size();
 
-        for (int j = 0; j < handlersSize; j++) {
-            handlers.get(j).discharge();
-            Utilities.serialize(handlers.get(j).getMessage().getDocumentElement());
-            String oblString = XMLUtil.DocumentToString(handlers.get(j).getMessage());
+        for (ObligationHandler handler : handlers) {
+            handler.discharge();
+            //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
+            Utilities.serialize(handler.getMessage().getDocumentElement());
+            String oblString = XMLUtil.DocumentToString(handler.getMessage());
             if (title == null || title.isEmpty()) {
-                title = getPath() + "nro/" + getDocumentTitle(msguuid, handlers.get(j).toString()) + ".xml";
+                title = getPath() + "nro/" + getDocumentTitle(msguuid, handler.toString()) + ".xml";
             } else {
                 title = getPath() + "nro/" + getDocumentTitle(msguuid, title) + ".xml";
             }

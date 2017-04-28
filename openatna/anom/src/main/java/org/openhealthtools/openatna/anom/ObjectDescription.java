@@ -37,7 +37,7 @@ public class ObjectDescription implements Serializable {
     private static final long serialVersionUID = 2387890466430687382L;
     private Set<String> mppsUids = new HashSet<>();
     private List<String> accessionNumbers = new ArrayList<>();
-    private ArrayList<SopClass> sopClasses= new ArrayList<>();
+    private List<SopClass> sopClasses = new ArrayList<>();
 
     public ObjectDescription() {
         super();

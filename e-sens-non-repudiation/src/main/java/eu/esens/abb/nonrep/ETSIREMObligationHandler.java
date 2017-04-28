@@ -7,6 +7,8 @@ import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
 import org.herasaf.xacml.core.policy.impl.AttributeAssignmentType;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;
@@ -39,6 +41,7 @@ import java.util.UUID;
 public class ETSIREMObligationHandler implements ObligationHandler {
 
     static final String SHA256 = "http://www.w3.org/2001/04/xmlenc#sha256";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ETSIREMObligationHandler.class);
     // Prefixes, that matches the XACML policy
     private static final String REM_NRR_PREFIX = "urn:eSENS:obligations:nrr:ETSIREM";
     private static final String REM_NRO_PREFIX = "urn:eSENS:obligations:nro:ETSIREM";
@@ -89,16 +92,15 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
     private void makeETSIREM() throws DatatypeConfigurationException, JAXBException, CertificateEncodingException,
             NoSuchAlgorithmException, IOException, SOAPException, ParserConfigurationException, XMLSecurityException, TransformerException {
-        int size = obligations.size();
-        JAXBContext jc = JAXBContext.newInstance("eu.esens.abb.nonrep.etsi.rem");
 
+        JAXBContext jc = JAXBContext.newInstance("eu.esens.abb.nonrep.etsi.rem");
         ObjectFactory of = new ObjectFactory();
         REMEvidenceType type = new REMEvidenceType();
 
-        for (int i = 0; i < size; i++) {
-            ESensObligation eSensObl = obligations.get(i);
-            System.out.println(eSensObl.getObligationID());
-            System.out.println(REM_NRO_PREFIX);
+        for (ESensObligation eSensObl : obligations) {
+
+            LOGGER.info("ObligationID '{}'", eSensObl.getObligationID());
+            LOGGER.info(REM_NRO_PREFIX);
             if (eSensObl.getObligationID().equals(REM_NRO_PREFIX)) {
                 String outcome;
                 if (eSensObl instanceof PERMITEsensObligation) {
@@ -155,7 +157,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
                 type.setEvidenceIdentifier(UUID.randomUUID().toString());
 
 				/*
-				 * ISO Token mappings
+                 * ISO Token mappings
 				 */
                 // This is the Pol field of the ISO13888 token
                 EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
@@ -192,7 +194,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
                 type.setEvidenceIdentifier(UUID.randomUUID().toString());
 
 				/*
-				 * ISO Token mappings
+                 * ISO Token mappings
 				 */
                 // This is the Pol field of the ISO13888 token
                 String policyUrl = find(REM_NRD_PREFIX + ":PolicyID", listAttr);
@@ -233,14 +235,13 @@ public class ETSIREMObligationHandler implements ObligationHandler {
             cd1.setX509Certificate(context.getSenderCertificate().getEncoded());
         }
         if (context.getSenderNamePostalAddress() != null) {
-            LinkedList<String> slist = context.getSenderNamePostalAddress();
-            int size = slist.size();
 
+            LinkedList<String> slist = context.getSenderNamePostalAddress();
             NamesPostalAddresses snpas = new NamesPostalAddresses();
 
-            for (int i = 0; i < size; i++) {
+            for (String aSlist : slist) {
                 EntityName sen = new EntityName();
-                sen.getNames().add(slist.get(i));
+                sen.getNames().add(aSlist);
                 NamePostalAddress snpa = new NamePostalAddress();
                 snpa.setEntityName(sen);
                 snpas.getNamePostalAddresses().add(snpa);
@@ -249,13 +250,12 @@ public class ETSIREMObligationHandler implements ObligationHandler {
             sedt1.setNamesPostalAddresses(snpas);
         }
 
-
         type.setSenderDetails(sedt1); // To check if null sender details is
         // allowed
 
         // This is the B field, the recipient
-		/*
-		 * Made optional by a request from the eJustice domain
+        /*
+         * Made optional by a request from the eJustice domain
 		 */
         EntityDetailsType edt2 = new EntityDetailsType();
 
@@ -267,14 +267,13 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
         }
         if (context.getRecipientNamePostalAddress() != null) {
-            LinkedList<String> list = context.getRecipientNamePostalAddress();
-            int size = list.size();
 
+            LinkedList<String> list = context.getRecipientNamePostalAddress();
             NamesPostalAddresses npas = new NamesPostalAddresses();
 
-            for (int i = 0; i < size; i++) {
+            for (String aList : list) {
                 EntityName en = new EntityName();
-                en.getNames().add(list.get(i));
+                en.getNames().add(aList);
                 NamePostalAddress npa = new NamePostalAddress();
                 npa.setEntityName(en);
                 npas.getNamePostalAddresses().add(npa);
@@ -355,9 +354,8 @@ public class ETSIREMObligationHandler implements ObligationHandler {
     }
 
     private String find(String string, List<AttributeAssignmentType> listAttr) {
-        int size = listAttr.size();
-        for (int i = 0; i < size; i++) {
-            AttributeAssignmentType att = listAttr.get(i);
+
+        for (AttributeAssignmentType att : listAttr) {
             if (att.getAttributeId().equals(string)) {
                 return ((String) att.getContent().get(0)).trim();
             }
@@ -366,6 +364,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
     }
 
     private void sign(Document doc, X509Certificate cert, PrivateKey key) throws XMLSecurityException {
+
         String BaseURI = "./";
         XMLSignature sig = new XMLSignature(doc, BaseURI,
                 org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA);
@@ -383,7 +382,6 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         sig.addKeyInfo(cert.getPublicKey());
 
         sig.sign(key);
-
     }
 
     @Override

@@ -99,7 +99,11 @@ public class Utilities {
     }
 
     public static void serialize(Element request) throws TransformerException {
-        serialize(request, System.out);
+        //TODO: Check if the rendering to System.out was necessary or not?
+        //serialize(request, System.out);
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        serialize(request, outputStream);
+        logger.debug("Stream: '{}'", outputStream.toString());
     }
 
     /**
