@@ -52,7 +52,7 @@ public abstract class BasePage extends WebPage implements Serializable, IAjaxInd
     private AjaxLink<?> showWarningsLink;
     private FeedbackPanel feedback;
     private ErrorFeedbackPanel errorFeedbackPanel;
-    private List<ErrorFeedback> list = new ArrayList<ErrorFeedback>();
+    private List<ErrorFeedback> list = new ArrayList<>();
     private SpecialBreadCrumbPanel bcPanel;
     private AjaxIndicatorAppender ajaxIndicator;
 

@@ -3,6 +3,19 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
+    <filter>
+        <filter-name>ParameterValidationFilter</filter-name>
+        <filter-class>com.matthewcasperson.validation.filter.ParameterValidationFilter</filter-class>
+        <init-param>
+            <param-name>configFile</param-name>
+            <param-value>/WEB-INF/xml/pvf.xml</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>ParameterValidationFilter</filter-name>
+        <url-pattern>*.jsp</url-pattern>
+    </filter-mapping>
+
     <servlet>
         <servlet-name>storkServlet</servlet-name>
         <servlet-class>com.liferay.portal.security.auth.StorkServlet</servlet-class>

@@ -22,6 +22,7 @@
  */
 package tr.com.srdc.epsos.securityman.helper;
 
+import org.apache.commons.lang.StringUtils;
 import org.opensaml.common.xml.SAMLSchemaBuilder;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Attribute;
@@ -40,7 +41,10 @@ import javax.xml.transform.dom.DOMSource;
  */
 public class Helper {
 
-    public static Logger logger = LoggerFactory.getLogger(Helper.class);
+    private static final Logger logger = LoggerFactory.getLogger(Helper.class);
+
+    private Helper() {
+    }
 
     public static Assertion getHCPAssertion(Element sh) {
         try {
@@ -74,7 +78,7 @@ public class Helper {
             return hcpAssertion;
 
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.debug("Exception: '{}'", e.getMessage(), e);
             return null;
         }
     }
@@ -84,12 +88,14 @@ public class Helper {
 
         try {
             Assertion assertion = getHCPAssertion(sh);
-            String val = assertion.getSubject().getNameID().getValue();
-            if (val != null && !val.equals("")) {
-                result = val;
+            if (assertion != null) {
+                String val = assertion.getSubject().getNameID().getValue();
+                if (StringUtils.isNotBlank(val)) {
+                    result = val;
+                }
             }
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.debug("Exception: '{}'", e.getMessage(), e);
         }
 
         return result;
@@ -149,14 +155,14 @@ public class Helper {
     public static Assertion getTRCAssertion(Element sh) {
         try {
             NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
-            Element security = null;
+            Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
             } else {
                 throw (new MissingFieldException("Security element is required."));
             }
             NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "Assertion");
-            Element trcAss = null;
+            Element trcAss;
             Assertion trcAssertion = null;
 
             if (assertionList.getLength() > 0) {
@@ -175,7 +181,7 @@ public class Helper {
             return trcAssertion;
 
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.debug("Exception: '{}'", e.getMessage(), e);
             return null;
         }
     }
@@ -195,18 +201,19 @@ public class Helper {
     }
 
     /**
-     *
-     * @param sh SOAP Header
+     * @param sh            SOAP Header
      * @param attributeName Attribute name
-     * @param trc true, if attribute should be picked from TRC assertion
+     * @param trc           true, if attribute should be picked from TRC assertion
      * @return attribute value
      */
     private static String getXSPAAttributeByName(Element sh, String attributeName, boolean trc) {
+
         String result = null;
+        Assertion assertion = null;
 
         try {
-            Assertion assertion = null;
-            if (trc == true) {
+
+            if (trc) {
                 assertion = getTRCAssertion(sh);
             } else {
                 assertion = getHCPAssertion(sh);
@@ -217,15 +224,15 @@ public class Helper {
             for (Attribute attr : assertion.getAttributeStatements().get(0).getAttributes()) {
                 if (attr.getName().equals(attributeName)) {
                     String val = attr.getAttributeValues().get(0).getDOM().getTextContent();
-                    if (val != null && !val.equals("")) {
+                    if (StringUtils.isNotBlank(val)) {
                         result = val;
                     }
                 }
             }
         } catch (Exception e) {
             String assertionType = trc ? "TRC" : "HCP";
-            logger.error("XSPA attribute " + attributeName + " not found in " + assertionType + " assertion");
-            logger.debug(e.getMessage());
+            logger.error("XSPA attribute '{}' not found in '{}' assertion", attributeName, assertionType);
+            logger.debug("Exception: '{}'", e.getMessage(), e);
         }
 
         return result;

@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
 import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
 
+import java.text.MessageFormat;
 import java.util.List;
-
 
 /**
  * Created:
@@ -21,6 +21,10 @@ import java.util.List;
 public class AssertionHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(AssertionHelper.class);
+    private static final String ERROR_MESSAGE = "'{}' - attribute should contain AttributeValue element.";
+
+    private AssertionHelper() {
+    }
 
     /**
      * Get attribute value from assertion.
@@ -34,15 +38,15 @@ public class AssertionHelper {
         for (AttributeStatement as : assertion.getAttributeStatements()) {
             for (Attribute a : as.getAttributes()) {
                 if (a.getName().equals(attribute)) {
-                    if (a.getAttributeValues().size() > 0) {
+                    if (!a.getAttributeValues().isEmpty()) {
                         return a.getAttributeValues().get(0).getDOM().getTextContent();
                     } else {
-                        throw new MissingFieldException("'" + attribute + "' - attribute should contain AttributeValue element.");
+                        throw new MissingFieldException(MessageFormat.format(ERROR_MESSAGE, attribute));
                     }
                 }
             }
         }
-        throw new MissingFieldException("'" + attribute + "' - attribute should contain AttributeValue element.");
+        throw new MissingFieldException(MessageFormat.format(ERROR_MESSAGE, attribute));
     }
 
     /**
@@ -61,7 +65,7 @@ public class AssertionHelper {
                 }
             }
         }
-        throw new MissingFieldException("'" + attribute + "' - attribute should contain AttributeValue element.");
+        throw new MissingFieldException(MessageFormat.format(ERROR_MESSAGE, attribute));
     }
 
     public static List<XMLObject> getPermissionValuesFromAssertion(Assertion assertion) throws InsufficientRightsException {
@@ -69,7 +73,7 @@ public class AssertionHelper {
             return getAttributeValuesFromAssertion(assertion, PolicyManagerInterface.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION);
         } catch (MissingFieldException e) {
             // this is to get the behavior as before...
-            logger.error("InsufficientRightsException");
+            logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
             throw new InsufficientRightsException(4703);
         }
     }

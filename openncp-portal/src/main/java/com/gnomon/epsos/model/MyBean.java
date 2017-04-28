@@ -16,6 +16,7 @@ import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.saml2.core.Assertion;
@@ -104,19 +105,19 @@ public class MyBean implements Serializable {
         log.info("Initializing MyBean ...");
         checkButtonPermissions();
         String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH");
-        log.info("EPSOS PROPS PATH IS : " + epsosPropsPath);
+        log.info("EPSOS PROPS PATH IS: '{}'", epsosPropsPath);
         if (!Validator.isNull(epsosPropsPath)) {
             try {
                 cdaStylesheet = EpsosHelperService
                         .getConfigProperty(EpsosHelperService.PORTAL_CDA_STYLESHEET);
                 consentExists = false;
                 consentOpt = "1";
-                countries = new ArrayList<Country>();
-                identifiers = new ArrayList<Identifier>();
-                demographics = new ArrayList<Demographics>();
+                countries = new ArrayList<>();
+                identifiers = new ArrayList<>();
+                demographics = new ArrayList<>();
                 countries = EpsosHelperService.getCountriesFromCS(LiferayUtils
                         .getPortalLanguage());
-                log.info("Countries found : " + countries.size());
+                log.info("Countries found: '{}'", countries.size());
             } catch (Exception e) {
                 FacesContext.getCurrentInstance().addMessage(
                         null,
@@ -139,7 +140,7 @@ public class MyBean implements Serializable {
                 .getCurrentInstance().getExternalContext().getRequestMap()
                 .get("javax.portlet.request"));
         String parameter = renderRequest.getParameter("productId");
-        log.info("PRODUCT ID: " + parameter);
+        log.info("PRODUCT ID: '{}'", parameter);
     }
 
     public List<Country> getCountries() {
@@ -169,7 +170,7 @@ public class MyBean implements Serializable {
 
         showDemographics = !demographics.isEmpty();
         LiferayUtils.storeToSession("selectedCountry", selectedCountry);
-        patients = new ArrayList<Patient>();
+        patients = new ArrayList<>();
     }
 
     public boolean getAssertionExists() {
@@ -190,8 +191,7 @@ public class MyBean implements Serializable {
 
     public void searchPatientsRequest(ActionEvent event) {
         checkButtonPermissions();
-        log.info("searchPatientORequest ::: Selected country is : "
-                + selectedCountry);
+        log.info("searchPatientORequest ::: Selected country is : '{}'", selectedCountry);
         String country = (String) event.getComponent().getAttributes()
                 .get("selectedCountry");
         identifiers = (List<Identifier>) event.getComponent().getAttributes()
@@ -201,18 +201,17 @@ public class MyBean implements Serializable {
         if (Validator.isNotNull(country)) {
             selectedCountry = country;
         }
-        log.info("searchPatientsRequest ::: Selected country is : "
-                + selectedCountry);
+        log.info("searchPatientsRequest ::: Selected country is : '{}'", selectedCountry);
         searchPatients();
     }
 
     private void searchPatients(Assertion assertion, List<Identifier> id_,
                                 List<Demographics> dem_, String country) {
-        log.info("Search Patients selected country is: " + country);
+        log.info("Search Patients selected country is: '{}'", country);
         String runningMode = MyServletContextListener.getRunningMode();
         String strMsg = "";
         Assertion ass = null;
-        if (runningMode.equals("demo")) {
+        if (StringUtils.equals(runningMode, "demo")) {
             patients = EpsosHelperService.getMockPatients();
             trcAssertion = null;
             trcassertionnotexists = true;
@@ -223,10 +222,10 @@ public class MyBean implements Serializable {
                 trcAssertion = null;
                 trcassertionnotexists = true;
                 trcassertionexists = false;
-                patients = new ArrayList<Patient>();
+                patients = new ArrayList<>();
                 String serviceUrl = EpsosHelperService
                         .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-                log.info("CONNECTOR URL IS: " + serviceUrl);
+                log.info("CONNECTOR URL IS: '{}'", serviceUrl);
 
                 PatientDemographics pd = EpsosHelperService
                         .createPatientDemographicsForQuery(id_, dem_);
@@ -239,9 +238,9 @@ public class MyBean implements Serializable {
                         .getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS));
                 ass = assertion;
 
-                log.info("Searching for patients in " + country);
-                log.info("Assertion id: " + ass.getID());
-                log.info("PD: " + pd.toString());
+                log.info("Searching for patients in '{}'", country);
+                log.info("Assertion id: '{}'", ass.getID());
+                log.info("PD: '{}'", pd.toString());
                 strMsg = pd.toString();
 
                 try {
@@ -288,7 +287,7 @@ public class MyBean implements Serializable {
                 }
 
                 log.error(ExceptionUtils.getStackTrace(ex));
-                patients = new ArrayList<Patient>();
+                patients = new ArrayList<>();
                 showPatientList = true;
                 queryPatientsException = LiferayUtils.getPortalTranslation(ex
                         .getMessage());

@@ -18,6 +18,7 @@
  */
 package tr.com.srdc.epsos.consent;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.consent.db.PatientDBConnector;
@@ -27,6 +28,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -39,22 +41,30 @@ public class PDP {
     private static Logger logger = LoggerFactory.getLogger(PDP.class);
 
     public static ResponseType getDecision(RequestType request) {
+
         ResponseType response = new ResponseType();
         ResultType result = new ResultType();
         response.getResult().add(result);
         result.setDecision(DecisionType.DENY);
         String patientId = "";
+        //String SQL_SELECT_CONSENT = "SELECT * FROM consent WHERE patientId = '" + patientId + "'";
+        String SQL_SELECT_CONSENT = "SELECT * FROM consent WHERE patientId = ?";
+
         for (AttributesType attributes : request.getAttributes()) {
             for (AttributeType attribute : attributes.getAttribute()) {
-                if (attribute.getAttributeId().equals("patient-id")) {
+                if (StringUtils.equals(attribute.getAttributeId(), "patient-id")) {
                     patientId = (String) attribute.getAttributeValue().get(0).getContent().get(0);
                 }
             }
         }
 
-        //ResultSet rs = null;
         try {
-            try (ResultSet rs = PatientDBConnector.getStatement().executeQuery("SELECT * FROM consent WHERE patientId = '" + patientId + "'")) {
+            //try (ResultSet rs = PatientDBConnector.getStatement().executeQuery()) {
+            try (PreparedStatement preparedStatement = PatientDBConnector.getPreparedStatement(SQL_SELECT_CONSENT)) {
+
+                preparedStatement.setString(1, patientId);
+                ResultSet rs = preparedStatement.executeQuery();
+
                 if (rs.next()) {
                     int isGranted = rs.getInt("granted");
                     if (isGranted == 0) {
@@ -129,15 +139,6 @@ public class PDP {
         } catch (ParseException e) {
             logger.error("", e);
         }
-//        finally {
-//            try {
-//                if (rs != null) {
-//                    rs.close();
-//                }
-//            } catch (SQLException e) {
-//                logger.error("", e);
-//            }
-//        }
 
         return response;
     }

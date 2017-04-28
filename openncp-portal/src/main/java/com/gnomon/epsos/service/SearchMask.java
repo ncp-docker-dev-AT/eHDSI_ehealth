@@ -6,9 +6,9 @@ public class SearchMask implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public String label;
-    public String domain;
-    public String friendlyName;
+    private String label;
+    private String domain;
+    private String friendlyName;
 
     public String getLabel() {
         return label;
@@ -26,12 +26,11 @@ public class SearchMask implements Serializable {
         this.domain = domain;
     }
 
-	public String getFriendlyName() {
-		return friendlyName;
-	}
+    public String getFriendlyName() {
+        return friendlyName;
+    }
 
-	public void setFriendlyName(String friendlyName) {
-		this.friendlyName = friendlyName;
-	}
-
+    public void setFriendlyName(String friendlyName) {
+        this.friendlyName = friendlyName;
+    }
 }

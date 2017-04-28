@@ -20,6 +20,7 @@
 package eu.epsos.validation.datamodel.dts;
 
 import eu.epsos.validation.datamodel.common.DetailedResult;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,12 @@ public class WsUnmarshaller {
     private static final Logger logger = LoggerFactory.getLogger(WsUnmarshaller.class);
 
     /**
+     * Private constructor to avoid instantiation.
+     */
+    private WsUnmarshaller() {
+    }
+
+    /**
      * This method performs an unmarshall operation with the provided XML
      * response.
      *
@@ -49,37 +56,23 @@ public class WsUnmarshaller {
      */
     public static DetailedResult unmarshal(String xmlDetails) {
 
-        if (xmlDetails == null) {
-            logger.error("The provided XML String to unmarshall object is null.");
-        }
-
-        if (xmlDetails.isEmpty()) {
-            logger.error("The provided XML String object to unmarshall is empty.");
-        }
-
-        InputStream is = new ByteArrayInputStream(xmlDetails.getBytes());
         DetailedResult result = null;
-        Unmarshaller unmarshaller = null;
-        JAXBContext jc = null;
 
-        try {
-            jc = JAXBContext.newInstance(DetailedResult.class);
-        } catch (JAXBException ex) {
-            logger.error(null, ex);
+        if (StringUtils.isBlank(xmlDetails)) {
+            logger.error("The provided XML String object to unmarshall is empty.");
+        } else {
+            InputStream is = new ByteArrayInputStream(xmlDetails.getBytes());
+
+            try {
+
+                JAXBContext jc = JAXBContext.newInstance(DetailedResult.class);
+                Unmarshaller unmarshaller = jc.createUnmarshaller();
+                result = (DetailedResult) unmarshaller.unmarshal(is);
+
+            } catch (JAXBException ex) {
+                logger.error("JAXBException: '{}'", ex.getMessage(), ex);
+            }
         }
-
-        try {
-            unmarshaller = jc.createUnmarshaller();
-        } catch (JAXBException ex) {
-            logger.error(null, ex);
-        }
-
-        try {
-            result = (DetailedResult) unmarshaller.unmarshal(is);
-        } catch (JAXBException ex) {
-            logger.error(null, ex);
-        }
-
         return result;
     }
 
@@ -91,47 +84,28 @@ public class WsUnmarshaller {
      */
     public static String marshal(DetailedResult detailedResult) {
 
+        String result = "";
+
         if (detailedResult == null) {
             logger.error("The provided object to marshall is null.");
         }
 
-        String result;
-        JAXBContext context = null;
-        Marshaller m = null;
-
         try {
-            context = JAXBContext.newInstance(detailedResult.getClass());
-        } catch (JAXBException ex) {
-            logger.error(null, ex);
-        }
+            StringWriter writer = new StringWriter();
 
-        try {
-            m = context.createMarshaller();
-        } catch (JAXBException ex) {
-            logger.error(null, ex);
-        }
-
-        try {
+            JAXBContext context = JAXBContext.newInstance(DetailedResult.class);
+            Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.marshal(detailedResult, writer);
+
+            result = writer.toString();
+
         } catch (PropertyException ex) {
             logger.error(null, ex);
+        } catch (JAXBException e) {
+            logger.error("JAXBException: '{}'", e.getMessage(), e);
         }
-
-        StringWriter writer = new StringWriter();
-        try {
-            m.marshal(detailedResult, writer);
-        } catch (JAXBException ex) {
-            logger.error(null, ex);
-        }
-
-        result = writer.toString();
 
         return result;
-    }
-
-    /**
-     * Private constructor to avoid instantiation.
-     */
-    private WsUnmarshaller() {
     }
 }

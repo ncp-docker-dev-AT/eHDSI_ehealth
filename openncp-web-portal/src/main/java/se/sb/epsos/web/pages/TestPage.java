@@ -66,7 +66,7 @@ public class TestPage extends BasePage {
     public class TestForm extends Form<TestFormModel> {
 
         private static final long serialVersionUID = 8147216706035343297L;
-        private final Logger logger = LoggerFactory.getLogger(TestForm.class);
+        private transient final Logger logger = LoggerFactory.getLogger(TestForm.class);
         private DropDownChoice<String> dropdown;
         private ListView<String> labellist;
 

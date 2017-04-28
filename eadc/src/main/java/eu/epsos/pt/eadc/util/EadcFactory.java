@@ -8,6 +8,7 @@ import com.spirit.epsos.cc.adc.db.EadcDbConnect;
 import com.spirit.epsos.cc.adc.db.EadcDbConnectImpl;
 import com.spirit.epsos.cc.adc.extractor.AutomaticDataCollector;
 import com.spirit.epsos.cc.adc.extractor.AutomaticDataCollectorImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -78,7 +79,8 @@ public enum EadcFactory {
         } else {
             LOGGER.trace("initReceiver - use old singleton instance: '{}'", implClass);
         }
-        if (!implClass.equals(receiver.getClass().getName())) {
+        //if (!implClass.equals(receiver.getClass().getName())) {
+        if (!StringUtils.equals(implClass, receiver.getClass().getName())) {
             throw new IllegalArgumentException("singleton / implClass conflict - receivedImplClass :" + implClass + ", actUsedSingleton :" + receiver.getClass().getName());
         }
 
@@ -100,7 +102,8 @@ public enum EadcFactory {
         } else {
             LOGGER.trace("initEntry - use old singleton instance: '{}'", implClass);
         }
-        if (!implClass.equals(entry.getClass().getName())) {
+        //if (!implClass.equals(entry.getClass().getName())) {
+        if (!StringUtils.equals(implClass, entry.getClass().getName())) {
             throw new IllegalArgumentException("singleton / implClass conflict - receivedImplClass :" + implClass + ", actUsedSingleton :" + entry.getClass().getName());
         }
 

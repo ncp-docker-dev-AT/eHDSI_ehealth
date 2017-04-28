@@ -115,12 +115,12 @@ public class SMPUploadFileController {
      * @return
      */
     @RequestMapping(value = "smpeditor/uploadsmpfile", method = RequestMethod.POST)
-    public String postUpload(@ModelAttribute("smpupload") SMPHttp smpupload, Model model, final RedirectAttributes redirectAttributes) {
+    public String postUpload(@ModelAttribute("smpupload") SMPHttp smpupload, Model model, final RedirectAttributes redirectAttributes) throws Exception {
         logger.debug("\n==== in postUpload ====");
         model.addAttribute("smpupload", smpupload);
     
     /*Iterate through all chosen files*/
-        List<SMPHttp> allItems = new ArrayList<SMPHttp>();
+        List<SMPHttp> allItems = new ArrayList<>();
         for (int i = 0; i < smpupload.getUploadFiles().size(); i++) {
             SMPHttp itemUpload = new SMPHttp();
 
@@ -476,6 +476,9 @@ public class SMPUploadFileController {
                 smpClient = DynamicDiscoveryBuilder.newInstance()
                         .locator(new DefaultBDXRLocator(ConfigurationManagerService.getInstance().getProperty("SML_DOMAIN")))
                         .build();
+            }
+            if (smpClient == null) {
+                throw new Exception("Cannot instantiate SMPClient!!!!");
             }
             URI smpURI = null;
             try {

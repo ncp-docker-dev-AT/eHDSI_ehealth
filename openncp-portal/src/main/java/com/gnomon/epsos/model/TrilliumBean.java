@@ -369,5 +369,4 @@ public class TrilliumBean implements Serializable {
     public void setSourcecda(String sourcecda) {
         this.sourcecda = sourcecda;
     }
-
 }
