@@ -12,8 +12,6 @@ package se.sb.epsos.web.model;
 
 import hl7OrgV3.ClinicalDocumentDocument1;
 import org.apache.xmlbeans.XmlException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import se.sb.epsos.shelob.ws.client.jaxws.EpsosDocument;
 import se.sb.epsos.web.service.MetaDocument;
 
@@ -27,7 +25,6 @@ import java.util.Base64;
 public class PdfDocument extends CdaDocument {
 
     private static final long serialVersionUID = -84248995964958326L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(PdfDocument.class);
     private ClinicalDocumentDocument1 doc;
 
     /**
@@ -39,8 +36,8 @@ public class PdfDocument extends CdaDocument {
     public PdfDocument(MetaDocument metaDoc, byte[] bytes, EpsosDocument epsosDocument) throws XmlException {
         super(metaDoc, bytes, epsosDocument);
         try {
-            ClinicalDocumentDocument1 doc = ClinicalDocumentDocument1.Factory.parse(new ByteArrayInputStream(bytes));
-            this.doc = doc;
+
+            this.doc = ClinicalDocumentDocument1.Factory.parse(new ByteArrayInputStream(bytes));
         } catch (IOException ex) {
             throw new XmlException("Failed to parse CDA", ex);
         }

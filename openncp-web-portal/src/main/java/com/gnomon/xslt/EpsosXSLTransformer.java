@@ -51,46 +51,46 @@ public class EpsosXSLTransformer {
 
     public static String readFile(String file) throws IOException {
 
-        FileInputStream fstream = new FileInputStream(file);
-        InputStreamReader in2 = new InputStreamReader(fstream, "UTF-8");
+        try (FileInputStream fstream = new FileInputStream(file)) {
+            InputStreamReader in2 = new InputStreamReader(fstream, "UTF-8");
 
-        BufferedReader reader = new BufferedReader(in2);
-        String line = null;
-        StringBuilder stringBuilder = new StringBuilder();
-        String ls = System.getProperty("line.separator");
-        while ((line = reader.readLine()) != null) {
-            // remove a strange character in the begining of the file
-            if (line.length() > 0 && line.codePointAt(0) == 65279)
-                line = line.substring(1);
-            stringBuilder.append(line);
-            stringBuilder.append(ls);
+            BufferedReader reader = new BufferedReader(in2);
+            String line = null;
+            StringBuilder stringBuilder = new StringBuilder();
+            String ls = System.getProperty("line.separator");
+            while ((line = reader.readLine()) != null) {
+                // remove a strange character in the begining of the file
+                if (line.length() > 0 && line.codePointAt(0) == 65279)
+                    line = line.substring(1);
+                stringBuilder.append(line);
+                stringBuilder.append(ls);
+            }
+            return stringBuilder.toString();
         }
-        return stringBuilder.toString();
     }
 
     public static String readFile(File file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line = null;
-        StringBuilder stringBuilder = new StringBuilder();
-        String ls = System.getProperty("line.separator");
-        while ((line = reader.readLine()) != null) {
-            // remove a strange character in the begining of the file
-            if (line.length() > 0 && line.codePointAt(0) == 65279) {
-                line = line.substring(1);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line = null;
+            StringBuilder stringBuilder = new StringBuilder();
+            String ls = System.getProperty("line.separator");
+            while ((line = reader.readLine()) != null) {
+                // remove a strange character in the begining of the file
+                if (line.length() > 0 && line.codePointAt(0) == 65279) {
+                    line = line.substring(1);
+                }
+                stringBuilder.append(line);
+                stringBuilder.append(ls);
             }
-            stringBuilder.append(line);
-            stringBuilder.append(ls);
+            return stringBuilder.toString();
         }
-        return stringBuilder.toString();
     }
 
     /**
-     * @param xml
-     *            the source cda xml file
-     * @param lang
-     *            the language you want the labels, value set to be displayed
-     * @param actionpath
-     *            the url that you want to post the dispensation form
+     * @param xml        the source cda xml file
+     * @param lang       the language you want the labels, value set to be displayed
+     * @param actionpath the url that you want to post the dispensation form
      * @return the cda document in html format
      * @throws IOException
      * @throws TransformerException

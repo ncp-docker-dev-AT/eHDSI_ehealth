@@ -20,6 +20,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.transform.TransformerException;
 
 import org.herasaf.xacml.core.SyntaxException;
 import org.herasaf.xacml.core.api.PDP;
@@ -84,7 +85,15 @@ public class EvidenceEmitterTest {
         org.apache.xml.security.Init.init();
     }
 
-    
+    private static Document readMessage(String file)
+            throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document incomingMsg = db.parse(new File(file));
+        return incomingMsg;
+    }
+
     /**
      * This test reads a sample message from the eHealth domain (XCA) and will
      * issue an ATNA-specific audit trail.
@@ -102,7 +111,7 @@ public class EvidenceEmitterTest {
     public void testGenerateATNA() throws ParserConfigurationException,
             SAXException, IOException, MalformedIHESOAPException,
             URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException {
+            ObligationDischargeException, SOAPException, TransformerException {
         testGenerateAtna();
     }
 
@@ -124,7 +133,7 @@ public class EvidenceEmitterTest {
     public Document testGenerateAtna() throws ParserConfigurationException,
             SAXException, IOException, MalformedIHESOAPException,
             URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException {
+            ObligationDischargeException, SOAPException, TransformerException {
         /*
          * AlternativeUserID = IP of the machine NetworkAccessPointID = IP of
          * the machine UserName = user from the SAML assertion
@@ -150,7 +159,7 @@ public class EvidenceEmitterTest {
 //		Document incomingMsg = readMessage("test/testData/incomingMsg.xml");
         Document incomingMsg = readMessage("src/test/testData/audit.xml");
         //	SOAPMessage message = Utilities.toSoap(incomingMsg, null);
-		/*
+        /*
          * Instantiate the message inspector, to see which type of message is
          */
         MessageInspector messageInspector = new MessageInspector(incomingMsg);
@@ -244,7 +253,7 @@ public class EvidenceEmitterTest {
     public void testGenerateRemNRO() throws ParserConfigurationException,
             SAXException, IOException, MalformedIHESOAPException,
             URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException {
+            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, TransformerException {
         testGenerateREMNRO();
     }
 
@@ -266,7 +275,7 @@ public class EvidenceEmitterTest {
     public Document testGenerateREMNRO() throws ParserConfigurationException,
             SAXException, IOException, MalformedIHESOAPException,
             URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException {
+            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, TransformerException {
 
 
         /*
@@ -349,7 +358,7 @@ public class EvidenceEmitterTest {
         context.setSigningKey(key);
         context.setSubmissionTime(new DateTime());
         context.setEvent("epSOS-31");
-        
+
         context.setMessageUUID(messageInspector.getMessageUUID());
         context.setAuthenticationMethod("3");
         context.setRequest(request); // here I pass the XML in order to give to
@@ -386,7 +395,7 @@ public class EvidenceEmitterTest {
     public void testGenerateRemNRR() throws ParserConfigurationException,
             SAXException, IOException, MalformedIHESOAPException,
             URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException {
+            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException, TransformerException {
         testGenerateREMNRR();
     }
 
@@ -409,7 +418,7 @@ public class EvidenceEmitterTest {
     public Document testGenerateREMNRR() throws ParserConfigurationException,
             SAXException, IOException, MalformedIHESOAPException,
             URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException {
+            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException, TransformerException {
 
 
         /*
@@ -447,7 +456,7 @@ public class EvidenceEmitterTest {
         MessageInspector messageInspector = new MessageInspector(message);
         MessageType messageType = messageInspector.getMessageType();
         assertNotNull(messageType);
-	//	assertNotNull(messageInspector.getMessageUUID());
+        //	assertNotNull(messageInspector.getMessageUUID());
 //		assertEquals("uuid:C3F5A03D-1A0C-4F62-ADC7-F3C007CD50CF",messageInspector.getMessageUUID());
 
         /*
@@ -531,7 +540,7 @@ public class EvidenceEmitterTest {
         System.out.println(handlers.get(0).getClass().getName());
 
         handlers.get(0).discharge();
-	//	handlers.get(1).discharge();
+        //	handlers.get(1).discharge();
 
         // Give me the ATNA, it's an ATNA test
         assertNotNull(handlers.get(0).getMessage());
@@ -546,9 +555,10 @@ public class EvidenceEmitterTest {
     public void testGenerateRemNRD() throws ParserConfigurationException,
             SAXException, IOException, MalformedIHESOAPException,
             URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException {
+            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException, TransformerException {
         testGenerateREMNRD();
     }
+
     /**
      * This method issue a REM NRD evidence
      *
@@ -568,7 +578,7 @@ public class EvidenceEmitterTest {
     public Document testGenerateREMNRD() throws ParserConfigurationException,
             SAXException, IOException, MalformedIHESOAPException,
             URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException {
+            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException, TransformerException {
 
 
         /*
@@ -607,7 +617,7 @@ public class EvidenceEmitterTest {
         MessageInspector messageInspector = new MessageInspector(message);
         MessageType messageType = messageInspector.getMessageType();
         assertNotNull(messageType);
-	//	assertNotNull(messageInspector.getMessageUUID());
+        //	assertNotNull(messageInspector.getMessageUUID());
 //		assertEquals("uuid:C3F5A03D-1A0C-4F62-ADC7-F3C007CD50CF",messageInspector.getMessageUUID());
 
         /*
@@ -662,8 +672,8 @@ public class EvidenceEmitterTest {
 
         Context context = new Context();
         context.setIncomingMsg(incomingMsg);
-        context.setIssuerCertificate(cert); 
-        
+        context.setIssuerCertificate(cert);
+
         // Justice domain has them optional
         context.setSenderCertificate(cert);
         context.setRecipientCertificate(cert);
@@ -684,7 +694,7 @@ public class EvidenceEmitterTest {
         LinkedList<String> namesPostalAddress = new LinkedList<>();
         namesPostalAddress.add("Test");
         namesPostalAddress.add("Test2");
-        
+
         context.setRecipientNamePostalAddress(namesPostalAddress);
         LinkedList<String> sendernamesPostalAddress = new LinkedList<>();
         sendernamesPostalAddress.add("SenderTest");
@@ -701,7 +711,7 @@ public class EvidenceEmitterTest {
         System.out.println(handlers.get(0).getClass().getName());
 
         handlers.get(0).discharge();
-	//	handlers.get(1).discharge();
+        //	handlers.get(1).discharge();
 
         // Give me the ATNA, it's an ATNA test
         assertNotNull(handlers.get(0).getMessage());
@@ -710,16 +720,6 @@ public class EvidenceEmitterTest {
         // I think I need to return handler.getMessage() which will be the audit
         // the audit will go to the server and get validated by another wrapper
         return handlers.get(0).getMessage();
-    }
-
-    
-    private static Document readMessage(String file)
-            throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document incomingMsg = db.parse(new File(file));
-        return incomingMsg;
     }
 
     private void checkCorrectnessofIHEXCA(final MessageType messageType) {

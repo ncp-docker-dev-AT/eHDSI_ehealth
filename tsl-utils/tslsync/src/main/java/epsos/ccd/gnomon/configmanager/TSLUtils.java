@@ -38,15 +38,16 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.KeyStore;
 import java.security.Provider;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 
 /**
  * Helper utils form validating xnl, extracting nodes from xml.
- *
- * Massi: why all the fields are static? By removing the staticity, a lot of code can be 
- * re-factored. If not, we can still re-factor by adding a static block. 
+ * <p>
+ * Massi: why all the fields are static? By removing the staticity, a lot of code can be
+ * re-factored. If not, we can still re-factor by adding a static block.
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -70,7 +71,7 @@ public class TSLUtils {
     public static void init_variables() {
 
 		/*
-		 * The configuration manager should have a method to group functionalities. 
+         * The configuration manager should have a method to group functionalities.
 		 * Everytime load a keystore, and passing all these values is bad code. 
 		 */
 
@@ -110,8 +111,7 @@ public class TSLUtils {
      * Given the path of the tsl file and the service name, this method exports
      * its certifivate to der format
      *
-     * @param filename
-     *            is the path of the tsl file
+     * @param filename is the path of the tsl file
      * @return in a hashtable the services defined in the thsl file
      */
     public static String exportSSLFromTSL(String filename, String countrycode) {
@@ -290,8 +290,7 @@ public class TSLUtils {
      * defined the last part of the service url. E.g if the service URL is
      * http://epsos.e/ccd/PatientService the service name is PatientService
      *
-     * @param filename
-     *            is the path stored the tsl file
+     * @param filename is the path stored the tsl file
      * @return a hashtable of the service names and the endpoints
      */
     public static Hashtable getServicesFromTSL(String filename) {
@@ -391,12 +390,10 @@ public class TSLUtils {
     }
 
     /**
-     *
      * Given a nodelist the method returns the x509 certificate which is inside
      * the signature of the file
      *
-     * @param nl
-     *            is a nodelist of a dom element
+     * @param nl is a nodelist of a dom element
      * @return the X509 Certificate
      */
     public static X509Certificate getCertificateFromNodeList(NodeList nl) {
@@ -432,8 +429,7 @@ public class TSLUtils {
     /**
      * Extracts the signature in pem format from the tsl file
      *
-     * @param filename
-     *            is the path of the tsl file
+     * @param filename is the path of the tsl file
      * @return the signature of the tsl file in pem format
      */
     public static X509Certificate getCertificateFromTSL(String filename) {
@@ -468,11 +464,8 @@ public class TSLUtils {
     }
 
     /**
-     *
-     * @param sTag
-     *            the tag name of an element of a dom
-     * @param eElement
-     *            the selected dom element
+     * @param sTag     the tag name of an element of a dom
+     * @param eElement the selected dom element
      * @return the value of the specific element
      */
     private static String getTagValue(String sTag, Element eElement) {
@@ -513,8 +506,7 @@ public class TSLUtils {
      * This method takes a certificate and imports it to the truststore defined
      * in the configuration file
      *
-     * @param cert
-     *            the certificate to be imported
+     * @param cert the certificate to be imported
      */
     public static boolean storeCertificateToTrustStore(java.security.cert.Certificate cert, String certalias) {
         boolean exp = false;
@@ -523,20 +515,20 @@ public class TSLUtils {
             KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
             File keystoreFile = new File(TRUST_STORE);
             // Load the keystore contents
-            FileInputStream in = new FileInputStream(keystoreFile);
-            keystore.load(in, TRUST_STORE_PASS.toCharArray());
-            in.close();
+            try (FileInputStream in = new FileInputStream(keystoreFile)) {
+                keystore.load(in, TRUST_STORE_PASS.toCharArray());
+                in.close();
 
-            keystore.setCertificateEntry(certalias, cert);
-            logger.debug("CERTALIAS: " + certalias);
-            // Save the new keystore contents
-            FileOutputStream out = new FileOutputStream(keystoreFile);
-            keystore.store(out, TRUST_STORE_PASS.toCharArray());
-            out.close();
-            exp = true;
+                keystore.setCertificateEntry(certalias, cert);
+                logger.debug("CERTALIAS: '{}'", certalias);
+                // Save the new keystore contents
+                FileOutputStream out = new FileOutputStream(keystoreFile);
+                keystore.store(out, TRUST_STORE_PASS.toCharArray());
+                out.close();
+                exp = true;
+            }
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            e.printStackTrace();
+            logger.error("Exception: {}", e.getMessage(), e);
         }
         return exp;
     }
@@ -554,29 +546,31 @@ public class TSLUtils {
         try {
             // Get the encoded form which is suitable for exporting
             byte[] buf = cert.getEncoded();
-            FileOutputStream os = new FileOutputStream(file);
-            if (binary) { // Write in binary form
-                os.write(buf);
-            } else { // Write in text form
-                Writer wr = new OutputStreamWriter(os, Charset.forName("UTF-8"));
-                wr.write("-----BEGIN CERTIFICATE-----\n");
-                wr.write(new String(coder.encodeBase64(buf)));
-                wr.write("\n-----END CERTIFICATE-----\n");
-                wr.flush();
+            try (FileOutputStream os = new FileOutputStream(file)) {
+                if (binary) { // Write in binary form
+                    os.write(buf);
+                } else { // Write in text form
+                    Writer wr = new OutputStreamWriter(os, Charset.forName("UTF-8"));
+                    wr.write("-----BEGIN CERTIFICATE-----\n");
+                    wr.write(new String(coder.encodeBase64(buf)));
+                    wr.write("\n-----END CERTIFICATE-----\n");
+                    wr.flush();
+                }
+                os.close();
+                exp = true;
+            } catch (Exception e) {
+                exp = false;
+                e.printStackTrace();
+                logger.error(e.getMessage());
             }
-            os.close();
-            exp = true;
-        } catch (Exception e) {
-            exp = false;
+        } catch (CertificateEncodingException e) {
             e.printStackTrace();
-            logger.error(e.getMessage());
         }
         return exp;
     }
 
     /**
      * Wrapper method to Security Manager
-     *
      */
     public static boolean VerifyTSL(Document doc) {
         boolean verified = false;
@@ -591,11 +585,9 @@ public class TSLUtils {
     }
 
     /**
-     * Given a URL containing an xml file, it parses it and returns the dom
-     * object
+     * Given a URL containing an xml file, it parses it and returns the dom object.
      *
-     * @param inputFile
-     *            the url path as String
+     * @param strURL the url path as String
      * @return org.w3c.dom.Document
      */
     public static Document createDomFromURL(String strURL) {

@@ -67,7 +67,7 @@ public class PacBean implements Serializable {
     private String queryDocumentsException;
     private boolean showPS;
     private boolean consentExists;
-    private Map<String, String> ltrlanguages = new HashMap<String, String>();
+    private Map<String, String> ltrlanguages = new HashMap<>();
     private String ltrlang;
     private boolean hasPacToOther;
     private boolean hasPac;

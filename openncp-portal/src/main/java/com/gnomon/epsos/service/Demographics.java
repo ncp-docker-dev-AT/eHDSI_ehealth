@@ -1,86 +1,85 @@
 package com.gnomon.epsos.service;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Demographics {
+public class Demographics implements Serializable {
 
-	private String label;
-	private int length;
-	private boolean mandatory;
-	private String userValue;
-	private String key;
-	private String type;
-	private Date userDateValue;
-        private String friendlyName;
-	
-        public Demographics() {
-		super();
-	}
+    private static final long serialVersionUID = -5946653173330618050L;
+    private String label;
+    private int length;
+    private boolean mandatory;
+    private String userValue;
+    private String key;
+    private String type;
+    private Date userDateValue;
+    private String friendlyName;
 
-        public String getFriendlyName() {
-            return friendlyName;
-        }
+    public Demographics() {
+        super();
+    }
 
-        public void setFriendlyName(String name) {
-            this.friendlyName = name;
-        }
-        
-	public String getLabel() {	
-		return label;
-	}
+    public String getFriendlyName() {
+        return friendlyName;
+    }
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+    public void setFriendlyName(String name) {
+        this.friendlyName = name;
+    }
 
-	public int getLength() {
-		return length;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public void setLength(int length) {
-		this.length = length;
-	}
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
-	public boolean getMandatory() {
-		return mandatory;
-	}
+    public int getLength() {
+        return length;
+    }
 
-	public void setMandatory(boolean mandatory) {
-		this.mandatory = mandatory;
-	}
+    public void setLength(int length) {
+        this.length = length;
+    }
 
-	public String getUserValue() {
-		return userValue;
-	}
+    public boolean getMandatory() {
+        return mandatory;
+    }
 
-	public void setUserValue(String userValue) {
-		this.userValue = userValue;
-	}
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getUserValue() {
+        return userValue;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setUserValue(String userValue) {
+        this.userValue = userValue;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	public Date getUserDateValue() {
-		return userDateValue;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public void setUserDateValue(Date userDateValue) {
-		this.userDateValue = userDateValue;
-	}
-	
-	
+    public void setType(String type) {
+        this.type = type;
+    }
 
+    public Date getUserDateValue() {
+        return userDateValue;
+    }
+
+    public void setUserDateValue(Date userDateValue) {
+        this.userDateValue = userDateValue;
+    }
 }

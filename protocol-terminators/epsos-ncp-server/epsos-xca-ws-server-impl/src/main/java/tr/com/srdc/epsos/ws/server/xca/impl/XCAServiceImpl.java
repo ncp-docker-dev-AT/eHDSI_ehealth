@@ -639,9 +639,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     private String getLocation() {
         ConfigurationManagerService configManager = ConfigurationManagerService.getInstance();
-        String location = configManager.getServiceWSE(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
-                Constants.PatientService);
-
+        //String location = configManager.getServiceWSE(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
+        //                Constants.PatientService);
+        // EHNCP-1131
+        String location = "urn:oid:" + Constants.HOME_COMM_ID;
         return location;
     }
 
@@ -653,7 +654,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error"));
         re.setCodeContext(codeContext);
         re.setValue(value);
-
         return re;
     }
 
@@ -664,6 +664,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
         re.addAttribute(factory.createOMAttribute("errorCode", null, errorCode));
         String aux = "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error");
         re.addAttribute(factory.createOMAttribute("severity", null, aux));
+        // EHNCP-1131
+        re.addAttribute(factory.createOMAttribute("location", null, getLocation()));
         re.setText(value);
 
         return re;
@@ -1017,7 +1019,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 }
             }
 
-            logger.info("The client country code to be used by the PDP: " + countryCode);
+            logger.info("The client country code to be used by the PDP '{}' ", countryCode);
 
             // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
             if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
@@ -1038,7 +1040,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         "NI_XCA_RETRIEVE_REQ",
                         DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {
-                logger.error(ExceptionUtils.getStackTrace(e));
+                logger.error("createEvidenceREMNRO: " + ExceptionUtils.getStackTrace(e));
             }
 
             EPSOSDocument epsosDoc = documentSearchService.getDocument(DocumentFactory.createSearchCriteria()
@@ -1076,7 +1078,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         "NI_XCA_RETRIEVE_RES_SUCC",
                         DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {
-                logger.error(ExceptionUtils.getStackTrace(e));
+                logger.error("createEvidenceREMNRR() " + ExceptionUtils.getStackTrace(e));
             }
 
             classCodeValue = epsosDoc.getClassCode();
