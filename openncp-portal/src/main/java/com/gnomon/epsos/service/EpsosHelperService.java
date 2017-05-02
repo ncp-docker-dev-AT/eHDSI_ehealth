@@ -2063,8 +2063,7 @@ public class EpsosHelperService {
             Node pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
             if (pdfNode != null) {
                 String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                log.info("##### base64EncodedPdfString: "
-                        + base64EncodedPdfString);
+                log.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                 result = base64EncodedPdfString;//decode.decode(base64EncodedPdfString);
                 result = "data:application/pdf;base64," + result;
             } else {
@@ -2074,8 +2073,7 @@ public class EpsosHelperService {
                 if (pdfNode != null) {
                     String base64EncodedPdfString = pdfNode.getTextContent()
                             .trim();
-                    log.info("##### base64EncodedPdfString: "
-                            + base64EncodedPdfString);
+                    log.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                     result = base64EncodedPdfString;//decode.decode(base64EncodedPdfString.getBytes());
                     result = "data:application/pdf;base64," + result;
                 }
