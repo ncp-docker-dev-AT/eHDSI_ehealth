@@ -75,7 +75,7 @@ public class DispenseServlet extends HttpServlet {
             if (dispensedIds != null) {
                 List<String> dispensedIdsList = Arrays.asList(dispensedIds);
 
-                ArrayList<ViewResult> dispensedLines = new ArrayList<ViewResult>();
+                ArrayList<ViewResult> dispensedLines = new ArrayList<>();
 
                 for (ViewResult line : lines) {
                     int id = line.getMainid();
@@ -124,7 +124,7 @@ public class DispenseServlet extends HttpServlet {
                     dispensedLines.add(d_line);
                 }
 
-                if (dispensedLines.size() > 0) {
+                if (!dispensedLines.isEmpty()) {
                     edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user);
                 }
 
@@ -216,6 +216,7 @@ public class DispenseServlet extends HttpServlet {
                 }
             }
         } catch (Exception ex) {
+
             log.error("UPLOAD DISP DOC RESPONSE ERROR: " + ex.getMessage());
             res.setContentType("text/html");
             String message = "";

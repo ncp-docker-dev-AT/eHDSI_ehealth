@@ -113,38 +113,40 @@ public class SecurityMgr {
 
             // Retrieve signing key
             KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
-            keyStore.load(new FileInputStream(KEY_STORE_NAME), KEY_STORE_PASS.toCharArray());
+            try (FileInputStream stream = new FileInputStream(KEY_STORE_NAME)) {
+                keyStore.load(stream, KEY_STORE_PASS.toCharArray());
 
-            PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
+                PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
 
-            X509Certificate cert = (X509Certificate) keyStore.getCertificate(KEY_ALIAS);
-            PublicKey publicKey = cert.getPublicKey();
+                X509Certificate cert = (X509Certificate) keyStore.getCertificate(KEY_ALIAS);
+                PublicKey publicKey = cert.getPublicKey();
 
-            // Create a Reference to the enveloped document
-            Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(DigestMethod.SHA1, null),
-                    transforms, null, null);
+                // Create a Reference to the enveloped document
+                Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(DigestMethod.SHA1, null),
+                        transforms, null, null);
 
-            // Create the SignedInfo
-            SignedInfo signedInfo = sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
-                    CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
-                    .newSignatureMethod(SignatureMethod.RSA_SHA1, null), Collections.singletonList(ref));
+                // Create the SignedInfo
+                SignedInfo signedInfo = sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
+                        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
+                        .newSignatureMethod(SignatureMethod.RSA_SHA1, null), Collections.singletonList(ref));
 
-            // Create a KeyValue containing the RSA PublicKey
-            KeyInfoFactory keyInfoFactory = sigFactory.getKeyInfoFactory();
-            KeyValue keyValue = keyInfoFactory.newKeyValue(publicKey);
+                // Create a KeyValue containing the RSA PublicKey
+                KeyInfoFactory keyInfoFactory = sigFactory.getKeyInfoFactory();
+                KeyValue keyValue = keyInfoFactory.newKeyValue(publicKey);
 
-            // Create a KeyInfo and add the KeyValue to it
-            KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(keyValue));
+                // Create a KeyInfo and add the KeyValue to it
+                KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(keyValue));
 
-            // Create a DOMSignContext and specify the RSA PrivateKey and
-            // location of the resulting XMLSignature's parent element
-            DOMSignContext dsc = new DOMSignContext(privateKey, sigParent);
+                // Create a DOMSignContext and specify the RSA PrivateKey and
+                // location of the resulting XMLSignature's parent element
+                DOMSignContext dsc = new DOMSignContext(privateKey, sigParent);
 
-            // Create the XMLSignature (but don't sign it yet)
-            XMLSignature signature = sigFactory.newXMLSignature(signedInfo, keyInfo);
+                // Create the XMLSignature (but don't sign it yet)
+                XMLSignature signature = sigFactory.newXMLSignature(signedInfo, keyInfo);
 
-            // Marshal, generate (and sign) the enveloped signature
-            signature.sign(dsc);
+                // Marshal, generate (and sign) the enveloped signature
+                signature.sign(dsc);
+            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -174,56 +176,58 @@ public class SecurityMgr {
 
             // Retrieve signing key
             KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
-            keyStore.load(new FileInputStream(KEY_STORE_NAME), KEY_STORE_PASS.toCharArray());
+            try (FileInputStream stream = new FileInputStream(KEY_STORE_NAME)) {
+                keyStore.load(stream, KEY_STORE_PASS.toCharArray());
 
-            PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
+                PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
 
-            X509Certificate cert = (X509Certificate) keyStore.getCertificate(KEY_ALIAS);
-            PublicKey publicKey = cert.getPublicKey();
+                X509Certificate cert = (X509Certificate) keyStore.getCertificate(KEY_ALIAS);
+                PublicKey publicKey = cert.getPublicKey();
 
-            // Create a Reference to the enveloped document
-            Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(DigestMethod.SHA1, null),
-                    transforms, null, null);
+                // Create a Reference to the enveloped document
+                Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(DigestMethod.SHA1, null),
+                        transforms, null, null);
 
-            // Create the SignedInfo
-            SignedInfo signedInfo = sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
-                    CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
-                    .newSignatureMethod(SignatureMethod.RSA_SHA1, null), Collections.singletonList(ref));
+                // Create the SignedInfo
+                SignedInfo signedInfo = sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
+                        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
+                        .newSignatureMethod(SignatureMethod.RSA_SHA1, null), Collections.singletonList(ref));
 
-            sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
-                    CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
-                    .newSignatureMethod(SignatureMethod.DSA_SHA1, null), Collections.singletonList(ref));
+                sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
+                        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
+                        .newSignatureMethod(SignatureMethod.DSA_SHA1, null), Collections.singletonList(ref));
 
-            // Create a KeyValue containing the RSA PublicKey
-            KeyInfoFactory keyInfoFactory = sigFactory.getKeyInfoFactory();
-            KeyValue keyValue = keyInfoFactory.newKeyValue(publicKey);
+                // Create a KeyValue containing the RSA PublicKey
+                KeyInfoFactory keyInfoFactory = sigFactory.getKeyInfoFactory();
+                KeyValue keyValue = keyInfoFactory.newKeyValue(publicKey);
 
-            // Create a KeyInfo and add the KeyValue to it
-            KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(keyValue));
+                // Create a KeyInfo and add the KeyValue to it
+                KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(keyValue));
 
-            // Create a DOMSignContext and specify the RSA PrivateKey and
-            // location of the resulting XMLSignature's parent element
-            new DOMSignContext(privateKey, doc);
+                // Create a DOMSignContext and specify the RSA PrivateKey and
+                // location of the resulting XMLSignature's parent element
+                new DOMSignContext(privateKey, doc);
 
-            // Create the XMLSignature (but don't sign it yet)
-            XMLSignature signature = sigFactory.newXMLSignature(signedInfo, keyInfo);
+                // Create the XMLSignature (but don't sign it yet)
+                XMLSignature signature = sigFactory.newXMLSignature(signedInfo, keyInfo);
 
-            // Create the Document that will hold the resulting XMLSignature
+                // Create the Document that will hold the resulting XMLSignature
 
-            // Create a DOMSignContext and set the signing Key to the DSA
-            // PrivateKey and specify where the XMLSignature should be inserted
-            // in the target document (in this case, the document root)
-            DOMSignContext signContext = new DOMSignContext(privateKey, doc);
+                // Create a DOMSignContext and set the signing Key to the DSA
+                // PrivateKey and specify where the XMLSignature should be inserted
+                // in the target document (in this case, the document root)
+                DOMSignContext signContext = new DOMSignContext(privateKey, doc);
 
-            // Marshal, generate (and sign) the enveloped signature
-            signature.sign(signContext);
+                // Marshal, generate (and sign) the enveloped signature
+                signature.sign(signContext);
 
-            // output the resulting document
-            // FileOutputStream os = new FileOutputStream(outputFile);
-            bas = new ByteArrayOutputStream();
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
-            trans.transform(new DOMSource(doc), new StreamResult(bas));
-            signed = bas.toString();
+                // output the resulting document
+                // FileOutputStream os = new FileOutputStream(outputFile);
+                bas = new ByteArrayOutputStream();
+                Transformer trans = TransformerFactory.newInstance().newTransformer();
+                trans.transform(new DOMSource(doc), new StreamResult(bas));
+                signed = bas.toString();
+            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

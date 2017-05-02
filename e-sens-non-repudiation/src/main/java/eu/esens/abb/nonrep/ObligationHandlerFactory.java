@@ -9,30 +9,30 @@ import java.util.List;
 public class ObligationHandlerFactory {
 
     private static ObligationHandlerFactory instance = null;
-    private static Logger l = LoggerFactory.getLogger(ObligationHandlerFactory.class);
-
-    public static ObligationHandlerFactory getInstance() {
-        if (instance == null) {
-            synchronized (ObligationHandlerFactory.class) {
-                if (instance == null) {
-                    try {
-                        instance = new ObligationHandlerFactory();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-
-                        throw new IllegalStateException(
-                                "Unable to instantiate the ObligationHandlerFactory: "
- 
-                                		+ e.getMessage(), e);
-                    }
-                }
-            }
-        }
-        return instance;
-    }
+    private static Logger LOG = LoggerFactory.getLogger(ObligationHandlerFactory.class);
 
     private ObligationHandlerFactory() {
-        l.debug("In the ObligationHandlerFactory constructor");
+        LOG.debug("In the ObligationHandlerFactory constructor");
+    }
+
+    public synchronized static ObligationHandlerFactory getInstance() {
+        //if (instance == null) {
+        //synchronized (ObligationHandlerFactory.class) {
+        if (instance == null) {
+            try {
+                instance = new ObligationHandlerFactory();
+            } catch (Exception e) {
+                LOG.error("Exception: '{}'", e.getMessage(), e);
+
+                throw new IllegalStateException(
+                        "Unable to instantiate the ObligationHandlerFactory: "
+
+                                + e.getMessage(), e);
+            }
+        }
+        //}
+        //}
+        return instance;
     }
 
     /**

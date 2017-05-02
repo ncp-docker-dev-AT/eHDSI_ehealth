@@ -2,28 +2,27 @@ package com.gnomon.epsos.model.cda;
 
 public class EDDetail {
 
-    public String relativePrescriptionLineId;
-    public String dispensedQuantity;
-    public String dispensedQuantityUnit;
-    public String medicineBarcode;
-    public String medicineTainiaGnisiotitas;
-    public String medicineEofCode;
-    public String medicineCommercialName;
-    public String medicinePackageFormCode;
-    public String medicinePackageFormCodeDescription;
-    public String medicineFormCode;
-    public String medicineFormCodeDescription;
-    public String medicineCapacityQuantity;
-    public String medicineDrastikiATCCode;
-    public String medicineDrastikiName;
-    public String patientInstructions;
-    public String medicinePrice;
-    public String medicineRefPrice;
-    public String patientParticipation;
-    public String tameioParticipation;
-    public String patientDifference;
-    public String medicineExecutionCase;
-    //Detail substitution indicator
+    private String relativePrescriptionLineId;
+    private String dispensedQuantity;
+    private String dispensedQuantityUnit;
+    private String medicineBarcode;
+    private String medicineTainiaGnisiotitas;
+    private String medicineEofCode;
+    private String medicineCommercialName;
+    private String medicinePackageFormCode;
+    private String medicinePackageFormCodeDescription;
+    private String medicineFormCode;
+    private String medicineFormCodeDescription;
+    private String medicineCapacityQuantity;
+    private String medicineDrastikiATCCode;
+    private String medicineDrastikiName;
+    private String patientInstructions;
+    private String medicinePrice;
+    private String medicineRefPrice;
+    private String patientParticipation;
+    private String tameioParticipation;
+    private String patientDifference;
+    private String medicineExecutionCase;
     private boolean substituted;
 
     public String getRelativePrescriptionLineId() {
@@ -193,6 +192,34 @@ public class EDDetail {
     public void setMedicinePackageFormCodeDescription(
             String medicinePackageFormCodeDescription) {
         this.medicinePackageFormCodeDescription = medicinePackageFormCodeDescription;
+    }
+
+    @Override
+    public String toString() {
+        return "EDDetail{" +
+                "relativePrescriptionLineId='" + relativePrescriptionLineId + '\'' +
+                ", dispensedQuantity='" + dispensedQuantity + '\'' +
+                ", dispensedQuantityUnit='" + dispensedQuantityUnit + '\'' +
+                ", medicineBarcode='" + medicineBarcode + '\'' +
+                ", medicineTainiaGnisiotitas='" + medicineTainiaGnisiotitas + '\'' +
+                ", medicineEofCode='" + medicineEofCode + '\'' +
+                ", medicineCommercialName='" + medicineCommercialName + '\'' +
+                ", medicinePackageFormCode='" + medicinePackageFormCode + '\'' +
+                ", medicinePackageFormCodeDescription='" + medicinePackageFormCodeDescription + '\'' +
+                ", medicineFormCode='" + medicineFormCode + '\'' +
+                ", medicineFormCodeDescription='" + medicineFormCodeDescription + '\'' +
+                ", medicineCapacityQuantity='" + medicineCapacityQuantity + '\'' +
+                ", medicineDrastikiATCCode='" + medicineDrastikiATCCode + '\'' +
+                ", medicineDrastikiName='" + medicineDrastikiName + '\'' +
+                ", patientInstructions='" + patientInstructions + '\'' +
+                ", medicinePrice='" + medicinePrice + '\'' +
+                ", medicineRefPrice='" + medicineRefPrice + '\'' +
+                ", patientParticipation='" + patientParticipation + '\'' +
+                ", tameioParticipation='" + tameioParticipation + '\'' +
+                ", patientDifference='" + patientDifference + '\'' +
+                ", medicineExecutionCase='" + medicineExecutionCase + '\'' +
+                ", substituted=" + substituted +
+                '}';
     }
 
     /**

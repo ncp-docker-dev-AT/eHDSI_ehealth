@@ -27,7 +27,9 @@ import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.gnomon.utils.SerializableMessage;
 import epsos.ccd.gnomon.utils.Utils;
 import eu.epsos.util.audit.AuditLogSerializer;
+import eu.europa.ec.sante.ehdsi.openncp.audit.Configuration;
 import net.RFC3881.AuditMessage;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ import javax.net.ssl.SSLSocket;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
@@ -55,20 +58,18 @@ import java.util.TimeZone;
 public class MessageSender extends java.lang.Thread {
 
     private static final Logger log = LoggerFactory.getLogger(MessageSender.class);
-
+    private static String[] enabledProtocols = {"TLSv1"};
+    private static String AUDIT_REPOSITORY_URL = "audit.repository.url";
+    private static String AUDIT_REPOSITORY_PORT = "audit.repository.port";
+    private static String KEYSTORE_FILE = "NCP_SIG_KEYSTORE_PATH";
+    //private static String KEYSTORE_PWD = "NCP_SIG_KEYSTORE_PASSWORD";
+    private static String TRUSTSTORE = "TRUSTSTORE_PATH";
+    //private static String TRUSTSTORE_PWD = "TRUSTSTORE_PASSWORD";
+    private static String KEY_ALIAS = "NCP_SIG_PRIVATEKEY_ALIAS";
     private AuditLogSerializer auditLogSerializer;
     private AuditMessage auditmessage;
     private String facility;
     private String severity;
-
-    private static String enabledProtocols[] = {"TLSv1"};
-    private static String AUDIT_REPOSITORY_URL = "audit.repository.url";
-    private static String AUDIT_REPOSITORY_PORT = "audit.repository.port";
-    private static String KEYSTORE_FILE = "NCP_SIG_KEYSTORE_PATH";
-    private static String KEYSTORE_PWD = "NCP_SIG_KEYSTORE_PASSWORD";
-    private static String TRUSTSTORE = "TRUSTSTORE_PATH";
-    private static String TRUSTSTORE_PWD = "TRUSTSTORE_PASSWORD";
-    private static String KEY_ALIAS = "NCP_SIG_PRIVATEKEY_ALIAS";
 
     public MessageSender(AuditLogSerializer auditLogSerializer, AuditMessage auditmessage, String facility, String severity) {
         super();
@@ -89,7 +90,7 @@ public class MessageSender extends java.lang.Thread {
             if (!Utils.isEmpty(auditmsg)) {
                 long timeout = Long.parseLong(Utils.getProperty("audit.time.to.try", "60000", true));
                 boolean timeouted = false;
-                log.info("Try to send the message for " + timeout + " msec");
+                log.info("Try to send the message for '{}' msec", timeout);
                 timeout += System.currentTimeMillis();
 
                 do {
@@ -140,21 +141,24 @@ public class MessageSender extends java.lang.Thread {
         if (log.isDebugEnabled()) {
             log.debug("Set the security properties");
             log.debug(cms.getProperty(KEYSTORE_FILE));
-            log.debug(cms.getProperty(KEYSTORE_PWD));
+            log.debug(cms.getProperty(Configuration.KEYSTORE_PWD.getValue()));
             log.debug(cms.getProperty(TRUSTSTORE));
-            log.debug(cms.getProperty(TRUSTSTORE_PWD));
+            log.debug(cms.getProperty(Configuration.TRUSTSTORE_PWD.getValue()));
             log.debug(cms.getProperty(KEY_ALIAS));
         }
 
         if (log.isTraceEnabled()) {
+
+            InputStream stream = null;
             try {
                 KeyStore ks = KeyStore.getInstance("JKS");
-                ks.load(Utils.fullStream(cms.getProperty(KEYSTORE_FILE)), cms.getProperty(KEYSTORE_PWD).toCharArray());
+                ks.load(Utils.fullStream(cms.getProperty(KEYSTORE_FILE)), cms.getProperty(Configuration.KEYSTORE_PWD.getValue()).toCharArray());
                 X509Certificate cert = (X509Certificate) ks.getCertificate(cms.getProperty(KEY_ALIAS));
                 log.debug("KEYSTORE");
                 log.debug(cert.toString());
                 KeyStore ks1 = KeyStore.getInstance("JKS");
-                ks1.load(Utils.fullStream(cms.getProperty(TRUSTSTORE)), cms.getProperty(TRUSTSTORE_PWD).toCharArray());
+                stream = Utils.fullStream(cms.getProperty(TRUSTSTORE));
+                ks1.load(stream, cms.getProperty(Configuration.TRUSTSTORE_PWD.getValue()).toCharArray());
                 Enumeration<String> enu = ks1.aliases();
                 int i = 0;
                 while (enu.hasMoreElements()) {
@@ -165,6 +169,8 @@ public class MessageSender extends java.lang.Thread {
                 }
             } catch (Exception e) {
                 log.error("Error logging keystore file", e);
+            } finally {
+                IOUtils.closeQuietly(stream);
             }
         }
 
@@ -173,11 +179,11 @@ public class MessageSender extends java.lang.Thread {
         try {
             log.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Initialize the SSL socket");
             File u = new File(cms.getProperty(TRUSTSTORE));
-            KeystoreDetails trust = new KeystoreDetails(u.toString(), cms.getProperty(TRUSTSTORE_PWD),
+            KeystoreDetails trust = new KeystoreDetails(u.toString(), cms.getProperty(Configuration.TRUSTSTORE_PWD.getValue()),
                     cms.getProperty(KEY_ALIAS));
             File uu = new File(cms.getProperty(KEYSTORE_FILE));
-            KeystoreDetails key = new KeystoreDetails(uu.toString(), cms.getProperty(KEYSTORE_PWD),
-                    cms.getProperty(KEY_ALIAS), cms.getProperty(KEYSTORE_PWD));
+            KeystoreDetails key = new KeystoreDetails(uu.toString(), cms.getProperty(Configuration.KEYSTORE_PWD.getValue()),
+                    cms.getProperty(KEY_ALIAS), cms.getProperty(Configuration.KEYSTORE_PWD.getValue()));
             AuthSSLSocketFactory f = new AuthSSLSocketFactory(key, trust);
             log.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Create socket");
 

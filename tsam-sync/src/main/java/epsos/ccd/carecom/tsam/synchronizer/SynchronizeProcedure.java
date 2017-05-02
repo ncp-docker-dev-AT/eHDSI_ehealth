@@ -245,7 +245,7 @@ public abstract class SynchronizeProcedure {
      * @return A list of code systems.
      */
     protected List<CodeSystem> retrieveCodeSystems() {
-        List<CodeSystem> codeSystems = new ArrayList<CodeSystem>(0);
+        List<CodeSystem> codeSystems = new ArrayList<>(0);
 
         ApplicationController.STATS.registerActionStart(WebMethodCallAuditGatherer.WEB_METHOD_CALL_CODE_SYSTEMS, null);
 

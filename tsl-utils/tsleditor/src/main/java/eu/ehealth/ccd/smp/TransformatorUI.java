@@ -6,21 +6,14 @@
 package eu.ehealth.ccd.smp;
 
 import eu.ehealth.ccd.exceptions.SignatureCancelledException;
-import java.awt.Dimension;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ListModel;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,24 +25,68 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Class representing the main SMP JFrame. Adds the features of:
  * 1) TSL-to-SMP transformation
  * 2) Signing of SMP files
  * 3) Upload of SMP files to SMP server
- * 
+ *
  * @author joao.cunha
  */
 public class TransformatorUI extends javax.swing.JFrame {
     private static final Logger logger = LoggerFactory.getLogger(TransformatorUI.class);
+    private File tslFile;
+    private File ismFile;
+    private File outputFolder;
+    private File keystoreFile;
+    private File smpFolder;
+    // Variables declaration - do not modify
+    private javax.swing.JButton ismChooseButton;
+    private javax.swing.JTextField ismFileTextField;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JButton keystoreChooseButton;
+    private javax.swing.JTextField keystoreFileTextField;
+    private javax.swing.JPasswordField keystorePassPasswordField;
+    private javax.swing.JButton outputFolderChooseButton;
+    private javax.swing.JTextField outputFolderTextField;
+    private javax.swing.JTextField privateKeyAliasTextField;
+    private javax.swing.JPasswordField privateKeyPassPasswordField;
+    private javax.swing.JCheckBox signCheckbox;
+    private javax.swing.JList smpFilesList;
+    private javax.swing.JButton smpFolderChooseButton;
+    private javax.swing.JTextField smpFolderTextField;
+    private javax.swing.JPasswordField smpPasswordPasswordField;
+    private javax.swing.JTextField smpServerTextField;
+    private javax.swing.JTextField smpUsernameTextField;
+    private javax.swing.JButton transformButton;
+    private javax.swing.JButton tslChooseButton;
+    private javax.swing.JTextField tslFileTextField;
+    private javax.swing.JButton uploadButton;
 
     /**
      * Creates new form TransformatorUI
@@ -59,12 +96,103 @@ public class TransformatorUI extends javax.swing.JFrame {
     }
 
     /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+//        try {
+//            Source xslt = new StreamSource(new File("src/resources/tsl2smp.xsl"));
+//            StringWriter writer = new StringWriter();
+//            StreamResult sr = new StreamResult(writer);
+//            TransformerFactory tf = TransformerFactory.newInstance();
+//            Transformer transformer = tf.newTransformer();
+//            transformer.transform(xslt, sr);
+//            System.out.println(writer.toString());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        //</editor-fold>
+//        try {
+//            Source xslt = new StreamSource(new File("src/resources/tsl2smp.xsl"));
+//            StringWriter writer = new StringWriter();
+//            StreamResult sr = new StreamResult(writer);
+//            TransformerFactory tf = TransformerFactory.newInstance();
+//            Transformer transformer = tf.newTransformer();
+//            transformer.transform(xslt, sr);
+//            System.out.println(writer.toString());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        /* TEST -- works with Saxon HE 9.5.1.7 */
+//        try {
+//            TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
+//            Source xslt = new StreamSource(new File("src/resources/teste.xsl"));
+//            Transformer transformer = factory.newTransformer(xslt);
+//
+//            Source text = new StreamSource(new File("src/resources/teste.xml"));
+//            transformer.transform(text, new StreamResult(new File("output.xml")));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        /* TEST PARAMETERS */
+
+//         try {
+//            TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
+//            Source xslt = new StreamSource(new File("src/resources/parameters.xsl"));
+//            Transformer transformer = factory.newTransformer(xslt);
+//            transformer.setParameter("ism",new StreamSource(new File(ismFile)));
+//            Source text = new StreamSource("output.xml");
+//            transformer.transform(text, null);
+//
+//
+//
+//        } catch (TransformerException e) {
+//            System.out.println(e.getMessage());
+//        }
+
+//        System.out.println("begin load");
+        // works
+//        InputStream is = TransformatorUI.class.getResourceAsStream("/resources/tsl2smp.xsl");
+//        System.out.println(getStringFromInputStream(is));
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new TransformatorUI().setVisible(true);
+            }
+        });
+    }
+
+    /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
@@ -233,164 +361,164 @@ public class TransformatorUI extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(37, 37, 37)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(37, 37, 37)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel8)
-                                    .addComponent(jLabel9))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(privateKeyAliasTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 429, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addGap(6, 6, 6)
-                                        .addComponent(privateKeyPassPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, 429, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel6))
-                                .addGap(18, 18, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(keystorePassPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
-                                    .addComponent(keystoreFileTextField))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(keystoreChooseButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(signCheckbox, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 675, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(transformButton))
-                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(jLabel11)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(jScrollPane1))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(jLabel10)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(smpFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 459, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel14)
-                                            .addComponent(jLabel12)
-                                            .addComponent(jLabel13))
-                                        .addGap(42, 42, 42)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(smpServerTextField)
-                                            .addComponent(smpUsernameTextField)
-                                            .addComponent(smpPasswordPasswordField))))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(uploadButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(smpFolderChooseButton))))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(outputFolderTextField)
-                                .addGap(18, 18, 18)
-                                .addComponent(outputFolderChooseButton))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(ismFileTextField)
-                                .addGap(18, 18, 18)
-                                .addComponent(ismChooseButton))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(tslFileTextField)
-                                .addGap(18, 18, 18)
-                                .addComponent(tslChooseButton)))))
-                .addGap(32, 32, 32))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(jLabel8)
+                                                                        .addComponent(jLabel9))
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(layout.createSequentialGroup()
+                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                                .addComponent(privateKeyAliasTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 429, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                                .addGap(6, 6, 6)
+                                                                                .addComponent(privateKeyPassPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, 429, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(jLabel7)
+                                                                        .addComponent(jLabel6))
+                                                                .addGap(18, 18, Short.MAX_VALUE)
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                        .addComponent(keystorePassPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
+                                                                        .addComponent(keystoreFileTextField))))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(keystoreChooseButton))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(signCheckbox, javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 675, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(transformButton))
+                                                        .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                                                .addComponent(jLabel11)
+                                                                                .addGap(18, 18, 18)
+                                                                                .addComponent(jScrollPane1))
+                                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                                                .addComponent(jLabel10)
+                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                                .addComponent(smpFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 459, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                        .addComponent(jLabel14)
+                                                                                        .addComponent(jLabel12)
+                                                                                        .addComponent(jLabel13))
+                                                                                .addGap(42, 42, 42)
+                                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                        .addComponent(smpServerTextField)
+                                                                                        .addComponent(smpUsernameTextField)
+                                                                                        .addComponent(smpPasswordPasswordField))))
+                                                                .addGap(18, 18, 18)
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(uploadButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addComponent(smpFolderChooseButton))))
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel4)
+                                                        .addComponent(jLabel3)
+                                                        .addComponent(jLabel5))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                .addComponent(outputFolderTextField)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(outputFolderChooseButton))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                .addComponent(ismFileTextField)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(ismChooseButton))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                .addComponent(tslFileTextField)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(tslChooseButton)))))
+                                .addGap(32, 32, 32))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tslFileTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
-                    .addComponent(tslChooseButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ismFileTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
-                    .addComponent(ismChooseButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(outputFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5)
-                    .addComponent(outputFolderChooseButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(signCheckbox)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(keystoreFileTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(keystoreChooseButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(keystorePassPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(privateKeyAliasTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(12, 12, 12)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(privateKeyPassPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(11, 11, 11)
-                .addComponent(transformButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(smpFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(smpFolderChooseButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel11)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel14)
-                            .addComponent(smpServerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(smpUsernameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel12))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(smpPasswordPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel13))
-                        .addGap(28, 28, 28))
-                    .addComponent(uploadButton, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addGap(4, 4, 4))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(tslFileTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel3)
+                                        .addComponent(tslChooseButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(ismFileTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel4)
+                                        .addComponent(ismChooseButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(outputFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel5)
+                                        .addComponent(outputFolderChooseButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(signCheckbox)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel6)
+                                        .addComponent(keystoreFileTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(keystoreChooseButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel7)
+                                        .addComponent(keystorePassPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel9)
+                                        .addComponent(privateKeyAliasTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(12, 12, 12)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel8)
+                                        .addComponent(privateKeyPassPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(11, 11, 11)
+                                .addComponent(transformButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel10)
+                                        .addComponent(smpFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(smpFolderChooseButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel11)
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel14)
+                                                        .addComponent(smpServerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(smpUsernameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jLabel12))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(smpPasswordPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jLabel13))
+                                                .addGap(28, 28, 28))
+                                        .addComponent(uploadButton, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addGap(4, 4, 4))
         );
 
         pack();
-    }// </editor-fold>                        
+    }// </editor-fold>
 
-    private void tslChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                
+    private void tslChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         final JFileChooser tslFileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("TSL files", "xml");
@@ -404,9 +532,9 @@ public class TransformatorUI extends javax.swing.JFrame {
             tslFileTextField.setText(tslFileLocation);
             this.enableTransformButton();
         }
-    }                                               
+    }
 
-    private void ismChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                
+    private void ismChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         final JFileChooser ismFileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("ISM files", "xml");
@@ -420,9 +548,9 @@ public class TransformatorUI extends javax.swing.JFrame {
             ismFileTextField.setText(ismFileLocation);
             this.enableTransformButton();
         }
-    }                                               
+    }
 
-    private void outputFolderChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                         
+    private void outputFolderChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         final JFileChooser outputFolderChooser = new JFileChooser();
         outputFolderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -435,9 +563,9 @@ public class TransformatorUI extends javax.swing.JFrame {
             outputFolderTextField.setText(outputFolderLocation);
             this.enableTransformButton();
         }
-    }                                                        
+    }
 
-    private void signCheckboxActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void signCheckboxActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         boolean showSignatureFields = signCheckbox.isSelected();
         keystoreFileTextField.setEnabled(showSignatureFields);
@@ -452,9 +580,9 @@ public class TransformatorUI extends javax.swing.JFrame {
             privateKeyAliasTextField.setText(null);
             privateKeyPassPasswordField.setText(null);
         }
-    }                                            
+    }
 
-    private void transformButtonActionPerformed(java.awt.event.ActionEvent evt) {      
+    private void transformButtonActionPerformed(java.awt.event.ActionEvent evt) {
         //         TODO add your handling code here:
         try {
             //            TransformerFactory factory = TransformerFactory.newInstance();
@@ -467,11 +595,11 @@ public class TransformatorUI extends javax.swing.JFrame {
             transformer.setParameter("ism", ismFile != null ? ismFile.toURI() : null);
             transformer.setParameter("ismCreationDate", ismFile != null ? GenericUtils.getCreationTime(ismFile.getAbsolutePath()) : null);
             transformer.setParameter("outputFolder", outputFolder.getAbsolutePath());
-            
-            logger.info("Going to transform...\nISM URI: " + (ismFile != null ? ismFile.toURI() : "null") + 
-            		"\n" + (ismFile != null ? GenericUtils.convertFileToString(ismFile) : "null") + 
-            		"\nISM CreationDate: " + (ismFile != null ? GenericUtils.getCreationTime(ismFile.getAbsolutePath()) : "null"));
-            
+
+            logger.info("Going to transform...\nISM URI: " + (ismFile != null ? ismFile.toURI() : "null") +
+                    "\n" + (ismFile != null ? GenericUtils.convertFileToString(ismFile) : "null") +
+                    "\nISM CreationDate: " + (ismFile != null ? GenericUtils.getCreationTime(ismFile.getAbsolutePath()) : "null"));
+
             Source text = new StreamSource(tslFile);
             // transform TSL file into SMP files. XSLT is the artifact that generates the files
             transformer.transform(text, new DOMResult());
@@ -479,9 +607,9 @@ public class TransformatorUI extends javax.swing.JFrame {
             // check if we should sign SMP files
             if (signCheckbox.isSelected()) {
                 // At this moment the XSLT already generated the unsigned SMP files in the SMP output folder
-                String country = tslFile.getName().substring(tslFile.getName().length()-7, tslFile.getName().length()-5);
+                String country = tslFile.getName().substring(tslFile.getName().length() - 7, tslFile.getName().length() - 5);
                 File smpOutputFolder = new File(outputFolder.getAbsolutePath(), country);
-                
+
                 // show signature confirmation dialog
                 SignatureConfirmationDialog signatureConfirmationDialog = new SignatureConfirmationDialog(this, true, smpOutputFolder);
                 signatureConfirmationDialog.setVisible(true);
@@ -489,35 +617,36 @@ public class TransformatorUI extends javax.swing.JFrame {
                 if (!userConfirm) {
                     throw new SignatureCancelledException("Signature cancelled by user (scheme operator)!");
                 }
-                
+
                 // get signing information
                 char[] keystorePasswordArray = keystorePassPasswordField.getPassword();
                 String keystorePassword = new String(keystorePasswordArray);
                 String privateKeyAlias = privateKeyAliasTextField.getText();
                 char[] privateKeyPasswordArray = privateKeyPassPasswordField.getPassword();
                 String privateKeyPassword = new String(privateKeyPasswordArray);
-                
+
                 for (File file : smpOutputFolder.listFiles()) {
-                    final InputStream fileInputStream = new FileInputStream(file);                 
+                    try (final InputStream fileInputStream = new FileInputStream(file)) {
 //                    SignatureUtils.output(SignatureUtils.sign(fileInputStream, keystoreFile, keystorePassword, privateKeyAlias, privateKeyPassword), file.getAbsolutePath());
-                    
-                    // obtain reference to <Extension> and sign it
-                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                    dbf.setNamespaceAware(true);
-                    DocumentBuilder db = dbf.newDocumentBuilder();
-                    Document smpRecord = db.parse(fileInputStream);
-                    // find the pointer.
-                    final String ns = "http://busdox.org/serviceMetadata/publishing/1.0/";
-                    NodeList elements = smpRecord.getElementsByTagNameNS(ns, "ServiceInformation");
-                    Node serviceInformation = elements.item(0);
-                    Node n = serviceInformation.getLastChild();
-                    Element xtPointer = (Element) n;
-                    
-                    SignatureUtils.sign(xtPointer, keystoreFile, keystorePassword, privateKeyAlias, privateKeyPassword);
-                    // Output the resulting document.
-                    TransformerFactory tf = TransformerFactory.newInstance();
-                    Transformer trans = tf.newTransformer();
-                    trans.transform(new DOMSource(smpRecord), new StreamResult(file));
+
+                        // obtain reference to <Extension> and sign it
+                        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                        dbf.setNamespaceAware(true);
+                        DocumentBuilder db = dbf.newDocumentBuilder();
+                        Document smpRecord = db.parse(fileInputStream);
+                        // find the pointer.
+                        final String ns = "http://busdox.org/serviceMetadata/publishing/1.0/";
+                        NodeList elements = smpRecord.getElementsByTagNameNS(ns, "ServiceInformation");
+                        Node serviceInformation = elements.item(0);
+                        Node n = serviceInformation.getLastChild();
+                        Element xtPointer = (Element) n;
+
+                        SignatureUtils.sign(xtPointer, keystoreFile, keystorePassword, privateKeyAlias, privateKeyPassword);
+                        // Output the resulting document.
+                        TransformerFactory tf = TransformerFactory.newInstance();
+                        Transformer trans = tf.newTransformer();
+                        trans.transform(new DOMSource(smpRecord), new StreamResult(file));
+                    }
                 }
                 // Zero out the possible passwords, for security.
                 Arrays.fill(keystorePasswordArray, '0');
@@ -525,23 +654,23 @@ public class TransformatorUI extends javax.swing.JFrame {
             }
 
             JOptionPane.showMessageDialog(this, "Transformation successfully made. SMP files have been generated at " +
-                outputFolder.getAbsolutePath(), "Info", JOptionPane.INFORMATION_MESSAGE);
+                    outputFolder.getAbsolutePath(), "Info", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (SignatureCancelledException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Signature Cancelled", JOptionPane.ERROR_MESSAGE);
         } catch (TransformerException e) {
             String stackTrace = GenericUtils.printExceptionStackTrace(e);
-            JOptionPane.showMessageDialog(this, createScrollablePane(stackTrace), "Error",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, createScrollablePane(stackTrace), "Error", JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             String stackTrace = GenericUtils.printExceptionStackTrace(e);
-            JOptionPane.showMessageDialog(this, createScrollablePane(stackTrace), "Error",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, createScrollablePane(stackTrace), "Error", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             String stackTrace = GenericUtils.printExceptionStackTrace(e);
-            JOptionPane.showMessageDialog(this, createScrollablePane(stackTrace), "Error",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, createScrollablePane(stackTrace), "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }                                               
+    }
 
-    private void keystoreChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                     
+    private void keystoreChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         final JFileChooser keystoreFileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("JKS files", "jks");
@@ -554,13 +683,13 @@ public class TransformatorUI extends javax.swing.JFrame {
             String keystoreFileLocation = keystoreFile.getAbsolutePath();
             keystoreFileTextField.setText(keystoreFileLocation);
         }
-    }                                                    
+    }
 
-    private void keystorePassPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {                                                          
+    private void keystorePassPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
-    }                                                         
+    }
 
-    private void smpFolderChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                      
+    private void smpFolderChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         final JFileChooser smpFolderChooser = new JFileChooser();
         smpFolderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -577,21 +706,21 @@ public class TransformatorUI extends javax.swing.JFrame {
             }
             smpFilesList.setModel(smpListModel);
         }
-    }                                                     
+    }
 
-    private void smpFilesListValueChanged(javax.swing.event.ListSelectionEvent evt) {                                          
+    private void smpFilesListValueChanged(javax.swing.event.ListSelectionEvent evt) {
         // TODO add your handling code here:
         uploadButton.setEnabled(!smpFilesList.isSelectionEmpty());
-    }                                         
+    }
 
-    private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         try {
             List<File> smpFiles = new ArrayList<File>();
             int[] selectedIndexes = smpFilesList.getSelectedIndices();
             ListModel smpListModel = smpFilesList.getModel();
             for (int i = 0; i < selectedIndexes.length; i++) {
-                File smpFile = (File)smpListModel.getElementAt(selectedIndexes[i]);
+                File smpFile = (File) smpListModel.getElementAt(selectedIndexes[i]);
                 logger.info(smpFile.getAbsolutePath());
                 smpFiles.add(smpFile);
             }
@@ -603,23 +732,23 @@ public class TransformatorUI extends javax.swing.JFrame {
             SMPConnection smpConnection = new SMPConnection(smpServerUri, smpUsername, smpPassword);
             SMP smp = new SMP(smpConnection);
             SMPParticipantInformation smpParticipantInformation = smp.uploadSMPFiles(smpFiles);
-            
+
             JOptionPane.showMessageDialog(this, createScrollablePane("Upload successfully made. Check your SMP information at: \n\n" +
-                smpParticipantInformation), "Info", JOptionPane.INFORMATION_MESSAGE);
+                    smpParticipantInformation), "Info", JOptionPane.INFORMATION_MESSAGE);
             smpFilesList.clearSelection();
         } catch (Exception e) {
             String stackTrace = GenericUtils.printExceptionStackTrace(e);
-            JOptionPane.showMessageDialog(this, createScrollablePane(stackTrace), "Error",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, createScrollablePane(stackTrace), "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }                                            
+    }
 
-    private void smpServerTextFieldActionPerformed(java.awt.event.ActionEvent evt) {                                                   
+    private void smpServerTextFieldActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
-    }                                                  
-    
+    }
+
     private JScrollPane createScrollablePane(String text) {
         JTextArea jta = new JTextArea(text);
-        JScrollPane jsp = new JScrollPane(jta){
+        JScrollPane jsp = new JScrollPane(jta) {
             @Override
             public Dimension getPreferredSize() {
                 return new Dimension(680, 320);
@@ -627,148 +756,12 @@ public class TransformatorUI extends javax.swing.JFrame {
         };
         return jsp;
     }
-    
+
     private void enableTransformButton() {
-        boolean enabled = (this.tslFileTextField.getText() != null && !this.tslFileTextField.getText().isEmpty()) && 
-                (this.ismFileTextField.getText() != null && !this.ismFileTextField.getText().isEmpty()) && 
+        boolean enabled = (this.tslFileTextField.getText() != null && !this.tslFileTextField.getText().isEmpty()) &&
+                (this.ismFileTextField.getText() != null && !this.ismFileTextField.getText().isEmpty()) &&
                 (this.outputFolderTextField.getText() != null && !this.outputFolderTextField.getText().isEmpty());
         transformButton.setEnabled(enabled);
     }
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-//        try {
-//            Source xslt = new StreamSource(new File("src/resources/tsl2smp.xsl"));
-//            StringWriter writer = new StringWriter();
-//            StreamResult sr = new StreamResult(writer);
-//            TransformerFactory tf = TransformerFactory.newInstance();
-//            Transformer transformer = tf.newTransformer();
-//            transformer.transform(xslt, sr);
-//            System.out.println(writer.toString());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        //</editor-fold>
-//        try {
-//            Source xslt = new StreamSource(new File("src/resources/tsl2smp.xsl"));
-//            StringWriter writer = new StringWriter();
-//            StreamResult sr = new StreamResult(writer);
-//            TransformerFactory tf = TransformerFactory.newInstance();
-//            Transformer transformer = tf.newTransformer();
-//            transformer.transform(xslt, sr);
-//            System.out.println(writer.toString());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        
-        /* TEST -- works with Saxon HE 9.5.1.7 */
-//        try {
-//            TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
-//            Source xslt = new StreamSource(new File("src/resources/teste.xsl"));
-//            Transformer transformer = factory.newTransformer(xslt);
-//
-//            Source text = new StreamSource(new File("src/resources/teste.xml"));
-//            transformer.transform(text, new StreamResult(new File("output.xml")));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        
-        /* TEST PARAMETERS */
-        
-//         try {
-//            TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
-//            Source xslt = new StreamSource(new File("src/resources/parameters.xsl"));
-//            Transformer transformer = factory.newTransformer(xslt);
-//            transformer.setParameter("ism",new StreamSource(new File(ismFile)));
-//            Source text = new StreamSource("output.xml");
-//            transformer.transform(text, null);
-//            
-//            
-//            
-//        } catch (TransformerException e) {
-//            System.out.println(e.getMessage());
-//        }
-        
-//        System.out.println("begin load");
-        // works
-//        InputStream is = TransformatorUI.class.getResourceAsStream("/resources/tsl2smp.xsl");
-//        System.out.println(getStringFromInputStream(is));
-        
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TransformatorUI().setVisible(true);
-            }
-        });
-    }
-
-    private File tslFile;
-    private File ismFile;
-    private File outputFolder;
-    private File keystoreFile;
-    private File smpFolder;
-    
-    // Variables declaration - do not modify                     
-    private javax.swing.JButton ismChooseButton;
-    private javax.swing.JTextField ismFileTextField;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JButton keystoreChooseButton;
-    private javax.swing.JTextField keystoreFileTextField;
-    private javax.swing.JPasswordField keystorePassPasswordField;
-    private javax.swing.JButton outputFolderChooseButton;
-    private javax.swing.JTextField outputFolderTextField;
-    private javax.swing.JTextField privateKeyAliasTextField;
-    private javax.swing.JPasswordField privateKeyPassPasswordField;
-    private javax.swing.JCheckBox signCheckbox;
-    private javax.swing.JList smpFilesList;
-    private javax.swing.JButton smpFolderChooseButton;
-    private javax.swing.JTextField smpFolderTextField;
-    private javax.swing.JPasswordField smpPasswordPasswordField;
-    private javax.swing.JTextField smpServerTextField;
-    private javax.swing.JTextField smpUsernameTextField;
-    private javax.swing.JButton transformButton;
-    private javax.swing.JButton tslChooseButton;
-    private javax.swing.JTextField tslFileTextField;
-    private javax.swing.JButton uploadButton;
     // End of variables declaration                   
 }

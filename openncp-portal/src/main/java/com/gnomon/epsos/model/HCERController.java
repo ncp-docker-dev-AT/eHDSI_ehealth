@@ -480,9 +480,9 @@ public class HCERController {
         LOGGER.info("Phone: " + phone);
         LOGGER.info("Email: " + email);
         LOGGER.info("-----------------------------------------------------");
-        try {
-            // Saving locally the XML patient summary into an XML file
-            FileWriter writer = new FileWriter(new File("hcer-report.xml"));
+        // Saving locally the XML patient summary into an XML file
+        try (FileWriter writer = new FileWriter(new File("hcer-report.xml"))) {
+
             writer.write(hcer.toString());
             writer.flush();
 

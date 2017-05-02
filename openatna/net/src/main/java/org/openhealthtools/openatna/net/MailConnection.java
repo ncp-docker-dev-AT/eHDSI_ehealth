@@ -116,12 +116,12 @@ public class MailConnection {
 
     public MimeBodyPart decryptMessage(Message message) throws MessagingException {
 
-        try {
+        try (FileInputStream stream = new FileInputStream(getSenderKeystoreFile())) {
             /* Add BC */
             Security.addProvider(new BouncyCastleProvider());
             // Open the key store
             KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(new FileInputStream(getSenderKeystoreFile()), getSenderKeystorePassword().toCharArray());
+            ks.load(stream, getSenderKeystorePassword().toCharArray());
 
             // find the certificate for the private key and generate a
             // suitable recipient identifier.

@@ -8,6 +8,7 @@ import com.spirit.epsos.cc.adc.db.EadcDbConnect;
 import com.spirit.epsos.cc.adc.db.EadcDbConnectImpl;
 import com.spirit.epsos.cc.adc.extractor.AutomaticDataCollector;
 import com.spirit.epsos.cc.adc.extractor.AutomaticDataCollectorImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -70,18 +71,16 @@ public enum EadcFactory {
      * enable you to add additional functionality during the data collection
      * from the EadcEntry to the Database tables
      */
-    private EadcReceiver initReceiver(String implClass) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    private synchronized EadcReceiver initReceiver(String implClass) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+
         if (receiver == null) {
-            synchronized (INSTANCE) {
-                if (receiver == null) {
-                    LOGGER.debug("initReceiver - instantiate new :" + implClass);
-                    receiver = (EadcReceiver) Class.forName(implClass).newInstance();
-                }
-            }
+            LOGGER.debug("initReceiver - instantiate new : '{}'", implClass);
+            receiver = (EadcReceiver) Class.forName(implClass).newInstance();
         } else {
-            LOGGER.trace("initReceiver - use old singleton instance :" + implClass);
+            LOGGER.trace("initReceiver - use old singleton instance: '{}'", implClass);
         }
-        if (!implClass.equals(receiver.getClass().getName())) {
+        //if (!implClass.equals(receiver.getClass().getName())) {
+        if (!StringUtils.equals(implClass, receiver.getClass().getName())) {
             throw new IllegalArgumentException("singleton / implClass conflict - receivedImplClass :" + implClass + ", actUsedSingleton :" + receiver.getClass().getName());
         }
 
@@ -95,18 +94,16 @@ public enum EadcFactory {
      * default EadcReceiverImpl is only using the data xml and not the soap
      * request and response data
      */
-    private EadcEntry initEntry(String implClass, String dsName, Document data, Document soapRqData, Document soapRspData) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    private synchronized EadcEntry initEntry(String implClass, String dsName, Document data, Document soapRqData, Document soapRspData) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         if (entry == null) {
-            synchronized (INSTANCE) {
-                if (entry == null) {
-                    LOGGER.debug("initEntry - instantiate new :" + implClass);
-                    entry = (EadcEntry) Class.forName(implClass).newInstance();
-                }
-            }
+            LOGGER.debug("initEntry - instantiate new: '{}'", implClass);
+            entry = (EadcEntry) Class.forName(implClass).newInstance();
+
         } else {
-            LOGGER.trace("initEntry - use old singleton instance :" + implClass);
+            LOGGER.trace("initEntry - use old singleton instance: '{}'", implClass);
         }
-        if (!implClass.equals(entry.getClass().getName())) {
+        //if (!implClass.equals(entry.getClass().getName())) {
+        if (!StringUtils.equals(implClass, entry.getClass().getName())) {
             throw new IllegalArgumentException("singleton / implClass conflict - receivedImplClass :" + implClass + ", actUsedSingleton :" + entry.getClass().getName());
         }
 

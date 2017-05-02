@@ -8,8 +8,8 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -19,12 +19,8 @@ import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
-import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,7 +33,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URLDecoder;
-import java.security.AlgorithmParameters;
 import java.security.Key;
 import java.security.SecureRandom;
 import java.text.DateFormat;
@@ -47,7 +42,18 @@ import java.util.TimeZone;
 
 public class Utils {
 
+    private static final String DATE_TIME_FORMAT_FULL = "ddMMyyyyHHmmss";
     private static final Logger log = LoggerFactory.getLogger("Utils");
+    //private static final String password = "dow98u983u29ejoia9832983927jdodj0834804930jdfkfjlsfsjojojfd9";
+    private static final String ALGO = "AES";
+    private static final byte[] keyValue
+            = new byte[]{'T', 'h', '1', 'B', 'e', 's', 't',
+            'S', '1', '@', 'r', 'e', '$', 'K', '2', 'y'};
+    private static String DATE_TIME_FORMAT = "dd-MM-yyyy HH:mm";
+    private static String salt;
+    private static int pswdIterations = 65536;
+    private static int keySize = 256;
+    private byte[] ivBytes;
 
     public static String getDocumentAsXml(org.w3c.dom.Document doc, boolean header) {
         String resp = "";
@@ -79,21 +85,14 @@ public class Utils {
         return resp;
     }
 
-    private static final String password = "dow98u983u29ejoia9832983927jdodj0834804930jdfkfjlsfsjojojfd9";
-    private static String salt;
-    private static int pswdIterations = 65536;
-    private static int keySize = 256;
-    private byte[] ivBytes;
-    public static final String DATE_TIME_FORMAT_FULL = "ddMMyyyyHHmmss";
-
     public static boolean verifyTicket(String ticket) {
         String encryptionKey = MyServletContextListener.getEncryptionKey();
-        log.info("ENCRYPTION KEY: " + encryptionKey);
+        log.info("ENCRYPTION KEY: '{}'", encryptionKey);
         boolean verified = false;
         try {
-            log.info("PRE  String to be decrypted is " + ticket);
-            ticket = URLDecoder.decode(ticket);
-            log.info("POST String to be decrypted is " + ticket);
+            log.info("PRE  String to be decrypted is '{}'", ticket);
+            ticket = URLDecoder.decode(ticket, CharEncoding.UTF_8);
+            log.info("POST String to be decrypted is '{}'", ticket);
             String decrypted = "";
             try {
                 decrypted = decrypt(ticket, encryptionKey);
@@ -103,7 +102,7 @@ public class Utils {
             }
             log.info("### Decrypted String is " + decrypted);
             if (Validator.isNotNull(decrypted)) {
-                Ticket ticket1 = StringToTicket(URLDecoder.decode(decrypted));
+                Ticket ticket1 = StringToTicket(URLDecoder.decode(decrypted, CharEncoding.UTF_8));
                 log.info("Date from ticket: " + ticket1.getCreatedDate());
                 log.info("Email from ticket: " + ticket1.getEmailAddress());
                 DateFormat format = new SimpleDateFormat(DATE_TIME_FORMAT_FULL);
@@ -123,103 +122,6 @@ public class Utils {
         return verified;
     }
 
-    public boolean isValidUser(String user) throws Exception {
-        Utils utils = new Utils();
-        String userId_ = user; //URLDecoder.decode(user);
-        int userId = Integer.parseInt(Utils.decrypt(userId_));
-        log.info("#### Encrypted userid " + user);
-        log.info("#### Decrypted userid " + userId);
-        return Validator.isNotNull(UserLocalServiceUtil.getUser(userId));
-    }
-
-    public User getLiferayUserUnEncrypted(String user) throws Exception {
-        Utils utils = new Utils();
-        User liferayUser = UserLocalServiceUtil.getUserByScreenName(EpsosRestService.companyId, user);
-        if (Validator.isNotNull(liferayUser)) {
-            return liferayUser;
-        }
-        return null;
-    }
-
-    public User getLiferayUser(String user) throws Exception {
-        Utils utils = new Utils();
-        String userId_ = user; //URLDecoder.decode(user);
-        int userId = Integer.parseInt(Utils.decrypt(userId_));
-        User liferayUser = UserLocalServiceUtil.getUser(userId);
-        if (Validator.isNotNull(liferayUser)) {
-            return liferayUser;
-        }
-        return null;
-    }
-
-    public String encrypt_(String plainText) throws Exception {
-        log.info("String to be encrypted is " + plainText);
-        //get salt
-        salt = generateSalt();
-        byte[] saltBytes = salt.getBytes("UTF-8");
-
-        // Derive the key
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        PBEKeySpec spec = new PBEKeySpec(
-                password.toCharArray(),
-                saltBytes,
-                pswdIterations,
-                keySize
-        );
-
-        SecretKey secretKey = factory.generateSecret(spec);
-        SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
-
-        //encrypt the message
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secret);
-        AlgorithmParameters params = cipher.getParameters();
-        ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
-        byte[] encryptedTextBytes = cipher.doFinal(plainText.getBytes("UTF-8"));
-        String ret = new Base64().encodeAsString(encryptedTextBytes);
-        return ret;
-    }
-
-    @SuppressWarnings("static-access")
-    public String decrypt_(String encryptedText) throws Exception {
-        log.info("String to be decrypted: " + encryptedText);
-        byte[] saltBytes = salt.getBytes("UTF-8");
-        byte[] encryptedTextBytes = new Base64().decodeBase64(encryptedText);
-
-        // Derive the key
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        PBEKeySpec spec = new PBEKeySpec(
-                password.toCharArray(),
-                saltBytes,
-                pswdIterations,
-                keySize
-        );
-
-        SecretKey secretKey = factory.generateSecret(spec);
-        SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
-
-        // Decrypt the message
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
-
-        byte[] decryptedTextBytes = null;
-        try {
-            decryptedTextBytes = cipher.doFinal(encryptedTextBytes);
-        } catch (IllegalBlockSizeException e) {
-            log.error(ExceptionUtils.getStackTrace(e));
-        } catch (BadPaddingException e) {
-            log.error(ExceptionUtils.getStackTrace(e));
-        }
-
-        String ret = new String(decryptedTextBytes);
-        return ret;
-    }
-
-    private static final String ALGO = "AES";
-    private static final byte[] keyValue
-            = new byte[]{'T', 'h', '1', 'B', 'e', 's', 't',
-            'S', '1', '@', 'r', 'e', '$', 'K', '2', 'y'};
-
     private static Key generateKey() throws Exception {
         Key key = new SecretKeySpec(keyValue, ALGO);
         return key;
@@ -230,17 +132,15 @@ public class Utils {
         Cipher c = Cipher.getInstance(ALGO);
         c.init(Cipher.ENCRYPT_MODE, key);
         byte[] encVal = c.doFinal(Data.getBytes());
-        String encryptedValue = new BASE64Encoder().encode(encVal);
-        return encryptedValue;
+        return java.util.Base64.getEncoder().encodeToString(encVal);
     }
 
     private static Key generateKeyWithKey(byte[] encryptionKey) throws Exception {
-        Key key = new SecretKeySpec(encryptionKey, ALGO);
-        return key;
+        return new SecretKeySpec(encryptionKey, ALGO);
     }
 
     public static String decrypt(String encryptedData, String encryptionKey) throws Exception {
-        Key key = null;
+        Key key;
         if (Validator.isNotNull(encryptionKey)) {
             byte[] bytes = encryptionKey.getBytes();
             key = generateKeyWithKey(bytes);
@@ -256,7 +156,7 @@ public class Utils {
             byte[] decValue = c.doFinal(decordedValue);
             decryptedValue = new String(decValue);
         } catch (Exception e) {
-            log.error("Error decrypting: " + encryptedData + " " + e.getMessage());
+            log.error("Error decrypting: '{}' because of '{}'", encryptedData, e.getMessage(), e);
         }
         return decryptedValue;
     }
@@ -267,21 +167,14 @@ public class Utils {
             Key key = generateKey();
             Cipher c = Cipher.getInstance(ALGO);
             c.init(Cipher.DECRYPT_MODE, key);
-            byte[] decordedValue = new BASE64Decoder().decodeBuffer(encryptedData);
+            //byte[] decordedValue = new BASE64Decoder().decodeBuffer(encryptedData);
+            byte[] decordedValue = java.util.Base64.getDecoder().decode(encryptedData);
             byte[] decValue = c.doFinal(decordedValue);
             decryptedValue = new String(decValue);
         } catch (Exception e) {
             log.error("Error decrypting: " + encryptedData + " " + e.getMessage());
         }
         return decryptedValue;
-    }
-
-    public String generateSalt() {
-        SecureRandom random = new SecureRandom();
-        byte bytes[] = new byte[20];
-        random.nextBytes(bytes);
-        String s = new String(bytes);
-        return s;
     }
 
     public static Ticket StringToTicket(String key) {
@@ -351,7 +244,7 @@ public class Utils {
                 ret = true;
             }
         } catch (Exception e) {
-            log.error("Error finding user for user inside ticket");
+            log.error("Error finding user for user inside ticket '{}'", e.getMessage(), e);
         }
 //            String date = ticket1.getCreatedDate();
 //            log.info("Userid is " + userId + " and date is " + date);
@@ -369,8 +262,6 @@ public class Utils {
         return ret;
     }
 
-    public static String DATE_TIME_FORMAT = "dd-MM-yyyy HH:mm";
-
     public static String formatDate(Date date) {
         String formatted = "";
         if (date != null) {
@@ -383,13 +274,13 @@ public class Utils {
     }
 
     public static String transformDomToString(Document doc) throws TransformerConfigurationException, TransformerException {
+
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(doc), new StreamResult(writer));
-        String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
-        return output;
+        return writer.getBuffer().toString().replaceAll("\n|\r", "");
     }
 
     public static Document readXml(StreamSource is) throws SAXException, IOException,
@@ -413,6 +304,105 @@ public class Utils {
         is2.setCharacterStream(is.getReader());
 
         return db.parse(is2);
+    }
+
+    public boolean isValidUser(String user) throws Exception {
+        Utils utils = new Utils();
+        String userId_ = user; //URLDecoder.decode(user);
+        int userId = Integer.parseInt(Utils.decrypt(userId_));
+        log.info("#### Encrypted userid '{}'", user);
+        log.info("#### Decrypted userid '{}'", userId);
+        return Validator.isNotNull(UserLocalServiceUtil.getUser(userId));
+    }
+
+    public User getLiferayUserUnEncrypted(String user) throws Exception {
+        Utils utils = new Utils();
+        User liferayUser = UserLocalServiceUtil.getUserByScreenName(EpsosRestService.companyId, user);
+        if (Validator.isNotNull(liferayUser)) {
+            return liferayUser;
+        }
+        return null;
+    }
+
+    public User getLiferayUser(String user) throws Exception {
+        Utils utils = new Utils();
+        String userId_ = user; //URLDecoder.decode(user);
+        int userId = Integer.parseInt(Utils.decrypt(userId_));
+        User liferayUser = UserLocalServiceUtil.getUser(userId);
+        if (Validator.isNotNull(liferayUser)) {
+            return liferayUser;
+        }
+        return null;
+    }
+
+//    public String encrypt_(String plainText) throws Exception {
+//        log.info("String to be encrypted is " + plainText);
+//        //get salt
+//        salt = generateSalt();
+//        byte[] saltBytes = salt.getBytes("UTF-8");
+//
+//        // Derive the key
+//        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+//        PBEKeySpec spec = new PBEKeySpec(
+//                password.toCharArray(),
+//                saltBytes,
+//                pswdIterations,
+//                keySize
+//        );
+//
+//        SecretKey secretKey = factory.generateSecret(spec);
+//        SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
+//
+//        //encrypt the message
+//        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//        cipher.init(Cipher.ENCRYPT_MODE, secret);
+//        AlgorithmParameters params = cipher.getParameters();
+//        ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
+//        byte[] encryptedTextBytes = cipher.doFinal(plainText.getBytes("UTF-8"));
+//        String ret = new Base64().encodeAsString(encryptedTextBytes);
+//        return ret;
+//    }
+
+//    @SuppressWarnings("static-access")
+//    public String decrypt_(String encryptedText) throws Exception {
+//        log.info("String to be decrypted: " + encryptedText);
+//        byte[] saltBytes = salt.getBytes("UTF-8");
+//        byte[] encryptedTextBytes = new Base64().decodeBase64(encryptedText);
+//
+//        // Derive the key
+//        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+//        PBEKeySpec spec = new PBEKeySpec(
+//                password.toCharArray(),
+//                saltBytes,
+//                pswdIterations,
+//                keySize
+//        );
+//
+//        SecretKey secretKey = factory.generateSecret(spec);
+//        SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
+//
+//        // Decrypt the message
+//        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//        cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
+//
+//        byte[] decryptedTextBytes = null;
+//        try {
+//            decryptedTextBytes = cipher.doFinal(encryptedTextBytes);
+//        } catch (IllegalBlockSizeException e) {
+//            log.error(ExceptionUtils.getStackTrace(e));
+//        } catch (BadPaddingException e) {
+//            log.error(ExceptionUtils.getStackTrace(e));
+//        }
+//
+//        String ret = new String(decryptedTextBytes);
+//        return ret;
+//    }
+
+    public String generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte bytes[] = new byte[20];
+        random.nextBytes(bytes);
+        return new String(bytes);
     }
 }
 

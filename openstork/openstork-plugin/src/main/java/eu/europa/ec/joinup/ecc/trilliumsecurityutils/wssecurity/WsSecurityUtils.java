@@ -9,35 +9,9 @@
  */
 package eu.europa.ec.joinup.ecc.trilliumsecurityutils.wssecurity;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyPair;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import javax.xml.crypto.dsig.CanonicalizationMethod;
-import javax.xml.crypto.dsig.DigestMethod;
-import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.SignatureMethod;
-import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.Transform;
-import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.namespace.QName;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.xerces.dom.DocumentImpl;
 import org.opensaml.saml2.core.Assertion;
@@ -49,6 +23,21 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.saml.SAML;
+
+import javax.xml.crypto.dsig.*;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+import javax.xml.namespace.QName;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Utility class with helper methods for WS-Security
@@ -98,6 +87,7 @@ public class WsSecurityUtils {
     public static Element signSecurityHeader(SOAPHeaderBlock securityHeader, Assertion assertion) {
         Element result = null;
         final Element securityTokeReference;
+        FileInputStream is = null;
         try {
             XMLSignatureFactory factory;
             KeyStore keyStore;
@@ -109,7 +99,7 @@ public class WsSecurityUtils {
             factory = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
 
             // Set keyStore
-            FileInputStream is = new FileInputStream(Constants.SC_KEYSTORE_PATH.split(Constants.EPSOS_PROPS_PATH)[0]);
+            is = new FileInputStream(Constants.SC_KEYSTORE_PATH.split(Constants.EPSOS_PROPS_PATH)[0]);
             keyStore = KeyStore.getInstance("JKS");
             keyStore.load(is, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
             is.close();
@@ -162,6 +152,8 @@ public class WsSecurityUtils {
             LOG.error("An error has occurred during the SECURITY HEADER signing process.", ex);
         } catch (Exception ex) {
             LOG.error("An error has occurred during the SECURITY HEADER signing process.", ex);
+        } finally {
+            IOUtils.closeQuietly(is);
         }
         return result;
     }
