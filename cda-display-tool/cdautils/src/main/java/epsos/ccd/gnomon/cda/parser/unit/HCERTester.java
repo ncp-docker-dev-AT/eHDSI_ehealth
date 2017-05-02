@@ -1,42 +1,22 @@
 package epsos.ccd.gnomon.cda.parser.unit;
 
-import epsos.ccd.gnomon.cda.parser.beans.Address;
-import epsos.ccd.gnomon.cda.parser.beans.Author;
-import epsos.ccd.gnomon.cda.parser.beans.Birthdate;
-import epsos.ccd.gnomon.cda.parser.beans.Code;
-import epsos.ccd.gnomon.cda.parser.beans.Contact;
-import epsos.ccd.gnomon.cda.parser.beans.Custodian;
-import epsos.ccd.gnomon.cda.parser.beans.Gender;
-import epsos.ccd.gnomon.cda.parser.beans.GenericCode;
-import epsos.ccd.gnomon.cda.parser.beans.Identifier;
-import epsos.ccd.gnomon.cda.parser.beans.LegalAuthenticator;
-import epsos.ccd.gnomon.cda.parser.beans.MedicalComponent;
-import epsos.ccd.gnomon.cda.parser.beans.Name;
-import epsos.ccd.gnomon.cda.parser.beans.Observation;
-import epsos.ccd.gnomon.cda.parser.beans.Organization;
-import epsos.ccd.gnomon.cda.parser.beans.Patient;
-import epsos.ccd.gnomon.cda.parser.beans.Problem;
-import epsos.ccd.gnomon.cda.parser.beans.RelatedDocument;
-import epsos.ccd.gnomon.cda.parser.beans.Time;
+import epsos.ccd.gnomon.cda.parser.beans.*;
 import epsos.ccd.gnomon.cda.parser.docs.ClinicalDocument;
 import epsos.ccd.gnomon.cda.parser.docs.HCEReport;
-import epsos.ccd.gnomon.cda.parser.enums.ContactUse;
-import epsos.ccd.gnomon.cda.parser.enums.Country;
-import epsos.ccd.gnomon.cda.parser.enums.MedicalSection;
-import epsos.ccd.gnomon.cda.parser.enums.Sex;
-import epsos.ccd.gnomon.cda.parser.enums.URLScheme;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.Date;
+import epsos.ccd.gnomon.cda.parser.enums.*;
+import org.xml.sax.InputSource;
+
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
-import org.xml.sax.InputSource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.Date;
 
 /**
  * A simple unit testing class.
@@ -120,7 +100,7 @@ public class HCERTester {
         prob1.setDescription("Acute angle closure glaucoma");
         prob1.setRoot("2.16.470.1.100.1.1.1000.990.1");
         prob1.addObservation(new Observation("H40", "Glaucoma", "1.3.6.1.4.1.12559.11.10.1.3.1.44.2", "ICD-10"));
-        
+
         // Adding the medical entry
         diagnoses.addEntry(prob1);
 
@@ -136,19 +116,19 @@ public class HCERTester {
         prob2.setRoot("2.16.470.1.100.1.1.1000.990.1");
         prob2.addObservation(new Observation("E14", "Unspecified diabetes mellitus", "1.3.6.1.4.1.12559.11.10.1.3.1.44.2", "ICD-10"));
         prob2.addObservation(new Observation("XX", "Unspecified", "1.3.6.1.4.1.12559.11.10.1.3.1.44.2", "ICD-10"));
-        
+
         // Adding the medical entry
         diagnoses.addEntry(prob2);
-        
+
         diagnoses.addRoot("2.16.840.1.113883.10.20.1.11");
         diagnoses.addRoot("1.3.6.1.4.1.19376.1.5.3.1.3.6");
-        
+
         // Adding the medical component to the document
         cda.addComponent(diagnoses);
 
-        try {
+        try (FileWriter writer = new FileWriter(new File("/home/karkaletsis/Downloads/hcer-report.xml"))) {
             // Saving locally the XML patient summary into an XML file
-            FileWriter writer = new FileWriter(new File("/home/karkaletsis/Downloads/hcer-report.xml"));
+
             writer.write(cda.toString());
             writer.flush();
 

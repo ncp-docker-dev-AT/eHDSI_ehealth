@@ -1,24 +1,34 @@
 /**
  * Copyright (c) 2009-2011 University of Cardiff and others.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * <p>
  * Contributors:
  * Cardiff University - intial API and implementation
  */
 
 package org.openhealthtools.openatna.archive;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openhealthtools.openatna.audit.AtnaFactory;
+import org.openhealthtools.openatna.audit.persistence.dao.*;
+import org.openhealthtools.openatna.audit.persistence.model.*;
+import org.openhealthtools.openatna.audit.persistence.model.codes.CodeEntity;
+import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.DateFormat;
@@ -26,27 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openhealthtools.openatna.audit.AtnaFactory;
-import org.openhealthtools.openatna.audit.persistence.dao.CodeDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ErrorDao;
-import org.openhealthtools.openatna.audit.persistence.dao.MessageDao;
-import org.openhealthtools.openatna.audit.persistence.dao.NetworkAccessPointDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ObjectDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ParticipantDao;
-import org.openhealthtools.openatna.audit.persistence.dao.SourceDao;
-import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageEntity;
-import org.openhealthtools.openatna.audit.persistence.model.NetworkAccessPointEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ObjectEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ParticipantEntity;
-import org.openhealthtools.openatna.audit.persistence.model.SourceEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.CodeEntity;
-import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
 
 /**
  * @author Andrew Harrison
@@ -56,15 +45,13 @@ import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
 
 public class Archiver {
 
-    static Log log = LogFactory.getLog("org.openhealthtools.openatna.archive.Archiver");
-
     public static final String EXT = ".oar";
     public static final String MESSAGES = "messages.xml";
     public static final String ENTITIES = "entities.xml";
     public static final String ERRORS = "errors.xml";
     protected static DateFormat archiveFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
     protected static DateFormat nameFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
-
+    static Log log = LogFactory.getLog("org.openhealthtools.openatna.archive.Archiver");
     private boolean archiveMessages = true;
     private boolean archiveEntities = true;
     private boolean archiveErrors = true;
@@ -77,6 +64,12 @@ public class Archiver {
     }
 
     public Archiver() {
+    }
+
+    public static void main(String[] args) throws Exception {
+        Archiver a = new Archiver();
+        a.setArchiveName("test");
+        a.archive();
     }
 
     public void archive() throws Exception {
@@ -98,23 +91,28 @@ public class Archiver {
     }
 
     private File archiveMessages(File directory) throws Exception {
+
         MessageDao dao = AtnaFactory.messageDao();
         MessageWriter writer = new MessageWriter();
         File ret = new File(directory, MESSAGES);
-        FileOutputStream fout = new FileOutputStream(ret);
-        XMLStreamWriter w = XMLOutputFactory.newInstance().createXMLStreamWriter(fout);
-        int offset = 0;
-        List<? extends MessageEntity> msgs = dao.getAll(offset, pageSize);
-        writer.begin(w);
-        writer.writeMessages(msgs, w);
-        offset += msgs.size();
-        while (msgs.size() >= pageSize) {
-            msgs = dao.getAll(offset, pageSize);
+
+        try (FileOutputStream fout = new FileOutputStream(ret)) {
+
+            XMLStreamWriter w = XMLOutputFactory.newInstance().createXMLStreamWriter(fout);
+            int offset = 0;
+            List<? extends MessageEntity> msgs = dao.getAll(offset, pageSize);
+            writer.begin(w);
             writer.writeMessages(msgs, w);
             offset += msgs.size();
+            while (msgs.size() >= pageSize) {
+                msgs = dao.getAll(offset, pageSize);
+                writer.writeMessages(msgs, w);
+                offset += msgs.size();
+            }
+            writer.finish(w);
+            log.info("written " + offset + " messages");
         }
-        writer.finish(w);
-        log.info("written " + offset + " messages");
+
         return ret;
     }
 
@@ -133,16 +131,17 @@ public class Archiver {
      */
     private File archiveEntities(File directory) throws Exception {
         File ret = new File(directory, ENTITIES);
-        FileOutputStream fout = new FileOutputStream(ret);
-        XMLStreamWriter w = XMLOutputFactory.newInstance().createXMLStreamWriter(fout);
-        EntityWriter writer = new EntityWriter();
-        writer.begin(w);
-        archiveCodes(writer, w, pageSize);
-        archiveNaps(writer, w, pageSize);
-        archiveSources(writer, w, pageSize);
-        archiveParticipants(writer, w, pageSize);
-        archiveObjects(writer, w, pageSize);
-        writer.finish(w);
+        try (FileOutputStream fout = new FileOutputStream(ret)) {
+            XMLStreamWriter w = XMLOutputFactory.newInstance().createXMLStreamWriter(fout);
+            EntityWriter writer = new EntityWriter();
+            writer.begin(w);
+            archiveCodes(writer, w, pageSize);
+            archiveNaps(writer, w, pageSize);
+            archiveSources(writer, w, pageSize);
+            archiveParticipants(writer, w, pageSize);
+            archiveObjects(writer, w, pageSize);
+            writer.finish(w);
+        }
         return ret;
     }
 
@@ -227,23 +226,25 @@ public class Archiver {
     }
 
     private File archiveErrors(File directory) throws Exception {
+
         ErrorDao dao = AtnaFactory.errorDao();
         ErrorWriter writer = new ErrorWriter();
         File ret = new File(directory, ERRORS);
-        FileOutputStream fout = new FileOutputStream(ret);
-        XMLStreamWriter w = XMLOutputFactory.newInstance().createXMLStreamWriter(fout);
-        int offset = 0;
-        List<? extends ErrorEntity> msgs = dao.getAll(offset, pageSize);
-        writer.begin(w);
-        writer.writeErrors(msgs, w);
-        offset += msgs.size();
-        while (msgs.size() >= pageSize) {
-            msgs = dao.getAll(offset, pageSize);
+        try (FileOutputStream fout = new FileOutputStream(ret)) {
+            XMLStreamWriter w = XMLOutputFactory.newInstance().createXMLStreamWriter(fout);
+            int offset = 0;
+            List<? extends ErrorEntity> msgs = dao.getAll(offset, pageSize);
+            writer.begin(w);
             writer.writeErrors(msgs, w);
             offset += msgs.size();
+            while (msgs.size() >= pageSize) {
+                msgs = dao.getAll(offset, pageSize);
+                writer.writeErrors(msgs, w);
+                offset += msgs.size();
+            }
+            writer.finish(w);
+            log.info("written " + offset + " errors");
         }
-        writer.finish(w);
-        log.info("written " + offset + " errors");
         return ret;
     }
 
@@ -267,7 +268,6 @@ public class Archiver {
             archiveName += EXT;
         }
     }
-
 
     public boolean isArchiveMessages() {
         return archiveMessages;
@@ -315,11 +315,5 @@ public class Archiver {
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
-    }
-
-    public static void main(String[] args) throws Exception {
-        Archiver a = new Archiver();
-        a.setArchiveName("test");
-        a.archive();
     }
 }

@@ -1,27 +1,27 @@
 /**
  * Patient summary and ePrescription XCA server implementation
- *
+ * <p>
  * Patient summary implementation by SRDC Copyright (C) 2011, 2012 SRDC Yazilim
  * Arastirma ve Gelistirme ve Danismanlik Tic. Ltd. Sti. <epsos@srdc.com.tr>
- *
+ * <p>
  * This file is part of SRDC epSOS NCP.
- *
+ * <p>
  * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along with
  * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- *
+ * <p>
  * ePrescription implementation by Kela (The Social Insurance Institution of
  * Finland) and SALAR/Diabol of Sweden GNU General Public License v3
- *
+ * <p>
  * Corrections/updates by other epSOS project participants
  */
 package tr.com.srdc.epsos.ws.server.xca.impl;
@@ -46,48 +46,21 @@ import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.services.CdaValidationService;
-import fi.kela.se.epsos.data.model.DocumentAssociation;
-import fi.kela.se.epsos.data.model.DocumentFactory;
-import fi.kela.se.epsos.data.model.EPDocumentMetaData;
-import fi.kela.se.epsos.data.model.EPSOSDocument;
-import fi.kela.se.epsos.data.model.EPSOSDocumentMetaData;
-import fi.kela.se.epsos.data.model.MroDocumentMetaData;
-import fi.kela.se.epsos.data.model.PSDocumentMetaData;
+import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ServiceLoader;
-import java.util.UUID;
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.namespace.QName;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.AssociationType1;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ClassificationType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExtrinsicObjectType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.log4j.Logger;
-import org.hibernate.exception.ExceptionUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -101,17 +74,27 @@ import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
+import javax.activation.DataHandler;
+import javax.mail.util.ByteArrayDataSource;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.namespace.QName;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.*;
+
 public class XCAServiceImpl implements XCAServiceInterface {
 
-    public static Logger logger = Logger.getLogger(XCAServiceImpl.class);
+    public static Logger logger = LoggerFactory.getLogger(XCAServiceImpl.class);
+    ITransformationService transformationService;
+    OMFactory factory;
     private oasis.names.tc.ebxml_regrep.xsd.query._3.ObjectFactory ofQuery;
     private oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory ofRim;
     private oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
     private ihe.iti.xds_b._2007.ObjectFactory ofXds;
     private ServiceLoader<DocumentSearchInterface> serviceLoader;
     private DocumentSearchInterface documentSearchService;
-    ITransformationService transformationService;
-    OMFactory factory;
 
     public XCAServiceImpl() throws Exception {
 
@@ -136,8 +119,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
         transformationService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
     }
 
-    public void prepareEventLogForQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, Element sh, String classCode) throws DatatypeConfigurationException {
+    public void prepareEventLogForQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, Element sh, String classCode) {
         ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+
 
         if (classCode.equals(Constants.EP_CLASSCODE)) {
             eventLog.setEventType(EventType.epsosOrderServiceList);
@@ -150,7 +134,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
             eventLog.setEI_TransactionName(TransactionName.epsosMroServiceList);
         }
         eventLog.setEI_EventActionCode(EventActionCode.READ);
-        eventLog.setEI_EventDateTime(new XMLGregorianCalendarImpl(new GregorianCalendar()));
+        try {
+            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
+        } catch (DatatypeConfigurationException e) {
+            logger.error("DatatypeConfigurationException: {}", e.getMessage());
+        }
         eventLog.setPS_PatricipantObjectID(getDocumentEntryPatientId(request));
 
         if (response.getRegistryObjectList() != null) {
@@ -211,7 +199,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             boolean documentReturned,
             OMElement registryErrorList,
             Element sh,
-            String classCode) throws DatatypeConfigurationException {
+            String classCode) {
         ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
 
         if (classCode == null || classCode.equals(Constants.EP_CLASSCODE)) {
@@ -228,7 +216,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
             eventLog.setEI_TransactionName(TransactionName.epsosMroServiceRetrieve);
         }
         eventLog.setEI_EventActionCode(EventActionCode.READ);
-        eventLog.setEI_EventDateTime(new XMLGregorianCalendarImpl(new GregorianCalendar()));
+        try {
+            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
+        } catch (DatatypeConfigurationException e) {
+            logger.error("DatatypeConfigurationException: {}", e.getMessage());
+        }
 
         eventLog.setET_ObjectID(Constants.UUID_PREFIX + request.getDocumentRequest().get(0).getDocumentUniqueId());
 
@@ -653,9 +645,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     private String getLocation() {
         ConfigurationManagerService configManager = ConfigurationManagerService.getInstance();
-        String location = configManager.getServiceWSE(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
-                Constants.PatientService);
-
+        //String location = configManager.getServiceWSE(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
+        //                Constants.PatientService);
+        // EHNCP-1131
+        String location = "urn:oid:" + Constants.HOME_COMM_ID;
         return location;
     }
 
@@ -667,7 +660,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error"));
         re.setCodeContext(codeContext);
         re.setValue(value);
-
         return re;
     }
 
@@ -678,6 +670,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
         re.addAttribute(factory.createOMAttribute("errorCode", null, errorCode));
         String aux = "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error");
         re.addAttribute(factory.createOMAttribute("severity", null, aux));
+        // EHNCP-1131
+        re.addAttribute(factory.createOMAttribute("location", null, getLocation()));
         re.setText(value);
 
         return re;
@@ -756,7 +750,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
 
 //        // Evidence for call to NI for XCA List
-        /* Joao: we MUST generate NRO when NCPA sends to NI. This was throwing errors because we were not passing a XML document. 
+        /* Joao: we MUST generate NRO when NCPA sends to NI. This was throwing errors because we were not passing a XML document.
         We're passing data like:
         "SearchCriteria: {patientId = 12445ASD}"
         So we provided a XML representation of such data */
@@ -884,8 +878,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                 }
 //                // Evidence for response from NI for XCA List in case of success
-                /* Joao: This should be NRR of NCPA receiving from NI. 
-                    This was throwing errors because we were not passing a XML document. 
+                /* Joao: This should be NRR of NCPA receiving from NI.
+                    This was throwing errors because we were not passing a XML document.
                     We're passing data like:
                     "SearchCriteria: {patientId = 12445ASD}"
                     So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
@@ -906,7 +900,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             } else {
                 // Evidence for response from NI for XCA List in case of failure
                 /* Joao: This should be NRR of NCPA receiving from NI.
-                    This was throwing errors because we were not passing a XML document. 
+                    This was throwing errors because we were not passing a XML document.
                     We're passing data like:
                     "SearchCriteria: {patientId = 12445ASD}"
                     So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
@@ -941,10 +935,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private Document transformDocument(Document doc,
-            OMElement registryErrorList,
-            OMElement registryResponseElement,
-            boolean isTranscode,
-            EventLog eventLog) throws Exception {
+                                       OMElement registryErrorList,
+                                       OMElement registryResponseElement,
+                                       boolean isTranscode,
+                                       EventLog eventLog) throws Exception {
 
         logger.debug("Transforming document, isTranscode: " + isTranscode);
 
@@ -1012,7 +1006,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         boolean documentReturned = false;
 
-        Element soapHeaderElement = null;
+        Element soapHeaderElement;
         String classCodeValue = null;
 
         // Start processing within a labeled block, break on certain errors
@@ -1021,7 +1015,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             try {
                 soapHeaderElement = XMLUtils.toDOM(soapHeader);
             } catch (Exception e) {
-                logger.fatal(e);
+                logger.error(null, e);
                 throw e;
             }
 
@@ -1055,7 +1049,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 }
             }
 
-            logger.info("The client country code to be used by the PDP: " + countryCode);
+            logger.info("The client country code to be used by the PDP '{}' ", countryCode);
 
             // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
             if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
@@ -1065,7 +1059,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             }
 
             // Evidence for call to NI for XCA Retrieve
-            /* Joao: we MUST generate NRO when NCPA sends to NI.This was throwing errors because we were not passing a XML document. 
+            /* Joao: we MUST generate NRO when NCPA sends to NI.This was throwing errors because we were not passing a XML document.
                 We're passing data like:
                 "SearchCriteria: {patientId = 12445ASD}"
                 So we provided a XML representation of such data */
@@ -1086,7 +1080,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         "NI_XCA_RETRIEVE_REQ",
                         Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {
-                logger.error(ExceptionUtils.getStackTrace(e));
+                logger.error("createEvidenceREMNRO: " + ExceptionUtils.getStackTrace(e));
             }
 
             EPSOSDocument epsosDoc = documentSearchService.getDocument(DocumentFactory.createSearchCriteria()
@@ -1095,8 +1089,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     .add(Criteria.RepositoryId, repositoryId));
             if (epsosDoc == null) {
 //                // Evidence for response from NI in case of failure
-                /* Joao: This should be NRR of NCPA receiving from NI. 
-                    This was throwing errors because we were not passing a XML document. 
+                /* Joao: This should be NRR of NCPA receiving from NI.
+                    This was throwing errors because we were not passing a XML document.
                     We're passing data like:
                     "SearchCriteria: {patientId = 12445ASD}"
                     So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
@@ -1119,8 +1113,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
             }
 
             // Evidence for response from NI in case of success
-            /* Joao: This should be NRR of NCPA receiving from NI. 
-                    This was throwing errors because we were not passing a XML document. 
+            /* Joao: This should be NRR of NCPA receiving from NI.
+                    This was throwing errors because we were not passing a XML document.
                     We're passing data like:
                     "SearchCriteria: {patientId = 12445ASD}"
                     So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
@@ -1294,7 +1288,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     @Override
     public AdhocQueryResponse queryDocument(AdhocQueryRequest adhocQueryRequest,
-            SOAPHeader sh, EventLog eventLog) throws Exception {
+                                            SOAPHeader sh, EventLog eventLog) throws Exception {
         AdhocQueryResponse result = ofQuery.createAdhocQueryResponse();
         try {
             AdhocQueryResponseBuilder(adhocQueryRequest, result, sh, eventLog);
@@ -1339,7 +1333,5 @@ public class XCAServiceImpl implements XCAServiceInterface {
         } else {
             return null;
         }
-
     }
-
 }

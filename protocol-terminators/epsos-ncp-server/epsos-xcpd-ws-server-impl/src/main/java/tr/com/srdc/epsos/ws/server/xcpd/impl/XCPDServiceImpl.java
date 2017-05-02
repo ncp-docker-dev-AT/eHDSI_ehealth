@@ -1,19 +1,19 @@
 /**
  * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
  * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- *
+ * <p>
  * This file is part of SRDC epSOS NCP.
- *
+ * <p>
  * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along with
  * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -47,47 +47,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.log4j.Logger;
-import org.hibernate.exception.ExceptionUtils;
-import org.hl7.v3.AD;
-import org.hl7.v3.ActClassControlAct;
-import org.hl7.v3.ActRelationshipMitigates;
-import org.hl7.v3.AdxpCity;
-import org.hl7.v3.AdxpCountry;
-import org.hl7.v3.AdxpPostalCode;
-import org.hl7.v3.AdxpStreetAddressLine;
-import org.hl7.v3.AdxpStreetName;
-import org.hl7.v3.CE;
-import org.hl7.v3.CommunicationFunctionType;
-import org.hl7.v3.EnFamily;
-import org.hl7.v3.EnGiven;
-import org.hl7.v3.EntityClassDevice;
-import org.hl7.v3.II;
-import org.hl7.v3.INT;
-import org.hl7.v3.MCCIMT000100UV01Organization;
-import org.hl7.v3.MCCIMT000300UV01Agent;
-import org.hl7.v3.MCCIMT000300UV01Organization;
-import org.hl7.v3.MCCIMT000300UV01Receiver;
-import org.hl7.v3.MCCIMT000300UV01Sender;
-import org.hl7.v3.MFMIMT700711UV01Reason;
-import org.hl7.v3.ObjectFactory;
-import org.hl7.v3.PN;
-import org.hl7.v3.PRPAIN201305UV02;
-import org.hl7.v3.PRPAIN201305UV02QUQIMT021001UV01ControlActProcess;
-import org.hl7.v3.PRPAIN201306UV02;
-import org.hl7.v3.PRPAIN201306UV02MFMIMT700711UV01Subject1;
-import org.hl7.v3.PRPAMT201306UV02LivingSubjectAdministrativeGender;
-import org.hl7.v3.PRPAMT201306UV02LivingSubjectBirthTime;
-import org.hl7.v3.PRPAMT201306UV02LivingSubjectId;
-import org.hl7.v3.PRPAMT201306UV02LivingSubjectName;
-import org.hl7.v3.PRPAMT201306UV02ParameterList;
-import org.hl7.v3.PRPAMT201306UV02PatientAddress;
-import org.hl7.v3.PRPAMT201306UV02QueryByParameter;
-import org.hl7.v3.PRPAMT201310UV02Person;
-import org.hl7.v3.ParticipationTargetSubject;
-import org.hl7.v3.TS;
-import org.hl7.v3.XActMoodDefEvn;
-import org.hl7.v3.XActMoodIntentEvent;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.hl7.v3.*;
 import org.joda.time.DateTime;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -104,12 +65,20 @@ import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 public class XCPDServiceImpl implements XCPDServiceInterface {
 
-    public static Logger logger = Logger.getLogger(XCPDServiceImpl.class);
     public static final String ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED = "DemographicsQueryNotAllowed";
     public static final String ERROR_ANSWER_NOT_AVAILABLE = "AnswerNotAvailable";
     public static final String ERROR_INSUFFICIENT_RIGHTS = "InsufficientRights";
+    public static Logger logger = LoggerFactory.getLogger(XCPDServiceImpl.class);
     private ObjectFactory of;
     private ServiceLoader<PatientSearchInterface> serviceLoader;
     private PatientSearchInterface patientSearchService;
@@ -131,11 +100,15 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         return id.getExtension() + "^^^&" + id.getRoot() + "&ISO";
     }
 
-    public void prepareEventLog(EventLog eventLog, PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, Element sh) throws DatatypeConfigurationException {
+    public void prepareEventLog(EventLog eventLog, PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, Element sh) {
         eventLog.setEventType(EventType.epsosIdentificationServiceFindIdentityByTraits);
         eventLog.setEI_TransactionName(TransactionName.epsosIdentificationServiceFindIdentityByTraits);
         eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
-        eventLog.setEI_EventDateTime(new XMLGregorianCalendarImpl(new GregorianCalendar()));
+        try {
+            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
+        } catch (DatatypeConfigurationException e) {
+            logger.error("DatatypeConfigurationException: {}", e.getMessage());
+        }
         eventLog.setHR_UserID(Constants.HR_ID_PREFIX + "<" + Helper.getUserID(sh) + "@" + Helper.getOrganization(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getRoleID(sh));
@@ -600,7 +573,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         try {
             shElement = XMLUtils.toDOM(sh);
         } catch (Exception e) {
-            logger.fatal("SOAP header jaxb to dom failed.", e);
+            logger.error("SOAP header jaxb to dom failed.", e);
             throw e;
         }
         patientSearchService.setSOAPHeader(shElement);

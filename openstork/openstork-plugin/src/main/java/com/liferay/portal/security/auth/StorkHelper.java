@@ -1,28 +1,24 @@
 package com.liferay.portal.security.auth;
 
-import com.liferay.portal.SystemException;
+
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
-import com.liferay.portlet.expando.model.ExpandoColumn;
-import com.liferay.portlet.expando.model.ExpandoColumnConstants;
-import com.liferay.portlet.expando.model.ExpandoTable;
-import com.liferay.portlet.expando.model.ExpandoTableConstants;
-import com.liferay.portlet.expando.model.ExpandoValue;
+import com.liferay.portlet.expando.model.*;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
 import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
-import eu.stork.peps.auth.commons.IPersonalAttributeList;
-import eu.stork.peps.auth.commons.PEPSUtil;
-import eu.stork.peps.auth.commons.PersonalAttribute;
-import eu.stork.peps.auth.commons.PersonalAttributeList;
-import eu.stork.peps.auth.commons.STORKAuthnRequest;
+import eu.stork.peps.auth.commons.*;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
 import eu.stork.peps.exceptions.STORKSAMLEngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -32,21 +28,20 @@ import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+
 
 /**
- *
  * @author karkaletsis
  */
 public class StorkHelper {
 
-    private final String USER_AGENT = "Mozilla/5.0";
-    private static Logger log = Logger.getLogger(StorkHelper.class.getName());
+    private static Logger log = LoggerFactory.getLogger(StorkHelper.class.getName());
     private static long companyId = CompanyThreadLocal.getCompanyId();
+    private final String USER_AGENT = "Mozilla/5.0";
 
     public static String getPepsURL() throws com.liferay.portal.kernel.exception.SystemException {
         String pepsurl = PrefsPropsUtil.getString(companyId, "peps.url");
-        log.info("### PEPS URL IS : " + pepsurl);
+        log.info("### PEPS URL IS : '{}'", pepsurl);
         return pepsurl;
     }
 
@@ -54,7 +49,7 @@ public class StorkHelper {
         return PrefsPropsUtil.getString(companyId, "sp.country");
     }
 
-    public static boolean isEnabled(long companyId) throws SystemException, com.liferay.portal.kernel.exception.SystemException {
+    public static boolean isEnabled(long companyId) throws SystemException {
         return PrefsPropsUtil.getBoolean(companyId, "stork.enabled", false);
     }
 
@@ -140,7 +135,7 @@ public class StorkHelper {
             authnRequest = engine.generateSTORKAuthnRequest(authnRequest);
         } catch (STORKSAMLEngineException e) {
             e.printStackTrace();
-            log.severe(e.getMessage());
+            log.error(e.getMessage());
         }
 
         token = authnRequest.getTokenSaml();
@@ -172,41 +167,6 @@ public class StorkHelper {
         properties.setSpApplication(PrefsPropsUtil.getString(companyId, "sp.aplication"));
         properties.setProviderName(PrefsPropsUtil.getString(companyId, "provider.name"));
         return createStorkSAML(properties);
-    }
-
-    public String doSubmit(String url, Map<String, String> data) throws Exception {
-        URL siteUrl = new URL(url);
-        HttpURLConnection conn = (HttpURLConnection) siteUrl.openConnection();
-        conn.setRequestProperty("User-Agent", USER_AGENT);
-        conn.setRequestProperty("referer", "localhost");
-        conn.setRequestMethod("POST");
-        conn.setDoOutput(true);
-        conn.setDoInput(true);
-
-        DataOutputStream out = new DataOutputStream(conn.getOutputStream());
-
-        Set keys = data.keySet();
-        Iterator keyIter = keys.iterator();
-        String content = "";
-        for (int i = 0; keyIter.hasNext(); i++) {
-            Object key = keyIter.next();
-            if (i != 0) {
-                content += "&";
-            }
-            content += key + "=" + URLEncoder.encode(data.get(key), "UTF-8");
-        }
-        //System.out.println(content);
-        out.writeBytes(content);
-        out.flush();
-        out.close();
-        StringBuilder sb = new StringBuilder();
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String line = "";
-        while ((line = in.readLine()) != null) {
-            sb.append(line);
-        }
-        in.close();
-        return sb.toString();
     }
 
     public static void updateColumnValue(long expGroupTableId, String columnName, String value, long companyId, long groupId) {
@@ -271,4 +231,38 @@ public class StorkHelper {
         return column;
     }
 
+    public String doSubmit(String url, Map<String, String> data) throws Exception {
+        URL siteUrl = new URL(url);
+        HttpURLConnection conn = (HttpURLConnection) siteUrl.openConnection();
+        conn.setRequestProperty("User-Agent", USER_AGENT);
+        conn.setRequestProperty("referer", "localhost");
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setDoInput(true);
+
+        DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+
+        Set keys = data.keySet();
+        Iterator keyIter = keys.iterator();
+        String content = "";
+        for (int i = 0; keyIter.hasNext(); i++) {
+            Object key = keyIter.next();
+            if (i != 0) {
+                content += "&";
+            }
+            content += key + "=" + URLEncoder.encode(data.get(key), "UTF-8");
+        }
+        //System.out.println(content);
+        out.writeBytes(content);
+        out.flush();
+        out.close();
+        StringBuilder sb = new StringBuilder();
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String line = "";
+        while ((line = in.readLine()) != null) {
+            sb.append(line);
+        }
+        in.close();
+        return sb.toString();
+    }
 }

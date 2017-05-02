@@ -58,6 +58,7 @@ import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
@@ -66,23 +67,27 @@ import org.opensaml.saml2.core.Assertion;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.UUID;
+
 /**
  * RespondingGateway_ServiceStub java implementation.
  *
  * @author SRDC<code> - epsos@srdc.com.tr>
  * @author Aarne Roosi<code> - Aarne.Roosi@Affecto.com</code>
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
- *
  */
 public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub {
 
     private static final Logger LOG = Logger.getLogger(RespondingGateway_ServiceStub.class);
-    
+
     static {
         LOG.debug("Loading the WS-Security init libraries in RespondingGateway_ServiceStub xcpd");
-        org.apache.xml.security.Init.init(); // Massi added 3/1/2017. 
+        org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
     }
-	
+
     protected org.apache.axis2.description.AxisOperation[] _operations;
     // hashmaps to keep the fault mapping
     private java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
@@ -93,11 +98,11 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     private String countryCode;
     private Date transactionStartTime;
     private Date transactionEndTime;
-    
+
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
     }
-    
+
     private static synchronized String getUniqueSuffix() {
         // reset the counter if it is greater than 99999
         if (counter > 99999) {
@@ -177,8 +182,6 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     /**
      * Auto generated method signature
      *
-     * @see
-     * tr.com.srdc.epsos.ws.xcpd.client.RespondingGateway_Service#respondingGateway_PRPA_IN201305UV02
      * @param pRPA_IN201305UV02
      * @param idAssertion
      * @return
@@ -226,10 +229,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (Exception ex) {
                 LOG.error(ex.getLocalizedMessage(), ex);
             }
-            /* The WSA To header is not being manually added, it's added by the client-connector axis2.xml configurations 
-            (which globally engages the addressing module, adding the wsa:To header based on the endpoint value from the transport) 
-            based on the assumption that these IHE Service clients will always be coupled with client-connector, which may not be 
-            the case in the future. When that happens, we may need to revisit this code to add the To header like it's done in the IHE XCA service client. 
+            /* The WSA To header is not being manually added, it's added by the client-connector axis2.xml configurations
+            (which globally engages the addressing module, adding the wsa:To header based on the endpoint value from the transport)
+            based on the assumption that these IHE Service clients will always be coupled with client-connector, which may not be
+            the case in the future. When that happens, we may need to revisit this code to add the To header like it's done in the IHE XCA service client.
             See issues EHNCP-1141 and EHNCP-1168. */
             _serviceClient.addHeader(action);
             _serviceClient.addHeader(id);
@@ -241,7 +244,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
             /* add the message contxt to the operation client */
             operationClient.addMessageContext(messageContext);
-            
+
             /* Log soap request */
             String logRequestBody;
             try {
@@ -305,7 +308,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
                     LOG.debug("Retrying the request with the new configurations: [" + value + "]");
-                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value)); 
+                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value));
 
                     /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
                     OperationClient newOperationClient = _serviceClient.createClient(_operations[0].getName());
@@ -315,7 +318,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
                     SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
 
-                    /* we need to create a new SOAP payload so that the wsa:To header is correctly set 
+                    /* we need to create a new SOAP payload so that the wsa:To header is correctly set
                     (i.e., copied from the Transport information to the wsa:To during the running of the Addressing Phase,
                     as defined by the global engagement of the addressing module in axis2.xml). The old payload still contains the old endpoint. */
                     org.apache.axiom.soap.SOAPEnvelope newEnv;
@@ -324,7 +327,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                             optimizeContent(new javax.xml.namespace.QName(XCPDConstants.SOAP_HEADERS.NAMESPACE_URI, XCPDConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART)));
 
                     /* we set the previous headers in the new SOAP envelope. Note: the wsa:To header is not manually set (only Action and MessageID are) but instead handled by the
-                    axis2 configuration of client-connector (my assumption). This may have impact if we decouple client-connector from the IHE service clients. If 
+                    axis2 configuration of client-connector (my assumption). This may have impact if we decouple client-connector from the IHE service clients. If
                     they are decoupled, we most probably have to add the To header manually like it's done in the IHE XCA client, both here and in the initial
                     request. See issues EHNCP-1141 and EHNCP-1168. */
                     _serviceClient.addHeadersToEnvelope(newEnv);
@@ -352,7 +355,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             org.apache.axis2.context.MessageContext _returnMessageContext = operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             org.apache.axiom.soap.SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
-            
+
             // TMP
             // Transaction end time
             end = System.currentTimeMillis();
@@ -389,7 +392,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
             /*
              * Invoke NRR
-             */            
+             */
 //            LOG.info("XCPD Response received. EVIDENCE NRR");
 //            // NRR
 //            try {
@@ -438,7 +441,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 LOG.info("SOAP MESSAGE IS: " + XMLUtils.toDOM(_returnEnv));
             } catch (Exception ex) {
-                java.util.logging.Logger.getLogger(RespondingGateway_ServiceStub.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.error(null, ex);
             }
 
             LOG.info("Submission Time is : " + eventLog.getEI_EventDateTime());
@@ -490,7 +493,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 try {
                     _messageContext.getTransportOut().getSender().cleanup(_messageContext);
                 } catch (AxisFault ex) {
-                    LOG.info(ex);
+                    LOG.error(null, ex);
                 }
             }
         }
@@ -510,6 +513,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
         return returnMap;
     }
+
     private javax.xml.namespace.QName[] opNameArray = null;
 
     private boolean optimizeContent(javax.xml.namespace.QName opName) {

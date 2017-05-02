@@ -1,36 +1,39 @@
 /**
  * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
  * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- *
+ * <p>
  * This file is part of SRDC epSOS NCP.
- *
+ * <p>
  * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along with
  * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- *
+ * <p>
  * Modifications by Kela (The Social Insurance Institution of Finland) GNU
  * Public License v3
  */
 package tr.com.srdc.epsos.securityman.helper;
 
-import javax.xml.transform.dom.DOMSource;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 import org.opensaml.common.xml.SAMLSchemaBuilder;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Attribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
 import tr.com.srdc.epsos.util.saml.SAML;
+
+import javax.xml.transform.dom.DOMSource;
 
 /**
  * TODO: improve the implementation by implementing a method which picks
@@ -38,7 +41,10 @@ import tr.com.srdc.epsos.util.saml.SAML;
  */
 public class Helper {
 
-    public static Logger logger = Logger.getLogger(Helper.class);
+    private static final Logger logger = LoggerFactory.getLogger(Helper.class);
+
+    private Helper() {
+    }
 
     public static Assertion getHCPAssertion(Element sh) {
         try {
@@ -72,7 +78,7 @@ public class Helper {
             return hcpAssertion;
 
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.debug("Exception: '{}'", e.getMessage(), e);
             return null;
         }
     }
@@ -82,12 +88,14 @@ public class Helper {
 
         try {
             Assertion assertion = getHCPAssertion(sh);
-            String val = assertion.getSubject().getNameID().getValue();
-            if (val != null && !val.equals("")) {
-                result = val;
+            if (assertion != null) {
+                String val = assertion.getSubject().getNameID().getValue();
+                if (StringUtils.isNotBlank(val)) {
+                    result = val;
+                }
             }
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.debug("Exception: '{}'", e.getMessage(), e);
         }
 
         return result;
@@ -147,14 +155,14 @@ public class Helper {
     public static Assertion getTRCAssertion(Element sh) {
         try {
             NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
-            Element security = null;
+            Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
             } else {
                 throw (new MissingFieldException("Security element is required."));
             }
             NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "Assertion");
-            Element trcAss = null;
+            Element trcAss;
             Assertion trcAssertion = null;
 
             if (assertionList.getLength() > 0) {
@@ -173,7 +181,7 @@ public class Helper {
             return trcAssertion;
 
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.debug("Exception: '{}'", e.getMessage(), e);
             return null;
         }
     }
@@ -193,18 +201,19 @@ public class Helper {
     }
 
     /**
-     *
-     * @param sh SOAP Header
+     * @param sh            SOAP Header
      * @param attributeName Attribute name
-     * @param trc true, if attribute should be picked from TRC assertion
+     * @param trc           true, if attribute should be picked from TRC assertion
      * @return attribute value
      */
     private static String getXSPAAttributeByName(Element sh, String attributeName, boolean trc) {
+
         String result = null;
+        Assertion assertion = null;
 
         try {
-            Assertion assertion = null;
-            if (trc == true) {
+
+            if (trc) {
                 assertion = getTRCAssertion(sh);
             } else {
                 assertion = getHCPAssertion(sh);
@@ -215,15 +224,15 @@ public class Helper {
             for (Attribute attr : assertion.getAttributeStatements().get(0).getAttributes()) {
                 if (attr.getName().equals(attributeName)) {
                     String val = attr.getAttributeValues().get(0).getDOM().getTextContent();
-                    if (val != null && !val.equals("")) {
+                    if (StringUtils.isNotBlank(val)) {
                         result = val;
                     }
                 }
             }
         } catch (Exception e) {
             String assertionType = trc ? "TRC" : "HCP";
-            logger.error("XSPA attribute " + attributeName + " not found in " + assertionType + " assertion");
-            logger.debug(e.getMessage());
+            logger.error("XSPA attribute '{}' not found in '{}' assertion", attributeName, assertionType);
+            logger.debug("Exception: '{}'", e.getMessage(), e);
         }
 
         return result;

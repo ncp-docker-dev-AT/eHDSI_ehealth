@@ -46,6 +46,8 @@ import org.herasaf.xacml.core.policy.PolicyMarshaller;
 import org.herasaf.xacml.core.simplePDP.SimplePDPFactory;
 import org.herasaf.xacml.core.utils.JAXBMarshallerConfiguration;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -54,8 +56,25 @@ import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.FileUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPException;
+import javax.xml.transform.TransformerException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+
 /**
- *
  * @author karkaletsis
  */
 public class EvidenceUtils {
@@ -64,6 +83,10 @@ public class EvidenceUtils {
     public static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
     public static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
     public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
+    private static Logger logger = LoggerFactory.getLogger(EvidenceUtils.class);
+
+    private EvidenceUtils() {
+    }
 
     private static boolean checkCorrectnessofIHEXCA(final MessageType messageType) {
         return true;
@@ -98,7 +121,7 @@ public class EvidenceUtils {
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
         }
-        createEvidenceREMNRR(incomingMsg, issuerKeyStorePath, issuerKeyPassword, 
+        createEvidenceREMNRR(incomingMsg, issuerKeyStorePath, issuerKeyPassword,
                 issuerCertAlias, senderKeyStorePath, senderKeyPassword,
                 senderCertAlias, recipientKeyStorePath, recipientKeyPassword,
                 recipientCertAlias, eventType, submissionTime, status, title, msguuid);
@@ -152,14 +175,14 @@ public class EvidenceUtils {
         /*
          * Now create the XACML request
          */
-        LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> actionList = new LinkedList<>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
         action.setIdentifier(new URI("urn:eSENS:outcome"));
         actionList.add(action);
         action.setValue(statusmsg);
 
-        LinkedList<XACMLAttributes> environmentList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
         environment.setDataType(new URI(DATATYPE_DATETIME));
         environment.setIdentifier(new URI("urn:esens:2014:event"));
@@ -171,28 +194,29 @@ public class EvidenceUtils {
 
         Element request = requestCreator.getRequest();
 
+        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
         // just some printouts
         Utilities.serialize(request);
 
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
 
         enforcePolicy.decide(request);
-        Utilities.serialize(enforcePolicy.getResponseAsDocument()
-                .getDocumentElement());
+        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
+        Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
 
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
 
         Context context = new Context();
         context.setIncomingMsg(incomingMsg);
-        
+
         /* Loading the different certificates */
         X509Certificate issuerCert = getCertificate(issuerKeyStorePath, issuerKeyPassword, issuerCertAlias);
         X509Certificate senderCert = getCertificate(senderKeyStorePath, senderKeyPassword, senderCertAlias);
         X509Certificate recipientCert = getCertificate(recipientKeyStorePath, recipientKeyPassword, recipientCertAlias);
         context.setIssuerCertificate(issuerCert);
-        context.setSenderCertificate(senderCert); 
+        context.setSenderCertificate(senderCert);
         context.setRecipientCertificate(recipientCert);
-        
+
         /* Signing key is the issuer key */
         PrivateKey key = getSigningKey(issuerKeyStorePath, issuerKeyPassword, issuerCertAlias);
         context.setSigningKey(key);
@@ -208,14 +232,13 @@ public class EvidenceUtils {
         List<ObligationHandler> handlers = handlerFactory.createHandler(
                 messageType, obligations, context);
 
-        int handlersSize = handlers.size();
-        for (int j = 0; j < handlersSize; j++) {
-            ObligationHandler oh = handlers.get(j);
+        for (ObligationHandler oh : handlers) {
             oh.discharge();
-            Utilities.serialize(handlers.get(j).getMessage().getDocumentElement());
-            String oblString = XMLUtil.DocumentToString(handlers.get(j).getMessage());
+            //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
+            Utilities.serialize(oh.getMessage().getDocumentElement());
+            String oblString = XMLUtil.DocumentToString(oh.getMessage());
             if (title == null || title.isEmpty()) {
-                title = getPath() + "nrr/" + getDocumentTitle(msguuid, handlers.get(j).toString()) + ".xml";
+                title = getPath() + "nrr/" + getDocumentTitle(msguuid, oh.toString()) + ".xml";
             } else {
                 title = getPath() + "nrr/" + getDocumentTitle(msguuid, title) + ".xml";
             }
@@ -278,7 +301,7 @@ public class EvidenceUtils {
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
         }
-        createEvidenceREMNRO(incomingSoap, issuerKeyStorePath, issuerKeyPassword, 
+        createEvidenceREMNRO(incomingSoap, issuerKeyStorePath, issuerKeyPassword,
                 issuerCertAlias, senderKeyStorePath, senderKeyPassword,
                 senderCertAlias, recipientKeyStorePath, recipientKeyPassword,
                 recipientCertAlias, eventType, submissionTime, status, title, msguuid);
@@ -355,6 +378,7 @@ public class EvidenceUtils {
                 messageType, null, null, actionList, environmentList);
 
         Element request = requestCreator.getRequest();
+        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
         Utilities.serialize(request);
 
         /*
@@ -365,22 +389,22 @@ public class EvidenceUtils {
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
 
         enforcePolicy.decide(request);
-        Utilities.serialize(enforcePolicy.getResponseAsDocument()
-                .getDocumentElement());
+        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
+        Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
 
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
 
         Context context = new Context();
         context.setIncomingMsg(incomingSoap);
-        
+
         /* Loading the different certificates */
         X509Certificate issuerCert = getCertificate(issuerKeyStorePath, issuerKeyPassword, issuerCertAlias);
         X509Certificate senderCert = getCertificate(senderKeyStorePath, senderKeyPassword, senderCertAlias);
         X509Certificate recipientCert = getCertificate(recipientKeyStorePath, recipientKeyPassword, recipientCertAlias);
         context.setIssuerCertificate(issuerCert);
-        context.setSenderCertificate(senderCert); 
+        context.setSenderCertificate(senderCert);
         context.setRecipientCertificate(recipientCert);
-        
+
         /* Signing key is the issuer key */
         PrivateKey key = getSigningKey(issuerKeyStorePath, issuerKeyPassword, issuerCertAlias);
         context.setSigningKey(key);
@@ -397,14 +421,14 @@ public class EvidenceUtils {
 
         // Here I discharge manually. This behavior is to let free an
         // implementation
-        int handlersSize = handlers.size();
 
-        for (int j = 0; j < handlersSize; j++) {
-            handlers.get(j).discharge();
-            Utilities.serialize(handlers.get(j).getMessage().getDocumentElement());
-            String oblString = XMLUtil.DocumentToString(handlers.get(j).getMessage());
+        for (ObligationHandler handler : handlers) {
+            handler.discharge();
+            //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
+            Utilities.serialize(handler.getMessage().getDocumentElement());
+            String oblString = XMLUtil.DocumentToString(handler.getMessage());
             if (title == null || title.isEmpty()) {
-                title = getPath() + "nro/" + getDocumentTitle(msguuid, handlers.get(j).toString()) + ".xml";
+                title = getPath() + "nro/" + getDocumentTitle(msguuid, handler.toString()) + ".xml";
             } else {
                 title = getPath() + "nro/" + getDocumentTitle(msguuid, title) + ".xml";
             }
@@ -439,7 +463,7 @@ public class EvidenceUtils {
         X509Certificate cert = (X509Certificate) ks.getCertificate(certAlias);
         return cert;
     }
-    
+
     private static PrivateKey getSigningKey(String keyStorePath, String keyPassword, String certAlias) throws FileNotFoundException, KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));

@@ -1,38 +1,41 @@
 package com.spirit.epsos.cc.adc.test;
 
+import com.spirit.epsos.cc.adc.db.EadcDbConnect;
+import eu.epsos.pt.eadc.util.EadcFactory;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.naming.NamingException;
+import javax.xml.parsers.ParserConfigurationException;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import javax.naming.NamingException;
-import javax.xml.parsers.ParserConfigurationException;
-import org.apache.log4j.Logger;
-import org.apache.log4j.BasicConfigurator;
-import com.spirit.epsos.cc.adc.db.EadcDbConnect;
-
-import eu.epsos.pt.eadc.util.EadcFactory;
-
-import org.junit.Test;
 
 /**
  * This test will test the database connection
  */
 public class DbConnectTest extends BaseEadcTest {
 
-    private static Logger log = Logger.getLogger(DbConnectTest.class);
-    
+    private static Logger log = LoggerFactory.getLogger(DbConnectTest.class);
+
     @Test
-    public void eadcReceiverTest() throws ClassNotFoundException, SQLException, ParserConfigurationException, NamingException {
-        //DOMConfigurator.configureAndWatch("log4j.xml", 60 * 1000);
-        BasicConfigurator.configure();
+    public void eadcReceiverTest() throws ClassNotFoundException, SQLException, ParserConfigurationException, NamingException, InterruptedException {
+
+        // TODO: check and validate, adding dummy Thread.sleep(500); in order to prevent the JDBC Exception
+        // Unique index or primary key violation: "PRIMARY_KEY_E ON PUBLIC.TEST_ADC(PK)"; SQL statement:
+        // during the Unit Test plan execution caused by the System.currentTimeMillis() as a Primary Key
         for (int i = 0; i < 3; i++) {
             new DbConnectTest().tryDbConnect(false);
+            Thread.sleep(500);
         }
+        Thread.sleep(500);
         new DbConnectTest().tryDbConnect(true);
     }
 
-    public void tryDbConnect(boolean dropTable) throws NamingException, SQLException, ParserConfigurationException, ClassNotFoundException {
+    private void tryDbConnect(boolean dropTable) throws NamingException, SQLException, ParserConfigurationException, ClassNotFoundException {
+
         log.info("create new  DBConnect_epSOS");
         EadcDbConnect con = EadcFactory.INSTANCE.createEadcDbConnect(DS_NAME);
         log.info("DBConnect_epSOS created .......");
@@ -69,5 +72,4 @@ public class DbConnectTest extends BaseEadcTest {
             con.closeConnection();
         }
     }
-
 }

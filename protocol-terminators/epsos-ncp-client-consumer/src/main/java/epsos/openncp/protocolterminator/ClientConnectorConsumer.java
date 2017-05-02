@@ -67,21 +67,27 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
 
+import javax.xml.namespace.QName;
+import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.List;
+
 /*
  *  ClientConnectorServiceServiceTest Junit test case
  */
 public class ClientConnectorConsumer {
-    
+
     private static final Logger logger = java.util.logging.Logger.getLogger(ClientConnectorConsumer.class.getName());
 
-    private String epr;
     private final long TIMEOUT = 3 * 60 * 1000; // Three minutes
-    
+
+    private String epr;
+
     public ClientConnectorConsumer(String epr) {
             this.epr = epr;
     }
-    
-    private void registerEvidenceEmitterHandler(ClientConnectorServiceServiceStub stub) throws AxisFault {        
+
+    private void registerEvidenceEmitterHandler(ClientConnectorServiceServiceStub stub) throws AxisFault {
         /* Adding custom phase for evidence emitter processing */
         logger.log(Level.INFO,"Adding custom phase for outflow evidence emitter processing");
         HandlerDescription outFlowHandlerDescription = new HandlerDescription("OutFlowEvidenceEmitterHandler");
@@ -98,6 +104,17 @@ public class ClientConnectorConsumer {
         logger.log(Level.INFO,"Resetting global Out phases");
         axisConfiguration.setGlobalOutPhase(outFlowPhasesList);
         logger.log(Level.INFO,"Ended phases restrucruting");
+    }
+
+    private static void addAssertions(ClientConnectorServiceServiceStub stub, Assertion idAssertion, Assertion trcAssertion) throws Exception {
+        OMFactory omFactory = OMAbstractFactory.getOMFactory();
+        OMElement omSecurityElement = omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security", "wsse"), null);
+        if (trcAssertion != null) {
+            omSecurityElement.addChild(XMLUtils.toOM(trcAssertion.getDOM()));
+        }
+        omSecurityElement.addChild(XMLUtils.toOM(idAssertion.getDOM()));
+        stub._getServiceClient().addHeader(omSecurityElement);
+
     }
 
     /**
@@ -134,12 +151,15 @@ public class ClientConnectorConsumer {
         }
 
         EpsosDocument1[] docArray = queryDocumentsResponseDocument.getQueryDocumentsResponse().getReturnArray();
-        List<EpsosDocument1> result = Arrays.asList(docArray);
-        return result;
+        return Arrays.asList(docArray);
     }
 
     /**
-     * Auto generated test method
+     *
+     * @param idAssertion
+     * @param countryCode
+     * @param pd
+     * @return
      */
     public List<PatientDemographics> queryPatient(Assertion idAssertion, String countryCode,
                                                   PatientDemographics pd) {
@@ -182,8 +202,7 @@ public class ClientConnectorConsumer {
         }
 
         PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
-        List<PatientDemographics> result = Arrays.asList(pdArray);
-        return result;
+        return Arrays.asList(pdArray);
     }
 
     /**
@@ -206,10 +225,9 @@ public class ClientConnectorConsumer {
         try {
             sayHelloResponseDocument = stub.sayHello(sayHelloDocument);
         } catch (RemoteException ex) {
-           throw new RuntimeException(ex.getMessage(), ex);
+            throw new RuntimeException(ex.getMessage(), ex);
         }
-        String result = sayHelloResponseDocument.getSayHelloResponse().getReturn();
-        return result;
+        return sayHelloResponseDocument.getSayHelloResponse().getReturn();
     }
 
     /**
@@ -248,10 +266,18 @@ public class ClientConnectorConsumer {
             throw new RuntimeException(ex.getMessage(), ex);
         }
 
-        EpsosDocument1 result = retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
-        return result;
+        return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
     }
-    
+
+    /**
+     * @param idAssertion
+     * @param trcAssertion
+     * @param countryCode
+     * @param documentId
+     * @param homeCommunityId
+     * @param classCode
+     * @return
+     */
     @Deprecated
     public EpsosDocument1 retrieveDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode,
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) {
@@ -264,7 +290,7 @@ public class ClientConnectorConsumer {
     public SubmitDocumentResponse submitDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode,
                                                  EpsosDocument1 document, PatientDemographics pd) {
 
-        SubmitDocumentResponse response = null;
+        SubmitDocumentResponse response;
         ClientConnectorServiceServiceStub stub;
         try {
             stub = new ClientConnectorServiceServiceStub(epr);
@@ -297,17 +323,5 @@ public class ClientConnectorConsumer {
         }
 
         return response;
-
-    }
-
-    private static void addAssertions(ClientConnectorServiceServiceStub stub, Assertion idAssertion, Assertion trcAssertion) throws Exception {
-        OMFactory omFactory = OMAbstractFactory.getOMFactory();
-        OMElement omSecurityElement = omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security", "wsse"), null);
-        if (trcAssertion != null) {
-            omSecurityElement.addChild(XMLUtils.toOM(trcAssertion.getDOM()));
-        }
-        omSecurityElement.addChild(XMLUtils.toOM(idAssertion.getDOM()));
-        stub._getServiceClient().addHeader(omSecurityElement);
-
     }
 }

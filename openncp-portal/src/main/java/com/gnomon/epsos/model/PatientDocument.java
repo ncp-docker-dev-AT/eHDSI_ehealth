@@ -1,12 +1,16 @@
 package com.gnomon.epsos.model;
 
 import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
-import org.apache.log4j.Logger;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class PatientDocument {
+import java.io.Serializable;
 
-    private static final Logger log = Logger.getLogger("PatientDocument");
+public class PatientDocument implements Serializable {
+
+    private static final Logger log = LoggerFactory.getLogger("PatientDocument");
+    private static final long serialVersionUID = 2812911062938264973L;
     private String title;
     private String description;
     private String author;
@@ -126,5 +130,4 @@ public class PatientDocument {
     public void setDocType(String docType) {
         this.docType = docType;
     }
-
 }

@@ -80,9 +80,9 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 
 	static {
                 /* These are the services that OpenNCP currently defines.
-                    The keys come from the OpenNCP custom implementation of the 
+                    The keys come from the OpenNCP custom implementation of the
                     deprecated D3.4.2 - 4.5.8.1 and IHE profiles (e.g., same
-                    endpoint for XCA Query and Retrieve. 
+                    endpoint for XCA Query and Retrieve.
                     TODO: ideally this should be shared with SMP-Editor*/
 		mapMap.put("PatientIdentificationService", "urn:ehealth:PatientIdentificationAndAuthentication::XCPD::CrossGatewayPatientDiscovery##ITI-55");
                 mapMap.put("PatientService", "urn:ehealth:RequestOfData::XCA::CrossGatewayQuery##ITI-38");
@@ -110,7 +110,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 		if (instance == null) {
 			synchronized (ConfigurationManagerSMP.class) {
 				if (instance == null) {
-					l.debug("Instatiating a new ConfigurationManagerSMP");
+					l.info("Instatiating a new ConfigurationManagerSMP");
 					instance = new ConfigurationManagerSMP();
 				}
 			}
@@ -124,21 +124,21 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 	private ConfigurationManagerSMP() {
 
 		long start = System.currentTimeMillis();
-		l.debug("Loading the Hibernate session object");
+		l.info("Loading the Hibernate session object");
 		session = HibernateUtil.getSessionFactory().openSession();
 		long end = System.currentTimeMillis();
 		long total = end - start;
-		l.debug("Loaded took: " + total);
+		l.info("Loaded took: " + total);
 
 		populate();
-		l.debug("Constructor ends");
+		l.info("Constructor ends");
 	}
 
 	/**
 	 * Adds the values from the DB to the memory.
 	 */
 	private void populate() {
-		l.debug("Loading all the values");
+		l.info("Loading all the values");
 		long start = System.currentTimeMillis();
 
 		@SuppressWarnings("unchecked")
@@ -146,9 +146,9 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 
 		long end = System.currentTimeMillis();
 		long total = end - start;
-		l.debug("Getting all the properties took: " + total);
+		l.info("Getting all the properties took: " + total);
 		int size = properties.size();
-		l.debug("Adding " + size + " properties into the hashmap");
+		l.info("Adding " + size + " properties into the hashmap");
 
 		start = System.currentTimeMillis();
 		// Not using streams because of the mandatory requirement to use java7
@@ -164,7 +164,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 		}
 		end = System.currentTimeMillis();
 		total = end - start;
-		l.debug("Loading in memory the full database took: " + total);
+		l.info("Loading in memory the full database took: " + total);
 	}
 
 	/**
@@ -199,11 +199,11 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 			}
 		}
 		if (psc == null) {
-			l.debug("Value is still null, let's run TSLSynchronizer");
+			l.info("Value is still null, let's run TSLSynchronizer");
 			// TSLSynchronizer.sync();
 		}
 		if (psc != null) {
-			l.debug("Returning the value: " + psc.getValue());
+			l.info("Returning the value: " + psc.getValue());
 			return psc.getValue();
 		}
 
@@ -288,7 +288,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
          * Stores the fetched certificate in the OpenNCP truststore.
          * @param cert The certificate to be stored
          * @param alias The alias to assign to the certificate
-         * @throws SMLSMPClientException 
+         * @throws SMLSMPClientException
          */
 	private void storeCertificateToTrustStore(X509Certificate cert, String alias) throws SMLSMPClientException {
 		ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
@@ -311,24 +311,24 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 			FileOutputStream out = new FileOutputStream(keystoreFile);
 			keystore.store(out, TRUST_STORE_PASS.toCharArray());
 			out.close();
-			
+
 		} catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
 			l.error("Unable to store the message in the truststore", e);
 			throw new SMLSMPClientException(e);
 		}
 	}
-        
+
         /**
          * Stores the certificate fetched from the SMP record into the folder given
-         * by the certificates.storepath property. E.g., for the certificate used 
+         * by the certificates.storepath property. E.g., for the certificate used
          * to protect the Portuguese XCPD (ITI-55) endpoint, it stores the certificate
          * under the filename pt_ITI-55.der.
          * @param certificate The certificate to store
-         * @param countryCode The lowercase two-letter country code (ISO 3166-1 alpha-2) 
-         * @param eventId The suffix of the SMP Document Identifier, corresponding 
-         * to the epSOS EventIDs from D3.A.7 AuditTrail - 2.3.5.7, plus some custom 
+         * @param countryCode The lowercase two-letter country code (ISO 3166-1 alpha-2)
+         * @param eventId The suffix of the SMP Document Identifier, corresponding
+         * to the epSOS EventIDs from D3.A.7 AuditTrail - 2.3.5.7, plus some custom
          * ones, both outlined in the CP-eHealthDSI-002 for SMP/SML capabilities.
-         * @throws SMLSMPClientException 
+         * @throws SMLSMPClientException
          */
         private void storeCertificateInCertsFolder(X509Certificate certificate, String countryCode, String eventId) throws SMLSMPClientException {
             // export the certificate to der format
@@ -343,16 +343,16 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
                 l.info("Failed to export the certificate " + filename + ".der");
             }
         }
-        
+
         /**
          * Stores the certificate fetched from the SMP record into the hashmap and
-         * also in the properties DB. E.g., for the certificate used to protect the 
+         * also in the properties DB. E.g., for the certificate used to protect the
          * Portuguese XCPD (ITI-55) endpoint, it stores the certificate
          * under the key pt_ITI-55.
          * @param certificate The certificate to store
-         * @param countryCode The lowercase two-letter country code (ISO 3166-1 alpha-2) 
-         * @param eventId The suffix of the SMP Document Identifier, corresponding 
-         * to the epSOS EventIDs from D3.A.7 AuditTrail - 2.3.5.7, plus some custom 
+         * @param countryCode The lowercase two-letter country code (ISO 3166-1 alpha-2)
+         * @param eventId The suffix of the SMP Document Identifier, corresponding
+         * to the epSOS EventIDs from D3.A.7 AuditTrail - 2.3.5.7, plus some custom
          * ones, both outlined in the CP-eHealthDSI-002 for SMP/SML capabilities.
          */
         private void storeCertificateInConfigurationAndDB(X509Certificate certificate, String countryCode, String eventId) {
@@ -360,7 +360,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
             configuration.put(certificate.getSerialNumber().toString(), new PropertySearchableContainer(countryCode + "_" + eventId, false));
             updateProperty(certificate.getSerialNumber().toString(), countryCode + "_" + eventId);
         }
-            
+
         /**
 	 * This method exports a certificate either to text (pem format), either to
 	 * binary (der format)
@@ -419,7 +419,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 		OLDConfigurationManagerDb.getInstance().updateProperty(key, value);
 		return value;
 	}
-        
+
         /**
          * Removes a key from the hashmap.
          * @param key The key to delete.

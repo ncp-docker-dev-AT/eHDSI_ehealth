@@ -1,13 +1,6 @@
 package com.gnomon.epsos.rest;
 
-import static com.gnomon.epsos.filter.RestAuthenticationFilter.AUTHENTICATION_HEADER;
-import com.gnomon.epsos.model.Country;
-import com.gnomon.epsos.model.DictionaryTerm;
-import com.gnomon.epsos.model.DocumentExt;
-import com.gnomon.epsos.model.Identifier;
-import com.gnomon.epsos.model.Patient;
-import com.gnomon.epsos.model.PatientDocument;
-import com.gnomon.epsos.model.UserData;
+import com.gnomon.epsos.model.*;
 import com.gnomon.epsos.model.adapter.PatientAdapter;
 import com.gnomon.epsos.model.adapter.PatientDocumentAdapter;
 import com.gnomon.epsos.model.queries.Info;
@@ -27,53 +20,44 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import epsos.ccd.gnomon.xslt.EpsosXSLTransformer;
 import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
 import epsos.openncp.protocolterminator.clientconnector.PatientId;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.opensaml.saml2.core.Assertion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.opensaml.saml2.core.Assertion;
-import org.w3c.dom.Document;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.*;
+
+import static com.gnomon.epsos.filter.RestAuthenticationFilter.AUTHENTICATION_HEADER;
 
 /**
- *
  * @author karkaletsis
- *
  */
 @Path("/")
 public class EpsosRestService {
 
-    private static final int bypassRefererChecking = 1;
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("EpsosRestService");
     public static final long companyId = 10157;
+    private static final int bypassRefererChecking = 1;
+    private static final Logger log = LoggerFactory.getLogger("EpsosRestService");
     private static final Utils utils = new Utils();
+    @Context
+    private static HttpServletRequest servletRequest;
     private PatientDiscovery pdq = null;
     private PatientDemographics pd = null;
     private Info ru = null;
     private com.gnomon.epsos.model.queries.Document document;
-
-    @Context
-    private static HttpServletRequest servletRequest;
 
     @GET
     @Path("/dictionary/conditions")
@@ -217,9 +201,8 @@ public class EpsosRestService {
     }
 
     /**
-     * Returns the list of countries available in epsos node
+     * Returns the list of countries available in epSOS node.
      *
-     * @param username
      * @param language
      * @param referer
      * @return
@@ -234,7 +217,7 @@ public class EpsosRestService {
             @HeaderParam("referer") String referer) throws PortalException, SystemException, Exception {
         log.info("Get Countries for language: " + language);
         String ret = "";
-        String path = servletRequest.getRealPath("/");
+        String path = servletRequest.getSession().getServletContext().getRealPath("/");
         log.info("Application Path is: " + path);
         List<Country> countries = EpsosHelperService.getCountriesFromCS(language, path);
         Gson gson = new Gson();
@@ -266,7 +249,7 @@ public class EpsosRestService {
             @HeaderParam("referer") String referer) throws PortalException, SystemException, Exception {
         log.info("Get attributes for language: " + country);
         String ret = "";
-        String path = request.getRealPath("/") + "/WEB-INF/";
+        String path = request.getSession().getServletContext().getRealPath("/") + "/WEB-INF/";
         log.info("#################: " + path);
         Vector countryIdentifiers = EpsosHelperService.getCountryIdsFromCS(country, path);
         List<Identifier> identifiers = EpsosHelperService.getCountryIdentifiers(country, language, path, null);
@@ -389,6 +372,7 @@ public class EpsosRestService {
             @PathParam("country") String country,
             @PathParam("root") String root,
             @PathParam("extension") String extension) throws Exception {
+
         log.info("Get into search patients");
         String ret = "";
         String username = getUsernameFromHeaders();
@@ -699,7 +683,7 @@ public class EpsosRestService {
             }
             log.info("firstname: " + pd.getFamilyName());
             log.info("getBirthDate:  " + pd.getBirthDate());
-            log.info(pd);
+            log.info("PatientDemographic" + pd);
             pd.setPatientIdArray(idArray);
         } catch (Exception e) {
             e.printStackTrace();
@@ -742,5 +726,4 @@ public class EpsosRestService {
         }
         return username;
     }
-
 }

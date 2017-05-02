@@ -18,7 +18,6 @@
     </properties>
 
     <dependencies>
-        <!-- epsos CCD dependencies -->
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-audit-manager</artifactId>
@@ -32,12 +31,26 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-evidence-emitter</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bcprov-jdk15</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xmltooling</artifactId>
+                    <groupId>org.opensaml</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
@@ -85,14 +98,30 @@
             <version>2.1-b16</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
+            <groupId>org.opensaml</groupId>
+            <artifactId>xmltooling</artifactId>
+            <!--<version>1.3.1</version>-->
+            <version>1.4.4</version>
         </dependency>
+        <!-- TODO: Validate the third part dependency linked to OpenSAML version and bouncycastle bcprov -->
+        <!-- NoClassDefound SubjectKeyIdentifierStructure-->
+        <!--<dependency>-->
+            <!--<groupId>org.bouncycastle</groupId>-->
+            <!--<artifactId>bcprov-jdk15</artifactId>-->
+            <!--<version>1.46</version>-->
+            <!--<scope>runtime</scope>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.56</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!--Security-->
+        <dependency>
+            <groupId>com.matthewcasperson</groupId>
+            <artifactId>parameter_validation_filter</artifactId>
+            <version>1.2.1</version>
         </dependency>
     </dependencies>
 
@@ -102,10 +131,9 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5.1</version>
                     <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
                         <compilerArguments>
                             <endorseddirs>${endorsed.dir}</endorseddirs>
                         </compilerArguments>
@@ -114,7 +142,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.1.1</version>
                     <configuration>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                     </configuration>
@@ -122,7 +149,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.1</version>
                     <executions>
                         <execution>
                             <phase>validate</phase>

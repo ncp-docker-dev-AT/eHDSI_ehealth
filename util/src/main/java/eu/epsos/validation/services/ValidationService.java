@@ -24,16 +24,17 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.reporting.ReportBuilder;
-import javax.xml.bind.DatatypeConverter;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.DatatypeConverter;
+
 /**
- *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
 public abstract class ValidationService {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ValidationService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ValidationService.class);
     private static final String VALIDATION_STATUS_PROPERTY_NAME = "automated.validation";
 
     /**
@@ -63,9 +64,9 @@ public abstract class ValidationService {
      * based validation of a specific object (e.g. a document or transaction
      * message), using a specific model.
      *
-     * @param object the object to validate (e.g. a document or transaction
-     * message)
-     * @param model the specific model to be used
+     * @param object  the object to validate (e.g. a document or transaction
+     *                message)
+     * @param model   the specific model to be used
      * @param ncpSide
      * @return the result of validation execution: false if errors occur.
      */
@@ -77,16 +78,13 @@ public abstract class ValidationService {
      * using a specific schematron. This operation is shared by many object
      * types and they all share the same endpoint.
      *
-     * @param object the object to validate (e.g. a document or transaction
-     * message)
+     * @param object     the object to validate (e.g. a document or transaction
+     *                   message)
      * @param schematron the specific schematron to be used
-     * @param ncpSide the specific NCP side, either NCP-A or NCP-B.
+     * @param ncpSide    the specific NCP side, either NCP-A or NCP-B.
      * @return the result of validation execution: false if errors occur.
      */
     protected boolean validateSchematron(String object, String schematron, NcpSide ncpSide) {
-        net.ihe.gazelle.sch.validator.ws.GazelleObjectValidatorService gazelleObjVal;
-        net.ihe.gazelle.sch.validator.ws.GazelleObjectValidator gazelleObjValPOrt;
-
         String xmlDetails = "";
 
         if (!ValidationService.isValidationOn()) {
@@ -94,21 +92,20 @@ public abstract class ValidationService {
             return false;
         }
 
-        gazelleObjVal = new net.ihe.gazelle.sch.validator.ws.GazelleObjectValidatorService();
-        gazelleObjValPOrt = gazelleObjVal.getGazelleObjectValidatorPort();
-
-        try {
-            xmlDetails = gazelleObjValPOrt.validateObject(DatatypeConverter.printBase64Binary(object.getBytes()), schematron, schematron); // Invocation of Web Service.
-        } catch (Exception ex) {
-            LOG.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
-            return false;
-        }
+//        try {
+//            net.ihe.gazelle.sch.validator.ws.GazelleObjectValidatorService gazelleObjVal = new net.ihe.gazelle.sch.validator.ws.GazelleObjectValidatorService();
+//            net.ihe.gazelle.sch.validator.ws.GazelleObjectValidator gazelleObjValPOrt = gazelleObjVal.getGazelleObjectValidatorPort();
+//            xmlDetails = gazelleObjValPOrt.validateObject(DatatypeConverter.printBase64Binary(object.getBytes()), schematron, schematron); // Invocation of Web Service.
+//        } catch (Exception ex) {
+//            LOG.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+//            return false;
+//        }
 
         if (!xmlDetails.isEmpty()) {
             return ReportBuilder.build(schematron, Hl7v3Schematron.checkSchematron(schematron).getObjectType().toString(), object, WsUnmarshaller.unmarshal(xmlDetails), xmlDetails, ncpSide); // Report generation.
         } else {
             LOG.error("The webservice response is empty.");
-            return false;
+            return ReportBuilder.build(schematron, Hl7v3Schematron.checkSchematron(schematron).getObjectType().toString(), object, null, null, ncpSide); // Report generation
         }
     }
 }

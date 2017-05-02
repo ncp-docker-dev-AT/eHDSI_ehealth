@@ -4,6 +4,7 @@ import com.gnomon.epsos.service.EpsosHelperService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,8 +16,10 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-import org.apache.log4j.Logger;
-import org.hibernate.exception.ExceptionUtils;
+
+import org.slf4j.Logger;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -25,8 +28,9 @@ import org.xml.sax.SAXException;
 
 public class CDAUtils {
 
-    private static final Logger _log = Logger.getLogger("CDAUtils");
-    public final static String XML_LOINC_SYSTEM = "LOINC",
+    private static final Logger _log = LoggerFactory.getLogger("CDAUtils");
+
+    private final static String XML_LOINC_SYSTEM = "LOINC",
             XML_LOINC_CODESYSTEM = "2.16.840.1.113883.6.1",
             XML_PRESCRIPTION_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.1.1",
             XML_PRESCRIPTION_ENTRY_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.2.1",
@@ -56,20 +60,23 @@ public class CDAUtils {
             XML_DISPENSATION_PRODUCT_MATERIAL_FORMCODE_SYSTEM = "1.3.6.1.4.1.12559.11.10.1.3.1.42.2",
             XML_DISPENSATION_PRODUCT_MATERIAL_CONTAINER_FORMCODE_SYSTEM = "1.3.6.1.4.1.12559.11.10.1.3.1.42.3";
 
-    public static String createDispensation(Document epDoc, CDAHeader cda) throws ParserConfigurationException, SAXException, IOException {
-        String ed = CDAModelToEDXML(epDoc, cda);
-        return ed;
+    private CDAUtils() {
     }
 
-    public static Document readEpXML(String xml) throws ParserConfigurationException, SAXException, IOException {
+    public static String createDispensation(Document epDoc, CDAHeader cda) throws ParserConfigurationException, SAXException, IOException {
+
+        return CDAModelToEDXML(epDoc, cda);
+    }
+
+    private static Document readEpXML(String xml) throws ParserConfigurationException, SAXException, IOException {
+
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setNamespaceAware(true);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
-        return doc;
+        return dBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
     }
 
-    public static XPath getXPathFactory() {
+    private static XPath getXPathFactory() {
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
         xpath.setNamespaceContext(new CDANameSpaceContext());
@@ -77,8 +84,10 @@ public class CDAUtils {
     }
 
     public static String getRelativePrescriptionBarcode(Document doc) {
-        NodeList nl = null;
+
+        NodeList nl;
         String refBarcode = "";
+
         try {
             XPath xpath = getXPathFactory();
             XPathExpression epExpr = xpath.compile("//xsi:component/xsi:structuredBody/xsi:component/xsi:section//xsi:id/@extension");
@@ -155,10 +164,10 @@ public class CDAUtils {
      * A method returning the updated context of the substituted product during
      * the dispensation.
      *
-     * @param doc the cloned prescription document.
-     * @param id the id of the corresponding product.
-     * @param product the substituted name of the product.
-     * @param unit the substituted unit of the product.
+     * @param doc      the cloned prescription document.
+     * @param id       the id of the corresponding product.
+     * @param product  the substituted name of the product.
+     * @param unit     the substituted unit of the product.
      * @param quantity the substituted quantity size of the product.
      * @return the updated context of the substituted product.
      */
@@ -169,7 +178,7 @@ public class CDAUtils {
 
         try {
             //Adding the namespaces within the document
-            Map<String, String> namespaces = new HashMap<String, String>();
+            Map<String, String> namespaces = new HashMap<>();
             namespaces.put("hl7", "urn:hl7-org:v3");
             namespaces.put("epsos", "urn:epsos-org:ep:medication");
             namespaces.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
@@ -497,7 +506,7 @@ public class CDAUtils {
     }
 
     private static String addLegalAuthenticator(String legalOrgOid, String legalauthenticatorfirstname, String legalauthenticatorlastname,
-            String legalauthenticatorcity, String legalauthenticatorpostalcode, String edCountry) {
+                                                String legalauthenticatorcity, String legalauthenticatorpostalcode, String edCountry) {
         StringBuilder sb = new StringBuilder();
         sb.append("<legalAuthenticator contextControlCode=\"OP\" typeCode=\"LA\">" + "\r\n" + "<time value=\"20120927112208\"/>" + "\r\n" + "<signatureCode code=\"S\"/>" + "\r\n" + "<assignedEntity classCode=\"ASSIGNED\">" + "\r\n" + "<id root=\"").append(legalOrgOid).append("\"/>" + "\r\n" + "<telecom nullFlavor=\"NI\"/>" + "\r\n" + "<assignedPerson>" + "\r\n" + "<name>" + "\r\n" + "<family>").append(legalauthenticatorfirstname).append("</family>" + "\r\n" + "<given>").append(legalauthenticatorlastname).append("</given>" + "\r\n" + "</name>" + "\r\n" + "</assignedPerson>" + "\r\n" + "<representedOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\">" + "\r\n" + "<id root=\"").append(legalOrgOid).append("\"/>" + "\r\n" + "<name>Kansaneläkelaitos</name>" + "\r\n" + "<addr use=\"PST\">" + "\r\n" + "<streetAddressLine>N/A</streetAddressLine>" + "\r\n" + "<city>").append(legalauthenticatorcity).append("</city>" + "\r\n" + "<postalCode>").append(legalauthenticatorpostalcode).append("</postalCode>" + "\r\n" + "<state nullFlavor=\"UNK\"/>" + "\r\n" + "<country>").append(edCountry).append("</country>" + "\r\n"
                 + "</addr>" + "\r\n"
@@ -508,6 +517,7 @@ public class CDAUtils {
     }
 
     private static String CDAModelToEDXML(Document epDoc, CDAHeader cda) {
+
         String edCountry = GetterUtil.getString(ConfigurationManagerService.getInstance().getProperty("ncp.country"), "");
         String pharmacistsOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_OID);
         String pharmaciesOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIES_OID);
@@ -673,7 +683,7 @@ public class CDAUtils {
                 String product = detail.getMedicineCommercialName();
                 String unit = detail.getDispensedQuantityUnit(); //Even in a substitution we getting null
                 String quantity = detail.getDispensedQuantity();
-
+                _log.info("************************* EDDetails: {}", detail.toString());
                 //Adding the relative product line updated with the substituted data, if any
                 sb.append(getSubstitutedRelativeProductLineFromEP(clone, id, product, unit, quantity));
 
@@ -684,7 +694,7 @@ public class CDAUtils {
             }
 
             // TODO fix containerPackageMedicine code
-							/*
+                            /*
              *
              *                       <epsos:containerPackagedMedicine classCode="CONT" determinerCode="INSTANCE">
              <epsos:name>DIGOXIN</epsos:name>
@@ -1164,6 +1174,5 @@ public class CDAUtils {
             _log.error(e.getMessage());
         }
         return sameBarcode;
-
     }
 }

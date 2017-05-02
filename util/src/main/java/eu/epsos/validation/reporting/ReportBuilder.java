@@ -21,32 +21,35 @@ package eu.epsos.validation.reporting;
 
 import eu.epsos.validation.datamodel.common.DetailedResult;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 /**
- *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
 public class ReportBuilder {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ReportBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ReportBuilder.class);
     private static final String REPORT_FILES_FOLDER = "validation";
+
+    private ReportBuilder() {
+    }
 
     /**
      * This is the main operation in the report building process. It main
      * responsibility is to generate a report based on a supplied model,
      * validation object and detailed result.
      *
-     * @param model the model used in the Web Service invocation.
+     * @param model            the model used in the Web Service invocation.
      * @param validationObject the validated object.
      * @param validationResult the validation result.
-     *
      * @return A boolean flag, indicating if the reporting process succeed or
      * not.
      */
@@ -57,8 +60,6 @@ public class ReportBuilder {
         String validationTestResult;
         String validationBody;
         File reportFile;
-        FileWriter fw;
-        BufferedWriter bw;
 
         if (model == null) {
             LOG.error("The specified model is null.");
@@ -101,8 +102,7 @@ public class ReportBuilder {
 
         if (checkReportDir(reportDirName)) {
 
-            LOG.info("Writing validation report in: " + reportFileName);
-
+            LOG.info("Writing validation report in: '{}'", reportFileName);
             reportFile = new File(reportFileName);
 
             if (!reportFile.exists()) {
@@ -113,17 +113,8 @@ public class ReportBuilder {
                     return false;
                 }
             }
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(reportFile.getAbsoluteFile()))) {
 
-            try {
-                fw = new FileWriter(reportFile.getAbsoluteFile());
-            } catch (IOException ex) {
-                LOG.error("An I/O error has occurred while creating the report file for writting purposes, please check the stack trace for more information.", ex);
-                return false;
-            }
-
-            bw = new BufferedWriter(fw);
-
-            try {
                 bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
                 bw.write("\n");
                 bw.write("<validationReport>");
@@ -137,32 +128,65 @@ public class ReportBuilder {
                 bw.write("</validationResult>");
                 bw.write("\n");
                 bw.write("</validationReport>");
+
+                LOG.info("Validation report written with success");
+                return true;
+
             } catch (IOException ex) {
                 LOG.error("An I/O error has occurred while writting the report file, please check the stack trace for more information.", ex);
                 return false;
             }
-            try {
-                bw.close();
-            } catch (IOException ex) {
-                LOG.error("An I/O error has occurred while closing the report file, please check the stack trace for more information.", ex);
-                return false;
-            }
 
-            LOG.info("Validation report written with success");
-            return true;
+//            try {
+//                fw = new FileWriter(reportFile.getAbsoluteFile());
+//            } catch (IOException ex) {
+//                LOG.error("An I/O error has occurred while creating the report file for writting purposes, please check the stack trace for more information.", ex);
+//                return false;
+//            } finally {
+//                IOUtils.closeQuietly(fw);
+//            }
+//
+//            bw = new BufferedWriter(fw);
+//
+//            try {
+//                bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+//                bw.write("\n");
+//                bw.write("<validationReport>");
+//                bw.write("\n");
+//                bw.write("<validatedObject>");
+//                bw.write(validationObject.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""));
+//                bw.write("</validatedObject>");
+//                bw.write("\n");
+//                bw.write("<validationResult>");
+//                bw.write(validationBody);
+//                bw.write("</validationResult>");
+//                bw.write("\n");
+//                bw.write("</validationReport>");
+//            } catch (IOException ex) {
+//                LOG.error("An I/O error has occurred while writting the report file, please check the stack trace for more information.", ex);
+//                return false;
+//            } finally {
+//                IOUtils.closeQuietly(fw);
+//            }
+//            try {
+//                bw.close();
+//            } catch (IOException ex) {
+//                LOG.error("An I/O error has occurred while closing the report file, please check the stack trace for more information.", ex);
+//                return false;
+//            }
         }
         return false;
     }
 
     /**
-     * This method will generate a file name for the report, based on a set of
-     * parameters. Format mask: [timestamp]_[validator model]_[validation
-     * result].txt
+     * This method will generate a file name for the report, based on a set of parameters.
+     * Format mask: [timestamp]_[validator model]_[validation result].txt
      *
-     * @param model the model used in the validation.
-     * @param validationResult the validation result object.
+     * @param model                the model used in the validation.
+     * @param validationTestResult the validation result object.
      * @return a report file name.
      */
+
     private static String buildReportFileName(final String model, final String objectType, final String validationTestResult) {
 
         final String SEPARATOR = "_";
@@ -191,22 +215,20 @@ public class ReportBuilder {
         fileName.append(FILE_EXTENSION);
 
         return fileName.toString();
-
-//        return DateUtil.getCurrentTimeLocal() + SEPARATOR + objectType + SEPARATOR + modelNormalized.toUpperCase() + SEPARATOR + validationTestResult.toUpperCase() + FILE_EXTENSION;
     }
 
     /**
-     * This method will check if the report directory exists, if not, it will
-     * create it.
+     * This method will check if the report directory exists, if not, it will create it.
      *
      * @param reportDirPath the complete path for the report dir.
      * @return a boolean flag stating the success of the operation.
      */
     private static boolean checkReportDir(final String reportDirPath) {
+
         File reportDir = new File(reportDirPath);
 
         if (!reportDir.exists()) {
-            LOG.info("Creating validation report folder in: " + reportDirPath);
+            LOG.info("Creating validation report folder in: '{}'", reportDirPath);
             if (!reportDir.mkdirs()) {
                 LOG.error("An error has occurred during the creation of validation report directory.");
                 return false;
@@ -215,8 +237,5 @@ public class ReportBuilder {
             }
         }
         return true;
-    }
-
-    private ReportBuilder() {
     }
 }

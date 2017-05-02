@@ -25,6 +25,7 @@ import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.reporting.ReportBuilder;
 import net.ihe.gazelle.xd.ModelBasedValidationWS;
 import net.ihe.gazelle.xd.ModelBasedValidationWSService;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -34,13 +35,25 @@ import org.slf4j.LoggerFactory;
  */
 public class XcaValidationService extends ValidationService {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(XcaValidationService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XcaValidationService.class);
     private static XcaValidationService instance;
+
+    /**
+     * Private constructor to avoid instantiation.
+     */
+    private XcaValidationService() {
+    }
+
+    public static XcaValidationService getInstance() {
+        if (instance == null) {
+
+            instance = new XcaValidationService();
+        }
+        return instance;
+    }
 
     @Override
     public boolean validateModel(String object, String model, NcpSide ncpSide) {
-        ModelBasedValidationWSService xdService;
-        ModelBasedValidationWS xdPort;
         String xdXmlDetails = "";
 
         if (!ValidationService.isValidationOn()) {
@@ -63,15 +76,14 @@ public class XcaValidationService extends ValidationService {
             return false;
         }
 
-        xdService = new ModelBasedValidationWSService();
-        xdPort = xdService.getModelBasedValidationWSPort();
-
-        try {
-            xdXmlDetails = xdPort.validateDocument(object, model); // Invocation of Web Service client.
-        } catch (Exception ex) {
-            LOG.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
-//            return false;
-        }
+        //TODO: Fix Gazelle timeout and validation error.
+        //        try {
+        //        ModelBasedValidationWSService xdService = new ModelBasedValidationWSService();
+        //        ModelBasedValidationWS xdPort = xdService.getModelBasedValidationWSPort();
+        //            xdXmlDetails = xdPort.validateDocument(object, model); // Invocation of Web Service client.
+        //        } catch (Exception ex) {
+        //            LOG.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+        //        }
 
         if (!xdXmlDetails.isEmpty()) {
             return ReportBuilder.build(model, XdModel.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(xdXmlDetails), xdXmlDetails.toString(), ncpSide); // Report generation.
@@ -80,19 +92,5 @@ public class XcaValidationService extends ValidationService {
             return ReportBuilder.build(model, XdModel.checkModel(model).getObjectType().toString(), object, null, null, ncpSide); // Report generation.
         }
 
-    }
-
-    public static XcaValidationService getInstance() {
-        if (instance == null) {
-
-            instance = new XcaValidationService();
-        }
-        return instance;
-    }
-
-    /**
-     * Private constructor to avoid instantiation.
-     */
-    private XcaValidationService() {
     }
 }

@@ -24,10 +24,10 @@ import eu.epsos.validation.datamodel.audit.AuditSchematron;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.reporting.ReportBuilder;
-import org.slf4j.LoggerFactory;
-import net.ihe.gazelle.am.AuditMessageValidationWSService;
 import net.ihe.gazelle.am.AuditMessageValidationWS;
-import net.ihe.gazelle.am.SOAPException_Exception;
+import net.ihe.gazelle.am.AuditMessageValidationWSService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents the wrapper for the Audit messages validation.
@@ -36,14 +36,26 @@ import net.ihe.gazelle.am.SOAPException_Exception;
  */
 public class AuditValidationService extends ValidationService {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(XcaValidationService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XcaValidationService.class);
     private static AuditValidationService instance;
+
+    /**
+     * Private constructor to avoid instantiation.
+     */
+    private AuditValidationService() {
+    }
+
+    public static AuditValidationService getInstance() {
+        if (instance == null) {
+
+            instance = new AuditValidationService();
+        }
+        return instance;
+    }
 
     @Override
     public boolean validateModel(String object, String model, NcpSide ncpSide) {
         boolean result;
-        AuditMessageValidationWSService amService;
-        AuditMessageValidationWS amPort;
         String amXmlDetails = "";
 
         if (!ValidationService.isValidationOn()) {
@@ -56,46 +68,32 @@ public class AuditValidationService extends ValidationService {
             return false;
         }
 
-        amService = new AuditMessageValidationWSService();
-        amPort = amService.getAuditMessageValidationWSPort();
-        try {
-            amXmlDetails = amPort.validateDocument(object, model); // Invocation of Web Service client.
-        } catch (SOAPException_Exception ex) {
-            LOG.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
-            return false;
-        }
+        //TODO: Fix Gazelle timeout and validation error.
+        //        try {
+        //        AuditMessageValidationWSService amService = new AuditMessageValidationWSService();
+        //        AuditMessageValidationWS amPort = amService.getAuditMessageValidationWSPort();
+        //            amXmlDetails = amPort.validateDocument(object, model); // Invocation of Web Service client.
+        //        } catch (SOAPException_Exception ex) {
+        //            LOG.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+        //        }
 
         if (!amXmlDetails.isEmpty()) {
             result = ReportBuilder.build(model, AuditModel.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(amXmlDetails), amXmlDetails.toString(), ncpSide); // Report generation.
         } else {
             LOG.error("The webservice response is empty.");
-            return false;
+            result = ReportBuilder.build(model, AuditModel.checkModel(model).getObjectType().toString(), object, null, null, ncpSide); // Report generation.
         }
 
         return result;
     }
-    
+
     @Override
     public boolean validateSchematron(String object, String schematron, NcpSide ncpSide) {
         if (AuditSchematron.checkSchematron(schematron) == null) {
             LOG.error("The specified schematron is not supported by the WebService.");
             return false;
         }
-        
+
         return super.validateSchematron(object, schematron, ncpSide);
-    }
-
-    public static AuditValidationService getInstance() {
-        if (instance == null) {
-
-            instance = new AuditValidationService();
-        }
-        return instance;
-    }
-
-    /**
-     * Private constructor to avoid instantiation.
-     */
-    private AuditValidationService() {
     }
 }

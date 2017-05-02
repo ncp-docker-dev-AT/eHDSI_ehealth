@@ -24,7 +24,7 @@ import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 public class TestSMP {
 	private static final String ns = "http://busdox.org/serviceMetadata/publishing/1.0/";
 
-        /* Joao: I commented this because I was having errors after pulling and AFAIK, 
+        /* Joao: I commented this because I was having errors after pulling and AFAIK,
         log4j was dropped in favour of logback. We can analyse this after merging the branches */
 //	@BeforeClass
 //	public static void setup() {
@@ -53,7 +53,7 @@ public class TestSMP {
 	 * @throws MalformedURLException
 	 * @throws CertificateException
 	 * @throws TechnicalException
-	 * 
+	 *
 	 */
 	@Test
 	public void testClass() throws SMLSMPClientException, CertificateException, MalformedURLException, IOException,
@@ -69,8 +69,8 @@ public class TestSMP {
 		}
 	}
 
-	
-	
+
+
 
 
 }
