@@ -14,24 +14,25 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.Handler;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
  * OutFlowEvidenceEmitter
  * Generates all NROs
  * Currently supporting the generation of evidences in the following cases:
- *      NCP-B sends to NCP-A
- *      NCP-A replies to NCP-B (left commented as the Evidence Emitter CP does not mandate generation of evidences on the response)
- *      NCP-B replies to Portal (left commented as the Evidence Emitter CP does not mandate generation of evidences on the response)
+ * NCP-B sends to NCP-A
+ * NCP-A replies to NCP-B (left commented as the Evidence Emitter CP does not mandate generation of evidences on the response)
+ * NCP-B replies to Portal (left commented as the Evidence Emitter CP does not mandate generation of evidences on the response)
  *
  * @author jgoncalves
  */
 public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
-    
-    private static final Logger LOG = Logger.getLogger(OutFlowEvidenceEmitterHandler.class);
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(OutFlowEvidenceEmitterHandler.class);
+
     private EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils;
 
     @Override
@@ -40,7 +41,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
         this.evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
 
         /* I'll leave this here as it might be useful in the future */
-        
+
 //        SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
 //        if (soapHeader != null) {
 //            Iterator<?> blocks = soapHeader.examineAllHeaderBlocks();
@@ -52,7 +53,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //                block.setProcessed();
 //            }
 //        }
-        
+
 //        LOG.debug("LOGGING TEST VALUES");
 //        LOG.debug("MessageContext properties: " + msgcontext.getProperties());
 //        LOG.debug("MessageContext messageID: " + msgcontext.getMessageID());
@@ -63,7 +64,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("SessionContext is null!");
 //        }
-        
+
 //        OperationContext operationCtx = msgcontext.getOperationContext();
 //        if (operationCtx != null) {
 //            LOG.debug("OperationContext operationName: " + operationCtx.getOperationName());
@@ -73,7 +74,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("OperationContext is null!");
 //        }
-        
+
 //        ServiceGroupContext serviceGroupCtx = msgcontext.getServiceGroupContext();
 //        if (serviceGroupCtx != null) {
 //            LOG.debug("ServiceGroupContext ID: " + serviceGroupCtx.getId());
@@ -100,7 +101,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("ServiceGroupContext is null!");
 //        }
-        
+
 //        ConfigurationContext configCtx = msgcontext.getRootContext();
 //        if (configCtx != null) {
 //            LOG.debug("ConfigurationContext contextRoot: " + configCtx.getContextRoot());
@@ -109,11 +110,11 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("ConfigurationContext is null!");
 //        }
-       
+
         try {
             /* Canonicalizing the full SOAP message */
             Document envCanonicalized = this.evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(msgcontext.getEnvelope());
-        
+
             SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
             SOAPBody soapBody = msgcontext.getEnvelope().getBody();
             String eventType = null;
@@ -134,21 +135,21 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
                 //msgUUID = null; It stays as null because it's fetched from soap msg
                 LOG.debug("eventType: " + eventType);
                 LOG.debug("title: " + title);
-                
+
                 EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
-                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
-                            eventType,
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            title);
+                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                        tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
+                        tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
+                        tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
+                        tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
+                        tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
+                        tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
+                        eventType,
+                        new DateTime(),
+                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+                        title);
             } else {
                 /* NCP-A replies to NCP-B, e.g.: 
                     NRO
@@ -209,7 +210,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-            
+
         return Handler.InvocationResponse.CONTINUE;
     }
 }

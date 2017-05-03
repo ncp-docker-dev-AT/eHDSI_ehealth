@@ -326,13 +326,13 @@ public class SignatureConfirmationDialog extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SignatureConfirmationDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("ClassNotFoundException: '{}'", ex.getMessage(), ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SignatureConfirmationDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("InstantiationException: '{}'", ex.getMessage(), ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SignatureConfirmationDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("IllegalAccessException: '{}'", ex.getMessage(), ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SignatureConfirmationDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("UnsupportedLookAndFeelException: '{}'", ex.getMessage(), ex);
         }
         //</editor-fold>
 

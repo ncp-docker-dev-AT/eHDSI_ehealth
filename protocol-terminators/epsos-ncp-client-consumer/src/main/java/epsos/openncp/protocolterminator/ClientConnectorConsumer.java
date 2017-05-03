@@ -23,49 +23,21 @@
  */
 package epsos.openncp.protocolterminator;
 
-import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
+import epsos.openncp.protocolterminator.clientconnector.*;
+import epsos.openncp.pt.client.ClientConnectorServiceServiceStub;
+import eu.europa.ec.sante.ehdsi.openncp.evidence.utils.OutFlowEvidenceEmitterHandler;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.util.XMLUtils;
-import org.opensaml.saml2.core.Assertion;
-
-import epsos.openncp.protocolterminator.clientconnector.DocumentId;
-import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
-import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
-import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
-import epsos.openncp.protocolterminator.clientconnector.PatientId;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocumentRequest;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocuments;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocumentsDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocumentsResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryPatientDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryPatientRequest;
-import epsos.openncp.protocolterminator.clientconnector.QueryPatientResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocument1;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocumentDocument1;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocumentRequest;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocumentResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.SayHelloDocument;
-import epsos.openncp.protocolterminator.clientconnector.SayHelloResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.SubmitDocument1;
-import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentDocument1;
-import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentRequest;
-import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentResponse;
-import epsos.openncp.pt.client.ClientConnectorServiceServiceStub;
-import eu.europa.ec.sante.ehdsi.openncp.evidence.utils.OutFlowEvidenceEmitterHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
+import org.apache.axis2.util.XMLUtils;
+import org.opensaml.saml2.core.Assertion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import java.rmi.RemoteException;
@@ -77,33 +49,14 @@ import java.util.List;
  */
 public class ClientConnectorConsumer {
 
-    private static final Logger logger = java.util.logging.Logger.getLogger(ClientConnectorConsumer.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ClientConnectorConsumer.class.getName());
 
     private final long TIMEOUT = 3 * 60 * 1000; // Three minutes
 
     private String epr;
 
     public ClientConnectorConsumer(String epr) {
-            this.epr = epr;
-    }
-
-    private void registerEvidenceEmitterHandler(ClientConnectorServiceServiceStub stub) throws AxisFault {
-        /* Adding custom phase for evidence emitter processing */
-        logger.log(Level.INFO,"Adding custom phase for outflow evidence emitter processing");
-        HandlerDescription outFlowHandlerDescription = new HandlerDescription("OutFlowEvidenceEmitterHandler");
-        outFlowHandlerDescription.setHandler(new OutFlowEvidenceEmitterHandler());
-        AxisConfiguration axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext().getAxisConfiguration();
-        List<Phase> outFlowPhasesList = axisConfiguration.getOutFlowPhases();
-        Phase outFlowEvidenceEmitterPhase = new Phase("OutFlowEvidenceEmitterPhase");
-        try {
-            outFlowEvidenceEmitterPhase.addHandler(outFlowHandlerDescription);
-        } catch (PhaseException ex) {
-            java.util.logging.Logger.getLogger(ClientConnectorConsumer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        outFlowPhasesList.add(outFlowEvidenceEmitterPhase);
-        logger.log(Level.INFO,"Resetting global Out phases");
-        axisConfiguration.setGlobalOutPhase(outFlowPhasesList);
-        logger.log(Level.INFO,"Ended phases restrucruting");
+        this.epr = epr;
     }
 
     private static void addAssertions(ClientConnectorServiceServiceStub stub, Assertion idAssertion, Assertion trcAssertion) throws Exception {
@@ -115,6 +68,25 @@ public class ClientConnectorConsumer {
         omSecurityElement.addChild(XMLUtils.toOM(idAssertion.getDOM()));
         stub._getServiceClient().addHeader(omSecurityElement);
 
+    }
+
+    private void registerEvidenceEmitterHandler(ClientConnectorServiceServiceStub stub) throws AxisFault {
+        /* Adding custom phase for evidence emitter processing */
+        logger.info("Adding custom phase for outflow evidence emitter processing");
+        HandlerDescription outFlowHandlerDescription = new HandlerDescription("OutFlowEvidenceEmitterHandler");
+        outFlowHandlerDescription.setHandler(new OutFlowEvidenceEmitterHandler());
+        AxisConfiguration axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext().getAxisConfiguration();
+        List<Phase> outFlowPhasesList = axisConfiguration.getOutFlowPhases();
+        Phase outFlowEvidenceEmitterPhase = new Phase("OutFlowEvidenceEmitterPhase");
+        try {
+            outFlowEvidenceEmitterPhase.addHandler(outFlowHandlerDescription);
+        } catch (PhaseException ex) {
+            logger.error("PhaseException: '{}'", ex.getMessage(), ex);
+        }
+        outFlowPhasesList.add(outFlowEvidenceEmitterPhase);
+        logger.info("Resetting global Out phases");
+        axisConfiguration.setGlobalOutPhase(outFlowPhasesList);
+        logger.info("Ended phases restrucruting");
     }
 
     /**
@@ -155,7 +127,6 @@ public class ClientConnectorConsumer {
     }
 
     /**
-     *
      * @param idAssertion
      * @param countryCode
      * @param pd

@@ -1,15 +1,16 @@
 package eu.esens.abb.nonrep;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
+import eu.esens.abb.nonrep.etsi.rem.*;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.transforms.Transforms;
+import org.apache.xml.security.utils.Constants;
+import org.herasaf.xacml.core.policy.impl.AttributeAssignmentType;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -21,45 +22,33 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
-
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.utils.Constants;
-import org.herasaf.xacml.core.policy.impl.AttributeAssignmentType;
-import org.joda.time.DateTime;
-import org.w3c.dom.Document;
-
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
-
-import eu.esens.abb.nonrep.etsi.rem.AuthenticationDetailsType;
-import eu.esens.abb.nonrep.etsi.rem.CertificateDetails;
-import eu.esens.abb.nonrep.etsi.rem.EntityDetailsType;
-import eu.esens.abb.nonrep.etsi.rem.EntityName;
-import eu.esens.abb.nonrep.etsi.rem.EvidenceIssuerPolicyID;
-import eu.esens.abb.nonrep.etsi.rem.MessageDetailsType;
-import eu.esens.abb.nonrep.etsi.rem.NamePostalAddress;
-import eu.esens.abb.nonrep.etsi.rem.NamesPostalAddresses;
-import eu.esens.abb.nonrep.etsi.rem.ObjectFactory;
-import eu.esens.abb.nonrep.etsi.rem.REMEvidenceType;
-import eu.esens.abb.nonrep.etsi.rem.RecipientsDetails;
+import javax.xml.transform.TransformerException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This class is a sample discharge of the Evidence Emitter.
- * 
+ *
  * @author max
  */
 public class ETSIREMObligationHandler implements ObligationHandler {
 
-	private List<ESensObligation> obligations;
-
-	// Prefixes, that matches the XACML policy
-	private static final String REM_NRR_PREFIX = "urn:eSENS:obligations:nrr:ETSIREM";
-	private static final String REM_NRO_PREFIX = "urn:eSENS:obligations:nro:ETSIREM";
-	private static final String REM_NRD_PREFIX = "urn:eSENS:obligations:nrd:ETSIREM";
-
-	private Document audit = null;
-	private Context context;
+    // Prefixes, that matches the XACML policy
+    private static final String REM_NRR_PREFIX = "urn:eSENS:obligations:nrr:ETSIREM";
+    private static final String REM_NRO_PREFIX = "urn:eSENS:obligations:nro:ETSIREM";
+    private static final String REM_NRD_PREFIX = "urn:eSENS:obligations:nrd:ETSIREM";
+    private Logger LOGGER = LoggerFactory.getLogger(ETSIREMObligationHandler.class);
+    private List<ESensObligation> obligations;
+    private Document audit = null;
+    private Context context;
 
     public ETSIREMObligationHandler(MessageType messageType, List<ESensObligation> obligations, Context context) {
         this.obligations = obligations;
@@ -91,7 +80,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         // }
 
 		/*
-		 * For the e-SENS pilot we issue the NRO and NRR token to all the
+         * For the e-SENS pilot we issue the NRO and NRR token to all the
 		 * incoming messages -> This is the per hop protocol.
 		 */
         try {
@@ -162,18 +151,18 @@ public class ETSIREMObligationHandler implements ObligationHandler {
                 }
                 List<AttributeAssignmentType> listAttr = eSensObl.getAttributeAssignments();
 
-				type.setVersion(find(REM_NRR_PREFIX + ":version", listAttr));
-				type.setEventCode(outcome);
+                type.setVersion(find(REM_NRR_PREFIX + ":version", listAttr));
+                type.setEventCode(outcome);
 
                 type.setEvidenceIdentifier(UUID.randomUUID().toString());
 
 				/*
                  * ISO Token mappings
 				 */
-				// This is the Pol field of the ISO13888 token
-				EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
-				eipid.getPolicyIDs().add(find(REM_NRR_PREFIX + ":PolicyID", listAttr));
-				type.setEvidenceIssuerPolicyID(eipid);
+                // This is the Pol field of the ISO13888 token
+                EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
+                eipid.getPolicyIDs().add(find(REM_NRR_PREFIX + ":PolicyID", listAttr));
+                type.setEvidenceIssuerPolicyID(eipid);
 
                 mapToIso(type);
 
@@ -199,22 +188,22 @@ public class ETSIREMObligationHandler implements ObligationHandler {
                 }
                 List<AttributeAssignmentType> listAttr = eSensObl.getAttributeAssignments();
 
-				type.setVersion(find(REM_NRD_PREFIX + ":version", listAttr));
-				type.setEventCode(outcome);
+                type.setVersion(find(REM_NRD_PREFIX + ":version", listAttr));
+                type.setEventCode(outcome);
 
                 type.setEvidenceIdentifier(UUID.randomUUID().toString());
 
 				/*
                  * ISO Token mappings
 				 */
-				// This is the Pol field of the ISO13888 token
-				String policyUrl = find(REM_NRD_PREFIX + ":PolicyID", listAttr);
-				if (policyUrl != null) {
-					EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
-					eipid.getPolicyIDs().add(policyUrl);
-					type.setEvidenceIssuerPolicyID(eipid);
-				}
-				mapToIso(type);
+                // This is the Pol field of the ISO13888 token
+                String policyUrl = find(REM_NRD_PREFIX + ":PolicyID", listAttr);
+                if (policyUrl != null) {
+                    EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
+                    eipid.getPolicyIDs().add(policyUrl);
+                    type.setEvidenceIssuerPolicyID(eipid);
+                }
+                mapToIso(type);
 
                 // Imp is the signature
 
@@ -236,51 +225,51 @@ public class ETSIREMObligationHandler implements ObligationHandler {
     private void mapToIso(REMEvidenceType type)
             throws CertificateEncodingException, NoSuchAlgorithmException, DatatypeConfigurationException, IOException, SOAPException, TransformerException {
 
-		// The flag f1 is the AcceptanceRejection (the evidence type)
-		// This is the A field the originator
-		EntityDetailsType edt1 = new EntityDetailsType();
+        // The flag f1 is the AcceptanceRejection (the evidence type)
+        // This is the A field the originator
+        EntityDetailsType edt1 = new EntityDetailsType();
 
-		if (context.getSenderCertificate() != null) {
-			CertificateDetails cd1 = new CertificateDetails();
-			edt1.setCertificateDetails(cd1);
-			cd1.setX509Certificate(context.getSenderCertificate().getEncoded());
-		}
-		type.setSenderDetails(edt1); // To check if null sender details is
-										// allowed
+        if (context.getSenderCertificate() != null) {
+            CertificateDetails cd1 = new CertificateDetails();
+            edt1.setCertificateDetails(cd1);
+            cd1.setX509Certificate(context.getSenderCertificate().getEncoded());
+        }
+        type.setSenderDetails(edt1); // To check if null sender details is
+        // allowed
 
-		// This is the B field, the recipient
-		/*
+        // This is the B field, the recipient
+        /*
 		 * Made optional by a request from the eJustice domain
 		 */
-		EntityDetailsType edt2 = new EntityDetailsType();
+        EntityDetailsType edt2 = new EntityDetailsType();
 
-		if (context.getRecipientCertificate() != null) {
+        if (context.getRecipientCertificate() != null) {
 
-			CertificateDetails cd2 = new CertificateDetails();
-			edt2.setCertificateDetails(cd2);
-			cd2.setX509Certificate(context.getRecipientCertificate().getEncoded());
+            CertificateDetails cd2 = new CertificateDetails();
+            edt2.setCertificateDetails(cd2);
+            cd2.setX509Certificate(context.getRecipientCertificate().getEncoded());
 
-		}
-		if (context.getRecipientNamePostalAddress() != null) {
-			LinkedList<String> list = context.getRecipientNamePostalAddress();
-			int size = list.size();
+        }
+        if (context.getRecipientNamePostalAddress() != null) {
+            LinkedList<String> list = context.getRecipientNamePostalAddress();
+            int size = list.size();
 
-			NamesPostalAddresses npas = new NamesPostalAddresses();
+            NamesPostalAddresses npas = new NamesPostalAddresses();
 
-			for (int i=0; i<size; i++) {
-				EntityName en = new EntityName();
-				en.getNames().add(list.get(i));
-				NamePostalAddress npa = new NamePostalAddress();
-				npa.setEntityName(en);
-				npas.getNamePostalAddresses().add(npa);
+            for (int i = 0; i < size; i++) {
+                EntityName en = new EntityName();
+                en.getNames().add(list.get(i));
+                NamePostalAddress npa = new NamePostalAddress();
+                npa.setEntityName(en);
+                npas.getNamePostalAddresses().add(npa);
 
-			}
-			edt2.setNamesPostalAddresses(npas);
-		}
+            }
+            edt2.setNamesPostalAddresses(npas);
+        }
 
-		RecipientsDetails rd = new RecipientsDetails();
-		rd.getEntityDetails().add(edt2);
-		type.setRecipientsDetails(rd);
+        RecipientsDetails rd = new RecipientsDetails();
+        rd.getEntityDetails().add(edt2);
+        type.setRecipientsDetails(rd);
 
         // Evidence Issuer Details is the C field of the ISO token
         EntityDetailsType edt = new EntityDetailsType();
@@ -339,13 +328,13 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         mdt.setDigestMethod(dm);
         type.setSenderMessageDetails(mdt);
 
-		AuthenticationDetailsType adt = new AuthenticationDetailsType();
-		adt.setAuthenticationMethod(context.getAuthenticationMethod());
-		// this is the authentication time. I set it as "now", since it is
-		// required by the REM, but it is not used here.
-		adt.setAuthenticationTime((new XMLGregorianCalendarImpl(new DateTime().toGregorianCalendar())));
+        AuthenticationDetailsType adt = new AuthenticationDetailsType();
+        adt.setAuthenticationMethod(context.getAuthenticationMethod());
+        // this is the authentication time. I set it as "now", since it is
+        // required by the REM, but it is not used here.
+        adt.setAuthenticationTime((new XMLGregorianCalendarImpl(new DateTime().toGregorianCalendar())));
 
-		type.setSenderAuthenticationDetails(adt);
+        type.setSenderAuthenticationDetails(adt);
 
     }
 

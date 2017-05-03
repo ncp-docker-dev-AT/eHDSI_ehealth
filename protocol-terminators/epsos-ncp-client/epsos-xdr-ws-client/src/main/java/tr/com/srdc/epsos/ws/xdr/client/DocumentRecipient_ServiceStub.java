@@ -32,21 +32,10 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XdrValidationService;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
-import javax.activation.DataHandler;
-import javax.xml.parsers.ParserConfigurationException;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axiom.attachments.ByteArrayDataSource;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
@@ -54,42 +43,30 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.log4j.Logger;
 import org.opensaml.saml2.core.Assertion;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.activation.DataHandler;
+import javax.xml.parsers.ParserConfigurationException;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+
 public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub {
 
-    private static final Logger LOG = Logger.getLogger(DocumentRecipient_ServiceStub.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DocumentRecipient_ServiceStub.class);
+    // http://servicelocation/DocumentRecipient_Service
+    private static final javax.xml.bind.JAXBContext wsContext;
+    private static int counter = 0;
 
     static {
         LOG.debug("Loading the WS-Security init libraries in DocumentRecipient_ServiceStub");
 
         org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
-    }
-
-    private static int counter = 0;
-    // http://servicelocation/DocumentRecipient_Service
-    private static final javax.xml.bind.JAXBContext wsContext;
-    private org.apache.axis2.description.AxisOperation[] _operations;
-    // hashmaps to keep the fault mapping
-    private java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
-    private java.util.HashMap faultExceptionClassNameMap = new java.util.HashMap();
-    private java.util.HashMap faultMessageMap = new java.util.HashMap();
-    private javax.xml.namespace.QName[] opNameArray = null;
-    private String countryCode;
-    private Date transactionStartTime;
-    private Date transactionEndTime;
-    private String classCode;
-
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-    }
-
-    public void setClassCode(String classCode) {
-        this.classCode = classCode;
     }
 
     static {
@@ -109,10 +86,17 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         }
     }
 
+    private org.apache.axis2.description.AxisOperation[] _operations;
+    // hashmaps to keep the fault mapping
+    private java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
+    private java.util.HashMap faultExceptionClassNameMap = new java.util.HashMap();
+    private java.util.HashMap faultMessageMap = new java.util.HashMap();
+    private javax.xml.namespace.QName[] opNameArray = null;
+    private String countryCode;
+    private Date transactionStartTime;
+    private Date transactionEndTime;
+    private String classCode;
 
-    /*
-     * Contructors
-     */
     /**
      * Constructor that takes in a configContext
      */
@@ -142,6 +126,11 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
     }
 
+
+    /*
+     * Contructors
+     */
+
     /**
      * Default Constructor
      */
@@ -163,18 +152,34 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         this(null, targetEndpoint);
     }
 
+    private static synchronized String getUniqueSuffix() {
+        if (counter > 99999) {
+            counter = 0;    // reset the counter if it is greater than 99999
+        }
+        counter++;
+        return Long.toString(System.currentTimeMillis()) + "_" + counter;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
     /*
      * Methods
      */
+
+    public void setClassCode(String classCode) {
+        this.classCode = classCode;
+    }
+
     /**
      * Auto generated method signature
      *
-     * @see
-     * tr.com.srdc.epsos.ws.xdr.client.DocumentRecipient_Service#documentRecipient_ProvideAndRegisterDocumentSetB
      * @param provideAndRegisterDocumentSetRequest
+     * @see tr.com.srdc.epsos.ws.xdr.client.DocumentRecipient_Service#documentRecipient_ProvideAndRegisterDocumentSetB
      */
     public RegistryResponseType documentRecipient_ProvideAndRegisterDocumentSetB(ProvideAndRegisterDocumentSetRequestType provideAndRegisterDocumentSetRequest,
-            Assertion idAssertion, Assertion trcAssertion)
+                                                                                 Assertion idAssertion, Assertion trcAssertion)
             throws java.rmi.RemoteException {
         org.apache.axis2.context.MessageContext _messageContext = null;
         try {
@@ -193,7 +198,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
                     provideAndRegisterDocumentSetRequest,
                     optimizeContent(new javax.xml.namespace.QName(XDRConstants.NAMESPACE_URI,
-                                    XDRConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART)));
+                            XDRConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART)));
 
             /*
              * adding SOAP soap_headers
@@ -295,7 +300,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                     case tr.com.srdc.epsos.util.Constants.CONSENT_CLASSCODE:
                         service = ".ConsentService.WSE";
                         break;
-                    default: break;
+                    default:
+                        break;
                 }
                 String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
                 configManagerSMP.deleteKeyFromHashMap(key);
@@ -308,8 +314,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
                     /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
                     org.apache.axis2.client.OperationClient newOperationClient = _serviceClient.createClient(_operations[0].getName());
-		    newOperationClient.getOptions().setAction(XDRConstants.SOAP_HEADERS.REQUEST_ACTION);
-		    newOperationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
+                    newOperationClient.getOptions().setAction(XDRConstants.SOAP_HEADERS.REQUEST_ACTION);
+                    newOperationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
                     addPropertyToOperationClient(newOperationClient, org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
 
                     SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
@@ -346,7 +352,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                     LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
                     throw e;
                 }
-           }
+            }
 
             org.apache.axis2.context.MessageContext _returnMessageContext;
             _returnMessageContext = _operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
@@ -453,12 +459,14 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             }
         }
     }
+
     /**
      * get the default envelope
      */
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory) {
         return factory.getDefaultEnvelope();
     }
+
     private boolean optimizeContent(javax.xml.namespace.QName opName) {
         if (opNameArray == null) {
             return false;
@@ -539,6 +547,43 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         }
     }
 
+    // TODO A.R. eDispensation handling
+    private EventLog createAndSendEventLogConsent(ProvideAndRegisterDocumentSetRequestType request, RegistryErrorList rel,
+                                                  org.apache.axis2.context.MessageContext msgContext,
+                                                  org.apache.axiom.soap.SOAPEnvelope _returnEnv, org.apache.axiom.soap.SOAPEnvelope env, Assertion idAssertion, Assertion trcAssertion, String address) {
+        EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
+        EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
+        EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
+        EventLogUtil.prepareXDRCommonLog(eventLog, request, rel);
+        EventLogClientUtil.sendEventLog(eventLog);
+        return eventLog;
+    }
+
+    private void populateAxisService() throws AxisFault {
+
+        // creating the Service with a unique name
+        _service = new org.apache.axis2.description.AxisService(XDRConstants.DOCUMENT_RECIPIENT_SERVICE_STR + getUniqueSuffix());
+        addAnonymousOperations();
+
+        // creating the operations
+        org.apache.axis2.description.AxisOperation __operation;
+
+        _operations = new org.apache.axis2.description.AxisOperation[1];
+
+        __operation = new org.apache.axis2.description.OutInAxisOperation();
+
+        __operation.setName(new javax.xml.namespace.QName(XDRConstants.NAMESPACE_URI,
+                XDRConstants.PROVIDE_AND_REGISTER_DOCUMENT_SET_REQ_STR));
+        _service.addOperation(__operation);
+
+        _operations[0] = __operation;
+
+    }
+
+    // populates the faults
+    private void populateFaults() {
+    }
+
     class JaxbRIDataSource implements org.apache.axiom.om.OMDataSource {
 
         /**
@@ -569,7 +614,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
          * @param marshaller
          */
         public JaxbRIDataSource(Class clazz, Object obj,
-                javax.xml.bind.Marshaller marshaller, String nsuri, String name) {
+                                javax.xml.bind.Marshaller marshaller, String nsuri, String name) {
             this.outClazz = clazz;
             this.outObject = obj;
             this.marshaller = marshaller;
@@ -578,7 +623,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         }
 
         public void serialize(java.io.OutputStream output,
-                org.apache.axiom.om.OMOutputFormat format)
+                              org.apache.axiom.om.OMOutputFormat format)
                 throws javax.xml.stream.XMLStreamException {
             try {
                 marshaller.marshal(new javax.xml.bind.JAXBElement(
@@ -591,7 +636,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         }
 
         public void serialize(java.io.Writer writer,
-                org.apache.axiom.om.OMOutputFormat format)
+                              org.apache.axiom.om.OMOutputFormat format)
                 throws javax.xml.stream.XMLStreamException {
             try {
                 marshaller.marshal(new javax.xml.bind.JAXBElement(
@@ -630,50 +675,5 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                 throw new javax.xml.stream.XMLStreamException(XDRConstants.EXCEPTIONS.ERROR_JAXB_MARSHALLING, e);
             }
         }
-    }
-
-    // TODO A.R. eDispensation handling
-    private EventLog createAndSendEventLogConsent(ProvideAndRegisterDocumentSetRequestType request, RegistryErrorList rel,
-            org.apache.axis2.context.MessageContext msgContext,
-            org.apache.axiom.soap.SOAPEnvelope _returnEnv, org.apache.axiom.soap.SOAPEnvelope env, Assertion idAssertion, Assertion trcAssertion, String address) {
-        EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
-        EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
-        EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
-        EventLogUtil.prepareXDRCommonLog(eventLog, request, rel);
-        EventLogClientUtil.sendEventLog(eventLog);
-        return eventLog;
-    }
-
-    private static synchronized String getUniqueSuffix() {
-        if (counter > 99999) {
-            counter = 0;    // reset the counter if it is greater than 99999
-        }
-        counter++;
-        return Long.toString(System.currentTimeMillis()) + "_" + counter;
-    }
-
-    private void populateAxisService() throws AxisFault {
-
-        // creating the Service with a unique name
-        _service = new org.apache.axis2.description.AxisService(XDRConstants.DOCUMENT_RECIPIENT_SERVICE_STR + getUniqueSuffix());
-        addAnonymousOperations();
-
-        // creating the operations
-        org.apache.axis2.description.AxisOperation __operation;
-
-        _operations = new org.apache.axis2.description.AxisOperation[1];
-
-        __operation = new org.apache.axis2.description.OutInAxisOperation();
-
-        __operation.setName(new javax.xml.namespace.QName(XDRConstants.NAMESPACE_URI,
-                XDRConstants.PROVIDE_AND_REGISTER_DOCUMENT_SET_REQ_STR));
-        _service.addOperation(__operation);
-
-        _operations[0] = __operation;
-
-    }
-
-    // populates the faults
-    private void populateFaults() {
     }
 }

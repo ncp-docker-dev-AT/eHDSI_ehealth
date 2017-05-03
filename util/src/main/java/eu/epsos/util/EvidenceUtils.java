@@ -1,44 +1,7 @@
 package eu.epsos.util;
 
-import eu.esens.abb.nonrep.Context;
-import eu.esens.abb.nonrep.ESensObligation;
-import eu.esens.abb.nonrep.EnforcePolicy;
-import eu.esens.abb.nonrep.EnforcePolicyException;
-import eu.esens.abb.nonrep.MalformedIHESOAPException;
-import eu.esens.abb.nonrep.MalformedMIMEMessageException;
-import eu.esens.abb.nonrep.MessageInspector;
-import eu.esens.abb.nonrep.MessageType;
-import eu.esens.abb.nonrep.ObligationDischargeException;
-import eu.esens.abb.nonrep.ObligationHandler;
-import eu.esens.abb.nonrep.ObligationHandlerFactory;
-import eu.esens.abb.nonrep.TOElementException;
-import eu.esens.abb.nonrep.UnknownMessageType;
-import eu.esens.abb.nonrep.Utilities;
-import eu.esens.abb.nonrep.XACMLAttributes;
-import eu.esens.abb.nonrep.XACMLRequestCreator;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.SOAPException;
-import javax.xml.transform.TransformerException;
-import org.apache.log4j.Logger;
+import eu.esens.abb.nonrep.*;
+import org.apache.commons.lang3.StringUtils;
 import org.herasaf.xacml.core.SyntaxException;
 import org.herasaf.xacml.core.api.PDP;
 import org.herasaf.xacml.core.api.UnorderedPolicyRepository;
@@ -51,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.FileUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
@@ -61,10 +23,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.*;
@@ -79,11 +38,10 @@ import java.util.UUID;
  */
 public class EvidenceUtils {
 
-    private static final Logger logger = Logger.getLogger(EvidenceUtils.class);
-    public static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
-    public static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
     public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
-    private static Logger logger = LoggerFactory.getLogger(EvidenceUtils.class);
+    private static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
+    private static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
+    private static final Logger logger = LoggerFactory.getLogger(EvidenceUtils.class);
 
     private EvidenceUtils() {
     }
@@ -109,14 +67,14 @@ public class EvidenceUtils {
             String title
     ) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
-
         MessageType messageType = null;
-        String msguuid = "";
+        String msguuid;
         try {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);
             messageType = messageInspector.getMessageType();
             msguuid = messageInspector.getMessageUUID();
         } catch (Exception e) {
+            logger.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
@@ -145,7 +103,7 @@ public class EvidenceUtils {
             String msguuid
     ) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
         String statusmsg = "failure";
-        if (status.equals("0")) {
+        if (StringUtils.equals("0", status)) {
             statusmsg = "success";
         }
 
@@ -169,6 +127,7 @@ public class EvidenceUtils {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
+            logger.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             messageType = umt;
         }
@@ -242,7 +201,7 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nrr/" + getDocumentTitle(msguuid, title) + ".xml";
             }
-            logger.info("MSGUUID: " + msguuid + " " + "NRR TITLE :" + title);
+            logger.info("MSGUUID: '{}'  NRR TITLE: '{}'", msguuid, title);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
     }
@@ -297,6 +256,7 @@ public class EvidenceUtils {
             messageType = messageInspector.getMessageType();
             msguuid = messageInspector.getMessageUUID();
         } catch (Exception e) {
+            logger.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingSoap);
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
@@ -325,8 +285,10 @@ public class EvidenceUtils {
             String title,
             String msguuid
     ) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+
         String statusmsg = "failure";
-        if (status.equals("0")) {
+        if (StringUtils.equals("0", status)) {
+
             statusmsg = "success";
         }
 //        Document incomingMsg = XMLUtil.parseContent(incomingSoap);
@@ -350,24 +312,25 @@ public class EvidenceUtils {
             MessageInspector messageInspector = new MessageInspector(incomingSoap);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
+            logger.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingSoap);
             messageType = umt;
         }
         if (checkCorrectnessofIHEXCA(messageType)) {
-            logger.info("The message type : " + messageType + " is correct");
+            logger.info("The message type : '{}' is correct.", messageType);
         }
 
         /*
          * Now create the XACML request
          */
-        LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> actionList = new LinkedList<>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
         action.setIdentifier(new URI("urn:eSENS:outcome"));
         actionList.add(action);
         action.setValue(statusmsg);
 
-        LinkedList<XACMLAttributes> environmentList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
         environment.setDataType(new URI(DATATYPE_DATETIME));
         environment.setIdentifier(new URI("urn:esens:2014:event"));
@@ -432,7 +395,7 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nro/" + getDocumentTitle(msguuid, title) + ".xml";
             }
-            logger.info("MSGUUID: " + msguuid + " " + "NRO TITLE :" + title);
+            logger.info("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
 
@@ -452,23 +415,20 @@ public class EvidenceUtils {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document incomingMsg = db.parse(new File(file));
-        return incomingMsg;
+        return db.parse(new File(file));
     }
 
     private static X509Certificate getCertificate(String keyStorePath, String keyPassword, String certAlias) throws KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
         ks.load(keyStream, keyPassword.toCharArray());
-        X509Certificate cert = (X509Certificate) ks.getCertificate(certAlias);
-        return cert;
+        return (X509Certificate) ks.getCertificate(certAlias);
     }
 
     private static PrivateKey getSigningKey(String keyStorePath, String keyPassword, String certAlias) throws FileNotFoundException, KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
         ks.load(keyStream, keyPassword.toCharArray());
-        PrivateKey key = (PrivateKey) ks.getKey(certAlias, keyPassword.toCharArray());
-        return key;
+        return (PrivateKey) ks.getKey(certAlias, keyPassword.toCharArray());
     }
 }

@@ -14,33 +14,34 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.Handler;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
  * OutFlowEvidenceEmitter
  * Generates all NRRs
  * Currently supporting the generation of evidences in the following cases:
- *      NCP-B receives from Portal
- *      NCP-A receives from NCP-B
- *      NCP-B receives from NCP-A (left commented as the Evidence Emitter CP does not mandate generation of evidences on the response)
+ * NCP-B receives from Portal
+ * NCP-A receives from NCP-B
+ * NCP-B receives from NCP-A (left commented as the Evidence Emitter CP does not mandate generation of evidences on the response)
  *
  * @author jgoncalves
  */
 public class InFlowEvidenceEmitterHandler extends AbstractHandler {
-    
-    private static final Logger LOG = Logger.getLogger(InFlowEvidenceEmitterHandler.class);
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(InFlowEvidenceEmitterHandler.class);
+
     private EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils;
- 
+
     @Override
     public Handler.InvocationResponse invoke(MessageContext msgcontext) throws AxisFault {
         LOG.debug("InFlow Evidence Emitter handler is executing");
         this.evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
 
         /* I'll leave this here as it might be useful in the future */
-        
+
 //        SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
 //        if (soapHeader != null) {
 //            Iterator<?> blocks = soapHeader.examineAllHeaderBlocks();
@@ -52,7 +53,7 @@ public class InFlowEvidenceEmitterHandler extends AbstractHandler {
 //                block.setProcessed();
 //            }
 //        }
-        
+
 //        LOG.debug("LOGGING TEST VALUES");
 //        LOG.debug("MessageContext properties: " + msgcontext.getProperties());
 //        LOG.debug("MessageContext messageID: " + msgcontext.getMessageID());
@@ -73,7 +74,7 @@ public class InFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("OperationContext is null!");
 //        }
-        
+
 //        ServiceGroupContext serviceGroupCtx = msgcontext.getServiceGroupContext();
 //        if (serviceGroupCtx != null) {
 //            LOG.debug("ServiceGroupContext ID: " + serviceGroupCtx.getId());
@@ -100,7 +101,7 @@ public class InFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("ServiceGroupContext is null!");
 //        }
-        
+
 //        ConfigurationContext configCtx = msgcontext.getRootContext();
 //        if (configCtx != null) {
 //            LOG.debug("ConfigurationContext contextRoot: " + configCtx.getContextRoot());
@@ -109,12 +110,12 @@ public class InFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("ConfigurationContext is null!");
 //        }
-        
-        
+
+
         try {
             /* Canonicalizing the full SOAP message */
             Document envCanonicalized = this.evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(msgcontext.getEnvelope());
-        
+
             SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
             SOAPBody soapBody = msgcontext.getEnvelope().getBody();
             String eventType = null;
@@ -169,46 +170,46 @@ public class InFlowEvidenceEmitterHandler extends AbstractHandler {
                 LOG.debug("eventType: " + eventType);
                 LOG.debug("title: " + title);
 //                LOG.debug("msgUUID: " + msgUUID); //It stays as null because it's fetched from soap msg
-                
+
                 if (msgUUID != null) {
                     // this is a Portal-NCPB interaction: msgUUID comes from IdA or TRCA or is random
                     EvidenceUtils.createEvidenceREMNRR(envCanonicalized,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
-                                eventType,
-                                new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                title,
-                                msgUUID);
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                            tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
+                            tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
+                            tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
+                            eventType,
+                            new DateTime(),
+                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+                            title,
+                            msgUUID);
                 } else {
                     // this isn't a Portal-NCPB interaction (it's NCPB-NCPA), so msgUUID is retrieved from the SOAP header
                     EvidenceUtils.createEvidenceREMNRR(envCanonicalized,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
-                                tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
-                                eventType,
-                                new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                title);
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                            tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
+                            tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
+                            tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
+                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
+                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
+                            tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
+                            eventType,
+                            new DateTime(),
+                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+                            title);
                 }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-            
+
         return Handler.InvocationResponse.CONTINUE;
     }
 }

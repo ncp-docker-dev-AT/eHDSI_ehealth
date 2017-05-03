@@ -19,37 +19,18 @@
  */
 package tr.com.srdc.epsos.ws.server.xcpd.impl;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
-import epsos.ccd.gnomon.auditmanager.EventActionCode;
-import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
-import epsos.ccd.gnomon.auditmanager.EventType;
-import epsos.ccd.gnomon.auditmanager.IHEEventType;
-import epsos.ccd.gnomon.auditmanager.TransactionName;
+import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
 import eu.epsos.protocolterminators.ws.server.xcpd.XCPDServiceInterface;
 import eu.epsos.util.EvidenceUtils;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Random;
-import java.util.ServiceLoader;
-import java.util.UUID;
-import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hl7.v3.*;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -68,10 +49,14 @@ import tr.com.srdc.epsos.util.http.HTTPUtil;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 public class XCPDServiceImpl implements XCPDServiceInterface {
 

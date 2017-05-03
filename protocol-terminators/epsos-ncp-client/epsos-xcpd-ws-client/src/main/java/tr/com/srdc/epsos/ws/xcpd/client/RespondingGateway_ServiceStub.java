@@ -30,46 +30,29 @@ import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.services.XcpdValidationService;
-
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
-import java.util.logging.Level;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml2.core.Assertion;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -81,11 +64,30 @@ import java.util.UUID;
  */
 public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub {
 
-    private static final Logger LOG = Logger.getLogger(RespondingGateway_ServiceStub.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RespondingGateway_ServiceStub.class);
+    private static final javax.xml.bind.JAXBContext wsContext;
+    private static int counter = 0;
 
     static {
         LOG.debug("Loading the WS-Security init libraries in RespondingGateway_ServiceStub xcpd");
         org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
+    }
+
+    static {
+        javax.xml.bind.JAXBContext jc;
+        jc = null;
+        try {
+            jc = javax.xml.bind.JAXBContext.newInstance(
+                    org.hl7.v3.PRPAIN201305UV02.class,
+                    org.hl7.v3.PRPAIN201306UV02.class);
+        } catch (javax.xml.bind.JAXBException ex) {
+            System.err.println("Unable to create JAXBContext: "
+                    + ex.getMessage());
+            ex.printStackTrace(System.err);
+            Runtime.getRuntime().exit(-1);
+        } finally {
+            wsContext = jc;
+        }
     }
 
     protected org.apache.axis2.description.AxisOperation[] _operations;
@@ -93,44 +95,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     private java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
     private java.util.HashMap faultExceptionClassNameMap = new java.util.HashMap();
     private java.util.HashMap faultMessageMap = new java.util.HashMap();
-    private static int counter = 0;
-    private static final javax.xml.bind.JAXBContext wsContext;
     private String countryCode;
     private Date transactionStartTime;
     private Date transactionEndTime;
-
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-    }
-
-    private static synchronized String getUniqueSuffix() {
-        // reset the counter if it is greater than 99999
-        if (counter > 99999) {
-            counter = 0;
-        }
-        counter++;
-        return Long.toString(System.currentTimeMillis()) + "_" + counter;
-    }
-
-    private void populateAxisService() {
-
-        // creating the Service with a unique name
-        _service = new org.apache.axis2.description.AxisService("RespondingGateway_Service" + getUniqueSuffix());
-        addAnonymousOperations();
-
-        // creating the operations
-        org.apache.axis2.description.AxisOperation __operation;
-        _operations = new org.apache.axis2.description.AxisOperation[1];
-        __operation = new org.apache.axis2.description.OutInAxisOperation();
-        __operation.setName(new javax.xml.namespace.QName(XCPDConstants.SOAP_HEADERS.NAMESPACE_URI, XCPDConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART));
-        _service.addOperation(__operation);
-        _operations[0] = __operation;
-
-    }
-
-    // populates the faults
-    private void populateFaults() {
-    }
+    private javax.xml.namespace.QName[] opNameArray = null;
 
     /**
      * Constructor that takes in a configContext
@@ -177,6 +145,39 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
      */
     public RespondingGateway_ServiceStub(String targetEndpoint) {
         this(null, targetEndpoint);
+    }
+
+    private static synchronized String getUniqueSuffix() {
+        // reset the counter if it is greater than 99999
+        if (counter > 99999) {
+            counter = 0;
+        }
+        counter++;
+        return Long.toString(System.currentTimeMillis()) + "_" + counter;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    private void populateAxisService() {
+
+        // creating the Service with a unique name
+        _service = new org.apache.axis2.description.AxisService("RespondingGateway_Service" + getUniqueSuffix());
+        addAnonymousOperations();
+
+        // creating the operations
+        org.apache.axis2.description.AxisOperation __operation;
+        _operations = new org.apache.axis2.description.AxisOperation[1];
+        __operation = new org.apache.axis2.description.OutInAxisOperation();
+        __operation.setName(new javax.xml.namespace.QName(XCPDConstants.SOAP_HEADERS.NAMESPACE_URI, XCPDConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART));
+        _service.addOperation(__operation);
+        _operations[0] = __operation;
+
+    }
+
+    // populates the faults
+    private void populateFaults() {
     }
 
     /**
@@ -350,7 +351,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
                     throw e;
                 }
-           }
+            }
 
             org.apache.axis2.context.MessageContext _returnMessageContext = operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             org.apache.axiom.soap.SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
@@ -514,8 +515,6 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         return returnMap;
     }
 
-    private javax.xml.namespace.QName[] opNameArray = null;
-
     private boolean optimizeContent(javax.xml.namespace.QName opName) {
 
         if (opNameArray == null) {
@@ -527,23 +526,6 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             }
         }
         return false;
-    }
-
-    static {
-        javax.xml.bind.JAXBContext jc;
-        jc = null;
-        try {
-            jc = javax.xml.bind.JAXBContext.newInstance(
-                    org.hl7.v3.PRPAIN201305UV02.class,
-                    org.hl7.v3.PRPAIN201306UV02.class);
-        } catch (javax.xml.bind.JAXBException ex) {
-            System.err.println("Unable to create JAXBContext: "
-                    + ex.getMessage());
-            ex.printStackTrace(System.err);
-            Runtime.getRuntime().exit(-1);
-        } finally {
-            wsContext = jc;
-        }
     }
 
     private org.apache.axiom.om.OMElement toOM(org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent)
@@ -626,6 +608,14 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         } catch (javax.xml.bind.JAXBException bex) {
             throw org.apache.axis2.AxisFault.makeFault(bex);
         }
+    }
+
+    private EventLog createAndSendEventLog(PRPAIN201305UV02 sended, PRPAIN201306UV02 received, org.apache.axis2.context.MessageContext msgContext, org.apache.axiom.soap.SOAPEnvelope _returnEnv, org.apache.axiom.soap.SOAPEnvelope env, Assertion idAssertion, String address) {
+        EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
+        EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
+        EventLogUtil.prepareXCPDCommonLog(eventLog, sended, received);
+        EventLogClientUtil.sendEventLog(eventLog);
+        return eventLog;
     }
 
     class JaxbRIDataSource implements org.apache.axiom.om.OMDataSource {
@@ -711,13 +701,5 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 throw new javax.xml.stream.XMLStreamException("Error in JAXB marshalling", e);
             }
         }
-    }
-
-    private EventLog createAndSendEventLog(PRPAIN201305UV02 sended, PRPAIN201306UV02 received, org.apache.axis2.context.MessageContext msgContext, org.apache.axiom.soap.SOAPEnvelope _returnEnv, org.apache.axiom.soap.SOAPEnvelope env, Assertion idAssertion, String address) {
-        EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
-        EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
-        EventLogUtil.prepareXCPDCommonLog(eventLog, sended, received);
-        EventLogClientUtil.sendEventLog(eventLog);
-        return eventLog;
     }
 }

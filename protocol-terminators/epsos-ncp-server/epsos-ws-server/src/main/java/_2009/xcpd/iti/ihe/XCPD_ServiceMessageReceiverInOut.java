@@ -21,6 +21,11 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
  */
 /**
  * XCPD_ServiceMessageReceiverInOut.java
@@ -42,8 +47,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
@@ -60,12 +65,31 @@ import java.util.UUID;
  */
 public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.AbstractInOutMessageReceiver {
 
-    public static final Logger logger = Logger.getLogger(XCPD_ServiceMessageReceiverInOut.class);
+    public static final Logger logger = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
+    //
+    private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
         logger.debug("Loading the WS-Security init libraries in XCPD_ServiceMessageReceiverInOut xcpd 2009");
 
         org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
+    }
+
+    static {
+        javax.xml.bind.JAXBContext jc;
+        jc = null;
+        try {
+            jc = javax.xml.bind.JAXBContext.newInstance(
+                    org.hl7.v3.PRPAIN201305UV02.class,
+                    org.hl7.v3.PRPAIN201306UV02.class);
+        } catch (javax.xml.bind.JAXBException ex) {
+            System.err.println("Unable to create JAXBContext: "
+                    + ex.getMessage());
+            ex.printStackTrace(System.err);
+            // Runtime.getRuntime().exit(-1);
+        } finally {
+            wsContext = jc;
+        }
     }
 
     private String getIPofSender(
@@ -242,26 +266,6 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
         }
     }
 
-    //
-    private static final javax.xml.bind.JAXBContext wsContext;
-
-    static {
-        javax.xml.bind.JAXBContext jc;
-        jc = null;
-        try {
-            jc = javax.xml.bind.JAXBContext.newInstance(
-                    org.hl7.v3.PRPAIN201305UV02.class,
-                    org.hl7.v3.PRPAIN201306UV02.class);
-        } catch (javax.xml.bind.JAXBException ex) {
-            System.err.println("Unable to create JAXBContext: "
-                    + ex.getMessage());
-            ex.printStackTrace(System.err);
-            // Runtime.getRuntime().exit(-1);
-        } finally {
-            wsContext = jc;
-        }
-    }
-
     private org.apache.axiom.om.OMElement toOM(
             org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
@@ -351,6 +355,33 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
         } catch (javax.xml.bind.JAXBException bex) {
             throw org.apache.axis2.AxisFault.makeFault(bex);
         }
+    }
+
+    /**
+     * A utility method that copies the namepaces from the SOAPEnvelope
+     */
+    private java.util.Map getEnvelopeNamespaces(
+            org.apache.axiom.soap.SOAPEnvelope env) {
+        java.util.Map returnMap = new java.util.HashMap();
+        java.util.Iterator namespaceIterator = env.getAllDeclaredNamespaces();
+        while (namespaceIterator.hasNext()) {
+            org.apache.axiom.om.OMNamespace ns = (org.apache.axiom.om.OMNamespace) namespaceIterator
+                    .next();
+            returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
+        }
+        return returnMap;
+    }
+
+    private org.apache.axis2.AxisFault createAxisFault(java.lang.Exception e) {
+        org.apache.axis2.AxisFault f;
+        Throwable cause = e.getCause();
+        if (cause != null) {
+            f = new org.apache.axis2.AxisFault(e.getMessage(), cause);
+        } else {
+            f = new org.apache.axis2.AxisFault(e.getMessage());
+        }
+
+        return f;
     }
 
     class JaxbRIDataSource implements org.apache.axiom.om.OMDataSource {
@@ -450,32 +481,5 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
                         "Error in JAXB marshalling", e);
             }
         }
-    }
-
-    /**
-     * A utility method that copies the namepaces from the SOAPEnvelope
-     */
-    private java.util.Map getEnvelopeNamespaces(
-            org.apache.axiom.soap.SOAPEnvelope env) {
-        java.util.Map returnMap = new java.util.HashMap();
-        java.util.Iterator namespaceIterator = env.getAllDeclaredNamespaces();
-        while (namespaceIterator.hasNext()) {
-            org.apache.axiom.om.OMNamespace ns = (org.apache.axiom.om.OMNamespace) namespaceIterator
-                    .next();
-            returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
-        }
-        return returnMap;
-    }
-
-    private org.apache.axis2.AxisFault createAxisFault(java.lang.Exception e) {
-        org.apache.axis2.AxisFault f;
-        Throwable cause = e.getCause();
-        if (cause != null) {
-            f = new org.apache.axis2.AxisFault(e.getMessage(), cause);
-        } else {
-            f = new org.apache.axis2.AxisFault(e.getMessage());
-        }
-
-        return f;
     }
 }// end of class

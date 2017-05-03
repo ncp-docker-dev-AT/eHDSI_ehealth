@@ -13,21 +13,23 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.Handler;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
  * EvidenceEmitterHandler
  * Generates all NROs for the Portal
  * Currently supporting the generation of evidences in the following cases:
- *      Portal sends request to NCP-B *
+ * Portal sends request to NCP-B *
+ *
  * @author jgoncalves
  */
 public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
-    
-    private static final Logger LOG = Logger.getLogger(OutFlowEvidenceEmitterHandler.class);
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(OutFlowEvidenceEmitterHandler.class);
+
     private EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils;
 
     @Override
@@ -36,7 +38,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
         this.evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
 
         /* I'll leave this here as it might be useful in the future */
-        
+
 //        SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
 //        if (soapHeader != null) {
 //            Iterator<?> blocks = soapHeader.examineAllHeaderBlocks();
@@ -48,7 +50,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //                block.setProcessed();
 //            }
 //        }
-        
+
 //        LOG.debug("LOGGING TEST VALUES");
 //        LOG.debug("MessageContext properties: " + msgcontext.getProperties());
 //        LOG.debug("MessageContext messageID: " + msgcontext.getMessageID());
@@ -59,7 +61,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("SessionContext is null!");
 //        }
-        
+
 //        OperationContext operationCtx = msgcontext.getOperationContext();
 //        if (operationCtx != null) {
 //            LOG.debug("OperationContext operationName: " + operationCtx.getOperationName());
@@ -69,7 +71,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("OperationContext is null!");
 //        }
-        
+
 //        ServiceGroupContext serviceGroupCtx = msgcontext.getServiceGroupContext();
 //        if (serviceGroupCtx != null) {
 //            LOG.debug("ServiceGroupContext ID: " + serviceGroupCtx.getId());
@@ -96,7 +98,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("ServiceGroupContext is null!");
 //        }
-        
+
 //        ConfigurationContext configCtx = msgcontext.getRootContext();
 //        if (configCtx != null) {
 //            LOG.debug("ConfigurationContext contextRoot: " + configCtx.getContextRoot());
@@ -105,11 +107,11 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //        } else {
 //            LOG.debug("ConfigurationContext is null!");
 //        }
-       
+
         try {
             /* Canonicalizing the full SOAP message */
             Document envCanonicalized = this.evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(msgcontext.getEnvelope());
-        
+
             SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
             SOAPBody soapBody = msgcontext.getEnvelope().getBody();
             String eventType = this.evidenceEmitterHandlerUtils.getEventTypeFromMessage(soapBody);
@@ -121,25 +123,25 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
             
             /* Portal sends request to NCP-B*/
             EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
-                            eventType,
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            title,
-                            msgUUID);
+                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                    tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                    tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                    tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
+                    tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
+                    tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
+                    eventType,
+                    new DateTime(),
+                    EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+                    title,
+                    msgUUID);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-            
+
         return Handler.InvocationResponse.CONTINUE;
     }
 }
