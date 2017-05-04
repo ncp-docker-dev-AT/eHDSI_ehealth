@@ -23,8 +23,6 @@ package org.openhealthtools.openatna.report;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openhealthtools.openatna.audit.AtnaFactory;
 import org.openhealthtools.openatna.audit.persistence.AtnaPersistenceException;
 import org.openhealthtools.openatna.audit.persistence.dao.EntityDao;
@@ -32,6 +30,8 @@ import org.openhealthtools.openatna.audit.persistence.dao.MessageDao;
 import org.openhealthtools.openatna.audit.persistence.model.MessageEntity;
 import org.openhealthtools.openatna.audit.persistence.model.PersistentEntity;
 import org.openhealthtools.openatna.audit.persistence.util.QueryString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,7 +65,7 @@ public class Reporter {
             "ObjectDetailEntity",
             "ProvisionalEntity"
     };
-    static Log log = LogFactory.getLog("org.openhealthtools.openatna.report.Reporter");
+    private static final Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.report.Reporter");
     private static SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy_hh-mm-ss");
     private ReportConfig config;
     private boolean isAtnaQuery = false;
@@ -79,7 +79,7 @@ public class Reporter {
             InputStream in = new FileInputStream(args[0]);//Reporter.class.getResourceAsStream("/rc.xml");
             ReportConfig rc = ReportConfig.fromXml(in);
             Reporter r = new Reporter(rc);
-            System.out.println(r.report());
+            log.info("Report: '{}'", r.report());
         } catch (Exception e) {
             e.printStackTrace();
         }

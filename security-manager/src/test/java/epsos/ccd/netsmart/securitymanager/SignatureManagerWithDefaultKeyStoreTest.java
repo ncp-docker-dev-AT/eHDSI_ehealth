@@ -71,7 +71,7 @@ public class SignatureManagerWithDefaultKeyStoreTest {
     public void testSignXMLWithEnvelopedSig() {
         try {
 
-            System.out.println("signXMLWithEnvelopedSig");
+            logger.info("signXMLWithEnvelopedSig");
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);

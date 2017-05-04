@@ -107,8 +107,6 @@ public class TRCAssertionRequest {
             rstMsg = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
             createRSTHeader(rstMsg.getSOAPHeader());
             createRSTBody(rstMsg.getSOAPBody());
-
-            //rstMsg.writeTo(System.out);
         } catch (SOAPException ex) {
             LOGGER.error(null, ex);
             throw new Exception("Unable to create RST Message");

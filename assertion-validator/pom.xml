@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
@@ -15,9 +15,9 @@
         <name>SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik Tic. Ltd. Sti.</name>
         <url>www.srdc.com.tr</url>
     </organization>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--<log4jVersion>1.2.17</log4jVersion>-->
     </properties>
 
     <!-- Libraries Dependencies -->
@@ -42,28 +42,5 @@
             <artifactId>jcl-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4jVersion}</version>
-        </dependency>-->
     </dependencies>
-
-    <!-- Build Settings -->
-    <build>
-    </build>
-
-    <!-- Environment Settings -->
-    <repositories>
-        <!--<repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
-            <name>Sonatype repository</name>
-        </repository>
-        <repository>
-            <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
-            <id>openSamlRep</id>
-            <name>Official OpenSaml Repository</name>
-        </repository>-->
-    </repositories>
 </project>

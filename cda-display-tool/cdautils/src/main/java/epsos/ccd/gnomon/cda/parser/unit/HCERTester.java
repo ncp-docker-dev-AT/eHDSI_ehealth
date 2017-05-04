@@ -4,6 +4,8 @@ import epsos.ccd.gnomon.cda.parser.beans.*;
 import epsos.ccd.gnomon.cda.parser.docs.ClinicalDocument;
 import epsos.ccd.gnomon.cda.parser.docs.HCEReport;
 import epsos.ccd.gnomon.cda.parser.enums.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 import javax.xml.transform.OutputKeys;
@@ -24,6 +26,8 @@ import java.util.Date;
  * @author Akis Papadopoulos
  */
 public class HCERTester {
+
+    private static final Logger logger = LoggerFactory.getLogger(HCERTester.class);
 
     public static void main(String[] args) throws Exception {
         // Creating the patient id
@@ -139,9 +143,9 @@ public class HCERTester {
             Source xmlSource = new SAXSource(new InputSource(new ByteArrayInputStream(cda.toString().getBytes())));
             StreamResult res = new StreamResult(new ByteArrayOutputStream());
             serializer.transform(xmlSource, res);
-            System.out.println(new String(((ByteArrayOutputStream) res.getOutputStream()).toByteArray()));
+            logger.info(new String(((ByteArrayOutputStream) res.getOutputStream()).toByteArray()));
         } catch (Exception exc) {
-            exc.printStackTrace(System.out);
+            logger.error("Exception: '{}'", exc.getMessage(), exc);
         }
     }
 }

@@ -16,6 +16,8 @@ import org.apache.http.util.EntityUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,13 +46,15 @@ import java.security.cert.X509Certificate;
 import static org.junit.Assert.assertNotNull;
 
 public class TestSMP {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestSMP.class);
     private static final String ns = "http://busdox.org/serviceMetadata/publishing/1.0/";
 
     @BeforeClass
     public static void setup() {
         //TODO: Check Logger Jerome
         /*Logger rootLogger = Logger.getRootLogger();
-		if (!rootLogger.getAllAppenders().hasMoreElements()) {
+        if (!rootLogger.getAllAppenders().hasMoreElements()) {
 			rootLogger.setLevel(Level.OFF);
 		
 			Logger hornetLogger = rootLoggerFactory.getLoggerRepository().getLogger("org.hornetq.core.server");
@@ -126,8 +130,8 @@ public class TestSMP {
                 Record rec = records[0];
 
                 String t = rec.rdataToString();
-				/*
-				 * The string is 100 10 "U" "Meta:SMP"
+                /*
+                 * The string is 100 10 "U" "Meta:SMP"
 				 * "!^.*$!http://EHEALTH-TEST-UPRC.publisher.acc.edelivery.tech.ec.europa.eu!"
 				 * .
 				 */
@@ -158,7 +162,7 @@ public class TestSMP {
                 // what
                 // they
                 // are
-                System.out.println(url1);
+                LOGGER.info(url1);
 				/*
 				 * HERE SML ENDS, BEGIN SMP
 				 */
@@ -170,12 +174,12 @@ public class TestSMP {
                 // THIS
                 // IS
                 // DEFINED?
-                System.out.println(sgName);
+                LOGGER.info(sgName);
 
                 getServicegroup(sgName, did);
 
             } else {
-                System.out.println(l.getErrorString());
+                LOGGER.info(l.getErrorString());
             }
 
         } catch (Exception e) {
@@ -210,7 +214,7 @@ public class TestSMP {
         // discarded
         // by the connection manager.
         try {
-            System.out.println(response1.getStatusLine());
+            LOGGER.info("Response: '{}'", response1.getStatusLine());
             HttpEntity entity1 = response1.getEntity();
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -260,11 +264,10 @@ public class TestSMP {
 				 */
 
                 if (serviceName.contains(did)) {
-                    System.out.println("Found the service which I'm looking for. Fetching the document");
+                    LOGGER.info("Found the service which I'm looking for. Fetching the document");
                     getSignedServiceInformation(url);
                     break;
                 }
-
             }
         }
     }

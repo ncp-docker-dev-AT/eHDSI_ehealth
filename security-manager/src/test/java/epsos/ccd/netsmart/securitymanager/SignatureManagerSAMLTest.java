@@ -81,7 +81,7 @@ public class SignatureManagerSAMLTest {
     @Test
     public void testSignAndVerifySAMLAssertion() throws IOException {
         try {
-            System.out.println("signSAMLAssertion");
+            logger.info("signSAMLAssertion");
 
             // Get parser pool manager
             BasicParserPool ppMgr = new BasicParserPool();

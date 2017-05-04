@@ -1,25 +1,29 @@
 /**
- *  Copyright (c) 2009-2011 Misys Open Source Solutions (MOSS) and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    Misys Open Source Solutions - initial API and implementation
- *    -
+ * Copyright (c) 2009-2011 Misys Open Source Solutions (MOSS) and others
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * <p>
+ * Contributors:
+ * Misys Open Source Solutions - initial API and implementation
+ * -
  */
 
 package org.openhealthtools.openatna.net;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.URL;
 import java.security.KeyStore;
@@ -30,14 +34,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * A simple class for dealing with certificate management. <p />
@@ -61,7 +57,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ConnectionCertificateHandler {
 
-    static Log log = LogFactory.getLog("org.openhealthtools.openatna.net.ConnectionCertificateHandler");
+    private static Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.net.ConnectionCertificateHandler");
 
     /**
      * Creates a key/trust store and loads in the corresponding file.
@@ -146,7 +142,7 @@ public class ConnectionCertificateHandler {
         }
         return "";
     }
-    
+
     /**
      * For debuging only.  Prints out keystore certificate chain.
      *
@@ -207,21 +203,20 @@ public class ConnectionCertificateHandler {
             KeyStore ks = ConnectionCertificateHandler.createKeyStore(new URL("file:certs/keystore"), "password");
             ConnectionCertificateHandler.printKeyCertificates(ks);
             KeyManager[] kms = ConnectionCertificateHandler.createKeyManagers(ks, "password");
-            System.out.println("Printing all key managers:");
+            log.info("Printing all key managers:");
             for (KeyManager km : kms) {
-                System.out.println(km.toString());
+                log.info(km.toString());
             }
             KeyStore ts = ConnectionCertificateHandler.createKeyStore(new URL("file:certs/truststore"), "password");
             ConnectionCertificateHandler.printTrustCerts(ts);
             TrustManager[] tms = ConnectionCertificateHandler.createTrustManagers(ts, null);
-            System.out.println("Printing all trust managers:");
+            log.info("Printing all trust managers:");
             for (TrustManager tm : tms) {
-                System.out.println(tm.toString());
+                log.info(tm.toString());
             }
 
         } catch (Exception e) {
-            System.out.println("Top Level Error: " + e);
+            log.info("Top Level Error: " + e);
         }
     }
-
 }
