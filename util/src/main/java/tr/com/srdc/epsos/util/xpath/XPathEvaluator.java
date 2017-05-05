@@ -1,40 +1,35 @@
 /**
  * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
  * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- *
+ * <p>
  * This file is part of SRDC epSOS NCP.
- *
+ * <p>
  * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along with
  * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
  */
 package tr.com.srdc.epsos.util.xpath;
 
-import java.util.HashMap;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import javax.xml.xpath.*;
+import java.util.HashMap;
+
 public class XPathEvaluator {
 
+    XPathExpression xPathExp = null;
     private XPathFactory xpf = null;
     private XPath xPath = null;
-    XPathExpression xPathExp = null;
 
     public XPathEvaluator(HashMap namespaces, String xPathExpStr) {
         this(namespaces);
@@ -56,7 +51,6 @@ public class XPathEvaluator {
         if (xpf == null) {
             xpf = XPathFactory.newInstance();
             xPath = xpf.newXPath();
-            //System.err.println("Loaded XPath Provider " + xPath.getClass().getName());
         }
     }
 

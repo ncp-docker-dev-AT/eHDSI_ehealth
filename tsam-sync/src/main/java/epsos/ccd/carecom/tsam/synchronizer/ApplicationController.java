@@ -25,34 +25,32 @@ import java.util.Date;
 public final class ApplicationController {
 
     /**
-     * Holds the name of the default system property, whose value points to the location of a log file.
-     */
-    public static final String DEFAULT_SETTING_LOG_SETTINGS = "java.util.logging.config.file";
-    /**
      * This is the main log class used for logging by this application.
      */
     public final static Logger LOG = LoggerFactory.getLogger("TSAM.Synchronizer");
+    /**
+     * Holds the name of the default system property, whose value points to the location of a log file.
+     */
+    public static final String DEFAULT_SETTING_LOG_SETTINGS = "java.util.logging.config.file";
     /*
      * Standard date string
      */
-    private static final String syncdate = "MMM dd yyyy hh:mm:ss";
+    protected static final String syncdate = "MMM dd yyyy hh:mm:ss";
     /**
      * Default text used when shutting the application down.
      */
-    private final static String SHUTTING_DOWN_LOG_TEXT = "Cannot continue -> SHUTTING DOWN!";
-
-    /**
-     * Holds the notifier for gathering of statistic data.
-     */
-    public static NotifierImpl STATS = new NotifierImpl();
-
+    protected final static String SHUTTING_DOWN_LOG_TEXT = "Cannot continue -> SHUTTING DOWN!";
     /**
      * Holds the number of retries the client should make when an error occurs
      */
-    public static int retryNumber;
+    protected static int retryNumber;
+    /**
+     * Holds the notifier for gathering of statistic data.
+     */
+    protected static NotifierImpl STATS = new NotifierImpl();
 
     static {
-        //Level logLevel = Level.parse(Settings.getInstance().getSettingValue("sync.statistics.log"));
+
         Level logLevel = Level.valueOf(Settings.getInstance().getSettingValue("sync.statistics.log"));
 
         retryNumber = Settings.getInstance().getRetryNumber();
@@ -80,6 +78,9 @@ public final class ApplicationController {
                 (onError != null && onError.equalsIgnoreCase("PRINT")), Level.INFO));
     }
 
+    private ApplicationController() {
+    }
+
     /**
      * Attempts to write a synchronization date using the <i>Configuration Manager Common Component</i>.
      */
@@ -92,9 +93,9 @@ public final class ApplicationController {
         String result = configService.updateProperty(countryCode + ".tsam.synchronizer.lastsyncdate", date);
 
         if (result != null && result.equals(date)) {
-            LOG.info("Last sync date written to Configuration Manager: " + result);
+            LOG.info("Last sync date written to Configuration Manager: '{}'", result);
         } else {
-            LOG.warn("Could not verify writing last sync date to Configuration Manager: " + date);
+            LOG.warn("Could not verify writing last sync date to Configuration Manager: '{}'", date);
         }
     }
 
@@ -127,7 +128,7 @@ public final class ApplicationController {
      * @param msg Custom message.
      */
     public static void handleSevereError(Throwable e, String msg) {
-        LOG.error("Caught " + e.toString() + ": " + msg, e);
+        LOG.error("Caught '{}': '{}", e.getMessage(), msg, e);
         LOG.error(SHUTTING_DOWN_LOG_TEXT);
 
         // must try to unlock the application before exiting.
@@ -190,10 +191,11 @@ public final class ApplicationController {
         File pidFile = getPidFile();
         try {
             if (pidFile.exists()) {
-                pidFile.delete();
+                boolean deleted = pidFile.delete();
+                LOG.info("Application unlocked: '{}'", deleted);
             }
         } catch (SecurityException e) {
-            LOG.warn("Could not remove the pid file", e);
+            LOG.warn("Could not remove the pid file: '{}'", e.getMessage(), e);
         }
         LOG.info("Lock file deleted");
     }
@@ -206,7 +208,7 @@ public final class ApplicationController {
         try {
             return pidFile.exists();
         } catch (SecurityException e) {
-            LOG.warn("Could not access the pid file", e);
+            LOG.warn("Could not access the pid file '{}'", e.getMessage(), e);
         }
         return false;
     }
@@ -217,7 +219,6 @@ public final class ApplicationController {
     private static File getPidFile() {
         String path = System.getProperty("user.dir");
         String seperator = System.getProperty("file.separator");
-        File pidFile = new File(path + seperator + "tsam.synchronizer.pid");
-        return pidFile;
+        return new File(path + seperator + "tsam.synchronizer.pid");
     }
 }

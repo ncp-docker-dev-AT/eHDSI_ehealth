@@ -1,22 +1,22 @@
-    /*
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. epsos@srdc.com.tr
- *
- * This file is part of SRDC epSOS NCP.
- *
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- *
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see http://www.gnu.org/licenses/.
- */
+/*
+* Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
+* Tic. Ltd. Sti. epsos@srdc.com.tr
+*
+* This file is part of SRDC epSOS NCP.
+*
+* SRDC epSOS NCP is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation, either version 3 of the License, or (at your option) any
+* later version.
+*
+* SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+* details.
+*
+* You should have received a copy of the GNU General Public License along with
+* SRDC epSOS NCP. If not, see http://www.gnu.org/licenses/.
+*/
 package tr.com.srdc.epsos.ws.xca.client;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
@@ -35,39 +35,55 @@ import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XcaValidationService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
-import java.util.Date;
-import java.util.UUID;
-import javax.xml.parsers.ParserConfigurationException;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.joda.time.DateTime;
 import org.opensaml.saml2.core.Assertion;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.util.Date;
+import java.util.UUID;
+
 /*
  *  RespondingGateway_ServiceStub java implementation
  */
 public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub {
 
-    protected org.apache.axis2.description.AxisOperation[] _operations;
+    //http://localhost:8080/axis2/services/RespondingGateway_Soap12
+    private static final javax.xml.bind.JAXBContext wsContext;
     private static Logger LOG = LoggerFactory.getLogger(RespondingGateway_ServiceStub.class);
     private static int counter = 0;
+
+    static {
+        javax.xml.bind.JAXBContext jc;
+        jc = null;
+        try {
+            jc = javax.xml.bind.JAXBContext.newInstance(
+                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
+                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse.class,
+                    RetrieveDocumentSetRequestType.class,
+                    RetrieveDocumentSetResponseType.class);
+        } catch (javax.xml.bind.JAXBException ex) {
+            LOG.error("JAXBException: {} - '{}'", XCAConstants.EXCEPTIONS.UNABLE_CREATE_JAXB_CONTEXT, ex.getMessage(), ex);
+            Runtime.getRuntime().exit(-1);
+        } finally {
+            wsContext = jc;
+        }
+    }
+
+    protected org.apache.axis2.description.AxisOperation[] _operations;
     //hashmaps to keep the fault mapping
     private java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
     private java.util.HashMap faultExceptionClassNameMap = new java.util.HashMap();
@@ -76,44 +92,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     private String countryCode;
     private Date transactionStartTime;
     private Date transactionEndTime;
-
-    public void setAddr(String addr) {
-        this.addr = addr;
-    }
-
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-    }
-
-    private static synchronized java.lang.String getUniqueSuffix() {
-        // reset the counter if it is greater than 99999
-        if (counter > 99999) {
-            counter = 0;
-        }
-        counter++;
-        return java.lang.Long.toString(System.currentTimeMillis()) + "_" + counter;
-    }
-
-    private void populateAxisService() throws org.apache.axis2.AxisFault {
-        //creating the Service with a unique name
-        _service = new org.apache.axis2.description.AxisService(XCAConstants.RESPONDING_GATEWAY_SERVICE + getUniqueSuffix());
-        addAnonymousOperations();
-        //creating the operations
-        org.apache.axis2.description.AxisOperation __operation;
-        _operations = new org.apache.axis2.description.AxisOperation[2];
-        __operation = new org.apache.axis2.description.OutInAxisOperation();
-        __operation.setName(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.QUERY.NAMESPACE_REQUEST_LOCAL_PART));
-        _service.addOperation(__operation);
-        _operations[0] = __operation;
-        __operation = new org.apache.axis2.description.OutInAxisOperation();
-        __operation.setName(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.RETRIEVE.NAMESPACE_REQUEST_LOCAL_PART));
-        _service.addOperation(__operation);
-        _operations[1] = __operation;
-    }
-
-    //populates the faults
-    private void populateFaults() {
-    }
+    private javax.xml.namespace.QName[] opNameArray = null;
 
     /**
      * Constructor that takes in a configContext
@@ -166,18 +145,54 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         this(null, targetEndpoint);
     }
 
+    private static synchronized java.lang.String getUniqueSuffix() {
+        // reset the counter if it is greater than 99999
+        if (counter > 99999) {
+            counter = 0;
+        }
+        counter++;
+        return java.lang.Long.toString(System.currentTimeMillis()) + "_" + counter;
+    }
+
+    public void setAddr(String addr) {
+        this.addr = addr;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    private void populateAxisService() throws org.apache.axis2.AxisFault {
+        //creating the Service with a unique name
+        _service = new org.apache.axis2.description.AxisService(XCAConstants.RESPONDING_GATEWAY_SERVICE + getUniqueSuffix());
+        addAnonymousOperations();
+        //creating the operations
+        org.apache.axis2.description.AxisOperation __operation;
+        _operations = new org.apache.axis2.description.AxisOperation[2];
+        __operation = new org.apache.axis2.description.OutInAxisOperation();
+        __operation.setName(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.QUERY.NAMESPACE_REQUEST_LOCAL_PART));
+        _service.addOperation(__operation);
+        _operations[0] = __operation;
+        __operation = new org.apache.axis2.description.OutInAxisOperation();
+        __operation.setName(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.RETRIEVE.NAMESPACE_REQUEST_LOCAL_PART));
+        _service.addOperation(__operation);
+        _operations[1] = __operation;
+    }
+
+    //populates the faults
+    private void populateFaults() {
+    }
+
     /**
      * Auto generated method signature
      *
-     * @see
-     * tr.com.srdc.epsos.test.xca.RespondingGateway_Service#respondingGateway_CrossGatewayQuery
      * @param adhocQueryRequest
-     *
+     * @see tr.com.srdc.epsos.test.xca.RespondingGateway_Service#respondingGateway_CrossGatewayQuery
      */
     public AdhocQueryResponse respondingGateway_CrossGatewayQuery(AdhocQueryRequest adhocQueryRequest,
-            Assertion idAssertion,
-            Assertion trcAssertion,
-            String classCode)
+                                                                  Assertion idAssertion,
+                                                                  Assertion trcAssertion,
+                                                                  String classCode)
             throws java.rmi.RemoteException {
         org.apache.axis2.context.MessageContext _messageContext = null;
         try {
@@ -450,21 +465,19 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     /**
      * Auto generated method signature
      *
-     * @see
-     * tr.com.srdc.epsos.test.xca.RespondingGateway_Service#respondingGateway_CrossGatewayRetrieve
      * @param retrieveDocumentSetRequest
      * @param idAssertion
      * @param trcAssertion
-     * @param classCode Class code of the document to be retrieved, needed for
-     * audit log preparation
+     * @param classCode                  Class code of the document to be retrieved, needed for
+     *                                   audit log preparation
      * @return
      * @throws java.rmi.RemoteException
-     *
+     * @see tr.com.srdc.epsos.test.xca.RespondingGateway_Service#respondingGateway_CrossGatewayRetrieve
      */
     public RetrieveDocumentSetResponseType respondingGateway_CrossGatewayRetrieve(RetrieveDocumentSetRequestType retrieveDocumentSetRequest,
-            Assertion idAssertion,
-            Assertion trcAssertion,
-            String classCode)
+                                                                                  Assertion idAssertion,
+                                                                                  Assertion trcAssertion,
+                                                                                  String classCode)
             throws java.rmi.RemoteException {
         org.apache.axis2.context.MessageContext _messageContext = null;
         org.apache.axiom.soap.SOAPEnvelope env;
@@ -700,7 +713,6 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         }
         return returnMap;
     }
-    private javax.xml.namespace.QName[] opNameArray = null;
 
     private boolean optimizeContent(javax.xml.namespace.QName opName) {
 
@@ -713,26 +725,6 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             }
         }
         return false;
-    }
-    //http://localhost:8080/axis2/services/RespondingGateway_Soap12
-    private static final javax.xml.bind.JAXBContext wsContext;
-
-    static {
-        javax.xml.bind.JAXBContext jc;
-        jc = null;
-        try {
-            jc = javax.xml.bind.JAXBContext.newInstance(
-                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
-                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse.class,
-                    RetrieveDocumentSetRequestType.class,
-                    RetrieveDocumentSetResponseType.class);
-        } catch (javax.xml.bind.JAXBException ex) {
-            System.err.println(XCAConstants.EXCEPTIONS.UNABLE_CREATE_JAXB_CONTEXT + " " + ex.getMessage());
-            ex.printStackTrace(System.err);
-            Runtime.getRuntime().exit(-1);
-        } finally {
-            wsContext = jc;
-        }
     }
 
     private org.apache.axiom.om.OMElement toOM(oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest param, boolean optimizeContent)
@@ -876,6 +868,34 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         }
     }
 
+    private EventLog createAndSendEventLogQuery(AdhocQueryRequest request, AdhocQueryResponse response,
+                                                org.apache.axis2.context.MessageContext msgContext,
+                                                org.apache.axiom.soap.SOAPEnvelope _returnEnv,
+                                                org.apache.axiom.soap.SOAPEnvelope env,
+                                                Assertion idAssertion, Assertion trcAssertion,
+                                                String address, String classCode) {
+        EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
+        EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
+        EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
+        EventLogUtil.prepareXCACommonLogQuery(eventLog, request, response, classCode);
+        EventLogClientUtil.sendEventLog(eventLog);
+        return eventLog;
+    }
+
+    private EventLog createAndSendEventLogRetrieve(RetrieveDocumentSetRequestType request, RetrieveDocumentSetResponseType response,
+                                                   org.apache.axis2.context.MessageContext msgContext,
+                                                   org.apache.axiom.soap.SOAPEnvelope _returnEnv,
+                                                   org.apache.axiom.soap.SOAPEnvelope env,
+                                                   Assertion idAssertion, Assertion trcAssertion,
+                                                   String address, String classCode) {
+        EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
+        EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
+        EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
+        EventLogUtil.prepareXCACommonLogRetrieve(eventLog, request, response, classCode);
+        EventLogClientUtil.sendEventLog(eventLog);
+        return eventLog;
+    }
+
     class JaxbRIDataSource implements org.apache.axiom.om.OMDataSource {
 
         /**
@@ -958,33 +978,5 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 throw new javax.xml.stream.XMLStreamException(XCAConstants.EXCEPTIONS.ERROR_JAXB_MARSHALLING, e);
             }
         }
-    }
-
-    private EventLog createAndSendEventLogQuery(AdhocQueryRequest request, AdhocQueryResponse response,
-            org.apache.axis2.context.MessageContext msgContext,
-            org.apache.axiom.soap.SOAPEnvelope _returnEnv,
-            org.apache.axiom.soap.SOAPEnvelope env,
-            Assertion idAssertion, Assertion trcAssertion,
-            String address, String classCode) {
-        EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
-        EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
-        EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
-        EventLogUtil.prepareXCACommonLogQuery(eventLog, request, response, classCode);
-        EventLogClientUtil.sendEventLog(eventLog);
-        return eventLog;
-    }
-
-    private EventLog createAndSendEventLogRetrieve(RetrieveDocumentSetRequestType request, RetrieveDocumentSetResponseType response,
-            org.apache.axis2.context.MessageContext msgContext,
-            org.apache.axiom.soap.SOAPEnvelope _returnEnv,
-            org.apache.axiom.soap.SOAPEnvelope env,
-            Assertion idAssertion, Assertion trcAssertion,
-            String address, String classCode) {
-        EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
-        EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
-        EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
-        EventLogUtil.prepareXCACommonLogRetrieve(eventLog, request, response, classCode);
-        EventLogClientUtil.sendEventLog(eventLog);
-        return eventLog;
     }
 }

@@ -43,7 +43,7 @@ import java.net.InetSocketAddress;
  */
 public class UdpProtocolHandler extends IoHandlerAdapter {
 
-    static Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.syslog.mina.udp.UdpProtocolHandler");
+    private static Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.syslog.mina.udp.UdpProtocolHandler");
 
     private Notifier server;
     private int mtu;
@@ -53,19 +53,23 @@ public class UdpProtocolHandler extends IoHandlerAdapter {
         this.mtu = mtu;
     }
 
+    @Override
     public void sessionCreated(IoSession session) {
         log.info("Enter");
     }
 
+    @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
         log.info("Enter");
     }
 
+    @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        cause.printStackTrace();
+        log.error("exceptionCaught: '{}'", cause.getMessage(), cause);
         session.close();
     }
 
+    @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {
         log.info("Enter");
@@ -75,7 +79,7 @@ public class UdpProtocolHandler extends IoHandlerAdapter {
         }
         ByteBuffer buff = (ByteBuffer) message;
         if (buff.limit() > mtu) {
-            log.info("message is too long: " + buff.limit() + ". It exceeds config MTU of " + mtu);
+            log.info("message is too long: '{}'. It exceeds config MTU of '{}'", buff.limit(), mtu);
             SyslogException e = new SyslogException("Packet exceeds MTU of " + mtu);
             e.setSourceIp(((InetSocketAddress) session.getRemoteAddress()).getAddress().getHostAddress());
             buff.rewind();

@@ -20,6 +20,11 @@
  * <p>
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.5.5  Built on : May 28, 2011 (08:30:56 CEST)
+ * <p>
+ * XDR_ServiceSkeleton.java
+ * <p>
+ * This file was auto-generated from WSDL
+ * by the Apache Axis2 version: 1.5.5  Built on : May 28, 2011 (08:30:56 CEST)
  */
 /**
  * XDR_ServiceSkeleton.java
@@ -32,8 +37,6 @@ package _2007.xds_b.iti.ihe;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import org.apache.axiom.soap.SOAPHeader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.ws.server.xdr.XDRServiceImpl;
 
 /**
@@ -42,9 +45,6 @@ import tr.com.srdc.epsos.ws.server.xdr.XDRServiceImpl;
 public class XDR_ServiceSkeleton {
 
     private XDRServiceInterface service = null;
-
-    // added by Kela
-    public static Logger logger = LoggerFactory.getLogger(XCA_ServiceSkeleton.class);
 
     public XDR_ServiceSkeleton() {
     }

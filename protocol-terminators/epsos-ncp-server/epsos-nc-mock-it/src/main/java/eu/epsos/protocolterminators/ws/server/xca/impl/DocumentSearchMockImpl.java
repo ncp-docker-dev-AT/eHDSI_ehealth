@@ -33,13 +33,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private static final String PATTERN_EP = "epstore.+\\.xml";
     private static final String PATTERN_PS = "psstore.+\\.xml";
     private static final String PATTERN_MRO = "mrostore.+\\.xml";
-    public static Logger logger = LoggerFactory.getLogger(DocumentSearchMockImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DocumentSearchMockImpl.class);
     private List<DocumentAssociation<EPDocumentMetaData>> epDocumentMetaDatas = new ArrayList<>();
     private List<DocumentAssociation<PSDocumentMetaData>> psDocumentMetaDatas = new ArrayList<>();
     private List<DocumentAssociation<MroDocumentMetaData>> mroDocumentMetaDatas = new ArrayList<>();
     private List<EPSOSDocument> documents = new ArrayList<EPSOSDocument>();
 
     public DocumentSearchMockImpl() {
+
         Collection<String> documentlist = ResourceList.getResources(Pattern.compile(PATTERN_EP));
         ResourceLoader resourceLoader = new ResourceLoader();
 

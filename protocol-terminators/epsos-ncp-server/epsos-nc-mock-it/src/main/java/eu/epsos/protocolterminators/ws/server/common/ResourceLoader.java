@@ -12,7 +12,7 @@ import java.io.*;
  */
 public class ResourceLoader {
 
-    public static Logger logger = LoggerFactory.getLogger(ResourceLoader.class);
+    private final static Logger logger = LoggerFactory.getLogger(ResourceLoader.class);
 
     /**
      * Locates and loads file for the specified filename. Returns contents as a String.
@@ -29,11 +29,10 @@ public class ResourceLoader {
 
         if (is != null) {
             resourceStr = streamToString(is);
-            //logger.debug(resourceStr);
         }
 
         if (resourceStr.isEmpty()) {
-            logger.debug("ERROR - Failed to load resource with name " + resourceName);
+            logger.debug("ERROR - Failed to load resource with name '{}'", resourceName);
         }
 
         return resourceStr;
@@ -54,7 +53,7 @@ public class ResourceLoader {
             br.close();
             return out.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("Exception: '{}'", e.getMessage(), e);
         }
         return out.toString();
     }
@@ -72,8 +71,7 @@ public class ResourceLoader {
             }
             is.close();
         } catch (IOException e) {
-            logger.error(e.getMessage());
-            e.printStackTrace();
+            logger.error("IOException: '{}'", e.getMessage(), e);
         }
         return baos.toByteArray();
     }

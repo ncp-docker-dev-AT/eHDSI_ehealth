@@ -4,6 +4,7 @@ import com.google.common.io.BaseEncoding;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -218,7 +219,7 @@ public class SMLSMPClient {
         String ep1 = epSOSaction.replace("-", "::");
         String finalDocumentIdentifier = SMP_PREFIX + ep1.toLowerCase();
 
-        L.debug("Final document identifier is: " + finalDocumentIdentifier);
+        L.debug("Final document identifier is: '{}'", finalDocumentIdentifier);
 
         L.debug("Obtaining the Service Group");
         // get the sg, then each file get it
@@ -266,7 +267,7 @@ public class SMLSMPClient {
      * @throws IOException
      */
     private Document getFromHTTP(String url) throws IOException {
-        L.debug("Doing HTTP to " + url);
+        L.debug("Doing HTTP to '{}'", url);
 
         // TODO HTTP
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
@@ -275,9 +276,7 @@ public class SMLSMPClient {
             try {
                 response1 = httpclient.execute(httpGet);
             } catch (IOException e) {
-
-                e.printStackTrace();
-                L.error("Unable to get the SMP record", e);
+                L.error("Unable to get the SMP record '{}'", e.getMessage(), e);
                 throw e;
             }
 
@@ -299,7 +298,7 @@ public class SMLSMPClient {
                 try {
                     response1.close();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    L.error("IOException: '{}'", e.getMessage(), e);
                 }
             }
         }
@@ -333,7 +332,7 @@ public class SMLSMPClient {
             String t = rec.rdataToString();
             L.debug("Obtained RAW data: " + t);
             /*
-			 * The string is 100 10 "U" "Meta:SMP"
+             * The string is 100 10 "U" "Meta:SMP"
 			 * "!^.*$!http://EHEALTH-TEST-UPRC.publisher.acc.edelivery.tech.ec.europa.eu!"
 			 * .
 			 */
@@ -349,7 +348,7 @@ public class SMLSMPClient {
             String metaSMP = t1[3];
             String url = t1[4];
 
-            if (!metaSMP.equals("\"Meta:SMP\"")) {
+            if (!StringUtils.equals(metaSMP, "\"Meta:SMP\"")) {
                 throw new RuntimeException("I'm confused. The tag " + metaSMP + " can't be recognized");
             }
 
@@ -357,8 +356,8 @@ public class SMLSMPClient {
             // it is.
             String url1 = url.substring(url.indexOf("http"), url.length() - 2);
             L.debug("The full record is: " + url1);
-			/*
-			 * HERE SML ENDS, BEGIN SMP
+            /*
+             * HERE SML ENDS, BEGIN SMP
 			 */
             // Get the service group,
             // http://ehealth-test-uprc.publisher.acc.edelivery.tech.ec.europa.eu/ehealth-actorid-qns%3A%3Aurn%3Aehealth%3Apt%3Ancpb-idp
@@ -439,7 +438,7 @@ public class SMLSMPClient {
         Document signedServiceInfo = getFromHTTP(url.toExternalForm());
 
 		/*
-		 * TODO THIS IS THE JOAO FIX ON THE BUG OF THE SMP SERVER. TO ADD
+         * TODO THIS IS THE JOAO FIX ON THE BUG OF THE SMP SERVER. TO ADD
 		 */
         // Document beforeTheFix = signedServiceInfo;
 
@@ -453,7 +452,7 @@ public class SMLSMPClient {
         // SmpXslt.validateXml(tbValidated, ns, "ServiceInformation");
 
 		/*
-		 * TODO: after the JOAO you MUST verify all the signatures.
+         * TODO: after the JOAO you MUST verify all the signatures.
 		 */
         if (L.isDebugEnabled()) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -480,14 +479,14 @@ public class SMLSMPClient {
 
             if (n.getNodeType() == Node.ELEMENT_NODE) {
                 String localName = n.getLocalName();
-                if (localName.equals("ServiceEndpointList")) {
+                if (StringUtils.equals(localName, "ServiceEndpointList")) {
                     Element sel = (Element) n;
                     NodeList endpoint = sel.getChildNodes();
                     int size1 = endpoint.getLength();
                     for (int j = 0; j < size1; j++) {
                         Node localName1 = endpoint.item(j);
                         String localName11 = localName1.getLocalName();
-                        if (localName11 != null && localName11.equals("Endpoint")) {
+                        if (StringUtils.equals(localName11, "Endpoint")) {
                             Element endpointEl = (Element) localName1;
                             NodeList nl2 = endpointEl.getElementsByTagNameNS("http://www.w3.org/2005/08/addressing",
                                     "Address");
