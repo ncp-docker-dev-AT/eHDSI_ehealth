@@ -12,7 +12,7 @@ public class TsamSyncApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(TsamSyncApplication.class);
 
-    private TsamSyncApplication() {
+    public TsamSyncApplication() {
     }
 
     public static void main(String[] args) {
