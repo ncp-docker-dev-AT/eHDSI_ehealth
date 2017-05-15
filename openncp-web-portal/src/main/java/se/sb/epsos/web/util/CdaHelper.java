@@ -7,8 +7,7 @@
 *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 *
 *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
-**/
-package se.sb.epsos.web.util;
+**/package se.sb.epsos.web.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
@@ -58,22 +57,17 @@ public class CdaHelper {
 		ArrayList<PrescriptionRow> rows = new ArrayList<PrescriptionRow>();
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			dbf.setNamespaceAware(true);
-			dbf.setValidating(false);
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document dom = db.parse(new ByteArrayInputStream(prescription.getBytes()));
 
 			XPath xpath = XPathFactory.newInstance().newXPath();
 
-			xpath.setNamespaceContext(new CdaNamespaceContext());
-
 			// for each prescription component, search for its entries and make up the list
-			XPathExpression prescriptionIDExpr = xpath.compile(
-					"/hl7:ClinicalDocument/hl7:component/hl7:structuredBody/hl7:component/hl7:section[hl7:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']");
-
+			XPathExpression prescriptionIDExpr = xpath
+					.compile("/ClinicalDocument/component/structuredBody/component/section[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']");
 			NodeList prescriptionIDNodes = (NodeList) prescriptionIDExpr.evaluate(dom, XPathConstants.NODESET);
 			if (prescriptionIDNodes != null && prescriptionIDNodes.getLength() > 0) {
-				XPathExpression idExpr = xpath.compile("hl7:id");
+				XPathExpression idExpr = xpath.compile("id");
 
 				for (int p = 0; p < prescriptionIDNodes.getLength(); p++) {
 					String prescriptionID = "";
@@ -81,22 +75,22 @@ public class CdaHelper {
 					Node sectionNode = prescriptionIDNodes.item(p);
 					Node pIDNode = (Node) idExpr.evaluate(sectionNode, XPathConstants.NODE);
 					if (pIDNode != null) {
-						if (pIDNode.getAttributes().getNamedItem("extension") != null) {
-							prescriptionID = pIDNode.getAttributes().getNamedItem("extension").getNodeValue();
-						} else {
-							prescriptionID = pIDNode.getAttributes().getNamedItem("root").getNodeValue();
-						}
-						prescriptionIDRoot = pIDNode.getAttributes().getNamedItem("root").getNodeValue();
+                        if (pIDNode.getAttributes().getNamedItem("extension") != null) {
+                            prescriptionID = pIDNode.getAttributes().getNamedItem("extension").getNodeValue();
+                        } else {
+                            prescriptionID = pIDNode.getAttributes().getNamedItem("root").getNodeValue();
+                        }
+                        prescriptionIDRoot = pIDNode.getAttributes().getNamedItem("root").getNodeValue();
 					}
 
-					XPathExpression prefixExpr = xpath.compile("hl7:author/hl7:assignedAuthor/hl7:assignedPerson/hl7:name/hl7:prefix");
-					XPathExpression givenNameExpr = xpath.compile("hl7:author/hl7:assignedAuthor/hl7:assignedPerson/hl7:name/hl7:given");
-					XPathExpression familyNameExpr = xpath.compile("hl7:author/hl7:assignedAuthor/hl7:assignedPerson/hl7:name/hl7:family");
+					XPathExpression prefixExpr = xpath.compile("author/assignedAuthor/assignedPerson/name/prefix");
+					XPathExpression givenNameExpr = xpath.compile("author/assignedAuthor/assignedPerson/name/given");
+					XPathExpression familyNameExpr = xpath.compile("author/assignedAuthor/assignedPerson/name/family");
 					String prescriber = handleAssignedPerson(sectionNode, prefixExpr, givenNameExpr, familyNameExpr);
 
-					XPathExpression performerPrefixExpr = xpath.compile("/hl7:ClinicalDocument/hl7:author/hl7:assignedAuthor/hl7:assignedPerson/hl7:name/hl7:prefix");
-					XPathExpression performerGivenNameExpr = xpath.compile("/hl7:ClinicalDocument/hl7:author/hl7:assignedAuthor/hl7:assignedPerson/hl7:name/hl7:given");
-					XPathExpression performerSurnameExpr = xpath.compile("/hl7:ClinicalDocument/hl7:author/hl7:assignedAuthor/hl7:assignedPerson/hl7:name/hl7:family");
+					XPathExpression performerPrefixExpr = xpath.compile("/ClinicalDocument/author/assignedAuthor/assignedPerson/name/prefix");
+					XPathExpression performerGivenNameExpr = xpath.compile("/ClinicalDocument/author/assignedAuthor/assignedPerson/name/given");
+					XPathExpression performerSurnameExpr = xpath.compile("/ClinicalDocument/author/assignedAuthor/assignedPerson/name/family");
 					String performer = handleAssignedPerson(dom, performerPrefixExpr, performerGivenNameExpr, performerSurnameExpr);
 					if (prescriber == null || prescriber.isEmpty()) {
 						prescriber = performer;
@@ -120,7 +114,7 @@ public class CdaHelper {
 					prescription.setCountry(handleCountryPrescriber(dom, xpath));
 
 					// PRESCRIPTION ITEMS
-					XPathExpression entryExpr = xpath.compile("hl7:entry");
+					XPathExpression entryExpr = xpath.compile("entry");
 					NodeList entryList = (NodeList) entryExpr.evaluate(sectionNode, XPathConstants.NODESET);
 					if (entryList != null && entryList.getLength() > 0) {
 						for (int i = 0; i < entryList.getLength(); i++) {
@@ -130,34 +124,34 @@ public class CdaHelper {
 
 							String materialID = "";
 
-							XPathExpression productIdExpr = xpath.compile(
-									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code");
+							XPathExpression productIdExpr = xpath
+									.compile("substanceAdministration/consumable/manufacturedProduct/manufacturedMaterial/code");
 							Node materialIDNode = (Node) productIdExpr.evaluate(entryNode, XPathConstants.NODE);
 							if (materialIDNode != null) {
 								materialID = materialIDNode.getAttributes().getNamedItem("code").getNodeValue();
 							}
 
-							XPathExpression nameExpr = xpath.compile(
-									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:name");
+							XPathExpression nameExpr = xpath
+									.compile("substanceAdministration/consumable/manufacturedProduct/manufacturedMaterial/name");
 							Node materialName = (Node) nameExpr.evaluate(entryNode, XPathConstants.NODE);
 							String name = materialName.getTextContent().trim();
 
 							String formCode = null;
 							String packsString = "";
-							XPathExpression doseFormExpr = xpath.compile(
-									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:formCode");
+							XPathExpression doseFormExpr = xpath
+									.compile("substanceAdministration/consumable/manufacturedProduct/manufacturedMaterial/formCode");
 							Node doseForm = (Node) doseFormExpr.evaluate(entryNode, XPathConstants.NODE);
 							if (doseForm != null) {
 								packsString = doseForm.getAttributes().getNamedItem("displayName").getNodeValue();
-								formCode = doseForm.getAttributes().getNamedItem("code").getNodeValue();
 							}
 
-							XPathExpression packQuantityExpr = xpath.compile(
-									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:ingredient/epsos:quantity/epsos:numerator[@xsi:type='epsos:PQ']");
+							formCode = doseForm.getAttributes().getNamedItem("code").getNodeValue();
+							XPathExpression packQuantityExpr = xpath
+									.compile("substanceAdministration/consumable/manufacturedProduct/manufacturedMaterial/asContent/quantity/numerator[@type='epsos:PQ']");
 							Node packQuant = (Node) packQuantityExpr.evaluate(entryNode, XPathConstants.NODE);
 
-							XPathExpression packQuantityExpr2 = xpath.compile(
-									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:ingredient/epsos:quantity/epsos:denominator[@xsi:type='epsos:PQ']");
+							XPathExpression packQuantityExpr2 = xpath
+									.compile("substanceAdministration/consumable/manufacturedProduct/manufacturedMaterial/asContent/quantity/denominator[@type='epsos:PQ']");
 							Node packQuant2 = (Node) packQuantityExpr2.evaluate(entryNode, XPathConstants.NODE);
 							if (packQuant != null && packQuant2 != null) {
 								String unit = packQuant.getAttributes().getNamedItem("unit").getNodeValue();
@@ -178,7 +172,7 @@ public class CdaHelper {
 							row.setIngredient(handleIngredients(xpath, entryNode));
 
 							String doseString = "";
-							XPathExpression doseExpr = xpath.compile("hl7:substanceAdministration/hl7:doseQuantity");
+							XPathExpression doseExpr = xpath.compile("substanceAdministration/doseQuantity");
 							Node dose = (Node) doseExpr.evaluate(entryNode, XPathConstants.NODE);
 							if (dose != null) {
 								if (dose.getAttributes().getNamedItem("value") != null) {
@@ -192,7 +186,7 @@ public class CdaHelper {
 								} else {
 									String lowString = "";
 									String highString = "";
-									XPathExpression doseExprLow = xpath.compile("hl7:low");
+									XPathExpression doseExprLow = xpath.compile("low");
 									Node lowDoseNode = (Node) doseExprLow.evaluate(dose, XPathConstants.NODE);
 									if (lowDoseNode != null && lowDoseNode.getAttributes().getNamedItem("value") != null) {
 										lowString = lowDoseNode.getAttributes().getNamedItem("value").getNodeValue();
@@ -203,7 +197,7 @@ public class CdaHelper {
 											}
 										}
 									}
-									XPathExpression doseExprHigh = xpath.compile("hl7:high");
+									XPathExpression doseExprHigh = xpath.compile("high");
 									Node highDoseNode = (Node) doseExprHigh.evaluate(dose, XPathConstants.NODE);
 									if (highDoseNode != null && highDoseNode.getAttributes().getNamedItem("value") != null) {
 										highString = highDoseNode.getAttributes().getNamedItem("value").getNodeValue();
@@ -229,8 +223,8 @@ public class CdaHelper {
 								}
 							}
 
-							XPathExpression substituteInstrExpr = xpath.compile(
-									"hl7:substanceAdministration/hl7:entryRelationship[@typeCode='SUBJ'][@inversionInd='true']/hl7:observation[@classCode='OBS']/hl7:value");
+							XPathExpression substituteInstrExpr = xpath
+									.compile("substanceAdministration/entryRelationship[@typeCode='SUBJ'][@inversionInd='true']/observation[@classCode='OBS']/value");
 							Node substituteNode = (Node) substituteInstrExpr.evaluate(entryNode, XPathConstants.NODE);
 							SubstitutionPermitted sp = handleSubstitution(substituteNode);
 
@@ -242,11 +236,11 @@ public class CdaHelper {
 
 							row.setDosage(doseString);
 
-							XPathExpression packageSize = xpath.compile(
-									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity");
+							XPathExpression packageSize = xpath
+									.compile("substanceAdministration/consumable/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/capacityQuantity");
 							row.setPackageSize(handleQuantity(packageSize, entryNode));
 
-							XPathExpression nrOfPacksExpr = xpath.compile("hl7:substanceAdministration/hl7:entryRelationship/hl7:supply/hl7:quantity");
+							XPathExpression nrOfPacksExpr = xpath.compile("substanceAdministration/entryRelationship/supply/quantity");
 							row.setNbrPackages(handleQuantity(nrOfPacksExpr, entryNode));
 							row.setTypeOfPackage(handleTypeOfPackage(xpath, entryNode));
 
@@ -277,18 +271,17 @@ public class CdaHelper {
 		}
 	}
 
-	private void handleInstructions(Prescription prescription, PrescriptionRow row, XPath xpath, Node entryNode)
-			throws UnsupportedEncodingException, XPathExpressionException, TransformerFactoryConfigurationError,
-			TransformerException {
+	private void handleInstructions(Prescription prescription, PrescriptionRow row, XPath xpath, Node entryNode) throws UnsupportedEncodingException,
+			XPathExpressionException, TransformerFactoryConfigurationError, TransformerException {
 
 		String patientString = "";
-		XPathExpression patientInstrEexpr = xpath.compile(
-				"hl7:substanceAdministration/hl7:entryRelationship/hl7:act/hl7:code[@code='PINSTRUCT']/../hl7:text/hl7:reference[@value]");
+		XPathExpression patientInstrEexpr = xpath
+				.compile("substanceAdministration/entryRelationship/act/code[@code='PINSTRUCT']/../text/reference[@value]");
 		Node patientInfo = (Node) patientInstrEexpr.evaluate(entryNode, XPathConstants.NODE);
 		if (patientInfo != null) {
 			patientString = patientInfo.getAttributes().getNamedItem("value").getNodeValue();
 		}
-
+		
 		if (patientString.startsWith("#")) {
 			patientString = handleReferenceXPath(xpath, entryNode, patientString);
 			row.setPatientInstructions(patientString);
@@ -297,8 +290,8 @@ public class CdaHelper {
 		}
 
 		String fillerString = "";
-		XPathExpression fillerInstrEexpr = xpath.compile(
-				"hl7:substanceAdministration/hl7:entryRelationship/hl7:act/hl7:code[@code='FINSTRUCT']/../hl7:text/hl7:reference[@value]");
+		XPathExpression fillerInstrEexpr = xpath
+				.compile("substanceAdministration/entryRelationship/act/code[@code='FINSTRUCT']/../text/reference[@value]");
 		Node fillerInfo = (Node) fillerInstrEexpr.evaluate(entryNode, XPathConstants.NODE);
 		if (fillerInfo != null) {
 			fillerString = fillerInfo.getAttributes().getNamedItem("value").getNodeValue();
@@ -312,50 +305,38 @@ public class CdaHelper {
 		}
 	}
 
-	private void handleEffectiveTime_IVL_TS(XPath xpath, PrescriptionRow row, Node entryNode)
-			throws XPathExpressionException {
-		XPathExpression lowExpr = xpath
-				.compile("hl7:substanceAdministration/hl7:effectiveTime[@xsi:type='IVL_TS']/hl7:low");
+	private void handleEffectiveTime_IVL_TS(XPath xpath, PrescriptionRow row, Node entryNode) throws XPathExpressionException {
+		XPathExpression lowExpr = xpath.compile("substanceAdministration/effectiveTime[@type='IVL_TS']/low");
 		Node nodeLow = (Node) lowExpr.evaluate(entryNode, XPathConstants.NODE);
 		Date dateLow = getDate(nodeLow);
 		if (dateLow != null) {
 			row.setStartDate(DateUtil.formatDate(dateLow, "yyyy-MM-dd"));
 		} else {
-			if (nodeLow != null) {
-				Node nodeLowNullFlavor = nodeLow.getAttributes().getNamedItem("nullFlavor");
-				if (nodeLowNullFlavor != null) {
-					String nodeLowString = nodeLowNullFlavor.getNodeValue();
-					if (!Validator.isNull(nodeLowString)) {
-						nodeLowString = NullFlavorManager.getNullFlavor(nodeLowString);
-					}
-					row.setStartDate(nodeLowString);
-				}
+			String nodeLowString = nodeLow.getAttributes().getNamedItem("nullFlavor").getNodeValue();
+			if (!Validator.isNull(nodeLowString)) {
+				nodeLowString = NullFlavorManager.getNullFlavor(nodeLowString);
 			}
+			row.setStartDate(nodeLowString);
 		}
 
-		XPathExpression highExpr = xpath.compile("hl7:substanceAdministration/hl7:effectiveTime[@xsi:type='IVL_TS']/hl7:high");
+		XPathExpression highExpr = xpath.compile("substanceAdministration/effectiveTime[@type='IVL_TS']/high");
 		Node nodeHigh = (Node) highExpr.evaluate(entryNode, XPathConstants.NODE);
 		Date dateHigh = getDate(nodeHigh);
 		if (dateHigh != null) {
 			row.setEndDate(DateUtil.formatDate(dateHigh, "yyyy-MM-dd"));
 		} else {
-			if (nodeHigh != null) {
-				Node nodeHighNullFlavor = nodeHigh.getAttributes().getNamedItem("nullFlavor");
-				if (nodeHighNullFlavor != null) {
-					String nodeHighString = nodeHighNullFlavor.getNodeValue();
-					if (!Validator.isNull(nodeHighString)) {
-						nodeHighString = NullFlavorManager.getNullFlavor(nodeHighString);
-					}
-					row.setEndDate(nodeHighString);
-				}
+			String nodeHighString = nodeHigh.getAttributes().getNamedItem("nullFlavor").getNodeValue();
+			if (!Validator.isNull(nodeHighString)) {
+				nodeHighString = NullFlavorManager.getNullFlavor(nodeHighString);
 			}
+			row.setEndDate(nodeHighString);
 		}
 	}
 
 	private List<Ingredient> handleIngredients(XPath xpath, Node entryNode) throws XPathExpressionException {
 		List<Ingredient> ingredientList = new ArrayList<Ingredient>();
-		XPathExpression ingredientRowExpr = xpath.compile(
-				"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']");
+		XPathExpression ingredientRowExpr = xpath
+				.compile("substanceAdministration/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']");
 		NodeList ingredientRowNodeList = (NodeList) ingredientRowExpr.evaluate(entryNode, XPathConstants.NODESET);
 		if (ingredientRowNodeList != null && ingredientRowNodeList.getLength() > 0) {
 			LOGGER.info("IngredientRow Length: " + ingredientRowNodeList.getLength());
@@ -374,11 +355,11 @@ public class CdaHelper {
 
 	private String handleStrength(XPath xpath, Node ingredientNode) throws XPathExpressionException {
 		String strength = "";
-		XPathExpression quantityExpr = xpath.compile("epsos:quantity");
+		XPathExpression quantityExpr = xpath.compile("quantity");
 		Node quantityNode = (Node) quantityExpr.evaluate(ingredientNode, XPathConstants.NODE);
 		if (quantityNode != null && !quantityNode.hasAttributes()) {
-			XPathExpression numeratorExpression = xpath.compile("epsos:numerator");
-			XPathExpression denumeratorExpression = xpath.compile("epsos:denominator");
+			XPathExpression numeratorExpression = xpath.compile("numerator");
+			XPathExpression denumeratorExpression = xpath.compile("denominator");
 			Node numeratorNode = (Node) numeratorExpression.evaluate(quantityNode, XPathConstants.NODE);
 			Node denumeratorNode = (Node) denumeratorExpression.evaluate(quantityNode, XPathConstants.NODE);
 			if (numeratorNode != null && denumeratorNode != null && numeratorNode.getAttributes().getNamedItem("nullFlavor") == null) {
@@ -421,7 +402,7 @@ public class CdaHelper {
 			}
 		}
 		LOGGER.debug("strength: " + strength);
-
+		
 		return strength;
 	}
 
@@ -430,17 +411,17 @@ public class CdaHelper {
 		LOGGER.debug("Strength unit original " + dNUnit + ", translated: " + translated);
 		return translated;
 	}
-
-	// private StrengthVO handleStrength2(XPath xpath, Node ingredientNode) throws XPathExpressionException {
-	// XPathExpression strengthExpr = xpath.compile("quantity/numerator[@type='epsos:PQ']");
-	// XPathExpression strengthExpr2 = xpath.compile("quantity/denominator[@type='epsos:PQ']");
+	
+	//	private StrengthVO handleStrength2(XPath xpath, Node ingredientNode) throws XPathExpressionException {
+	//		XPathExpression strengthExpr = xpath.compile("quantity/numerator[@type='epsos:PQ']");
+	//		XPathExpression strengthExpr2 = xpath.compile("quantity/denominator[@type='epsos:PQ']");
 	//
-	// return new StrengthVO(handleQuantity(strengthExpr, ingredientNode), handleQuantity(strengthExpr2, ingredientNode));
-	// }
+	//		return new StrengthVO(handleQuantity(strengthExpr, ingredientNode), handleQuantity(strengthExpr2, ingredientNode));
+	//	}
 
 	private String handleIngredient(XPath xpath, Node ingredientNode) throws XPathExpressionException {
 		String ingredient = "";
-		XPathExpression ingredientExpression = xpath.compile("epsos:ingredient/epsos:code");
+		XPathExpression ingredientExpression = xpath.compile("ingredient/code");
 		Node ingrNode = (Node) ingredientExpression.evaluate(ingredientNode, XPathConstants.NODE);
 		if (ingrNode != null) {
 			ingredient += ingrNode.getAttributes().getNamedItem("code").getNodeValue() + " - "
@@ -465,26 +446,26 @@ public class CdaHelper {
 					DecimalFormat df = new DecimalFormat("#0.0#");
 					quantityValue = df.format(d).replace(",", ".");
 				}
-				LOGGER.debug("Formatted value: " + quantityValue);
+				LOGGER.debug("Formatted value: " + quantityValue);	
 			}
 
 			if (node.getAttributes().getNamedItem("unit") != null) {
 				quantityUnitUcum = node.getAttributes().getNamedItem("unit").getNodeValue();
 				LOGGER.debug("Unit in UCUM: " + quantityUnitUcum);
-				quantityUnit = translateQuantityUnit(quantityUnitUcum);
+				quantityUnit = translateQuantityUnit( quantityUnitUcum );
 			}
 		}
 		return new QuantityVO(quantityValue, quantityUnit, quantityUnitUcum);
 	}
-
+	
 	private String translateQuantityUnit(String cdaQU) {
 		String translated = new StringResourceModel("quantity.unit." + cdaQU, null, cdaQU).getString();
 		LOGGER.debug("Translated unit: " + translated);
 		return translated;
 	}
-
-	private String handleAssignedPerson(Node sectionNode, XPathExpression prefixExpr, XPathExpression givenNameExpr,
-			XPathExpression familyNameExpr) throws XPathExpressionException {
+	
+	private String handleAssignedPerson(Node sectionNode, XPathExpression prefixExpr, XPathExpression givenNameExpr, XPathExpression familyNameExpr)
+			throws XPathExpressionException {
 		String returnString = "";
 
 		Node prefix = (Node) prefixExpr.evaluate(sectionNode, XPathConstants.NODE);
@@ -499,18 +480,18 @@ public class CdaHelper {
 
 		NodeList givenNames = (NodeList) givenNameExpr.evaluate(sectionNode, XPathConstants.NODESET);
 		if (givenNames != null) {
-			for (int i = 0; i < givenNames.getLength(); i++) {
+			for(int i = 0; i < givenNames.getLength(); i++) {
 				returnString += givenNames.item(i).getTextContent().trim() + CHAR_SPACE;
 			}
 		}
-
+		
 		return returnString.trim();
 	}
 
 	private List<String> handlePrescriberTelecom(Document dom, XPath xpath) throws XPathExpressionException {
 		String prescriberContact = "";
 		List<String> list = new ArrayList<String>();
-		XPathExpression telecomExpression = xpath.compile("/hl7:ClinicalDocument/hl7:author/hl7:assignedAuthor/hl7:telecom");
+		XPathExpression telecomExpression = xpath.compile("/ClinicalDocument/author/assignedAuthor/telecom");
 		NodeList prescriberTelecomNodeList = (NodeList) telecomExpression.evaluate(dom, XPathConstants.NODESET);
 		if (prescriberTelecomNodeList != null && prescriberTelecomNodeList.getLength() > 0) {
 			for (int i = 0; i < prescriberTelecomNodeList.getLength(); i++) {
@@ -537,7 +518,7 @@ public class CdaHelper {
 
 	private Date handlePrescriptionDate(Document dom, XPath xpath) throws XPathExpressionException {
 		Date prescriptionDate = null;
-		XPathExpression prescriptionDateExpr = xpath.compile("/hl7:ClinicalDocument/hl7:author/hl7:time");
+		XPathExpression prescriptionDateExpr = xpath.compile("/ClinicalDocument/author/time");
 		Node prescrDate = (Node) prescriptionDateExpr.evaluate(dom, XPathConstants.NODE);
 		if (prescrDate != null) {
 			prescriptionDate = getDate(prescrDate);
@@ -547,7 +528,7 @@ public class CdaHelper {
 
 	private String handleFacility(Document dom, XPath xpath) throws XPathExpressionException {
 		String facility = "";
-		XPathExpression facilityNameExpr = xpath.compile("/hl7:ClinicalDocument/hl7:author/hl7:assignedAuthor/hl7:representedOrganization/hl7:name");
+		XPathExpression facilityNameExpr = xpath.compile("/ClinicalDocument/author/assignedAuthor/representedOrganization/name");
 		Node facilityNode = (Node) facilityNameExpr.evaluate(dom, XPathConstants.NODE);
 		if (facilityNode != null) {
 			facility = facilityNode.getTextContent().trim();
@@ -564,20 +545,20 @@ public class CdaHelper {
 	private String handleAdress(Document dom, XPath xpath) throws XPathExpressionException {
 		String address = "";
 
-		XPathExpression facilityAddressStreetExpr = xpath.compile(
-				"/hl7:ClinicalDocument/hl7:author/hl7:assignedAuthor/hl7:representedOrganization/hl7:addr/hl7:streetAddressLine");
+		XPathExpression facilityAddressStreetExpr = xpath
+				.compile("/ClinicalDocument/author/assignedAuthor/representedOrganization/addr/streetAddressLine");
 		Node street = (Node) facilityAddressStreetExpr.evaluate(dom, XPathConstants.NODE);
 		if (street != null) {
 			address += street.getTextContent().trim();
 		}
 
-		XPathExpression facilityAddressZipExpr = xpath.compile("/hl7:ClinicalDocument/hl7:author/hl7:assignedAuthor/hl7:representedOrganization/hl7:addr/hl7:postalCode");
+		XPathExpression facilityAddressZipExpr = xpath.compile("/ClinicalDocument/author/assignedAuthor/representedOrganization/addr/postalCode");
 		Node zip = (Node) facilityAddressZipExpr.evaluate(dom, XPathConstants.NODE);
 		if (zip != null) {
 			address += ", " + zip.getTextContent().trim();
 		}
 
-		XPathExpression facilityAddressCityExpr = xpath.compile("/hl7:ClinicalDocument/hl7:author/hl7:assignedAuthor/hl7:representedOrganization/hl7:addr/hl7:city");
+		XPathExpression facilityAddressCityExpr = xpath.compile("/ClinicalDocument/author/assignedAuthor/representedOrganization/addr/city");
 		Node city = (Node) facilityAddressCityExpr.evaluate(dom, XPathConstants.NODE);
 		if (city != null) {
 			address += ", " + city.getTextContent().trim();
@@ -592,7 +573,7 @@ public class CdaHelper {
 
 	private String handleCountryPrescriber(Document dom, XPath xpath) throws XPathExpressionException {
 		String country = "";
-		XPathExpression facilityAddressCountryExpr = xpath.compile("/hl7:ClinicalDocument/hl7:author/hl7:assignedAuthor/hl7:representedOrganization/hl7:addr/hl7:country");
+		XPathExpression facilityAddressCountryExpr = xpath.compile("/ClinicalDocument/author/assignedAuthor/representedOrganization/addr/country");
 		Node countryNode = (Node) facilityAddressCountryExpr.evaluate(dom, XPathConstants.NODE);
 		if (countryNode != null) {
 			country = countryNode.getTextContent().trim();
@@ -601,8 +582,8 @@ public class CdaHelper {
 	}
 
 	private String handleEffectiveTimeTypePivl_Ts(XPath xpath, Node entryNode) throws XPathExpressionException {
-		XPathExpression effectiveTime = xpath.compile("hl7:substanceAdministration/hl7:effectiveTime[@xsi:type='PIVL_TS']");
-		XPathExpression period = xpath.compile("hl7:substanceAdministration/hl7:effectiveTime[@xsi:type='PIVL_TS']/period");
+		XPathExpression effectiveTime = xpath.compile("substanceAdministration/effectiveTime[@type='PIVL_TS']");
+		XPathExpression period = xpath.compile("substanceAdministration/effectiveTime[@type='PIVL_TS']/period");
 		String freqString = "";
 		Node effectiveTimeNode = (Node) effectiveTime.evaluate(entryNode, XPathConstants.NODE);
 		if (effectiveTimeNode != null) {
@@ -627,8 +608,8 @@ public class CdaHelper {
 
 	private String handleTypeOfPackage(XPath xpath, Node entryNode) throws XPathExpressionException {
 		String typeOfPackage = "";
-		XPathExpression packTypeExpr = xpath.compile(
-				"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:formCode");
+		XPathExpression packTypeExpr = xpath
+				.compile("substanceAdministration/consumable/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/formCode");
 		Node packType = (Node) packTypeExpr.evaluate(entryNode, XPathConstants.NODE);
 		if (packType != null) {
 			if (packType.getAttributes().getNamedItem("displayName") != null) {
@@ -647,7 +628,7 @@ public class CdaHelper {
 
 	private String handleProfession(Document dom, XPath xpath) throws XPathExpressionException {
 		String profession = "";
-		XPathExpression professionExpr = xpath.compile("/hl7:ClinicalDocument/hl7:author/hl7:functionCode");
+		XPathExpression professionExpr = xpath.compile("/ClinicalDocument/author/functionCode");
 		Node professionNode = (Node) professionExpr.evaluate(dom, XPathConstants.NODE);
 		if (professionNode != null) {
 			profession = professionNode.getAttributes().getNamedItem("displayName").getNodeValue();
@@ -663,7 +644,7 @@ public class CdaHelper {
 
 	private String handleRoute(XPath xpath, Node entryNode) throws XPathExpressionException {
 		String routeString = "";
-		XPathExpression routeExpr = xpath.compile("hl7:substanceAdministration/hl7:routeCode");
+		XPathExpression routeExpr = xpath.compile("substanceAdministration/routeCode");
 		Node route = (Node) routeExpr.evaluate(entryNode, XPathConstants.NODE);
 		if (route != null) {
 			if (route.getAttributes().getNamedItem("displayName") != null) {
@@ -681,7 +662,7 @@ public class CdaHelper {
 
 	private SubstitutionPermitted handleSubstitution(Node substituteNode) {
 		String substituteValue = "";
-
+		
 		if (substituteNode != null) {
 			if (substituteNode.getAttributes().getNamedItem("code") != null) {
 				substituteValue = substituteNode.getAttributes().getNamedItem("code").getNodeValue();
@@ -722,29 +703,29 @@ public class CdaHelper {
 
 	private String handleReferenceXPath(XPath xpath, Node entryNode, String reference) throws XPathExpressionException, TransformerFactoryConfigurationError, TransformerException {
 		String refValue = "";
-		if (reference != null && reference.length() > 1) {
+		if(reference != null && reference.length() > 1) {
 			XPathExpression referenceExpr = xpath.compile("//*[@ID='" + reference.substring(1) + "']");
 			Node refValueNode = (Node) referenceExpr.evaluate(entryNode, XPathConstants.NODE);
-			refValue = transformNodeContentToString(refValueNode);
-			LOGGER.info("Reference(" + reference + ") found: " + refValue);
+            refValue = transformNodeContentToString(refValueNode);
+            LOGGER.info("Reference(" + reference + ") found: " + refValue);
 		}
 		return refValue;
 	}
-
+	
 	private String transformNodeContentToString(Node node) throws TransformerFactoryConfigurationError, TransformerException {
-		if (node != null && node.hasChildNodes()) {
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-			StringWriter stw = new StringWriter();
-			transformer.transform(new DOMSource(node), new StreamResult(stw));
-			String nodeContent = stw.toString();
-			return nodeContent.substring(nodeContent.indexOf('>') + 1, nodeContent.lastIndexOf('<'));
-		} else {
-			return "";
-		}
-	}
-
+        if(node != null && node.hasChildNodes()) {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            StringWriter stw = new StringWriter();
+            transformer.transform(new DOMSource(node), new StreamResult(stw));
+            String nodeContent = stw.toString();
+            return nodeContent.substring(nodeContent.indexOf('>') + 1, nodeContent.lastIndexOf('<'));
+        } else {
+            return "";
+        }
+    }
+	
 	public static class Validator {
 		public static boolean isNull(String str) {
 			return (str == null || str.isEmpty());
@@ -754,16 +735,15 @@ public class CdaHelper {
 	private class SubstitutionPermitted {
 		private String substitutionPermittedText;
 		private boolean substitutionPermitted;
-
+		
 		private SubstitutionPermitted(boolean substitutionPermitted, String substitutionPermittedText) {
 			this.substitutionPermitted = substitutionPermitted;
 			this.substitutionPermittedText = substitutionPermittedText;
 		}
-
+		
 		public String getSubstitutionPermittedText() {
 			return substitutionPermittedText;
 		}
-
 		public boolean isSubstitutionPermitted() {
 			return substitutionPermitted;
 		}
