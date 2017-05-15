@@ -1,32 +1,24 @@
 /**
  * Copyright (c) 2009-2011 University of Cardiff and others.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * <p>
  * Contributors:
  * Cardiff University - intial API and implementation
  */
-
 package org.openhealthtools.openatna.archive;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -53,6 +45,9 @@ public class ArchiveHandler {
         ignores.add(".DS_Store");
         ignores.add("CVS");
         ignores.add(".svn");
+    }
+
+    private ArchiveHandler() {
     }
 
     public static File archive(String jarName, List<File> files, File destDir) throws IOException {
@@ -106,14 +101,15 @@ public class ArchiveHandler {
                 }
             }
         } else {
-            FileInputStream in = new FileInputStream(f);
-            byte[] bytes = new byte[64768];
-            int c;
-            jos.putNextEntry(new ZipEntry(path));
-            while ((c = in.read(bytes)) != -1) {
-                jos.write(bytes, 0, c);
+            try (FileInputStream in = new FileInputStream(f)) {
+                byte[] bytes = new byte[64768];
+                int c;
+                jos.putNextEntry(new ZipEntry(path));
+                while ((c = in.read(bytes)) != -1) {
+                    jos.write(bytes, 0, c);
+                }
+                jos.closeEntry();
             }
-            jos.closeEntry();
         }
     }
 
@@ -149,7 +145,8 @@ public class ArchiveHandler {
     }
 
     public static List<File> copyFilesRecursive(File src, File dest) throws IOException {
-        ArrayList<File> list = new ArrayList<File>();
+
+        ArrayList<File> list = new ArrayList<>();
         if (!src.exists()) {
             throw new FileNotFoundException("Input file does not exist.");
         }
@@ -168,17 +165,23 @@ public class ArchiveHandler {
             if (dest.exists() && dest.isDirectory()) {
                 dest = new File(dest, src.getName());
             }
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(src));
-            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest));
-            byte[] bytes = new byte[8192];
-            int c;
-            while ((c = in.read(bytes)) != -1) {
-                out.write(bytes, 0, c);
+            try (FileInputStream source = new FileInputStream(src); FileOutputStream destination = new FileOutputStream(dest)) {
+
+                BufferedInputStream in = new BufferedInputStream(source);
+                BufferedOutputStream out = new BufferedOutputStream(destination);
+//                BufferedInputStream in = new BufferedInputStream(new FileInputStream(src));
+//                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest));
+
+                byte[] bytes = new byte[8192];
+                int c;
+                while ((c = in.read(bytes)) != -1) {
+                    out.write(bytes, 0, c);
+                }
+                out.flush();
+                out.close();
+                in.close();
+                list.add(dest);
             }
-            out.flush();
-            out.close();
-            in.close();
-            list.add(dest);
         }
         return list;
     }
@@ -241,15 +244,16 @@ public class ArchiveHandler {
         if (f.isDirectory()) {
             return f;
         }
-        FileOutputStream out = new FileOutputStream(f);
-        byte[] bytes = new byte[8192];
-        int c;
-        while ((c = in.read(bytes)) != -1) {
-            out.write(bytes, 0, c);
+        try (FileOutputStream out = new FileOutputStream(f)) {
+            byte[] bytes = new byte[8192];
+            int c;
+            while ((c = in.read(bytes)) != -1) {
+                out.write(bytes, 0, c);
+            }
+            out.flush();
+            out.close();
+            in.close();
         }
-        out.flush();
-        out.close();
-        in.close();
         return f;
     }
 

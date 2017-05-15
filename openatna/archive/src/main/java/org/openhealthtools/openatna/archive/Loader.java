@@ -1,49 +1,38 @@
 /**
  * Copyright (c) 2009-2011 University of Cardiff and others.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * <p>
  * Contributors:
  * Cardiff University - intial API and implementation
  */
 
 package org.openhealthtools.openatna.archive;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.List;
-
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openhealthtools.openatna.audit.AtnaFactory;
 import org.openhealthtools.openatna.audit.persistence.PersistencePolicies;
-import org.openhealthtools.openatna.audit.persistence.dao.CodeDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ErrorDao;
-import org.openhealthtools.openatna.audit.persistence.dao.MessageDao;
-import org.openhealthtools.openatna.audit.persistence.dao.NetworkAccessPointDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ObjectDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ParticipantDao;
-import org.openhealthtools.openatna.audit.persistence.dao.SourceDao;
-import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageEntity;
-import org.openhealthtools.openatna.audit.persistence.model.NetworkAccessPointEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ObjectEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ParticipantEntity;
-import org.openhealthtools.openatna.audit.persistence.model.SourceEntity;
+import org.openhealthtools.openatna.audit.persistence.dao.*;
+import org.openhealthtools.openatna.audit.persistence.model.*;
 import org.openhealthtools.openatna.audit.persistence.model.codes.CodeEntity;
 import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
+
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import java.io.File;
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author Andrew Harrison
@@ -73,6 +62,12 @@ public class Loader {
         AtnaFactory.setPropertiesLocation(propertiesLocation);
     }
 
+    public static void main(String[] args) throws Exception {
+        Loader e = new Loader(System.getProperty("user.dir") + File.separator + "test.oar", "archive.properties");
+        e.extract();
+
+    }
+
     private void initPolicies() {
         pp.setAllowNewCodes(true);
         pp.setAllowNewNetworkAccessPoints(true);
@@ -88,38 +83,40 @@ public class Loader {
             throw new Exception("archive does not exist");
         }
         if (loadEntities) {
-            InputStream min = ArchiveHandler.readEntities(f);
-            if (min != null) {
-                XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(min);
-                loadEntities(reader);
-                reader.close();
-            } else {
-                log.info(" Input stream to " + f.getAbsolutePath() + " message file is null");
+            try (InputStream min = ArchiveHandler.readEntities(f)) {
+                if (min != null) {
+                    XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(min);
+                    loadEntities(reader);
+                    reader.close();
+                } else {
+                    log.info(" Input stream to " + f.getAbsolutePath() + " message file is null");
+                }
             }
         }
         if (loadMessages) {
-            InputStream min = ArchiveHandler.readMessages(f);
-            if (min != null) {
-                XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(min);
-                loadMessages(reader);
-                reader.close();
-            } else {
-                log.info(" Input stream to " + f.getAbsolutePath() + " message file is null");
+            try (InputStream min = ArchiveHandler.readMessages(f)) {
+                if (min != null) {
+                    XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(min);
+                    loadMessages(reader);
+                    reader.close();
+                } else {
+                    log.info(" Input stream to " + f.getAbsolutePath() + " message file is null");
+                }
             }
         }
 
         if (loadErrors) {
-            InputStream min = ArchiveHandler.readErrors(f);
-            if (min != null) {
-                XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(min);
-                loadErrors(reader);
-                reader.close();
-            } else {
-                log.info(" Input stream to " + f.getAbsolutePath() + " message file is null");
+
+            try (InputStream min = ArchiveHandler.readErrors(f)) {
+                if (min != null) {
+                    XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(min);
+                    loadErrors(reader);
+                    reader.close();
+                } else {
+                    log.info(" Input stream to " + f.getAbsolutePath() + " message file is null");
+                }
             }
         }
-
-
     }
 
     public void loadMessages(XMLEventReader reader) throws Exception {
@@ -141,7 +138,6 @@ public class Loader {
         }
         log.info("read " + total + " messages");
     }
-
 
     public void loadErrors(XMLEventReader reader) throws Exception {
         ErrorDao dao = AtnaFactory.errorDao();
@@ -304,11 +300,5 @@ public class Loader {
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
-    }
-
-    public static void main(String[] args) throws Exception {
-        Loader e = new Loader(System.getProperty("user.dir") + File.separator + "test.oar", "archive.properties");
-        e.extract();
-
     }
 }

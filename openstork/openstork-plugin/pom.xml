@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,7 +17,6 @@
         <system>hudson</system>
         <url>http://dev.iuz.pt:14001/openncp-jenkins/job/DEVELOP-epSOS.STORK.Plugin/</url>
     </ciManagement>
-
 
     <properties>
         <liferay.version>6.2.0-RC5</liferay.version>
@@ -135,8 +134,8 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -145,7 +144,6 @@
             <version>2.0</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>eu.stork</groupId>
             <artifactId>SamlEngine</artifactId>
@@ -216,13 +214,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
@@ -242,11 +233,6 @@
             <artifactId>openncp-util</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>-->
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-assertion-validator</artifactId>
@@ -265,12 +251,6 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- <dependency> <groupId>eu.europa.ec.sante.ehdsi</groupId> <artifactId>TRILLIUM.SECURITY.UTILS</artifactId>
-            <version>1.1</version> <exclusions> <exclusion> <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-trc-sts-client</artifactId> </exclusion> </exclusions>
-            </dependency> -->
-        <!-- <dependency> <groupId>eu.stork</groupId> <artifactId>Commons</artifactId>
-            <version>${stork-commons.version}</version> <type>jar</type> </dependency> -->
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-openstork-utils</artifactId>
@@ -285,16 +265,6 @@
             <type>jar</type>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.7.5</version>
-        </dependency>-->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -325,14 +295,11 @@
             <version>1.6.2</version>
             <type>jar</type>
         </dependency>
+        <!--Security-->
+        <dependency>
+            <groupId>com.matthewcasperson</groupId>
+            <artifactId>parameter_validation_filter</artifactId>
+            <version>1.2.1</version>
+        </dependency>
     </dependencies>
-
-    <!-- ================== Repositories ================== -->
-    <!--<repositories>
-        <repository>
-            <name>Official OpenSaml Repository</name>
-            <id>openSamlRep</id>
-            <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
-        </repository>
-    </repositories>-->
 </project>

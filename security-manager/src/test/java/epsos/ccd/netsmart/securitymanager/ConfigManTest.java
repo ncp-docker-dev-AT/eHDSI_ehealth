@@ -19,21 +19,23 @@ package epsos.ccd.netsmart.securitymanager;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
+import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
- *
  * @author Jerry Dimitriou <jerouris at netsmart.gr>
  */
 public class ConfigManTest {
 
-    ConfigurationManagerService cm = ConfigurationManagerService.getInstance();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigManTest.class);
+
+    ConfigurationManagerService configurationManagerService = ConfigurationManagerService.getInstance();
+
     public ConfigManTest() {
     }
 
@@ -57,24 +59,24 @@ public class ConfigManTest {
     @Test
     public void configManTests() throws IOException {
 
-        cm = ConfigurationManagerService.getInstance();
+        configurationManagerService = ConfigurationManagerService.getInstance();
         //Properties cm = new Properties();
         //cm.load(ClassLoader.getSystemResourceAsStream("securitymanager_test.properties"));
         //cm.load(new FileInputStream(System.getProperty("SECMAN_HOME") + "/securitymanager.properties"));
-        assertNotNull(cm);
+        assertNotNull(configurationManagerService);
 
         // Constants Initialization
-        String KEYSTORE_LOCATION = cm.getProperty("NCP_SIG_KEYSTORE_PATH");
-        System.out.println("Keystore Location: " + KEYSTORE_LOCATION);
+        String KEYSTORE_LOCATION = configurationManagerService.getProperty("NCP_SIG_KEYSTORE_PATH");
+        LOGGER.info("Keystore Location: '{}'", KEYSTORE_LOCATION);
 
-        String TRUSTSTORE_LOCATION = cm.getProperty("TRUSTSTORE_PATH");
-        System.out.println("Truststore Location:" + TRUSTSTORE_LOCATION);
+        String TRUSTSTORE_LOCATION = configurationManagerService.getProperty("TRUSTSTORE_PATH");
+        LOGGER.info("Truststore Location: '{}'", TRUSTSTORE_LOCATION);
 
-        String KEYSTORE_PASSWORD = cm.getProperty("NCP_SIG_KEYSTORE_PASSWORD");
-        String TRUSTSTORE_PASSWORD = cm.getProperty("TRUSTSTORE_PASSWORD");
-        
-        String PRIVATEKEY_ALIAS = cm.getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
-        String PRIVATEKEY_PASSWORD = cm.getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
+        String KEYSTORE_PASSWORD = configurationManagerService.getProperty("NCP_SIG_KEYSTORE_PASSWORD");
+        String TRUSTSTORE_PASSWORD = configurationManagerService.getProperty("TRUSTSTORE_PASSWORD");
+
+        String PRIVATEKEY_ALIAS = configurationManagerService.getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
+        String PRIVATEKEY_PASSWORD = configurationManagerService.getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
 
         //String ERROR_PARAM = cm.getProperty("ERRORRRR");
 
@@ -93,7 +95,5 @@ public class ConfigManTest {
 
         KeyStoreManager km = new DefaultKeyStoreManager();
         assertNotNull(km);
-
     }
-
 }

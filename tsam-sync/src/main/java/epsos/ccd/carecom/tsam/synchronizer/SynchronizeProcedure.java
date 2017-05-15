@@ -14,20 +14,17 @@ import java.util.*;
  */
 public abstract class SynchronizeProcedure {
 
-    /**
-     * Holds an empty list of type Long.
-     */
-    public static final List<Long> EMPTY_LONG_LIST = Collections.emptyList();
+    public final static List<Long> EMPTY_LONG_LIST = Collections.EMPTY_LIST;
 
     /**
      * Holds an instance of the CTS2 web service.
      */
-    protected AuthenticatedCTS2Webservice service;
+    public AuthenticatedCTS2Webservice service;
 
     /**
      * Holds a notifier instance that notifies all observers about specific events during synchronization.
      */
-    protected Notifier notifier;
+    public Notifier notifier;
 
     private Date startDate;
 
@@ -39,7 +36,7 @@ public abstract class SynchronizeProcedure {
     /**
      * This method should always be called to initialize logging and settings.
      */
-    protected void init() {
+    public void init() {
         // This try-catch is performed only when initializing procedures, to achieve a lazy try-catch.
         // The lazy try-catch makes it only necessary to do a try-catch once, because this we know that'
         // only when the Settings class is initialized that the exceptions can be thrown.
@@ -86,7 +83,7 @@ public abstract class SynchronizeProcedure {
      * @return A list of transcodings.
      */
     protected List<Transcoding> retrieveTranscodings(List<Long> sourceConceptIds, List<Long> targetConceptIds) {
-        Map<String, Long> filters = new LinkedHashMap<String, Long>(2);
+        Map<String, Long> filters = new LinkedHashMap<>(2);
 
         if (sourceConceptIds != null) {
             filters.put("SourceConceptIds",
@@ -98,7 +95,7 @@ public abstract class SynchronizeProcedure {
         }
         ApplicationController.STATS.registerActionStart(WebMethodCallAuditGatherer.WEB_METHOD_CALL_TRANSCODINGS, filters);
 
-        List<Transcoding> transcodings = new ArrayList<Transcoding>(0);
+        List<Transcoding> transcodings = new ArrayList<>(0);
 
         Throwable exception = null;
         int retries = 0;
@@ -128,9 +125,9 @@ public abstract class SynchronizeProcedure {
      */
     protected List<Designation> retrieveDesignations(Long codeSystemId, List<Long> conceptIds) {
         List<Long> codeSystemIds = null;
-        Map<String, Long> filters = new LinkedHashMap<String, Long>();
+        Map<String, Long> filters = new LinkedHashMap<>();
         if (codeSystemId != null) {
-            codeSystemIds = new ArrayList<Long>();
+            codeSystemIds = new ArrayList<>();
             codeSystemIds.add(codeSystemId);
 
             filters.put("CodeSystemId", codeSystemId);
@@ -167,9 +164,9 @@ public abstract class SynchronizeProcedure {
      */
     protected List<CodeSystemConcept> retrieveConcepts(Long codeSystemId, Long valueSetId) {
         List<Long> codeSystemIds = null;
-        Map<String, Long> filters = new LinkedHashMap<String, Long>();
+        Map<String, Long> filters = new LinkedHashMap<>();
         if (codeSystemId != null) {
-            codeSystemIds = new ArrayList<Long>(1);
+            codeSystemIds = new ArrayList<>(1);
             codeSystemIds.add(codeSystemId);
             filters.put("CodeSystemId", codeSystemId);
         }
@@ -208,11 +205,11 @@ public abstract class SynchronizeProcedure {
      */
     protected List<ValueSet> retrieveValueSets(Long codeSystemId) {
         List<Long> codeSystemIds = null;
-        Map<String, Long> filters = new LinkedHashMap<String, Long>(1);
-        List<ValueSet> valueSets = new ArrayList<ValueSet>(0);
+        Map<String, Long> filters = new LinkedHashMap<>(1);
+        List<ValueSet> valueSets = new ArrayList<>(0);
 
         if (codeSystemId != null) {
-            codeSystemIds = new ArrayList<Long>(1);
+            codeSystemIds = new ArrayList<>(1);
             codeSystemIds.add(codeSystemId);
 
             filters.put("CodeSystemId", codeSystemId);
@@ -245,7 +242,7 @@ public abstract class SynchronizeProcedure {
      * @return A list of code systems.
      */
     protected List<CodeSystem> retrieveCodeSystems() {
-        List<CodeSystem> codeSystems = new ArrayList<CodeSystem>(0);
+        List<CodeSystem> codeSystems = new ArrayList<>(0);
 
         ApplicationController.STATS.registerActionStart(WebMethodCallAuditGatherer.WEB_METHOD_CALL_CODE_SYSTEMS, null);
 

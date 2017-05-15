@@ -13,10 +13,7 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- *//*
-    * To change this template, choose Tools | Templates
-	* and open the template in the editor.
-	*/
+ */
 package epsos.ccd.gnomon.auditmanager;
 
 import epsos.ccd.gnomon.utils.SecurityMgr;
@@ -27,6 +24,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.services.AuditValidationService;
 import net.RFC3881.*;
 import net.RFC3881.AuditMessage.ActiveParticipant;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -43,7 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * This class provides methods for constructing the aufit message and for
+ * This class provides methods for constructing the audit message and for
  * sending the syslog message to the repository
  *
  * @author Kostas Karkaletsis
@@ -60,6 +58,105 @@ public enum AuditTrailUtils {
 
     public static AuditTrailUtils getInstance() {
         return INSTANCE;
+    }
+
+    public synchronized static String constructMessage(AuditMessage auditmessage, boolean sign) {
+
+        String auditmsg = "";
+        log.info("Constructing message");
+        String eventTypeCode = "EventTypeCode(N/A)";
+        try {
+            eventTypeCode = auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode();
+            log.debug("'{}' try to convert the message to xml using JAXB", eventTypeCode);
+        } catch (NullPointerException e) {
+            log.warn("Unable to log AuditMessageEventTypeCode.", e);
+        }
+
+        try {
+            auditmsg = AuditTrailUtils.convertAuditObjectToXML(auditmessage);
+        } catch (JAXBException e) {
+            log.error(e.getMessage(), e);
+        }
+        log.info("Message created");
+
+        INSTANCE.writeTestAudits(auditmessage, auditmsg);
+
+        log.info("'{}' message constructed", eventTypeCode);
+
+        boolean validated = false;
+        URL url = null;
+        try {
+            url = Utils.class.getClassLoader().getResource("RFC3881.xsd");
+        } catch (Exception e) {
+            log.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error getting xsd url", e);
+        }
+        try {
+            validated = Utils.validateSchema(auditmsg, url);
+            log.info(auditmessage.getEventIdentification().getEventID().getCode() + " Validating Schema");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        boolean forcewrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "TRUE", true));
+        if (!validated) {
+            log.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message not validated");
+            if (!forcewrite) {
+                auditmsg = "";
+            }
+        }
+        if (validated || forcewrite) {
+            if (validated) {
+                log.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message validated");
+            } else {
+                log.info(auditmessage.getEventIdentification().getEventID().getCode() + " message not validated");
+            }
+            if (forcewrite && !validated) {
+                log.info(auditmessage.getEventIdentification().getEventID().getCode()
+                        + " AuditManager is force to send the message. So trying ...");
+            }
+
+            try {
+                // validate xml according to xsd
+                log.debug(auditmessage.getEventIdentification().getEventID().getCode()
+                        + " XML stuff: Create Dom From String");
+                Document doc = Utils.createDomFromString(auditmsg);
+                if (sign) {
+                    // Gnomon SecMan
+                    auditmsg = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
+
+                    log.info(auditmessage.getEventIdentification().getEventID().getCode() + " message signed");
+                }
+            } catch (Exception e) {
+                auditmsg = "";
+                log.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error signing doc"
+                        + e.getMessage(), e);
+            }
+        }
+        return auditmsg;
+    }
+
+    /**
+     * The method converts the audit message to xml format, having as input the
+     * Audit Message. Uses the JAXB library to marshal the audti message object
+     *
+     * @param am
+     * @return
+     * @throws JAXBException
+     */
+    public synchronized static String convertAuditObjectToXML(AuditMessage am) throws JAXBException {
+        log.info("Converting message");
+        StringWriter sw = new StringWriter();
+        log.debug("JAXB marshalling the Audit Object");
+        JAXBContext context = JAXBContext.newInstance(AuditMessage.class);
+        Marshaller m = context.createMarshaller();
+        try {
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        } catch (PropertyException e) {
+            log.warn("Unable to format converted AuditMessage to XML.");
+        }
+        m.marshal(am, sw);
+        log.info("Converting message finished");
+        return sw.toString();
     }
 
     /**
@@ -128,6 +225,12 @@ public enum AuditTrailUtils {
         if (eventLog.getEventType().equals("ITI-39")) {
             am = au._CreateAuditTrailForRequestOfData(eventLog);
         }
+        if (eventLog.getEventType().equals("ehealth-193")) {
+            am = au._CreateAuditTrailForEhealthSMPQuery(eventLog);
+        }
+        if (eventLog.getEventType().equals("ehealth-194")) {
+            am = au._CreateAuditTrailForEhealthSMPPush(eventLog);
+        }
 
         am = AuditTrailUtils.getInstance().addNonRepudiationSection(am, eventLog.getReqM_ParticipantObjectID(),
                 eventLog.getReqM_PatricipantObjectDetail(), eventLog.getResM_ParticipantObjectID(),
@@ -181,6 +284,38 @@ public enum AuditTrailUtils {
     }
 
     /**
+     * Constructs an Audit Message for the Patient Privacy Audit schema
+     * in eHealth NCP Query
+     *
+     * @param eventLog the EventLog object
+     * @return the created AuditMessage object
+     */
+    private AuditMessage _CreateAuditTrailForEhealthSMPQuery(EventLog eventLog) {
+
+        AuditMessage am = createAuditTrailForEhealthSMPQuery(eventLog);
+        if (am != null) {
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "SMP", "eHealth Security", "SignedServiceMetadata");
+        }
+        return am;
+    }
+
+    /**
+     * Constructs an Audit Message for the Patient Privacy Audit schema
+     * in eHealth NCP Push
+     *
+     * @param eventLog the EventLog object
+     * @return the created AuditMessage object
+     */
+    private AuditMessage _CreateAuditTrailForEhealthSMPPush(EventLog eventLog) {
+
+        AuditMessage am = createAuditTrailForEhealthSMPPush(eventLog);
+        if (am != null) {
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "SMP", "eHealth Security", "SignedServiceMetadata");
+        }
+        return am;
+    }
+
+    /**
      * Constructs an Audit Message for the epSOS Order Service According schema
      * is HCP Assurcance
      *
@@ -189,7 +324,9 @@ public enum AuditTrailUtils {
      */
     private AuditMessage _CreateAuditTrailForOrderService(EventLog eventLog) {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
-        addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+        if (am != null) {
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+        }
         return am;
     }
 
@@ -202,9 +339,11 @@ public enum AuditTrailUtils {
      */
     private AuditMessage _CreateAuditTrailHCPIdentity(EventLog eventLog) {
         AuditMessage am = createAuditTrailForHCPIdentity(eventLog);
-        // Event Target
-        addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "IdA", "epSOS Security",
-                "HCP Identity Assertion");
+        if (am != null) {
+            // Event Target
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "IdA", "epSOS Security",
+                    "HCP Identity Assertion");
+        }
         return am;
     }
 
@@ -217,8 +356,10 @@ public enum AuditTrailUtils {
      */
     private AuditMessage _CreateAuditTrailNCPTrustedServiceList(EventLog eventLog) {
         AuditMessage am = createAuditTrailForNCPTrustedServiceList(eventLog);
-        addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "NSL", "epSOS Security",
-                "Trusted Service List");
+        if (am != null) {
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "NSL", "epSOS Security",
+                    "Trusted Service List");
+        }
         return am;
     }
 
@@ -231,13 +372,14 @@ public enum AuditTrailUtils {
      */
     private AuditMessage _CreateAuditTrailPivotTranslation(EventLog eventLog) {
         AuditMessage am = createAuditTrailForPivotTranslation(eventLog);
-        // Event Target
-        addEventTarget(am, eventLog.getET_ObjectID(), new Short("4"), new Short("5"), "in", "epSOS Tranlation",
-                "Input Data");
-        addEventTarget(am, eventLog.getET_ObjectID_additional(), new Short("4"), new Short("5"), "out",
-                "epSOS Tranlation", "Output Data");
+        if (am != null) {
+            // Event Target
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("4"), new Short("5"), "in", "epSOS Tranlation",
+                    "Input Data");
+            addEventTarget(am, eventLog.getET_ObjectID_additional(), new Short("4"), new Short("5"), "out",
+                    "epSOS Tranlation", "Output Data");
+        }
         return am;
-
     }
 
     /**
@@ -248,7 +390,9 @@ public enum AuditTrailUtils {
      */
     private AuditMessage _CreateAuditTrailTRCA(EventLog eventLog) {
         AuditMessage am = createAuditTrailForTRCA(eventLog);
-        addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "TrcA", "epSOS Security", "TRC Assertion");
+        if (am != null) {
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "TrcA", "epSOS Security", "TRC Assertion");
+        }
         return am;
     }
 
@@ -263,13 +407,14 @@ public enum AuditTrailUtils {
     private AuditMessage _CreateAuditTrailForDispensationService(EventLog eventLog, String action) {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         // Event Target
-        if (action.equals("Discard")) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "Discard",
-                    new Short("14"));
-        } else {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+        if (am != null) {
+            if (action.equals("Discard")) {
+                addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "Discard",
+                        new Short("14"));
+            } else {
+                addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+            }
         }
-
         return am;
     }
 
@@ -278,12 +423,14 @@ public enum AuditTrailUtils {
      * is HCP Assurcance
      *
      * @param eventLog the EventLog object
-     * @param action   the action of the service
      * @return the created AuditMessage object
      */
     private AuditMessage _CreateAuditTrailForHCERService(EventLog eventLog) {
+
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
-        addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+        if (am != null) {
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+        }
         return am;
     }
 
@@ -296,18 +443,21 @@ public enum AuditTrailUtils {
      * @return the created AuditMessage object
      */
     private AuditMessage _CreateAuditTrailForConsentService(EventLog eventLog, String action) {
-        AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
-        if (action.equals("Discard")) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", action,
-                    new Short("14"));
-        }
 
-        if (action.equals("Put")) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "Put", new Short("0"));
-        }
-        if (action.equals("Pin")) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("4"), new Short("12"), "PIN", "esSOS Security",
-                    "Privacy Information Notice");
+        AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
+        if (am != null) {
+            if (StringUtils.equalsIgnoreCase(action, "Discard")) {
+                addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", action,
+                        new Short("14"));
+            }
+
+            if (StringUtils.equalsIgnoreCase(action, "Put")) {
+                addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "Put", new Short("0"));
+            }
+            if (StringUtils.equalsIgnoreCase(action, "Pin")) {
+                addEventTarget(am, eventLog.getET_ObjectID(), new Short("4"), new Short("12"), "PIN", "esSOS Security",
+                        "Privacy Information Notice");
+            }
         }
         return am;
     }
@@ -321,7 +471,9 @@ public enum AuditTrailUtils {
      */
     private AuditMessage _CreateAuditTrailForPatientService(EventLog eventLog) {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
-        addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+        if (am != null) {
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+        }
         return am;
     }
 
@@ -351,7 +503,9 @@ public enum AuditTrailUtils {
      */
     private AuditMessage _CreateAuditTrailForPACService(EventLog eventLog) {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
-        addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("24"), "10", "", new Short("0"));
+        if (am != null) {
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("24"), "10", "", new Short("0"));
+        }
         return am;
     }
 
@@ -363,7 +517,9 @@ public enum AuditTrailUtils {
      */
     private AuditMessage _CreateAuditTrailForRequestOfData(EventLog eventLog) {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
-        addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("24"), "10", "", new Short("0"));
+        if (am != null) {
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("24"), "10", "", new Short("0"));
+        }
         return am;
     }
 
@@ -434,6 +590,12 @@ public enum AuditTrailUtils {
         if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosMroRetrieve.getCode())) {
             return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosMroRetrieve.getCode();
         }
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ehealthSMPQuery.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.ehealthSMPQuery.getCode();
+        }
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ehealthSMPPush.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.ehealthSMPPush.getCode();
+        }
         // TODO: Fix this issue, does the mappedEventType should be initialized?
         if (mappedEventType == null) {
             return null;
@@ -499,6 +661,12 @@ public enum AuditTrailUtils {
         }
         if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosMroServiceRetrieve.getCode())) {
             return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosMroServiceRetrieve.getCode();
+        }
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.ehealthSMPQuery.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.ehealthSMPQuery.getCode();
+        }
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.ehealthSMPPush.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.ehealthSMPPush.getCode();
         }
         // TODO: Fix this issue, does the mappedEventType should be initialized?
         if (mappedEventType == null) {
@@ -595,6 +763,20 @@ public enum AuditTrailUtils {
             eventID_epsos.setCode("N/A");
             eventID_epsos.setCodeSystemName("epSOS LOINC");
             eventID_epsos.setDisplayName("PAC");
+            eit.getEventTypeCode().add(eventID_epsos);
+        }
+        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ehealthSMPQuery.getCode())) {
+            CodedValueType eventID_epsos = new CodedValueType();
+            eventID_epsos.setCode("SMP");
+            eventID_epsos.setCodeSystemName("ehealth-193");
+            eventID_epsos.setDisplayName("SMP::Query");
+            eit.getEventTypeCode().add(eventID_epsos);
+        }
+        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ehealthSMPPush.getCode())) {
+            CodedValueType eventID_epsos = new CodedValueType();
+            eventID_epsos.setCode("SMP");
+            eventID_epsos.setCodeSystemName("ehealth-194");
+            eventID_epsos.setDisplayName("SMP::Push");
             eit.getEventTypeCode().add(eventID_epsos);
         }
 
@@ -741,6 +923,62 @@ public enum AuditTrailUtils {
         EM_object.setDisplayName(EM_DisplayName);
         em.setParticipantObjectIDTypeCode(EM_object);
         am.getParticipantObjectIdentification().add(em);
+        return am;
+    }
+
+    /**
+     * Constructs an Audit Message for Patient Privacy Audit Schema for eHealth SMP Query
+     *
+     * @param eventLog the EventLog object
+     * @return the created AuditMessage object
+     */
+    private AuditMessage createAuditTrailForEhealthSMPQuery(EventLog eventLog) {
+        //TODO
+        AuditMessage am = null;
+        try {
+            ObjectFactory of = new ObjectFactory();
+            am = of.createAuditMessage();
+            addEventIdentification(am, eventLog.getEventType(), eventLog.getEI_TransactionName(),
+                    eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
+                    eventLog.getEI_EventOutcomeIndicator());
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS", "epSOS Service Consumer",
+                    eventLog.getSourceip());
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
+                    eventLog.getTargetip());
+            addAuditSource(am, eventLog.getAS_AuditSourceId());
+            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
+                    new Short("3"), "9", "errormsg");
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage(), e);
+        }
+        return am;
+    }
+
+    /**
+     * Constructs an Audit Message for Patient Privacy Audit Schema for eHealth SMP Push
+     *
+     * @param eventLog the EventLog object
+     * @return the created AuditMessage object
+     */
+    private AuditMessage createAuditTrailForEhealthSMPPush(EventLog eventLog) {
+        //TODOO
+        AuditMessage am = null;
+        try {
+            ObjectFactory of = new ObjectFactory();
+            am = of.createAuditMessage();
+            addEventIdentification(am, eventLog.getEventType(), eventLog.getEI_TransactionName(),
+                    eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
+                    eventLog.getEI_EventOutcomeIndicator());
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS", "epSOS Service Consumer",
+                    eventLog.getSourceip());
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
+                    eventLog.getTargetip());
+            addAuditSource(am, eventLog.getAS_AuditSourceId());
+            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
+                    new Short("3"), "9", "errormsg");
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage(), e);
+        }
         return am;
     }
 
@@ -986,104 +1224,6 @@ public enum AuditTrailUtils {
         }
     }
 
-    public synchronized static String constructMessage(AuditMessage auditmessage, boolean sign) {
-        String auditmsg = "";
-        log.info("Constructing message");
-        String eventTypeCode = "EventTypeCode(N/A)";
-        try {
-            eventTypeCode = auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode();
-            log.debug(eventTypeCode + " try to convert the message to xml using JAXB");
-        } catch (NullPointerException e) {
-            log.warn("Unable to log AuditMessageEventTypeCode.");
-        }
-
-        try {
-            auditmsg = AuditTrailUtils.convertAuditObjectToXML(auditmessage);
-        } catch (JAXBException e) {
-            log.error(e.getMessage(), e);
-        }
-        log.info("Message created");
-
-        INSTANCE.writeTestAudits(auditmessage, auditmsg);
-
-        log.info(eventTypeCode + " message constructed");
-
-        boolean validated = false;
-        URL url = null;
-        try {
-            url = Utils.class.getClassLoader().getResource("RFC3881.xsd");
-        } catch (Exception e) {
-            log.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error getting xsd url", e);
-        }
-        try {
-            validated = Utils.validateSchema(auditmsg, url);
-            log.info(auditmessage.getEventIdentification().getEventID().getCode() + " Validating Schema");
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-
-        boolean forcewrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "TRUE", true));
-        if (!validated) {
-            log.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message not validated");
-            if (!forcewrite) {
-                auditmsg = "";
-            }
-        }
-        if (validated || forcewrite) {
-            if (validated) {
-                log.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message validated");
-            } else {
-                log.info(auditmessage.getEventIdentification().getEventID().getCode() + " message not validated");
-            }
-            if (forcewrite && !validated) {
-                log.info(auditmessage.getEventIdentification().getEventID().getCode()
-                        + " AuditManager is force to send the message. So trying ...");
-            }
-
-            try {
-                // validate xml according to xsd
-                log.debug(auditmessage.getEventIdentification().getEventID().getCode()
-                        + " XML stuff: Create Dom From String");
-                Document doc = Utils.createDomFromString(auditmsg);
-                if (sign) {
-                    // Gnomon SecMan
-                    auditmsg = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
-
-                    log.info(auditmessage.getEventIdentification().getEventID().getCode() + " message signed");
-                }
-            } catch (Exception e) {
-                auditmsg = "";
-                log.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error signing doc"
-                        + e.getMessage(), e);
-            }
-        }
-        return auditmsg;
-    }
-
-    /**
-     * The method converts the audit message to xml format, having as input the
-     * Audit Message. Uses the JAXB library to marshal the audti message object
-     *
-     * @param am
-     * @return
-     * @throws JAXBException
-     */
-    public synchronized static String convertAuditObjectToXML(AuditMessage am) throws JAXBException {
-        log.info("Converting message");
-        StringWriter sw = new StringWriter();
-        log.debug("JAXB marshalling the Audit Object");
-        JAXBContext context = JAXBContext.newInstance(AuditMessage.class);
-        Marshaller m = context.createMarshaller();
-        try {
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        } catch (PropertyException e) {
-            log.warn("Unable to format converted AuditMessage to XML.");
-        }
-        m.marshal(am, sw);
-        log.info("Converting message finished");
-        return sw.toString();
-    }
-
     public synchronized void sendATNASyslogMessage(AuditLogSerializer auditLogSerializer, AuditMessage auditmessage,
                                                    String facility, String severity) {
         MessageSender t = new MessageSender(auditLogSerializer, auditmessage, facility, severity);
@@ -1164,7 +1304,6 @@ public enum AuditTrailUtils {
                 }
                 break;
             }
-
         }
 
         return AuditValidationService.getInstance().validateModel(AuditTrailUtils.constructMessage(am, false), model,

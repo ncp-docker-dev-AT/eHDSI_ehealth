@@ -38,19 +38,33 @@ import java.util.*;
 public class StorkServlet extends HttpServlet {
 
     private static Logger log = LoggerFactory.getLogger(StorkServlet.class.getName());
-
+    private static Properties configs;
+    private static String providerName;
+    private static String homepage = "/SP/";
+    private static String allowIP = "127.0.0.1";
     private final String USER_AGENT = "Mozilla/5.0";
     private String SAMLResponse;
     private String samlResponseXML;
     private String SAMLRequest;
     private String samlRequestXML;
     private ArrayList<PersonalAttribute> attrList;
-
     private HttpServletRequest request;
-    private static Properties configs;
-    private static String providerName;
-    private static String homepage = "/SP/";
-    private static String allowIP = "127.0.0.1";
+
+    public static Logger getLog() {
+        return log;
+    }
+
+    public static void setLog(Logger log) {
+        StorkServlet.log = log;
+    }
+
+    public static String getHomepage() {
+        return homepage;
+    }
+
+    public static void setHomepage(String homepage) {
+        StorkServlet.homepage = homepage;
+    }
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -101,24 +115,24 @@ public class StorkServlet extends HttpServlet {
             ipAddress = request.getRemoteAddr();
         }
 
-        System.out.println("IP-Addr: " + ipAddress);
+        log.info("IP-Addr: " + ipAddress);
 
         String STORK_ENABLED = "stork.enabled";
         Company company;
         try {
             company = PortalUtil.getCompany(request);
             String storkEnabled = PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false");
-            System.out.println("storkEnabled:" + PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false"));
-            System.out.println("provider.name:" + PrefsPropsUtil.getString(company.getCompanyId(), "provider.name", ""));
-            System.out.println("sp.sector:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.sector", ""));
-            System.out.println("sp.aplication:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.aplication", ""));
-            System.out.println("sp.country:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.country", ""));
-            System.out.println("sp.qaalevel:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.qaalevel", ""));
-            System.out.println("peps.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "peps.url", ""));
-            System.out.println("stork.login.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "stork.login.url", ""));
-            System.out.println("sp.mandatory.personal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.personal.attributes", ""));
-            System.out.println("sp.mandatory.business.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.business.attributes", ""));
-            System.out.println("sp.mandatory.legal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.legal.attributes", ""));
+            log.info("storkEnabled:" + PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false"));
+            log.info("provider.name:" + PrefsPropsUtil.getString(company.getCompanyId(), "provider.name", ""));
+            log.info("sp.sector:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.sector", ""));
+            log.info("sp.aplication:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.aplication", ""));
+            log.info("sp.country:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.country", ""));
+            log.info("sp.qaalevel:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.qaalevel", ""));
+            log.info("peps.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "peps.url", ""));
+            log.info("stork.login.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "stork.login.url", ""));
+            log.info("sp.mandatory.personal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.personal.attributes", ""));
+            log.info("sp.mandatory.business.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.business.attributes", ""));
+            log.info("sp.mandatory.legal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.legal.attributes", ""));
 
             request.getRequestDispatcher("/stork.jsp").forward(request, response);
         } catch (PortalException ex) {
@@ -142,12 +156,12 @@ public class StorkServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("##################### Stork Servlet Post ...");
+        log.info("##################### Stork Servlet Post ...");
         providerName = PropsUtil.get("provider.name");
         SAMLResponse = request.getParameter("SAMLResponse");
         byte[] decSamlToken = PEPSUtil.decodeSAMLToken(SAMLResponse);
         samlResponseXML = new String(decSamlToken);
-        System.out.println("SAML IS : " + samlResponseXML);
+        log.info("SAML IS : " + samlResponseXML);
 
         STORKAuthnResponse authnResponse = null;
         IPersonalAttributeList personalAttributeList = null;
@@ -192,28 +206,12 @@ public class StorkServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    public static Logger getLog() {
-        return log;
-    }
-
-    public static void setLog(Logger log) {
-        StorkServlet.log = log;
-    }
-
     public HttpServletRequest getRequest() {
         return request;
     }
 
     public void setRequest(HttpServletRequest request) {
         this.request = request;
-    }
-
-    public static String getHomepage() {
-        return homepage;
-    }
-
-    public static void setHomepage(String homepage) {
-        StorkServlet.homepage = homepage;
     }
 
     private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
@@ -256,7 +254,7 @@ public class StorkServlet extends HttpServlet {
             }
             content += key + "=" + URLEncoder.encode(data.get(key), "UTF-8");
         }
-        //System.out.println(content);
+        //log.info(content);
         out.writeBytes(content);
         out.flush();
         out.close();

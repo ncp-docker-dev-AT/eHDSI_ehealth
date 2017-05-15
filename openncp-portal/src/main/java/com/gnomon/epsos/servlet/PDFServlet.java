@@ -29,12 +29,13 @@ import java.io.OutputStream;
 
 public class PDFServlet extends HttpServlet {
 
-    private static Logger log = LoggerFactory.getLogger(PDFServlet.class.getName());
+    private static Logger log = LoggerFactory.getLogger(PDFServlet.class);
 
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        byte[] pdf = null;
 
-        log.debug("getting pdf document");
+        log.info("Getting PDF document");
+        byte[] pdf = null;
 
         try {
             String uuid = req.getParameter("uuid");
@@ -42,9 +43,9 @@ public class PDFServlet extends HttpServlet {
             String hcid = req.getParameter("hcid");
 
             log.debug("Retrieving PDF document");
-            log.debug("uuid: " + uuid);
-            log.debug("repositoryId: " + repositoryId);
-            log.debug("hcid: " + hcid);
+            log.debug("uuid: '{}'", uuid);
+            log.debug("repositoryId: '{}'", repositoryId);
+            log.debug("hcid: '{}'", hcid);
 
             EpsosDocument selectedEpsosDocument = new EpsosDocument();
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
@@ -147,31 +148,59 @@ public class PDFServlet extends HttpServlet {
             log.debug("The requested XML-PDF file for " + uuid + "\n" + xmlfile);
 
             pdf = EpsosHelperService.extractPdfPartOfDocument(eps.getBase64Binary());
-
-            res.setContentType("application/pdf");
-            res.setHeader("Content-Disposition", "inline; filename=cdapdf.pdf");
-            res.setHeader("Cache-Control", "no-cache");
-            res.setDateHeader("Expires", 0);
-            res.setHeader("Pragma", "No-cache");
-            log.info("##########3 Serve pdf file");
-            OutputStream OutStream = res.getOutputStream();
-            OutStream.write(pdf);
-            OutStream.flush();
-            OutStream.close();
+            writeOutpustream(res, pdf);
+//            res.setContentType("application/pdf");
+//            res.setHeader("Content-Disposition", "inline; filename=cdapdf.pdf");
+//            res.setHeader("Cache-Control", "no-cache");
+//            res.setDateHeader("Expires", 0);
+//            res.setHeader("Pragma", "No-cache");
+//            log.info("##########3 Serve pdf file");
+//            OutputStream OutStream = res.getOutputStream();
+//            OutStream.write(pdf);
+//            OutStream.flush();
+//            OutStream.close();
         } catch (Exception ex) {
             log.error(ExceptionUtils.getStackTrace(ex));
-            res.setContentType("text/html");
-
-            res.setHeader("Cache-Control", "no-cache");
-            res.setDateHeader("Expires", 0);
-            res.setHeader("Pragma", "No-cache");
-
-            OutputStream OutStream = res.getOutputStream();
-            OutStream.write(ex.getMessage().getBytes());
-            OutStream.flush();
-            OutStream.close();
-            log.error(ExceptionUtils.getStackTrace(ex));
+//            res.setContentType("text/html");
+//
+//            res.setHeader("Cache-Control", "no-cache");
+//            res.setDateHeader("Expires", 0);
+//            res.setHeader("Pragma", "No-cache");
+//
+//            OutputStream OutStream = res.getOutputStream();
+//            OutStream.write(ex.getMessage().getBytes());
+//            OutStream.flush();
+//            OutStream.close();
+//            log.error(ExceptionUtils.getStackTrace(ex));
         }
+    }
 
+    private void writeOutpustream(HttpServletResponse response, byte[] bytes) {
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "inline; filename=cdapdf.pdf");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0);
+        response.setHeader("Pragma", "No-cache");
+
+        try (OutputStream stream = response.getOutputStream()) {
+
+            log.info("##########3 Serve pdf file");
+            stream.write(bytes);
+            stream.flush();
+            stream.close();
+        } catch (IOException e) {
+            log.error("IOException: '{}'", e.getMessage(), e);
+            response.setContentType("text/html");
+            response.setHeader("Cache-Control", "no-cache");
+            response.setDateHeader("Expires", 0);
+            response.setHeader("Pragma", "No-cache");
+            try (OutputStream stream = response.getOutputStream()) {
+
+                stream.write(e.getMessage().getBytes());
+            } catch (IOException ex) {
+                log.error("IOException: '{}'", ex.getMessage(), ex);
+            }
+        }
     }
 }

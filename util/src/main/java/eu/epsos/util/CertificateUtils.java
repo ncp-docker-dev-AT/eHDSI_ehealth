@@ -30,7 +30,9 @@ import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
@@ -50,18 +52,20 @@ public class CertificateUtils {
         return HTTPUtil.getServerCertificate(endpoint);
     }
 
-    public static X509Certificate getClientCertificate() {
+    public static X509Certificate getClientCertificate() throws IOException, KeyStoreException {
         String KEYSTORE_LOCATION = Constants.NCP_SIG_KEYSTORE_PATH;
         String KEY_STORE_PASS = Constants.NCP_SIG_KEYSTORE_PASSWORD;
         String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
         String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
         X509Certificate cert = null;
 
-        try {
-            KeyStoreManager keyManager = new DefaultKeyStoreManager();
-            KeyStore keyStore = KeyStore.getInstance("JKS");
-            File file = new File(KEYSTORE_LOCATION);
-            keyStore.load(new FileInputStream(file),
+        KeyStoreManager keyManager = new DefaultKeyStoreManager();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        File file = new File(KEYSTORE_LOCATION);
+
+        try (FileInputStream stream = new FileInputStream(file)) {
+
+            keyStore.load(stream,
                     KEY_STORE_PASS.toCharArray());
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS,
                     PRIVATE_KEY_PASS.toCharArray());

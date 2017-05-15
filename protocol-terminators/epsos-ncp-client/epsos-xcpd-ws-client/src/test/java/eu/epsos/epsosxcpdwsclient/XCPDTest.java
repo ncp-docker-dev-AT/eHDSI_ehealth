@@ -36,6 +36,12 @@ public class XCPDTest {
         TestConstants.checkEnvironmentVariables();
     }
 
+    public static void main(String[] args) {
+
+        new XCPDTest().getPatientDemographics();
+        logger.info("+++++++++++++++++++++++ FINISHED! +++++++++++++++++++++++");
+    }
+
     public void getPatientDemographics() {
 
         PatientDemographics patientDemographics = new PatientDemographics();
@@ -61,16 +67,10 @@ public class XCPDTest {
                     idAssertion,
                     PATIENT_COUNTRY);
 
-            System.out.println("result: " + result);
+            logger.info("result: '{}'", result);
 
         } catch (NoPatientIdDiscoveredException ex) {
             logger.error(null, ex);
         }
-    }
-
-    public static void main(String[] args) {
-
-        new XCPDTest().getPatientDemographics();
-        System.out.println("+++++++++++++++++++++++ FINISHED! +++++++++++++++++++++++");
     }
 }

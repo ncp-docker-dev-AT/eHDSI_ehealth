@@ -56,21 +56,19 @@ public class XmlFileReader {
      * @return
      * @throws Exception
      */
-    public static XmlFileReader getInstance() throws Exception {
+    public synchronized static XmlFileReader getInstance() throws Exception {
+
         if (XmlFileReader.singletonInstance == null) {
-            synchronized (XmlFileReader.syncVariable) {
-                if (XmlFileReader.singletonInstance == null) {
-                    try {
-                        XmlFileReader.singletonInstance = new XmlFileReader();
-                    } catch (Exception exception) {
-                        log.error("Unable to initialize the singleton for class " + XmlFileReader.class.getCanonicalName(),
-                                exception);
-                        throw new Exception("Unable to initialize the singleton for class " + XmlFileReader.class.getCanonicalName(),
-                                exception);
-                    }
-                }
+            try {
+                XmlFileReader.singletonInstance = new XmlFileReader();
+            } catch (Exception exception) {
+                log.error("Unable to initialize the singleton for class " + XmlFileReader.class.getCanonicalName(),
+                        exception);
+                throw new Exception("Unable to initialize the singleton for class " + XmlFileReader.class.getCanonicalName(),
+                        exception);
             }
         }
+
         log.debug("Instance of XmlFileReader successfully retrieved");
         return XmlFileReader.singletonInstance;
     }

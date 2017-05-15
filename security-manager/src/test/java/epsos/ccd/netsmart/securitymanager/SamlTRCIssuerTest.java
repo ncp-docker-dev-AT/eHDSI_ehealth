@@ -16,24 +16,8 @@
  */
 package epsos.ccd.netsmart.securitymanager;
 
-import static org.junit.Assert.fail;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
+import org.junit.*;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLObject;
 import org.opensaml.saml2.core.Assertion;
@@ -50,10 +34,17 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import static org.junit.Assert.fail;
 
 /**
- *
  * @author Jerry Dimitriou <jerouris at netsmart.gr>
  */
 public class SamlTRCIssuerTest {
@@ -90,7 +81,7 @@ public class SamlTRCIssuerTest {
     public void testIssueTrcToken() throws IOException {
         try {
 
-            System.out.println("issueTrcToken");
+            logger.info("issueTrcToken");
 
             // Get parser pool manager
             BasicParserPool ppMgr = new BasicParserPool();
@@ -145,7 +136,7 @@ public class SamlTRCIssuerTest {
     @Ignore
     @Test
     public void testVerifyTrcToken() throws Exception {
-        System.out.println("verifyTrcToken");
+        logger.info("verifyTrcToken");
 
         // Get parser pool manager
         Assertion idas = loadSamlAssertionAsResource("SignedSamlAssertion.xml");

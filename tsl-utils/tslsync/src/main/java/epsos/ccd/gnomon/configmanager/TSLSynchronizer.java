@@ -50,12 +50,13 @@ import java.util.Hashtable;
  */
 public class TSLSynchronizer {
 
+    private static Logger logger = LoggerFactory.getLogger(TSLSynchronizer.class);
+
     public TSLSynchronizer() {
     }
 
-    static Logger logger = LoggerFactory.getLogger(TSLSynchronizer.class);
-
     public static String sync() {
+
         StringBuilder sb1 = new StringBuilder();
         String sb = "";
         ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
@@ -73,12 +74,11 @@ public class TSLSynchronizer {
 
         // read the country codes of the epSOS countries from the NCP configuration
         String[] countries = getCountriesList(cms).split(",");
-        Hashtable serviceNames = null;
-        String url = "";
+
         // Loop through countries list
-        for (int i = 0; i < countries.length; i++) {
-            System.out.println("Exporting configuration for : " + countries[i]);
-            sb = exportCountryConfig(sb1, countries[i]);
+        for (String country : countries) {
+            logger.info("Exporting configuration for: '{}'", country);
+            sb = exportCountryConfig(sb1, country);
         }
         return sb;
     }
@@ -91,19 +91,19 @@ public class TSLSynchronizer {
                 throw new Exception("Argument must be a 2-letter country-code!");
             } else {
                 syncCountry(arg.toLowerCase());
-                System.out.println("TSL SYNC FINISHED");
+                logger.info("TSL SYNC FINISHED");
                 System.exit(0);
             }
         } else {
             String sb = sync().toString();
-            System.out.println("TSL SYNC FINISHED");
+            logger.info("TSL SYNC FINISHED");
             System.exit(0);
         }
     }
 
     /* Sync info for a specified country */
     public static String syncCountry(String country) {
-        System.out.println("Synchronizing a specific country...");
+        logger.info("Synchronizing a specific country...");
         StringBuilder sb1 = new StringBuilder();
         String sb = "";
         ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
@@ -119,7 +119,7 @@ public class TSLSynchronizer {
             cms.updateProperty("ncp.email", ncpemail);
         }
 
-        System.out.println("Exporting configuration for : " + country);
+        logger.info("Exporting configuration for: '{}'", country);
         sb = exportCountryConfig(sb1, country);
 
         return sb;

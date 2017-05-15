@@ -117,6 +117,10 @@
                     <artifactId>slf4j-log4j12</artifactId>
                     <groupId>org.slf4j</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>net.sf.saxon</artifactId>
+                    <groupId>saxon9he</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
@@ -140,13 +144,10 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- <dependency>
-             <groupId>log4j</groupId>
-             <artifactId>log4j</artifactId>
-         </dependency>-->
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
@@ -186,12 +187,11 @@
             <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
             <artifactId>openncp-integration-test</artifactId>
         </dependency>
-        <!-- Runtime dependencies -->
+        <!--Security-->
         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15</artifactId>
-            <version>1.46</version>
-            <scope>runtime</scope>
+            <groupId>com.matthewcasperson</groupId>
+            <artifactId>parameter_validation_filter</artifactId>
+            <version>1.2.1</version>
         </dependency>
     </dependencies>
 

@@ -2,7 +2,6 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <!--pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern-->
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </layout>
     </appender>
@@ -12,11 +11,55 @@
         <append>true</append>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            <!--pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern-->
         </encoder>
     </appender>
 
     <logger name="org.openhealthtools.openatna" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="org.openhealthtools.openatna.syslog.mina.tls.SyslogProtocolHandler" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="org.openhealthtools.openatna" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="org.openhealthtools.openexchange" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="com.misyshealthcare.connect" level="WARN" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Limit the org.apache logger to INFO as its DEBUG is verbose -->
+    <logger name="org.apache" level="WARN" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Limit the org.hibernate logger to WARN -->
+    <logger name="org.hibernate" level="WARN" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="org.hibernate.SQL" level="WARN" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Limit the net.sf.ehcache logger to ERROR -->
+    <logger name="net.sf.ehcache" level="ERROR" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Limit jboss axis to INFO as its DEBUG is even more verbose -->
+    <logger name="org.jboss.axis" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Limit the JSR77 categories -->
+    <logger name="org.jboss.management" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

@@ -65,7 +65,7 @@ public class TerminologyTest {
         assertTrue(response.getWarnings().size() > 0);
         ITMTSAMEror warn = response.getWarnings().get(0);
         warn.getCode().equals(TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH);
-        System.out.println(response.getDesignation());
+        log.info(response.getDesignation());
     }
 
     @Test
@@ -287,7 +287,7 @@ public class TerminologyTest {
     public void testGetValueSetConcepts() {
         List<RetrievedConcept> concepts = service.getValueSetConcepts("1.3.6.1.4.1.12559.11.10.1.3.1.42.2", "MVC 1.0", "en");
         for (RetrievedConcept retrievedConcept : concepts) {
-            System.out.println(retrievedConcept.getCode());
+            log.info(retrievedConcept.getCode());
         }
         //      assertEquals(concepts.size(), 5);
     }
@@ -295,11 +295,11 @@ public class TerminologyTest {
     @Test
     public void testGetValueSetConceptsCurrentVersion() {
         List<RetrievedConcept> concepts = service.getValueSetConcepts("1.3.6.1.4.1.12559.11.10.1.3.1.42.2", null, "en");
-        System.out.println(concepts.size());
+        log.info("Number of Concepts: '{}'", concepts.size());
         CodedElement ce;
         long start = System.currentTimeMillis();
         for (RetrievedConcept concept : concepts) {
-            //          System.out.println(concept.getCode());
+            //          log.info(concept.getCode());
 
             String csName = "EDQM";
             String csOid = "1.3.6.1.4.1.12559.11.10.1.3.1.44.1";
@@ -309,10 +309,10 @@ public class TerminologyTest {
             if (designation != null) {
                 designation = designation.trim();
             }
-            //          System.out.println("d: "+designation);
+            //          log.info("d: "+designation);
         }
         long time = System.currentTimeMillis() - start;
-        System.out.println("time: " + time);
+        log.info("time: " + time);
         //      assertEquals(concepts.size(),2);
     }
 }

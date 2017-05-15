@@ -30,24 +30,24 @@ import java.util.regex.Pattern;
  */
 public class DocumentSearchMockImpl extends NationalConnectorGateway implements DocumentSearchInterface {
 
-    public static Logger logger = LoggerFactory.getLogger(DocumentSearchMockImpl.class);
-
     private static final String PATTERN_EP = "epstore.+\\.xml";
     private static final String PATTERN_PS = "psstore.+\\.xml";
     private static final String PATTERN_MRO = "mrostore.+\\.xml";
-    private List<DocumentAssociation<EPDocumentMetaData>> epDocumentMetaDatas = new ArrayList<DocumentAssociation<EPDocumentMetaData>>();
-    private List<DocumentAssociation<PSDocumentMetaData>> psDocumentMetaDatas = new ArrayList<DocumentAssociation<PSDocumentMetaData>>();
-    private List<DocumentAssociation<MroDocumentMetaData>> mroDocumentMetaDatas = new ArrayList<DocumentAssociation<MroDocumentMetaData>>();
+    private static final Logger logger = LoggerFactory.getLogger(DocumentSearchMockImpl.class);
+    private List<DocumentAssociation<EPDocumentMetaData>> epDocumentMetaDatas = new ArrayList<>();
+    private List<DocumentAssociation<PSDocumentMetaData>> psDocumentMetaDatas = new ArrayList<>();
+    private List<DocumentAssociation<MroDocumentMetaData>> mroDocumentMetaDatas = new ArrayList<>();
     private List<EPSOSDocument> documents = new ArrayList<EPSOSDocument>();
 
     public DocumentSearchMockImpl() {
+
         Collection<String> documentlist = ResourceList.getResources(Pattern.compile(PATTERN_EP));
         ResourceLoader resourceLoader = new ResourceLoader();
 
         // Mocked ePrescription fill up
-
         for (String xmlFilename : documentlist) {
-            logger.debug("reading file " + xmlFilename);
+
+            logger.debug("Reading file '{}'", xmlFilename);
             // make sure there is a pdf version of the document in the repository
             String pdfFilename = xmlFilename.substring(0, xmlFilename.length() - 4) + ".pdf";
             if (resourceLoader.getResource(pdfFilename).equals("")) {
@@ -84,7 +84,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         documentlist = ResourceList.getResources(Pattern.compile(PATTERN_PS));
 
         for (String xmlFilename : documentlist) {
-            logger.debug("reading file " + xmlFilename);
+            logger.debug("Reading file '{}", xmlFilename);
             // make sure there is a pdf version of the document in the repository
             String pdfFilename = xmlFilename.substring(0, xmlFilename.length() - 4) + ".pdf";
             if (resourceLoader.getResource(pdfFilename).equals("")) {

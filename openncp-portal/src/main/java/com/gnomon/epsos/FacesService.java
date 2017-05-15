@@ -19,6 +19,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletURLFactoryUtil;
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ import javax.faces.context.FacesContext;
 import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -41,8 +43,7 @@ public class FacesService {
     public static final int URL_MODE_RENDER = 0;
     public static final int URL_MODE_ACTION = 1;
     public static final int URL_MODE_RESOURCE = 2;
-
-
+    public static final String BUNDLE_LOCATION = "content.Language";
     private static final Logger log = LoggerFactory.getLogger("FacesService");
 
     public static PortletRequest getPortletRequest() {
@@ -54,7 +55,6 @@ public class FacesService {
     }
 
     /**
-     *
      * @return
      */
     public static PortletResponse getPortletResponse() {
@@ -74,7 +74,6 @@ public class FacesService {
         return response;
     }
 
-
     public static HttpServletRequest getHttpServletRequest() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
@@ -92,7 +91,7 @@ public class FacesService {
                     .getRequest();
             HttpServletRequest req = PortalUtil.getHttpServletRequest(portletRequest);
             HttpSession session = req.getSession();
-            session.putValue(param, value);
+            session.setAttribute(param, value);
         } catch (Exception e) {
             log.error("ERROR: While trying to store to session the parameter : " + param + " with value : " + value + ": " + e.getMessage());
             log.error(ExceptionUtils.getStackTrace(e));
@@ -116,7 +115,6 @@ public class FacesService {
         }
         return ret;
     }
-
 
     public static boolean userHasRole(long userId, long companyId, String rolename) {
         boolean hasRole = false;
@@ -150,7 +148,6 @@ public class FacesService {
         }
         return df;
     }
-
 
     public static ExternalContext getContext() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -213,7 +210,6 @@ public class FacesService {
         }
         return url.toString();
     }
-
 
     public static Layout scanLayout(long groupId, boolean isPrivatePage, String frUrlPart) {
 
@@ -304,13 +300,13 @@ public class FacesService {
         String str = key;
         try {
             str = rb.getString(key);
+            str = StringUtils.toEncodedString(str.getBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error("Key: " + key + " not found in message bundle. Using key as value");
         }
 
         return str;
     }
-
 
     /**
      * Translates a key to the proper locale
@@ -327,6 +323,7 @@ public class FacesService {
         String str = key;
         try {
             str = rb.getString(key);
+            str = StringUtils.toEncodedString(str.getBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error("Key: " + key + " not found in message bundle. Using key as value");
         }
@@ -334,13 +331,11 @@ public class FacesService {
         return str;
     }
 
-
     public static Locale getLocale() {
         FacesContext ctx = FacesContext.getCurrentInstance();
         Locale locale = ctx.getViewRoot().getLocale();
         return locale;
     }
-
 
     /**
      * Adds A message to the current Context message component (p:growl or h:message )
@@ -386,7 +381,6 @@ public class FacesService {
 
     }
 
-
     public static String getParameter(String key) {
 
         PortletRequest request = FacesService.getPortletRequest();
@@ -426,7 +420,5 @@ public class FacesService {
         PortletRequest request = ((PortletRequest) (FacesContext.getCurrentInstance().getExternalContext().getRequest()));
         return request.isUserInRole("administrator");
     }
-
-    public static final String BUNDLE_LOCATION = "content.Language";
 
 }

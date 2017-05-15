@@ -406,7 +406,7 @@ public class StorkUtils {
             isHcpProfessional = Boolean.parseBoolean(getPersonalAttribute(attrs, IS_HCP_ATTR_NAME).getValue().get(0));
             tittle = getPersonalAttribute(attrs, IS_HCP_ATTR_NAME).getValue().get(0);
         } catch (Exception e) {
-            System.out.println("Problem getting role attrs");
+            LOG.error("Problem getting role attrs");
         }
 
         return obtainHcpRole(isHcpProfessional, tittle);

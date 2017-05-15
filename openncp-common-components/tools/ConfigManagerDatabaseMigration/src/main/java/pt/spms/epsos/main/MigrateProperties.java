@@ -19,29 +19,24 @@
  */
 package pt.spms.epsos.main;
 
-import java.io.File;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import eu.epsos.configmanager.database.HibernateUtil;
+import eu.epsos.configmanager.database.model.Property;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.hibernate.Session;
-import eu.epsos.configmanager.database.HibernateUtil;
-import eu.epsos.configmanager.database.model.Property;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * MigrateProperties main class, that includes the main operation methods.
  *
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
- *
  */
 public final class MigrateProperties {
 
@@ -57,6 +52,12 @@ public final class MigrateProperties {
      * Class logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(MigrateProperties.class);
+
+    /**
+     * Private constructor to disable instantiation.
+     */
+    private MigrateProperties() {
+    }
 
     /**
      * Main Runnable method.
@@ -103,13 +104,13 @@ public final class MigrateProperties {
      */
     private static void processProperties(final String epsosPropsFile) throws ConfigurationException, FileNotFoundException, IOException {
         LOGGER.info("READING CONFIGURATION FILE FROM: " + epsosPropsFile);
-        
+
         File propsFile = new File(epsosPropsFile);
-        
+
         processCommaProperties(propsFile, epsosPropsFile);
-        
+
         propsFile = new File(epsosPropsFile);
-        
+
         final PropertiesConfiguration config = new PropertiesConfiguration();
         config.setReloadingStrategy(new FileChangedReloadingStrategy());
 
@@ -177,15 +178,15 @@ public final class MigrateProperties {
 
     /**
      * This method will replace the commas with "\," to improve the processing by Apache-Commons
-     * 
+     *
      * @param propertiesFile
      * @param filePath
      * @throws FileNotFoundException
-     * @throws IOException 
+     * @throws IOException
      */
     private static void processCommaProperties(File propertiesFile, String filePath) throws FileNotFoundException, IOException {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(propertiesFile));
+        try (BufferedReader reader = new BufferedReader(new FileReader(propertiesFile)); FileWriter writer = new FileWriter(filePath)) {
+
             String line = "", oldtext = "";
             while ((line = reader.readLine()) != null) {
                 oldtext += line + "\r\n";
@@ -193,19 +194,12 @@ public final class MigrateProperties {
             reader.close();
             // replace a word in a file
             String newtext = oldtext.replaceAll(",", "\\,");
-
-            FileWriter writer = new FileWriter(filePath);
+            
             writer.write(newtext);
             writer.close();
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-    }
-
-    /**
-     * Private constructor to disable instantiation.
-     */
-    private MigrateProperties() {
     }
 }

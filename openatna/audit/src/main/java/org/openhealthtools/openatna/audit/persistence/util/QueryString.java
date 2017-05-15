@@ -1,38 +1,31 @@
 /**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
+ * Copyright (c) 2009-2011 University of Cardiff and others
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * <p>
+ * Contributors:
+ * University of Cardiff - initial API and implementation
+ * -
  */
 
 package org.openhealthtools.openatna.audit.persistence.util;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.openhealthtools.openatna.anom.EventAction;
-import org.openhealthtools.openatna.anom.EventOutcome;
-import org.openhealthtools.openatna.anom.NetworkAccessPoint;
-import org.openhealthtools.openatna.anom.ObjectType;
-import org.openhealthtools.openatna.anom.ObjectTypeCodeRole;
-import org.openhealthtools.openatna.anom.Timestamp;
+import org.openhealthtools.openatna.anom.*;
 import org.openhealthtools.openatna.audit.persistence.model.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * reads in a query in the form of a string and converts it to a Query.
@@ -67,6 +60,7 @@ import org.openhealthtools.openatna.audit.persistence.model.Query;
 public class QueryString {
 
     public static final char[] ESCAPED = {'"', '\\'};
+    private static final Logger LOGGER = LoggerFactory.getLogger(QueryString.class);
 
     private QueryString() {
     }
@@ -380,6 +374,31 @@ public class QueryString {
         return query;
     }
 
+    public static void main(String[] args) {
+        Query query = new Query();
+        Query.ConditionalStatement t1 = new Query.ConditionalStatement(Query.Conditional.EQUALS, "1",
+                Query.Target.PARTICIPANT_TYPE_CODE_SYSTEM_NAME);
+        Query.ConditionalStatement t2 = new Query.ConditionalStatement(Query.Conditional.EQUALS, "1",
+                Query.Target.PARTICIPANT_TYPE_CODE_SYSTEM);
+        query.notNull(Query.Target.EVENT_OUTCOME)
+                .equals("ITI-8", Query.Target.EVENT_ID_CODE)
+                .equals("IHE Transactions", Query.Target.EVENT_ID_CODE_SYSTEM_NAME)
+                .equals(EventAction.CREATE, Query.Target.EVENT_ACTION)
+                .equals("scmabh", Query.Target.PARTICIPANT_ID)
+                .equals(new Date(), Query.Target.EVENT_TIME)
+                .equals("bla \",,,^^^^  ble", Query.Target.OBJECT_SENSITIVITY)
+                .or(t1, t2)
+                .orderDescending(Query.Target.EVENT_TIME);
+        String s = QueryString.create(query);
+        LOGGER.info(s);
+        LOGGER.info("==========");
+        //String s = "EVENT_ID_CODE EQUALS \"ITI-8\" PARTICIPANT_TYPE_CODE LIKE \"L%\" OR SOURCE_TYPE_CODE EQUALS \"1223\"";
+        LOGGER.info("QueryString.main query: '{}'", s);
+        query = QueryString.parse(s);
+        LOGGER.info("Parsed Query: '{}'", query);
+
+    }
+
     private static class Joint {
 
         private String target1;
@@ -446,31 +465,4 @@ public class QueryString {
             this.value2 = value2;
         }
     }
-
-    public static void main(String[] args) {
-        Query query = new Query();
-        Query.ConditionalStatement t1 = new Query.ConditionalStatement(Query.Conditional.EQUALS, "1",
-                Query.Target.PARTICIPANT_TYPE_CODE_SYSTEM_NAME);
-        Query.ConditionalStatement t2 = new Query.ConditionalStatement(Query.Conditional.EQUALS, "1",
-                Query.Target.PARTICIPANT_TYPE_CODE_SYSTEM);
-        query.notNull(Query.Target.EVENT_OUTCOME)
-                .equals("ITI-8", Query.Target.EVENT_ID_CODE)
-                .equals("IHE Transactions", Query.Target.EVENT_ID_CODE_SYSTEM_NAME)
-                .equals(EventAction.CREATE, Query.Target.EVENT_ACTION)
-                .equals("scmabh", Query.Target.PARTICIPANT_ID)
-                .equals(new Date(), Query.Target.EVENT_TIME)
-                .equals("bla \",,,^^^^  ble", Query.Target.OBJECT_SENSITIVITY)
-                .or(t1, t2)
-                .orderDescending(Query.Target.EVENT_TIME);
-        String s = QueryString.create(query);
-        System.out.println(s);
-        System.out.println("==========");
-        //String s = "EVENT_ID_CODE EQUALS \"ITI-8\" PARTICIPANT_TYPE_CODE LIKE \"L%\" OR SOURCE_TYPE_CODE EQUALS \"1223\"";
-        System.out.println("QueryString.main query:" + s);
-        query = QueryString.parse(s);
-        System.out.println(query);
-
-    }
-
-
 }

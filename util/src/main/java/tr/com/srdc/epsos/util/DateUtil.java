@@ -36,8 +36,8 @@ public class DateUtil {
     public static final String DATE_FORMAT = "yyyyMMdd";
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     private static final int randLimit = 10000;
-    private static Random rand = new Random();
     public static Logger logger = LoggerFactory.getLogger(DateUtil.class);
+    private static Random rand = new Random();
 
     // Returns the current time in the local time zone
     public static String getCurrentTimeLocal() {
@@ -85,7 +85,7 @@ public class DateUtil {
 
     public static DateTime GregorianCalendarToJodaTime(XMLGregorianCalendar cal) {
         DateTime dt = new DateTime(cal.toGregorianCalendar().getTime());
-        System.out.println(dt);
+        logger.info("Date: '{}'", dt);
         return dt;
     }
 }

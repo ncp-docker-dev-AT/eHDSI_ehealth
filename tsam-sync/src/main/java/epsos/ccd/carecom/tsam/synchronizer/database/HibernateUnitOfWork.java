@@ -17,21 +17,19 @@ import java.util.Map;
 public abstract class HibernateUnitOfWork {
 
     /**
-     * Holds registered entities.
-     */
-    private Object registeredEntity;
-
-    /**
      * If true then the unit of work is running in debug mode. This variable is
      * used to decide if the executed business logic is more robust towards unexpected
      * and unwanted values.
      */
     protected boolean isDebug = false;
-
     /**
      * Indicates if the unit of work should attempt to truncate to long strings.
      */
     protected boolean truncateLongStrings = false;
+    /**
+     * Holds registered entities.
+     */
+    private Object registeredEntity;
 
     /**
      * Default constructor.
@@ -129,8 +127,10 @@ public abstract class HibernateUnitOfWork {
                 }
             }
             if (safeValue.length() > defaultLength) {
-                logTruncateString(
-                        this.registeredEntity.getClass().getName(), fieldName, safeValue.length(), defaultLength);
+                if (this.registeredEntity != null) {
+                    logTruncateString(
+                            this.registeredEntity.getClass().getName(), fieldName, safeValue.length(), defaultLength);
+                }
                 safeValue = safeValue.substring(0, defaultLength - 1);
             }
         }
