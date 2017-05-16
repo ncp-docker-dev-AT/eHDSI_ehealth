@@ -61,7 +61,7 @@ CREATE TABLE transcoding_association (
   quality                    VARCHAR(255),
   status                     VARCHAR(255),
   status_date                TIMESTAMP,
-  PRIMARY KEY (ID)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE value_set (

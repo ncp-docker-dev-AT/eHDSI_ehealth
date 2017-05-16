@@ -7,16 +7,17 @@ ehealth:
 logging:
   level:
      org.hibernate: ERROR
+     org.springframework.web.client: DEBUG
 openncp:
   ltrdb:
-    host: 127.0.0.1
+    host: 158.166.185.86
     port: 3306
     username: openncp_dev
     password: MyOpenncpPwd
     database-name: ehealth_ltrdb_dev
 spring:
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/ehealth_ltrdb_dev
+    url: jdbc:mysql://158.166.185.86/ehealth_ltrdb_dev
     username: openncp_dev
     password: MyOpenncpPwd
     driver-class-name: com.mysql.jdbc.Driver

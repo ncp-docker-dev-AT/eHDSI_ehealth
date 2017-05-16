@@ -28,9 +28,8 @@ public class TsamSyncManager {
 
     private final Logger logger = LoggerFactory.getLogger(TsamSyncManager.class);
 
-    private final ValueSetVersionConverter valueSetVersionConverter = new ValueSetVersionConverter();
-    private final CodeSystemEntityConverter codeSystemEntityConverter = new CodeSystemEntityConverter();
-
+    private final ValueSetVersionConverter valueSetVersionConverter;
+    private final CodeSystemEntityConverter codeSystemEntityConverter;
     private final TermServerClient termServerClient;
     private final DatabaseBackupTool databaseBackupTool;
     private final CodeSystemRepository codeSystemRepository;
@@ -41,13 +40,15 @@ public class TsamSyncManager {
     @Autowired
     public TsamSyncManager(TermServerClient termServerClient, DatabaseBackupTool databaseBackupTool,
                            CodeSystemRepository codeSystemRepository, CodeSystemEntityRepository codeSystemEntityRepository,
-                           ValueSetRepository valueSetRepository, ValueSetVersionRepository valueSetVersionRepository) {
+                           ValueSetRepository valueSetRepository, ValueSetVersionRepository valueSetVersionRepository, CodeSystemEntityConverter codeSystemEntityConverter, ValueSetVersionConverter valueSetVersionConverter) {
         this.termServerClient = termServerClient;
         this.databaseBackupTool = databaseBackupTool;
         this.codeSystemRepository = codeSystemRepository;
         this.codeSystemEntityRepository = codeSystemEntityRepository;
         this.valueSetRepository = valueSetRepository;
         this.valueSetVersionRepository = valueSetVersionRepository;
+        this.codeSystemEntityConverter = codeSystemEntityConverter;
+        this.valueSetVersionConverter = valueSetVersionConverter;
     }
 
     @SuppressWarnings("WeakerAccess")
