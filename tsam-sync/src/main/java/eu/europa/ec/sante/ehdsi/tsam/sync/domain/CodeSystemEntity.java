@@ -33,6 +33,9 @@ public class CodeSystemEntity {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "concept")
     private List<Designation> designations = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "target")
+    private List<Mapping> mappings = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
@@ -97,5 +100,14 @@ public class CodeSystemEntity {
     public void addDesignation(Designation designation) {
         designations.add(designation);
         designation.setConcept(this);
+    }
+
+    public List<Mapping> getMappings() {
+        return mappings;
+    }
+
+    public void addMapping(Mapping mapping) {
+        mappings.add(mapping);
+        mapping.setTarget(this);
     }
 }

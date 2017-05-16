@@ -3,10 +3,12 @@ package eu.europa.ec.sante.ehdsi.tsam.sync.converter;
 import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.CodeSystemModel;
 import eu.europa.ec.sante.ehdsi.tsam.sync.domain.CodeSystem;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class CodeSystemConverter implements Converter<CodeSystemModel, CodeSystem> {
 
     private Map<String, CodeSystem> cache = new HashMap<>();
