@@ -1,143 +1,143 @@
-DROP TABLE IF EXISTS X_CONCEPT_VALUE_SET;
-DROP TABLE IF EXISTS VALUE_SET_VERSION;
-DROP TABLE IF EXISTS VALUE_SET;
-DROP TABLE IF EXISTS DESIGNATION;
-DROP TABLE IF EXISTS TRANSCODING_ASSOCIATION;
-DROP TABLE IF EXISTS CODE_SYSTEM_CONCEPT;
-DROP TABLE IF EXISTS CODE_SYSTEM_VERSION;
-DROP TABLE IF EXISTS CODE_SYSTEM;
+DROP TABLE IF EXISTS x_concept_value_set;
+DROP TABLE IF EXISTS value_set_version;
+DROP TABLE IF EXISTS value_set;
+DROP TABLE IF EXISTS designation;
+DROP TABLE IF EXISTS transcoding_association;
+DROP TABLE IF EXISTS code_system_concept;
+DROP TABLE IF EXISTS code_system_version;
+DROP TABLE IF EXISTS code_system;
 
-CREATE TABLE CODE_SYSTEM (
-  ID          BIGINT AUTO_INCREMENT NOT NULL,
-  OID         VARCHAR(255),
-  NAME        VARCHAR(255),
-  DESCRIPTION VARCHAR(4000),
+CREATE TABLE code_system (
+  id          BIGINT AUTO_INCREMENT NOT NULL,
+  oid         VARCHAR(255),
+  name        VARCHAR(255),
+  description VARCHAR(4000),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE code_system_version (
+  id                  BIGINT AUTO_INCREMENT NOT NULL,
+  full_name           VARCHAR(255),
+  local_name          VARCHAR(255),
+  previous_version_id BIGINT,
+  effective_date      TIMESTAMP,
+  release_date        TIMESTAMP,
+  status              VARCHAR(255),
+  status_date         TIMESTAMP,
+  description         VARCHAR(4000),
+  copyright           VARCHAR(255),
+  source              VARCHAR(255),
+  code_system_id      BIGINT,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE code_system_concept (
+  id                     BIGINT AUTO_INCREMENT NOT NULL,
+  code                   VARCHAR(255),
+  status                 VARCHAR(255),
+  status_date            TIMESTAMP,
+  definition             VARCHAR(4000),
+  code_system_version_id BIGINT,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE designation (
+  id                     BIGINT AUTO_INCREMENT NOT NULL,
+  designation            VARCHAR(4000),
+  language_code          VARCHAR(255),
+  type                   VARCHAR(255),
+  is_preferred           BOOLEAN,
+  status                 VARCHAR(255),
+  status_date            TIMESTAMP,
+  code_system_concept_id BIGINT,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE transcoding_association (
+  id                         BIGINT AUTO_INCREMENT NOT NULL,
+  transcoding_association_id BIGINT                NOT NULL,
+  target_concept_id          BIGINT,
+  source_concept_id          BIGINT,
+  quality                    VARCHAR(255),
+  status                     VARCHAR(255),
+  status_date                TIMESTAMP,
   PRIMARY KEY (ID)
 );
 
-CREATE TABLE CODE_SYSTEM_VERSION (
-  ID                  BIGINT AUTO_INCREMENT NOT NULL,
-  FULL_NAME           VARCHAR(255),
-  LOCAL_NAME          VARCHAR(255),
-  PREVIOUS_VERSION_ID BIGINT,
-  EFFECTIVE_DATE      TIMESTAMP,
-  RELEASE_DATE        TIMESTAMP,
-  STATUS              VARCHAR(255),
-  STATUS_DATE         TIMESTAMP,
-  DESCRIPTION         VARCHAR(4000),
-  COPYRIGHT           VARCHAR(255),
-  SOURCE              VARCHAR(255),
-  CODE_SYSTEM_ID      BIGINT,
-  PRIMARY KEY (ID)
+CREATE TABLE value_set (
+  id                    BIGINT AUTO_INCREMENT NOT NULL,
+  oid                   VARCHAR(255),
+  epsos_name            VARCHAR(255),
+  description           VARCHAR(4000),
+  parent_code_system_id BIGINT,
+  PRIMARY KEY (id)
 );
 
-CREATE TABLE CODE_SYSTEM_CONCEPT (
-  ID                     BIGINT AUTO_INCREMENT NOT NULL,
-  CODE                   VARCHAR(255),
-  STATUS                 VARCHAR(255),
-  STATUS_DATE            TIMESTAMP,
-  DEFINITION             VARCHAR(4000),
-  CODE_SYSTEM_VERSION_ID BIGINT,
-  PRIMARY KEY (ID)
+CREATE TABLE value_set_version (
+  id                  BIGINT AUTO_INCREMENT NOT NULL,
+  version_name        VARCHAR(255),
+  effective_date      TIMESTAMP,
+  release_date        TIMESTAMP,
+  status              VARCHAR(255),
+  status_date         TIMESTAMP,
+  description         VARCHAR(4000),
+  previous_version_id BIGINT,
+  value_set_id        BIGINT,
+  PRIMARY KEY (id)
 );
 
-CREATE TABLE DESIGNATION (
-  ID                     BIGINT AUTO_INCREMENT NOT NULL,
-  DESIGNATION            VARCHAR(4000),
-  LANGUAGE_CODE          VARCHAR(255),
-  TYPE                   VARCHAR(255),
-  IS_PREFERRED           BOOLEAN,
-  STATUS                 VARCHAR(255),
-  STATUS_DATE            TIMESTAMP,
-  CODE_SYSTEM_CONCEPT_ID BIGINT,
-  PRIMARY KEY (ID)
+CREATE TABLE x_concept_value_set (
+  code_system_concept_id BIGINT NOT NULL,
+  value_set_version_id   BIGINT NOT NULL,
+  PRIMARY KEY (code_system_concept_id, value_set_version_id)
 );
 
-CREATE TABLE TRANSCODING_ASSOCIATION (
-  ID                         BIGINT AUTO_INCREMENT NOT NULL,
-  TRANSCODING_ASSOCIATION_ID BIGINT                NOT NULL,
-  TARGET_CONCEPT_ID          BIGINT,
-  SOURCE_CONCEPT_ID          BIGINT,
-  QUALITY                    VARCHAR(255),
-  STATUS                     VARCHAR(255),
-  STATUS_DATE                TIMESTAMP,
-  PRIMARY KEY (ID)
-);
+ALTER TABLE code_system_concept
+  ADD CONSTRAINT fk_code_system_version_id
+FOREIGN KEY (code_system_version_id)
+REFERENCES code_system_version (id);
 
-CREATE TABLE VALUE_SET (
-  ID                    BIGINT AUTO_INCREMENT NOT NULL,
-  OID                   VARCHAR(255),
-  EPSOS_NAME            VARCHAR(255),
-  DESCRIPTION           VARCHAR(4000),
-  PARENT_CODE_SYSTEM_ID BIGINT,
-  PRIMARY KEY (ID)
-);
+ALTER TABLE code_system_version
+  ADD CONSTRAINT fk_code_system_id
+FOREIGN KEY (code_system_id)
+REFERENCES code_system (id);
 
-CREATE TABLE VALUE_SET_VERSION (
-  ID                  BIGINT AUTO_INCREMENT NOT NULL,
-  VERSION_NAME        VARCHAR(255),
-  EFFECTIVE_DATE      TIMESTAMP,
-  RELEASE_DATE        TIMESTAMP,
-  STATUS              VARCHAR(255),
-  STATUS_DATE         TIMESTAMP,
-  DESCRIPTION         VARCHAR(4000),
-  PREVIOUS_VERSION_ID BIGINT,
-  VALUE_SET_ID        BIGINT,
-  PRIMARY KEY (ID)
-);
+ALTER TABLE designation
+  ADD CONSTRAINT fk_code_system_concept_id
+FOREIGN KEY (code_system_concept_id)
+REFERENCES code_system_concept (id);
 
-CREATE TABLE X_CONCEPT_VALUE_SET (
-  CODE_SYSTEM_CONCEPT_ID BIGINT NOT NULL,
-  VALUE_SET_VERSION_ID   BIGINT NOT NULL,
-  PRIMARY KEY (CODE_SYSTEM_CONCEPT_ID, VALUE_SET_VERSION_ID)
-);
+ALTER TABLE transcoding_association
+  ADD CONSTRAINT fk_source_concept_id
+FOREIGN KEY (source_concept_id)
+REFERENCES code_system_concept (id);
 
-ALTER TABLE CODE_SYSTEM_CONCEPT
-  ADD CONSTRAINT FK_CODE_SYSTEM_VERSION_ID
-FOREIGN KEY (CODE_SYSTEM_VERSION_ID)
-REFERENCES CODE_SYSTEM_VERSION (ID);
+ALTER TABLE transcoding_association
+  ADD CONSTRAINT fk_target_concept_id
+FOREIGN KEY (target_concept_id)
+REFERENCES code_system_concept (id);
 
-ALTER TABLE CODE_SYSTEM_VERSION
-  ADD CONSTRAINT FK_CODE_SYSTEM_ID
-FOREIGN KEY (CODE_SYSTEM_ID)
-REFERENCES CODE_SYSTEM (ID);
+ALTER TABLE value_set
+  ADD CONSTRAINT fk_parent_code_system_id
+FOREIGN KEY (parent_code_system_id)
+REFERENCES code_system (id);
 
-ALTER TABLE DESIGNATION
-  ADD CONSTRAINT FK_CODE_SYSTEM_CONCEPT_ID
-FOREIGN KEY (CODE_SYSTEM_CONCEPT_ID)
-REFERENCES CODE_SYSTEM_CONCEPT (ID);
+ALTER TABLE value_set_version
+  ADD CONSTRAINT fk_previous_version_id
+FOREIGN KEY (previous_version_id)
+REFERENCES value_set_version (id);
 
-ALTER TABLE TRANSCODING_ASSOCIATION
-  ADD CONSTRAINT FK_SOURCE_CONCEPT_ID
-FOREIGN KEY (SOURCE_CONCEPT_ID)
-REFERENCES CODE_SYSTEM_CONCEPT (ID);
+ALTER TABLE value_set_version
+  ADD CONSTRAINT fk_value_set_id
+FOREIGN KEY (value_set_id)
+REFERENCES value_set (id);
 
-ALTER TABLE TRANSCODING_ASSOCIATION
-  ADD CONSTRAINT FK_TARGET_CONCEPT_ID
-FOREIGN KEY (TARGET_CONCEPT_ID)
-REFERENCES CODE_SYSTEM_CONCEPT (ID);
+ALTER TABLE x_concept_value_set
+  ADD CONSTRAINT fk_code_system_concept_id
+FOREIGN KEY (code_system_concept_id)
+REFERENCES code_system_concept (id);
 
-ALTER TABLE VALUE_SET
-  ADD CONSTRAINT FK_PARENT_CODE_SYSTEM_ID
-FOREIGN KEY (PARENT_CODE_SYSTEM_ID)
-REFERENCES CODE_SYSTEM (ID);
-
-ALTER TABLE VALUE_SET_VERSION
-  ADD CONSTRAINT FK_PREVIOUS_VERSION_ID
-FOREIGN KEY (PREVIOUS_VERSION_ID)
-REFERENCES VALUE_SET_VERSION;
-
-ALTER TABLE VALUE_SET_VERSION
-  ADD CONSTRAINT FK_VALUE_SET_ID
-FOREIGN KEY (VALUE_SET_ID)
-REFERENCES VALUE_SET;
-
-ALTER TABLE X_CONCEPT_VALUE_SET
-  ADD CONSTRAINT FK_CODE_SYSTEM_CONCEPT_ID
-FOREIGN KEY (CODE_SYSTEM_CONCEPT_ID)
-REFERENCES CODE_SYSTEM_CONCEPT(ID);
-
-ALTER TABLE X_CONCEPT_VALUE_SET
-  ADD CONSTRAINT FK_VALUE_SET_VERSION_ID
-FOREIGN KEY (VALUE_SET_VERSION_ID)
-REFERENCES VALUE_SET_VERSION(ID);
+ALTER TABLE x_concept_value_set
+  ADD CONSTRAINT fk_value_set_version_id
+FOREIGN KEY (value_set_version_id)
+REFERENCES value_set_version (id);
