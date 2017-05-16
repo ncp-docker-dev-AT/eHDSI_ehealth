@@ -5,6 +5,8 @@ import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.DesignationModel
 import eu.europa.ec.sante.ehdsi.tsam.sync.domain.CodeSystemEntity;
 import org.springframework.core.convert.converter.Converter;
 
+import java.time.LocalDateTime;
+
 public class CodeSystemEntityConverter implements Converter<CodeSystemConceptModel, CodeSystemEntity> {
 
     private final CodeSystemVersionConverter codeSystemVersionConverter = new CodeSystemVersionConverter();
@@ -20,8 +22,8 @@ public class CodeSystemEntityConverter implements Converter<CodeSystemConceptMod
         CodeSystemEntity target = new CodeSystemEntity();
         target.setCode(source.getCode());
         target.setDefinition(source.getDescription());
-        target.setStatus(source.getStatus());
-//        target.setStatusDate();
+        target.setStatus("Current");
+        target.setStatusDate(LocalDateTime.now());
         target.setCodeSystemVersion(codeSystemVersionConverter.convert(source.getCodeSystemVersion()));
 
         for (DesignationModel designation : source.getDesignations()) {

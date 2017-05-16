@@ -18,8 +18,8 @@ public class DesignationConverter implements Converter<DesignationModel, Designa
         target.setDesignation(source.getName());
         target.setLanguageCode(source.getLanguage());
         target.setType(source.getType());
-        target.setStatus(source.getStatus());
-        target.setStatusDate(source.getStatusDate() == null ? null : LocalDateTime.parse(source.getStatusDate()));
+        target.setStatus("Current");
+        target.setStatusDate(LocalDateTime.now());
         return target;
     }
 }
