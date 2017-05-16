@@ -20,6 +20,7 @@ public class DesignationConverter implements Converter<DesignationModel, Designa
         target.setType(source.getType());
         target.setStatus("Current");
         target.setStatusDate(LocalDateTime.now());
+        target.setPreferred(true);
         return target;
     }
 }
