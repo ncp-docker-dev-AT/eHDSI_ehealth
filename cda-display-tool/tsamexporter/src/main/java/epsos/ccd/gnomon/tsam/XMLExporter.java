@@ -1,6 +1,7 @@
 package epsos.ccd.gnomon.tsam;
 
 import epsos.ccd.gnomon.tsam.configuration.Settings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +59,7 @@ public class XMLExporter {
             String userPassword = Settings.getInstance().getSettingValue("database.password");
 
             LOG.info("Connecting to database ...");
-            String query = "SELECT * FROM CODE_SYSTEM";
+            String query = "SELECT * FROM code_system";
 
             try (Connection conn = DriverManager.getConnection(databaseUrl, userName, userPassword);
                  Statement stat = conn.createStatement();
@@ -73,10 +74,10 @@ public class XMLExporter {
                 while (result.next()) {
                     StringBuilder sb = new StringBuilder();
 
-                    cs_id = result.getString("ID");
+                    cs_id = result.getString("id");
                     LOG.info("CS_ID IS : '{}'", cs_id);
-                    cs_oid = result.getString("OID");
-                    cs_name = result.getString("NAME");
+                    cs_oid = result.getString("oid");
+                    cs_name = result.getString("name");
                     String cs_name_nopaces = cs_name.replaceAll(" ", "");
 
                     LOG.info("Writing code with OID = '{}' and name = '{}'", cs_oid, cs_name);
@@ -87,50 +88,53 @@ public class XMLExporter {
                             append(cs_name_nopaces).
                             append("Information>\r\n");
 
-                    String distinctquery = "SELECT CODE_SYSTEM_CONCEPT.CODE "
-                            + "FROM CODE_SYSTEM_VERSION INNER JOIN "
-                            + " CODE_SYSTEM_CONCEPT ON CODE_SYSTEM_VERSION.ID = CODE_SYSTEM_CONCEPT.CODE_SYSTEM_VERSION_ID "
-                            + "WHERE CODE_SYSTEM_VERSION.CODE_SYSTEM_ID = '" + cs_id + "' "
-                            + "AND CODE_SYSTEM_CONCEPT.ID in (SELECT CODE_SYSTEM_CONCEPT_ID FROM X_CONCEPT_VALUE_SET)";
+                    String distinctquery = "SELECT code_system_concept.code "
+                            + "FROM code_system_version INNER JOIN "
+                            + " code_system_concept ON code_system_version.id = code_system_concept.code_system_version_id "
+                            + "WHERE code_system_version.code_system_id = '" + cs_id + "' "
+                            + "AND code_system_concept.id in (SELECT code_system_concept_id FROM x_concept_value_set)";
 
                     try (Statement stat1 = conn.createStatement();
                          ResultSet resultcodes = stat1.executeQuery(distinctquery)) {
 
                         while (resultcodes.next()) {
 
-                            String csdistinct_id = resultcodes.getString("CODE");
-                            String subquery = "SELECT VALUE_SET.OID, "
-                                    + " VALUE_SET.EPSOS_NAME, "
-                                    + " CODE_SYSTEM_CONCEPT.CODE, "
-                                    + " DESIGNATION.DESIGNATION, "
-                                    + " DESIGNATION.LANGUAGE_CODE, "
-                                    + " CODE_SYSTEM_VERSION.CODE_SYSTEM_ID "
-                                    + "FROM VALUE_SET JOIN "
-                                    + " VALUE_SET_VERSION ON VALUE_SET.ID = VALUE_SET_VERSION.VALUE_SET_ID JOIN "
-                                    + " X_CONCEPT_VALUE_SET ON VALUE_SET_VERSION.ID = X_CONCEPT_VALUE_SET.VALUE_SET_VERSION_ID JOIN "
-                                    + " CODE_SYSTEM_CONCEPT ON X_CONCEPT_VALUE_SET.CODE_SYSTEM_CONCEPT_ID = CODE_SYSTEM_CONCEPT.ID JOIN "
-                                    + " DESIGNATION ON DESIGNATION.CODE_SYSTEM_CONCEPT_ID = CODE_SYSTEM_CONCEPT.ID JOIN "
-                                    + " CODE_SYSTEM_VERSION ON  CODE_SYSTEM_VERSION.ID = CODE_SYSTEM_CONCEPT.CODE_SYSTEM_VERSION_ID "
-                                    + "WHERE CODE_SYSTEM_CONCEPT.CODE ='" + csdistinct_id + "' AND "
-                                    + " CODE_SYSTEM_VERSION.CODE_SYSTEM_ID = '" + cs_id + "' AND "
-                                    + " CODE_SYSTEM_CONCEPT.STATUS = 'Current' AND "
-                                    + " VALUE_SET_VERSION.STATUS = 'Current' AND "
-                                    + " DESIGNATION.STATUS='Current' AND "
-                                    + " DESIGNATION.IS_PREFERRED = 1 AND "
-                                    + " VALUE_SET.OID IS NOT NULL "
-                                    + "ORDER BY VALUE_SET.EPSOS_NAME";
-
+                            String csdistinct_id = resultcodes.getString("code");
+                            csdistinct_id = StringUtils.replaceAll(csdistinct_id, "'", "''");
+                            //LOG.info("Getting Info for CODE: '{}'", csdistinct_id);
+                            String subquery = "SELECT value_set.oid, "
+                                    + " value_set.epsos_name, "
+                                    + " code_system_concept.code, "
+                                    + " designation.designation, "
+                                    + " designation.language_code, "
+                                    + " code_system_version.code_system_id "
+                                    + "FROM value_set JOIN "
+                                    + " value_set_version ON value_set.id = value_set_version.value_set_id JOIN "
+                                    + " x_concept_value_set ON value_set_version.id = x_concept_value_set.value_set_version_id JOIN "
+                                    + " code_system_concept ON x_concept_value_set.code_system_concept_id = code_system_concept.id JOIN "
+                                    + " designation ON designation.code_system_concept_id = code_system_concept.id JOIN "
+                                    + " code_system_version ON  code_system_version.id = code_system_concept.code_system_version_id "
+                                    + "WHERE code_system_concept.code ='" + csdistinct_id + "' AND "
+                                    + " code_system_version.code_system_id = '" + cs_id + "' AND "
+                                    + " code_system_concept.status = 'Current' AND "
+                                    + " value_set_version.status = 'Current' AND "
+                                    + " designation.status='Current' AND "
+                                    + " designation.is_preferred = 1 AND "
+                                    + " value_set.oid IS NOT NULL "
+                                    + "ORDER BY value_set.epsos_name";
+                            //LOG.info("SUBQUERY: {}", subquery);
                             try (Statement stat2 = conn.createStatement();
                                  ResultSet result1 = stat2.executeQuery(subquery)) {
-                                ;
 
-                                String code = resultcodes.getString("CODE");
+                                String code = resultcodes.getString("code");
 
                                 if (result1.next()) {
-                                    String oid = result1.getString("OID");
-                                    String epsosName = result1.getString("EPSOS_NAME");
-                                    String lang_code = result1.getString("LANGUAGE_CODE");
-                                    String description = result1.getString("DESIGNATION");
+                                    String oid = result1.getString("oid");
+                                    String epsosName = result1.getString("epsos_name");
+                                    String lang_code = result1.getString("language_code");
+                                    String description = result1.getString("designation");
+
+                                    LOG.info("    OID: '{}' epSOS Name: '{}' Language: '{}' Description: '{}", oid, epsosName, lang_code, description);
                                     sb.append("<").
                                             append(cs_name_nopaces).
                                             append("Entry oid='").append(oid).append("'").
@@ -144,8 +148,8 @@ public class XMLExporter {
 
                                     while (result1.next()) {
 
-                                        lang_code = result1.getString("LANGUAGE_CODE");
-                                        description = result1.getString("DESIGNATION");
+                                        lang_code = result1.getString("language_code");
+                                        description = result1.getString("designation");
                                         sb.append("<displayName").append(" lang='").append(lang_code).append("'>").
                                                 append(description).
                                                 append("</displayName>\r\n");
@@ -208,9 +212,9 @@ public class XMLExporter {
 
             if (!f.exists()) {
                 f.mkdir();
-                LOG.info("EPSOS Repository created");
+                LOG.info("EPSOS Repository created for namespace {}", namespace);
             } else {
-                LOG.info("EPSOS Repository already exists");
+                LOG.info("EPSOS Repository already exists for namespace {}", namespace);
             }
 
             String outputFile = USER_HOME + "EpsosRepository/" + namespace + ".xml";
