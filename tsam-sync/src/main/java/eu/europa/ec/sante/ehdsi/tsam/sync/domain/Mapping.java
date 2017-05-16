@@ -11,6 +11,9 @@ public class Mapping {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "transcoding_association_id")
+    private Long transcodingAssociationId = 1L;
+
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "source_concept_id")
     private CodeSystemEntity source;

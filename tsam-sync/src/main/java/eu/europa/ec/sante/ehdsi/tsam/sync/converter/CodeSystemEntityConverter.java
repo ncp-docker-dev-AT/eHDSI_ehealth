@@ -7,28 +7,20 @@ import eu.europa.ec.sante.ehdsi.tsam.sync.domain.CodeSystemEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 
 @Component
 public class CodeSystemEntityConverter implements Converter<CodeSystemConceptModel, CodeSystemEntity> {
 
-    private final CodeSystemVersionConverter codeSystemVersionConverter;
-
-    private final DesignationConverter designationConverter;
-
-    private final MappingConverter mappingConverter;
+    @Autowired
+    private CodeSystemVersionConverter codeSystemVersionConverter;
 
     @Autowired
-    public CodeSystemEntityConverter(CodeSystemVersionConverter codeSystemVersionConverter, DesignationConverter designationConverter, MappingConverter mappingConverter) {
-        Assert.notNull(codeSystemVersionConverter, "codeSystemVersionConverter must not be null");
-        Assert.notNull(designationConverter, "designationConverter must not be null");
-        Assert.notNull(mappingConverter, "mappingConverter must not be null");
-        this.codeSystemVersionConverter = codeSystemVersionConverter;
-        this.designationConverter = designationConverter;
-        this.mappingConverter = mappingConverter;
-    }
+    private DesignationConverter designationConverter;
+
+    @Autowired
+    private MappingConverter mappingConverter;
 
     @Override
     public CodeSystemEntity convert(CodeSystemConceptModel source) {
@@ -43,14 +35,17 @@ public class CodeSystemEntityConverter implements Converter<CodeSystemConceptMod
         target.setStatusDate(LocalDateTime.now());
         target.setCodeSystemVersion(codeSystemVersionConverter.convert(source.getCodeSystemVersion()));
 
-        for (DesignationModel designation : source.getDesignations()) {
-            target.addDesignation(designationConverter.convert(designation));
+        if (source.getDesignations() != null) {
+            for (DesignationModel designation : source.getDesignations()) {
+                target.addDesignation(designationConverter.convert(designation));
+            }
         }
 
-        for (MappingModel mapping : source.getMappings()) {
-            target.addMapping(mappingConverter.convert(mapping));
+        if (source.getMappings() != null) {
+            for (MappingModel mapping : source.getMappings()) {
+                target.addMapping(mappingConverter.convert(mapping));
+            }
         }
-
         return target;
     }
 }

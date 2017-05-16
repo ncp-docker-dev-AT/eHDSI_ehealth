@@ -5,7 +5,6 @@ import eu.europa.ec.sante.ehdsi.tsam.sync.domain.CodeSystemVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -16,13 +15,8 @@ public class CodeSystemVersionConverter implements Converter<CodeSystemVersionMo
 
     private Map<String, CodeSystemVersion> cache = new HashMap<>();
 
-    private final CodeSystemConverter codeSystemConverter;
-
     @Autowired
-    public CodeSystemVersionConverter(CodeSystemConverter codeSystemConverter) {
-        Assert.notNull(codeSystemConverter, "codeSystemConverter must not be null");
-        this.codeSystemConverter = codeSystemConverter;
-    }
+    private CodeSystemConverter codeSystemConverter;
 
     @Override
     public CodeSystemVersion convert(CodeSystemVersionModel source) {
