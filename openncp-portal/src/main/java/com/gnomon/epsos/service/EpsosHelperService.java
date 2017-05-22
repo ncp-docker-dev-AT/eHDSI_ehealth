@@ -2515,14 +2515,13 @@ public class EpsosHelperService {
     }
 
     public static Document translateDoc(Document doc, String lang) {
-        ITransformationService tService = MyServletContextListener
-                .getTransformationService();
+
+        ITransformationService tService = MyServletContextListener.getTransformationService();
         if (Validator.isNotNull(tService)) {
-            log.info("The Transformation Service started correctly. Translating to "
-                    + lang);
+            log.info("The Transformation Service started correctly. Translating to {}", lang);
             TMResponseStructure tmResponse = tService.translate(doc, lang);
-            Document translatedDoc = tmResponse.getResponseCDA();
-            return translatedDoc;
+            return tmResponse.getResponseCDA();
+
         } else {
             log.info("The Transformation Service did not started correctly");
             return doc;
@@ -2531,7 +2530,7 @@ public class EpsosHelperService {
 
     public static String styleDoc(String input, String lang,
                                   boolean commonstyle, String actionUrl, boolean shownarrative) {
-        String convertedcda = "";
+        String convertedcda;
         EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
 
         if (commonstyle) {
@@ -2556,7 +2555,7 @@ public class EpsosHelperService {
             Document doc1 = com.gnomon.epsos.model.cda.Utils
                     .createDomFromString(input);
             isCDA = EpsosHelperService.isCDA(doc1);
-            log.info("########## IS CDA" + isCDA);
+            log.info("########## IS CDA {}", isCDA);
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
         }

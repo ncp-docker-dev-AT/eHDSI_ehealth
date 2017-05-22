@@ -2,31 +2,31 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="epsos.ccd.posam.tsam.model.Designation" table="DESIGNATION">
+    <class name="epsos.ccd.posam.tsam.model.Designation" table="designation">
         <id name="id" type="long">
-            <column name="ID"/>
+            <column name="id"/>
             <generator class="assigned"/>
         </id>
         <property name="designation" type="java.lang.String">
-            <column name="DESIGNATION"/>
+            <column name="designation"/>
         </property>
         <property name="languageCode" type="java.lang.String">
-            <column name="LANGUAGE_CODE"/>
+            <column name="language_code"/>
         </property>
         <property name="type" type="java.lang.String">
-            <column name="TYPE"/>
+            <column name="type"/>
         </property>
         <property name="preffered" type="java.lang.Boolean">
-            <column name="IS_PREFERRED"/>
+            <column name="is_preferred"/>
         </property>
         <property name="status" type="java.lang.String">
-            <column name="STATUS"/>
+            <column name="status"/>
         </property>
         <property name="statusDate" type="java.util.Date">
-            <column name="STATUS_DATE"/>
+            <column name="status_date"/>
         </property>
         <many-to-one name="concept" class="epsos.ccd.posam.tsam.model.CodeSystemConcept">
-            <column name="CODE_SYSTEM_CONCEPT_ID"></column>
+            <column name="code_system_concept_id"></column>
         </many-to-one>
     </class>
 </hibernate-mapping>

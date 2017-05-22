@@ -11,9 +11,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>openncp-tsam-sync</artifactId>
-
     <name>TSAM Synchronizer</name>
-
+    <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
@@ -108,7 +107,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <mainClass>eu.europa.ec.sante.ehdsi.tsam.sync.TsamSyncApplication</mainClass>
+                            <!--<addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
                         </manifest>
                     </archive>
                 </configuration>
@@ -117,6 +117,13 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

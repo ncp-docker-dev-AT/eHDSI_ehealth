@@ -31,6 +31,7 @@ public class PDFServlet extends HttpServlet {
 
     private static Logger log = LoggerFactory.getLogger(PDFServlet.class.getName());
 
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         byte[] pdf = null;
 
@@ -84,17 +85,27 @@ public class PDFServlet extends HttpServlet {
             }
 
             User user = (User) session.getAttribute("user");
-            String lang = user.getLanguageId();
+            String lang;
+            String userLanguage = "";
             String ltrlang = ParamUtil.getString(req, "lang");
 
             if (Validator.isNull(ltrlang)) {
-                lang = user.getLanguageId();
+                userLanguage = user.getLanguageId();
+                lang = userLanguage;
             } else {
                 lang = ltrlang;
             }
 
+//            String lang1 = lang.replace("_", "-");
+//            lang1 = lang1.replace("en-US", "en");
+
+            log.info("User Language: '{}' - Parameter Request Language: '{}' - Translated Language: {}", userLanguage, ltrlang, lang);
+
             String lang1 = lang.replace("_", "-");
-            lang1 = lang1.replace("en-US", "en");
+            lang1 = lang1.replace("en-US", "en-GB");
+            lang1 = lang1.replace("en_US", "en-GB");
+
+            log.info("Portal language is : '{} - {}'", lang, lang1);
 
             try {
                 EvidenceUtils.createEvidenceREMNRO(classCode.toString(),

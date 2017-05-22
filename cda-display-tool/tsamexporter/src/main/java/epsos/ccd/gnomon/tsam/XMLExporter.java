@@ -139,7 +139,7 @@ public class XMLExporter {
                                             append(cs_name_nopaces).
                                             append("Entry oid='").append(oid).append("'").
                                             append(" epsosName='").append(epsosName).append("'").
-                                            append(" code='").append(code).append("'").
+                                            append(" code='").append(StringUtils.replace(code, "'", "''")).append("'").
                                             append(">\r\n");
 
                                     sb.append("<displayName").append(" lang='").append(lang_code).append("'>").
