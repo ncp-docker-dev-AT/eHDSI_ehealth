@@ -58,7 +58,8 @@ public class QueryPersonPage extends BasePage {
     private DefaultDataTable<Person> datatablePersonList;
 
     private ModalWindow personInfoModalWindow;
-    private List<PatientIdVO> patientIdVOList = new ArrayList<>();
+    // The implementation relies on this being null (except in unit tests)
+    private List<PatientIdVO> patientIdVOList = null;
 
     public QueryPersonPage() {
 
@@ -220,11 +221,13 @@ public class QueryPersonPage extends BasePage {
      */
     protected List<PatientIdVO> getPatientVOList(CountryVO selectedCountry) {
 
-        if (this.patientIdVOList == null) {
+    	if (this.patientIdVOList == null) {
+    		// When not in unit tests. It is correct that this is NOT assigned to this.patientIdVOList!
             return CountryConfigManager.getPatientIdentifiers(selectedCountry);
-        } else {
+    	} else {
+    		// Only in unit tests
             return this.patientIdVOList;
-        }
+    	}
     }
 
     public class QueryPersonForm extends Form<QueryPerson> {
