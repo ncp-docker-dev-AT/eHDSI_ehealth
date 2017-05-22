@@ -2,20 +2,20 @@ package eu.epsos.epsosxcawsclient;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.exceptions.XCAException;
-import org.junit.Ignore;
-import org.opensaml.saml2.core.Assertion;
-
-import tr.com.srdc.epsos.data.model.GenericDocumentCode;
-import tr.com.srdc.epsos.data.model.PatientId;
-import tr.com.srdc.epsos.util.Constants;
-import tr.com.srdc.epsos.data.model.xds.QueryResponse;
-import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import eu.epsos.protocolterminators.integrationtest.common.HCPIAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TRCAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
 import eu.epsos.pt.ws.client.xca.XcaInitGateway;
 import eu.epsos.util.IheConstants;
+import org.junit.Ignore;
+import org.opensaml.saml2.core.Assertion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tr.com.srdc.epsos.data.model.GenericDocumentCode;
+import tr.com.srdc.epsos.data.model.PatientId;
+import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
+import tr.com.srdc.epsos.util.Constants;
 
 /**
  * Test class for the XCA Query Service. For a successful run you must set
@@ -26,6 +26,8 @@ import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
 @Ignore
 public class XCAQueryTest {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(XCAQueryTest.class);
+
     //parameters needed to run this test
     private static final String PATIENT_COUNTRY = TestConstants.PATIENT_COUNTRY;
     private static final String PATIENT_ID = TestConstants.PATIENT_ID;
@@ -35,6 +37,12 @@ public class XCAQueryTest {
 
     public XCAQueryTest() {
         TestConstants.checkEnvironmentVariables();
+    }
+
+    public static void main(String[] args) throws XCAException {
+
+        new XCAQueryTest().doQuery();
+        LOGGER.info("+++++++++++++++++++++++ FINISHED! +++++++++++++++++++++++");
     }
 
     public void doQuery() throws XCAException {
@@ -70,19 +78,13 @@ public class XCAQueryTest {
             if (result.getDocumentAssociations() != null) {
                 for (XDSDocumentAssociation documentAssociation : result.getDocumentAssociations()) {
                     if (documentAssociation.getCdaXML() != null) {
-                        System.out.println("documentUniqueId: " + documentAssociation.getCdaXML().getDocumentUniqueId());
+                        LOGGER.info("documentUniqueId: '{}'", documentAssociation.getCdaXML().getDocumentUniqueId());
                     }
                     if (documentAssociation.getCdaPDF() != null) {
-                        System.out.println("documentUniqueId: " + documentAssociation.getCdaPDF().getDocumentUniqueId());
+                        LOGGER.info("documentUniqueId: '{}'", documentAssociation.getCdaPDF().getDocumentUniqueId());
                     }
                 }
             }
         }
-    }
-
-    public static void main(String[] args) throws XCAException {
-
-        new XCAQueryTest().doQuery();
-        System.out.println("+++++++++++++++++++++++ FINISHED! +++++++++++++++++++++++");
     }
 }

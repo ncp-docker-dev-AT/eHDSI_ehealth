@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -24,7 +25,10 @@ import java.io.File;
  */
 public class Validator implements TMConstants {
 
-    private static final Logger log = LoggerFactory.getLogger(Validator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class);
+
+    private Validator() {
+    }
 
     /**
      * Validation against schema
@@ -33,42 +37,43 @@ public class Validator implements TMConstants {
      * @throws Exception
      */
     public static boolean validateToSchema(Document document) {
+
+        LOGGER.debug("method validateToSchema('{}')", document);
         if (TMConfiguration.getInstance().isSchemaValidationEnabled()) {
             // create a SchemaFactory capable of understanding WXS schemas
-            SchemaFactory factory = SchemaFactory
-                    .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
             // load a WXS schema, represented by a Schema instance
             try {
-                Source schemaFile = new StreamSource(new File(TMConfiguration
-                        .getInstance().getSchemaFilePath()));
+                LOGGER.info("XSD Path File: '{}'", TMConfiguration.getInstance().getSchemaFilePath());
+                Source schemaFile = new StreamSource(new File(TMConfiguration.getInstance().getSchemaFilePath()));
                 Schema schema = factory.newSchema(schemaFile);
 
-                // create a Validator instance, which can be used to validate an
-                // instance document
-                javax.xml.validation.Validator validator = schema
-                        .newValidator();
+                // create a Validator instance, which can be used to validate an instance document
+                javax.xml.validation.Validator validator = schema.newValidator();
 
                 // validate the DOM tree
-                log.info("... Schema Validation ");
+                LOGGER.info("... Schema Validation ");
+                LOGGER.debug("DOCUMENT: '{}", XMLUtil.prettyPrint(document));
                 validator.validate(new DOMSource(document));
-                log.info("OK , instance document is valid ");
+                LOGGER.info("OK , instance document is valid ");
                 return true;
             } catch (SAXException e) {
-                log.error("Schema validation error, input document is invalid!", e);
+                LOGGER.error("Schema validation error, input document is invalid!", e);
                 return false;
 
             } catch (Exception e) {
-                log.error("Schema validation error!", e);
+                LOGGER.error("Schema validation error!", e);
                 return false;
             }
         } else {
-            log.info("Schema validation DISABLED");
+            LOGGER.info("Schema validation DISABLED");
             return false;
         }
     }
 
     private static boolean isScanneddoc(String docType) {
+
         if (docType.equals(PATIENT_SUMMARY1) ||
                 docType.equals(EDISPENSATION1) ||
                 docType.equals(EPRESCRIPTION1) ||
@@ -77,7 +82,6 @@ public class Validator implements TMConstants {
 
             return true;
         }
-
         return false;
     }
 
@@ -89,14 +93,15 @@ public class Validator implements TMConstants {
      *                        eDispensation)
      * @param friendly        - if true validate against friendly scheme, else against pivot
      */
-    public static SchematronResult validateSchematron(Document document,
-                                                      String cdaDocumentType, boolean friendly) throws Exception {
-        SchematronResult result = null;
+    public static SchematronResult validateSchematron(Document document, String cdaDocumentType, boolean friendly) throws Exception {
+
+        LOGGER.info("--> method SchematronResult validateSchematron('{}', '{}', '{})", document, cdaDocumentType, friendly);
+        SchematronResult result;
         String schemaPath;
         SchematronValidator schValidator = SchematronValidator.getInstance();
 
         // fix docType for schematron validation. Schematron has special validators
-        // for L1 documents, not taking actuall doc type into account
+        // for L1 documents, not taking actual doc type into account
         if (isScanneddoc(cdaDocumentType)) {
             if (friendly) {
                 cdaDocumentType = SCANNED1;

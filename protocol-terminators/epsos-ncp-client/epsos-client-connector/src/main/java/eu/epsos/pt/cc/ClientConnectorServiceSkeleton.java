@@ -23,22 +23,10 @@ import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.exceptions.XdrException;
-import eu.epsos.pt.cc.dts.axis2.DocumentDts;
-import eu.epsos.pt.cc.dts.axis2.QueryPatientResponseDts;
-import eu.epsos.pt.cc.dts.axis2.RetrieveDocumentResponseDTS;
-import eu.epsos.pt.cc.dts.axis2.SubmitDocumentResponseDts;
-import eu.epsos.pt.cc.dts.axis2.XdsDocumentDts;
-import eu.epsos.pt.cc.stub.ConsentService;
-import eu.epsos.pt.cc.stub.DispensationService;
-import eu.epsos.pt.cc.stub.HcerService;
-import eu.epsos.pt.cc.stub.IdentificationService;
-import eu.epsos.pt.cc.stub.MroService;
-import eu.epsos.pt.cc.stub.OrderService;
-import eu.epsos.pt.cc.stub.PatientService;
+import eu.epsos.pt.cc.dts.axis2.*;
+import eu.epsos.pt.cc.stub.*;
 import eu.epsos.util.IheConstants;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
-import java.text.ParseException;
-import java.util.List;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +36,12 @@ import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.util.Constants;
 
+import java.text.ParseException;
+import java.util.List;
+
 /**
  * ClientConnectorServiceSkeleton java skeleton for the axisService.
- *
+ * <p>
  * This class implements the contact point into the NCP-B, allowing the Portal-B
  * to contact and perform requests in NCP-B.
  *
@@ -67,13 +58,13 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     /*
      * XCPD
      */
+
     /**
      * Performs international search for a patient, filtering by a set of
      * demographics. This method is an adapter for usage of a XCPD client.
      *
      * @param queryPatient axis wrapper for element: <code>queryPatient</code>.
-     * This encapsulates, destination Country Code and Patient's demographics.
-     *
+     *                     This encapsulates, destination Country Code and Patient's demographics.
      * @return a QueryPatientResponseDocument containing the query response(s).
      * @throws ParseException
      */
@@ -126,14 +117,14 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     /*
      * XCA
      */
+
     /**
      * Performs international search for documents. Filtering by patient and
      * document code. This method is an adapter for the usage of a XCA client.
      *
      * @param queryDocuments axis wrapper for * * * * * * *
-     * element: <code>queryDocuments</code>. This encapsulates, destination
-     * Country Code, patient's identification and documents class code.
-     *
+     *                       element: <code>queryDocuments</code>. This encapsulates, destination
+     *                       Country Code, patient's identification and documents class code.
      * @return a QueryDocumentsResponseDocument containing the query
      * response(s).
      */
@@ -203,13 +194,12 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     /**
      * Performs international search for documents. Filtering by patient and
      * document code. This method is an adapter for usage of a XCA client.
-     *
+     * <p>
      * It makes use of the XCA Service Client library.
      *
      * @param retrieveDocument axis wrapper for * * * * * * *
-     * element: <code>retrieveDocument</code>. This encapsulates, destination
-     * Country Code, patient's identification and document's identification.
-     *
+     *                         element: <code>retrieveDocument</code>. This encapsulates, destination
+     *                         Country Code, patient's identification and document's identification.
      * @return the retrieved document.
      */
     @Override
@@ -271,15 +261,16 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     /*
      * XDR
      */
+
     /**
      * Submits a document to a foreign country. This method is an adapter for
      * usage of a XDR client.
-     *
+     * <p>
      * This method makes use of the XDR Service Client library.
      *
      * @param submitDocument axis wrapper for * * * * * * *
-     * element: <code>submitDocument</code>. This encapsulates, destination
-     * Country Code and the document to submit with some Metadata.
+     *                       element: <code>submitDocument</code>. This encapsulates, destination
+     *                       Country Code and the document to submit with some Metadata.
      * @return a SubmitDocumentResponseDocument object.
      * @throws ParseException
      */
@@ -340,12 +331,13 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     /*
      * Auxiliar
      */
+
     /**
      * Greets someone by saying hello. This is an auxiliary operation for
      * diagnosis purposes.
      *
      * @param sayHello axis wrapper for element: <code>sayHello</code>. This
-     * encapsulates a <code>String</code>.
+     *                 encapsulates a <code>String</code>.
      * @return a text in the format: Hello + <code>sayHello</code>.
      */
     @Override

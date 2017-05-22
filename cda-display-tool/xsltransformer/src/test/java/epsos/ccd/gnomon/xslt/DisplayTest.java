@@ -40,7 +40,7 @@ public class DisplayTest {
         try {
             cda = xlsClass.readFile(input);
         } catch (Exception e) {
-            System.out.println("File not found");
+            logger.error("File not found");
         }
         String out = "";
         switch (type) {

@@ -294,6 +294,7 @@ public class TSLUtils {
      * @return a hashtable of the service names and the endpoints
      */
     public static Hashtable getServicesFromTSL(String filename) {
+
         Hashtable serviceNames = new Hashtable();
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -306,7 +307,6 @@ public class TSLUtils {
             doc.getDocumentElement().normalize();
             logger.debug("Root element " + doc.getDocumentElement().getNodeName());
             NodeList nodeLst = doc.getElementsByTagNameNS(TSLNS, "TSPServices");
-            // System.out.println("Information of all services");
 
             for (int s = 0; s < nodeLst.getLength(); s++) {
 

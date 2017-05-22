@@ -89,17 +89,22 @@ public class CDAServlet extends HttpServlet {
             log.info("classCode: '{}", classCode);
 
             String lang;
+            String userLanguage = "";
             String ltrlang = ParamUtil.getString(req, "lang");
             if (Validator.isNull(ltrlang)) {
-                lang = user.getLanguageId();
+                userLanguage = user.getLanguageId();
+                lang = userLanguage;
             } else {
                 lang = ltrlang;
             }
 
-            String lang1 = lang.replace("_", "-");
-            lang1 = lang1.replace("en-US", "en");
+            log.info("User Language: '{}' - Parameter Request Language: '{}' - Translated Language: {}", userLanguage, ltrlang, lang);
 
-            log.info("Portal language is : '{}-{}'", lang, lang1);
+            String lang1 = lang.replace("_", "-");
+            lang1 = lang1.replace("en-US", "en-GB");
+            lang1 = lang1.replace("en_US", "en-GB");
+
+            log.info("Portal language is : '{} - {}'", lang, lang1);
 
 //            try {
 //                EvidenceUtils.createEvidenceREMNRO(classCode.toString(),
@@ -168,12 +173,12 @@ public class CDAServlet extends HttpServlet {
             String convertedcda = "";
             if (isCDA) {
                 log.info("The document is EPSOS CDA");
-                log.info("########### Styling the document that is CDA: '{}' using EPSOS xsl", isCDA);
+                log.info("########### Styling the document that is CDA: '{}' using EPSOS XSLT translated in {}", isCDA, lang1);
                 // display it using cda display tool
                 convertedcda = EpsosHelperService.styleDoc(xmlfile, lang1, false, actionURL);
             } else {
                 log.info(("The document is CCD"));
-                log.info("########### Styling the document that is CDA: '{}' using standard xsl", isCDA);
+                log.info("########### Styling the document that is CDA: '{}' using standard XSLT translated in {} ", isCDA, lang1);
                 convertedcda = EpsosHelperService.styleDoc(xmlfile, lang1, true, "");
             }
 

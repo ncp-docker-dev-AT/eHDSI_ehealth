@@ -2,21 +2,6 @@ package eu.epsos.protocolterminators.integrationtest.common;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.util.IheConstants;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPBodyElement;
-import javax.xml.soap.SOAPConnection;
-import javax.xml.soap.SOAPConnectionFactory;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.soap.SOAPFaultException;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.impl.AssertionMarshaller;
 import org.opensaml.xml.io.MarshallingException;
@@ -26,6 +11,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.FileUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
+
+import javax.xml.soap.*;
+import javax.xml.ws.soap.SOAPFaultException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Test client that uses SAAJ (SOAP with Attachments API for Java) for calling web services. To be used for test
@@ -45,16 +37,68 @@ public class SimpleSoapClient {
      * Instanciate the SimpleSoapClient
      *
      * @param endpoint URL for an NCP-A IHE Service Endpoint (eg.
-     * http://localhost:8090/epsos-ws-server/services/XCA_Service/)
+     *                 http://localhost:8090/epsos-ws-server/services/XCA_Service/)
      */
     public SimpleSoapClient(String endpoint) {
         this.endpoint = endpoint;
     }
 
     /**
+     * Main class for testing & development purposes
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+
+        // load SOAP body content from file system
+        String bodyStr = new ResourceLoader().getResource("/xca/AdhocQueryRequest.xml");
+        LOG.error(bodyStr);
+        Document doc = null;
+        try {
+            doc = XMLUtil.parseContent(bodyStr.getBytes(FileUtil.UTF_8));
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            e.printStackTrace();
+        }
+
+        // build list of SAML2 assertions
+        Assertion idAssertion = new HCPIAssertionCreator().createHCPIAssertion(XSPARole.PHYSICIAN);
+        Assertion trcAssertion = new TRCAssertionCreator().createTRCAssertion("", "");
+        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        assertions.add(idAssertion);
+        assertions.add(trcAssertion);
+
+        // send soap request
+        SimpleSoapClient client = new SimpleSoapClient("http://localhost:8080/epsos-ws-server/services/XCA_Service/");
+        SOAPElement response;
+        try {
+            response = client.call(doc, assertions);
+            LOG.info("");
+            LOG.info(response.getValue());
+
+        } catch (SOAPFaultException ex) {
+            LOG.error(ex.getLocalizedMessage());
+        }
+    }
+
+    /**
+     * Convert any SOAP object that implements SOAPMessage into a String
+     *
+     * @param msg SOAP object
+     * @return String
+     * @throws SOAPException
+     * @throws IOException
+     */
+    private static String getXmlFromSOAPMessage(SOAPMessage msg) throws SOAPException, IOException {
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+        msg.writeTo(byteArrayOS);
+        return new String(byteArrayOS.toByteArray());
+    }
+
+    /**
      * Construct a SOAP message and send to web service endpoint.
      *
-     * @param document An XML document with the contents of the SOAP Body
+     * @param document   An XML document with the contents of the SOAP Body
      * @param assertions List of SAML2 assertions to be included in the SOAP Header
      * @return SOAPElement
      */
@@ -93,7 +137,7 @@ public class SimpleSoapClient {
 
             /* If error present */
             if (responseBody.getFault() != null) {
-            	LOG.info(LINE_SEPARATOR + getXmlFromSOAPMessage(response));
+                LOG.info(LINE_SEPARATOR + getXmlFromSOAPMessage(response));
                 throw new SOAPFaultException(responseBody.getFault());
             }
 
@@ -106,57 +150,5 @@ public class SimpleSoapClient {
         }
 
         return returnElement;
-    }
-
-    /**
-     * Main class for testing & development purposes
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-
-        // load SOAP body content from file system
-        String bodyStr = new ResourceLoader().getResource("/xca/AdhocQueryRequest.xml");
-        System.out.println(bodyStr);
-        Document doc = null;
-        try {
-            doc = XMLUtil.parseContent(bodyStr.getBytes(FileUtil.UTF_8));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        }
-
-        // build list of SAML2 assertions
-        Assertion idAssertion = new HCPIAssertionCreator().createHCPIAssertion(XSPARole.PHYSICIAN);
-        Assertion trcAssertion = new TRCAssertionCreator().createTRCAssertion("","");
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
-        assertions.add(idAssertion);
-        assertions.add(trcAssertion);
-
-        // send soap request
-        SimpleSoapClient client = new SimpleSoapClient("http://localhost:8080/epsos-ws-server/services/XCA_Service/");
-        SOAPElement response;
-        try {
-            response = client.call(doc, assertions);
-            System.out.println("");
-            System.out.println(response.getValue());
-            
-        } catch (SOAPFaultException ex) {
-            System.out.println(ex.getLocalizedMessage());
-        }
-    }
-
-    /**
-     * Convert any SOAP object that implements SOAPMessage into a String
-     *
-     * @param msg SOAP object
-     * @return String
-     * @throws SOAPException
-     * @throws IOException
-     */
-    private static String getXmlFromSOAPMessage(SOAPMessage msg) throws SOAPException, IOException {
-        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
-        msg.writeTo(byteArrayOS);
-        return new String(byteArrayOS.toByteArray());
     }
 }

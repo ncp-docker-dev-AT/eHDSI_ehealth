@@ -26,6 +26,6 @@ public interface SearchCriteria {
 	String getCriteriaValue(Criteria c);
 	
 	Iterator<Criteria> getSearchCriteriaKeys();
-        
+
         Document asXml();
 }

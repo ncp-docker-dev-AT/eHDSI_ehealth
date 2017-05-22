@@ -121,63 +121,6 @@ public class TransformatorUI extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             logger.error("UnsupportedLookAndFeelException: '{}'", ex.getMessage(), ex);
         }
-        //</editor-fold>
-//        try {
-//            Source xslt = new StreamSource(new File("src/resources/tsl2smp.xsl"));
-//            StringWriter writer = new StringWriter();
-//            StreamResult sr = new StreamResult(writer);
-//            TransformerFactory tf = TransformerFactory.newInstance();
-//            Transformer transformer = tf.newTransformer();
-//            transformer.transform(xslt, sr);
-//            System.out.println(writer.toString());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        //</editor-fold>
-//        try {
-//            Source xslt = new StreamSource(new File("src/resources/tsl2smp.xsl"));
-//            StringWriter writer = new StringWriter();
-//            StreamResult sr = new StreamResult(writer);
-//            TransformerFactory tf = TransformerFactory.newInstance();
-//            Transformer transformer = tf.newTransformer();
-//            transformer.transform(xslt, sr);
-//            System.out.println(writer.toString());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-        /* TEST -- works with Saxon HE 9.5.1.7 */
-//        try {
-//            TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
-//            Source xslt = new StreamSource(new File("src/resources/teste.xsl"));
-//            Transformer transformer = factory.newTransformer(xslt);
-//
-//            Source text = new StreamSource(new File("src/resources/teste.xml"));
-//            transformer.transform(text, new StreamResult(new File("output.xml")));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-        /* TEST PARAMETERS */
-
-//         try {
-//            TransformerFactory factory = new net.sf.saxon.TransformerFactoryImpl();
-//            Source xslt = new StreamSource(new File("src/resources/parameters.xsl"));
-//            Transformer transformer = factory.newTransformer(xslt);
-//            transformer.setParameter("ism",new StreamSource(new File(ismFile)));
-//            Source text = new StreamSource("output.xml");
-//            transformer.transform(text, null);
-//
-//
-//
-//        } catch (TransformerException e) {
-//            System.out.println(e.getMessage());
-//        }
-
-//        System.out.println("begin load");
-        // works
-//        InputStream is = TransformatorUI.class.getResourceAsStream("/resources/tsl2smp.xsl");
-//        System.out.println(getStringFromInputStream(is));
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {

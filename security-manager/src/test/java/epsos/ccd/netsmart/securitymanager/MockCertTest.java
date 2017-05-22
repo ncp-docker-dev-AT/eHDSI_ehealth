@@ -94,7 +94,6 @@ public class MockCertTest {
 
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
-    //
     @Ignore
     @Test
     public void TianiCertTest() throws IOException {
@@ -138,7 +137,7 @@ public class MockCertTest {
             if (ku == null) {
                 fail("Key Usage not Present");
             }
-            System.out.println(ku);
+            LOG.info("Key Usage: '{}'", ku);
             CertificateValidator cv = new CertificateValidator(ksm.getTrustStore());
             cv.validateCertificate(cert);
         } catch (SMgrException ex) {
@@ -159,7 +158,7 @@ public class MockCertTest {
             if (ku == null) {
                 fail("Key Usage not Present");
             }
-            System.out.println(ku);
+            LOG.info("Key Usage: '{}'", ku);
             CertificateValidator cv = new CertificateValidator(ksm.getTrustStore());
             cv.validateCertificate(cert);
         } catch (SMgrException ex) {
@@ -181,7 +180,7 @@ public class MockCertTest {
             CertificateValidator cv = new CertificateValidator(ksm.getTrustStore());
             cv.validateCertificate(cert);
 
-            System.out.println(ku);
+            LOG.info("Key Usage: '{}'", ku);
         } catch (SMgrException ex) {
             LOG.error(null, ex);
             fail(ex.getMessage());

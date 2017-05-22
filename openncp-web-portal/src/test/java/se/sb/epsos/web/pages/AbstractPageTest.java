@@ -36,7 +36,7 @@ import static org.mockito.Mockito.*;
 public abstract class AbstractPageTest {
 
     protected WicketTester tester;
-    protected Map<String, String> epsosErrorCodesAndExpectedTexts = new HashMap<String, String>();
+    protected Map<String, String> epsosErrorCodesAndExpectedTexts = new HashMap<>();
     protected MockSettings settings = withSettings().serializable();
     Localizer localizer;
     @Autowired

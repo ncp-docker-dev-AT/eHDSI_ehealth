@@ -64,9 +64,6 @@ public class CertificatePathTest {
 
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
-    //
-    // @Test
-    // public void hello() {}
 
     @Test
     public void TianiCertPathTest() {
@@ -80,7 +77,7 @@ public class CertificatePathTest {
             Certificate cert = ks.getCertificate("server1");
             X509CertSelector target = new X509CertSelector();
             target.setCertificate((X509Certificate) cert);
-            System.out.println(cert);
+            logger.info("Certificate: '{}'", cert);
             PKIXBuilderParameters builderParams = new PKIXBuilderParameters(
                     ksm.getTrustStore(), target);
             builderParams.setRevocationEnabled(false);
@@ -92,14 +89,12 @@ public class CertificatePathTest {
             CertPath cp = build.getCertPath();
 
             List<? extends Certificate> certs = cp.getCertificates();
-            System.out
-                    .println("--------------------------- Certificates as built ----------------------------");
+            logger.info("--------------------------- Certificates as built ----------------------------");
             for (Certificate crt : certs) {
-                System.out.println(crt);
+                logger.info("Certificate: '{}'", crt);
             }
 
-            System.out
-                    .println("--------------------------- END ----------------------------------------------");
+            logger.info("--------------------------- END ----------------------------------------------");
 
             CertPathValidator cpv = CertPathValidator.getInstance("PKIX");
             PKIXParameters params = new PKIXParameters(ksm.getTrustStore());
@@ -107,7 +102,7 @@ public class CertificatePathTest {
 
             PKIXCertPathValidatorResult validationResult = (PKIXCertPathValidatorResult) cpv
                     .validate(cp, params);
-            System.out.println(validationResult);
+            logger.info("PKIXCertPathValidatorResult: '{}'", validationResult);
 
         } catch (CertPathBuilderException ex) {
             logger.error(null, ex);
@@ -152,7 +147,7 @@ public class CertificatePathTest {
             // print each certificate in the path
             List<? extends Certificate> certs = cp.getCertificates();
             for (Certificate cert : certs) {
-                System.out.println(cert);
+                logger.info("Certificate: '{}'", cert);
             }
 
             CertPathValidator cpv = CertPathValidator.getInstance("PKIX");
@@ -165,7 +160,7 @@ public class CertificatePathTest {
 
             PKIXCertPathValidatorResult validationResult = (PKIXCertPathValidatorResult) cpv
                     .validate(cp, params);
-            System.out.println(validationResult);
+            logger.info("PKIXCertPathValidatorResult: '{}'", validationResult);
 
         } catch (CRLException ex) {
             logger.error(null, ex);
@@ -211,7 +206,7 @@ public class CertificatePathTest {
             // print each certificate in the path
             List<? extends Certificate> certs = cp.getCertificates();
             for (Certificate cert : certs) {
-                System.out.println(cert);
+                logger.info("Certificate: '{}'", cert);
             }
 
             CertPathValidator cpv = CertPathValidator.getInstance("PKIX");
@@ -224,7 +219,7 @@ public class CertificatePathTest {
 
             PKIXCertPathValidatorResult validationResult = (PKIXCertPathValidatorResult) cpv
                     .validate(cp, params);
-            System.out.println(validationResult);
+            logger.info("PKIXCertPathValidatorResult: '{}'", validationResult);
 
         } catch (CRLException ex) {
             logger.error(null, ex);

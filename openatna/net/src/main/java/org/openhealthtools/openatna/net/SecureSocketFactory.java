@@ -194,9 +194,9 @@ public class SecureSocketFactory {//implements SecureProtocolSocketFactory {
         // Useful debugging information:
         //secureSocket.setSoTimeout(1000);
         //String[] strings = secureSocket.getSupportedCipherSuites();
-        //for (String s: strings) System.out.println(s);
+        //for (String s: strings) log.info(s);
         //strings = secureSocket.getEnabledCipherSuites();
-        //for (String s: strings) System.out.println(s);
+        //for (String s: strings) log.info(s);
     }
 
     public String[] getAtnaCipherSuites() {

@@ -71,13 +71,13 @@ public class AuditTrailUtilsTest {
             // Close the output stream
             out.close();
         } catch (Exception e) {// Catch exception if any
-            System.err.println("Error: " + e.getMessage());
+            logger.error("Error: {}", e.getMessage(), e);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosPACService() {
-        System.out.println("########## createAuditMessage for PAC");
+        logger.info("########## createAuditMessage for PAC");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -114,7 +114,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosConsentServicePin() {
-        System.out.println("########### createAuditMessage for Consent Service PIN");
+        logger.info("########### createAuditMessage for Consent Service PIN");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -144,7 +144,7 @@ public class AuditTrailUtilsTest {
 
     // @Test
     // public void testCreateAuditMessage_epsosCommunicationFailure() {
-    // System.out.println("createAuditMessage for comm failure");
+    // logger.info("createAuditMessage for comm failure");
     // //
     // AuditService asd = new AuditService();
     // GregorianCalendar c = new GregorianCalendar();
@@ -188,7 +188,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosIdentificationServiceFindIdentityByTraits() {
-        System.out.println("######## createAuditMessage XCPD");
+        logger.info("######## createAuditMessage XCPD");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -222,7 +222,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosPatientService() {
-        System.out.println("########## createAuditMessage for patient list");
+        logger.info("########## createAuditMessage for patient list");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -259,7 +259,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosOrderService() {
-        System.out.println("########## createAuditMessage for Order Service");
+        logger.info("########## createAuditMessage for Order Service");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -295,7 +295,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosDispensationServiceInit() {
-        System.out.println("########## createAuditMessage for Dispensation Service Initialize");
+        logger.info("########## createAuditMessage for Dispensation Service Initialize");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -331,7 +331,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosDispensationServiceDiscard() {
-        System.out.println("########## createAuditMessage for Dispensation Service Discard");
+        logger.info("########## createAuditMessage for Dispensation Service Discard");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -366,7 +366,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosConsentServicePut() {
-        System.out.println("########## createAuditMessage for Consent Service Put");
+        logger.info("########## createAuditMessage for Consent Service Put");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -401,7 +401,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosConsentServiceDiscard() {
-        System.out.println("########## createAuditMessage for Consent Service Discard");
+        logger.info("########## createAuditMessage for Consent Service Discard");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -437,7 +437,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosHCPIdentity() {
-        System.out.println("########## createAuditMessage for HCP Identity");
+        logger.info("########## createAuditMessage for HCP Identity");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -475,7 +475,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosTRCA() {
-        System.out.println("########## createAuditMessage for TRCA");
+        logger.info("########## createAuditMessage for TRCA");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -513,7 +513,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosNCPTrustedServiceList() {
-        System.out.println("########## createAuditMessage for NCPTrustedServiceList");
+        logger.info("########## createAuditMessage for NCPTrustedServiceList");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -549,7 +549,7 @@ public class AuditTrailUtilsTest {
 
     @Test
     public void testCreateAuditMessage_epsosPivotTranslation() {
-        System.out.println("########## createAuditMessage for PivotTranslation");
+        logger.info("########## createAuditMessage for PivotTranslation");
         //
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();

@@ -20,6 +20,8 @@ import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -29,6 +31,8 @@ import static org.junit.Assert.assertNotNull;
  * @author Jerry Dimitriou <jerouris at netsmart.gr>
  */
 public class ConfigManTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigManTest.class);
 
     ConfigurationManagerService configurationManagerService = ConfigurationManagerService.getInstance();
 
@@ -63,10 +67,10 @@ public class ConfigManTest {
 
         // Constants Initialization
         String KEYSTORE_LOCATION = configurationManagerService.getProperty("NCP_SIG_KEYSTORE_PATH");
-        System.out.println("Keystore Location: " + KEYSTORE_LOCATION);
+        LOGGER.info("Keystore Location: '{}'", KEYSTORE_LOCATION);
 
         String TRUSTSTORE_LOCATION = configurationManagerService.getProperty("TRUSTSTORE_PATH");
-        System.out.println("Truststore Location:" + TRUSTSTORE_LOCATION);
+        LOGGER.info("Truststore Location: '{}'", TRUSTSTORE_LOCATION);
 
         String KEYSTORE_PASSWORD = configurationManagerService.getProperty("NCP_SIG_KEYSTORE_PASSWORD");
         String TRUSTSTORE_PASSWORD = configurationManagerService.getProperty("TRUSTSTORE_PASSWORD");

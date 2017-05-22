@@ -20,19 +20,21 @@
 
 package eu.epsos.protocolterminators.integrationtest.cda;
 
-import java.text.ParseException;
-import java.util.Iterator;
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;
+
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.text.ParseException;
+import java.util.Iterator;
 
 /**
  * This class gathers several utilities methods used in the Integration testing process.
@@ -41,13 +43,13 @@ import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class CdaUtils {
-    
-    public static Logger logger = LoggerFactory.getLogger(CdaUtils.class);
-    
+
+    private final static Logger logger = LoggerFactory.getLogger(CdaUtils.class);
+
     private static NamespaceContext hl7 = new NamespaceContext() {
         public String getNamespaceURI(String prefix) {
             String uri;
-            if (prefix.equals("hl7")) {
+            if (StringUtils.equals(prefix, "hl7")) {
                 uri = "urn:hl7-org:v3";
             } else {
                 uri = null;
@@ -63,7 +65,10 @@ public class CdaUtils {
             return null;
         }
     };
-    
+
+    private CdaUtils() {
+    }
+
     /**
      * Returns PatientDemographics information from a CDA document
      *
@@ -81,8 +86,7 @@ public class CdaUtils {
             String extension = xPath.evaluate("/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:id/@extension", doc);
             pd.setId(extension);
         } catch (XPathExpressionException e) {
-            // TODO Auto-generated catch block
-            logger.warn("Could not find patient's id in the CDA document");
+            logger.warn("Could not find patient's id in the CDA document: '{}'", e.getMessage(), e);
         }
 
         try {
@@ -99,7 +103,7 @@ public class CdaUtils {
                 }
             }
         } catch (XPathExpressionException e) {
-            logger.warn("Could not find patient's given name in the CDA document");
+            logger.warn("Could not find patient's given name in the CDA document: '{}'", e.getMessage(), e);
         }
 
         try {
@@ -112,19 +116,19 @@ public class CdaUtils {
                 }
             }
         } catch (XPathExpressionException e) {
-            logger.warn("Could not find patient's family name in the CDA document");
+            logger.warn("Could not find patient's family name in the CDA document: '{}'", e.getMessage(), e);
         }
 
 
         try {
             String administrativeGenderCode = xPath.evaluate("/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:administrativeGenderCode/@code", doc);
-            pd.setAdministrativeGender( Gender.parseGender( administrativeGenderCode ));
+            pd.setAdministrativeGender(Gender.parseGender(administrativeGenderCode));
         } catch (XPathExpressionException e) {
-            logger.warn("Could not find patient's administrative gender code in the CDA document");
-        } catch(ParseException pe) {
-        	logger.error("Error parsing patient administrative gender code.");
+            logger.warn("Could not find patient's administrative gender code in the CDA document: '{}'", e.getMessage(), e);
+        } catch (ParseException pe) {
+            logger.error("Error parsing patient administrative gender code.");
         }
 
         return pd;
     }
- }
+}

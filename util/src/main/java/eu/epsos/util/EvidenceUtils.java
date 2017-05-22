@@ -122,7 +122,7 @@ public class EvidenceUtils {
          * Instantiate the message inspector, to see which type of message is
          */
         MessageType messageType = null;
-//        String msguuid = "";
+        //        String msguuid = "";
         try {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);
             messageType = messageInspector.getMessageType();
@@ -382,9 +382,7 @@ public class EvidenceUtils {
         List<ObligationHandler> handlers = handlerFactory.createHandler(
                 messageType, obligations, context);
 
-        // Here I discharge manually. This behavior is to let free an
-        // implementation
-
+        // Here I discharge manually. This behavior is to let free an implementation
         for (ObligationHandler handler : handlers) {
             handler.discharge();
             //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.

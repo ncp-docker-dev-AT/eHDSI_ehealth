@@ -23,39 +23,27 @@
  */
 package epsos.openncp.protocolterminator.test;
 
-import epsos.openncp.protocolterminator.*;
-import epsos.openncp.protocolterminator.clientconnector.DocumentId;
-import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
-import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
-import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
-import epsos.openncp.protocolterminator.clientconnector.PatientId;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocumentRequest;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocuments;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocumentsDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocumentsResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryPatientDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryPatientRequest;
-import epsos.openncp.protocolterminator.clientconnector.QueryPatientResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocument1;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocumentDocument1;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocumentRequest;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocumentResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.SayHelloDocument;
-import epsos.openncp.protocolterminator.clientconnector.SayHelloResponseDocument;
+import epsos.openncp.protocolterminator.HCPIAssertionCreator;
+import epsos.openncp.protocolterminator.TRCAssertionCreator;
+import epsos.openncp.protocolterminator.clientconnector.*;
 import epsos.openncp.pt.client.ClientConnectorServiceServiceStub;
-import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axis2.util.XMLUtils;
 import org.opensaml.saml2.core.Assertion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.namespace.QName;
 
 /*
  *  ClientConnectorServiceServiceTest Junit test case
  */
 public class TestClientConnectorService {
 
-    public static final String EPR = "http://localhost:8080/epsos-client-connector/services/ClientConnectorService";
+    private static final String EPR = "http://localhost:8080/epsos-client-connector/services/ClientConnectorService";
+    private static Logger logger = LoggerFactory.getLogger(TestClientConnectorService.class);
 
     public static void main(String[] args) throws Exception {
 
@@ -102,11 +90,11 @@ public class TestClientConnectorService {
             for (EpsosDocument1 doc : docArray) {
                 String classCode2 = doc.getClassCode().getNodeRepresentation();
                 String formatCode = doc.getFormatCode().getNodeRepresentation();
-                System.out.println("___ Document: " + doc.getUuid() + " : " + classCode2 + " : " + formatCode + " : "
-                                   + doc.getTitle() + " : " + doc.getDescription());
+                logger.info("___ Document: " + doc.getUuid() + " : " + classCode2 + " : " + formatCode + " : "
+                        + doc.getTitle() + " : " + doc.getDescription());
             }
         } else {
-            System.out.println("___ No documents found");
+            logger.info("___ No documents found");
         }
 
 
@@ -155,14 +143,14 @@ public class TestClientConnectorService {
         if (pdArray != null && pdArray.length != 0) {
             for (PatientDemographics pd1 : pdArray) {
                 PatientId patientId1 = pd1.getPatientIdArray(0);
-                System.out.println("Patient found: " + patientId1.getRoot() + " : " + patientId1.getExtension()
-                                   + " : " + pd1.getGivenName() + " " + pd1.getFamilyName() + " : "
-                                   + pd1.getAdministrativeGender() + " : "
-                                   + pd1.getCity() + ", " + pd1.getCountry());
+                logger.info("Patient found: " + patientId1.getRoot() + " : " + patientId1.getExtension()
+                        + " : " + pd1.getGivenName() + " " + pd1.getFamilyName() + " : "
+                        + pd1.getAdministrativeGender() + " : "
+                        + pd1.getCity() + ", " + pd1.getCountry());
             }
 
         } else {
-            System.out.println("___ Patient not found!");
+            logger.info("___ Patient not found!");
         }
 
 
@@ -184,7 +172,7 @@ public class TestClientConnectorService {
 
         SayHelloResponseDocument sayHelloResponseDocument = stub.sayHello(sayHelloDocument);
         String sayHelloResponse = sayHelloResponseDocument.getSayHelloResponse().getReturn();
-        System.out.println("___ sayHello response:" + sayHelloResponse);
+        logger.info("___ sayHello response:" + sayHelloResponse);
 
     }
 
@@ -216,10 +204,10 @@ public class TestClientConnectorService {
 
         String classCode = doc.getClassCode().getNodeRepresentation();
         String formatCode = doc.getFormatCode().getNodeRepresentation();
-        System.out.println("___ Document: " + doc.getUuid() + " : " + classCode + " : " + formatCode + " : "
-                           + doc.getTitle() + " : " + doc.getDescription());
+        logger.info("___ Document: " + doc.getUuid() + " : " + classCode + " : " + formatCode + " : "
+                + doc.getTitle() + " : " + doc.getDescription());
         String CDA = new String(doc.getBase64Binary(), "UTF-8");
-        System.out.println(CDA);
+        logger.info(CDA);
     }
 
     /**
@@ -228,7 +216,7 @@ public class TestClientConnectorService {
     public static void testsubmitDocument() throws java.lang.Exception {
 
         ClientConnectorServiceServiceStub stub =
-                                          new ClientConnectorServiceServiceStub();//the default implementation should point to the right endpoint
+                new ClientConnectorServiceServiceStub();//the default implementation should point to the right endpoint
 
 //		epsos.openncp.protocolterminator.clientconnector.SubmitDocumentDocument1 submitDocument18=
 //				(epsos.openncp.protocolterminator.clientconnector.SubmitDocumentDocument1)getTestObject(epsos.openncp.protocolterminator.clientconnector.SubmitDocumentDocument1.class);
@@ -236,8 +224,6 @@ public class TestClientConnectorService {
 
 //		assertNotNull(stub.submitDocument(
 //				submitDocument18));
-
-
 
 
     }
