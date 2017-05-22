@@ -2,47 +2,47 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="epsos.ccd.posam.tsam.model.CodeSystemVersion" table="CODE_SYSTEM_VERSION">
+    <class name="epsos.ccd.posam.tsam.model.CodeSystemVersion" table="code_system_version">
         <cache usage="read-only"/>
         <id name="id" type="long">
-            <column name="ID"/>
+            <column name="id"/>
             <generator class="assigned"/>
         </id>
         <property name="fullName" type="java.lang.String">
-            <column name="FULL_NAME"/>
+            <column name="full_name"/>
         </property>
         <property name="localName" type="java.lang.String">
-            <column name="LOCAL_NAME"/>
+            <column name="local_name"/>
         </property>
         <property name="effectiveDate" type="java.util.Date">
-            <column name="EFFECTIVE_DATE"/>
+            <column name="effective_date"/>
         </property>
         <property name="releaseDate" type="java.util.Date">
-            <column name="RELEASE_DATE"/>
+            <column name="release_date"/>
         </property>
         <property name="status" type="java.lang.String">
-            <column name="STATUS"/>
+            <column name="status"/>
         </property>
         <property name="statusDate" type="java.util.Date">
-            <column name="STATUS_DATE"/>
+            <column name="status_date"/>
         </property>
         <property name="description" type="java.lang.String">
-            <column name="DESCRIPTION"/>
+            <column name="description"/>
         </property>
         <property name="copyright" type="java.lang.String">
-            <column name="COPYRIGHT"/>
+            <column name="copyright"/>
         </property>
         <property name="source" type="java.lang.String">
-            <column name="SOURCE"/>
+            <column name="source"/>
         </property>
         <many-to-one name="previousVersion" class="epsos.ccd.posam.tsam.model.CodeSystemVersion" lazy="proxy">
-            <column name="PREVIOUS_VERSION_ID"></column>
+            <column name="previous_version_id"></column>
         </many-to-one>
         <many-to-one name="codeSystem" class="epsos.ccd.posam.tsam.model.CodeSystem" foreign-key="FK_CODE_SYSTEM_ID">
-            <column name="CODE_SYSTEM_ID"/>
+            <column name="code_system_id"/>
         </many-to-one>
-        <bag name="concepts" table="CODE_SYSTEM_CONCEPT">
-            <key column="CODE_SYSTEM_VERSION_ID"/>
+        <bag name="concepts" table="code_system_concept">
+            <key column="code_system_version_id"/>
             <one-to-many class="epsos.ccd.posam.tsam.model.CodeSystemConcept"/>
         </bag>
     </class>

@@ -2,25 +2,25 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="epsos.ccd.posam.tsam.model.TranscodingAssociation" table="TRANSCODING_ASSOCIATION">
+    <class name="epsos.ccd.posam.tsam.model.TranscodingAssociation" table="transcoding_association">
         <id name="id" type="long">
-            <column name="ID"/>
+            <column name="id"/>
             <generator class="assigned"/>
         </id>
         <many-to-one name="targedConcept" class="epsos.ccd.posam.tsam.model.CodeSystemConcept" fetch="join">
-            <column name="TARGET_CONCEPT_ID"/>
+            <column name="target_concept_id"/>
         </many-to-one>
         <many-to-one name="sourceConcept" class="epsos.ccd.posam.tsam.model.CodeSystemConcept" fetch="join">
-            <column name="SOURCE_CONCEPT_ID"/>
+            <column name="source_concept_id"/>
         </many-to-one>
         <property name="quality" type="java.lang.String">
-            <column name="QUALITY"/>
+            <column name="quality"/>
         </property>
         <property name="status" type="java.lang.String">
-            <column name="STATUS"/>
+            <column name="status"/>
         </property>
         <property name="statusDate" type="java.util.Date">
-            <column name="STATUS_DATE"/>
+            <column name="status_date"/>
         </property>
     </class>
 </hibernate-mapping>

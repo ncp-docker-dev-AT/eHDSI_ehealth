@@ -6,7 +6,7 @@
     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.3"/>
     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.1"/>
     <id extension="1001" root="2.16.620.1.101.10.3.29.54259"/>
-    <code code="60591-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" codeSystemVersion="2.34"
+    <code code="60591-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" codeSystemVersion="2.59"
           displayName="Patient Summary"/>
     <title>Patient Summary</title>
     <effectiveTime value="20150316135535+0000"/>
@@ -167,7 +167,7 @@
                     <templateId root="2.16.840.1.113883.10.20.1.2"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.13"/>
                     <code code="48765-2" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
-                          codeSystemVersion="2.34" displayName="Allergies, adverse reactions, alerts"/>
+                          codeSystemVersion="2.59" displayName="Allergies, adverse reactions, alerts"/>
                     <title>Allergies, adverse reactions, alerts</title>
                     <text>
                         <content ID="noallergy">No known allergies.</content>
@@ -194,7 +194,7 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <id root="af58c270-6f80-477a-ab05-47bcffbc62f7"/>
                                     <code code="419199007" codeSystem="2.16.840.1.113883.6.96"
-                                          codeSystemName="SNOMED CT" codeSystemVersion="July 2009"
+                                          codeSystemName="SNOMED CT" codeSystemVersion="July 2016"
                                           displayName="Allergy to substance"/>
                                     <text>
                                         <reference value="#noallergy"/>
@@ -204,7 +204,7 @@
                                         <low nullFlavor="UNK"/>
                                     </effectiveTime>
                                     <value code="160244002" codeSystem="2.16.840.1.113883.6.96"
-                                           codeSystemName="SNOMED CT" codeSystemVersion="July 2009"
+                                           codeSystemName="SNOMED CT" codeSystemVersion="July 2016"
                                            displayName="No known allergies" xsi:type="CD"/>
                                     <participant nullFlavor="NA" typeCode="CSM">
                                         <participantRole classCode="MANU">
@@ -224,7 +224,7 @@
                     <templateId root="2.16.840.1.113883.10.20.1.8"/>
                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.3"/>
                     <code code="10160-0" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
-                          codeSystemVersion="2.34" displayName="History of medication use"/>
+                          codeSystemVersion="2.59" displayName="History of medication use"/>
                     <title>History of medical device use</title>
                     <text>
                         <content ID="nomedicationdescription">No known drug allergies</content>
@@ -237,7 +237,7 @@
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
                             <id root="ee9f61cb-5b8c-4f73-8ddc-e802cf5a44e8"/>
                             <code code="182904002" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
-                                  codeSystemVersion="July 2009" displayName="Drug treatment unknown">
+                                  codeSystemVersion="July 2016" displayName="Drug treatment unknown">
                                 <originalText>
                                     <reference value="#nomedicationdescription"/>
                                 </originalText>
@@ -279,7 +279,7 @@
                     <templateId root="2.16.840.1.113883.10.20.1.11"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.6"/>
                     <code code="11450-4" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
-                          codeSystemVersion="2.34" displayName="Problem list">
+                          codeSystemVersion="2.59" displayName="Problem list">
                         <translation displayName="Lista de problemas activos"/>
                     </code>
                     <title>Problem list</title>
@@ -312,7 +312,7 @@
                                         <high nullFlavor="UNK"/>
                                     </effectiveTime>
                                     <value code="160245001" codeSystem="2.16.840.1.113883.6.96"
-                                           codeSystemName="SNOMED CT" codeSystemVersion="July 2009"
+                                           codeSystemName="SNOMED CT" codeSystemVersion="July 2016"
                                            displayName="No current problems or disability" xsi:type="CD">
                                         <originalText>
                                             <reference value="#actnoproblem"/>
@@ -331,7 +331,7 @@
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.11"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.12"/>
                     <code code="47519-4" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
-                          codeSystemVersion="2.34" displayName="History of Procedures"/>
+                          codeSystemVersion="2.59" displayName="History of Procedures"/>
                     <title>History of Procedures</title>
                     <text>
                         <content ID="surgeries">No medical history.</content>
@@ -353,7 +353,7 @@
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.5.3.5"/>
                     <templateId assigningAuthorityName="epSOS" root="1.3.6.1.4.1.12559.11.10.1.3.1.2.4"/>
                     <code code="46264-8" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
-                          codeSystemVersion="2.34" displayName="History of medical device use"/>
+                          codeSystemVersion="2.59" displayName="History of medical device use"/>
                     <title>History of medical device use</title>
                     <text>
                         <content ID="nomedicalequipment">Medical history unknown</content>
