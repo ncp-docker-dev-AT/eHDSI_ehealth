@@ -45,7 +45,7 @@ public class EvidenceUtils {
     public static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
     public static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
     public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
-    private static Logger logger = LoggerFactory.getLogger(EvidenceUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EvidenceUtils.class);
 
     private EvidenceUtils() {
     }
@@ -74,7 +74,6 @@ public class EvidenceUtils {
             messageType = messageInspector.getMessageType();
             msguuid = messageInspector.getMessageUUID();
         } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingSoap);
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
@@ -119,7 +118,6 @@ public class EvidenceUtils {
             MessageInspector messageInspector = new MessageInspector(incomingSoap);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingSoap);
             messageType = umt;
         }
@@ -190,7 +188,7 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nrr/" + getDocumentTitle(msguuid, title) + ".xml";
             }
-            logger.info("MSGUUID: '{}' NRR TITLE: '{}'", msguuid, title);
+            LOGGER.info("MSGUUID: " + msguuid + " " + "NRR TITLE :" + title);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
     }
@@ -237,7 +235,6 @@ public class EvidenceUtils {
             messageType = messageInspector.getMessageType();
             msguuid = messageInspector.getMessageUUID();
         } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
@@ -261,6 +258,7 @@ public class EvidenceUtils {
         if (StringUtils.equals(status, "0")) {
             statusmsg = "success";
         }
+        LOGGER.info("Incoming SOAP Message: '{}'", incomingSoap);
         Document incomingMsg = XMLUtil.parseContent(incomingSoap);
         PDP simplePDP = SimplePDPFactory.getSimplePDP();
         UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP
@@ -282,25 +280,24 @@ public class EvidenceUtils {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             messageType = umt;
         }
         if (checkCorrectnessofIHEXCA(messageType)) {
-            logger.info("The message type : '{}' is correct", messageType);
+            LOGGER.info("The message type : " + messageType + " is correct");
         }
 
         /*
          * Now create the XACML request
          */
-        LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> actionList = new LinkedList<>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
         action.setIdentifier(new URI("urn:eSENS:outcome"));
         actionList.add(action);
         action.setValue(statusmsg);
 
-        LinkedList<XACMLAttributes> environmentList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
         environment.setDataType(new URI(DATATYPE_DATETIME));
         environment.setIdentifier(new URI("urn:esens:2014:event"));
@@ -361,7 +358,7 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nro/" + getDocumentTitle(msguuid, title) + ".xml";
             }
-            logger.info("MSGUUID: '{}' NRO TITLE: '{}'", msguuid, title);
+            LOGGER.info("MSGUUID: " + msguuid + " " + "NRO TITLE :" + title);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
     }
