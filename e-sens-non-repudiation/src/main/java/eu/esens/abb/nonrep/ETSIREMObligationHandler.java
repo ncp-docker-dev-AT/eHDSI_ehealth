@@ -292,11 +292,11 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         // we can avoid to build up the NROT Token as text||z_1||sa(z_1)
         MessageDetailsType mdt = new MessageDetailsType();
         eu.esens.abb.nonrep.etsi.rem.DigestMethod dm = new eu.esens.abb.nonrep.etsi.rem.DigestMethod();
-        dm.setAlgorithm("SHA1");
+        dm.setAlgorithm("SHA256");
         mdt.setDigestMethod(dm);
 
         // do the message digest
-        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.reset();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -352,7 +352,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
         String BaseURI = "./";
         XMLSignature sig = new XMLSignature(doc, BaseURI,
-                org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA);
+                org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256);
         doc.getDocumentElement().appendChild(sig.getElement());
 
         doc.appendChild(doc.createComment(" Comment after "));
