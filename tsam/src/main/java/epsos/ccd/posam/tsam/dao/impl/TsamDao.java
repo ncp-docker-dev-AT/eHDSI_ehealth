@@ -15,7 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Roman Repiscak
@@ -97,9 +100,9 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
 
         designations = filter;
 
-        // sort designations by prefered flag, put preffered on top
+        // sort designations by preferred flag, put preferred on top
         if (designations.size() > 1) {
-            Collections.sort(designations, new Comparator<Designation>() {
+            designations.sort(new Comparator<Designation>() {
                 public int compare(Designation o1, Designation o2) {
                     if (Boolean.TRUE.equals(o1.isPreffered())) {
                         return -1;
@@ -266,8 +269,7 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         long id1;
         long id2;
         int j = 0;
-        for (int i = 0; i < lc.size(); i++) {
-            CodeSystemConcept concept = lc.get(i);
+        for (CodeSystemConcept concept : lc) {
             retrievedConcept = new RetrievedConcept(concept);
             result.add(retrievedConcept);
             id1 = concept.getId();
@@ -296,7 +298,6 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         Criteria crt;
         Iterator<String> iterator;
 
-        //crt = getSession().createCriteria(Designation.class);
         crt = getSessionFactory().getCurrentSession().createCriteria(Designation.class);
         crt.setProjection(Projections.distinct(Projections.property(Designation.AT_LANGUAGE)));
         iterator = crt.list().iterator();
