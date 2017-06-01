@@ -26,11 +26,6 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
  */
 /**
  * XCPD_ServiceMessageReceiverInOut.java
@@ -43,11 +38,8 @@ package _2009.xcpd.iti.ihe;
 import com.spirit.epsos.cc.adc.EadcEntry;
 import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
-import epsos.ccd.gnomon.auditmanager.EventType;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.services.XcpdValidationService;
@@ -55,8 +47,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
@@ -75,9 +65,15 @@ import java.util.UUID;
  */
 public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.AbstractInOutMessageReceiver {
 
-    private final static Logger logger = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
-
+    public static final Logger logger = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
+    //
     private static final javax.xml.bind.JAXBContext wsContext;
+
+    static {
+        logger.debug("Loading the WS-Security init libraries in XCPD_ServiceMessageReceiverInOut xcpd 2009");
+
+        org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
+    }
 
     static {
         javax.xml.bind.JAXBContext jc;
@@ -87,7 +83,9 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
                     org.hl7.v3.PRPAIN201305UV02.class,
                     org.hl7.v3.PRPAIN201306UV02.class);
         } catch (javax.xml.bind.JAXBException ex) {
-            logger.error("Unable to create JAXBContext: '{}'", ex.getMessage(), ex);
+            System.err.println("Unable to create JAXBContext: "
+                    + ex.getMessage());
+            ex.printStackTrace(System.err);
             // Runtime.getRuntime().exit(-1);
         } finally {
             wsContext = jc;
@@ -145,18 +143,19 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
                     .getEnvelope())));
 
             // Send NRR
-            try {
-                EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())),
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        EventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
-                        new DateTime(),
-                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                        "NCPA_XCPD_REQ");
-            } catch (Exception e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
+//            try {
+//                EvidenceUtils.createEvidenceREMNRR(envCanonicalized,
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                        EventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
+//                        new DateTime(),
+//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                        "NCPA_XCPD_REQ");
+//
+//            } catch (Exception e) {
+//                log.error(ExceptionUtils.getStackTrace(e));
+//            }
 
             /* Validate incoming request message */
             XcpdValidationService.getInstance().validateSchematron(
@@ -217,19 +216,19 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
 
                     logger.debug("Outgoing XCPD Response Message:\n"
                             + XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
-
-                    try {
-                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                EventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
-                                new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                "NCPA_XCPD_RES");
-                    } catch (Exception e) {
-                        log.error(ExceptionUtils.getStackTrace(e));
-                    }
+//
+//                    try {
+//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                EventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
+//                                new DateTime(),
+//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                                "NCPA_XCPD_RES");
+//                    } catch (Exception e) {
+//                        log.error(ExceptionUtils.getStackTrace(e));
+//                    }
 
                 } else {
                     throw new java.lang.RuntimeException("method not found");

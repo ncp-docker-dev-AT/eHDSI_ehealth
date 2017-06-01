@@ -22,7 +22,13 @@
  */
 package tr.com.srdc.epsos.ws.server.xdr;
 
-import epsos.ccd.gnomon.auditmanager.*;
+import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
+import epsos.ccd.gnomon.auditmanager.EventActionCode;
+import epsos.ccd.gnomon.auditmanager.EventLog;
+import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
+import epsos.ccd.gnomon.auditmanager.EventType;
+import epsos.ccd.gnomon.auditmanager.IHEEventType;
+import epsos.ccd.gnomon.auditmanager.TransactionName;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import eu.epsos.exceptions.DocumentTransformationException;
@@ -444,13 +450,20 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 try {
                     org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
                     EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.ED_CLASSCODE, domDocument);
-                    // call to NI
+                    // Evidence for call to NI for XDR submit (dispensation)
+                    // Joao: here we have a Document so we can generate the mandatory NRO
                     try {
-                        EvidenceUtils.createEvidenceREMNRO(epsosDocument.toString(),
+                        EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(),
                                 tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
                                 tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
                                 tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                EventType.epsosDispensationServiceInitialize.getCode(),
+                                tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
+                                tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
+                                tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
+                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                                IHEEventType.epsosDispensationServiceInitialize.getCode(),
                                 new DateTime(),
                                 EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                                 "NI_XDR_DISP_REQ",
@@ -459,19 +472,22 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         logger.error(ExceptionUtils.getStackTrace(e));
                     }
                     documentSubmitService.submitDispensation(epsosDocument);
-                    try {
-                        EvidenceUtils.createEvidenceREMNRR(epsosDocument.toString(),
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                EventType.epsosDispensationServiceInitialize.getCode(),
-                                new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                "NI_XDR_DISP_RES",
-                                Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement) + "__" + DateUtil.getCurrentTimeGMT());
-                    } catch (Exception e) {
-                        logger.error(ExceptionUtils.getStackTrace(e));
-                    }
+                    // Evidence for response from NI for XDR submit (dispensation)
+                    /* Joao: the NRR is being generated based on the request message (submitted document). The interface for document submission does not return
+                    any response for the submit service. This NRR is optional as per the CP. Left commented for now. */
+//                    try {
+//                        EvidenceUtils.createEvidenceREMNRR(epsosDocument.toString(),
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                IHEEventType.epsosDispensationServiceInitialize.getCode(),
+//                                new DateTime(),
+//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                                "NI_XDR_DISP_RES",
+//                                Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement) + "__" + DateUtil.getCurrentTimeGMT());
+//                    } catch (Exception e) {
+//                        logger.error(ExceptionUtils.getStackTrace(e));
+//                    }
                 } catch (NIException e) {
                     rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
                 } catch (Exception e) {
@@ -600,13 +616,20 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
                 EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.CONSENT_CLASSCODE, domDocument);
 
-                // call to NI
+                // Evidence for call to NI for XDR submit (patient consent)
+                // Joao: here we have a Document so we can generate the mandatory NRO
                 try {
-                    EvidenceUtils.createEvidenceREMNRO(epsosDocument.toString(),
+                    EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(),
                             tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
                             tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
                             tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosConsentServicePut.getCode(),
+                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
+                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
+                            tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                            IHEEventType.epsosConsentServicePut.getCode(),
                             new DateTime(),
                             EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                             "NI_XDR_CONSENT_REQ",
@@ -616,20 +639,22 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 }
 
                 documentSubmitService.submitPatientConsent(epsosDocument);
-                // call to NI
-                try {
-                    EvidenceUtils.createEvidenceREMNRR(epsosDocument.toString(),
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosConsentServicePut.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            "NI_XDR_CONSENT_RES",
-                            Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement) + "__" + DateUtil.getCurrentTimeGMT());
-                } catch (Exception e) {
-                    logger.error(ExceptionUtils.getStackTrace(e));
-                }
+                // Evidence for response from NI for XDR submit (patient consent)
+                /* Joao: the NRR is being generated based on the request message (submitted document). The interface for document submission does not return
+                    any response for the submit service. This NRR is optional as per the CP. Left commented for now. */
+//                try {
+//                    EvidenceUtils.createEvidenceREMNRR(epsosDocument.toString(),
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                            IHEEventType.epsosConsentServicePut.getCode(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                            "NI_XDR_CONSENT_RES",
+//                            Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement) + "__" + DateUtil.getCurrentTimeGMT());
+//                } catch (Exception e) {
+//                    logger.error(ExceptionUtils.getStackTrace(e));
+//                }
 
             } catch (DocumentProcessingException e) {
                 rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
