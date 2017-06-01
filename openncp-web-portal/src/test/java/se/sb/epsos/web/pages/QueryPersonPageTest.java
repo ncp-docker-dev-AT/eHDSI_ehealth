@@ -13,7 +13,6 @@ package se.sb.epsos.web.pages;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.withSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,6 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 import se.sb.epsos.web.EpsosAuthenticatedWebSession;
 import se.sb.epsos.web.auth.AuthenticatedUser;
@@ -101,27 +99,34 @@ public class QueryPersonPageTest extends AbstractPageTest {
 		assertErrorPanel(errorCode, expectedMessage);
 	}
 
+	public static class TestQueryPersonPage extends QueryPersonPage {
+
+		public TestQueryPersonPage() {
+			super();
+		}
+
+		@Override
+		protected List<PatientIdVO> getPatientVOList(CountryVO selectedCountry) {
+			List<PatientIdVO> patients = new ArrayList<>();
+			PatientIdVO pivo = new PatientIdVO();
+			pivo.setDomain("domain123");
+			pivo.setLabel("label123");
+			pivo.setMax(100);
+			pivo.setMin(1);
+			pivo.setValue("value123");
+			patients.add(pivo);
+			return patients;
+		}
+	}
+
 	// TODO - Fails if order is changed in country-config.xml
 	private void queryPerson() {
-		tester.startPage(QueryPersonPage.class);
-		// Don't know what there is supposed to be as data in the first place,
-		// but this can be used to validate that the right content gets rendered to validate the test result
-		List<PatientIdVO> patients = new ArrayList<>();
-		PatientIdVO pivo = new PatientIdVO();
-		pivo.setDomain("domain123");
-		pivo.setLabel("label123");
-		pivo.setMax(100);
-		pivo.setMin(1);
-		pivo.setValue("value123");
-		patients.add(pivo);
-		QueryPersonPage page = (QueryPersonPage) tester.getLastRenderedPage();
-		page.setPatientVOList(patients);
+		tester.startPage(TestQueryPersonPage.class);
 
-		tester.assertRenderedPage(QueryPersonPage.class);
 		FormTester formTester = tester.newFormTester("form");
 		formTester.select("patientContainer:country", 10);
 		tester.executeAjaxEvent("form:patientContainer:country", "onchange");
-		tester.assertRenderedPage(QueryPersonPage.class);
+		tester.assertRenderedPage(TestQueryPersonPage.class);
 		tester.assertNoErrorMessage();
 		tester.dumpPage();
 		tester.assertNoErrorMessage();
@@ -130,19 +135,20 @@ public class QueryPersonPageTest extends AbstractPageTest {
 		tester.assertComponent("form:patientContainer:patientIds", ListView.class);
 		Component comp = tester.getComponentFromLastRenderedPage("form:patientContainer:patientIds");
 		if (comp instanceof ListView) {
-			TestCase.assertEquals(1, ((ListView) comp).size());
+			TestCase.assertEquals(1, ((ListView<?>) comp).size());
 		} else {
 			TestCase.fail("form:patientContainer:patientIds was not of type ListView");
 		}
-		
+
 		tester.assertComponent("form:patientContainer:patientIds:0:idLabel", Label.class);
 		tester.assertContains("label123");
 		tester.assertComponent("form:patientContainer:patientIds:0:idTextField", TextField.class);
 		tester.assertContains("value123");
-		
+
 		// Does not exist in the first place?
-//		String localizedString = localizer.getString("patient.search.patient.svnr", null);
-//		tester.assertContains(localizedString);
+		// String localizedString =
+		// localizer.getString("patient.search.patient.svnr", null);
+		// tester.assertContains(localizedString);
 		formTester = tester.newFormTester("form");
 		formTester.setValue("patientContainer:country", "SE");
 		formTester.setValue("patientContainer:patientIds:0:idTextField", "199604082397");

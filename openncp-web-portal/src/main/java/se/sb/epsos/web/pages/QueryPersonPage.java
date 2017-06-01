@@ -58,8 +58,6 @@ public class QueryPersonPage extends BasePage {
     private DefaultDataTable<Person> datatablePersonList;
 
     private ModalWindow personInfoModalWindow;
-    // The implementation relies on this being null (except in unit tests)
-    private List<PatientIdVO> patientIdVOList = null;
 
     public QueryPersonPage() {
 
@@ -204,15 +202,6 @@ public class QueryPersonPage extends BasePage {
     }
 
     /**
-     * Do not use as needed only for tests.
-     */
-    @Deprecated
-    protected void setPatientVOList(List<PatientIdVO> testContent) {
-
-        this.patientIdVOList = testContent;
-    }
-
-    /**
      * Added as an explicit method for the content to be substituted in test
      * (QueryPersonPageTest).
      *
@@ -220,14 +209,7 @@ public class QueryPersonPage extends BasePage {
      * @return A list of PatientIdVO objects
      */
     protected List<PatientIdVO> getPatientVOList(CountryVO selectedCountry) {
-
-    	if (this.patientIdVOList == null) {
-    		// When not in unit tests. It is correct that this is NOT assigned to this.patientIdVOList!
-            return CountryConfigManager.getPatientIdentifiers(selectedCountry);
-    	} else {
-    		// Only in unit tests
-            return this.patientIdVOList;
-    	}
+        return CountryConfigManager.getPatientIdentifiers(selectedCountry);
     }
 
     public class QueryPersonForm extends Form<QueryPerson> {
