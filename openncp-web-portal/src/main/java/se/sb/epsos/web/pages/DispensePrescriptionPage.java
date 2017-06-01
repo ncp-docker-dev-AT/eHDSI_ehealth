@@ -246,6 +246,8 @@ public class DispensePrescriptionPage extends BasePage {
                     List<IColumn<Ingredient>> columns = new ArrayList<IColumn<Ingredient>>();
                     columns.add(new PropertyColumn<Ingredient>(new StringResourceModel("prescription.activeIngredient", this, null), null,
                             "activeIngredient"));
+                    columns.add(new PropertyColumn<Ingredient>(new StringResourceModel("prescription.activeIngredientName", this, null), null,
+                            "activeIngredientName"));
                     columns.add(new PropertyColumn<Ingredient>(new StringResourceModel("prescription.strength", this, null), null, "strength"));
                     SortableDataProvider<Ingredient> provider = new SortableDataProvider<Ingredient>() {
 
@@ -291,7 +293,11 @@ public class DispensePrescriptionPage extends BasePage {
                     item.add(new Label("prescriptionRow.prescriptionId"));
 
                     item.add(new Label("prescriptionRow.substitutionPermittedText"));
-                    
+
+                    item.add(new Label("prescriptionRow.atcCode"));
+                    item.add(new Label("prescriptionRow.atcName"));
+                    item.add(new Label("prescriptionRow.strength"));
+
                     Label labelPatientInstructions = new Label("prescriptionRow.patientInstructions");
                     labelPatientInstructions.setEscapeModelStrings(false);
                     item.add(labelPatientInstructions);
