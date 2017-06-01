@@ -31,10 +31,14 @@ public class CodeSystemVersionConverter implements Converter<CodeSystemVersionMo
 
         CodeSystemVersion target = new CodeSystemVersion();
         target.setFullName(source.getFullName());
-        target.setLocalName(source.getLocalName());
+        //Version information is managed throw the attribute LocalName.
+        //target.setLocalName(source.getLocalName());
+        target.setLocalName(source.getVersionId());
         target.setEffectiveDate(source.getEffectiveDate() == null ? null : LocalDateTime.parse(source.getEffectiveDate()));
         target.setReleaseDate(source.getReleaseDate() == null ? null : LocalDateTime.parse(source.getReleaseDate()));
-        target.setStatus(source.getStatus());
+        //Code System Version status should be marked as "Current" in order to work properly with the TSAM component.
+        //target.setStatus(source.getStatus());
+        target.setStatus("Current");
         target.setStatusDate(source.getStatusDate() == null ? null : LocalDateTime.parse(source.getStatusDate()));
         target.setDescription(source.getDescription());
         target.setCopyright(source.getCopyright());
