@@ -48,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.io.StringReader;
+import org.xml.sax.InputSource;
 
 @ManagedBean
 @SessionScoped
@@ -243,26 +245,34 @@ public class MyBean implements Serializable {
                 log.info("PD: '{}'", pd.toString());
                 strMsg = pd.toString();
 
-                try {
-                    EvidenceUtils.createEvidenceREMNRO(strMsg, "NI_PD",
-                            new DateTime(), EventOutcomeIndicator.FULL_SUCCESS
-                                    .getCode().toString(), "NI_PD_REQ", ass
-                                    .getID());
-                } catch (Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
+//				try {
+//                                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//                                    factory.setNamespaceAware(true);
+//                                    DocumentBuilder builder = factory.newDocumentBuilder();
+//                                    Document doc = builder.parse(new InputSource(new StringReader(strMsg)));
+//                                    EvidenceUtils.createEvidenceREMNRO(doc, "NI_PD",
+//							new DateTime(), EventOutcomeIndicator.FULL_SUCCESS
+//									.getCode().toString(), "NI_PD_REQ", ass
+//									.getID());
+//				} catch (Exception e) {
+//					log.error(ExceptionUtils.getStackTrace(e));
+//				}
 
                 List<PatientDemographics> queryPatient = proxy.queryPatient(
                         ass, country, pd);
 
-                try {
-                    EvidenceUtils.createEvidenceREMNRR(strMsg, "NI_PD",
-                            new DateTime(), EventOutcomeIndicator.FULL_SUCCESS
-                                    .getCode().toString(), "NI_PD_RES_SUCC",
-                            ass.getID());
-                } catch (Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
+//				try {
+//                                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//                                    factory.setNamespaceAware(true);
+//                                    DocumentBuilder builder = factory.newDocumentBuilder();
+//                                    Document doc = builder.parse(new InputSource(new StringReader(queryPatient.toString())));
+//                                    EvidenceUtils.createEvidenceREMNRR(doc, "NI_PD",
+//							new DateTime(), EventOutcomeIndicator.FULL_SUCCESS
+//									.getCode().toString(), "NI_PD_RES_SUCC",
+//							ass.getID());
+//				} catch (Exception e) {
+//					log.error(ExceptionUtils.getStackTrace(e));
+//				}
 
                 for (PatientDemographics aux : queryPatient) {
                     Patient patient = EpsosHelperService.populatePatient(aux);
@@ -277,14 +287,14 @@ public class MyBean implements Serializable {
                 showPatientList = true;
             } catch (Exception ex) {
 
-                try {
-                    EvidenceUtils.createEvidenceREMNRR(strMsg, "NI_PD",
-                            new DateTime(),
-                            EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
-                                    .toString(), "NI_PD_RES_FAIL", ass.getID());
-                } catch (Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
+//				try {
+//					EvidenceUtils.createEvidenceREMNRR(strMsg, "NI_PD",
+//							new DateTime(),
+//							EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
+//									.toString(), "NI_PD_RES_FAIL", ass.getID());
+//				} catch (Exception e) {
+//					log.error(ExceptionUtils.getStackTrace(e));
+//				}
 
                 log.error(ExceptionUtils.getStackTrace(ex));
                 patients = new ArrayList<>();
@@ -502,16 +512,16 @@ public class MyBean implements Serializable {
             // Summary
             // ClassCode.
 
-            try {
-                EvidenceUtils
-                        .createEvidenceREMNRO(patientId.toString(),
-                                "NI_DQ_MRO", new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode()
-                                        .toString(), "NI_DQ_MRO_REQ",
-                                trcAssertion.getID());
-            } catch (Exception e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
+//			try {
+//				EvidenceUtils
+//						.createEvidenceREMNRO(patientId.toString(),
+//								"NI_DQ_MRO", new DateTime(),
+//								EventOutcomeIndicator.FULL_SUCCESS.getCode()
+//										.toString(), "NI_DQ_MRO_REQ",
+//								trcAssertion.getID());
+//			} catch (Exception e) {
+//				log.error(ExceptionUtils.getStackTrace(e));
+//			}
 
             log.info("MRO QUERY: Getting mro documents for : "
                     + patientId.getExtension() + " from " + selectedCountry);
@@ -521,50 +531,50 @@ public class MyBean implements Serializable {
             log.info("MRO QUERY: Found " + queryDocuments.size() + " for : "
                     + patientId.getExtension() + " from " + selectedCountry);
 
-            try {
-                EvidenceUtils
-                        .createEvidenceREMNRR(patientId.toString(),
-                                "NI_DQ_MRO", new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode()
-                                        .toString(), "NI_DQ_MRO_RES_SUCC",
-                                trcAssertion.getID());
-            } catch (Exception e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
+//			try {
+//				EvidenceUtils
+//						.createEvidenceREMNRR(patientId.toString(),
+//								"NI_DQ_MRO", new DateTime(),
+//								EventOutcomeIndicator.FULL_SUCCESS.getCode()
+//										.toString(), "NI_DQ_MRO_RES_SUCC",
+//								trcAssertion.getID());
+//			} catch (Exception e) {
+//				log.error(ExceptionUtils.getStackTrace(e));
+//			}
 
-            showMRO = true;
-            consentExists = true;
-            for (EpsosDocument1 aux : queryDocuments) {
-                PatientDocument document = EpsosHelperService.populateDocument(
-                        aux, "mro");
-                patientDocuments.add(document);
-            }
-            queryDocumentsException = LiferayUtils
-                    .getPortalTranslation("report.list.no.document");
-            log.debug("Selected Country: "
-                    + LiferayUtils.getFromSession("selectedCountry"));
-        } catch (Exception ex) {
-            try {
-                EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
-                        "NI_DQ_MRO", new DateTime(),
-                        EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
-                                .toString(), "NI_DQ_MRO_RES_FAIL", trcAssertion
-                                .getID());
-            } catch (Exception e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
-            consentExists = true;
-            log.error(ExceptionUtils.getStackTrace(ex));
-            FacesContext.getCurrentInstance().addMessage(
-                    null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "DOCUMENT QUERY", LiferayUtils
-                            .getPortalTranslation(ex.getMessage())));
-            log.error("MRO QUERY: Error getting ps documents for : "
-                    + patientId.getExtension() + " from " + selectedCountry
-                    + " - " + ex.getMessage());
-            queryDocumentsException = LiferayUtils.getPortalTranslation(ex
-                    .getMessage());
+			showMRO = true;
+			consentExists = true;
+			for (EpsosDocument1 aux : queryDocuments) {
+				PatientDocument document = EpsosHelperService.populateDocument(
+						aux, "mro");
+				patientDocuments.add(document);
+			}
+			queryDocumentsException = LiferayUtils
+					.getPortalTranslation("report.list.no.document");
+			log.debug("Selected Country: "
+					+ LiferayUtils.getFromSession("selectedCountry"));
+		} catch (Exception ex) {
+//			try {
+//				EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
+//						"NI_DQ_MRO", new DateTime(),
+//						EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
+//								.toString(), "NI_DQ_MRO_RES_FAIL", trcAssertion
+//								.getID());
+//			} catch (Exception e) {
+//				log.error(ExceptionUtils.getStackTrace(e));
+//			}
+			consentExists = true;
+			log.error(ExceptionUtils.getStackTrace(ex));
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							"DOCUMENT QUERY", LiferayUtils
+									.getPortalTranslation(ex.getMessage())));
+			log.error("MRO QUERY: Error getting ps documents for : "
+					+ patientId.getExtension() + " from " + selectedCountry
+					+ " - " + ex.getMessage());
+			queryDocumentsException = LiferayUtils.getPortalTranslation(ex
+					.getMessage());
 
             if (ex.getMessage().contains("4701")) {
                 consentExists = false;
@@ -606,16 +616,16 @@ public class MyBean implements Serializable {
                 log.info("patientId: " + patientId);
                 log.info("classCode: " + classCode);
 
-                // NRO
-                try {
-                    EvidenceUtils.createEvidenceREMNRO(patientId.toString(),
-                            "NI_DQ_PS", new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode()
-                                    .toString(), "NI_DQ_PS_REQ", trcAssertion
-                                    .getID());
-                } catch (Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
+				// NRO
+//				try {
+//					EvidenceUtils.createEvidenceREMNRO(patientId.toString(),
+//							"NI_DQ_PS", new DateTime(),
+//							EventOutcomeIndicator.FULL_SUCCESS.getCode()
+//									.toString(), "NI_DQ_PS_REQ", trcAssertion
+//									.getID());
+//				} catch (Exception e) {
+//					log.error(ExceptionUtils.getStackTrace(e));
+//				}
 
                 List<EpsosDocument1> queryDocuments = clientConectorConsumer
                         .queryDocuments(hcpAssertion, trcAssertion,
@@ -624,37 +634,37 @@ public class MyBean implements Serializable {
                 log.info("PS QUERY: Found " + queryDocuments.size() + " for : "
                         + patientId.getExtension() + " from " + selectedCountry);
 
-                try {
-                    EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
-                            "NI_DQ_PS", new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode()
-                                    .toString(), "NI_DQ_PS_RES_SUCC",
-                            trcAssertion.getID());
-                } catch (Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
+//				try {
+//					EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
+//							"NI_DQ_PS", new DateTime(),
+//							EventOutcomeIndicator.FULL_SUCCESS.getCode()
+//									.toString(), "NI_DQ_PS_RES_SUCC",
+//							trcAssertion.getID());
+//				} catch (Exception e) {
+//					log.error(ExceptionUtils.getStackTrace(e));
+//				}
 
-                showPS = true;
-                consentExists = true;
-                for (EpsosDocument1 aux : queryDocuments) {
-                    PatientDocument document = EpsosHelperService
-                            .populateDocument(aux, "ps");
-                    patientDocuments.add(document);
-                }
-                queryDocumentsException = LiferayUtils
-                        .getPortalTranslation("report.list.no.document");
-                log.debug("Selected Country: "
-                        + LiferayUtils.getFromSession("selectedCountry"));
-            } catch (Exception ex) {
-                try {
-                    EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
-                            "NI_DQ_PS", new DateTime(),
-                            EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
-                                    .toString(), "NI_DQ_PS_RES_FAIL",
-                            trcAssertion.getID());
-                } catch (Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
+				showPS = true;
+				consentExists = true;
+				for (EpsosDocument1 aux : queryDocuments) {
+					PatientDocument document = EpsosHelperService
+							.populateDocument(aux, "ps");
+					patientDocuments.add(document);
+				}
+				queryDocumentsException = LiferayUtils
+						.getPortalTranslation("report.list.no.document");
+				log.debug("Selected Country: "
+						+ LiferayUtils.getFromSession("selectedCountry"));
+			} catch (Exception ex) {
+//				try {
+//					EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
+//							"NI_DQ_PS", new DateTime(),
+//							EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
+//									.toString(), "NI_DQ_PS_RES_FAIL",
+//							trcAssertion.getID());
+//				} catch (Exception e) {
+//					log.error(ExceptionUtils.getStackTrace(e));
+//				}
 
                 consentExists = true;
                 log.error(ExceptionUtils.getStackTrace(ex));
@@ -919,54 +929,54 @@ public class MyBean implements Serializable {
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.EP_TITLE); // EP
 
-            try {
-                EvidenceUtils
-                        .createEvidenceREMNRO(patientId.toString(), "NI_DQ_EP",
-                                new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode()
-                                        .toString(), "NI_DQ_EP_REQ",
-                                trcAssertion.getID());
-            } catch (Exception e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
+//			try {
+//				EvidenceUtils
+//						.createEvidenceREMNRO(patientId.toString(), "NI_DQ_EP",
+//								new DateTime(),
+//								EventOutcomeIndicator.FULL_SUCCESS.getCode()
+//										.toString(), "NI_DQ_EP_REQ",
+//								trcAssertion.getID());
+//			} catch (Exception e) {
+//				log.error(ExceptionUtils.getStackTrace(e));
+//			}
 
             log.info("EP QUERY: Getting ePrescription documents for: {} from {}.", patientId.getExtension(), selectedCountry);
             List<EpsosDocument1> queryDocuments = clientConectorConsumer
                     .queryDocuments(hcpAssertion, trcAssertion,
                             selectedCountry, patientId, classCode);
 
-            try {
-                EvidenceUtils
-                        .createEvidenceREMNRR(patientId.toString(), "NI_DQ_EP",
-                                new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode()
-                                        .toString(), "NI_DQ_EP_RES_SUCC",
-                                trcAssertion.getID());
-            } catch (Exception e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
-            log.info("EP QUERY: Found {} document for : {} from {}.", queryDocuments.size(), patientId.getExtension(), selectedCountry);
-            showEP = true;
-            for (EpsosDocument1 aux : queryDocuments) {
-                PatientDocument document = EpsosHelperService.populateDocument(
-                        aux, "ep");
-                patientPrescriptions.add(document);
-            }
-            queryPrescriptionsException = LiferayUtils.getPortalTranslation(
-                    "document.empty.list", FacesService.getPortalLanguage());
-            log.info("Documents are {}", queryDocuments.size());
-        } catch (Exception ex) {
+//			try {
+//				EvidenceUtils
+//						.createEvidenceREMNRR(patientId.toString(), "NI_DQ_EP",
+//								new DateTime(),
+//								EventOutcomeIndicator.FULL_SUCCESS.getCode()
+//										.toString(), "NI_DQ_EP_RES_SUCC",
+//								trcAssertion.getID());
+//			} catch (Exception e) {
+//				log.error(ExceptionUtils.getStackTrace(e));
+//			}
 
-            log.error("Exception: {}", ex.getMessage(), ex);
-            try {
-                EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
-                        "NI_DQ_EP", new DateTime(),
-                        EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
-                                .toString(), "NI_DQ_EP_RES_FAIL", trcAssertion
-                                .getID());
-            } catch (Exception e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
+			log.info("EP QUERY: Found " + queryDocuments.size() + " for : "
+					+ patientId.getExtension() + " from " + selectedCountry);
+			showEP = true;
+			for (EpsosDocument1 aux : queryDocuments) {
+				PatientDocument document = EpsosHelperService.populateDocument(
+						aux, "ep");
+				patientPrescriptions.add(document);
+			}
+			queryPrescriptionsException = LiferayUtils.getPortalTranslation(
+					"document.empty.list", FacesService.getPortalLanguage());
+			log.info("Documents are " + queryDocuments.size());
+		} catch (Exception ex) {
+//			try {
+//				EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
+//						"NI_DQ_EP", new DateTime(),
+//						EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
+//								.toString(), "NI_DQ_EP_RES_FAIL", trcAssertion
+//								.getID());
+//			} catch (Exception e) {
+//				log.error(ExceptionUtils.getStackTrace(e));
+//			}
 
             FacesContext.getCurrentInstance().addMessage(
                     null,

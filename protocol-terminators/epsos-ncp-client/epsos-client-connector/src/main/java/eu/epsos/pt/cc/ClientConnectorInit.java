@@ -42,6 +42,7 @@ public class ClientConnectorInit extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+       
         logger.info("Initiating Client Connector");
         
         System.setProperty("javax.net.ssl.keyStore", Constants.SC_KEYSTORE_PATH);

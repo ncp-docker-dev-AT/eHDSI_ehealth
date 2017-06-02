@@ -23,12 +23,10 @@ import com.spirit.epsos.cc.adc.EadcEntry;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
-import epsos.ccd.gnomon.auditmanager.EventType;
+import epsos.ccd.gnomon.configmanager.ConfigurationManagerSMP;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.pt.transformation.TMServices;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
@@ -41,9 +39,8 @@ import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.DateTime;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +51,7 @@ import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 /*
@@ -61,10 +59,16 @@ import java.util.UUID;
  */
 public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RespondingGateway_ServiceStub.class);
     //http://localhost:8080/axis2/services/RespondingGateway_Soap12
     private static final javax.xml.bind.JAXBContext wsContext;
-    private static Logger LOG = LoggerFactory.getLogger(RespondingGateway_ServiceStub.class);
     private static int counter = 0;
+
+    static {
+        LOG.debug("Loading the WS-Security init libraries in RespondingGateway_ServiceStub xca");
+
+        org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
+    }
 
     static {
         javax.xml.bind.JAXBContext jc;
@@ -76,7 +80,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     RetrieveDocumentSetRequestType.class,
                     RetrieveDocumentSetResponseType.class);
         } catch (javax.xml.bind.JAXBException ex) {
-            LOG.error("JAXBException: {} - '{}'", XCAConstants.EXCEPTIONS.UNABLE_CREATE_JAXB_CONTEXT, ex.getMessage(), ex);
+            System.err.println(XCAConstants.EXCEPTIONS.UNABLE_CREATE_JAXB_CONTEXT + " " + ex.getMessage());
+            ex.printStackTrace(System.err);
             Runtime.getRuntime().exit(-1);
         } finally {
             wsContext = jc;
@@ -245,6 +250,11 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             address.addChild(node4);
             replyTo.addChild(address);
 
+            /* We are manually adding all WSA headers (To, Action, MessageID). Other IHE service clients (XCPD and XDR) skip the addition of the To header
+            and let the client-connector axis2 configurations take care of it (through the global engaging of WS-Addressing module in axis2.xml, which sets
+            the To with the endpoint value from the transport information), but we cannot assume that these IHE Service clients will always be coupled with
+            the client-connector (and that it'll always be based on Axis2). See issues EHNCP-1141 and EHNCP-1168.
+            */
             _serviceClient.addHeader(to);
             _serviceClient.addHeader(action);
             _serviceClient.addHeader(id);
@@ -276,18 +286,18 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         + System.getProperty("line.separator") + logRequestMsg);
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
                 // NRO
-                try {
-                    EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(env)),
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosOrderServiceList.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            "NCPB_XCA_LIST_DOC_REQ");
-                } catch (Exception e) {
-                    LOG.error(ExceptionUtils.getStackTrace(e));
-                }
+//                try {
+//                    EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                            EventType.epsosOrderServiceList.getCode(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                            "NCPB_XCA_LIST_REQ");
+//                } catch (Exception e) {
+//                    LOG.error(ExceptionUtils.getStackTrace(e));
+//                }
 
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -318,7 +328,88 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
              * Execute Operation
              */
             transactionStartTime = new Date();
-            _operationClient.execute(true);
+            try {
+                _operationClient.execute(true);
+            } catch (AxisFault e) {
+                LOG.error("Axis Fault error: " + e.getMessage());
+                LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
+                ConfigurationManagerSMP configManagerSMP = ConfigurationManagerSMP.getInstance();
+                String service = null;
+                LOG.debug("ClassCode: " + classCode);
+                switch (classCode) {
+                    case Constants.PS_CLASSCODE:
+                        service = ".PatientService.WSE";
+                        break;
+                    case Constants.EP_CLASSCODE:
+                        service = ".OrderService.WSE";
+                        break;
+                    default:
+                        break;
+                }
+                String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
+                configManagerSMP.deleteKeyFromHashMap(key);
+                String value = configManagerSMP.getProperty(key);
+                if (value != null) {
+                    /* if we get something from the Central Services, then we retry the request */
+                    /* correctly sets the Transport information with the new endpoint */
+                    LOG.debug("Retrying the request with the new configurations: [" + value + "]");
+                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value));
+
+                    /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
+                    org.apache.axis2.client.OperationClient newOperationClient = _serviceClient.createClient(_operations[0].getName());
+                    newOperationClient.getOptions().setAction(XCAConstants.SOAP_HEADERS.QUERY.REQUEST_ACTION);
+                    newOperationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
+                    addPropertyToOperationClient(newOperationClient, org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+
+                    SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
+
+                    /* As there's no simple way of replacing the previously set WSA To header (still containing the old endpoint) we need to create a new SOAP
+                    payload so that the wsa:To header is correctly set. Here we have 2 situations. If we rely on the client-connector axis2.xml configurations,
+                    then the new endpoint will be copied from the Transport information to the wsa:To during the running of the Addressing Phase,
+                    as defined by the global engagement of the addressing module in axis2.xml. But we're not doing it since these IHE service clients should be
+                    decoupled from client-connector, thus we manually add the new WSA To header to the new SOAP envelope. See issues EHNCP-1141 and EHNCP-1168. */
+                    org.apache.axiom.soap.SOAPEnvelope newEnv;
+                    newEnv = toEnvelope(newSoapFactory,
+                            adhocQueryRequest,
+                            optimizeContent(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.QUERY.NAMESPACE_REQUEST_LOCAL_PART)));
+
+                    /* Creating the new WSA To header with the new endpoint */
+                    to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+                    node3 = newSoapFactory.createOMText(value);
+                    to.addChild(node3);
+                    to.addAttribute(att2);
+
+                    /* There's no way to remove a single header (and WS-Addressing specification forbids the existence of
+                    more than 1 addressing:To header), so we need to remove all the old headers and add them again to _serviceClient
+                    (including the new To header with the right endpoint), from which they'll be copied into the final SOAP envelope */
+                    _serviceClient.removeHeaders();
+                    _serviceClient.addHeader(to);
+                    _serviceClient.addHeader(action);
+                    _serviceClient.addHeader(id);
+                    _serviceClient.addHeader(replyTo);
+                    _serviceClient.addHeader(security);
+                    _serviceClient.addHeadersToEnvelope(newEnv);
+
+                    /* we create a new Message Context with the new SOAP envelope */
+                    org.apache.axis2.context.MessageContext newMessageContext = new org.apache.axis2.context.MessageContext();
+                    newMessageContext.setEnvelope(newEnv);
+
+                    /* add the new message contxt to the new operation client */
+                    newOperationClient.addMessageContext(newMessageContext);
+                    /* we retry the request */
+                    newOperationClient.execute(true);
+                    /* we need to reset the previous variables with the new content, to be used later */
+                    _operationClient = newOperationClient;
+                    _messageContext = newMessageContext;
+                    env = newEnv;
+                    LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
+                } else {
+                    /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
+                    LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
+                    throw e;
+                }
+            }
+
             org.apache.axis2.context.MessageContext _returnMessageContext = _operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             org.apache.axiom.soap.SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
@@ -356,18 +447,18 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             start = System.currentTimeMillis();
 
             // NRR
-            try {
-                EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(env)),
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        EventType.epsosOrderServiceList.getCode(),
-                        new DateTime(),
-                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                        "NCPB_XCA_LIST_RES");
-            } catch (Exception e) {
-                LOG.error(ExceptionUtils.getStackTrace(e));
-            }
+//            try {
+//                EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(env)),
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                        EventType.epsosOrderServiceList.getCode(),
+//                        new DateTime(),
+//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                        "NCPB_XCA_LIST_RES");
+//            } catch (Exception e) {
+//                LOG.error(ExceptionUtils.getStackTrace(e));
+//            }
 
             /*
              * Invoque eADC
@@ -527,6 +618,11 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             address.addChild(node4);
             replyTo.addChild(address);
 
+            /* We are manually adding all WSA headers (To, Action, MessageID). Other IHE service clients (XCPD and XDR) skip the addition of the To header
+            and let the client-connector axis2 configurations take care of it (through the global engaging of WS-Addressing module in axis2.xml, which sets
+            the To with the endpoint value from the transport information), but we cannot assume that these IHE Service clients will always be coupled with
+            the client-connector (and that it'll always be based on Axis2). See issues EHNCP-1141 and EHNCP-1168.
+            */
             _serviceClient.addHeader(to);
             _serviceClient.addHeader(action);
             _serviceClient.addHeader(id);
@@ -561,18 +657,18 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         + System.getProperty("line.separator") + logRequestMsg);
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
                 // NRO
-                try {
-                    EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(env)),
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosOrderServiceRetrieve.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            "NCPB_XCA_RETRIEVE_DOC_REQ");
-                } catch (Exception e) {
-                    LOG.error(ExceptionUtils.getStackTrace(e));
-                }
+//                try {
+//                    EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                            EventType.epsosOrderServiceRetrieve.getCode(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                            "NCPB_XCA_RETRIEVE_REQ");
+//                } catch (Exception e) {
+//                    LOG.error(ExceptionUtils.getStackTrace(e));
+//                }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -585,7 +681,91 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
              */
             transactionStartTime = new Date();
             org.apache.axiom.soap.SOAPEnvelope returnEnv;
-            _operationClient.execute(true);
+            try {
+                _operationClient.execute(true);
+            } catch (AxisFault e) {
+                LOG.error("Axis Fault error: " + e.getMessage());
+                LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
+                ConfigurationManagerSMP configManagerSMP = ConfigurationManagerSMP.getInstance();
+                String service = null;
+                LOG.debug("ClassCode: " + classCode);
+                switch (classCode) {
+                    case Constants.PS_CLASSCODE:
+                        service = ".PatientService.WSE";
+                        break;
+                    case Constants.EP_CLASSCODE:
+                        service = ".OrderService.WSE";
+                        break;
+                    default:
+                        break;
+                }
+                String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
+                configManagerSMP.deleteKeyFromHashMap(key);
+                String value = configManagerSMP.getProperty(key);
+                if (value != null) {
+                    /* if we get something from the Central Services, then we retry the request */
+                    /* correctly sets the Transport information with the new endpoint */
+                    LOG.debug("Retrying the request with the new configurations: [" + value + "]");
+                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value));
+
+                    /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
+                    org.apache.axis2.client.OperationClient newOperationClient = _serviceClient.createClient(_operations[1].getName());
+                    newOperationClient.getOptions().setAction(XCAConstants.SOAP_HEADERS.RETRIEVE.REQUEST_ACTION);
+                    newOperationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
+                    addPropertyToOperationClient(newOperationClient, org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+                    addPropertyToOperationClient(newOperationClient, org.apache.axis2.Constants.Configuration.ENABLE_MTOM, org.apache.axis2.Constants.VALUE_TRUE);
+
+                    SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
+
+                    /* As there's no simple way of replacing the previously set WSA To header (still containing the old endpoint) we need to create a new SOAP
+                    payload so that the wsa:To header is correctly set. Here we have 2 situations. If we rely on the client-connector axis2.xml configurations,
+                    then the new endpoint will be copied from the Transport information to the wsa:To during the running of the Addressing Phase,
+                    as defined by the global engagement of the addressing module in axis2.xml. But we're not doing it since these IHE service clients should be
+                    decoupled from client-connector, thus we manually add the new WSA To header to the new SOAP envelope. In this specific case of the XCA Retrieve,
+                    since the manual WSA headers are being added under the http://www.w3.org/2005/08/addressing/anonymous namespace and not under the usual http://www.w3.org/2005/08/addressing
+                    namespace, both the manually added headers and the automatically added ones from client-connector's axis2 configurations will be added. This needs to be analysed.
+                    See issues EHNCP-1141 and EHNCP-1168. */
+                    org.apache.axiom.soap.SOAPEnvelope newEnv;
+                    newEnv = toEnvelope(newSoapFactory,
+                            retrieveDocumentSetRequest,
+                            optimizeContent(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.RETRIEVE.NAMESPACE_REQUEST_LOCAL_PART)));
+
+                    /* Creating the new WSA To header with the new endpoint */
+                    to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+                    node3 = newSoapFactory.createOMText(value);
+                    to.addChild(node3);
+//                    to.addAttribute(att2);
+
+                    /* There's no way to remove a single header (and WS-Addressing specification forbids the existence of
+                    more than 1 addressing:To header), so we need to remove all the old headers and add them again to _serviceClient
+                    (including the new To header with the right endpoint), from which they'll be copied into the final SOAP envelope */
+                    _serviceClient.removeHeaders();
+                    _serviceClient.addHeader(to);
+                    _serviceClient.addHeader(action);
+                    _serviceClient.addHeader(id);
+                    _serviceClient.addHeader(replyTo);
+                    _serviceClient.addHeader(security);
+                    _serviceClient.addHeadersToEnvelope(newEnv);
+
+                    /* we create a new Message Context with the new SOAP envelope */
+                    org.apache.axis2.context.MessageContext newMessageContext = new org.apache.axis2.context.MessageContext();
+                    newMessageContext.setEnvelope(newEnv);
+
+                    /* add the new message context to the new operation client */
+                    newOperationClient.addMessageContext(newMessageContext);
+                    /* we retry the request */
+                    newOperationClient.execute(true);
+                    /* we need to reset the previous variables with the new content, to be used later */
+                    _operationClient = newOperationClient;
+                    _messageContext = newMessageContext;
+                    env = newEnv;
+                    LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
+                } else {
+                    /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
+                    LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
+                    throw e;
+                }
+            }
             org.apache.axis2.context.MessageContext _returnMessageContext;
             _returnMessageContext = _operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             returnEnv = _returnMessageContext.getEnvelope();
@@ -615,19 +795,20 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             retrieveDocumentSetResponse = (RetrieveDocumentSetResponseType) object;
 
             LOG.info("XCA Retrieve Request received. EVIDENCE NRR");
-            // NRR
-            try {
-                EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(env)),
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        EventType.epsosOrderServiceRetrieve.getCode(),
-                        new DateTime(),
-                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                        "NCPB_XCA_RETRIEVE_RES");
-            } catch (Exception e) {
-                LOG.error(ExceptionUtils.getStackTrace(e));
-            }
+
+//            // NRR
+//            try {
+//                EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(env)),
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                        EventType.epsosOrderServiceRetrieve.getCode(),
+//                        new DateTime(),
+//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                        "NCPB_XCA_RETRIEVE_RES");
+//            } catch (Exception e) {
+//                LOG.error(ExceptionUtils.getStackTrace(e));
+//            }
 
             /*
              * Invoque eADC

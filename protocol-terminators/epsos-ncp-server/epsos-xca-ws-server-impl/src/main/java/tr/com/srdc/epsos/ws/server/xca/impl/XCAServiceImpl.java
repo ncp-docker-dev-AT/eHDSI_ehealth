@@ -26,7 +26,13 @@
  */
 package tr.com.srdc.epsos.ws.server.xca.impl;
 
-import epsos.ccd.gnomon.auditmanager.*;
+import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
+import epsos.ccd.gnomon.auditmanager.EventActionCode;
+import epsos.ccd.gnomon.auditmanager.EventLog;
+import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
+import epsos.ccd.gnomon.auditmanager.EventType;
+import epsos.ccd.gnomon.auditmanager.IHEEventType;
+import epsos.ccd.gnomon.auditmanager.TransactionName;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
@@ -743,13 +749,23 @@ public class XCAServiceImpl implements XCAServiceInterface {
             rel.getRegistryError().add(createErrorMessage("4202", "Class code missing in XCA query request.", "", false));
         }
 
-        // call to NI
+//        // Evidence for call to NI for XCA List
+        /* Joao: we MUST generate NRO when NCPA sends to NI. This was throwing errors because we were not passing a XML document.
+        We're passing data like:
+        "SearchCriteria: {patientId = 12445ASD}"
+        So we provided a XML representation of such data */
         try {
-            EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).toString(),
+            EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
                     tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
                     tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
                     tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                    EventType.epsosOrderServiceList.getCode(),
+                    tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
+                    tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
+                    tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
+                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                    tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                    IHEEventType.epsosPatientServiceList.getCode(),
                     new DateTime(),
                     EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                     "NI_XCA_LIST_REQ",
@@ -861,34 +877,48 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         }
                     }
                 }
-                // call to NI
-                try {
-                    EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).toString(),
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosOrderServiceList.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            "NI_XCA_LIST_RES",
-                            Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
-                } catch (Exception e) {
-                    logger.error(ExceptionUtils.getStackTrace(e));
-                }
+//                // Evidence for response from NI for XCA List in case of success
+                /* Joao: This should be NRR of NCPA receiving from NI.
+                    This was throwing errors because we were not passing a XML document.
+                    We're passing data like:
+                    "SearchCriteria: {patientId = 12445ASD}"
+                    So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
+                    This NRR is optional as per the CP. So we leave this commented*/
+//                try {
+//                    EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                            IHEEventType.epsosPatientServiceList.getCode(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                            "NI_XCA_LIST_RES",
+//                            Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
+//                } catch (Exception e) {
+//                    logger.error(ExceptionUtils.getStackTrace(e));
+//                }
             } else {
-                try {
-                    EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).toString(),
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosOrderServiceList.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
-                            "NI_XCA_LIST_RES_FAIL",
-                            Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
-                } catch (Exception e) {
-                    logger.error(ExceptionUtils.getStackTrace(e));
-                }
+                // Evidence for response from NI for XCA List in case of failure
+                /* Joao: This should be NRR of NCPA receiving from NI.
+                    This was throwing errors because we were not passing a XML document.
+                    We're passing data like:
+                    "SearchCriteria: {patientId = 12445ASD}"
+                    So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
+                    This NRR is optional as per the CP. So we leave this commented
+                */
+//                try {
+//                    EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                            IHEEventType.epsosPatientServiceList.getCode(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
+//                            "NI_XCA_LIST_RES_FAIL",
+//                            Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
+//                } catch (Exception e) {
+//                    logger.error(ExceptionUtils.getStackTrace(e));
+//                }
 
                 rel.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
                 response.setRegistryErrorList(rel);
@@ -1028,17 +1058,27 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 break processLabel;
             }
 
-            // call to NI
+            // Evidence for call to NI for XCA Retrieve
+            /* Joao: we MUST generate NRO when NCPA sends to NI.This was throwing errors because we were not passing a XML document.
+                We're passing data like:
+                "SearchCriteria: {patientId = 12445ASD}"
+                So we provided a XML representation of such data */
             try {
-                EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).toString(),
+                EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
                         tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
                         tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
                         tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        EventType.epsosOrderServiceList.getCode(),
+                        tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
+                        tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
+                        tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
+                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                        IHEEventType.epsosPatientServiceRetrieve.getCode(),
                         new DateTime(),
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                         "NI_XCA_RETRIEVE_REQ",
-                        DateUtil.getCurrentTimeGMT());
+                        Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {
                 logger.error("createEvidenceREMNRO: " + ExceptionUtils.getStackTrace(e));
             }
@@ -1048,38 +1088,50 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     .add(Criteria.PatientId, patientId)
                     .add(Criteria.RepositoryId, repositoryId));
             if (epsosDoc == null) {
-                // call to NI
-                try {
-                    EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).toString(),
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosOrderServiceRetrieve.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
-                            "NI_XCA_RETRIEVE_RES_FAIL",
-                            Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
-                } catch (Exception e) {
-                    logger.error(ExceptionUtils.getStackTrace(e));
-                }
+//                // Evidence for response from NI in case of failure
+                /* Joao: This should be NRR of NCPA receiving from NI.
+                    This was throwing errors because we were not passing a XML document.
+                    We're passing data like:
+                    "SearchCriteria: {patientId = 12445ASD}"
+                    So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
+                    This NRR is optional as per the CP. So we leave this commented */
+//                try {
+//                    EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                            IHEEventType.epsosPatientServiceRetrieve.getCode(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
+//                            "NI_XCA_RETRIEVE_RES_FAIL",
+//                            Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
+//                } catch (Exception e) {
+//                    logger.error(ExceptionUtils.getStackTrace(e));
+//                }
                 registryErrorList.addChild(createErrorOMMessage(ns, "XDSMissingDocument", "Requested document not found.", "", false));
                 break processLabel;
             }
 
-            // call to NI
-            try {
-                EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).toString(),
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        EventType.epsosOrderServiceRetrieve.getCode(),
-                        new DateTime(),
-                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                        "NI_XCA_RETRIEVE_RES_SUCC",
-                        DateUtil.getCurrentTimeGMT());
-            } catch (Exception e) {
-                logger.error("createEvidenceREMNRR() " + ExceptionUtils.getStackTrace(e));
-            }
+            // Evidence for response from NI in case of success
+            /* Joao: This should be NRR of NCPA receiving from NI.
+                    This was throwing errors because we were not passing a XML document.
+                    We're passing data like:
+                    "SearchCriteria: {patientId = 12445ASD}"
+                    So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
+                    This NRR is optional as per the CP. So we leave this commented */
+//            try {
+//                EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                        IHEEventType.epsosPatientServiceRetrieve.getCode(),
+//                        new DateTime(),
+//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                        "NI_XCA_RETRIEVE_RES_SUCC",
+//                        DateUtil.getCurrentTimeGMT());
+//            } catch (Exception e) {
+//                logger.error(ExceptionUtils.getStackTrace(e));
+//            }
 
             classCodeValue = epsosDoc.getClassCode();
 

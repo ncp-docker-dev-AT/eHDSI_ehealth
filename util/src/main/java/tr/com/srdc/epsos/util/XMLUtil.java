@@ -19,6 +19,7 @@
  */
 package tr.com.srdc.epsos.util;
 
+import org.apache.xml.security.c14n.Canonicalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -69,12 +70,24 @@ public class XMLUtil {
     }
 
     /**
-     * @param byteContent
-     * @return
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
+     * Gets a DOM document and canonicalize it using OMIT_COMMENTS.
+     * <p>
+     * Add by massi - 29/12/2016
+     *
+     * @param doc The document to be canonicalized
+     * @return the canonicalized document
+     * @throws Exception either the document is null, there is no available DOM factory, or a generic c14n error
      */
+    public static Document canonicalize(Document doc) throws Exception {
+        Canonicalizer canon = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
+        byte[] back = canon.canonicalizeSubtree(doc);
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+
+        Document docCanon = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(back));
+        return docCanon;
+    }
+
     public static org.w3c.dom.Document parseContent(byte[] byteContent) throws ParserConfigurationException, SAXException, IOException {
         org.w3c.dom.Document doc = null;
         String content = new String(byteContent);

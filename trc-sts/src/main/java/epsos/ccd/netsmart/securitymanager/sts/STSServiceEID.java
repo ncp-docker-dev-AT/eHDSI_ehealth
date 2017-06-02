@@ -179,7 +179,7 @@ public class STSServiceEID implements Provider<SOAPMessage> {
 
 
             String tls_cn = getSSLCertPeer();
-            logger.info("tls_cn: " + tls_cn);
+            logger.info("tls_cn: '{}'", tls_cn);
 
             if (context.getUserPrincipal() != null) {
                 tls_cn = context.getUserPrincipal().getName();

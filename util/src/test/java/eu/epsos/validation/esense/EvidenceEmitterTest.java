@@ -89,7 +89,13 @@ public class EvidenceEmitterTest {
         LOGGER.info(a1);
         //org.w3c.dom.Document incomingMsg = XMLUtil.newDocumentFromInputStream(inputStream);
         EvidenceUtils.createEvidenceREMNRR(
-                a1,
+        		incomingMsg,
+                keyStoreFile.getAbsolutePath(),
+                "spirit",
+                "server1",
+                keyStoreFile.getAbsolutePath(),
+                "spirit",
+                "server1",
                 keyStoreFile.getAbsolutePath(),
                 "spirit",
                 "server1",
@@ -113,7 +119,13 @@ public class EvidenceEmitterTest {
         LOGGER.info(a1);
         //org.w3c.dom.Document incomingMsg = XMLUtil.newDocumentFromInputStream(inputStream);
         EvidenceUtils.createEvidenceREMNRO(
-                a1,
+                incomingMsg,
+                keyStoreFile.getAbsolutePath(),
+                "spirit",
+                "server1",
+                keyStoreFile.getAbsolutePath(),
+                "spirit",
+                "server1",
                 keyStoreFile.getAbsolutePath(),
                 "spirit",
                 "server1",
