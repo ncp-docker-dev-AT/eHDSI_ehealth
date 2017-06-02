@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -11,6 +12,7 @@
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
     <artifactId>openncp-ncp-server</artifactId>
     <packaging>pom</packaging>
+
     <name>OpenNCP CC Web Services Server</name>
 
     <modules>
@@ -21,9 +23,4 @@
         <module>epsos-nc-mock-it</module>
         <module>epsos-ws-server</module>
     </modules>
-
-    <description>
-        This project is a simple POM project.
-        It was created with the only purpose of aggregate all IHE server projects "under the same roof".
-    </description>
 </project>

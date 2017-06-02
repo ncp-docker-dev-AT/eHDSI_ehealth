@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -10,18 +11,30 @@
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-cdadisplaytool</groupId>
     <artifactId>openncp-tsamexporter</artifactId>
-    <url>http://maven.apache.org</url>
+    <packaging>jar</packaging>
+
     <name>tsamexporter</name>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <developers>
+        <developer>
+            <id>k.karkaletsis@gnomon.com.gr</id>
+            <email>k.karkaletsis@gnomon.com.gr</email>
+            <name>Kostas Karkaletsis</name>
+            <organization>Gnomon</organization>
+            <organizationUrl>http://gnomon.com.gr</organizationUrl>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.5</version>
+            <version>${commons-io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -36,19 +49,14 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.23</version>
+            <version>${mysql-connector.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
+            <version>${postgresql.version}</version>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.5</version>
         </dependency>
     </dependencies>
 
@@ -121,30 +129,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <developers>
-        <developer>
-            <id>k.karkaletsis@gnomon.com.gr</id>
-            <email>k.karkaletsis@gnomon.com.gr</email>
-            <name>Kostas Karkaletsis</name>
-            <organization>Gnomon</organization>
-            <organizationUrl>http://gnomon.com.gr</organizationUrl>
-        </developer>
-    </developers>
-    <inceptionYear>2012</inceptionYear>
-    <licenses>
-        <license>
-            <name>Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:git:https://bitbucket.org/openncp/cda-display-tool.git</connection>
-        <tag>HEAD</tag>
-        <url>https://bitbucket.org/openncp/cda-display-tool</url>
-    </scm>
-    <issueManagement>
-        <system>JIRA</system>
-        <url>https://openncp.atlassian.net</url>
-    </issueManagement>
 </project>
