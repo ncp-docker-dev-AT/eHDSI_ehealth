@@ -3,6 +3,14 @@ package epsos.ccd.gnomon.configmanager;
 public class PropertySearchableContainer {
 	private String value;
 	private boolean isSearchable;
+        
+        public PropertySearchableContainer() {}
+        
+        public PropertySearchableContainer(String value, boolean isSearchable) {
+            this.value = value;
+            this.isSearchable = isSearchable;
+        }
+        
 	public String getValue() {
 		return value;
 	}

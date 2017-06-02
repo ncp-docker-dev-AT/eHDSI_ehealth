@@ -177,9 +177,9 @@ public class Context {
 
 	public void setSenderNamePostalAddress(LinkedList<String> sendernamesPostalAddress) {
 		this.senderNamePostalAddress = sendernamesPostalAddress;
-		
+
 	}
-	
+
 	public LinkedList<String> getSenderNamePostalAddress() {
 		return this.senderNamePostalAddress;
 	}

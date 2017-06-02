@@ -22,7 +22,7 @@
         <Obligations>
             <!-- When the corner 3 receives the message, in case of success, it returns a RelayAcceptanceRejection, which is not considered
                 to be a non repudiation token, although it can be seen as an NRS -->
-            <Obligation ObligationId="urn:eSENS:obligations:nrr:ATNA" FulfillOn="Permit">
+            <!-- Obligation ObligationId="urn:eSENS:obligations:nrr:ATNA" FulfillOn="Permit">
                 <AttributeAssignment AttributeId="urn:eSENS:obligations:nrr:ATNA:EventID" DataType="http://www.w3.org/2001/XMLSchema#string">
                     110106
                 </AttributeAssignment>
@@ -39,7 +39,7 @@
                     Tiani-Spirit
                 </AttributeAssignment>
                 
-            </Obligation>
+            </Obligation> -->
             <Obligation ObligationId="urn:eSENS:obligations:nro:ETSIREM" FulfillOn="Permit">
                 <AttributeAssignment AttributeId="urn:eSENS:obligations:nro:ETSIREM:version" DataType="http://www.w3.org/2001/XMLSchema#string">
                     2

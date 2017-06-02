@@ -43,6 +43,7 @@ import java.util.List;
  * @author joao.cunha
  */
 public class TransformatorUI extends javax.swing.JFrame {
+
     private static final Logger logger = LoggerFactory.getLogger(TransformatorUI.class);
     private File tslFile;
     private File ismFile;
@@ -112,13 +113,13 @@ public class TransformatorUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("ClassNotFoundException: '{}'", ex.getMessage(), ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("InstantiationException: '{}'", ex.getMessage(), ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("IllegalAccessException: '{}'", ex.getMessage(), ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(TransformatorUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("UnsupportedLookAndFeelException: '{}'", ex.getMessage(), ex);
         }
 
         /* Create and display the form */

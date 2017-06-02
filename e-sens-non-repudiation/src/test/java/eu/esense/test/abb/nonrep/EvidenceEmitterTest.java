@@ -67,6 +67,7 @@ public class EvidenceEmitterTest {
         cert = (X509Certificate) ks.getCertificate("server1");
         key = (PrivateKey) ks.getKey("server1", "spirit".toCharArray());
         org.apache.xml.security.Init.init();
+        
     }
 
     private static Document readMessage(String file)
@@ -344,7 +345,7 @@ public class EvidenceEmitterTest {
         context.setEvent("epSOS-31");
 
         context.setMessageUUID(messageInspector.getMessageUUID());
-        context.setAuthenticationMethod("3");
+        context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
         context.setRequest(request); // here I pass the XML in order to give to
         // the developers the posisbility
         // to use their own implementation. Although an object is easier to get
@@ -364,15 +365,15 @@ public class EvidenceEmitterTest {
         // implementation
         // to still decide which handler to trigger
         handlers.get(0).discharge();
-        handlers.get(1).discharge();
+//        handlers.get(1).discharge();
 
         // Give me the ATNA, it's an ATNA test
-        assertNotNull(handlers.get(1).getMessage());
-        Utilities.serialize(handlers.get(1).getMessage().getDocumentElement());
+        assertNotNull(handlers.get(0).getMessage());
+        Utilities.serialize(handlers.get(0).getMessage().getDocumentElement());
 
         // I think I need to return handler.getMessage() which will be the audit
         // the audit will go to the server and get validated by another wrapper
-        return handlers.get(1).getMessage();
+        return handlers.get(0).getMessage();
     }
 
     @Test
@@ -502,7 +503,7 @@ public class EvidenceEmitterTest {
         context.setSubmissionTime(new DateTime());
         context.setEvent("epSOS-31");
         context.setMessageUUID(messageInspector.getMessageUUID());
-        context.setAuthenticationMethod("3");
+        context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
         context.setRequest(request); // here I pass the XML in order to give to
         // the developers the posisbility
         // to use their own implementation. Although an object is easier to get
@@ -665,7 +666,7 @@ public class EvidenceEmitterTest {
         context.setSubmissionTime(new DateTime());
         context.setEvent("epSOS-31"); // TODO, change to setEventCode
         context.setMessageUUID(messageInspector.getMessageUUID());
-        context.setAuthenticationMethod("3");
+        context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
         context.setRequest(request); // here I pass the XML in order to give to
         // the developers the posisbility
         // to use their own implementation. Although an object is easier to get
@@ -678,6 +679,8 @@ public class EvidenceEmitterTest {
         LinkedList<String> namesPostalAddress = new LinkedList<>();
         namesPostalAddress.add("Test");
         namesPostalAddress.add("Test2");
+
+        context.setRecipientNamePostalAddress(namesPostalAddress);
 
         context.setRecipientNamePostalAddress(namesPostalAddress);
         LinkedList<String> sendernamesPostalAddress = new LinkedList<>();

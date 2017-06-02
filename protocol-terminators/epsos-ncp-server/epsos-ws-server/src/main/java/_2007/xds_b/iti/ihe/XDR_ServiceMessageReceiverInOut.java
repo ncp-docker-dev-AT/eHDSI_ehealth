@@ -26,6 +26,11 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.5
  * Built on : May 28, 2011 (08:30:56 CEST)
+ * <p>
+ * XDR_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.5
+ * Built on : May 28, 2011 (08:30:56 CEST)
  */
 /**
  * XDR_ServiceMessageReceiverInOut.java
@@ -38,11 +43,8 @@ package _2007.xds_b.iti.ihe;
 import com.spirit.epsos.cc.adc.EadcEntry;
 import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
-import epsos.ccd.gnomon.auditmanager.EventType;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XdrValidationService;
@@ -50,12 +52,9 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
-import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
@@ -70,9 +69,15 @@ import java.util.UUID;
  */
 public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.AbstractInOutMessageReceiver {
 
-    //
+    private static final Logger logger = LoggerFactory.getLogger(XDR_ServiceMessageReceiverInOut.class);
+
     private static final javax.xml.bind.JAXBContext wsContext;
-    private static Logger logger = LoggerFactory.getLogger(XDR_ServiceMessageReceiverInOut.class);
+
+    static {
+        logger.debug("Loading the WS-Security init libraries in XDR 2007");
+
+        org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
+    }
 
     static {
         javax.xml.bind.JAXBContext jc;
@@ -148,20 +153,20 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
 
                 logger.debug("Incoming XDR Request Message:\n" + XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
 
-                logger.info("XDR Request Received. EVIDENCE NRR");
+//                logger.info("XDR Request Received. EVIDENCE NRR");
                 // Send NRR
-                try {
-                    EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())),
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosDispensationServiceInitialize.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            "NCPA_XDR_REQ");
-                } catch (Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
+//                try {
+//                    EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope()),
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                            EventType.epsosDispensationServiceInitialize.getCode(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                            "NCPA_XDR_REQ");
+//                } catch (Exception e) {
+//                    log.error(ExceptionUtils.getStackTrace(e));
+//                }
 
                 if ("documentRecipient_ProvideAndRegisterDocumentSetB"
                         .equals(methodName)) {
@@ -193,20 +198,22 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
 
                     logger.debug("Response Header:\n" + envelope.getHeader().toString());
                     logger.debug("Outgoing XDR Response Message:\n" + XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
-                    logger.info("XDR Response going to be sent. EVIDENCE NRO");
+//                    logger.info("XDR Response going to be sent. EVIDENCE NRO");
                     // Call to Evidence Emitter
-                    try {
-                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                EventType.epsosDispensationServiceInitialize.getCode(),
-                                DateUtil.GregorianCalendarToJodaTime(eventLog.getEI_EventDateTime()),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                "NCPA_XDR_RES");
-                    } catch (Exception e) {
-                        logger.error(ExceptionUtils.getStackTrace(e));
-                    }
+
+                    // Massi commented out: call to NI
+//                    try {
+//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                EventType.epsosDispensationServiceInitialize.getCode(),
+//                                DateUtil.GregorianCalendarToJodaTime(eventLog.getEI_EventDateTime()),
+//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                                "NCPA_XDR_RES");
+//                    } catch (Exception e) {
+//                        logger.error(ExceptionUtils.getStackTrace(e));
+//                    }
 
                 } else {
                     throw new java.lang.RuntimeException("method not found");
@@ -461,4 +468,4 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
             }
         }
     }
-}
+}// end of class

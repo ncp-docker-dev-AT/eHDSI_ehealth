@@ -46,6 +46,7 @@ public final class RespondingGateway_RequestSender {
      *
      * @param pd the Patient Demographics object.
      * @param idAssertion the assertion.
+     * @param countryCode The two-letter country code
      * @return a PRPAIN201306UV02 (XCPD Response) message.
      *
      * @see PRPAIN201306UV02

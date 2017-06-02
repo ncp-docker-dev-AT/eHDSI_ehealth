@@ -2,11 +2,26 @@ package epsos.ccd.gnomon.configmanager;
 
 import eu.epsos.configmanager.database.HibernateUtil;
 import eu.epsos.configmanager.database.model.Property;
+
+import org.apache.commons.codec.binary.Base64;
 import org.hibernate.PropertyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
@@ -60,26 +75,28 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 	/** This is the logger. */
 	private static final Logger l = LoggerFactory.getLogger(ConfigurationManagerSMP.class);
 
-	private static final HashMap<String, ServiceProcessItem> mapMap = new HashMap<>();
+        /** A map from OpenNCP Services/IHE Transactions to SMP DocumentIdentifiers. */
+	private static final HashMap<String, String> mapMap = new HashMap<>();
 
 	static {
-		mapMap.put("ConsentService",
-				new ServiceProcessItem(new String[] { "epsosConsentService::Put", "epsosConsentService::Discard" },
-						new String[] { "epsos-51", "epsos-52" }, null));
-		mapMap.put("OrderService", new ServiceProcessItem(new String[] { "epsosOrderService::List" },
-				new String[] { "epsos-31" }, null));
-		mapMap.put("PatientIdentificationService",
-				new ServiceProcessItem(new String[] { "epsosIdentityService::FindIdentityByTraits" },
-						new String[] { "epsos-11" }, null));
-		mapMap.put("PatientService", new ServiceProcessItem(new String[] { "epsosPatientService::List" },
-				new String[] { "epsos-21" }, null));
-		mapMap.put("DispensationService",
-				new ServiceProcessItem(
-						new String[] { "epsosDispensationService::Initialize", "epsosDispensationService::Discard" },
-						new String[] { "epsos-41", "epsos-42" }, null));
-		mapMap.put("VPNGateway", new ServiceProcessItem(new String[] { "urn:ehealth:ncp:vpngateway" },
-				new String[] { "epsos-91" }, null)); // not
-		// sure
+                /* These are the services that OpenNCP currently defines.
+                    The keys come from the OpenNCP custom implementation of the
+                    deprecated D3.4.2 - 4.5.8.1 and IHE profiles (e.g., same
+                    endpoint for XCA Query and Retrieve.
+                    TODO: ideally this should be shared with SMP-Editor*/
+		mapMap.put("PatientIdentificationService", "urn:ehealth:PatientIdentificationAndAuthentication::XCPD::CrossGatewayPatientDiscovery##ITI-55");
+                mapMap.put("PatientService", "urn:ehealth:RequestOfData::XCA::CrossGatewayQuery##ITI-38");
+                mapMap.put("OrderService", "urn:ehealth:RequestOfData::XCA::CrossGatewayQuery##ITI-38");
+                mapMap.put("DispensationService", "urn:ehealth:ProvisioningOfData:Provide::XDR::ProvideandRegisterDocumentSet-b##ITI-41");
+                mapMap.put("ConsentService", "urn:ehealth:ProvisioningOfData:BPPC-RegisterUpdate::XDR::ProvideandRegisterDocumentSet-b##ITI-41");
+                /* These are services both foreseen in the specification but not currently configurable */
+                mapMap.put("ITI-63","urn:ehealth:RequestOfData::XCF::CrossGatewayFetchRequest##ITI-63");
+                mapMap.put("ITI-39","urn:ehealth:RequestOfData::XCA::CrossGatewayRetrieve##ITI-39");
+                mapMap.put("epsos-91","urn:ehealth:CountryBIdentityProvider::identityProvider::HPAuthentication##epsos-91");
+                mapMap.put("ITI-40","urn:ehealth:CountryBIdentityProvider::XUA::ProvideX-UserAssertion##ITI-40");
+                mapMap.put("ehealth-105","urn:ehealth:VPN::VPNGatewayServer##ehealth-105");
+                mapMap.put("ehealth-106","urn:ehealth:VPN::VPNGatewayClient##ehealth-106");
+                mapMap.put("ehealth-107","urn:ehealth:ISM::InternationalSearchMask##ehealth-107");
 	}
 
 	/** The hibernate session. */
@@ -118,15 +135,15 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 	}
 
 	/**
-	 * Adds the values from the DB to the memory
+	 * Adds the values from the DB to the memory.
 	 */
 	private void populate() {
 		l.info("Loading all the values");
 		long start = System.currentTimeMillis();
-		
+
 		@SuppressWarnings("unchecked")
 		List<Property> properties = session.createCriteria(Property.class).list();
-		
+
 		long end = System.currentTimeMillis();
 		long total = end - start;
 		l.info("Getting all the properties took: " + total);
@@ -141,7 +158,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 			String value = property.getValue();
 			PropertySearchableContainer psc = new PropertySearchableContainer();
 			psc.setValue(value);
-//			psc.setSearchable(property.isSMP());
+			// psc.setSearchable(property.isSMP());
 			configuration.put(name, psc);
 			l.debug("Added the couple (name, value); " + name + ":" + value);
 		}
@@ -160,24 +177,26 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 	 *             if the property can't be found either in the hashmap, SMP, or
 	 *             after TSLSynchronizer
 	 */
-	public String getProperty(String key) throws PropertyNotFoundException {
-		l.info("Searching for " + key);
-		l.info("Trying hashmap first");
+	public String getProperty(String key) {
+		l.debug("Searching for " + key);
+		l.debug("Trying hashmap first");
 		PropertySearchableContainer psc = configuration.get(key);
-		
-		// Ok, here two things: one is that the entry does not exist, the second is that it is not 
-		// Searchable. So, if it does not exist, we try SMP anyway. If it exists, then we use it. 
+
+		// Ok, here two things: one is that the entry does not exist, the second
+		// is that it is not
+		// Searchable. So, if it does not exist, we try SMP anyway. If it
+		// exists, then we use it.
 		// To update we remove first and we re-add it.
 		if (psc == null) {
-			l.info("Nothing found in the hashmap, let's try to SMP");
-				String value = query(key);
-				if (value != null) {
-					PropertySearchableContainer psc1 = new PropertySearchableContainer();
-					psc1.setSearchable(true);
-					psc1.setValue(value);
-					configuration.put(key, psc1);
-					psc = psc1;
-				}
+			l.debug("Nothing found in the hashmap, let's try to SMP");
+			String value = query(key);
+			if (value != null) {
+				PropertySearchableContainer psc1 = new PropertySearchableContainer();
+				psc1.setSearchable(true);
+				psc1.setValue(value);
+				configuration.put(key, psc1);
+				psc = psc1;
+			}
 		}
 		if (psc == null) {
 			l.info("Value is still null, let's run TSLSynchronizer");
@@ -211,7 +230,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 		/*
 		 * Participant identifier is: urn:ehealth:lu:ncpb-idp document
 		 * identifier is relatd to the transaction
-		 * epsos-docid-qns::urn:epsos:services##epsos-21.
+		 * epsos-resid-qns::urn:ehealth:PatientIdentificationAndAuthentication::XCPD::CrossGatewayPatientDiscovery##ITI-55.
 		 * 
 		 * How the participant identifier is calculated: we split the string in
 		 * three (must be three). The first is the country, the second is the to
@@ -225,47 +244,154 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 
 		String countryCode = values[0];
 		l.debug("Found country code: " + countryCode);
-		ServiceProcessItem spi = map(values[1]);
-		String documentType = spi.getEventNumber()[0];
-		l.debug("Found documentType" + documentType);
-		String endpoints = spi.getEventName()[0];
-		l.debug("Searching endpoint: " + endpoints);
+		String documentType = mapMap.get(values[1]);
+		l.debug("Found documentType: " + documentType);
 		SMLSMPClient client = new SMLSMPClient();
 		try {
 			l.debug("Doing SML/SMP");
-			client.lookup(countryCode, documentType, false);
-			l.debug("Founda values!!!!");
+			client.lookup(countryCode, documentType);
+			l.debug("Found values!!!!");
 			/*
-			 * What to do with the property? One is to return to the caller the endpoint, 
-			 * the second is to put it into the certificate
+			 * What to do with the property? One is to return to the caller the
+			 * endpoint, the second is to put it into the certificate
 			 */
 			X509Certificate cert = client.getCertificate();
 			if (cert != null) {
-				l.debug("Storing certificate in truststore");
-//				String subject = cert.getSubjectDN().getName();
-//				String value = Base64.encodeBase64String(MessageDigest.getInstance("MD5").digest(subject.getBytes()));
-//				TSLUtils.storeCertificateToTrustStore(cert, value);
+				l.debug("Storing the certificate in the truststore, configuration/DB and folder");
+				String subject = cert.getSubjectDN().getName();
+				String alias = Base64.encodeBase64String(MessageDigest.getInstance("MD5").digest(subject.getBytes()));
+				storeCertificateToTrustStore(cert, alias);
+                                String eventId = documentType.substring(documentType.lastIndexOf("##")+2); // "e.g., obtain "ITI-55"
+                                storeCertificateInConfigurationAndDB(cert, countryCode, eventId);
+                                storeCertificateInCertsFolder(cert, countryCode, eventId);
 			}
 			URL endpoint = client.getEndpointReference();
+			l.debug("Found endpoint: " + endpoint);
 			if (endpoint != null) {
+                                l.debug("Storing the new endpoint for " + key + " in DB");
+                                updateProperty(key, endpoint.toString());
 				return endpoint.toString();
 			} else {
 				return null;
 			}
 		} catch (SMLSMPClientException e) {
-			l.error("SMP/SML Exception",e);
+			l.error("SMP/SML Exception", e);
+			return null;
+		} catch (NoSuchAlgorithmException e) {
+			l.error("Invalid exception in message digest", e);
 			return null;
 		}
 
-
-
 	}
 
-	private ServiceProcessItem map(String value) {
-		return mapMap.get(value); // always return the first, is it ok?????
-									// we assume they have the same
-									// cetificate for both services
+        /**
+         * Stores the fetched certificate in the OpenNCP truststore.
+         * @param cert The certificate to be stored
+         * @param alias The alias to assign to the certificate
+         * @throws SMLSMPClientException
+         */
+	private void storeCertificateToTrustStore(X509Certificate cert, String alias) throws SMLSMPClientException {
+		ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+		String TRUST_STORE = cms.getProperty("TRUSTSTORE_PATH");
+		String TRUST_STORE_PASS = cms.getProperty("TRUSTSTORE_PASSWORD");
+		l.debug("Storing in truststore: " + TRUST_STORE);
+		l.debug("Storing the certificate with DN: " + cert.getSubjectDN() + " and SN: " + cert.getSerialNumber());
+
+		try {
+			KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+			File keystoreFile = new File(TRUST_STORE);
+			// Load the keystore contents
+			FileInputStream in = new FileInputStream(keystoreFile);
+			keystore.load(in, TRUST_STORE_PASS.toCharArray());
+			in.close();
+
+			keystore.setCertificateEntry(alias, cert);
+			l.debug("CERTALIAS: " + alias);
+			// Save the new keystore contents
+			FileOutputStream out = new FileOutputStream(keystoreFile);
+			keystore.store(out, TRUST_STORE_PASS.toCharArray());
+			out.close();
+
+		} catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
+			l.error("Unable to store the message in the truststore", e);
+			throw new SMLSMPClientException(e);
+		}
 	}
+
+        /**
+         * Stores the certificate fetched from the SMP record into the folder given
+         * by the certificates.storepath property. E.g., for the certificate used
+         * to protect the Portuguese XCPD (ITI-55) endpoint, it stores the certificate
+         * under the filename pt_ITI-55.der.
+         * @param certificate The certificate to store
+         * @param countryCode The lowercase two-letter country code (ISO 3166-1 alpha-2)
+         * @param eventId The suffix of the SMP Document Identifier, corresponding
+         * to the epSOS EventIDs from D3.A.7 AuditTrail - 2.3.5.7, plus some custom
+         * ones, both outlined in the CP-eHealthDSI-002 for SMP/SML capabilities.
+         * @throws SMLSMPClientException
+         */
+        private void storeCertificateInCertsFolder(X509Certificate certificate, String countryCode, String eventId) throws SMLSMPClientException {
+            // export the certificate to der format
+            String storepath = configuration.get("certificates.storepath").getValue();
+            String filename = countryCode + "_" + eventId;
+            boolean exp = exportCertificate(certificate,
+                            new File(storepath + filename + ".der"),
+                            true);
+            if (exp) {
+                l.info("Certificate " + filename + ".der exported successfully");
+            } else {
+                l.info("Failed to export the certificate " + filename + ".der");
+            }
+        }
+
+        /**
+         * Stores the certificate fetched from the SMP record into the hashmap and
+         * also in the properties DB. E.g., for the certificate used to protect the
+         * Portuguese XCPD (ITI-55) endpoint, it stores the certificate
+         * under the key pt_ITI-55.
+         * @param certificate The certificate to store
+         * @param countryCode The lowercase two-letter country code (ISO 3166-1 alpha-2)
+         * @param eventId The suffix of the SMP Document Identifier, corresponding
+         * to the epSOS EventIDs from D3.A.7 AuditTrail - 2.3.5.7, plus some custom
+         * ones, both outlined in the CP-eHealthDSI-002 for SMP/SML capabilities.
+         */
+        private void storeCertificateInConfigurationAndDB(X509Certificate certificate, String countryCode, String eventId) {
+            // create a keypair value with certid and country code and update both the hashmap and DB
+            configuration.put(certificate.getSerialNumber().toString(), new PropertySearchableContainer(countryCode + "_" + eventId, false));
+            updateProperty(certificate.getSerialNumber().toString(), countryCode + "_" + eventId);
+        }
+
+        /**
+	 * This method exports a certificate either to text (pem format), either to
+	 * binary (der format)
+	 *
+	 * @param cert
+	 * @param file
+	 * @param binary
+	 */
+	private boolean exportCertificate(java.security.cert.Certificate cert, File file, boolean binary) throws SMLSMPClientException {
+            boolean exp = false;
+            try {
+                // Get the encoded form which is suitable for exporting
+                byte[] buf = cert.getEncoded();
+                FileOutputStream os = new FileOutputStream(file);
+                if (binary) { // Write in binary form
+                    os.write(buf);
+                } else { // Write in text form
+                    Writer wr = new OutputStreamWriter(os, Charset.forName("UTF-8"));
+                    wr.write("-----BEGIN CERTIFICATE-----\n");
+                    wr.write(new String(Base64.encodeBase64(buf)));
+                    wr.write("\n-----END CERTIFICATE-----\n");
+                    wr.flush();
+                }
+                os.close();
+                exp = true;
+            } catch (CertificateEncodingException | IOException e) {
+                exp = false;
+                throw new SMLSMPClientException(e);
+            }
+            return exp;
+        }
 
 	/**
 	 * Get the endpoint URL for a specified country and a service name
@@ -285,10 +411,21 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 		throw new IllegalArgumentException("Unable to set WSE: wrong concept in SMP");
 	}
 
+	/**
+	 * This method persists the updated property.
+	 */
 	@Override
 	public String updateProperty(String key, String value) {
 		OLDConfigurationManagerDb.getInstance().updateProperty(key, value);
 		return value;
 	}
 
+        /**
+         * Removes a key from the hashmap.
+         * @param key The key to delete.
+         */
+        public void deleteKeyFromHashMap(String key) {
+            l.debug("Going to remove from the hashmap the following key: " + key);
+            configuration.remove(key);
+        }
 }

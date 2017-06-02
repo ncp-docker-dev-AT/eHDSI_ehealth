@@ -128,13 +128,13 @@ public class GlassfishTestKeyStoreManager implements KeyStoreManager {
             trustStore.load(keystoreStream, TEST_TRUSTSTORE_PASSWORD.toCharArray());
             return trustStore;
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(GlassfishTestKeyStoreManager.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("IOException: '{}'", ex.getMessage(), ex);
         } catch (NoSuchAlgorithmException ex) {
-            java.util.logging.Logger.getLogger(GlassfishTestKeyStoreManager.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("NoSuchAlgorithmException: '{}'", ex.getMessage(), ex);
         } catch (CertificateException ex) {
-            java.util.logging.Logger.getLogger(GlassfishTestKeyStoreManager.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("CertificateException: '{}'", ex.getMessage(), ex);
         } catch (KeyStoreException ex) {
-            java.util.logging.Logger.getLogger(GlassfishTestKeyStoreManager.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("KeyStoreException: '{}'", ex.getMessage(), ex);
         }
         return null;
     }
