@@ -148,8 +148,14 @@ public class CdaHelper {
 									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:formCode");
 							Node doseForm = (Node) doseFormExpr.evaluate(entryNode, XPathConstants.NODE);
 							if (doseForm != null) {
-								packsString = doseForm.getAttributes().getNamedItem("displayName").getNodeValue();
-								formCode = doseForm.getAttributes().getNamedItem("code").getNodeValue();
+								Node displayNameNode = doseForm.getAttributes().getNamedItem("displayName");
+								if (displayNameNode != null) {
+									packsString = displayNameNode.getNodeValue();
+								}
+								Node codeNode = doseForm.getAttributes().getNamedItem("code");
+								if (codeNode != null) {
+									formCode = codeNode.getNodeValue();
+								}
 							}
 
 							String atcCode = null;
@@ -171,35 +177,6 @@ public class CdaHelper {
 							Node strengthNode = (Node) strengthExpr.evaluate(entryNode, XPathConstants.NODE);
 							if (strengthNode != null) {
 								strength = strengthNode.getTextContent().trim();
-							}
-
-							XPathExpression packQuantityExpr = xpath.compile(
-									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:ingredient/epsos:quantity/epsos:numerator[@xsi:type='epsos:PQ']");
-							Node packQuant = (Node) packQuantityExpr.evaluate(entryNode, XPathConstants.NODE);
-
-							XPathExpression packQuantityExpr2 = xpath.compile(
-									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:ingredient/epsos:quantity/epsos:denominator[@xsi:type='epsos:PQ']");
-							Node packQuant2 = (Node) packQuantityExpr2.evaluate(entryNode, XPathConstants.NODE);
-							if (packQuant != null && packQuant2 != null) {
-								if (packQuant.getAttributes().getNamedItem("unit") != null) {
-									String unit = packQuant.getAttributes().getNamedItem("unit").getNodeValue();
-									if (unit != null && !unit.equals(CHAR_ONE)) {
-										packsString += CHAR_SPACE + unit;
-									}
-
-									if (packQuant2.getAttributes().getNamedItem("value") != null) {
-										String denom = packQuant2.getAttributes().getNamedItem("value").getNodeValue();
-										if (denom != null && !denom.equals(CHAR_ONE)) {
-											packsString += CHAR_FORWARD_SLASH + denom;
-											if (packQuant2.getAttributes().getNamedItem("unit") != null) {
-												unit = packQuant2.getAttributes().getNamedItem("unit").getNodeValue();
-												if (unit != null && !unit.equals(CHAR_ONE)) {
-													packsString += CHAR_SPACE + unit;
-												}
-											}
-										}
-									}
-								}
 							}
 
 							row.setIngredient(handleIngredients(xpath, entryNode));
