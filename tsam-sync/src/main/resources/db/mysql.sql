@@ -103,7 +103,7 @@ FOREIGN KEY (code_system_id)
 REFERENCES code_system (id);
 
 ALTER TABLE designation
-  ADD CONSTRAINT fk_code_system_concept_id
+  ADD CONSTRAINT fk_des_code_system_concept_id
 FOREIGN KEY (code_system_concept_id)
 REFERENCES code_system_concept (id);
 
@@ -133,7 +133,7 @@ FOREIGN KEY (value_set_id)
 REFERENCES value_set (id);
 
 ALTER TABLE x_concept_value_set
-  ADD CONSTRAINT fk_code_system_concept_id
+  ADD CONSTRAINT fk_con_code_system_concept_id
 FOREIGN KEY (code_system_concept_id)
 REFERENCES code_system_concept (id);
 
