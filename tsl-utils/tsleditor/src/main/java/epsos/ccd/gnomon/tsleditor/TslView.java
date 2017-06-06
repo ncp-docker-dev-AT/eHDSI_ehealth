@@ -2254,8 +2254,7 @@ public class TslView extends FrameView implements TreeSelectionListener, ItemLis
                 PrivateKey privateKey = (PrivateKey) keyStore.getKey(new String(this.keyAlias.getPassword()),
                         this.keyPassword.getPassword());
 
-                X509Certificate cert = (X509Certificate) keyStore
-                        .getCertificate(new String(this.keyAlias.getPassword()));
+                X509Certificate cert = (X509Certificate) keyStore.getCertificate(new String(this.keyAlias.getPassword()));
                 this.trustServiceList.sign(privateKey, cert);
 
                 // after this we need to reload the model from the dom
@@ -2266,7 +2265,7 @@ public class TslView extends FrameView implements TreeSelectionListener, ItemLis
                 this.showTSLSignature();
 
             } catch (Exception e) {
-                LOGGER.error("Exception: " + e.getMessage());
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
                 JOptionPane.showMessageDialog(this.jSplitPane1, "XML Signature of TSL Failed", "XML Signature Error",
                         JOptionPane.ERROR_MESSAGE);
             }
