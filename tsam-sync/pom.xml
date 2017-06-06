@@ -18,7 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
         <commons-lang3.version>3.5</commons-lang3.version>
-        <ehealth-termservice-server.version>1.0.0-SNAPSHOT</ehealth-termservice-server.version>
+        <ehealth-termservice-server.version>1.0.0</ehealth-termservice-server.version>
         <hibernate.version>5.2.7.Final</hibernate.version>
         <hikaricp.version>2.6.0</hikaricp.version>
         <httpclient.version>4.5.2</httpclient.version>
