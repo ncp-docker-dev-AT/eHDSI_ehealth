@@ -1,28 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
+        <artifactId>openncp</artifactId>
         <version>2.5.0-SNAPSHOT</version>
     </parent>
 
-    <!-- The project OpenATNA has been initially developed by OpenHeathTools.
-        Since the OpenNCP project have needed to make some changes to the project,
-        the OpenNCP Community have decided to change the groupId from org.openhealthtools.openatna
-        to eu.europa.ec.joinup.ecc.ehdsi.epsos-openatna and the artifactId from openatna
-        to epsos-openatna and publish the new artifacts on the EU JoinUP repository
-        (https://joinup.ec.europa.eu/nexus/content/repositories/releases/eu/europa/ec/joinup/ecc/); -->
     <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
     <artifactId>openncp-openatna</artifactId>
     <packaging>pom</packaging>
-    <name>OpenATNA</name>
+
+    <name>OpenNCP OpenATNA</name>
     <url>https://openatna.projects.openhealthtools.org</url>
-    <prerequisites>
-        <maven>2.0.6</maven>
-    </prerequisites>
     <licenses>
         <license>
             <name>Apache License Version 2.0</name>
@@ -30,16 +22,6 @@
         </license>
     </licenses>
 
-    <scm>
-        <connection>scm:svn:https://www.projects.openhealthtools.org/svn/openatna/trunk/openatna</connection>
-        <developerConnection>scm:svn:https://www.projects.openhealthtools.org/svn/openatna/trunk/openatna
-        </developerConnection>
-        <url>https://www.projects.openhealthtools.org/svn/openatna/</url>
-    </scm>
-    <issueManagement>
-        <system/>
-        <url/>
-    </issueManagement>
     <developers>
         <developer>
             <id>scmabh</id>
@@ -54,6 +36,27 @@
             <timezone>EST</timezone>
         </developer>
     </developers>
+
+    <prerequisites>
+        <maven>2.0.6</maven>
+    </prerequisites>
+
+    <modules>
+        <module>syslog</module>
+        <module>audit</module>
+        <module>anom</module>
+        <module>jaxb</module>
+        <module>net</module>
+        <module>report</module>
+        <module>archive</module>
+        <module>all</module>
+        <module>web</module>
+    </modules>
+
+    <properties>
+        <spring.version>3.2.18.RELEASE</spring.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -83,25 +86,6 @@
         </plugins>
     </build>
 
-    <!-- Properties defined by OpenATNA -->
-    <properties>
-        <spring.version>3.2.18.RELEASE</spring.version>
-    </properties>
-
-    <modules>
-        <module>syslog</module>
-        <module>audit</module>
-        <module>anom</module>
-        <module>jaxb</module>
-        <module>net</module>
-        <module>report</module>
-        <module>archive</module>
-        <module>all</module>
-        <module>web</module>
-    </modules>
-
-    <!--===================LICENCE HEADER CHECK USE -P headers with mvn command
-        ======================== -->
     <profiles>
         <profile>
             <id>headers</id>

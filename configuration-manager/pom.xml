@@ -1,63 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <version>2.5.0-SNAPSHOT</version>
     </parent>
+
     <artifactId>openncp-configuration-manager</artifactId>
     <packaging>jar</packaging>
+
     <name>configurationmanager</name>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <developers>
-        <developer>
-            <id>k.karkaletsis@gnomon.com.gr</id>
-            <email>k.karkaletsis@gnomon.com.gr</email>
-            <name>Kostas Karkaletsis</name>
-            <organization>Gnomon</organization>
-            <organizationUrl>http://gnomon.com.gr</organizationUrl>
-        </developer>
-    </developers>
-    <inceptionYear>2012</inceptionYear>
-    <licenses>
-        <license>
-            <name>Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
-    <scm>
-        <connection>https://ec.europa.eu/cefdigital/code/scm/openncp/ehealth.git</connection>
-        <tag>HEAD</tag>
-        <url>https://bitbucket.org/openncp/configuration-manager</url>
-    </scm>
-    <issueManagement>
-        <system>JIRA</system>
-        <url>https://ec.europa.eu/cefdigital/tracker/projects/OPENNCP</url>
-    </issueManagement>
-
     <dependencies>
+        <!--dependency>
+        	<groupId>eu.europa.ec.sante.ehdsi</groupId>
+        	<artifactId>openncp-audit-manager</artifactId>
+        	<version>2.5.0-SNAPSHOT</version>
+        </dependency-->
+        <!--<dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-util</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+               <exclusion>
+                <artifactId>bcprov-jdk15</artifactId>
+                <groupId>org.bouncycastle</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>-->
         <dependency>
             <groupId>eu.europa.ec.dynamic-discovery</groupId>
             <artifactId>dynamic-discovery-client</artifactId>
-            <version>1.1</version>
+            <version>${dynamic-discovery-client.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>eu.europa.ec.sante.ehdsi</groupId>-->
-            <!--<artifactId>openncp-util</artifactId>-->
-            <!--<version>${project.version}</version>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<artifactId>bcprov-jdk15</artifactId>-->
-                    <!--<groupId>org.bouncycastle</groupId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
+        <!-- This is the PEPPOL client, supporting OASIS BDXL -->
+        <dependency>
+            <groupId>no.difi.vefa</groupId>
+            <artifactId>peppol-lookup</artifactId>
+            <version>${peppol-lookup.version}</version>
+        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -71,28 +55,27 @@
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
-            <!--<version>1.7</version>-->
+            <version>${commons-configuration.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
+            <version>${httpclient.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.10</version>
+            <version>${commons-codec.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.5</version>
+            <version>${commons-io.version}</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
+            <version>${saxon-he.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -108,7 +91,7 @@
         <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.12.0.GA</version>
+            <version>${javassist.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -119,46 +102,32 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.21</version>
+            <version>${mysql-connector.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
+            <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
-        <!-- This is the PEPPOL client, supporting OASIS BDXL -->
         <dependency>
-            <groupId>no.difi.vefa</groupId>
-            <artifactId>peppol-lookup</artifactId>
-            <version>0.9.5</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
-        <!-- Testing dependencies -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.2.142</version>
+            <version>${h2database.version}</version>
             <type>jar</type>
             <scope>test</scope>
         </dependency>
-        <!-- PEPPOL-SMP workaround dependencies -->
-        <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>Saxon-HE</artifactId>
-            <version>${saxon-he.version}</version>
-        </dependency>
-        <!--dependency>
-        	<groupId>eu.europa.ec.sante.ehdsi</groupId>
-        	<artifactId>openncp-audit-manager</artifactId>
-        	<version>2.5.0-SNAPSHOT</version>
-        </dependency-->
     </dependencies>
 
-    <!-- ================== Build plugins ================== -->
     <build>
         <plugins>
-            <!--This plugin will bundle Postgres and MySQL JDBC drivers into the Jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

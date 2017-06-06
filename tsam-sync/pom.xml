@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>openncp</artifactId>
-        <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>2.5.0-SNAPSHOT</version>
-    </parent>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>eu.europa.ec.sante.ehdsi</groupId>
+        <artifactId>openncp</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+    </parent>
+
     <artifactId>openncp-tsam-sync</artifactId>
-    <name>TSAM Synchronizer</name>
     <packaging>jar</packaging>
+
+    <name>TSAM Synchronizer</name>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
@@ -30,6 +31,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi.termservice</groupId>
+            <artifactId>ehealth-termservice-rest-model</artifactId>
+            <version>${ehealth-termservice-server.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -80,11 +86,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi.termservice</groupId>
-            <artifactId>ehealth-termservice-rest-model</artifactId>
-            <version>${ehealth-termservice-server.version}</version>
         </dependency>
         <dependency>
             <groupId>com.oracle</groupId>

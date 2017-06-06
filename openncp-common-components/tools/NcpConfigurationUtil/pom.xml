@@ -1,5 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -10,101 +11,26 @@
     </parent>
 
     <artifactId>openncp-configuration-util</artifactId>
-    <inceptionYear>2013</inceptionYear>
     <packaging>jar</packaging>
 
-    <name>NcpConfigurationUtil</name>
-    <url>http://code.google.com/p/epsos-common-components/</url>
-    <description>This project will help the installation of new OpenNCP instances, by setting up all the NCP required properties in the database.</description>
+    <name>OpenNCP NCP Configuration Utility</name>
+    <description>
+        This project will help the installation of new OpenNCP instances, by setting up all the NCP required
+        properties in the database.
+    </description>
 
-    <!-- ==================
-       Development
-    ================== -->
-    <licenses>
-        <license>
-            <name>GNU Public License, Version 3.0</name>
-            <url>http://www.gnu.org/copyleft/gpl.html</url>
-        </license>
-    </licenses>
-
-    <!-- ==================
-       Developers
-    ================== -->
-    <developers>
-        <developer>
-            <id>marcelo.fonseca@iuz.pt</id>
-            <email>marcelo.fonseca@iuz.pt</email>
-            <name>Marcelo Fonseca</name>
-            <organization>SPMS, Portugal</organization>
-            <organizationUrl>http://www.spms.pt</organizationUrl>
-        </developer>
-    </developers>
-
-    <!-- ==================
-       Properties
-    ================== -->
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <!-- ==================
-       Dependencies
-    ================== -->
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <!--<version>3.3.2.GA</version>-->
             <version>${hibernate.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>org.slf4j</artifactId>
-                    <groupId>slf4j-api</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.12.0.GA</version>
+            <version>${javassist.version}</version>
             <scope>runtime</scope>
         </dependency>
-        <!--<dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-commons-annotations</artifactId>
-            <version>3.1.0.GA</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>3.3.2.GA</version>
-        </dependency>-->
-        <!--<dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>ejb3-persistence</artifactId>
-            <version>1.0.1.GA</version>
-        </dependency>-->
-        <!--<dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
-        </dependency>-->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -118,29 +44,30 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.21</version>
+            <version>${mysql-connector.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
+            <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
             <version>${commons-configuration.version}</version>
-            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
-    <!-- ==================
-      Build plugins
-    ================== -->
     <build>
         <plugins>
-            <!--This plugin will bundle Postgres and MySQL JDBC drivers into the Jar-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

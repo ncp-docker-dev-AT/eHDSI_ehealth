@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -10,23 +10,20 @@
     </parent>
 
     <artifactId>openncp-openstork-utils</artifactId>
+    <packaging>jar</packaging>
 
     <name>OpenSTORK Utils</name>
-    <inceptionYear>2014</inceptionYear>
-    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml</artifactId>
-            <version>2.6.4</version>
-            <type>jar</type>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-assertion-validator</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>eu.stork</groupId>
-            <artifactId>Commons</artifactId>
-            <version>1.4.2</version>
-            <type>jar</type>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-configuration-manager</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
@@ -35,21 +32,18 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-configuration-manager</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-assertion-validator</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-util</artifactId>
             <version>${project.version}</version>
-            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>2.6.4</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.stork</groupId>
+            <artifactId>Commons</artifactId>
+            <version>${stork-commons.version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -1,11 +1,8 @@
-<?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- ==================
-       Artifact
-    ================== -->
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
         <artifactId>openncp-ncp-client</artifactId>
@@ -14,54 +11,11 @@
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client</groupId>
     <artifactId>openncp-xdr-ws-client</artifactId>
+    <packaging>jar</packaging>
 
     <name>OpenNCP CC IHE-XDR Service Client</name>
-    <inceptionYear>2012</inceptionYear>
 
-
-    <!-- ==================
-       Development
-    ================== -->
-    <licenses>
-        <license>
-            <name>GNU Public License, Version 3.0</name>
-            <url>http://www.gnu.org/copyleft/gpl.html</url>
-        </license>
-    </licenses>
-    <scm>
-        <connection>git clone https://code.google.com/p/epsos-common-components.protocolterminators/</connection>
-        <url>http://code.google.com/p/epsos-common-components.protocolterminators/source/browse/</url>
-    </scm>
-    <url>http://code.google.com/p/epsos-common-components.protocolterminators/</url>
-    <issueManagement>
-        <system>JIRA</system>
-        <url>https://openncp.atlassian.net/browse/PT</url>
-    </issueManagement>
-
-
-    <!-- ==================
-        Dependencies
-    ================== -->
     <dependencies>
-
-        <!-- epSOS -->
-
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
-            <artifactId>openncp-ncp-pt-utils</artifactId>
-        </dependency>
-
-        <!-- epsos -->
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-util</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-audit-manager</artifactId>
@@ -78,8 +32,7 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
-            <artifactId>openncp-integration-test</artifactId>
-            <scope>test</scope>
+            <artifactId>openncp-ncp-pt-utils</artifactId>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
@@ -117,8 +70,21 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- axis -->
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-util</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
+            <artifactId>openncp-integration-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
@@ -130,6 +96,24 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
@@ -144,29 +128,6 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>serializer</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-            <type>jar</type>
-        </dependency>
-
-        <!-- tests -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
