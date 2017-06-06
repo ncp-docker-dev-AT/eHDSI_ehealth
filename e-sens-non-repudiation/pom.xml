@@ -20,7 +20,7 @@
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
         </dependency>
-        <!-- TODO: Harmonizing the opensaml dependencies versions used in the diferents components -->
+        <!-- TODO: Aligning the opensaml dependencies versions used in the diferents components -->
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
