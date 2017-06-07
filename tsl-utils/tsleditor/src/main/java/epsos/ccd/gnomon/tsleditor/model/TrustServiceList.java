@@ -1,20 +1,3 @@
-/***Licensed to the Apache Software Foundation (ASF) under one
-*or more contributor license agreements.  See the NOTICE file
-*distributed with this work for additional information
-*regarding copyright ownership.  The ASF licenses this file
-*to you under the Apache License, Version 2.0 (the
-*"License"); you may not use this file except in compliance
-*with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-*Unless required by applicable law or agreed to in writing,
-*software distributed under the License is distributed on an
-*"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-*KIND, either express or implied.  See the License for the
-*specific language governing permissions and limitations
-*under the License.
-**/
 package epsos.ccd.gnomon.tsleditor.model;
 
 import java.io.ByteArrayOutputStream;
@@ -82,8 +65,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xpath.XPathAPI;
@@ -120,6 +101,8 @@ import org.etsi.uri._02231.v2.TSPType;
 import org.etsi.uri._02231.v2.TrustServiceProviderListType;
 import org.etsi.uri._02231.v2.TrustStatusListType;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3._2000._09.xmldsig.DigestMethodType;
 import org.w3._2000._09.xmldsig.X509IssuerSerialType;
 import org.w3c.dom.Document;
@@ -127,10 +110,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import epsos.ccd.gnomon.tsleditor.ValidatorUtil;
+import org.w3c.dom.NodeList;
 
 public class TrustServiceList {
 
-	private static final Log LOG = LogFactory.getLog(TrustServiceList.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrustServiceList.class);
 
 	private static final String XADES_TYPE = "http://uri.etsi.org/01903#SignedProperties";
 
@@ -161,34 +145,34 @@ public class TrustServiceList {
 	protected TrustServiceList() {
 		super();
 		this.changed = true;
-		this.changeListeners = new LinkedList<ChangeListener>();
-		this.objectFactory = new ObjectFactory();
-		this.xadesObjectFactory = new org.etsi.uri._01903.v1_3.ObjectFactory();
-		this.xmldsigObjectFactory = new org.w3._2000._09.xmldsig.ObjectFactory();
-		this.tslxObjectFactory = new org.etsi.uri._02231.v2.additionaltypes.ObjectFactory();
-		try {
-			this.datatypeFactory = DatatypeFactory.newInstance();
-		} catch (DatatypeConfigurationException e) {
-			throw new RuntimeException("datatype config error: " + e.getMessage(), e);
-		}
-		this.trustStatusList = new TrustStatusListType();
-	}
+        this.changeListeners = new LinkedList<>();
+        this.objectFactory = new ObjectFactory();
+        this.xadesObjectFactory = new org.etsi.uri._01903.v1_3.ObjectFactory();
+        this.xmldsigObjectFactory = new org.w3._2000._09.xmldsig.ObjectFactory();
+        this.tslxObjectFactory = new org.etsi.uri._02231.v2.additionaltypes.ObjectFactory();
+        try {
+            this.datatypeFactory = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new RuntimeException("datatype config error: " + e.getMessage(), e);
+        }
+        this.trustStatusList = new TrustStatusListType();
+    }
 
 	protected TrustServiceList(TrustStatusListType trustStatusList, Document tslDocument, File tslFile) {
 		this.trustStatusList = trustStatusList;
 		this.tslDocument = tslDocument;
 		this.tslFile = tslFile;
-		this.changeListeners = new LinkedList<ChangeListener>();
-		this.objectFactory = new ObjectFactory();
-		this.xadesObjectFactory = new org.etsi.uri._01903.v1_3.ObjectFactory();
-		this.xmldsigObjectFactory = new org.w3._2000._09.xmldsig.ObjectFactory();
-		this.tslxObjectFactory = new org.etsi.uri._02231.v2.additionaltypes.ObjectFactory();
-		try {
-			this.datatypeFactory = DatatypeFactory.newInstance();
-		} catch (DatatypeConfigurationException e) {
-			throw new RuntimeException("datatype config error: " + e.getMessage(), e);
-		}
-	}
+        this.changeListeners = new LinkedList<>();
+        this.objectFactory = new ObjectFactory();
+        this.xadesObjectFactory = new org.etsi.uri._01903.v1_3.ObjectFactory();
+        this.xmldsigObjectFactory = new org.w3._2000._09.xmldsig.ObjectFactory();
+        this.tslxObjectFactory = new org.etsi.uri._02231.v2.additionaltypes.ObjectFactory();
+        try {
+            this.datatypeFactory = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new RuntimeException("datatype config error: " + e.getMessage(), e);
+        }
+    }
 
 	public void addChangeListener(ChangeListener changeListener) {
 		this.changeListeners.add(changeListener);
@@ -292,51 +276,6 @@ public class TrustServiceList {
 			schemeInformation.setSchemeOperatorAddress(schemeOperatorAddress);
 		}
 		return schemeOperatorAddress;
-	}
-
-	public void setSchemeOperatorPostalAddress(PostalAddressType postalAddress, Locale locale) {
-		AddressType schemeOperatorAddress = getSchemeOperatorAddress();
-		PostalAddressListType postalAddresses = schemeOperatorAddress.getPostalAddresses();
-		if (null == postalAddresses) {
-			postalAddresses = this.objectFactory.createPostalAddressListType();
-			schemeOperatorAddress.setPostalAddresses(postalAddresses);
-		}
-		/*
-		 * First try to locate an existing address for the given locale.
-		 */
-		PostalAddressType existingPostalAddress = null;
-		for (PostalAddressType currentPostalAddress : postalAddresses.getPostalAddress()) {
-			if (currentPostalAddress.getLang().toLowerCase().equals(locale.getLanguage())) {
-				existingPostalAddress = currentPostalAddress;
-				break;
-			}
-		}
-		if (null != existingPostalAddress) {
-			/*
-			 * Update the existing postal address.
-			 */
-			existingPostalAddress.setStreetAddress(postalAddress.getStreetAddress());
-			existingPostalAddress.setPostalCode(postalAddress.getPostalCode());
-			existingPostalAddress.setLocality(postalAddress.getLocality());
-			existingPostalAddress.setStateOrProvince(postalAddress.getStateOrProvince());
-			existingPostalAddress.setCountryName(postalAddress.getCountryName());
-		} else {
-			LOG.debug("add postal address: " + locale.getLanguage());
-			/*
-			 * Add the new postal address. We really have to create a copy into
-			 * a new JAXB object. This allows a caller to reuse a postal address
-			 * JAXB data structure without running into trouble with the JAXB
-			 * marshaller.
-			 */
-			PostalAddressType newPostalAddress = this.objectFactory.createPostalAddressType();
-			newPostalAddress.setLang(locale.getLanguage());
-			newPostalAddress.setStreetAddress(postalAddress.getStreetAddress());
-			newPostalAddress.setPostalCode(postalAddress.getPostalCode());
-			newPostalAddress.setLocality(postalAddress.getLocality());
-			newPostalAddress.setStateOrProvince(postalAddress.getStateOrProvince());
-			newPostalAddress.setCountryName(postalAddress.getCountryName());
-			postalAddresses.getPostalAddress().add(newPostalAddress);
-		}
 	}
 
 	public List<String> getSchemeOperatorElectronicAddresses() {
@@ -447,26 +386,49 @@ public class TrustServiceList {
 		return statusDeterminationApproach;
 	}
 
-	public List<TrustServiceProvider> getTrustServiceProviders() {
-		if (null != this.trustServiceProviders) {
-			// only load once
-			return this.trustServiceProviders;
-		}
-		this.trustServiceProviders = new LinkedList<TrustServiceProvider>();
-		if (null == this.trustStatusList) {
-			return this.trustServiceProviders;
-		}
-		TrustServiceProviderListType trustServiceProviderList = this.trustStatusList.getTrustServiceProviderList();
-		if (null == trustServiceProviderList) {
-			return this.trustServiceProviders;
-		}
-		List<TSPType> tsps = trustServiceProviderList.getTrustServiceProvider();
-		for (TSPType tsp : tsps) {
-			TrustServiceProvider trustServiceProvider = new TrustServiceProvider(tsp);
-			this.trustServiceProviders.add(trustServiceProvider);
-		}
-		return this.trustServiceProviders;
-	}
+    public void setSchemeOperatorPostalAddress(PostalAddressType postalAddress, Locale locale) {
+        AddressType schemeOperatorAddress = getSchemeOperatorAddress();
+        PostalAddressListType postalAddresses = schemeOperatorAddress.getPostalAddresses();
+        if (null == postalAddresses) {
+            postalAddresses = this.objectFactory.createPostalAddressListType();
+            schemeOperatorAddress.setPostalAddresses(postalAddresses);
+        }
+        /*
+         * First try to locate an existing address for the given locale.
+		 */
+        PostalAddressType existingPostalAddress = null;
+        for (PostalAddressType currentPostalAddress : postalAddresses.getPostalAddress()) {
+            if (currentPostalAddress.getLang().toLowerCase().equals(locale.getLanguage())) {
+                existingPostalAddress = currentPostalAddress;
+                break;
+            }
+        }
+        if (null != existingPostalAddress) {
+            /*
+             * Update the existing postal address.
+			 */
+            existingPostalAddress.setStreetAddress(postalAddress.getStreetAddress());
+            existingPostalAddress.setPostalCode(postalAddress.getPostalCode());
+            existingPostalAddress.setLocality(postalAddress.getLocality());
+            existingPostalAddress.setStateOrProvince(postalAddress.getStateOrProvince());
+            existingPostalAddress.setCountryName(postalAddress.getCountryName());
+        } else {
+            LOGGER.debug("Add postal address: '{}'" + locale.getLanguage());
+            /*
+             * Add the new postal address. We really have to create a copy into a new JAXB object.
+             * This allows a caller to reuse a postal address JAXB data structure without running
+             * into trouble with the JAXB marshaller.
+			 */
+            PostalAddressType newPostalAddress = this.objectFactory.createPostalAddressType();
+            newPostalAddress.setLang(locale.getLanguage());
+            newPostalAddress.setStreetAddress(postalAddress.getStreetAddress());
+            newPostalAddress.setPostalCode(postalAddress.getPostalCode());
+            newPostalAddress.setLocality(postalAddress.getLocality());
+            newPostalAddress.setStateOrProvince(postalAddress.getStateOrProvince());
+            newPostalAddress.setCountryName(postalAddress.getCountryName());
+            postalAddresses.getPostalAddress().add(newPostalAddress);
+        }
+    }
 
 	public String getType() {
 		if (null == this.tslDocument) {
@@ -514,17 +476,53 @@ public class TrustServiceList {
 		return true;
 	}
 
-	public X509Certificate verifySignature() {
-		if (null == this.tslDocument) {
-			LOG.debug("first save the document");
-			return null;
-		}
+    public List<TrustServiceProvider> getTrustServiceProviders() {
+        if (null != this.trustServiceProviders) {
+            // only load once
+            return this.trustServiceProviders;
+        }
+        this.trustServiceProviders = new LinkedList<>();
+        if (null == this.trustStatusList) {
+            return this.trustServiceProviders;
+        }
+        TrustServiceProviderListType trustServiceProviderList = this.trustStatusList.getTrustServiceProviderList();
+        if (null == trustServiceProviderList) {
+            return this.trustServiceProviders;
+        }
+        List<TSPType> tsps = trustServiceProviderList.getTrustServiceProvider();
+        for (TSPType tsp : tsps) {
+            TrustServiceProvider trustServiceProvider = new TrustServiceProvider(tsp);
+            this.trustServiceProviders.add(trustServiceProvider);
+        }
+        return this.trustServiceProviders;
+    }
+
+    private Node getSignatureNode() {
+        Element nsElement = this.tslDocument.createElement("ns");
+        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", XMLSignature.XMLNS);
+        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tsl", "http://uri.etsi.org/02231/v2#");
+
+        Node signatureNode;
+        try {
+            signatureNode = XPathAPI.selectSingleNode(this.tslDocument, "tsl:TrustServiceStatusList/ds:Signature",
+                    nsElement);
+        } catch (TransformerException e) {
+            throw new RuntimeException("XPath error: " + e.getMessage(), e);
+        }
+        return signatureNode;
+    }
+
+    public X509Certificate verifySignature() {
+        if (null == this.tslDocument) {
+            LOGGER.debug("first save the document");
+            return null;
+        }
 
 		Node signatureNode = getSignatureNode();
 		if (null == signatureNode) {
-			LOG.debug("no ds:Signature element present");
-			return null;
-		}
+            LOGGER.debug("no ds:Signature element present");
+            return null;
+        }
 
 		KeyInfoKeySelector keyInfoKeySelector = new KeyInfoKeySelector();
 		DOMValidateContext valContext = new DOMValidateContext(keyInfoKeySelector, signatureNode);
@@ -543,34 +541,20 @@ public class TrustServiceList {
 		}
 
 		// TODO: check what has been signed
-
 		if (coreValidity) {
-			LOG.debug("signature valid");
-			return keyInfoKeySelector.getCertificate();
-		}
-		LOG.debug("signature invalid");
+            LOGGER.debug("signature valid");
+            return keyInfoKeySelector.getCertificate();
+        }
+        LOGGER.debug("signature invalid");
 
 		return null;
 	}
 
-	private Node getSignatureNode() {
-		Element nsElement = this.tslDocument.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", XMLSignature.XMLNS);
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tsl", "http://uri.etsi.org/02231/v2#");
-
-		Node signatureNode;
-		try {
-			signatureNode = XPathAPI.selectSingleNode(this.tslDocument, "tsl:TrustServiceStatusList/ds:Signature",
-					nsElement);
-		} catch (TransformerException e) {
-			throw new RuntimeException("XPath error: " + e.getMessage(), e);
-		}
-		return signatureNode;
-	}
-
 	private void marshall() throws JAXBException, ParserConfigurationException {
-		/*
-		 * Assign a unique XML Id to the TSL for signing purposes.
+
+        LOGGER.info("--> void marshall()...");
+        /*
+         * Assign a unique XML Id to the TSL for signing purposes.
 		 */
 		// String tslId = "tsl-" + UUID.randomUUID().toString();
 		TrustStatusListType trustStatusList = getTrustStatusList();
@@ -612,7 +596,7 @@ public class TrustServiceList {
 				org.etsi.uri.trstsvc.svcinfoext.esigdir_1999_93_ec_trustedlist.ObjectFactory.class,
 				org.etsi.uri._02231.v2.additionaltypes.ObjectFactory.class);
 		Marshaller marshaller = jaxbContext.createMarshaller();
-		LOG.debug("marshaller type: " + marshaller.getClass().getName());
+        LOGGER.debug("marshaller type: '{}'" + marshaller.getClass().getName());
 
 		// marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
 		// new TSLNamespacePrefixMapper());
@@ -625,10 +609,11 @@ public class TrustServiceList {
 	}
 
 	public void sign(PrivateKey privateKey, X509Certificate certificate) throws IOException {
-		LOG.debug("sign with: " + certificate.getSubjectX500Principal());
-		if (null == this.tslDocument) {
-			/*
-			 * Marshall to DOM.
+
+        LOGGER.info("Signing Document with: " + certificate.getSubjectX500Principal());
+        if (null == this.tslDocument) {
+            /*
+             * Marshall to DOM.
 			 */
 			try {
 				marshall();
@@ -641,9 +626,12 @@ public class TrustServiceList {
 		 * Remove existing XML signature from DOM.
 		 */
 		Node signatureNode = getSignatureNode();
+
 		if (null != signatureNode) {
-			signatureNode.getParentNode().removeChild(signatureNode);
-		}
+            LOGGER.info("Removing signature: '{}'", signatureNode.getNodeName());
+            signatureNode.getParentNode().removeChild(signatureNode);
+            LOGGER.info("Signature removed");
+        }
 
 		String tslId = this.trustStatusList.getId();
 
@@ -652,172 +640,199 @@ public class TrustServiceList {
 		 */
 		try {
 			xmlSign(privateKey, certificate, tslId);
-		} catch (Exception e) {
-			throw new IOException("XML sign error: " + e.getMessage(), e);
-		}
-		setChanged();
-	}
+            LOGGER.info("Document has been successfully signed: '{}'", tslId);
+        } catch (Exception e) {
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
+            throw new IOException("XML sign error: " + e.getMessage(), e);
+        }
+        setChanged();
+    }
 
-	private void xmlSign(PrivateKey privateKey, X509Certificate certificate, String tslId)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, MarshalException,
-			XMLSignatureException {
-		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", new XMLDSigRI());
-		LOG.debug("xml signature factory: " + signatureFactory.getClass().getName());
-		LOG.debug("loader: " + signatureFactory.getClass().getClassLoader());
-		XMLSignContext signContext = new DOMSignContext(privateKey, this.tslDocument.getDocumentElement());
-		signContext.putNamespacePrefix(XMLSignature.XMLNS, "ds");
+    /**
+     * TODO: Jerome Reviewing this method to comply with JDK version up to 1.7-25.
+     *
+     * @param privateKey
+     * @param certificate
+     * @param tslId
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidAlgorithmParameterException
+     * @throws MarshalException
+     * @throws XMLSignatureException
+     * @throws TransformerException
+     */
+    private void xmlSign(PrivateKey privateKey, X509Certificate certificate, String tslId)
+            throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, MarshalException,
+            XMLSignatureException, TransformerException {
 
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA1, null);
-		List<Reference> references = new LinkedList<Reference>();
-		List<Transform> transforms = new LinkedList<Transform>();
-		transforms.add(signatureFactory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
-		Transform exclusiveTransform = signatureFactory.newTransform(CanonicalizationMethod.EXCLUSIVE,
-				(TransformParameterSpec) null);
-		transforms.add(exclusiveTransform);
+        LOGGER.info("--> void xmlSign(PrivateKey privateKey, X509Certificate certificate, String tslId)");
+        //XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", new XMLDSigRI());
+        XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+        DOMSignContext signContext = new DOMSignContext(privateKey, this.tslDocument.getDocumentElement());
+        signContext.putNamespacePrefix(XMLSignature.XMLNS, "ds");
 
-		Reference reference = signatureFactory.newReference("#" + tslId, digestMethod, transforms, null, null);
-		references.add(reference);
 
-		String signatureId = "xmldsig-" + UUID.randomUUID().toString();
-		List<XMLObject> objects = new LinkedList<XMLObject>();
-		addXadesBes(signatureFactory, this.tslDocument, signatureId, certificate, references, objects);
+        DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA1, null);
+        List<Reference> references = new LinkedList<>();
+        List<Transform> transforms = new LinkedList<>();
+        transforms.add(signatureFactory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
+        Transform exclusiveTransform = signatureFactory.newTransform(CanonicalizationMethod.EXCLUSIVE,
+                (TransformParameterSpec) null);
+        transforms.add(exclusiveTransform);
 
-		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+        Reference reference = signatureFactory.newReference("#" + tslId, digestMethod, transforms, null, null);
+        references.add(reference);
 
-		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE, (C14NMethodParameterSpec) null);
-		SignedInfo signedInfo = signatureFactory.newSignedInfo(canonicalizationMethod, signatureMethod, references);
+        String signatureId = "xmldsig-" + UUID.randomUUID().toString();
+        LOGGER.info("SignatureId: '{}'", signatureId);
+        List<XMLObject> objects = new LinkedList<>();
+        addXadesBes(signatureFactory, this.tslDocument, signatureId, certificate, references, objects);
+        SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+        CanonicalizationMethod canonicalizationMethod = signatureFactory
+                .newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE, (C14NMethodParameterSpec) null);
 
-		List<Object> keyInfoContent = new LinkedList<Object>();
+        SignedInfo signedInfo = signatureFactory.newSignedInfo(canonicalizationMethod, signatureMethod, references);
+        List<Object> keyInfoContent = new LinkedList<>();
 
-		KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance();
-		List<Object> x509DataObjects = new LinkedList<Object>();
-		x509DataObjects.add(certificate);
-		x509DataObjects.add(keyInfoFactory.newX509IssuerSerial(certificate.getIssuerX500Principal().toString(),
-				certificate.getSerialNumber()));
-		X509Data x509Data = keyInfoFactory.newX509Data(x509DataObjects);
-		keyInfoContent.add(x509Data);
+        KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance();
+        List<Object> x509DataObjects = new LinkedList<>();
+        x509DataObjects.add(certificate);
+        x509DataObjects.add(keyInfoFactory.newX509IssuerSerial(certificate.getIssuerX500Principal().toString(),
+                certificate.getSerialNumber()));
+        X509Data x509Data = keyInfoFactory.newX509Data(x509DataObjects);
+        keyInfoContent.add(x509Data);
 
-		KeyValue keyValue;
-		try {
-			keyValue = keyInfoFactory.newKeyValue(certificate.getPublicKey());
-		} catch (KeyException e) {
-			throw new RuntimeException("key exception: " + e.getMessage(), e);
-		}
-		keyInfoContent.add(keyValue);
+        KeyValue keyValue;
+        try {
+            keyValue = keyInfoFactory.newKeyValue(certificate.getPublicKey());
+        } catch (KeyException e) {
+            throw new RuntimeException("key exception: " + e.getMessage(), e);
+        }
+        keyInfoContent.add(keyValue);
 
-		KeyInfo keyInfo = keyInfoFactory.newKeyInfo(keyInfoContent);
+        KeyInfo keyInfo = keyInfoFactory.newKeyInfo(keyInfoContent);
 
-		String signatureValueId = signatureId + "-signature-value";
-		XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, keyInfo, objects, signatureId,
-				signatureValueId);
-		xmlSignature.sign(signContext);
-	}
+        String signatureValueId = signatureId + "-signature-value";
+        LOGGER.info("SignatureValueId: '{}'", signatureValueId);
+        XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, keyInfo, objects, signatureId,
+                signatureValueId);
 
-	public void addXadesBes(XMLSignatureFactory signatureFactory, Document document, String signatureId,
-			X509Certificate signingCertificate, List<Reference> references, List<XMLObject> objects)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-		LOG.debug("preSign");
+        ((Element) this.tslDocument.getDocumentElement()).setIdAttribute("Id", true);
 
-		// QualifyingProperties
-		QualifyingPropertiesType qualifyingProperties = this.xadesObjectFactory.createQualifyingPropertiesType();
-		qualifyingProperties.setTarget("#" + signatureId);
+        //signContext.putNamespacePrefix(XMLSignature.XMLNS, "ds");
+        //signContext.setIdAttributeNS(((Element) this.tslDocument.getDocumentElement()), null, "Id");
 
-		// SignedProperties
-		SignedPropertiesType signedProperties = this.xadesObjectFactory.createSignedPropertiesType();
-		String signedPropertiesId = signatureId + "-xades";
-		signedProperties.setId(signedPropertiesId);
-		qualifyingProperties.setSignedProperties(signedProperties);
+        // Create the XMLSignature (but don't sign it yet)
+        XMLSignature signature = signatureFactory.newXMLSignature(signedInfo, keyInfo);
+        xmlSignature.sign(signContext);
+    }
 
-		// SignedSignatureProperties
-		SignedSignaturePropertiesType signedSignatureProperties = this.xadesObjectFactory
-				.createSignedSignaturePropertiesType();
-		signedProperties.setSignedSignatureProperties(signedSignatureProperties);
+    public void addXadesBes(XMLSignatureFactory signatureFactory, Document document, String signatureId,
+                            X509Certificate signingCertificate, List<Reference> references, List<XMLObject> objects)
+            throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 
-		// SigningTime
-		GregorianCalendar signingTime = new GregorianCalendar();
-		signingTime.setTimeZone(TimeZone.getTimeZone("Z"));
-		signedSignatureProperties.setSigningTime(this.datatypeFactory.newXMLGregorianCalendar(signingTime));
+        LOGGER.info("--> void addXadesBes(XMLSignatureFactory signatureFactory, Document document...)");
 
-		// SigningCertificate
-		CertIDListType signingCertificates = this.xadesObjectFactory.createCertIDListType();
-		CertIDType signingCertificateId = this.xadesObjectFactory.createCertIDType();
+        // QualifyingProperties
+        QualifyingPropertiesType qualifyingProperties = this.xadesObjectFactory.createQualifyingPropertiesType();
+        qualifyingProperties.setTarget("#" + signatureId);
 
-		X509IssuerSerialType issuerSerial = this.xmldsigObjectFactory.createX509IssuerSerialType();
-		issuerSerial.setX509IssuerName(signingCertificate.getIssuerX500Principal().toString());
-		issuerSerial.setX509SerialNumber(signingCertificate.getSerialNumber());
-		signingCertificateId.setIssuerSerial(issuerSerial);
+        // SignedProperties
+        SignedPropertiesType signedProperties = this.xadesObjectFactory.createSignedPropertiesType();
+        String signedPropertiesId = signatureId + "-xades";
+        signedProperties.setId(signedPropertiesId);
+        qualifyingProperties.setSignedProperties(signedProperties);
 
-		DigestAlgAndValueType certDigest = this.xadesObjectFactory.createDigestAlgAndValueType();
-		DigestMethodType jaxbDigestMethod = xmldsigObjectFactory.createDigestMethodType();
-		jaxbDigestMethod.setAlgorithm(DigestMethod.SHA256);
-		certDigest.setDigestMethod(jaxbDigestMethod);
-		MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-		byte[] digestValue;
-		try {
-			digestValue = messageDigest.digest(signingCertificate.getEncoded());
-		} catch (CertificateEncodingException e) {
-			throw new RuntimeException("certificate encoding error: " + e.getMessage(), e);
-		}
-		certDigest.setDigestValue(digestValue);
-		signingCertificateId.setCertDigest(certDigest);
+        // SignedSignatureProperties
+        SignedSignaturePropertiesType signedSignatureProperties = this.xadesObjectFactory
+                .createSignedSignaturePropertiesType();
+        signedProperties.setSignedSignatureProperties(signedSignatureProperties);
 
-		signingCertificates.getCert().add(signingCertificateId);
-		signedSignatureProperties.setSigningCertificate(signingCertificates);
+        // SigningTime
+        GregorianCalendar signingTime = new GregorianCalendar();
+        signingTime.setTimeZone(TimeZone.getTimeZone("Z"));
+        signedSignatureProperties.setSigningTime(this.datatypeFactory.newXMLGregorianCalendar(signingTime));
 
-		// marshall XAdES QualifyingProperties
-		Node qualifyingPropertiesNode = marshallQualifyingProperties(document, qualifyingProperties);
+        // SigningCertificate
+        CertIDListType signingCertificates = this.xadesObjectFactory.createCertIDListType();
+        CertIDType signingCertificateId = this.xadesObjectFactory.createCertIDType();
 
-		// add XAdES ds:Object
-		List<XMLStructure> xadesObjectContent = new LinkedList<XMLStructure>();
-		xadesObjectContent.add(new DOMStructure(qualifyingPropertiesNode));
-		XMLObject xadesObject = signatureFactory.newXMLObject(xadesObjectContent, null, null, null);
-		objects.add(xadesObject);
+        X509IssuerSerialType issuerSerial = this.xmldsigObjectFactory.createX509IssuerSerialType();
+        issuerSerial.setX509IssuerName(signingCertificate.getIssuerX500Principal().toString());
+        issuerSerial.setX509SerialNumber(signingCertificate.getSerialNumber());
+        signingCertificateId.setIssuerSerial(issuerSerial);
 
-		// add XAdES ds:Reference
-		DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA256, null);
-		List<Transform> transforms = new LinkedList<Transform>();
-		Transform exclusiveTransform = signatureFactory.newTransform(CanonicalizationMethod.EXCLUSIVE,
-				(TransformParameterSpec) null);
-		transforms.add(exclusiveTransform);
-		Reference reference = signatureFactory.newReference("#" + signedPropertiesId, digestMethod, transforms,
-				XADES_TYPE, null);
-		references.add(reference);
-	}
+        DigestAlgAndValueType certDigest = this.xadesObjectFactory.createDigestAlgAndValueType();
+        DigestMethodType jaxbDigestMethod = xmldsigObjectFactory.createDigestMethodType();
+        jaxbDigestMethod.setAlgorithm(DigestMethod.SHA256);
+        certDigest.setDigestMethod(jaxbDigestMethod);
 
-	private Node marshallQualifyingProperties(Document document, QualifyingPropertiesType qualifyingProperties) {
-		Node marshallNode = document.createElement("marshall-node");
-		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance(org.etsi.uri._01903.v1_3.ObjectFactory.class);
-			Marshaller marshaller = jaxbContext.createMarshaller();
-			// marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
-			// new TSLNamespacePrefixMapper());
-			marshaller.marshal(this.xadesObjectFactory.createQualifyingProperties(qualifyingProperties), marshallNode);
-		} catch (JAXBException e) {
-			throw new RuntimeException("JAXB error: " + e.getMessage(), e);
-		}
-		Node qualifyingPropertiesNode = marshallNode.getFirstChild();
-		return qualifyingPropertiesNode;
-	}
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+        byte[] digestValue;
+        try {
+            digestValue = messageDigest.digest(signingCertificate.getEncoded());
+        } catch (CertificateEncodingException e) {
+            throw new RuntimeException("certificate encoding error: " + e.getMessage(), e);
+        }
+        certDigest.setDigestValue(digestValue);
+        signingCertificateId.setCertDigest(certDigest);
 
-	private void clearChanged() {
-		this.changed = false;
-	}
+        signingCertificates.getCert().add(signingCertificateId);
+        signedSignatureProperties.setSigningCertificate(signingCertificates);
+
+        // marshall XAdES QualifyingProperties
+        Node qualifyingPropertiesNode = marshallQualifyingProperties(document, qualifyingProperties);
+
+
+        Element temp = (Element) qualifyingPropertiesNode.getFirstChild();
+        temp.setIdAttribute("Id", true);
+
+        // add XAdES ds:Object
+        List<XMLStructure> xadesObjectContent = new LinkedList<>();
+        xadesObjectContent.add(new DOMStructure(qualifyingPropertiesNode));
+        XMLObject xadesObject = signatureFactory.newXMLObject(xadesObjectContent, null, null, null);
+        objects.add(xadesObject);
+
+        // add XAdES ds:Reference
+        DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA256, null);
+        List<Transform> transforms = new LinkedList<>();
+        Transform exclusiveTransform = signatureFactory.newTransform(CanonicalizationMethod.EXCLUSIVE,
+                (TransformParameterSpec) null);
+        transforms.add(exclusiveTransform);
+        Reference reference = signatureFactory.newReference("#" + signedPropertiesId, digestMethod, transforms,
+                XADES_TYPE, null);
+        references.add(reference);
+    }
+
+    private Node marshallQualifyingProperties(Document document, QualifyingPropertiesType qualifyingProperties) {
+        Node marshallNode = document.createElement("marshall-node");
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(org.etsi.uri._01903.v1_3.ObjectFactory.class);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            // marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new TSLNamespacePrefixMapper());
+            marshaller.marshal(this.xadesObjectFactory.createQualifyingProperties(qualifyingProperties), marshallNode);
+        } catch (JAXBException e) {
+            throw new RuntimeException("JAXB error: " + e.getMessage(), e);
+        }
+        return marshallNode.getFirstChild();
+    }
+
+    private void clearChanged() {
+        this.changed = false;
+    }
 
 	public void save() throws IOException {
 		if (null == this.tslFile) {
 			throw new IllegalStateException("no TSL file set");
 		}
-		LOG.debug("save to: " + this.tslFile.getAbsolutePath());
-		if (null == this.tslDocument) {
-			try {
-				marshall();
-			} catch (Exception e) {
-				throw new IOException("marshall error: " + e.getMessage(), e);
-			}
-			/*
-			 * Only remove existing XML signature from new (or changed) DOM
-			 * documents.
+        LOGGER.debug("save to: '{}'", this.tslFile.getAbsolutePath());
+        if (null == this.tslDocument) {
+            try {
+                marshall();
+            } catch (Exception e) {
+                throw new IOException("marshall error: " + e.getMessage(), e);
+            }
+            /*
+             * Only remove existing XML signature from new (or changed) DOM documents.
 			 */
 			Node signatureNode = getSignatureNode();
 			if (null != signatureNode) {
@@ -900,14 +915,8 @@ public class TrustServiceList {
 		if (null == schemeTypeList) {
 			return null;
 		}
-		List<String> schemeTypes = schemeTypeList.getURI();
-		return schemeTypes;
-	}
-
-	public void setSchemeTerritory(String schemeTerritory) {
-		TSLSchemeInformationType schemeInformation = getSchemeInformation();
-		schemeInformation.setSchemeTerritory(schemeTerritory);
-	}
+        return schemeTypeList.getURI();
+    }
 
 	public String getSchemeTerritory() {
 		if (null == this.trustStatusList) {
@@ -917,18 +926,22 @@ public class TrustServiceList {
 		if (null == schemeInformation) {
 			return null;
 		}
-		String schemeTerritory = schemeInformation.getSchemeTerritory();
-		return schemeTerritory;
-	}
+        return schemeInformation.getSchemeTerritory();
+    }
 
-	public void addLegalNotice(String legalNotice, Locale locale) {
-		TSLSchemeInformationType schemeInformation = getSchemeInformation();
-		PolicyOrLegalnoticeType policyOrLegalnotice = schemeInformation.getPolicyOrLegalNotice();
-		if (null == policyOrLegalnotice) {
-			policyOrLegalnotice = this.objectFactory.createPolicyOrLegalnoticeType();
-			schemeInformation.setPolicyOrLegalNotice(policyOrLegalnotice);
-		}
-		List<MultiLangStringType> tslLegalNotices = policyOrLegalnotice.getTSLLegalNotice();
+    public void setSchemeTerritory(String schemeTerritory) {
+        TSLSchemeInformationType schemeInformation = getSchemeInformation();
+        schemeInformation.setSchemeTerritory(schemeTerritory);
+    }
+
+    public void addLegalNotice(String legalNotice, Locale locale) {
+        TSLSchemeInformationType schemeInformation = getSchemeInformation();
+        PolicyOrLegalnoticeType policyOrLegalnotice = schemeInformation.getPolicyOrLegalNotice();
+        if (null == policyOrLegalnotice) {
+            policyOrLegalnotice = this.objectFactory.createPolicyOrLegalnoticeType();
+            schemeInformation.setPolicyOrLegalNotice(policyOrLegalnotice);
+        }
+        List<MultiLangStringType> tslLegalNotices = policyOrLegalnotice.getTSLLegalNotice();
 
 		MultiLangStringType tslLegalNotice = this.objectFactory.createMultiLangStringType();
 		tslLegalNotice.setLang(locale.getLanguage());
@@ -1003,58 +1016,56 @@ public class TrustServiceList {
 			return null;
 		}
 		GregorianCalendar listIssueCalendar = listIssueDateTime.toGregorianCalendar();
-		DateTime dateTime = new DateTime(listIssueCalendar);
-		return dateTime;
-	}
+        return new DateTime(listIssueCalendar);
+    }
 
-	public void setNextUpdate(DateTime nextUpdateDateTime) {
-		TSLSchemeInformationType schemeInformation = getSchemeInformation();
-		GregorianCalendar nextUpdateCalendar = nextUpdateDateTime.toGregorianCalendar();
-		nextUpdateCalendar.setTimeZone(TimeZone.getTimeZone("Z"));
+    public DateTime getNextUpdate() {
+        if (null == this.trustStatusList) {
+            return null;
+        }
+        TSLSchemeInformationType schemeInformation = this.trustStatusList.getSchemeInformation();
+        if (null == schemeInformation) {
+            return null;
+        }
 
-		NextUpdateType nextUpdate = schemeInformation.getNextUpdate();
-		if (null == nextUpdate) {
-			nextUpdate = this.objectFactory.createNextUpdateType();
-			schemeInformation.setNextUpdate(nextUpdate);
-		}
-		nextUpdate.setDateTime(this.datatypeFactory.newXMLGregorianCalendar(nextUpdateCalendar));
-	}
+        NextUpdateType nextUpdate = schemeInformation.getNextUpdate();
+        if (null == nextUpdate) {
+            return null;
+        }
+        XMLGregorianCalendar nextUpdateXmlCalendar = nextUpdate.getDateTime();
+        return new DateTime(nextUpdateXmlCalendar.toGregorianCalendar());
+    }
 
-	public void setTSLSequenceNumber(BigInteger sequenceNumber) {
-		TSLSchemeInformationType schemeInformation = getSchemeInformation();
-		schemeInformation.setTSLSequenceNumber(sequenceNumber);
-	}
+    public void setNextUpdate(DateTime nextUpdateDateTime) {
+        TSLSchemeInformationType schemeInformation = getSchemeInformation();
+        GregorianCalendar nextUpdateCalendar = nextUpdateDateTime.toGregorianCalendar();
+        nextUpdateCalendar.setTimeZone(TimeZone.getTimeZone("Z"));
 
-	public DateTime getNextUpdate() {
-		if (null == this.trustStatusList) {
-			return null;
-		}
-		TSLSchemeInformationType schemeInformation = this.trustStatusList.getSchemeInformation();
-		if (null == schemeInformation) {
-			return null;
-		}
+        NextUpdateType nextUpdate = schemeInformation.getNextUpdate();
+        if (null == nextUpdate) {
+            nextUpdate = this.objectFactory.createNextUpdateType();
+            schemeInformation.setNextUpdate(nextUpdate);
+        }
+        nextUpdate.setDateTime(this.datatypeFactory.newXMLGregorianCalendar(nextUpdateCalendar));
+    }
 
-		NextUpdateType nextUpdate = schemeInformation.getNextUpdate();
-		if (null == nextUpdate) {
-			return null;
-		}
-		XMLGregorianCalendar nextUpdateXmlCalendar = nextUpdate.getDateTime();
-		DateTime nextUpdateDateTime = new DateTime(nextUpdateXmlCalendar.toGregorianCalendar());
-		return nextUpdateDateTime;
-	}
+    public void setTSLSequenceNumber(BigInteger sequenceNumber) {
+        TSLSchemeInformationType schemeInformation = getSchemeInformation();
+        schemeInformation.setTSLSequenceNumber(sequenceNumber);
+    }
 
-	public void addTrustServiceProvider(TrustServiceProvider trustServiceProvider) {
-		TrustStatusListType trustStatusList = getTrustStatusList();
-		TrustServiceProviderListType trustServiceProviderList = trustStatusList.getTrustServiceProviderList();
-		if (null == trustServiceProviderList) {
-			trustServiceProviderList = this.objectFactory.createTrustServiceProviderListType();
-			trustStatusList.setTrustServiceProviderList(trustServiceProviderList);
-		}
-		List<TSPType> tspList = trustServiceProviderList.getTrustServiceProvider();
-		tspList.add(trustServiceProvider.getTSP());
-		// reset Java model cache
-		this.trustServiceProviders = null;
-	}
+    public void addTrustServiceProvider(TrustServiceProvider trustServiceProvider) {
+        TrustStatusListType trustStatusList = getTrustStatusList();
+        TrustServiceProviderListType trustServiceProviderList = trustStatusList.getTrustServiceProviderList();
+        if (null == trustServiceProviderList) {
+            trustServiceProviderList = this.objectFactory.createTrustServiceProviderListType();
+            trustStatusList.setTrustServiceProviderList(trustServiceProviderList);
+        }
+        List<TSPType> tspList = trustServiceProviderList.getTrustServiceProvider();
+        tspList.add(trustServiceProvider.getTSP());
+        // reset Java model cache
+        this.trustServiceProviders = null;
+    }
 
 	public void humanReadableExport(File pdfExportFile) {
 		new Tsl2PdfExporter().humanReadableExport(this, pdfExportFile);
