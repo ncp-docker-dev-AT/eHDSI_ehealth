@@ -1,26 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>2.5.0.RC1</version>
+        <artifactId>openncp</artifactId>
+        <version>2.5.0</version>
     </parent>
-    <!-- General Information -->
-    <modelVersion>4.0.0</modelVersion>
+
     <artifactId>openncp-assertion-validator</artifactId>
     <packaging>jar</packaging>
-    <name>SRDC OpenNCP SAML Assertion Validator Implementation</name>
-    <organization>
-        <name>SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik Tic. Ltd. Sti.</name>
-        <url>www.srdc.com.tr</url>
-    </organization>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--<log4jVersion>1.2.17</log4jVersion>-->
-    </properties>
 
-    <!-- Libraries Dependencies -->
+    <name>OpenNCP SAML Assertion Validator</name>
+
     <dependencies>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
@@ -42,28 +34,5 @@
             <artifactId>jcl-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4jVersion}</version>
-        </dependency>-->
     </dependencies>
-
-    <!-- Build Settings -->
-    <build>
-    </build>
-
-    <!-- Environment Settings -->
-    <repositories>
-        <!--<repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
-            <name>Sonatype repository</name>
-        </repository>
-        <repository>
-            <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
-            <id>openSamlRep</id>
-            <name>Official OpenSaml Repository</name>
-        </repository>-->
-    </repositories>
 </project>

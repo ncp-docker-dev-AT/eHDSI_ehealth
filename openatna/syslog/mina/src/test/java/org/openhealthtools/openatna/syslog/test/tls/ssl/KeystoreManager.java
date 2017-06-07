@@ -52,16 +52,23 @@ public class KeystoreManager {
     static Logger log = LoggerFactory.getLogger("org.wspeer.security.KeystoreManager");
 
     private static X509TrustManager sunTrustManager = null;
+
+    static {
+        loadDefaultTrustManager();
+    }
+
     private KeystoreDetails defaultKeyDetails;
     private HashMap<String, KeystoreDetails> allKeys = new HashMap<>();
     private HashMap<String, KeystoreDetails> allStores = new HashMap<>();
-
     private File keysDir;
     private File certsDir;
     private String home;
 
-    static {
-        loadDefaultTrustManager();
+    public KeystoreManager(String home) {
+        if (home != null) {
+            this.home = home;
+            loadKeys(this.home);
+        }
     }
 
     private static void loadDefaultTrustManager() {
@@ -118,11 +125,36 @@ public class KeystoreManager {
         }
     }
 
-    public KeystoreManager(String home) {
-        if (home != null) {
-            this.home = home;
-            loadKeys(this.home);
+    public static X509TrustManager getDefaultTrustManager() {
+        return sunTrustManager;
+    }
+
+    private static String trimPort(String host) {
+        int colon = host.indexOf(":");
+        if (colon > 0 && colon < host.length() - 1) {
+            try {
+                int port = Integer.parseInt(host.substring(colon + 1, host.length()), host.length());
+                host = host.substring(0, colon);
+                log.info("KeystoreManager.trimPort up to colon:" + host);
+                log.info("KeystoreManager.trimPort port:" + port);
+
+                return host;
+            } catch (NumberFormatException e) {
+            }
         }
+        return null;
+    }
+
+    private static String getAnyPort(String auth) {
+        int star = auth.indexOf("*");
+        if (star == auth.length() - 1) {
+            int colon = auth.indexOf(":");
+            if (colon == star - 1) {
+                auth = auth.substring(0, colon);
+                return auth;
+            }
+        }
+        return null;
     }
 
     private void loadKeys(String home) {
@@ -168,10 +200,6 @@ public class KeystoreManager {
                 }
             }
         }
-    }
-
-    public static X509TrustManager getDefaultTrustManager() {
-        return sunTrustManager;
     }
 
     public void addKeyDetails(String fileName, KeystoreDetails details) throws IOException {
@@ -237,16 +265,16 @@ public class KeystoreManager {
     public KeystoreDetails getKeyFileForHost(String host) {
         KeystoreDetails def = null;
         for (KeystoreDetails keystoreDetails : allKeys.values()) {
-            System.out.println("KeystoreManager.getKeyFileForHost getting next key authority:" + keystoreDetails.getAuthority());
+            log.info("KeystoreManager.getKeyFileForHost getting next key authority: '{}'", keystoreDetails.getAuthority());
             String auth = keystoreDetails.getAuthority();
             if (auth != null) {
                 if (auth.endsWith("*")) {
                     String s = trimPort(host);
                     if (s != null) {
-                        log.info("KeystoreManager.getKeyFileForHost trimmed port:" + s);
+                        log.info("KeystoreManager.getKeyFileForHost trimmed port: '{}'", s);
                         String a = getAnyPort(auth);
                         if (a != null) {
-                            log.info("KeystoreManager.getKeyFileForHost trimmed auth:" + a);
+                            log.info("KeystoreManager.getKeyFileForHost trimmed auth: '{}'", a);
                             auth = a;
                             host = s;
                         }
@@ -260,34 +288,6 @@ public class KeystoreManager {
             }
         }
         return def;
-    }
-
-    private static String trimPort(String host) {
-        int colon = host.indexOf(":");
-        if (colon > 0 && colon < host.length() - 1) {
-            try {
-                int port = Integer.parseInt(host.substring(colon + 1, host.length()), host.length());
-                host = host.substring(0, colon);
-                log.info("KeystoreManager.trimPort up to colon:" + host);
-                log.info("KeystoreManager.trimPort port:" + port);
-
-                return host;
-            } catch (NumberFormatException e) {
-            }
-        }
-        return null;
-    }
-
-    private static String getAnyPort(String auth) {
-        int star = auth.indexOf("*");
-        if (star == auth.length() - 1) {
-            int colon = auth.indexOf(":");
-            if (colon == star - 1) {
-                auth = auth.substring(0, colon);
-                return auth;
-            }
-        }
-        return null;
     }
 
     public KeystoreDetails getTrustFileForHost(String host) {

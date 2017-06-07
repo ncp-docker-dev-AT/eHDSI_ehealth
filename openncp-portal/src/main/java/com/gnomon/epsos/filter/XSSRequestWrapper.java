@@ -1,36 +1,41 @@
 package com.gnomon.epsos.filter;
 
-import java.util.regex.Pattern;
+import org.owasp.esapi.ESAPI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import org.owasp.esapi.ESAPI;
+import java.util.regex.Pattern;
 
 public class XSSRequestWrapper extends HttpServletRequestWrapper {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(XSSRequestWrapper.class);
+
     private static Pattern[] patterns = new Pattern[]{
-        // Script fragments
-        Pattern.compile("<script>(.*?)</script>", Pattern.CASE_INSENSITIVE),
-        // src='...'
-        Pattern.compile("src[\r\n]*=[\r\n]*\\\'(.*?)\\\'", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
-        Pattern.compile("src[\r\n]*=[\r\n]*\\\"(.*?)\\\"", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
-        // lonely script tags
-        Pattern.compile("</script>", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("<script(.*?)>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
-        // eval(...)
-        Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
-        // expression(...)
-        Pattern.compile("expression\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
-        // javascript:...
-        Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE),
-        // vbscript:...
-        Pattern.compile("vbscript:", Pattern.CASE_INSENSITIVE),
-        // onload(...)=...
-        Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL)
+            // Script fragments
+            Pattern.compile("<script>(.*?)</script>", Pattern.CASE_INSENSITIVE),
+            // src='...'
+            Pattern.compile("src[\r\n]*=[\r\n]*\\\'(.*?)\\\'", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+            Pattern.compile("src[\r\n]*=[\r\n]*\\\"(.*?)\\\"", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+            // lonely script tags
+            Pattern.compile("</script>", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("<script(.*?)>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+            // eval(...)
+            Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+            // expression(...)
+            Pattern.compile("expression\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+            // javascript:...
+            Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE),
+            // vbscript:...
+            Pattern.compile("vbscript:", Pattern.CASE_INSENSITIVE),
+            // onload(...)=...
+            Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL)
     };
 
     public XSSRequestWrapper(HttpServletRequest servletRequest) {
         super(servletRequest);
-        System.out.println("CROSS SCRIPTING FILTER .... in progress");
+        LOGGER.info("CROSS SCRIPTING FILTER .... in progress");
     }
 
     @Override

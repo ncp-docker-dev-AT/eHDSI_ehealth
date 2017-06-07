@@ -7,16 +7,13 @@ import com.gnomon.epsos.service.EpsosHelperService;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.DocumentId;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,30 +89,61 @@ public class CDAServlet extends HttpServlet {
             log.info("classCode: '{}", classCode);
 
             String lang;
+            String userLanguage = "";
             String ltrlang = ParamUtil.getString(req, "lang");
             if (Validator.isNull(ltrlang)) {
-                lang = user.getLanguageId();
+                userLanguage = user.getLanguageId();
+                lang = userLanguage;
             } else {
                 lang = ltrlang;
             }
 
+            log.info("User Language: '{}' - Parameter Request Language: '{}' - Translated Language: {}", userLanguage, ltrlang, lang);
+
             String lang1 = lang.replace("_", "-");
-            lang1 = lang1.replace("en-US", "en");
+            lang1 = lang1.replace("en-US", "en-GB");
+            lang1 = lang1.replace("en_US", "en-GB");
 
-            log.info("Portal language is : '{}-{}'", lang, lang1);
+            log.info("Portal language is : '{} - {}'", lang, lang1);
 
-            try {
-                EvidenceUtils.createEvidenceREMNRO(classCode.toString(), "NI_DR" + classCode.getValue(),
-                        new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                        "NI_DR_" + classCode.getValue() + "_REQ", trcAssertion.getID());
-            } catch (Exception e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
+//            try {
+//                EvidenceUtils.createEvidenceREMNRO(classCode.toString(),
+//                        "NI_DR" + classCode.getValue(),
+//                        new DateTime(),
+//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                        "NI_DR_" + classCode.getValue() + "_REQ",
+//                        trcAssertion.getID());
+//            } catch (Exception e) {
+//                log.error(ExceptionUtils.getStackTrace(e));
+//            }
 
             EpsosDocument1 eps = clientConectorConsumer.retrieveDocument(hcpAssertion, trcAssertion, selectedCountry,
                     documentId, hcid, classCode, lang1);
 
-            createEvidenceREMNRR(eps, classCode, trcAssertion);
+            if (Validator.isNotNull(eps)) {
+//                try {
+//                    EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
+//                            "NI_DR" + classCode.getValue(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                            "NI_DR_" + classCode.getValue() + "_RES_SUCC",
+//                            trcAssertion.getID());
+//                } catch (Exception e) {
+//                    log.error(ExceptionUtils.getStackTrace(e));
+//                }
+            } else {
+//                try {
+//                    EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
+//                            "NI_DR" + classCode.getValue(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
+//                            "NI_DR_" + classCode.getValue() + "_RES_FAIL",
+//                            trcAssertion.getID());
+//                } catch (Exception e) {
+//                    log.error(ExceptionUtils.getStackTrace(e));
+//                }
+
+            }
 
             selectedEpsosDocument.setAuthor(eps.getAuthor() + "");
             try {
@@ -145,12 +173,12 @@ public class CDAServlet extends HttpServlet {
             String convertedcda = "";
             if (isCDA) {
                 log.info("The document is EPSOS CDA");
-                log.info("########### Styling the document that is CDA: '{}' using EPSOS xsl", isCDA);
+                log.info("########### Styling the document that is CDA: '{}' using EPSOS XSLT translated in {}", isCDA, lang1);
                 // display it using cda display tool
                 convertedcda = EpsosHelperService.styleDoc(xmlfile, lang1, false, actionURL);
             } else {
                 log.info(("The document is CCD"));
-                log.info("########### Styling the document that is CDA: '{}' using standard xsl", isCDA);
+                log.info("########### Styling the document that is CDA: '{}' using standard XSLT translated in {} ", isCDA, lang1);
                 convertedcda = EpsosHelperService.styleDoc(xmlfile, lang1, true, "");
             }
 
@@ -204,23 +232,23 @@ public class CDAServlet extends HttpServlet {
     private void createEvidenceREMNRR(EpsosDocument1 eps, GenericDocumentCode classCode, Assertion trcAssertion) {
         if (Validator.isNotNull(eps)) {
             try {
-                EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
-                        "NI_DR" + classCode.getValue(),
-                        new DateTime(),
-                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                        "NI_DR_" + classCode.getValue() + "_RES_SUCC",
-                        trcAssertion.getID());
+//                EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
+//                        "NI_DR" + classCode.getValue(),
+//                        new DateTime(),
+//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                        "NI_DR_" + classCode.getValue() + "_RES_SUCC",
+//                        trcAssertion.getID());
             } catch (Exception e) {
                 log.error(ExceptionUtils.getStackTrace(e));
             }
         } else {
             try {
-                EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
-                        "NI_DR" + classCode.getValue(),
-                        new DateTime(),
-                        EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
-                        "NI_DR_" + classCode.getValue() + "_RES_FAIL",
-                        trcAssertion.getID());
+//                EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
+//                        "NI_DR" + classCode.getValue(),
+//                        new DateTime(),
+//                        EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
+//                        "NI_DR_" + classCode.getValue() + "_RES_FAIL",
+//                        trcAssertion.getID());
             } catch (Exception e) {
                 log.error(ExceptionUtils.getStackTrace(e));
             }

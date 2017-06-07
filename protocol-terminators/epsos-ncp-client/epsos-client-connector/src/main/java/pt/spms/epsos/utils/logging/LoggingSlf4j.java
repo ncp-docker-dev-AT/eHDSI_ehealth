@@ -28,34 +28,34 @@ import org.slf4j.Logger;
  */
 public class LoggingSlf4j {
 
-    public static final String START = "Start";
-    public static final String END = "End";
-    public static final String ERROR = "Error";
+    private static final String START = "Start";
+    private static final String END = "End";
+    private static final String ERROR = "Error";
+
+    private LoggingSlf4j() {
+    }
 
     public static void start(Logger logger, String methodName) {
-        logger.debug(methodName + " | " + START);
+        logger.debug("{} | {}", methodName, START);
     }
 
     public static void start(Logger logger, String methodName, String msg) {
-        logger.debug(methodName + " | " + START + " : " + msg);
+        logger.debug("{} | {} : {}", methodName, START, msg);
     }
 
     public static void end(Logger logger, String methodName) {
-        logger.debug(methodName + " | " + END);
+        logger.debug("{} | {}", methodName, END);
     }
 
     public static void end(Logger logger, String methodName, String msg) {
-        logger.debug(methodName + " | " + END + " : " + msg);
+        logger.debug("{} | {} : {}", methodName, END, msg);
     }
 
     public static void error(Logger logger, String methodName) {
-        logger.debug(methodName + " | " + ERROR);
+        logger.debug("{} | {}", methodName, ERROR);
     }
 
     public static void errorMsg(Logger logger, String methodName, String msg) {
-        logger.debug(methodName + " | " + ERROR + " : " + msg);
-    }
-
-    private LoggingSlf4j() {
+        logger.debug("{} | {} : {}", methodName, ERROR, msg);
     }
 }

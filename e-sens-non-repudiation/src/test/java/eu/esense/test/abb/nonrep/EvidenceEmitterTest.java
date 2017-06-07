@@ -1,9 +1,27 @@
 package eu.esense.test.abb.nonrep;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import eu.esens.abb.nonrep.*;
+import org.herasaf.xacml.core.SyntaxException;
+import org.herasaf.xacml.core.api.PDP;
+import org.herasaf.xacml.core.api.UnorderedPolicyRepository;
+import org.herasaf.xacml.core.policy.PolicyMarshaller;
+import org.herasaf.xacml.core.simplePDP.SimplePDPFactory;
+import org.herasaf.xacml.core.utils.JAXBMarshallerConfiguration;
+import org.joda.time.DateTime;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,48 +33,14 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.transform.TransformerException;
-
-import org.herasaf.xacml.core.SyntaxException;
-import org.herasaf.xacml.core.api.PDP;
-import org.herasaf.xacml.core.api.UnorderedPolicyRepository;
-import org.herasaf.xacml.core.policy.PolicyMarshaller;
-import org.herasaf.xacml.core.simplePDP.SimplePDPFactory;
-import org.herasaf.xacml.core.utils.JAXBMarshallerConfiguration;
-import org.joda.time.DateTime;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
-import eu.esens.abb.nonrep.Context;
-import eu.esens.abb.nonrep.ESensObligation;
-import eu.esens.abb.nonrep.EnforcePolicy;
-import eu.esens.abb.nonrep.EnforcePolicyException;
-import eu.esens.abb.nonrep.IHEXCARetrieve;
-import eu.esens.abb.nonrep.MalformedIHESOAPException;
-import eu.esens.abb.nonrep.MalformedMIMEMessageException;
-import eu.esens.abb.nonrep.MessageInspector;
-import eu.esens.abb.nonrep.MessageType;
-import eu.esens.abb.nonrep.ObligationDischargeException;
-import eu.esens.abb.nonrep.ObligationHandler;
-import eu.esens.abb.nonrep.ObligationHandlerFactory;
-import eu.esens.abb.nonrep.TOElementException;
-import eu.esens.abb.nonrep.Utilities;
-import eu.esens.abb.nonrep.XACMLAttributes;
-import eu.esens.abb.nonrep.XACMLRequestCreator;
+import static org.junit.Assert.*;
 
 public class EvidenceEmitterTest {
 
     public static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
     public static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
     public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
+    private static final Logger LOGGER = LoggerFactory.getLogger(EvidenceEmitterTest.class);
     private static PDP simplePDP;
     private static X509Certificate cert;
     private static PrivateKey key;
@@ -83,6 +67,7 @@ public class EvidenceEmitterTest {
         cert = (X509Certificate) ks.getCertificate("server1");
         key = (PrivateKey) ks.getKey("server1", "spirit".toCharArray());
         org.apache.xml.security.Init.init();
+        
     }
 
     private static Document readMessage(String file)
@@ -360,7 +345,7 @@ public class EvidenceEmitterTest {
         context.setEvent("epSOS-31");
 
         context.setMessageUUID(messageInspector.getMessageUUID());
-        context.setAuthenticationMethod("3");
+        context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
         context.setRequest(request); // here I pass the XML in order to give to
         // the developers the posisbility
         // to use their own implementation. Although an object is easier to get
@@ -380,15 +365,15 @@ public class EvidenceEmitterTest {
         // implementation
         // to still decide which handler to trigger
         handlers.get(0).discharge();
-        handlers.get(1).discharge();
+//        handlers.get(1).discharge();
 
         // Give me the ATNA, it's an ATNA test
-        assertNotNull(handlers.get(1).getMessage());
-        Utilities.serialize(handlers.get(1).getMessage().getDocumentElement());
+        assertNotNull(handlers.get(0).getMessage());
+        Utilities.serialize(handlers.get(0).getMessage().getDocumentElement());
 
         // I think I need to return handler.getMessage() which will be the audit
         // the audit will go to the server and get validated by another wrapper
-        return handlers.get(1).getMessage();
+        return handlers.get(0).getMessage();
     }
 
     @Test
@@ -518,7 +503,7 @@ public class EvidenceEmitterTest {
         context.setSubmissionTime(new DateTime());
         context.setEvent("epSOS-31");
         context.setMessageUUID(messageInspector.getMessageUUID());
-        context.setAuthenticationMethod("3");
+        context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
         context.setRequest(request); // here I pass the XML in order to give to
         // the developers the posisbility
         // to use their own implementation. Although an object is easier to get
@@ -537,7 +522,7 @@ public class EvidenceEmitterTest {
         // Here I discharge manually. This behavior is to let free an
         // implementation
         // to still decide which handler to trigger
-        System.out.println(handlers.get(0).getClass().getName());
+        LOGGER.info(handlers.get(0).getClass().getName());
 
         handlers.get(0).discharge();
         //	handlers.get(1).discharge();
@@ -681,7 +666,7 @@ public class EvidenceEmitterTest {
         context.setSubmissionTime(new DateTime());
         context.setEvent("epSOS-31"); // TODO, change to setEventCode
         context.setMessageUUID(messageInspector.getMessageUUID());
-        context.setAuthenticationMethod("3");
+        context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
         context.setRequest(request); // here I pass the XML in order to give to
         // the developers the posisbility
         // to use their own implementation. Although an object is easier to get
@@ -696,6 +681,8 @@ public class EvidenceEmitterTest {
         namesPostalAddress.add("Test2");
 
         context.setRecipientNamePostalAddress(namesPostalAddress);
+
+        context.setRecipientNamePostalAddress(namesPostalAddress);
         LinkedList<String> sendernamesPostalAddress = new LinkedList<>();
         sendernamesPostalAddress.add("SenderTest");
         sendernamesPostalAddress.add("SenderTest2");
@@ -708,7 +695,7 @@ public class EvidenceEmitterTest {
         // Here I discharge manually. This behavior is to let free an
         // implementation
         // to still decide which handler to trigger
-        System.out.println(handlers.get(0).getClass().getName());
+        LOGGER.info(handlers.get(0).getClass().getName());
 
         handlers.get(0).discharge();
         //	handlers.get(1).discharge();

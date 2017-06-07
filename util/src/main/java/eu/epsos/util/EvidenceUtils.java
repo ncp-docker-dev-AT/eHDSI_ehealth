@@ -1,6 +1,7 @@
 package eu.epsos.util;
 
 import eu.esens.abb.nonrep.*;
+import org.apache.commons.lang3.StringUtils;
 import org.herasaf.xacml.core.SyntaxException;
 import org.herasaf.xacml.core.api.PDP;
 import org.herasaf.xacml.core.api.UnorderedPolicyRepository;
@@ -13,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.FileUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
@@ -23,10 +23,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.*;
@@ -41,10 +38,10 @@ import java.util.UUID;
  */
 public class EvidenceUtils {
 
-    public static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
-    public static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
     public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
-    private static Logger logger = LoggerFactory.getLogger(EvidenceUtils.class);
+    private static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
+    private static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
+    private static final Logger logger = LoggerFactory.getLogger(EvidenceUtils.class);
 
     private EvidenceUtils() {
     }
@@ -54,37 +51,51 @@ public class EvidenceUtils {
     }
 
     public static void createEvidenceREMNRR(
-            String incomingMsg,
-            String keyStorePath,
-            String keyPassword,
-            String certAlias,
+            Document incomingMsg,
+            String issuerKeyStorePath,
+            String issuerKeyPassword,
+            String issuerCertAlias,
+            String senderKeyStorePath,
+            String senderKeyPassword,
+            String senderCertAlias,
+            String recipientKeyStorePath,
+            String recipientKeyPassword,
+            String recipientCertAlias,
             String eventType,
             DateTime submissionTime,
             String status,
             String title
     ) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
-        Document incomingSoap = XMLUtil.parseContent(incomingMsg);
-
         MessageType messageType = null;
-        String msguuid = "";
+        String msguuid;
         try {
-            MessageInspector messageInspector = new MessageInspector(incomingSoap);
+            MessageInspector messageInspector = new MessageInspector(incomingMsg);
             messageType = messageInspector.getMessageType();
             msguuid = messageInspector.getMessageUUID();
         } catch (Exception e) {
-            UnknownMessageType umt = new UnknownMessageType(incomingSoap);
+            logger.error("Exception: '{}'", e.getMessage(), e);
+            UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
         }
-        createEvidenceREMNRR(incomingMsg, keyStorePath, keyPassword, certAlias, eventType, submissionTime, status, title, msguuid);
+        createEvidenceREMNRR(incomingMsg, issuerKeyStorePath, issuerKeyPassword,
+                issuerCertAlias, senderKeyStorePath, senderKeyPassword,
+                senderCertAlias, recipientKeyStorePath, recipientKeyPassword,
+                recipientCertAlias, eventType, submissionTime, status, title, msguuid);
     }
 
     public static void createEvidenceREMNRR(
-            String incomingMsg,
-            String keyStorePath,
-            String keyPassword,
-            String certAlias,
+            Document incomingMsg,
+            String issuerKeyStorePath,
+            String issuerKeyPassword,
+            String issuerCertAlias,
+            String senderKeyStorePath,
+            String senderKeyPassword,
+            String senderCertAlias,
+            String recipientKeyStorePath,
+            String recipientKeyPassword,
+            String recipientCertAlias,
             String eventType,
             DateTime submissionTime,
             String status,
@@ -92,10 +103,9 @@ public class EvidenceUtils {
             String msguuid
     ) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
         String statusmsg = "failure";
-        if (status.equals("0")) {
+        if (StringUtils.equals("0", status)) {
             statusmsg = "success";
         }
-        Document incomingSoap = XMLUtil.parseContent(incomingMsg);
 
         PDP simplePDP = SimplePDPFactory.getSimplePDP();
 
@@ -112,12 +122,13 @@ public class EvidenceUtils {
          * Instantiate the message inspector, to see which type of message is
          */
         MessageType messageType = null;
-//        String msguuid = "";
+        //        String msguuid = "";
         try {
-            MessageInspector messageInspector = new MessageInspector(incomingSoap);
+            MessageInspector messageInspector = new MessageInspector(incomingMsg);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
-            UnknownMessageType umt = new UnknownMessageType(incomingSoap);
+            logger.error("Exception: '{}'", e.getMessage(), e);
+            UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             messageType = umt;
         }
         /*
@@ -155,20 +166,23 @@ public class EvidenceUtils {
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
 
         Context context = new Context();
-        context.setIncomingMsg(incomingSoap);
-        KeyStore ks = KeyStore.getInstance("JKS");
-        InputStream keyStream = new FileInputStream(new File(keyStorePath));
-        ks.load(keyStream, keyPassword.toCharArray());
-        X509Certificate cert = (X509Certificate) ks.getCertificate(certAlias);
-        context.setIssuerCertificate(cert);
-        context.setSenderCertificate(cert); // TODO: this is a bug
-        context.setRecipientCertificate(cert);
-        PrivateKey key = (PrivateKey) ks.getKey(certAlias, keyPassword.toCharArray());
+        context.setIncomingMsg(incomingMsg);
+
+        /* Loading the different certificates */
+        X509Certificate issuerCert = getCertificate(issuerKeyStorePath, issuerKeyPassword, issuerCertAlias);
+        X509Certificate senderCert = getCertificate(senderKeyStorePath, senderKeyPassword, senderCertAlias);
+        X509Certificate recipientCert = getCertificate(recipientKeyStorePath, recipientKeyPassword, recipientCertAlias);
+        context.setIssuerCertificate(issuerCert);
+        context.setSenderCertificate(senderCert);
+        context.setRecipientCertificate(recipientCert);
+
+        /* Signing key is the issuer key */
+        PrivateKey key = getSigningKey(issuerKeyStorePath, issuerKeyPassword, issuerCertAlias);
         context.setSigningKey(key);
         context.setSubmissionTime(submissionTime);
         context.setEvent(eventType);
         context.setMessageUUID(msguuid);
-        context.setAuthenticationMethod("3");
+        context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
         context.setRequest(request);
         context.setEnforcer(enforcePolicy);
 
@@ -187,77 +201,97 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nrr/" + getDocumentTitle(msguuid, title) + ".xml";
             }
-            logger.info("MSGUUID: " + msguuid + " " + "NRR TITLE :" + title);
+            logger.info("MSGUUID: '{}'  NRR TITLE: '{}'", msguuid, title);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
     }
 
-    public static void createEvidenceREMNRR(
-            String incomingSoap,
-            String eventType,
-            DateTime submissionTime,
-            String status,
-            String title,
-            String msguuid) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+    /* Joao: commented since this is not used anymore */
+//    public static void createEvidenceREMNRR(
+//            Document incomingSoap,
+//            String eventType,
+//            DateTime submissionTime,
+//            String status,
+//            String title,
+//            String msguuid) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+//
+//        createEvidenceREMNRR(incomingSoap, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS, eventType, submissionTime, status, title, msguuid);
+//    }
 
-        createEvidenceREMNRR(incomingSoap, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS, eventType, submissionTime, status, title, msguuid);
-    }
+    /* Joao: commented since this is not used anymore */
+//    public static void createEvidenceREMNRO(
+//            Document incomingSoap,
+//            String eventType,
+//            DateTime submissionTime,
+//            String status,
+//            String title,
+//            String msguuid) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+//
+//        createEvidenceREMNRO(incomingSoap, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS, eventType, submissionTime, status, title, msguuid);
+//
+//    }
 
     public static void createEvidenceREMNRO(
-            String incomingSoap,
-            String eventType,
-            DateTime submissionTime,
-            String status,
-            String title,
-            String msguuid) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
-
-        createEvidenceREMNRO(incomingSoap, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS, eventType, submissionTime, status, title, msguuid);
-
-    }
-
-    public static void createEvidenceREMNRO(
-            String incomingSoap,
-            String keyStorePath,
-            String keyPassword,
-            String certAlias,
+            Document incomingSoap,
+            String issuerKeyStorePath,
+            String issuerKeyPassword,
+            String issuerCertAlias,
+            String senderKeyStorePath,
+            String senderKeyPassword,
+            String senderCertAlias,
+            String recipientKeyStorePath,
+            String recipientKeyPassword,
+            String recipientCertAlias,
             String eventType,
             DateTime submissionTime,
             String status,
             String title) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
-        Document incomingMsg = XMLUtil.parseContent(incomingSoap);
+//        Document incomingMsg = XMLUtil.parseContent(incomingSoap);
 
         MessageType messageType = null;
         String msguuid = "";
         try {
-            MessageInspector messageInspector = new MessageInspector(incomingMsg);
+            MessageInspector messageInspector = new MessageInspector(incomingSoap);
             messageType = messageInspector.getMessageType();
             msguuid = messageInspector.getMessageUUID();
         } catch (Exception e) {
-            UnknownMessageType umt = new UnknownMessageType(incomingMsg);
+            logger.error("Exception: '{}'", e.getMessage(), e);
+            UnknownMessageType umt = new UnknownMessageType(incomingSoap);
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
         }
-        createEvidenceREMNRO(incomingSoap, keyStorePath, keyPassword, certAlias, eventType, submissionTime, status, title, msguuid);
+        createEvidenceREMNRO(incomingSoap, issuerKeyStorePath, issuerKeyPassword,
+                issuerCertAlias, senderKeyStorePath, senderKeyPassword,
+                senderCertAlias, recipientKeyStorePath, recipientKeyPassword,
+                recipientCertAlias, eventType, submissionTime, status, title, msguuid);
 
     }
 
     public static void createEvidenceREMNRO(
-            String incomingSoap,
-            String keyStorePath,
-            String keyPassword,
-            String certAlias,
+            Document incomingSoap,
+            String issuerKeyStorePath,
+            String issuerKeyPassword,
+            String issuerCertAlias,
+            String senderKeyStorePath,
+            String senderKeyPassword,
+            String senderCertAlias,
+            String recipientKeyStorePath,
+            String recipientKeyPassword,
+            String recipientCertAlias,
             String eventType,
             DateTime submissionTime,
             String status,
             String title,
             String msguuid
     ) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+
         String statusmsg = "failure";
-        if (status.equals("0")) {
+        if (StringUtils.equals("0", status)) {
+
             statusmsg = "success";
         }
-        Document incomingMsg = XMLUtil.parseContent(incomingSoap);
+//        Document incomingMsg = XMLUtil.parseContent(incomingSoap);
         PDP simplePDP = SimplePDPFactory.getSimplePDP();
         UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP
                 .getPolicyRepository();
@@ -275,27 +309,28 @@ public class EvidenceUtils {
         // Read the message as it arrives at the facade
         MessageType messageType = null;
         try {
-            MessageInspector messageInspector = new MessageInspector(incomingMsg);
+            MessageInspector messageInspector = new MessageInspector(incomingSoap);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
-            UnknownMessageType umt = new UnknownMessageType(incomingMsg);
+            logger.error("Exception: '{}'", e.getMessage(), e);
+            UnknownMessageType umt = new UnknownMessageType(incomingSoap);
             messageType = umt;
         }
         if (checkCorrectnessofIHEXCA(messageType)) {
-            logger.info("The message type : " + messageType + " is correct");
+            logger.info("The message type : '{}' is correct.", messageType);
         }
 
         /*
          * Now create the XACML request
          */
-        LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> actionList = new LinkedList<>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
         action.setIdentifier(new URI("urn:eSENS:outcome"));
         actionList.add(action);
         action.setValue(statusmsg);
 
-        LinkedList<XACMLAttributes> environmentList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
         environment.setDataType(new URI(DATATYPE_DATETIME));
         environment.setIdentifier(new URI("urn:esens:2014:event"));
@@ -323,21 +358,23 @@ public class EvidenceUtils {
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
 
         Context context = new Context();
-        context.setIncomingMsg(incomingMsg);
-        KeyStore ks = KeyStore.getInstance("JKS");
-        InputStream keyStream = new FileInputStream(new File(keyStorePath));
-        ks.load(keyStream, keyPassword.toCharArray());
-        X509Certificate cert = (X509Certificate) ks.getCertificate(certAlias);
-        context.setIssuerCertificate(cert);
-        context.setSenderCertificate(cert);
-        context.setRecipientCertificate(cert);
+        context.setIncomingMsg(incomingSoap);
 
-        PrivateKey key = (PrivateKey) ks.getKey(certAlias, keyPassword.toCharArray());
+        /* Loading the different certificates */
+        X509Certificate issuerCert = getCertificate(issuerKeyStorePath, issuerKeyPassword, issuerCertAlias);
+        X509Certificate senderCert = getCertificate(senderKeyStorePath, senderKeyPassword, senderCertAlias);
+        X509Certificate recipientCert = getCertificate(recipientKeyStorePath, recipientKeyPassword, recipientCertAlias);
+        context.setIssuerCertificate(issuerCert);
+        context.setSenderCertificate(senderCert);
+        context.setRecipientCertificate(recipientCert);
+
+        /* Signing key is the issuer key */
+        PrivateKey key = getSigningKey(issuerKeyStorePath, issuerKeyPassword, issuerCertAlias);
         context.setSigningKey(key);
         context.setSubmissionTime(submissionTime);
         context.setEvent(eventType);
         context.setMessageUUID(msguuid);
-        context.setAuthenticationMethod("3");
+        context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
         context.setRequest(request);
         context.setEnforcer(enforcePolicy);
         ObligationHandlerFactory handlerFactory = ObligationHandlerFactory
@@ -345,9 +382,7 @@ public class EvidenceUtils {
         List<ObligationHandler> handlers = handlerFactory.createHandler(
                 messageType, obligations, context);
 
-        // Here I discharge manually. This behavior is to let free an
-        // implementation
-
+        // Here I discharge manually. This behavior is to let free an implementation
         for (ObligationHandler handler : handlers) {
             handler.discharge();
             //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
@@ -358,7 +393,7 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nro/" + getDocumentTitle(msguuid, title) + ".xml";
             }
-            logger.info("MSGUUID: " + msguuid + " " + "NRO TITLE :" + title);
+            logger.info("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
 
@@ -378,8 +413,20 @@ public class EvidenceUtils {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document incomingMsg = db.parse(new File(file));
-        return incomingMsg;
+        return db.parse(new File(file));
     }
 
+    private static X509Certificate getCertificate(String keyStorePath, String keyPassword, String certAlias) throws KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
+        KeyStore ks = KeyStore.getInstance("JKS");
+        InputStream keyStream = new FileInputStream(new File(keyStorePath));
+        ks.load(keyStream, keyPassword.toCharArray());
+        return (X509Certificate) ks.getCertificate(certAlias);
+    }
+
+    private static PrivateKey getSigningKey(String keyStorePath, String keyPassword, String certAlias) throws FileNotFoundException, KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+        KeyStore ks = KeyStore.getInstance("JKS");
+        InputStream keyStream = new FileInputStream(new File(keyStorePath));
+        ks.load(keyStream, keyPassword.toCharArray());
+        return (PrivateKey) ks.getKey(certAlias, keyPassword.toCharArray());
+    }
 }

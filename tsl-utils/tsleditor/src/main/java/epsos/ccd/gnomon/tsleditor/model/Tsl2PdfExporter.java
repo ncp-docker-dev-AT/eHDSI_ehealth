@@ -1,20 +1,3 @@
-/***Licensed to the Apache Software Foundation (ASF) under one
- *or more contributor license agreements.  See the NOTICE file
- *distributed with this work for additional information
- *regarding copyright ownership.  The ASF licenses this file
- *to you under the Apache License, Version 2.0 (the
- *"License"); you may not use this file except in compliance
- *with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- *Unless required by applicable law or agreed to in writing,
- *software distributed under the License is distributed on an
- *"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *KIND, either express or implied.  See the License for the
- *specific language governing permissions and limitations
- *under the License.
- **/
 package epsos.ccd.gnomon.tsleditor.model;
 
 import com.lowagie.text.*;
@@ -24,8 +7,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
@@ -37,6 +19,8 @@ import org.etsi.uri._02231.v2.ExtensionType;
 import org.etsi.uri._02231.v2.NonEmptyMultiLangURIType;
 import org.etsi.uri._02231.v2.PostalAddressType;
 import org.etsi.uri.trstsvc.svcinfoext.esigdir_1999_93_ec_trustedlist.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import javax.xml.bind.JAXBContext;
@@ -53,7 +37,7 @@ import java.util.List;
 
 public class Tsl2PdfExporter {
 
-    private static final Log LOG = LogFactory.getLog(Tsl2PdfExporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Tsl2PdfExporter.class);
     private static final int BORDER = 0;
     private static final QName ADDITIONAL_SERVICE_INFORMATION_QNAME = new QName(
             "http://uri.etsi.org/02231/v2#", "AdditionalServiceInformation");
@@ -156,11 +140,11 @@ public class Tsl2PdfExporter {
     @SuppressWarnings("unchecked")
     private static List<String> getDERValue(final DERObject derObj) {
         if (derObj instanceof DERSequence) {
-            final List<String> ret = new LinkedList<String>();
+            final List<String> ret = new LinkedList<>();
             final DERSequence seq = (DERSequence) derObj;
             final Enumeration<DERObject> enum1 = seq.getObjects();
             while (enum1.hasMoreElements()) {
-                final DERObject nestedObj = (DERObject) enum1.nextElement();
+                final DERObject nestedObj = enum1.nextElement();
                 final List<String> appo = getDERValue(nestedObj);
                 if (appo != null) {
                     ret.addAll(appo);
@@ -188,7 +172,7 @@ public class Tsl2PdfExporter {
     private static List<String> getKeyUsage(final X509Certificate cert) {
         final boolean[] keyUsage = cert.getKeyUsage();
         if (keyUsage != null) {
-            final List<String> ret = new LinkedList<String>();
+            final List<String> ret = new LinkedList<>();
             for (int i = 0; i < keyUsage.length; ++i) {
                 if (keyUsage[i]) {
                     if (i < keyUsageLabels.length) {
@@ -479,8 +463,8 @@ public class Tsl2PdfExporter {
             if (content instanceof JAXBElement<?>) {
                 JAXBElement<?> element = (JAXBElement<?>) content;
                 LOG.debug("QName: " + element.getName());
-                if (false == ADDITIONAL_SERVICE_INFORMATION_QNAME
-                        .equals(element.getName())) {
+                if (!(ADDITIONAL_SERVICE_INFORMATION_QNAME
+                        .equals(element.getName()))) {
                     continue;
                 }
                 addTitle("Additional service information", title4Font,

@@ -1,68 +1,47 @@
 /**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
+ * Copyright (c) 2009-2011 University of Cardiff and others
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * <p>
+ * Contributors:
+ * University of Cardiff - initial API and implementation
+ * -
  */
 
 package org.openhealthtools.openatna.audit.persistence.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import org.openhealthtools.openatna.anom.Timestamp;
+import org.openhealthtools.openatna.audit.AtnaFactory;
+import org.openhealthtools.openatna.audit.persistence.AtnaPersistenceException;
+import org.openhealthtools.openatna.audit.persistence.PersistencePolicies;
+import org.openhealthtools.openatna.audit.persistence.dao.*;
+import org.openhealthtools.openatna.audit.persistence.model.*;
+import org.openhealthtools.openatna.audit.persistence.model.codes.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.openhealthtools.openatna.anom.Timestamp;
-import org.openhealthtools.openatna.audit.AtnaFactory;
-import org.openhealthtools.openatna.audit.persistence.AtnaPersistenceException;
-import org.openhealthtools.openatna.audit.persistence.PersistencePolicies;
-import org.openhealthtools.openatna.audit.persistence.dao.CodeDao;
-import org.openhealthtools.openatna.audit.persistence.dao.MessageDao;
-import org.openhealthtools.openatna.audit.persistence.dao.NetworkAccessPointDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ObjectDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ParticipantDao;
-import org.openhealthtools.openatna.audit.persistence.dao.SourceDao;
-import org.openhealthtools.openatna.audit.persistence.model.MessageEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageObjectEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageParticipantEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageSourceEntity;
-import org.openhealthtools.openatna.audit.persistence.model.NetworkAccessPointEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ObjectDetailEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ObjectEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ParticipantEntity;
-import org.openhealthtools.openatna.audit.persistence.model.SourceEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.CodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.EventIdCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.EventTypeCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.ObjectIdTypeCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.ParticipantCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.SourceCodeEntity;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 /**
  * Reads an XML file and loads entities into the DB.
@@ -72,24 +51,24 @@ import org.openhealthtools.openatna.audit.persistence.model.codes.SourceCodeEnti
  * @created Sep 10, 2009: 8:37:36 AM
  * @date $Date:$ modified by $Author:$
  */
-
 public class DataReader {
 
+    private Logger logger = LoggerFactory.getLogger(DataReader.class);
 
     private Document doc;
 
-    private Map<String, CodeEntity> evtIds = new HashMap<String, CodeEntity>();
-    private Map<String, CodeEntity> evtTypes = new HashMap<String, CodeEntity>();
-    private Map<String, CodeEntity> sourceTypes = new HashMap<String, CodeEntity>();
-    private Map<String, CodeEntity> objTypes = new HashMap<String, CodeEntity>();
-    private Map<String, CodeEntity> partTypes = new HashMap<String, CodeEntity>();
+    private Map<String, CodeEntity> evtIds = new HashMap<>();
+    private Map<String, CodeEntity> evtTypes = new HashMap<>();
+    private Map<String, CodeEntity> sourceTypes = new HashMap<>();
+    private Map<String, CodeEntity> objTypes = new HashMap<>();
+    private Map<String, CodeEntity> partTypes = new HashMap<>();
 
 
-    private Map<String, NetworkAccessPointEntity> naps = new HashMap<String, NetworkAccessPointEntity>();
-    private Map<String, SourceEntity> sources = new HashMap<String, SourceEntity>();
-    private Map<String, ParticipantEntity> parts = new HashMap<String, ParticipantEntity>();
-    private Map<String, ObjectEntity> objects = new HashMap<String, ObjectEntity>();
-    private Set<MessageEntity> messages = new HashSet<MessageEntity>();
+    private Map<String, NetworkAccessPointEntity> naps = new HashMap<>();
+    private Map<String, SourceEntity> sources = new HashMap<>();
+    private Map<String, ParticipantEntity> parts = new HashMap<>();
+    private Map<String, ObjectEntity> objects = new HashMap<>();
+    private Set<MessageEntity> messages = new HashSet<>();
 
     public DataReader(InputStream in) {
         try {
@@ -100,6 +79,20 @@ public class DataReader {
         }
     }
 
+    private static Document newDocument(InputStream stream) throws IOException {
+        Document doc = null;
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            doc = db.parse(stream);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
+        return doc;
+    }
 
     public void parse() throws AtnaPersistenceException {
         readDoc();
@@ -272,7 +265,7 @@ public class DataReader {
         }
         String code = el.getAttribute(DataConstants.CODE);
         if (nill(code)) {
-            System.out.println("no code defined in coded value. Not loading...");
+            logger.info("no code defined in coded value. Not loading...");
             return;
         }
         entity.setCode(code);
@@ -297,7 +290,6 @@ public class DataReader {
         }
     }
 
-
     private void readNaps(Element codes) {
         NodeList children = codes.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
@@ -312,7 +304,7 @@ public class DataReader {
         String netId = el.getAttribute(DataConstants.NETWORK_ACCESS_POINT_ID);
         String type = el.getAttribute(DataConstants.TYPE);
         if (nill(netId) || nill(type)) {
-            System.out.println("no identifier or type defined in network access point. Not loading...");
+            logger.info("no identifier or type defined in network access point. Not loading...");
             return;
         }
         NetworkAccessPointEntity e = new NetworkAccessPointEntity();
@@ -334,7 +326,7 @@ public class DataReader {
     private void readSource(Element el) {
         String sourceId = el.getAttribute(DataConstants.SOURCE_ID);
         if (nill(sourceId)) {
-            System.out.println("No Source id set. Not loading...");
+            logger.info("No Source id set. Not loading...");
             return;
         }
         String ent = el.getAttribute(DataConstants.ENT_SITE_ID);
@@ -372,7 +364,7 @@ public class DataReader {
     private void readPart(Element el) {
         String partId = el.getAttribute(DataConstants.USER_ID);
         if (nill(partId)) {
-            System.out.println("no active participant id defined. Not loading...");
+            logger.info("no active participant id defined. Not loading...");
         }
         String name = el.getAttribute(DataConstants.USER_NAME);
         String alt = el.getAttribute(DataConstants.ALT_USER_ID);
@@ -411,7 +403,7 @@ public class DataReader {
     private void readObject(Element el) {
         String obId = el.getAttribute(DataConstants.OBJECT_ID);
         if (nill(obId)) {
-            System.out.println("no participating object id defined. Not loading...");
+            logger.info("no participating object id defined. Not loading...");
         }
         String name = el.getAttribute(DataConstants.OBJECT_NAME);
         String type = el.getAttribute(DataConstants.OBJECT_TYPE_CODE);
@@ -432,14 +424,14 @@ public class DataReader {
                 if (ele.getLocalName().equals(DataConstants.OBJECT_ID_TYPE)) {
                     String ref = ele.getAttribute(DataConstants.CODE);
                     if (nill(ref)) {
-                        System.out.println("no object id type defined. Not loading...");
+                        logger.info("no object id type defined. Not loading...");
                         return;
                     }
                     CodeEntity code = objTypes.get(ref);
                     if (code != null && code instanceof ObjectIdTypeCodeEntity) {
                         e.setObjectIdTypeCode((ObjectIdTypeCodeEntity) code);
                     } else {
-                        System.out.println("no object id type defined. Not loading...");
+                        logger.info("no object id type defined. Not loading...");
                         return;
                     }
                 } else if (ele.getLocalName().equals(DataConstants.OBJECT_DETAIL_KEY)) {
@@ -451,7 +443,7 @@ public class DataReader {
             }
         }
         if (e.getObjectIdTypeCode() == null) {
-            System.out.println("no object id type defined. Not loading...");
+            logger.info("no object id type defined. Not loading...");
             return;
         }
         objects.put(obId, e);
@@ -469,7 +461,7 @@ public class DataReader {
             ts = new Date();
         }
         if (nill(action) || nill(outcome)) {
-            System.out.println("action or outcome of message is null. Not loading...");
+            logger.info("action or outcome of message is null. Not loading...");
         }
         MessageEntity ent = new MessageEntity();
         ent.setEventActionCode(action);
@@ -483,14 +475,14 @@ public class DataReader {
                 if (ele.getLocalName().equals(DataConstants.EVT_ID)) {
                     String ref = ele.getAttribute(DataConstants.CODE);
                     if (nill(ref)) {
-                        System.out.println("no event id type defined. Not loading...");
+                        logger.info("no event id type defined. Not loading...");
                         return;
                     }
                     CodeEntity code = evtIds.get(ref);
                     if (code != null && code instanceof EventIdCodeEntity) {
                         ent.setEventId((EventIdCodeEntity) code);
                     } else {
-                        System.out.println("no event id type defined. Not loading...");
+                        logger.info("no event id type defined. Not loading...");
                         return;
                     }
                 } else if (ele.getLocalName().equals(DataConstants.EVT_TYPE)) {
@@ -586,30 +578,14 @@ public class DataReader {
             }
         }
         if (ent.getMessageParticipants().size() == 0) {
-            System.out.println("message has no participants. Not loading...");
+            logger.info("message has no participants. Not loading...");
             return;
         }
         if (ent.getMessageSources().size() == 0) {
-            System.out.println("message has no sources. Not loading...");
+            logger.info("message has no sources. Not loading...");
             return;
         }
         messages.add(ent);
-    }
-
-
-    private static Document newDocument(InputStream stream) throws IOException {
-        Document doc = null;
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            doc = db.parse(stream);
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        }
-        return doc;
     }
 
     private String id(Element el) {
@@ -626,6 +602,4 @@ public class DataReader {
         }
         return false;
     }
-
-
 }

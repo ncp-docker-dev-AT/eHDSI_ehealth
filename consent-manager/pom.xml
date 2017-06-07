@@ -1,38 +1,25 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>openncp</artifactId>
-		<groupId>eu.europa.ec.sante.ehdsi</groupId>
-		<version>2.5.0.RC1</version>
-	</parent>
+    <parent>
+        <groupId>eu.europa.ec.sante.ehdsi</groupId>
+        <artifactId>openncp</artifactId>
+        <version>2.5.0</version>
+    </parent>
 
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>openncp-consent</artifactId>
-	<name>OpenNCP Consent Manager</name>
-	<organization>
-		<name>SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik Tic. Ltd. Sti.</name>
-		<url>www.srdc.com.tr</url>
-	</organization>
+    <artifactId>openncp-consent</artifactId>
+    <version>2.5.0</version>
+    <packaging>jar</packaging>
 
-	<dependencies>
-		<dependency>
-			<groupId>eu.europa.ec.sante.ehdsi</groupId>
-			<artifactId>openncp-util</artifactId>
-			<version>${project.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<!--<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>${log4jVersion}</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>-->
-	</dependencies>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<axiomReleaseVersion>1.2.13</axiomReleaseVersion>
-		<!--<log4jVersion>1.2.17</log4jVersion>-->
-	</properties>
+    <name>OpenNCP Consent Manager</name>
+    
+    <dependencies>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-util</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>

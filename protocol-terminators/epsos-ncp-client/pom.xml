@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- ==================
-       Artifact
-    ================== -->
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp-protocol-terminators</artifactId>
-        <version>2.5.0.RC1</version>
+        <version>2.5.0</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
     <artifactId>openncp-ncp-client</artifactId>
-
     <packaging>pom</packaging>
+
     <name>OpenNCP CC Web Services Client</name>
 
     <modules>
@@ -23,9 +21,4 @@
         <module>epsos-xdr-ws-client</module>
         <module>epsos-client-connector</module>
     </modules>
-
-    <description>
-        This project is a simple POM project.
-        It was created with the only purpose of aggregate all IHE client projects "under the same roof".
-    </description>
 </project>

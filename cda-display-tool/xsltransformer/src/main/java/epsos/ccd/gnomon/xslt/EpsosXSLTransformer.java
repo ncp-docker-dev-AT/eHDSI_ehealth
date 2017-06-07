@@ -70,7 +70,7 @@ public class EpsosXSLTransformer {
 
         String output = "";
         checkLanguageFiles();
-        logger.info("Trying to transform xml using action path for dispensation '{}' and repository path '{}'", actionpath, path);
+        logger.info("Trying to transform XML using action path for dispensation '{}' and repository path '{}' to language {}", actionpath, path, lang);
 
         try {
             URL xslUrl = this.getClass().getResource(xsl);

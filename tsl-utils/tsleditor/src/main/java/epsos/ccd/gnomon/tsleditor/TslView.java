@@ -21,6 +21,10 @@
  * TslView.java
  * <p>
  * TslView.java
+ * <p>
+ * TslView.java
+ * <p>
+ * TslView.java
  */
 /**
  * TslView.java
@@ -71,11 +75,11 @@ import java.util.*;
  */
 public class TslView extends FrameView implements TreeSelectionListener, ItemListener, MouseListener {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TslView.class);
     private final Timer messageTimer;
     private final Timer busyIconTimer;
     private final Icon idleIcon;
     private final Icon[] busyIcons = new Icon[15];
-    Logger LOGGER = LoggerFactory.getLogger(TslView.class);
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel TSLEnvelopePanel;
     private javax.swing.JPanel TSLProviderPanel;
@@ -2250,8 +2254,7 @@ public class TslView extends FrameView implements TreeSelectionListener, ItemLis
                 PrivateKey privateKey = (PrivateKey) keyStore.getKey(new String(this.keyAlias.getPassword()),
                         this.keyPassword.getPassword());
 
-                X509Certificate cert = (X509Certificate) keyStore
-                        .getCertificate(new String(this.keyAlias.getPassword()));
+                X509Certificate cert = (X509Certificate) keyStore.getCertificate(new String(this.keyAlias.getPassword()));
                 this.trustServiceList.sign(privateKey, cert);
 
                 // after this we need to reload the model from the dom
@@ -2262,7 +2265,7 @@ public class TslView extends FrameView implements TreeSelectionListener, ItemLis
                 this.showTSLSignature();
 
             } catch (Exception e) {
-                LOGGER.error("Exception: " + e.getMessage());
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
                 JOptionPane.showMessageDialog(this.jSplitPane1, "XML Signature of TSL Failed", "XML Signature Error",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -4200,16 +4203,16 @@ public class TslView extends FrameView implements TreeSelectionListener, ItemLis
             channel.connect();
             ChannelSftp sftp = (ChannelSftp) channel;
             sftp.put(filePath, destFolder, ChannelSftp.OVERWRITE);
-            System.out.println(filePath + " got uploaded successfully to folder " + destFolder);
+            LOGGER.info(filePath + " got uploaded successfully to folder " + destFolder);
             JOptionPane.showMessageDialog(this.jSplitPane1, "Upload to site \'" + destFolder + "\' was successful!",
                     "Upload Success!", JOptionPane.INFORMATION_MESSAGE);
             ftpDialog.setVisible(false);
         } catch (JSchException e) {
             JOptionPane.showMessageDialog(null, "Exception on tranferring the file " + e.getMessage());
-            System.out.println("Exception on tranferring the file " + e.getMessage());
+            LOGGER.error("Exception on tranferring the file " + e.getMessage());
         } catch (SftpException e) {
             JOptionPane.showMessageDialog(null, "SFTP Exception on tranferring the file " + e.getMessage());
-            System.out.println("SFTP Exception on tranferring the file " + e.getMessage());
+            LOGGER.error("SFTP Exception on tranferring the file " + e.getMessage());
         } finally {
             if (channel != null)
                 channel.disconnect();
@@ -4217,5 +4220,4 @@ public class TslView extends FrameView implements TreeSelectionListener, ItemLis
                 session.disconnect();
         }
     }
-
 }

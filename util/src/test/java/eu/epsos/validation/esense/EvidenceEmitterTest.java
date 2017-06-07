@@ -1,49 +1,40 @@
 package eu.epsos.validation.esense;
 
 import eu.epsos.util.EvidenceUtils;
-import eu.esens.abb.nonrep.EnforcePolicyException;
-import eu.esens.abb.nonrep.MalformedIHESOAPException;
-import eu.esens.abb.nonrep.MalformedMIMEMessageException;
-import eu.esens.abb.nonrep.ObligationDischargeException;
-import eu.esens.abb.nonrep.TOElementException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import eu.esens.abb.nonrep.*;
+import org.apache.commons.io.FileUtils;
+import org.herasaf.xacml.core.SyntaxException;
+import org.joda.time.DateTime;
+import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+import tr.com.srdc.epsos.util.DateUtil;
+import tr.com.srdc.epsos.util.XMLUtil;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
-import org.apache.commons.io.FileUtils;
-import org.herasaf.xacml.core.SyntaxException;
-import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.xml.sax.SAXException;
-import tr.com.srdc.epsos.util.DateUtil;
-import tr.com.srdc.epsos.util.XMLUtil;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
- *
  * @author karkaletsis
  */
 public class EvidenceEmitterTest {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EvidenceEmitterTest.class);
     private static X509Certificate cert;
     private static PrivateKey key;
 
@@ -95,10 +86,16 @@ public class EvidenceEmitterTest {
         FileUtils.copyInputStreamToFile(keyStore, keyStoreFile);
         org.w3c.dom.Document incomingMsg = XMLUtil.newDocumentFromInputStream(inputStream);
         String a1 = XMLUtil.DocumentToString(incomingMsg);
-        System.out.println(a1);
+        LOGGER.info(a1);
         //org.w3c.dom.Document incomingMsg = XMLUtil.newDocumentFromInputStream(inputStream);
         EvidenceUtils.createEvidenceREMNRR(
-                a1,
+        		incomingMsg,
+                keyStoreFile.getAbsolutePath(),
+                "spirit",
+                "server1",
+                keyStoreFile.getAbsolutePath(),
+                "spirit",
+                "server1",
                 keyStoreFile.getAbsolutePath(),
                 "spirit",
                 "server1",
@@ -119,10 +116,16 @@ public class EvidenceEmitterTest {
         InputStream keyStore = loader.getResourceAsStream("testData///sample.keystore");
         File keyStoreFile = File.createTempFile("sample", ".keystore");
         FileUtils.copyInputStreamToFile(keyStore, keyStoreFile);
-        System.out.println(a1);
+        LOGGER.info(a1);
         //org.w3c.dom.Document incomingMsg = XMLUtil.newDocumentFromInputStream(inputStream);
         EvidenceUtils.createEvidenceREMNRO(
-                a1,
+                incomingMsg,
+                keyStoreFile.getAbsolutePath(),
+                "spirit",
+                "server1",
+                keyStoreFile.getAbsolutePath(),
+                "spirit",
+                "server1",
                 keyStoreFile.getAbsolutePath(),
                 "spirit",
                 "server1",
@@ -131,5 +134,4 @@ public class EvidenceEmitterTest {
                 "1", "testNRO", "111111222222");
         keyStoreFile.delete();
     }
-
 }

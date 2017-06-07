@@ -1,35 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <artifactId>openncp-openatna</artifactId>
-        <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
-        <version>2.5.0.RC1</version>
-    </parent>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
+        <artifactId>openncp-openatna</artifactId>
+        <version>2.5.0</version>
+    </parent>
 
     <artifactId>openatna-net</artifactId>
     <packaging>jar</packaging>
-    <name>OpenATNA Net</name>
-    <url>https://openatna.projects.openhealthtools.org</url>
 
-    <!-- <dependencies> -->
-    <!-- <dependency> -->
-    <!-- <groupId>javax.mail</groupId> -->
-    <!-- <artifactId>mail</artifactId> -->
-    <!-- <version>1.4.7</version> -->
-    <!-- </dependency> -->
-    <!-- <dependency> -->
-    <!-- <groupId>org.bouncycastle</groupId> -->
-    <!-- <artifactId>bcmail-jdk15on</artifactId> -->
-    <!-- <version>1.55</version> -->
-    <!-- </dependency> -->
-    <!-- <dependency> -->
-    <!-- <groupId>org.bouncycastle</groupId> -->
-    <!-- <artifactId>bcprov-jdk15on</artifactId> -->
-    <!-- <version>1.55</version> -->
-    <!-- </dependency> -->
-    <!-- </dependencies> -->
+    <name>OpenNCP OpenATNA Net</name>
+
     <dependencies>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -44,7 +28,7 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>1.4.7</version>
+            <version>${mail.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>

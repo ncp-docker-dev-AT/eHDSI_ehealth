@@ -1,49 +1,45 @@
 /**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
+ * Copyright (c) 2009-2011 University of Cardiff and others
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * <p>
+ * Contributors:
+ * University of Cardiff - initial API and implementation
+ * -
  */
 
 package org.openhealthtools.openatna.report;
 
+import org.openhealthtools.openatna.audit.persistence.model.Query;
+import org.openhealthtools.openatna.audit.persistence.util.QueryString;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.openhealthtools.openatna.audit.persistence.model.Query;
-import org.openhealthtools.openatna.audit.persistence.util.QueryString;
 
 /**
  * @author Andrew Harrison
@@ -114,87 +110,6 @@ public class ReportConfig extends HashMap<String, Object> {
     public ReportConfig() {
 
     }
-
-    public String getTitle() {
-        return (String) get(TITLE);
-    }
-
-    public void setTitle(String title) {
-        put(TITLE, title);
-    }
-
-    public String getQuery() {
-        return (String) get(QUERY);
-    }
-
-    public void setQuery(String query) {
-        put(QUERY, query);
-    }
-
-    public String getQueryLanguage() {
-        return (String) get(QUERY_LANGUAGE);
-    }
-
-    public void setQueryLanguage(String queryLanguage) {
-        put(QUERY_LANGUAGE, queryLanguage);
-    }
-
-    public String getOutputDirectory() {
-        return (String) get(OUTPUT_DIRECTORY);
-    }
-
-    public void setOutputDirectory(String input) {
-        put(OUTPUT_DIRECTORY, input);
-    }
-
-    public String getInputDirectory() {
-        return (String) get(INPUT_DIRECTORY);
-    }
-
-    public void setInputDirectory(String input) {
-        put(INPUT_DIRECTORY, input);
-    }
-
-    public String getOutputType() {
-        return (String) get(OUTPUT_TYPE);
-    }
-
-    public void setOutputType(String outputType) {
-        put(OUTPUT_TYPE, outputType);
-    }
-
-    public String getOutputFileName() {
-        return (String) get(OUTPUT_FILE_NAME);
-    }
-
-    public void setOutputFileName(String outputFileName) {
-        put(OUTPUT_FILE_NAME, outputFileName);
-    }
-
-    public String getReportInstance() {
-        return (String) get(REPORT_INSTANCE);
-    }
-
-    public void setReportInstance(String reportInstance) {
-        put(REPORT_INSTANCE, reportInstance);
-    }
-
-    public void setGroupingField(String field) {
-        put(GROUPING_FIELD, field);
-    }
-
-    public String getGroupingField() {
-        return (String) get(GROUPING_FIELD);
-    }
-
-    public void setTarget(String entity) {
-        put(TARGET, entity);
-    }
-
-    public String getTarget() {
-        return (String) get(TARGET);
-    }
-
 
     public static ReportConfig fromXml(InputStream in) throws IOException {
         ReportConfig conf = new ReportConfig();
@@ -276,7 +191,6 @@ public class ReportConfig extends HashMap<String, Object> {
         return doc;
     }
 
-
     private static Document newDocument() throws IOException {
         Document doc = null;
         try {
@@ -315,7 +229,6 @@ public class ReportConfig extends HashMap<String, Object> {
         return sr;
     }
 
-
     public static void main(String[] args) {
         Query query = new Query();
         query.notNull(Query.Target.EVENT_OUTCOME);
@@ -334,5 +247,83 @@ public class ReportConfig extends HashMap<String, Object> {
         }
     }
 
+    public String getTitle() {
+        return (String) get(TITLE);
+    }
 
+    public void setTitle(String title) {
+        put(TITLE, title);
+    }
+
+    public String getQuery() {
+        return (String) get(QUERY);
+    }
+
+    public void setQuery(String query) {
+        put(QUERY, query);
+    }
+
+    public String getQueryLanguage() {
+        return (String) get(QUERY_LANGUAGE);
+    }
+
+    public void setQueryLanguage(String queryLanguage) {
+        put(QUERY_LANGUAGE, queryLanguage);
+    }
+
+    public String getOutputDirectory() {
+        return (String) get(OUTPUT_DIRECTORY);
+    }
+
+    public void setOutputDirectory(String input) {
+        put(OUTPUT_DIRECTORY, input);
+    }
+
+    public String getInputDirectory() {
+        return (String) get(INPUT_DIRECTORY);
+    }
+
+    public void setInputDirectory(String input) {
+        put(INPUT_DIRECTORY, input);
+    }
+
+    public String getOutputType() {
+        return (String) get(OUTPUT_TYPE);
+    }
+
+    public void setOutputType(String outputType) {
+        put(OUTPUT_TYPE, outputType);
+    }
+
+    public String getOutputFileName() {
+        return (String) get(OUTPUT_FILE_NAME);
+    }
+
+    public void setOutputFileName(String outputFileName) {
+        put(OUTPUT_FILE_NAME, outputFileName);
+    }
+
+    public String getReportInstance() {
+        return (String) get(REPORT_INSTANCE);
+    }
+
+    public void setReportInstance(String reportInstance) {
+        put(REPORT_INSTANCE, reportInstance);
+    }
+
+    public String getGroupingField() {
+        return (String) get(GROUPING_FIELD);
+    }
+
+    public void setGroupingField(String field) {
+        put(GROUPING_FIELD, field);
+    }
+
+    public String getTarget() {
+        return (String) get(TARGET);
+    }
+
+    public void setTarget(String entity) {
+        put(TARGET, entity);
+    }
 }

@@ -65,5 +65,4 @@
         <property name="dao" ref="epsos.ccd.posam.tsam.dao.ITsamDao"/>
         <property name="config" ref="tsamConfig"/>
     </bean>
-
 </beans>

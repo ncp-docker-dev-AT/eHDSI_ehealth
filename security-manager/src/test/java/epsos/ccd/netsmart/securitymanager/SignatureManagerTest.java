@@ -73,7 +73,7 @@ public class SignatureManagerTest {
     public void testSignXMLWithEnvelopedSig() {
         try {
 
-            System.out.println("signXMLWithEnvelopedSig");
+            logger.info("signXMLWithEnvelopedSig");
             String keyAlias = "testncp";
             String keyPassword = "epsos123";
 
@@ -109,7 +109,7 @@ public class SignatureManagerTest {
     public void testSignXMLWithEnvelopedSigTiani() {
         try {
 
-            System.out.println("signXMLWithEnvelopedSigTiani");
+            logger.info("signXMLWithEnvelopedSigTiani");
             String keyAlias = "server1";
             String keyPassword = "spirit";
 
@@ -135,7 +135,7 @@ public class SignatureManagerTest {
     public void testSignXMLWithEnvelopedSigSPMS() {
         try {
 
-            System.out.println("signXMLWithEnvelopedSigSPMS");
+            logger.info("signXMLWithEnvelopedSigSPMS");
             String keyAlias = "ppt.ncp-signature.epsos.spms.pt";
             String keyPassword = "changeit";
 
@@ -163,7 +163,7 @@ public class SignatureManagerTest {
     @Test
     public void testSuccessfulVerifyEnvelopedSignature() {
         try {
-            System.out.println("verifyEnvelopedSignature");
+            logger.info("verifyEnvelopedSignature");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             Document signedDoc;
@@ -180,7 +180,7 @@ public class SignatureManagerTest {
     @Test
     public void testFailedVerifyEnvelopedSignatureTiani() {
         try {
-            System.out.println("failedVerifyEnvelopedSignature");
+            logger.info("failedVerifyEnvelopedSignature");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             Document signedDoc;
@@ -202,7 +202,7 @@ public class SignatureManagerTest {
     @Test
     public void testFailedVerifyEnvelopedSignatureSPMS() {
         try {
-            System.out.println("failedVerifyEnvelopedSignatureSPMS");
+            logger.info("failedVerifyEnvelopedSignatureSPMS");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             Document signedDoc;

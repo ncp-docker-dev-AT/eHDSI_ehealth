@@ -469,9 +469,9 @@ public class STSService implements Provider<SOAPMessage> {
             e.printStackTrace();
         }
         logger.info(out.toString());
-        System.out.println("***************************************************************************************");
-        System.out.println(out.toString());
-        System.out.println("***************************************************************************************");
+        logger.info("***************************************************************************************");
+        logger.info(out.toString());
+        logger.info("***************************************************************************************");
         return out.toString();
     }
 }

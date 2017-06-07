@@ -9,16 +9,25 @@ import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -33,23 +42,24 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private static final String PATTERN_EP = "epstore.+\\.xml";
     private static final String PATTERN_PS = "psstore.+\\.xml";
     private static final String PATTERN_MRO = "mrostore.+\\.xml";
-    public static Logger logger = LoggerFactory.getLogger(DocumentSearchMockImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentSearchMockImpl.class);
     private List<DocumentAssociation<EPDocumentMetaData>> epDocumentMetaDatas = new ArrayList<>();
     private List<DocumentAssociation<PSDocumentMetaData>> psDocumentMetaDatas = new ArrayList<>();
     private List<DocumentAssociation<MroDocumentMetaData>> mroDocumentMetaDatas = new ArrayList<>();
-    private List<EPSOSDocument> documents = new ArrayList<EPSOSDocument>();
+    private List<EPSOSDocument> documents = new ArrayList<>();
 
     public DocumentSearchMockImpl() {
+
         Collection<String> documentlist = ResourceList.getResources(Pattern.compile(PATTERN_EP));
         ResourceLoader resourceLoader = new ResourceLoader();
 
         // Mocked ePrescription fill up
         for (String xmlFilename : documentlist) {
 
-            logger.debug("Reading file '{}'", xmlFilename);
+            LOGGER.debug("Reading file '{}'", xmlFilename);
             // make sure there is a pdf version of the document in the repository
             String pdfFilename = xmlFilename.substring(0, xmlFilename.length() - 4) + ".pdf";
-            if (resourceLoader.getResource(pdfFilename).equals("")) {
+            if (StringUtils.equals(resourceLoader.getResource(pdfFilename), "")) {
                 continue;
             }
 
@@ -65,16 +75,16 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(), new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), "author");
-                logger.debug("Placed XML doc id=" + epdXml.getId() + ", HomeCommId=" + Constants.HOME_COMM_ID + ", Patient Id: " + pd.getId() + " into eP repository");
+                LOGGER.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository", epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
                 EPDocumentMetaData epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(), new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), "author");
-                logger.debug("Placed PDF doc id=" + epdPdf.getId() + " into eP repository");
+                LOGGER.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
 
                 epDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(epdXml, epdPdf));
             } catch (Exception e) {
-                logger.warn("Could not read file at" + xmlFilename, e);
+                LOGGER.warn("Could not read file at" + xmlFilename, e);
             }
         }
 
@@ -83,10 +93,10 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         documentlist = ResourceList.getResources(Pattern.compile(PATTERN_PS));
 
         for (String xmlFilename : documentlist) {
-            logger.debug("Reading file '{}", xmlFilename);
+            LOGGER.debug("Reading file '{}", xmlFilename);
             // make sure there is a pdf version of the document in the repository
             String pdfFilename = xmlFilename.substring(0, xmlFilename.length() - 4) + ".pdf";
-            if (resourceLoader.getResource(pdfFilename).equals("")) {
+            if (StringUtils.equals(resourceLoader.getResource(pdfFilename), "")) {
                 continue;
             }
 
@@ -97,21 +107,21 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 Document pdfDoc = XMLUtil.parseContent(xmlDocString);
                 byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
                 wrapPDFinCDA(pdfcontents, pdfDoc);
-                logger.debug("Adding format to the document's OID");
+                LOGGER.debug("Adding format to the document's OID");
                 addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
-                logger.debug("Parsing PS patient demographics");
+                LOGGER.debug("Parsing PS patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 PSDocumentMetaData psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(), new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), "author");
                 documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
                 PSDocumentMetaData psdXml = DocumentFactory.createPSDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(), new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), "author");
                 documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
-                logger.debug("Placed PDF doc id=" + psdPdf.getId() + " into PS repository");
-                logger.debug("Placed XML doc id=" + psdXml.getId() + " into PS repository");
+                LOGGER.debug("Placed PDF doc id=" + psdPdf.getId() + " into PS repository");
+                LOGGER.debug("Placed XML doc id=" + psdXml.getId() + " into PS repository");
 
                 psDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(psdXml, psdPdf));
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                LOGGER.warn("Could not read file at " + xmlFilename, e);
             }
         }
 
@@ -120,47 +130,57 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         documentlist = ResourceList.getResources(Pattern.compile(PATTERN_MRO));
 
         for (String xmlFilename : documentlist) {
-            logger.debug("reading file " + xmlFilename);
+            LOGGER.debug("reading file '{}'", xmlFilename);
             // make sure there is a pdf version of the document in the repository
             String pdfFilename = xmlFilename.substring(0, xmlFilename.length() - 4) + ".pdf";
-            if (resourceLoader.getResource(pdfFilename).equals("")) {
+            if (StringUtils.equals(resourceLoader.getResource(pdfFilename), "")) {
                 continue;
             }
 
             try {
                 String xmlDocString = resourceLoader.getResource(xmlFilename);
-                Document xmlDoc = XMLUtil.parseContent(xmlDocString);
+                Document xmlDoc = loadCDADocument(xmlDocString);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
-                Document pdfDoc = XMLUtil.parseContent(xmlDocString);
+                Document pdfDoc = loadCDADocument(xmlDocString);
                 byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
                 wrapPDFinCDA(pdfcontents, pdfDoc);
-                logger.debug("Adding format to the document's OID");
+                LOGGER.debug("Adding format to the document's OID");
                 addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
-                logger.debug("Parsing MRO patient demographics");
+                LOGGER.debug("Parsing MRO patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 MroDocumentMetaData psdPdf = DocumentFactory.createMroDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(), new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), "author");
                 documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
                 MroDocumentMetaData psdXml = DocumentFactory.createMroDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(), new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), "author");
                 documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
-                logger.debug("Placed PDF doc id=" + psdPdf.getId() + " into MRO repository");
-                logger.debug("Placed XML doc id=" + psdXml.getId() + " into MRO repository");
+                LOGGER.debug("Placed PDF doc id='{}' into MRO repository", psdPdf.getId());
+                LOGGER.debug("Placed XML doc id='{}' into MRO repository", psdXml.getId());
 
                 mroDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(psdXml, psdPdf));
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                LOGGER.warn("Could not read file at " + xmlFilename, e);
             }
         }
     }
 
+    public static Document loadCDADocument(String content) throws ParserConfigurationException, SAXException, IOException {
+
+        //LOGGER.debug("loadCDADocument(): '{}'", content);
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(false);
+        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+        StreamResult result = new StreamResult(new StringWriter());
+        return docBuilder.parse(new ByteArrayInputStream(result.toString().getBytes()));
+    }
+
     @Override
     public DocumentAssociation<PSDocumentMetaData> getPSDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException {
-        logger.info("getPSDocumentList(SearchCriteria searchCriteria): " + searchCriteria.toString());
+        LOGGER.info("getPSDocumentList(SearchCriteria searchCriteria): '{}'", searchCriteria.toString());
         for (DocumentAssociation<PSDocumentMetaData> da : psDocumentMetaDatas) {
-            logger.info("loop: " + da.toString());
+            LOGGER.info("loop: '{}'", da.toString());
             if (da.getXMLDocumentMetaData() != null
                     && da.getXMLDocumentMetaData().getPatientId().equals(searchCriteria.getCriteriaValue(Criteria.PatientId))) {
-                logger.info("getPSDocumentList(SearchCriteria searchCriteria): " + da.toString());
+                LOGGER.info("getPSDocumentList(SearchCriteria searchCriteria): '{}'", da.toString());
                 return da;
             }
         }
@@ -170,26 +190,26 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
     @Override
     public List<DocumentAssociation<EPDocumentMetaData>> getEPDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException {
-        logger.info("getEPDocumentList(SearchCriteria searchCriteria)");
-        List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<DocumentAssociation<EPDocumentMetaData>>();
+
+        LOGGER.info("getEPDocumentList(SearchCriteria searchCriteria)");
+        List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
 
         for (DocumentAssociation<EPDocumentMetaData> da : epDocumentMetaDatas) {
             if (da.getXMLDocumentMetaData() != null
                     && da.getXMLDocumentMetaData().getPatientId().equals(searchCriteria.getCriteriaValue(Criteria.PatientId))) {
                 metaDatas.add(da);
-                logger.info("getEPDocumentList(SearchCriteria searchCriteria): " + da.toString());
+                LOGGER.info("getEPDocumentList(SearchCriteria searchCriteria): '{}'", da.toString());
             }
         }
-
         return metaDatas;
     }
 
     @Override
     public EPSOSDocument getDocument(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException {
-        logger.info("getDocument(SearchCriteria searchCriteria)");
+        LOGGER.info("getDocument(SearchCriteria searchCriteria)");
         for (EPSOSDocument doc : documents) {
             if (doc.matchesCriteria(searchCriteria)) {
-                logger.info("getDocument(SearchCriteria searchCriteria): " + doc.toString());
+                LOGGER.info("getDocument(SearchCriteria searchCriteria): '{}'", doc.toString());
                 return doc;
             }
         }
@@ -199,12 +219,13 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
     @Override
     public DocumentAssociation<MroDocumentMetaData> getMroDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException {
-        logger.info("getMroDocumentList(SearchCriteria searchCriteria): " + searchCriteria.toString());
+
+        LOGGER.info("getMroDocumentList(SearchCriteria searchCriteria): '{}'", searchCriteria.toString());
         for (DocumentAssociation<MroDocumentMetaData> da : mroDocumentMetaDatas) {
-            logger.info("loop: " + da.toString());
+            LOGGER.info("loop: '{}'", da.toString());
             if (da.getXMLDocumentMetaData() != null
                     && da.getXMLDocumentMetaData().getPatientId().equals(searchCriteria.getCriteriaValue(Criteria.PatientId))) {
-                logger.info("getMroDocumentList(SearchCriteria searchCriteria): " + da.toString());
+                LOGGER.info("getMroDocumentList(SearchCriteria searchCriteria): '{}'", da.toString());
                 return da;
             }
         }
@@ -231,21 +252,22 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             Node titleNode = doc.getElementsByTagName("epsos:name").item(0);
             return titleNode.getTextContent();
         }
-        logger.debug("Could not locate the title of the prescription");
+        LOGGER.debug("Could not locate the title of the prescription");
         return "ePrescription";
     }
 
     private void wrapPDFinCDA(byte[] pdf, Document doc) {
 
-        logger.info("XML document parsed");
-
+        LOGGER.info("NameSpace: '{}', Document URI '{}', XML encoding: '{}', BaseURI: '{}'", doc.getNamespaceURI(), doc.getDocumentURI(), doc.getXmlEncoding(), doc.getBaseURI());
         // Remove old component element
         Node oldComponent = doc.getElementsByTagName("component").item(0);
-        Element newComponent = doc.createElement("component");
+
+        Element newComponent = doc.createElementNS("urn:hl7-org:v3", "component");
+        //doc.createElement("component").setAttributeNS();
 
         // Add new component element
-        Element nonXMLBody = doc.createElement("nonXMLBody");
-        Element text = doc.createElement("text");
+        Element nonXMLBody = doc.createElementNS("urn:hl7-org:v3", "nonXMLBody");
+        Element text = doc.createElementNS("urn:hl7-org:v3", "text");
 
         text.setAttribute("mediaType", "application/pdf");
         text.setAttribute("representation", "B64");
@@ -255,11 +277,13 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         newComponent.appendChild(nonXMLBody);
 
         Node rootNode = doc.getFirstChild();
-        logger.info("Adding PDF document. Removing old component node and adding a new.");
-        rootNode.removeChild(oldComponent);
-        rootNode.appendChild(newComponent);
-        logger.info("PDF document added.");
-        return;
+        LOGGER.info("Adding PDF document. Removing old component node and adding a new.");
+        LOGGER.info("Old Namespace: '{}'", oldComponent.getNamespaceURI());
+        LOGGER.info("New Namespace: '{}'", newComponent.getNamespaceURI());
+//        rootNode.removeChild(oldComponent);
+//        rootNode.appendChild(newComponent);
+        rootNode.replaceChild(newComponent, oldComponent);
+        LOGGER.info("PDF document added.");
     }
 
     private void addFormatToOID(Document doc, int format) {
@@ -268,9 +292,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             if (id.hasAttribute("extension")) {
                 id.setAttribute("extension", id.getAttribute("extension") + "." + format);
             } else {
-                id.setAttribute("extension", "" + format);
+                id.setAttribute("extension", Integer.toString(format));
             }
         }
-        return;
     }
 }

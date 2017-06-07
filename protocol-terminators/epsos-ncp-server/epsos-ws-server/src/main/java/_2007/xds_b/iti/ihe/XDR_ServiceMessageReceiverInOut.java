@@ -1,21 +1,36 @@
 /**
  * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
  * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- *
+ * <p>
  * This file is part of SRDC epSOS NCP.
- *
+ * <p>
  * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along with
  * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
+ * <p>
+ * XDR_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.5
+ * Built on : May 28, 2011 (08:30:56 CEST)
+ * <p>
+ * XDR_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.5
+ * Built on : May 28, 2011 (08:30:56 CEST)
+ * <p>
+ * XDR_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.5
+ * Built on : May 28, 2011 (08:30:56 CEST)
  */
 /**
  * XDR_ServiceMessageReceiverInOut.java
@@ -28,38 +43,57 @@ package _2007.xds_b.iti.ihe;
 import com.spirit.epsos.cc.adc.EadcEntry;
 import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
-import epsos.ccd.gnomon.auditmanager.EventType;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XdrValidationService;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.slf4j.Logger;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
-import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.namespace.QName;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.UUID;
 
 /**
  * XDR_ServiceMessageReceiverInOut message receiver
  */
 public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.AbstractInOutMessageReceiver {
 
-    public static Logger logger = LoggerFactory.getLogger(XDR_ServiceMessageReceiverInOut.class);
+    private static final Logger logger = LoggerFactory.getLogger(XDR_ServiceMessageReceiverInOut.class);
+
+    private static final javax.xml.bind.JAXBContext wsContext;
+
+    static {
+        logger.debug("Loading the WS-Security init libraries in XDR 2007");
+
+        org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
+    }
+
+    static {
+        javax.xml.bind.JAXBContext jc;
+        jc = null;
+        try {
+            jc = javax.xml.bind.JAXBContext
+                    .newInstance(
+                            ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class,
+                            oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType.class);
+        } catch (javax.xml.bind.JAXBException ex) {
+            logger.error("Unable to create JAXBContext: '{}'", ex.getMessage(), ex);
+            Runtime.getRuntime().exit(-1);
+        } finally {
+            wsContext = jc;
+        }
+    }
 
     private String getIPofSender(org.apache.axis2.context.MessageContext msgContext) {
         String remoteAddress_IPConsumer = (String) msgContext.getProperty("REMOTE_ADDR");
@@ -119,20 +153,20 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
 
                 logger.debug("Incoming XDR Request Message:\n" + XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
 
-                logger.info("XDR Request Received. EVIDENCE NRR");
+//                logger.info("XDR Request Received. EVIDENCE NRR");
                 // Send NRR
-                try {
-                    EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())),
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosDispensationServiceInitialize.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            "NCPA_XDR_REQ");
-                } catch (Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
+//                try {
+//                    EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope()),
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                            EventType.epsosDispensationServiceInitialize.getCode(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                            "NCPA_XDR_REQ");
+//                } catch (Exception e) {
+//                    log.error(ExceptionUtils.getStackTrace(e));
+//                }
 
                 if ("documentRecipient_ProvideAndRegisterDocumentSetB"
                         .equals(methodName)) {
@@ -144,7 +178,7 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
                     oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType registryResponse = null;
                     ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType wrappedParam = (ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType) fromOM(
                             msgContext.getEnvelope().getBody()
-                            .getFirstElement(),
+                                    .getFirstElement(),
                             ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
@@ -164,33 +198,35 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
 
                     logger.debug("Response Header:\n" + envelope.getHeader().toString());
                     logger.debug("Outgoing XDR Response Message:\n" + XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
-                    logger.info("XDR Response going to be sent. EVIDENCE NRO");
+//                    logger.info("XDR Response going to be sent. EVIDENCE NRO");
                     // Call to Evidence Emitter
-                    try {
-                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                EventType.epsosDispensationServiceInitialize.getCode(),
-                                DateUtil.GregorianCalendarToJodaTime(eventLog.getEI_EventDateTime()),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                "NCPA_XDR_RES");
-                    } catch (Exception e) {
-                        logger.error(ExceptionUtils.getStackTrace(e));
-                    }
+
+                    // Massi commented out: call to NI
+//                    try {
+//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                EventType.epsosDispensationServiceInitialize.getCode(),
+//                                DateUtil.GregorianCalendarToJodaTime(eventLog.getEI_EventDateTime()),
+//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                                "NCPA_XDR_RES");
+//                    } catch (Exception e) {
+//                        logger.error(ExceptionUtils.getStackTrace(e));
+//                    }
 
                 } else {
                     throw new java.lang.RuntimeException("method not found");
                 }
 
-                logger.info("Submission Time is : " + eventLog.getEI_EventDateTime());
-                logger.info("EventType is : " + eventLog.getEventType());
-                logger.info("Event Outcome is: " + eventLog.getEI_EventOutcomeIndicator().toString());
-                logger.info("KEYSTORE PATH: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH);
-                logger.info("KEYSTORE PWD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD);
-                logger.info("KEY ALIAS: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS);
-                logger.info("PRIVATE KEY PASSWORD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
-                logger.info("CLIENT CERTIFICATE: " + clientDN);
+                logger.info("Submission Time is : '{}'", eventLog.getEI_EventDateTime());
+                logger.info("EventType is : '{}'", eventLog.getEventType());
+                logger.info("Event Outcome is: '{}'", eventLog.getEI_EventOutcomeIndicator().toString());
+                logger.info("KEYSTORE PATH: '{}'", tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH);
+                logger.info("KEYSTORE PWD: '{}'", tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD);
+                logger.info("KEY ALIAS: '{}'", tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS);
+                logger.info("PRIVATE KEY PASSWORD: '{}'", tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
+                logger.info("CLIENT CERTIFICATE: '{}'", clientDN);
 
                 Date endTime = new Date();
                 newMsgContext.setEnvelope(envelope);
@@ -211,29 +247,8 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
                 }
             }
         } catch (java.lang.Exception e) {
-            logger.error(e.getMessage(), e);
-            e.printStackTrace();
+            logger.error("Exception: '{}'", e.getMessage(), e);
             throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-    //
-    private static final javax.xml.bind.JAXBContext wsContext;
-
-    static {
-        javax.xml.bind.JAXBContext jc;
-        jc = null;
-        try {
-            jc = javax.xml.bind.JAXBContext
-                    .newInstance(
-                            ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class,
-                            oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType.class);
-        } catch (javax.xml.bind.JAXBException ex) {
-            System.err.println("Unable to create JAXBContext: "
-                    + ex.getMessage());
-            ex.printStackTrace(System.err);
-            Runtime.getRuntime().exit(-1);
-        } finally {
-            wsContext = jc;
         }
     }
 
@@ -318,7 +333,7 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
     }
 
     private java.lang.Object fromOM(org.apache.axiom.om.OMElement param,
-            java.lang.Class type, java.util.Map extraNamespaces)
+                                    java.lang.Class type, java.util.Map extraNamespaces)
             throws org.apache.axis2.AxisFault {
         try {
             javax.xml.bind.JAXBContext context = wsContext;
@@ -330,6 +345,33 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
         } catch (javax.xml.bind.JAXBException bex) {
             throw org.apache.axis2.AxisFault.makeFault(bex);
         }
+    }
+
+    /**
+     * A utility method that copies the namepaces from the SOAPEnvelope
+     */
+    private java.util.Map getEnvelopeNamespaces(
+            org.apache.axiom.soap.SOAPEnvelope env) {
+        java.util.Map returnMap = new java.util.HashMap();
+        java.util.Iterator namespaceIterator = env.getAllDeclaredNamespaces();
+        while (namespaceIterator.hasNext()) {
+            org.apache.axiom.om.OMNamespace ns = (org.apache.axiom.om.OMNamespace) namespaceIterator
+                    .next();
+            returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
+        }
+        return returnMap;
+    }
+
+    private org.apache.axis2.AxisFault createAxisFault(java.lang.Exception e) {
+        org.apache.axis2.AxisFault f;
+        Throwable cause = e.getCause();
+        if (cause != null) {
+            f = new org.apache.axis2.AxisFault(e.getMessage(), cause);
+        } else {
+            f = new org.apache.axis2.AxisFault(e.getMessage());
+        }
+
+        return f;
     }
 
     class JaxbRIDataSource implements org.apache.axiom.om.OMDataSource {
@@ -362,7 +404,7 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
          * @param marshaller
          */
         public JaxbRIDataSource(Class clazz, Object obj,
-                javax.xml.bind.Marshaller marshaller, String nsuri, String name) {
+                                javax.xml.bind.Marshaller marshaller, String nsuri, String name) {
             this.outClazz = clazz;
             this.outObject = obj;
             this.marshaller = marshaller;
@@ -371,7 +413,7 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
         }
 
         public void serialize(java.io.OutputStream output,
-                org.apache.axiom.om.OMOutputFormat format)
+                              org.apache.axiom.om.OMOutputFormat format)
                 throws javax.xml.stream.XMLStreamException {
             try {
                 marshaller.marshal(new javax.xml.bind.JAXBElement(
@@ -384,7 +426,7 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
         }
 
         public void serialize(java.io.Writer writer,
-                org.apache.axiom.om.OMOutputFormat format)
+                              org.apache.axiom.om.OMOutputFormat format)
                 throws javax.xml.stream.XMLStreamException {
             try {
                 marshaller.marshal(new javax.xml.bind.JAXBElement(
@@ -425,32 +467,5 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
                         "Error in JAXB marshalling", e);
             }
         }
-    }
-
-    /**
-     * A utility method that copies the namepaces from the SOAPEnvelope
-     */
-    private java.util.Map getEnvelopeNamespaces(
-            org.apache.axiom.soap.SOAPEnvelope env) {
-        java.util.Map returnMap = new java.util.HashMap();
-        java.util.Iterator namespaceIterator = env.getAllDeclaredNamespaces();
-        while (namespaceIterator.hasNext()) {
-            org.apache.axiom.om.OMNamespace ns = (org.apache.axiom.om.OMNamespace) namespaceIterator
-                    .next();
-            returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
-        }
-        return returnMap;
-    }
-
-    private org.apache.axis2.AxisFault createAxisFault(java.lang.Exception e) {
-        org.apache.axis2.AxisFault f;
-        Throwable cause = e.getCause();
-        if (cause != null) {
-            f = new org.apache.axis2.AxisFault(e.getMessage(), cause);
-        } else {
-            f = new org.apache.axis2.AxisFault(e.getMessage());
-        }
-
-        return f;
     }
 }// end of class

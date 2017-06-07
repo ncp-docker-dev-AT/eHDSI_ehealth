@@ -1,99 +1,101 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>2.5.0.RC1</version>
+        <artifactId>openncp</artifactId>
+        <version>2.5.0</version>
     </parent>
-
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>openncp-tsam-sync</artifactId>
     <packaging>jar</packaging>
+
     <name>TSAM Synchronizer</name>
-    <url>https://code.google.com/p/epsos-common-components.tsam-sync</url>
-
-    <developers>
-        <developer>
-            <id>carecom</id>
-            <email>info@carecom.eu</email>
-            <name></name>
-            <organization>CareCom A/S</organization>
-            <organizationUrl>http://www.carecom.dk</organizationUrl>
-        </developer>
-        <developer>
-            <id>steen@manniche.net</id>
-            <email>stm@nsi.dk</email>
-            <name>Steen Manniche</name>
-            <organization>National Board of E-Health, Denmark</organization>
-            <organizationUrl>http://www.nsi.dk</organizationUrl>
-        </developer>
-    </developers>
-
-    <inceptionYear>2010</inceptionYear>
-    <licenses>
-        <license>
-            <name>Apache License, version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:git:https://bitbucket.org/openncp/tsam-sync.git</connection>
-        <url>https://bitbucket.org/openncp/tsam-sync</url>
-    </scm>
-
-    <issueManagement>
-        <system>JIRA</system>
-        <url>https://openncp.atlassian.net/browse/TM</url>
-    </issueManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <commons-lang3.version>3.5</commons-lang3.version>
+        <ehealth-termservice-server.version>1.0.0</ehealth-termservice-server.version>
+        <hibernate.version>5.2.7.Final</hibernate.version>
+        <hikaricp.version>2.6.0</hikaricp.version>
+        <httpclient.version>4.5.2</httpclient.version>
+        <jackson.version>2.8.4</jackson.version>
+        <javax-el.version>3.0.1-b08</javax-el.version>
+        <mysql-connector.version>5.1.39</mysql-connector.version>
+        <ojdbc.version>11.2.0.4</ojdbc.version>
+        <spring.version>4.3.6.RELEASE</spring.version>
+        <spring-boot.version>1.5.1.RELEASE</spring-boot.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-audit-manager</artifactId>
-            <version>${project.version}</version>
+            <groupId>eu.europa.ec.sante.ehdsi.termservice</groupId>
+            <artifactId>ehealth-termservice-rest-model</artifactId>
+            <version>${ehealth-termservice-server.version}</version>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-util</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>jaxws-rt</artifactId>
-            <version>2.1.3</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <groupId>org.hibernate</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>${javax-el.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>${ojdbc.version}</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.21</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.8.1.GA</version>
+            <version>${mysql-connector.version}</version>
         </dependency>
     </dependencies>
 
@@ -102,39 +104,25 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.0.2</version>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>epsos.ccd.carecom.tsam.synchronizer.Client</mainClass>
+                            <mainClass>eu.europa.ec.sante.ehdsi.tsam.sync.TsamSyncApplication</mainClass>
+                            <!--<addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.3</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>repackage</goal>
                         </goals>
-                        <configuration>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <shadedClassifierName>stand-alone</shadedClassifierName>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META_INF/*.SF</exclude>
-                                        <exclude>META_INF/*.DSA</exclude>
-                                        <exclude>META_INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

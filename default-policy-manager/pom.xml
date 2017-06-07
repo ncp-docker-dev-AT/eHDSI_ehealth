@@ -1,31 +1,28 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>2.5.0.RC1</version>
+        <artifactId>openncp</artifactId>
+        <version>2.5.0</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>openncp-defaultpolicymanager</artifactId>
-    <name>Default policy manager implementation</name>
-    <organization>
-        <name>Kela (Social insurance institution of Finland).</name>
-        <url>www.kanta.fi</url>
-    </organization>
 
-   <!-- <repositories>
-        <repository>
-            <url>https://build.shibboleth.net/nexus/content/repositories/releases</url>
-            <id>openSamlRep</id>
-            <name>Official OpenSaml Repository</name>
-        </repository>
-    </repositories>-->
+    <artifactId>openncp-defaultpolicymanager</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Default Policy Manager Implementation</name>
 
     <dependencies>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-assertion-validator</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-audit-manager</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -39,11 +36,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-audit-manager</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
@@ -53,16 +45,10 @@
             <artifactId>jcl-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4jVersion}</version>
-        </dependency>-->
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>xmltooling</artifactId>
-            <!--<version>1.3.4</version>-->
-            <version>1.4.4</version>
+            <version>${xmltooling.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.xerces</groupId>
@@ -98,6 +84,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- TODO: Harmonizing the opensaml dependencies versions used in the diferents components -->
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
@@ -138,9 +125,4 @@
             </exclusions>
         </dependency>
     </dependencies>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--<log4jVersion>1.2.17</log4jVersion>-->
-    </properties>
 </project>

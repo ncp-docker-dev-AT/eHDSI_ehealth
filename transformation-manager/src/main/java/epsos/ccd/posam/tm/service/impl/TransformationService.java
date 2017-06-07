@@ -32,8 +32,7 @@ import java.util.*;
  * @version 1.25, 2010, 20 October
  * @see ITransformationService
  */
-public class TransformationService implements ITransformationService,
-        TMConstants, InitializingBean {
+public class TransformationService implements ITransformationService, TMConstants, InitializingBean {
 
     private static final Logger log = LoggerFactory.getLogger(TransformationService.class);
 
@@ -43,9 +42,9 @@ public class TransformationService implements ITransformationService,
     private TMConfiguration config;
 
     public TMResponseStructure toEpSOSPivot(Document epSOSOriginalData) {
+
         log.debug("toEpsosPivot BEGIN");
-        TMResponseStructure responseStructure = process(epSOSOriginalData,
-                null, true);
+        TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
         log.debug("toEpsosPivot END");
         return responseStructure;
     }
@@ -60,8 +59,7 @@ public class TransformationService implements ITransformationService,
      * @throws TMException
      * @throws Exception
      */
-    public String getCDADocumentType(Document document) throws TMException,
-            Exception {
+    public String getCDADocumentType(Document document) throws TMException, Exception {
 
 //		XPath xpath = XPathFactory.newInstance().newXPath();
 //		XPathExpression expr = xpath.compile(XPATH_CLINICALDOCUMENT_CODE);
@@ -70,12 +68,12 @@ public class TransformationService implements ITransformationService,
         List<Node> nodeList = XmlUtil.getNodeList(document, XPATH_CLINICALDOCUMENT_CODE);
 
         // Document type code
-        String docTypeCode = null;
+        String docTypeCode;
         // exactly 1 document type element should exist
         if (nodeList.size() == 1) {
             Element docTypeCodeElement = (Element) nodeList.get(0);
             docTypeCode = docTypeCodeElement.getAttribute(CODE);
-            log.debug("docTypeCode: " + docTypeCode);
+            log.debug("docTypeCode: '{}'", docTypeCode);
             if (docTypeCode == null || docTypeCode.length() == 0) {
                 throw new TMException(TMError.ERROR_DOCUMENT_CODE_NOT_EXIST);
             } /*else if (!TMConfiguration.getInstance().getDocTypesCollection()
@@ -83,9 +81,7 @@ public class TransformationService implements ITransformationService,
              throw new TMException(TMError.ERROR_DOCUMENT_CODE_UNKNOWN);
              }*/
         } else {
-            log
-                    .error("Problem obtaining document type code ! found /ClinicalDocument/code elements:"
-                            + nodeList.size());
+            log.error("Problem obtaining document type code ! found /ClinicalDocument/code elements: '{}'", nodeList.size());
             throw new TMException(TMError.ERROR_DOCUMENT_CODE_NOT_EXIST);
         }
 
@@ -98,18 +94,18 @@ public class TransformationService implements ITransformationService,
         Node nodeStructuredBody = XmlUtil.getNode(document, XPATH_STRUCTUREDBODY);
         ;
         if (nodeStructuredBody != null) {
-            log.debug("Found - " + XPATH_STRUCTUREDBODY);
+            log.debug("Found - '{}'", XPATH_STRUCTUREDBODY);
             // LEVEL 3 document
             level3Doc = true;
         } else {
             // check if unstructured document
-            log.debug("Not Found  - " + XPATH_STRUCTUREDBODY);
+            log.debug("Not Found - '{}'", XPATH_STRUCTUREDBODY);
 //			XPathExpression expr3 = xpath.compile(XPATH_NONXMLBODY);
 //			Node nodeNonXMLBody = (Node) expr3.evaluate(document,
 //					XPathConstants.NODE);
             Node nodeNonXMLBody = XmlUtil.getNode(document, XPATH_NONXMLBODY);
             if (nodeNonXMLBody != null) {
-                log.debug("Found - " + NON_XML_BODY);
+                log.debug("Found - '{}'", NON_XML_BODY);
                 // LEVEL 1 document
                 level3Doc = false;
             } else {
@@ -131,33 +127,30 @@ public class TransformationService implements ITransformationService,
             throw new TMException(new TmErrorCtx(TMError.ERROR_DOCUMENT_CODE_UNKNOWN, docTypeCode));
         }
 
-        log.debug("docTypeConstant is: " + docTypeConstant);
+        log.debug("docTypeConstant is: '{}'", docTypeConstant);
         return docTypeConstant;
     }
 
-    public TMResponseStructure translate(Document epSosCDA,
-                                         String targetLanguageCode) {
+    public TMResponseStructure translate(Document epSosCDA, String targetLanguageCode) {
         log.debug("translate BEGIN");
-        TMResponseStructure responseStructure = process(epSosCDA,
-                targetLanguageCode, false);
+        TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
         log.debug("translate END");
         return responseStructure;
     }
 
-    private TMResponseStructure process(Document inputDocument,
-                                        String targetLanguageCode, boolean isTranscode) {
-        TMResponseStructure responseStructure = null;
+    private TMResponseStructure process(Document inputDocument, String targetLanguageCode, boolean isTranscode) {
+
+        TMResponseStructure responseStructure;
         String status;
         List<ITMTSAMEror> errors = new ArrayList<>();
         List<ITMTSAMEror> warnings = new ArrayList<>();
-        byte[] inputDocbytes = null;
+        byte[] inputDocbytes;
 
         try {
             if (inputDocument == null) {
                 status = STATUS_FAILURE;
                 errors.add(TMError.ERROR_NULL_INPUT_DOCUMENT);
-                responseStructure = new TMResponseStructure(inputDocument,
-                        status, errors, warnings);
+                responseStructure = new TMResponseStructure(inputDocument, status, errors, warnings);
                 log.error("Error, null input document!");
                 return responseStructure;
             } else {
@@ -323,7 +316,6 @@ public class TransformationService implements ITransformationService,
         } else {
             log.debug("Audit trail DISABLED");
         }
-
     }
 
     /**
@@ -623,6 +615,7 @@ public class TransformationService implements ITransformationService,
                                      HashMap<String, String> hmReffIdDisplayName, String valueSet,
                                      String valueSetVersion, List<ITMTSAMEror> errors,
                                      List<ITMTSAMEror> warnings) {
+
         return processElement(originalElement, document, targetLanguageCode,
                 hmReffIdDisplayName, valueSet, valueSetVersion, false, errors,
                 warnings);
@@ -654,7 +647,7 @@ public class TransformationService implements ITransformationService,
                     (CodedElement) codedElement, targetLanguageCode);
 
             if (tsamResponse.isStatusSuccess()) {
-                log.debug("processing successful " + codedElement.toString());
+                log.debug("processing successful '{}'", codedElement.toString());
                 // +++++ Element editing BEGIN +++++
 
                 // NEW TRANSLATION element
@@ -744,7 +737,7 @@ public class TransformationService implements ITransformationService,
                 warnings.addAll(tsamResponse.getWarnings());
                 return true;
             } else {
-                log.error("processing failure! " + codedElement.toString());
+                log.error("processing failure! for Code: '{}'", codedElement.toString());
                 errors.addAll(tsamResponse.getErrors());
                 warnings.addAll(tsamResponse.getWarnings());
                 return false;
@@ -793,7 +786,7 @@ public class TransformationService implements ITransformationService,
         String elName = XmlUtil.getElementPath(originalElement);
         // ak je nullFlavor, neprekladat, nevyhadzovat chybu
         if (originalElement.hasAttribute("nullFlavor")) {
-            log.debug("nullFlavor, skippink : " + elName);
+            log.debug("nullFlavor, skippink: '{}'", elName);
             return true;
         } else {
             // ak chyba code alebo codeSystem vyhodit warning
@@ -810,10 +803,10 @@ public class TransformationService implements ITransformationService,
                 NodeList origText = originalElement.getElementsByTagName("originalText");
                 if (origText.getLength() > 0) {
                     // ak element obsahuje originalText, preskocit, nevyhazovat warning
-                    log.debug("Element without required attributes, but has originalText, ignoring: " + elName);
+                    log.debug("Element without required attributes, but has originalText, ignoring: '{}'", elName);
                     return true;
                 } else {
-                    log.warn("Element has no \"code or \"codeSystem\" attribute: " + elName);
+                    log.warn("Element has no \"code or \"codeSystem\" attribute: '{}'", elName);
                     warnings.add(new TmErrorCtx(TMError.WARNING_MANDATORY_ATTRIBUTES_MISSING, "Element " + elName));
                     return false;
                 }
@@ -822,10 +815,6 @@ public class TransformationService implements ITransformationService,
         }
     }
 
-    // private void addComment(Document document) {
-    // Comment comment = document.createComment(POSAM_COMMENT);
-    // document.getDocumentElement().appendChild(comment);
-    // }
     public void setTsamApi(ITerminologyService tsamApi) {
         this.tsamApi = tsamApi;
     }
@@ -839,14 +828,15 @@ public class TransformationService implements ITransformationService,
     }
 
     public void afterPropertiesSet() throws Exception {
-        level1Type = new HashMap<String, String>();
+
+        level1Type = new HashMap<>();
         level1Type.put(config.getPatientSummaryCode(), PATIENT_SUMMARY1);
         level1Type.put(config.geteDispensationCode(), EDISPENSATION1);
         level1Type.put(config.getePrescriptionCode(), EPRESCRIPTION1);
         level1Type.put(config.getHcerCode(), HCER1);
         level1Type.put(config.getMroCode(), MRO1);
 
-        level3Type = new HashMap<String, String>();
+        level3Type = new HashMap<>();
         level3Type.put(config.getPatientSummaryCode(), PATIENT_SUMMARY3);
         level3Type.put(config.geteDispensationCode(), EDISPENSATION3);
         level3Type.put(config.getePrescriptionCode(), EPRESCRIPTION3);
@@ -861,6 +851,7 @@ public class TransformationService implements ITransformationService,
      * @return
      */
     private String getOIDFromDocument(Document doc) {
+
         String oid = "";
         if (doc.getElementsByTagName("id").getLength() > 0) {
             Node id = doc.getElementsByTagName("id").item(0);

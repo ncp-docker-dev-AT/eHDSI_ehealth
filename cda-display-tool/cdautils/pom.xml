@@ -1,20 +1,20 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp-cdadisplaytool</artifactId>
-        <version>2.5.0.RC1</version>
+        <version>2.5.0</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-cdadisplaytool</groupId>
     <artifactId>openncp-cdautils</artifactId>
-    <url>http://maven.apache.org</url>
+    <packaging>jar</packaging>
+
     <name>cdautils</name>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+
     <developers>
         <developer>
             <id>k.karkaletsis@gnomon.com.gr</id>
@@ -24,22 +24,19 @@
             <organizationUrl>http://gnomon.com.gr</organizationUrl>
         </developer>
     </developers>
-    <inceptionYear>2012</inceptionYear>
-    <licenses>
-        <license>
-            <name>Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:git:https://bitbucket.org/openncp/cda-display-tool.git</connection>
-        <tag>HEAD</tag>
-        <url>https://bitbucket.org/openncp/cda-display-tool</url>
-    </scm>
-    <issueManagement>
-        <system>JIRA</system>
-        <url>https://openncp.atlassian.net</url>
-    </issueManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

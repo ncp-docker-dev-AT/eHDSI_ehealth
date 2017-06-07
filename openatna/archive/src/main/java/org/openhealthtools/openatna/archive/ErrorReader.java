@@ -1,27 +1,27 @@
 /**
  * Copyright (c) 2009-2011 University of Cardiff and others.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * <p>
  * Contributors:
  * Cardiff University - intial API and implementation
  */
 
 package org.openhealthtools.openatna.archive;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
+import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
+import org.openhealthtools.openatna.audit.persistence.util.Base64;
+import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -29,9 +29,9 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
-import org.openhealthtools.openatna.audit.persistence.util.Base64;
-import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Andrew Harrison
@@ -94,7 +94,6 @@ public class ErrorReader {
             } else if (code.isEndElement()) {
                 EndElement el = code.asEndElement();
                 if (el.getName().getLocalPart().equals(DataConstants.ERROR)) {
-                    //System.out.println("EntityReader.readMessage end element found:" + el.toString());
                     // got to end of entity
                     break;
                 }
@@ -108,6 +107,4 @@ public class ErrorReader {
         }
         return se;
     }
-
-
 }

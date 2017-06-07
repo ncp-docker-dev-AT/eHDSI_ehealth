@@ -95,6 +95,7 @@ public class XDSbRepositoryServiceInvoker {
         stub = new DocumentRecipient_ServiceStub(epr);
         stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
         stub.setCountryCode(countryCode);
+        stub.setClassCode(docClassCode);
 
         // Dummy handler for any mustUnderstand header within server response
         EventLogClientUtil.createDummyMustUnderstandHandler(stub);

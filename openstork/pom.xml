@@ -1,81 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-    <parent>
-        <artifactId>openncp</artifactId>
-        <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>2.5.0.RC1</version>
-    </parent>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- ==================
-       Artifact
-    ================== -->
-    <artifactId>openncp-openstork</artifactId>
-    <name>OpenSTORK</name>
-    <packaging>pom</packaging>
-    <inceptionYear>2014</inceptionYear>
+    <parent>
+        <groupId>eu.europa.ec.sante.ehdsi</groupId>
+        <artifactId>openncp</artifactId>
+        <version>2.5.0</version>
+    </parent>
 
-    <!-- ==================
-       Modules
-    ================== -->
+    <artifactId>openncp-openstork</artifactId>
+    <packaging>pom</packaging>
+
+    <name>OpenSTORK</name>
+
     <modules>
         <module>openstork-util</module>
         <module>openstork-plugin</module>
     </modules>
 
-    <!--    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.zeroturnaround</groupId>
-                <artifactId>jrebel-maven-plugin</artifactId>
-                <version>1.1.5</version>
-                <executions>
-                    <execution>
-                        <id>generate-rebel-xml</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>-->
-
-
-
-    <!-- ==================
-       Properties
-    ================== -->
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jersey.version>1.18.1</jersey.version>
+        <stork-commons.version>1.4.2</stork-commons.version>
+        <stork-saml.version>1.4.2</stork-saml.version>
     </properties>
-
-    <!-- ==================
-       Properties
-    ================== -->
-    <repositories>
-        <repository>
-            <id>gnomon-lib-snapshot</id>
-            <url>http://artifactory.gnomon.com.gr/artifactory/libs-snapshot-local/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>gnomon-lib-release</id>
-            <url>http://artifactory.gnomon.com.gr/artifactory/libs-release-local/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 </project>

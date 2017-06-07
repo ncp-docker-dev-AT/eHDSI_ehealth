@@ -31,7 +31,9 @@ import org.hl7.v3.*;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.securityman.SAML2Validator;
@@ -47,10 +49,14 @@ import tr.com.srdc.epsos.util.http.HTTPUtil;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 public class XCPDServiceImpl implements XCPDServiceInterface {
 
@@ -500,6 +506,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
         // Set interaction id
         outputMessage.setInteractionId(of.createII());
+
         outputMessage.getInteractionId().setRoot(inputMessage.getInteractionId().getRoot());
         outputMessage.getInteractionId().setExtension("PRPA_IN201306UV02");
 
@@ -589,12 +596,23 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 logger.debug("patientIdList.size: " + patientIdList.size());
 
                 // call to NI
+                // Joao: we have an adhoc XML document, so we can generate this evidence correctly
                 try {
-                    EvidenceUtils.createEvidenceREMNRO(sb.toString(),
+                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                    factory.setNamespaceAware(true);
+                    DocumentBuilder builder = factory.newDocumentBuilder();
+                    Document doc = builder.parse(new InputSource(new StringReader(sb.toString())));
+                    EvidenceUtils.createEvidenceREMNRO(doc,
                             tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
                             tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
                             tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
+                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
+                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
+                            tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                            IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
                             new DateTime(),
                             EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                             "NI_XCPD_REQ",
@@ -603,19 +621,24 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     logger.error(ExceptionUtils.getStackTrace(e));
                 }
                 List<PatientDemographics> pdList = patientSearchService.getPatientDemographics(patientIdList);
-                try {
-                    EvidenceUtils.createEvidenceREMNRR(sb.toString(),
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            EventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            "NI_XCPD_RES",
-                            Helper.getHCPAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
-                } catch (Exception e) {
-                    logger.error(ExceptionUtils.getStackTrace(e));
-                }
+                // Joao: the NRR is being generated based on the request data, not on the response. This NRR is optional as per the CP, so it's left commented
+//                try {
+//                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//                    factory.setNamespaceAware(true);
+//                    DocumentBuilder builder = factory.newDocumentBuilder();
+//                    Document doc = builder.parse(new InputSource(new StringReader(sb.toString())));
+//                    EvidenceUtils.createEvidenceREMNRR(doc,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                            IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
+//                            new DateTime(),
+//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                            "NI_XCPD_RES",
+//                            Helper.getHCPAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
+//                } catch (Exception e) {
+//                    logger.error(ExceptionUtils.getStackTrace(e));
+//                }
                 if (pdList.size() == 0) {
                     // Preparing answer not available error
                     fillOutputMessage(outputMessage, "No patient found.", ERROR_ANSWER_NOT_AVAILABLE, "NF");

@@ -2,28 +2,28 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="epsos.ccd.posam.tsam.model.ValueSet" table="VALUE_SET">
+    <class name="epsos.ccd.posam.tsam.model.ValueSet" table="value_set">
         <id name="id" type="long">
-            <column name="ID"/>
+            <column name="id"/>
             <generator class="assigned"/>
         </id>
         <property name="oid" type="java.lang.String">
-            <column name="OID"/>
+            <column name="oid"/>
         </property>
         <property name="epsosName" type="java.lang.String">
-            <column name="EPSOS_NAME"/>
+            <column name="epsos_name"/>
         </property>
         <property name="description" type="java.lang.String">
-            <column name="DESCRIPTION"/>
+            <column name="description"/>
         </property>
-        <bag name="versions" inverse="true" table="VALUE_SET_VERSION" lazy="true">
+        <bag name="versions" inverse="true" table="value_set_version" lazy="true">
             <key>
-                <column name="ID"/>
+                <column name="id"/>
             </key>
             <one-to-many class="epsos.ccd.posam.tsam.model.ValueSetVersion"/>
         </bag>
         <many-to-one name="codeSystem" class="epsos.ccd.posam.tsam.model.CodeSystem">
-            <column name="PARENT_CODE_SYSTEM_ID"/>
+            <column name="parent_code_system_id"/>
         </many-to-one>
     </class>
 </hibernate-mapping>

@@ -1,73 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>2.5.0.RC1</version>
+        <artifactId>openncp</artifactId>
+        <version>2.5.0</version>
     </parent>
 
-    <modelVersion>4.0.0</modelVersion>
     <artifactId>openncp-web-portal</artifactId>
     <packaging>war</packaging>
-    <name>openncp-web</name>
-    <description/>
 
-    <!-- =================== Development =================== -->
-    <licenses>
-        <license>
-            <name>GNU Public License version 3</name>
-            <url>http://www.gnu.org/licenses/</url>
-        </license>
-    </licenses>
-    <scm>
-        <connection>git clone https://code.google.com/p/epsos-common-components.epsos-web/</connection>
-        <url>http://code.google.com/p/epsos-common-components.epsos-web/source/browse/</url>
-    </scm>
+    <name>openncp-web</name>
 
     <properties>
-        <!-- Versions -->
-        <serviceFacadeClass/> <!-- in order use mock version use mvn -DserviceFacadeClass=se.sb.epsos.web.service.mock.NcpServiceFacadeMock
-			jetty:run -->
-        <!-- in order to run selenium integrationtests use mvn -DserviceFacadeClass=se.sb.epsos.web.service.mock.NcpServiceFacadeMock
-            -Plocal,integration clean install -->
+        <!-- in order use mock version use mvn -DserviceFacadeClass=se.sb.epsos.web.service.mock.NcpServiceFacadeMock jetty:run -->
+        <serviceFacadeClass/>
+        <!-- in order to run selenium integrationtests use mvn -DserviceFacadeClass=se.sb.epsos.web.service.mock.NcpServiceFacadeMock -Plocal,integration clean install -->
         <wicket.version>1.4.17</wicket.version>
         <spring.version>3.1.4.RELEASE</spring.version>
         <spring-security.version>3.1.4.RELEASE</spring-security.version>
         <jetty.version>7.3.0.v20110203</jetty.version>
-        <!-- Current OpenNCP version -->
-        <!-- <openncp.version>3.2.0</openncp.version> -->
         <!-- Global properties & plugin config -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Environment config (These are default values. Override these props
-            in settings.xml) -->
+        <!-- Environment config (These are default values. Override these props in settings.xml) -->
         <!-- Default empty build number and id, is overridden by CI server -->
         <BUILD_NUMBER></BUILD_NUMBER>
         <BUILD_ID></BUILD_ID>
         <integrationtest.targetUrl>http://localhost:8080</integrationtest.targetUrl>
-        <!-- script to run for remote deployment on integration test server, should
-            be under src/scripts/ -->
+        <!-- script to run for remote deployment on integration test server, should be under src/scripts/ -->
         <integrationtest.deployScript>--</integrationtest.deployScript>
         <!-- username to use for remote deployment on integration test server -->
         <integrationtest.targetHostUser>--</integrationtest.targetHostUser>
-        <!-- user private key to use for remote deployment on integration test
-            server -->
+        <!-- user private key to use for remote deployment on integration test server -->
         <integrationtest.targetHostUserSSHKey>--</integrationtest.targetHostUserSSHKey>
-        <!-- Application config properties external override, ignored if it does
-            not exist -->
+        <!-- Application config properties external override, ignored if it does not exist -->
         <epsos-web-application-properties>${basedir}/src/main/java/se/sb/epsos/web/EpsosWebApplication_en.properties
         </epsos-web-application-properties>
         <applicationConfig>${basedir}/src/main/config/${user.name}-application.properties</applicationConfig>
-        <!-- Path to xmlR resources needed by gnomgon display tool, generated with
-            tsam-export tools -->
+        <!-- Path to xmlR resources needed by gnomgon display tool, generated with tsam-export tools -->
         <displayTool.xmlResourcePath>${basedir}/src/main/resources/EpsosRepository</displayTool.xmlResourcePath>
-        <epsos-internationalsearch-config-path>${basedir}/src/main/resources/config
+        <epsos-internationalsearch-config-path>
+            ${basedir}/src/main/resources/config
         </epsos-internationalsearch-config-path>
-        <client-connector-wsdl-url>http://localhost:8085/epsos-client-connector/services/ClientConnectorService?wsdl
+        <client-connector-wsdl-url>
+            http://localhost:8085/epsos-client-connector/services/ClientConnectorService?wsdl
         </client-connector-wsdl-url>
     </properties>
 
     <dependencies>
+        <!-- OpenNCP DEPENDENCIES START -->
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-audit-manager</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-configuration-manager</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-security-manager</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-trc-sts-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- PDF DEPENDENCIES -->
         <dependency>
             <groupId>com.itextpdf</groupId>
@@ -106,7 +109,6 @@
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
             <version>1.6</version>
-            <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -123,25 +125,6 @@
             <groupId>org.apache.xmlbeans</groupId>
             <artifactId>xmlbeans</artifactId>
             <version>2.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>2.37.0</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- JUNIT DEPENDENCY FOR TESTING -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.9.1</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
@@ -344,29 +327,29 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- OpenNCP DEPENDENCIES START -->
+        <!-- JUNIT DEPENDENCY FOR TESTING -->
         <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-trc-sts-client</artifactId>
-            <version>${project.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-configuration-manager</artifactId>
-            <version>${project.version}</version>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.9.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-audit-manager</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-security-manager</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>2.37.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
+        <finalName>epsos-web</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -590,8 +573,8 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>epsos-web</finalName>
     </build>
+
     <profiles>
         <profile>
             <id>integration</id>
@@ -707,67 +690,4 @@
             </build>
         </profile>
     </profiles>
-    <repositories>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-        <repository>
-            <id>Apache Nexus</id>
-            <url>https://repository.apache.org/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>maven-central</id>
-            <name>Maven Central</name>
-            <url>http://repo1.maven.org/maven2/</url>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <!-- ================== Developers ================== -->
-    <developers>
-        <developer>
-            <id>andreas@diabol.se</id>
-            <email>andreas@diabol.se</email>
-            <name>Andreas Rehn</name>
-            <organization>eHalsomyndigheten, Sweden</organization>
-            <organizationUrl>http://www.ehalsomyndigheten.se/</organizationUrl>
-        </developer>
-        <developer>
-            <id>anders.nystrom@ehalsomyndigheten.se</id>
-            <email>anders.nystrom@ehalsomyndigheten.se</email>
-            <name>Anders Nystrom</name>
-            <organization>eHalsomyndigheten, Sweden</organization>
-            <organizationUrl>http://www.ehalsomyndigheten.se/</organizationUrl>
-        </developer>
-        <developer>
-            <id>gareth.woodham@ehalsomyndigheten.se</id>
-            <email>gareth.woodham@ehalsomyndigheten.se</email>
-            <name>Gareth Woodham</name>
-            <organization>eHalsomyndigheten, Sweden</organization>
-            <organizationUrl>http://www.ehalsomyndigheten.se/</organizationUrl>
-        </developer>
-        <developer>
-            <id>fredrik.dahlman@gmail.com</id>
-            <email>fredrik.dahlman@cag.se</email>
-            <name>Fredrik Dahlman</name>
-            <organization>eHalsomyndigheten, Sweden</organization>
-            <organizationUrl>http://www.ehalsomyndigheten.se/</organizationUrl>
-        </developer>
-        <developer>
-            <id>daniel.gronberg@diabol.se</id>
-            <email>daniel.gronberg@diabol.se</email>
-            <name>Daniel Grönberg</name>
-            <organization>eHalsomyndigheten, Sweden</organization>
-            <organizationUrl>http://www.ehalsomyndigheten.se/</organizationUrl>
-        </developer>
-    </developers>
 </project>

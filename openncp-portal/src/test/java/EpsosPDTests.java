@@ -1,4 +1,3 @@
-
 import com.gnomon.epsos.model.Country;
 import com.gnomon.epsos.model.Identifier;
 import com.gnomon.epsos.service.Demographics;
@@ -52,7 +51,7 @@ public class EpsosPDTests {
     public void ListGreekIdentifiers() {
         List<Identifier> identifiers = EpsosHelperService.getCountryIdentifiers("GR", "el_GR", path, null);
         for (Identifier identifier : identifiers) {
-            System.out.println(identifier.getDomain() + " " + identifier.getKey());
+            log.info(identifier.getDomain() + " " + identifier.getKey());
         }
         assertEquals(1, identifiers.size());
     }
@@ -61,7 +60,7 @@ public class EpsosPDTests {
     public void ListGreekDemographics() {
         List<Demographics> demographics = EpsosHelperService.getCountryDemographics("GR", "el_GR", path, null);
         for (Demographics demographic : demographics) {
-            System.out.println(demographic.getKey());
+            log.info(demographic.getKey());
         }
         assertEquals(0, demographics.size());
     }

@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ClinicalDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epsos="urn:epsos-org:ep:medication"  xmlns="urn:hl7-org:v3" xsi:schemaLocation="urn:hl7-org:v3 CDA.xsd" classCode="DOCCLIN" moodCode="EVN">
+<ClinicalDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epsos="urn:epsos-org:ep:medication"
+                  xmlns="urn:hl7-org:v3" xsi:schemaLocation="urn:hl7-org:v3 CDA.xsd" classCode="DOCCLIN" moodCode="EVN">
     <realmCode/>
     <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
-    
-    <!-- epSOS MRO --><templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.5"/>
-    
+
+    <!-- epSOS MRO -->
+    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.5"/>
+
     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.1"/>
     <id root="1.2.250.1.197.1.100.1" extension="f11abb08-6e4c-4085-97a4-fe00d82c320d"/>
-    
-    <!-- epSOS MRO --><code codeSystem="2.16.840.1.113883.6.1" 
-    codeSystemName="LOINC" code="56445-0" codeSystemVersion="2.34" 
-    displayName="Medication Summary"/>  
-    
+
+    <!-- epSOS MRO -->
+    <code codeSystem="2.16.840.1.113883.6.1"
+          codeSystemName="LOINC" code="56445-0" codeSystemVersion="2.34"
+          displayName="Medication Summary"/>
+
     <title>Medication Summary</title>
     <effectiveTime value="1347275600049"/>
 
-    <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25" codeSystemName="Confidentiality" codeSystemVersion="913-20091020" displayName="normal" />
+    <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25" codeSystemName="Confidentiality"
+                         codeSystemVersion="913-20091020" displayName="normal"/>
     <languageCode code="sl-SI"/>
     <!--###################### Patient Demographics ######################-->
     <recordTarget>
@@ -35,7 +39,8 @@
                     <family>Frelih</family>
                     <given>Rafael</given>
                 </name>
-                <administrativeGenderCode code="M" codeSystem="2.16.840.1.113883.5.1" codeSystemName="HL7 AdministrativeGender" displayName="Male"/>
+                <administrativeGenderCode code="M" codeSystem="2.16.840.1.113883.5.1"
+                                          codeSystemName="HL7 AdministrativeGender" displayName="Male"/>
                 <birthTime value="19700402"/>
                 <languageCommunication>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.2.1"/>
@@ -61,7 +66,7 @@
                 <id root="2.16.17.710.830.1000.990.1.3.2.1" extension="340008204600048"/>
                 <name>ZD Ljubljana</name>
                 <addr>
-                    <streetAddressLine>Neka ulica v ljubljani 1</streetAddressLine>                 
+                    <streetAddressLine>Neka ulica v ljubljani 1</streetAddressLine>
                     <postalCode>1000</postalCode>
                     <city>Ljubljana</city>
                     <country>SI</country>
@@ -75,7 +80,7 @@
             <representedCustodianOrganization>
                 <id root="2.16.17.710.830.1000.990.1.3.3.1" extension="888888"/>
                 <name>Skrbnik8</name>
-                <telecom value="tel:+38631659133" use="MC"/>        
+                <telecom value="tel:+38631659133" use="MC"/>
                 <addr>
                     <streetAddressLine>Taborska 55</streetAddressLine>
                     <city>Maribor</city>
@@ -154,8 +159,9 @@
                 <section>
                     <templateId root="2.16.840.1.113883.10.20.1.2"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.13"/>
-                    <code code="48765-2" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Allergies, adverse reactions, alerts">
-                        
+                    <code code="48765-2" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                          displayName="Allergies, adverse reactions, alerts">
+
                     </code>
                     <title>Preobčutljivosti</title>
                     <text>
@@ -169,7 +175,7 @@
                                     <th>Datum pojava preobčutljivostne reakcije</th>
                                 </tr>
                                 <tr ID="allergy-1">
-                                    <td ID="allergy1_allergytype">Preobčutljivost za zdravilo </td>
+                                    <td ID="allergy1_allergytype">Preobčutljivost za zdravilo</td>
                                     <td ID="allergy1_allergycode">59037007</td>
                                     <td ID="allergy1_allergen">Tetraciklin</td>
                                     <td ID="allergy1_allergencode">D06AA04</td>
@@ -196,8 +202,9 @@
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <id extension="allergy.1.obs.1" root="2.16.17.710.830.1000.990.1.2.2"/>
-                                    <code code="59037007" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Drug intolerance">
-                                        
+                                    <code code="59037007" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
+                                          displayName="Drug intolerance">
+
                                     </code>
                                     <text>
                                         <reference value="#allergy-1"/>
@@ -211,11 +218,13 @@
                                         <originalText>
                                             <reference value="#allergy-1"/>
                                         </originalText>
-                                    </value>                               
+                                    </value>
                                     <participant typeCode="CSM">
                                         <participantRole classCode="MANU">
                                             <playingEntity classCode="MMAT">
-                                                <code code="D06AA04" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical" displayName="tetraciklin">
+                                                <code code="D06AA04" codeSystem="2.16.840.1.113883.6.73"
+                                                      codeSystemName="Anatomical Therapeutic Chemical"
+                                                      displayName="tetraciklin">
                                                     <originalText>
                                                         <reference value="#allergy1_allergen"/>
                                                     </originalText>
@@ -235,8 +244,9 @@
                 <section>
                     <templateId root="2.16.840.1.113883.10.20.1.11"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.6"/>
-                    <code code='11450-4' displayName='Problem list' codeSystem='2.16.840.1.113883.6.1' codeSystemName='LOINC'>
-                        
+                    <code code='11450-4' displayName='Problem list' codeSystem='2.16.840.1.113883.6.1'
+                          codeSystemName='LOINC'>
+
                     </code>
                     <title>Bolezni in stanja - aktivna</title>
                     <text>
@@ -269,7 +279,10 @@
                                     <effectiveTime>
                                         <low nullFlavor="UNK"/>
                                     </effectiveTime>
-                                    <value code="160245001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="ni trenutnih problemov ali invalidnosti" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="CD">
+                                    <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" code="160245001"
+                                           codeSystem="2.16.840.1.113883.6.96"
+                                           codeSystemName="SNOMED CT"
+                                           displayName="ni trenutnih problemov ali invalidnosti" xsi:type="CD">
                                         <originalText>
                                             <reference value="#actnoproblem"/>
                                         </originalText>
@@ -286,8 +299,9 @@
                     <templateId root="2.16.840.1.113883.10.20.1.8"/>
                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.3"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.19"/>
-                    <code code="10160-0" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="History of medication use">
-                        
+                    <code code="10160-0" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                          displayName="History of medication use">
+
                     </code>
                     <title>Povzetek podatkov o zdravilih</title>
                     <text>
@@ -347,7 +361,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        
+
                     </text>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="EVN">
@@ -367,9 +381,9 @@
                                 <high nullFlavor="UNK"/>
                             </effectiveTime>
                             <effectiveTime institutionSpecified="true"
-                                    nullFlavor="NA"
-                                    operator="A"
-                                    xsi:type="PIVL_TS"/>
+                                           nullFlavor="NA"
+                                           operator="A"
+                                           xsi:type="PIVL_TS"/>
                             <doseQuantity>
                                 <low unit="ug" value="200"/>
                                 <high unit="ug" value="200"/>
@@ -380,25 +394,35 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.53"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
-                                        <epsos:id root="931750DF-80C9-8E79-FCCF-A2C7BF283C93" xmlns:epsos="urn:epsos-org:ep:medication"/>
+                                        <epsos:id xmlns:epsos="urn:epsos-org:ep:medication"
+                                                  root="931750DF-80C9-8E79-FCCF-A2C7BF283C93"/>
                                         <code>
                                             <originalText>
                                                 <reference value="#meddesc1"/>
                                             </originalText>
                                         </code>
                                         <name nullFlavor="NI"/>
-                                        <epsos:formCode code="11107000" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.1" codeSystemName="EDQM" displayName="inhalacijska suspenzija pod tlakom" xmlns:epsos="urn:epsos-org:ep:medication">
+                                        <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication" code="11107000"
+                                                        codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.1"
+                                                        codeSystemName="EDQM"
+                                                        displayName="inhalacijska suspenzija pod tlakom">
                                             <epsos:originalText>
                                                 <epsos:reference value="#meddesc1_dose_form"/>
                                             </epsos:originalText>
                                         </epsos:formCode>
-                                        <epsos:ingredient classCode="ACTI" xmlns:epsos="urn:epsos-org:ep:medication">
+                                        <epsos:ingredient xmlns:epsos="urn:epsos-org:ep:medication" classCode="ACTI">
                                             <epsos:quantity>
-                                                <epsos:numerator unit="mcg/l" value="100" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="epsos:PQ"/>
-                                                <epsos:denominator unit="1" value="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="epsos:PQ"/>
+                                                <epsos:numerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" unit="mcg/l"
+                                                                 value="100"
+                                                                 xsi:type="epsos:PQ"/>
+                                                <epsos:denominator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" unit="1"
+                                                                   value="2"
+                                                                   xsi:type="epsos:PQ"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="R03CC02" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical" displayName="salbutamol">
+                                                <epsos:code code="R03CC02" codeSystem="2.16.840.1.113883.6.73"
+                                                            codeSystemName="Anatomical Therapeutic Chemical"
+                                                            displayName="salbutamol">
                                                     <epsos:originalText>
                                                         <epsos:reference value="#meddesc1_activeingredient"/>
                                                     </epsos:originalText>
@@ -413,63 +437,72 @@
                     </entry>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="EVN">
-                        <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
-                        <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7"/>
-                        <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
-                        <templateId root="2.16.840.1.113883.10.20.1.24"/>
-                        <id root="2.16.17.710.830.1000.990.1.2.13" extension="medication.2"/>
-                        <text>
-                            <reference value="#meddesc2"/>
-                        </text>
-                        <statusCode code="completed"/>
-                        <effectiveTime xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="IVL_TS">
-                            <low value="20111125"/>
-                            <high nullFlavor="UNK"/>
-                        </effectiveTime>
-                        <effectiveTime institutionSpecified="true" operator="A" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="PIVL_TS">
-                            <period unit="d" value="0.3333333333333333"/>
-                        </effectiveTime>
-                        <doseQuantity>
-                            <low value="1"/>
-                            <high value="1"/>
-                        </doseQuantity>
-                        <rateQuantity nullFlavor="NI"/>
-                        <consumable>
-                            <manufacturedProduct classCode="MANU">
-                                <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2"/>
-                                <templateId root="2.16.840.1.113883.10.20.1.53"/>
-                                <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
-                                    <epsos:id root="917F6B3B-2967-9E22-8378-1C2821A852A7" xmlns:epsos="urn:epsos-org:ep:medication"/>
-                                    <code>
-                                        <originalText>
-                                            <reference value="#meddesc2"/>
-                                        </originalText>
-                                    </code>
-                                    <name nullFlavor="NI"/>
-                                    <epsos:formCode code="10604000" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.1" codeSystemName="EDQM" displayName="Kapljice za oko, raztopina" xmlns:epsos="urn:epsos-org:ep:medication">
-                                        <epsos:originalText>
-                                            <epsos:reference value="#meddesc2_dose_form"/>
-                                        </epsos:originalText>
-                                    </epsos:formCode>
-                                    <epsos:ingredient classCode="ACTI" xmlns:epsos="urn:epsos-org:ep:medication">
-                                        <epsos:quantity>
-                                            <epsos:numerator unit="mg" value="3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="epsos:PQ"/>
-                                            <epsos:denominator unit="mL" value="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="epsos:PQ"/>
-                                        </epsos:quantity>
-                                        <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                            <epsos:code code="J01MA02" codeSystem="2.16.840.1.113883.6.73" codeSystemName="ATC WHO" displayName="Ciprofloksacin">
-                                                <epsos:originalText>
-                                                    <epsos:reference value="#meddesc2_activeingredient"/>
-                                                </epsos:originalText>
-                                            </epsos:code>
-                                            <epsos:name>Ciprofloksacin</epsos:name>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
+                            <templateId root="2.16.840.1.113883.10.20.1.24"/>
+                            <id root="2.16.17.710.830.1000.990.1.2.13" extension="medication.2"/>
+                            <text>
+                                <reference value="#meddesc2"/>
+                            </text>
+                            <statusCode code="completed"/>
+                            <effectiveTime xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="IVL_TS">
+                                <low value="20111125"/>
+                                <high nullFlavor="UNK"/>
+                            </effectiveTime>
+                            <effectiveTime xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" institutionSpecified="true"
+                                           operator="A" xsi:type="PIVL_TS">
+                                <period unit="d" value="0.3333333333333333"/>
+                            </effectiveTime>
+                            <doseQuantity>
+                                <low value="1"/>
+                                <high value="1"/>
+                            </doseQuantity>
+                            <rateQuantity nullFlavor="NI"/>
+                            <consumable>
+                                <manufacturedProduct classCode="MANU">
+                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2"/>
+                                    <templateId root="2.16.840.1.113883.10.20.1.53"/>
+                                    <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
+                                        <epsos:id xmlns:epsos="urn:epsos-org:ep:medication"
+                                                  root="917F6B3B-2967-9E22-8378-1C2821A852A7"/>
+                                        <code>
+                                            <originalText>
+                                                <reference value="#meddesc2"/>
+                                            </originalText>
+                                        </code>
+                                        <name nullFlavor="NI"/>
+                                        <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication" code="10604000"
+                                                        codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.1" codeSystemName="EDQM"
+                                                        displayName="Kapljice za oko, raztopina">
+                                            <epsos:originalText>
+                                                <epsos:reference value="#meddesc2_dose_form"/>
+                                            </epsos:originalText>
+                                        </epsos:formCode>
+                                        <epsos:ingredient xmlns:epsos="urn:epsos-org:ep:medication" classCode="ACTI">
+                                            <epsos:quantity>
+                                                <epsos:numerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" unit="mg"
+                                                                 value="3"
+                                                                 xsi:type="epsos:PQ"/>
+                                                <epsos:denominator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" unit="mL"
+                                                                   value="1"
+                                                                   xsi:type="epsos:PQ"/>
+                                            </epsos:quantity>
+                                            <epsos:ingredient classCode="MMAT" determinerCode="KIND">
+                                                <epsos:code code="J01MA02" codeSystem="2.16.840.1.113883.6.73"
+                                                            codeSystemName="ATC WHO" displayName="Ciprofloksacin">
+                                                    <epsos:originalText>
+                                                        <epsos:reference value="#meddesc2_activeingredient"/>
+                                                    </epsos:originalText>
+                                                </epsos:code>
+                                                <epsos:name>Ciprofloksacin</epsos:name>
+                                            </epsos:ingredient>
                                         </epsos:ingredient>
-                                    </epsos:ingredient>
-                                </manufacturedMaterial>
-                            </manufacturedProduct>
-                        </consumable>
-                    </substanceAdministration>
+                                    </manufacturedMaterial>
+                                </manufacturedProduct>
+                            </consumable>
+                        </substanceAdministration>
                     </entry>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="EVN">
@@ -488,7 +521,8 @@
                                 <low value="01012002"/>
                                 <high nullFlavor="UNK"/>
                             </effectiveTime>
-                            <effectiveTime institutionSpecified="true" operator="A" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="PIVL_TS">
+                            <effectiveTime xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" institutionSpecified="true"
+                                           operator="A" xsi:type="PIVL_TS">
                                 <period unit="d" value="0.3333333333333333"/>
                             </effectiveTime>
                             <doseQuantity>
@@ -502,25 +536,33 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.53"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
-                                        <epsos:id root="3E537CE4-B0FD-7E3C-82BB-847BD77D12A9" xmlns:epsos="urn:epsos-org:ep:medication"/>
+                                        <epsos:id xmlns:epsos="urn:epsos-org:ep:medication"
+                                                  root="3E537CE4-B0FD-7E3C-82BB-847BD77D12A9"/>
                                         <code>
                                             <originalText>
                                                 <reference value="#meddesc3"/>
                                             </originalText>
                                         </code>
                                         <name nullFlavor="NI"/>
-                                        <epsos:formCode code="12200" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.1" codeSystemName="EDQM" displayName="Tableta" xmlns:epsos="urn:epsos-org:ep:medication">
+                                        <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication" code="12200"
+                                                        codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.1" codeSystemName="EDQM"
+                                                        displayName="Tableta">
                                             <epsos:originalText>
                                                 <epsos:reference value="#meddesc3_dose_form"/>
                                             </epsos:originalText>
                                         </epsos:formCode>
-                                        <epsos:ingredient classCode="ACTI" xmlns:epsos="urn:epsos-org:ep:medication">
+                                        <epsos:ingredient xmlns:epsos="urn:epsos-org:ep:medication" classCode="ACTI">
                                             <epsos:quantity>
-                                                <epsos:numerator unit="mg" value="400" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="epsos:PQ"/>
-                                                <epsos:denominator unit="1" value="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="epsos:PQ"/>
+                                                <epsos:numerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" unit="mg"
+                                                                 value="400"
+                                                                 xsi:type="epsos:PQ"/>
+                                                <epsos:denominator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" unit="1"
+                                                                   value="1"
+                                                                   xsi:type="epsos:PQ"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="N05AN01" codeSystem="2.16.840.1.113883.6.73" codeSystemName="ATC WHO" displayName="Litij">
+                                                <epsos:code code="N05AN01" codeSystem="2.16.840.1.113883.6.73"
+                                                            codeSystemName="ATC WHO" displayName="Litij">
                                                     <epsos:originalText>
                                                         <epsos:reference value="#meddesc3_activeingredient"/>
                                                     </epsos:originalText>
@@ -550,7 +592,8 @@
                                 <low value="20040101"/>
                                 <high nullFlavor="UNK"/>
                             </effectiveTime>
-                            <effectiveTime institutionSpecified="true" operator="A" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="PIVL_TS">
+                            <effectiveTime xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" institutionSpecified="true"
+                                           operator="A" xsi:type="PIVL_TS">
                                 <period unit="d" value="0.5"/>
                             </effectiveTime>
                             <doseQuantity>
@@ -564,25 +607,33 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.53"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
-                                        <epsos:id root="DDF9FB6D-2476-EEC0-4D45-48C4107ADAD9" xmlns:epsos="urn:epsos-org:ep:medication"/>
+                                        <epsos:id xmlns:epsos="urn:epsos-org:ep:medication"
+                                                  root="DDF9FB6D-2476-EEC0-4D45-48C4107ADAD9"/>
                                         <code>
                                             <originalText>
                                                 <reference value="#meddesc4"/>
                                             </originalText>
                                         </code>
                                         <name nullFlavor="NI"/>
-                                        <epsos:formCode code="12200" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.1" codeSystemName="EDQM" displayName="Tableta" xmlns:epsos="urn:epsos-org:ep:medication">
+                                        <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication" code="12200"
+                                                        codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.1" codeSystemName="EDQM"
+                                                        displayName="Tableta">
                                             <epsos:originalText>
                                                 <epsos:reference value="#meddesc4_dose_form"/>
                                             </epsos:originalText>
                                         </epsos:formCode>
-                                        <epsos:ingredient classCode="ACTI" xmlns:epsos="urn:epsos-org:ep:medication">
+                                        <epsos:ingredient xmlns:epsos="urn:epsos-org:ep:medication" classCode="ACTI">
                                             <epsos:quantity>
-                                                <epsos:numerator unit="mg" value="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="epsos:PQ"/>
-                                                <epsos:denominator unit="1" value="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="epsos:PQ"/>
+                                                <epsos:numerator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" unit="mg"
+                                                                 value="10"
+                                                                 xsi:type="epsos:PQ"/>
+                                                <epsos:denominator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" unit="1"
+                                                                   value="1"
+                                                                   xsi:type="epsos:PQ"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="C09AA02" codeSystem="2.16.840.1.113883.6.73" codeSystemName="ATC WHO" displayName="Enalapril">
+                                                <epsos:code code="C09AA02" codeSystem="2.16.840.1.113883.6.73"
+                                                            codeSystemName="ATC WHO" displayName="Enalapril">
                                                     <epsos:originalText>
                                                         <epsos:reference value="#meddesc1_activeingredient"/>
                                                     </epsos:originalText>
@@ -597,7 +648,7 @@
                     </entry>
                 </section>
             </component>
-         </structuredBody>
+        </structuredBody>
     </component>
 </ClinicalDocument>
 

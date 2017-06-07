@@ -1,5 +1,6 @@
 package eu.esens.abb.nonrep;
 
+import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 import eu.esens.abb.nonrep.etsi.rem.*;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
@@ -40,12 +41,11 @@ import java.util.UUID;
  */
 public class ETSIREMObligationHandler implements ObligationHandler {
 
-    static final String SHA256 = "http://www.w3.org/2001/04/xmlenc#sha256";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ETSIREMObligationHandler.class);
     // Prefixes, that matches the XACML policy
     private static final String REM_NRR_PREFIX = "urn:eSENS:obligations:nrr:ETSIREM";
     private static final String REM_NRO_PREFIX = "urn:eSENS:obligations:nro:ETSIREM";
     private static final String REM_NRD_PREFIX = "urn:eSENS:obligations:nrd:ETSIREM";
+    private Logger LOGGER = LoggerFactory.getLogger(ETSIREMObligationHandler.class);
     private List<ESensObligation> obligations;
     private Document audit = null;
     private Context context;
@@ -151,7 +151,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
                 }
                 List<AttributeAssignmentType> listAttr = eSensObl.getAttributeAssignments();
 
-                type.setVersion(find(REM_NRO_PREFIX + ":version", listAttr));
+                type.setVersion(find(REM_NRR_PREFIX + ":version", listAttr));
                 type.setEventCode(outcome);
 
                 type.setEvidenceIdentifier(UUID.randomUUID().toString());
@@ -161,7 +161,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 				 */
                 // This is the Pol field of the ISO13888 token
                 EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
-                eipid.getPolicyIDs().add(find(REM_NRO_PREFIX + ":PolicyID", listAttr));
+                eipid.getPolicyIDs().add(find(REM_NRR_PREFIX + ":PolicyID", listAttr));
                 type.setEvidenceIssuerPolicyID(eipid);
 
                 mapToIso(type);
@@ -227,35 +227,19 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
         // The flag f1 is the AcceptanceRejection (the evidence type)
         // This is the A field the originator
-        EntityDetailsType sedt1 = new EntityDetailsType();
+        EntityDetailsType edt1 = new EntityDetailsType();
 
         if (context.getSenderCertificate() != null) {
             CertificateDetails cd1 = new CertificateDetails();
-            sedt1.setCertificateDetails(cd1);
+            edt1.setCertificateDetails(cd1);
             cd1.setX509Certificate(context.getSenderCertificate().getEncoded());
         }
-        if (context.getSenderNamePostalAddress() != null) {
-
-            LinkedList<String> slist = context.getSenderNamePostalAddress();
-            NamesPostalAddresses snpas = new NamesPostalAddresses();
-
-            for (String aSlist : slist) {
-                EntityName sen = new EntityName();
-                sen.getNames().add(aSlist);
-                NamePostalAddress snpa = new NamePostalAddress();
-                snpa.setEntityName(sen);
-                snpas.getNamePostalAddresses().add(snpa);
-
-            }
-            sedt1.setNamesPostalAddresses(snpas);
-        }
-
-        type.setSenderDetails(sedt1); // To check if null sender details is
+        type.setSenderDetails(edt1); // To check if null sender details is
         // allowed
 
         // This is the B field, the recipient
         /*
-         * Made optional by a request from the eJustice domain
+		 * Made optional by a request from the eJustice domain
 		 */
         EntityDetailsType edt2 = new EntityDetailsType();
 
@@ -267,13 +251,14 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
         }
         if (context.getRecipientNamePostalAddress() != null) {
-
             LinkedList<String> list = context.getRecipientNamePostalAddress();
+            int size = list.size();
+
             NamesPostalAddresses npas = new NamesPostalAddresses();
 
-            for (String aList : list) {
+            for (int i = 0; i < size; i++) {
                 EntityName en = new EntityName();
-                en.getNames().add(aList);
+                en.getNames().add(list.get(i));
                 NamePostalAddress npa = new NamePostalAddress();
                 npa.setEntityName(en);
                 npas.getNamePostalAddresses().add(npa);
@@ -307,11 +292,11 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         // we can avoid to build up the NROT Token as text||z_1||sa(z_1)
         MessageDetailsType mdt = new MessageDetailsType();
         eu.esens.abb.nonrep.etsi.rem.DigestMethod dm = new eu.esens.abb.nonrep.etsi.rem.DigestMethod();
-        dm.setAlgorithm("SHA1");
+        dm.setAlgorithm("SHA256");
         mdt.setDigestMethod(dm);
 
         // do the message digest
-        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.reset();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -347,8 +332,8 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         adt.setAuthenticationMethod(context.getAuthenticationMethod());
         // this is the authentication time. I set it as "now", since it is
         // required by the REM, but it is not used here.
-        //adt.setAuthenticationTime((new XMLGregorianCalendarImpl(new DateTime().toGregorianCalendar())));
-        adt.setAuthenticationTime((DatatypeFactory.newInstance().newXMLGregorianCalendar(new DateTime().toGregorianCalendar())));
+        adt.setAuthenticationTime((new XMLGregorianCalendarImpl(new DateTime().toGregorianCalendar())));
+
         type.setSenderAuthenticationDetails(adt);
 
     }
@@ -367,7 +352,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
         String BaseURI = "./";
         XMLSignature sig = new XMLSignature(doc, BaseURI,
-                org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA);
+                org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256);
         doc.getDocumentElement().appendChild(sig.getElement());
 
         doc.appendChild(doc.createComment(" Comment after "));

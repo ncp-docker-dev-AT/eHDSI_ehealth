@@ -15,10 +15,10 @@ import eu.stork.peps.auth.commons.IPersonalAttributeList;
 import eu.stork.peps.auth.commons.PEPSUtil;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import org.opensaml.saml2.core.Assertion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -26,29 +26,22 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import org.opensaml.saml2.core.Assertion;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- *
  * @author karkaletsis
- *
  */
 @Path("/stork")
 public class StorkRestService {
 
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger("StorkRestService");
+    private static final Logger log = LoggerFactory.getLogger("StorkRestService");
 
     @Context
     private HttpServletRequest servletRequest;
 
-//    @GET
-//    @Path("/{param}")
-//    public Response test(@Context HttpServletRequest request, @PathParam("param") String msg) {
-//        String ip = request.getRemoteAddr();
-//        log.info("IP ADDRESS IS : " + ip);
-//        String output = "OpenNCP says : " + msg;
-//        return Response.status(200).entity(output).build();
-//    }
     @GET
     @Path("/peps/url/get")
     public Response getPepsURL() throws SystemException {
@@ -70,15 +63,15 @@ public class StorkRestService {
     public Response decodeSaml(
             @FormParam("SAMLResponse") String SAMLResponse) throws UnsupportedEncodingException {
         String ret = "";
-        System.out.println("DECODE SAML: Getting saml attributes");
-        System.out.println("SAML RESPONSE IS : " + SAMLResponse);
+        log.info("DECODE SAML: Getting saml attributes");
+        log.info("SAML RESPONSE IS : " + SAMLResponse);
         Map<String, String> ehpattributes = new HashMap();
 
         byte[] decSamlToken = PEPSUtil.decodeSAMLToken(SAMLResponse);
         String samlResponseXML = new String(decSamlToken);
-        System.out.println("SAML RESPONSE IS : " + samlResponseXML);
+        log.info("SAML RESPONSE IS : " + samlResponseXML);
         String host = (String) servletRequest.getRemoteHost();
-        System.out.println("HOST : " + host);
+        log.info("HOST : " + host);
 
         STORKAuthnResponse authnResponse = null;
         IPersonalAttributeList attrs = null;
@@ -125,13 +118,13 @@ public class StorkRestService {
         resp.setAttrs(attrs);
 
         String countryCode = ConfigurationManagerService.getInstance().getProperty("COUNTRY_CODE");
-        System.out.println("The country code is :" + countryCode);
-        System.out.println("Reading the required attributes from International Search Mask");
+        log.info("The country code is: '{}'", countryCode);
+        log.info("Reading the required attributes from International Search Mask");
         Map<String, String> attributes = PatientSearchAttributes.getRequiredAttributesByCountry(countryCode);
         Iterator it = attributes.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pairs = (Map.Entry) it.next();
-            System.out.println("$$$$ " + pairs.getKey() + " = " + pairs.getValue());
+            log.info("$$$$ " + pairs.getKey() + " = " + pairs.getValue());
             try {
                 String attrName = pairs.getValue().toString(); //"2.16.470.1.100.1.1.1000.990.1";
                 String storkKey = pairs.getKey().toString();
@@ -144,10 +137,10 @@ public class StorkRestService {
                         value = sal.getSamlValue(storkKey);
                     }
                 } catch (Exception e) {
-                    System.out.println("Problem with eIdentifier " + value);
+                    log.info("Problem with eIdentifier '{}'", value, e);
                 }
 
-                System.out.println("Adding attribute :" + attrName + " with value " + value);
+                log.info("Adding attribute: '{}' with value: '{}'", attrName, value);
                 ehpattributes.put(attrName, value);
                 resp.setAttributes(ehpattributes);
 
@@ -155,7 +148,7 @@ public class StorkRestService {
                 e.printStackTrace();
             }
             ret = new Gson().toJson(resp);
-            System.out.println(ret);
+            log.info(ret);
         }
 
         return Response.status(200).entity(ret).build();
@@ -189,8 +182,7 @@ public class StorkRestService {
         properties.setSpSector(spSector);
 
         String saml = StorkHelper.createStorkSAML(properties);
-        log.info("saml : " + saml);
+        log.info("saml : '{}'", saml);
         return Response.status(200).entity(saml).build();
     }
-
 }

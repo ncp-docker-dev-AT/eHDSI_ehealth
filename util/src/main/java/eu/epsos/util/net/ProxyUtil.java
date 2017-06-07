@@ -52,7 +52,7 @@ public class ProxyUtil {
 	 *
 	 * @return <code>true</code> if the property defined is true or null
 	 */
-	public static boolean isProxyAnthenticationMandatory() { /*Changed to public in order to access the DB Proxy properties from others modules*/
+	public static boolean isProxyAnthenticationMandatory() {
 
 		return Boolean.valueOf(ConfigurationManagerService.getInstance()
 				.getProperty("APP_BEHIND_PROXY"));
@@ -65,7 +65,7 @@ public class ProxyUtil {
 	 * @return <code>ProxyCredentials</code> Object that encapsulates the
 	 *         necessary connection properties.
 	 */
-	public static ProxyCredentials getProxyCredentials() { /*Changed to public in order to access the DB Proxy properties from others modules*/
+	public static ProxyCredentials getProxyCredentials() {
 
 		ProxyCredentials credentials = new ProxyCredentials();
 		credentials.setProxyAuthenticated(ConfigurationManagerService

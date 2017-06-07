@@ -21,6 +21,11 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCA_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
  */
 /**
  * XCA_ServiceMessageReceiverInOut.java
@@ -33,11 +38,8 @@ package _2007.xds_b.iti.ihe;
 import com.spirit.epsos.cc.adc.EadcEntry;
 import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
-import epsos.ccd.gnomon.auditmanager.EventType;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XcaValidationService;
@@ -50,11 +52,8 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
@@ -69,7 +68,35 @@ import java.util.UUID;
  */
 public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.AbstractInOutMessageReceiver {
 
-    public static Logger logger = LoggerFactory.getLogger(XCA_ServiceMessageReceiverInOut.class);
+    public static final Logger logger = LoggerFactory.getLogger(XCA_ServiceMessageReceiverInOut.class);
+    //
+    private static final javax.xml.bind.JAXBContext wsContext;
+
+    static {
+        logger.debug("Loading the WS-Security init libraries in XCA 2007");
+
+        org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
+    }
+
+    static {
+        javax.xml.bind.JAXBContext jc;
+        jc = null;
+        try {
+            jc = javax.xml.bind.JAXBContext
+                    .newInstance(
+                            oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
+                            oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse.class,
+                            ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType.class,
+                            ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.class);
+        } catch (javax.xml.bind.JAXBException ex) {
+            System.err.println("Unable to create JAXBContext: "
+                    + ex.getMessage());
+            ex.printStackTrace(System.err);
+            Runtime.getRuntime().exit(-1);
+        } finally {
+            wsContext = jc;
+        }
+    }
 
     private String getIPofSender(org.apache.axis2.context.MessageContext msgContext) {
         String remoteAddress_IPConsumer = (String) msgContext.getProperty("REMOTE_ADDR");
@@ -134,19 +161,19 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
 
                 if ("respondingGateway_CrossGatewayQuery".equals(methodName)) {
                     // Send NRR
-                    logger.info("XCA LIST Request Received. EVIDENCE NRR");
-                    try {
-                        EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())),
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                EventType.epsosOrderServiceList.getCode(),
-                                new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                "NCPA_XCA_LIST_REQ");
-                    } catch (Exception e) {
-                        log.error(ExceptionUtils.getStackTrace(e));
-                    }
+//                    logger.info("XCA LIST Request Received. EVIDENCE NRR");
+//                    try {
+//                        EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope()),
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                EventType.epsosOrderServiceList.getCode(),
+//                                new DateTime(),
+//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                                "NCPA_XCA_LIST_REQ");
+//                    } catch (Exception e) {
+//                        log.error(ExceptionUtils.getStackTrace(e));
+//                    }
 
                     /* Validate incoming query request */
                     String requestMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
@@ -174,36 +201,38 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
 
                     logger.debug("Response Header:\n" + envelope.getHeader().toString());
                     logger.debug("Outgoing XCA Response Message:\n" + XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
-                    logger.info("XCA LIST Response to be sent. EVIDENCE NRO");
+//                    logger.info("XCA LIST Response to be sent. EVIDENCE NRO");
                     // Call to Evidence Emitter
-                    try {
-                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                EventType.epsosPatientServiceList.getCode(),
-                                DateUtil.GregorianCalendarToJodaTime(eventLog.getEI_EventDateTime()),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                "NCPA_XCA_LIST_RES");
-                    } catch (Exception e) {
-                        logger.error(ExceptionUtils.getStackTrace(e));
-                    }
+
+                    // Massi commented out non repudiation
+//                    try {
+//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                EventType.epsosPatientServiceList.getCode(),
+//                                DateUtil.GregorianCalendarToJodaTime(eventLog.getEI_EventDateTime()),
+//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                                "NCPA_XCA_LIST_RES");
+//                    } catch (Exception e) {
+//                        logger.error(ExceptionUtils.getStackTrace(e));
+//                    }
 
                 } else if ("respondingGateway_CrossGatewayRetrieve".equals(methodName)) {
                     // Send NRR
-                    logger.info("XCA RETRIEVE Request Received. EVIDENCE NRR");
-                    try {
-                        EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())),
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                EventType.epsosOrderServiceRetrieve.getCode(),
-                                new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                "NCPA_XCA_RETRIEVE_REQ");
-                    } catch (Exception e) {
-                        log.error(ExceptionUtils.getStackTrace(e));
-                    }
+//                    logger.info("XCA RETRIEVE Request Received. EVIDENCE NRR");
+//                    try {
+//                        EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope()),
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                EventType.epsosOrderServiceRetrieve.getCode(),
+//                                new DateTime(),
+//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                                "NCPA_XCA_RETRIEVE_REQ");
+//                    } catch (Exception e) {
+//                        log.error(ExceptionUtils.getStackTrace(e));
+//                    }
                     /* Validate incoming retrieve request */
                     String requestMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
                     XcaValidationService.getInstance().validateModel(requestMessage, XdModel.obtainModelXca(requestMessage).toString(), NcpSide.NCP_A);
@@ -235,20 +264,22 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
                     /* Validate outgoing retrieve response */
                     String responseMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
                     XcaValidationService.getInstance().validateModel(responseMessage, XdModel.obtainModelXca(responseMessage).toString(), NcpSide.NCP_A);
-                    logger.info("XCA RETRIEVE Response to be sent. EVIDENCE NRO");
+//                    logger.info("XCA RETRIEVE Response to be sent. EVIDENCE NRO");
                     // Call to Evidence Emitter
-                    try {
-                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                EventType.epsosPatientServiceRetrieve.getCode(),
-                                DateUtil.GregorianCalendarToJodaTime(eventLog.getEI_EventDateTime()),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                "NCPA_XCA_RETRIEVE_RESP");
-                    } catch (Exception e) {
-                        logger.error(ExceptionUtils.getStackTrace(e));
-                    }
+
+                    // Massi commented out non repudiation to NI
+//                    try {
+//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                EventType.epsosPatientServiceRetrieve.getCode(),
+//                                DateUtil.GregorianCalendarToJodaTime(eventLog.getEI_EventDateTime()),
+//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                                "NCPA_XCA_RETRIEVE_RESP");
+//                    } catch (Exception e) {
+//                        logger.error(ExceptionUtils.getStackTrace(e));
+//                    }
 
                 } else {
                     throw new java.lang.RuntimeException("method not found");
@@ -285,29 +316,6 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
         } catch (java.lang.Exception e) {
             logger.error(e.getMessage(), e);
             throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    //
-    private static final javax.xml.bind.JAXBContext wsContext;
-
-    static {
-        javax.xml.bind.JAXBContext jc;
-        jc = null;
-        try {
-            jc = javax.xml.bind.JAXBContext
-                    .newInstance(
-                            oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
-                            oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse.class,
-                            ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType.class,
-                            ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.class);
-        } catch (javax.xml.bind.JAXBException ex) {
-            System.err.println("Unable to create JAXBContext: "
-                    + ex.getMessage());
-            ex.printStackTrace(System.err);
-            Runtime.getRuntime().exit(-1);
-        } finally {
-            wsContext = jc;
         }
     }
 
@@ -491,6 +499,33 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
         }
     }
 
+    /**
+     * A utility method that copies the namepaces from the SOAPEnvelope
+     */
+    private java.util.Map getEnvelopeNamespaces(
+            org.apache.axiom.soap.SOAPEnvelope env) {
+        java.util.Map returnMap = new java.util.HashMap();
+        java.util.Iterator namespaceIterator = env.getAllDeclaredNamespaces();
+        while (namespaceIterator.hasNext()) {
+            org.apache.axiom.om.OMNamespace ns = (org.apache.axiom.om.OMNamespace) namespaceIterator
+                    .next();
+            returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
+        }
+        return returnMap;
+    }
+
+    private org.apache.axis2.AxisFault createAxisFault(java.lang.Exception e) {
+        org.apache.axis2.AxisFault f;
+        Throwable cause = e.getCause();
+        if (cause != null) {
+            f = new org.apache.axis2.AxisFault(e.getMessage(), cause);
+        } else {
+            f = new org.apache.axis2.AxisFault(e.getMessage());
+        }
+
+        return f;
+    }
+
     class JaxbRIDataSource implements org.apache.axiom.om.OMDataSource {
 
         /**
@@ -584,32 +619,5 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
                         "Error in JAXB marshalling", e);
             }
         }
-    }
-
-    /**
-     * A utility method that copies the namepaces from the SOAPEnvelope
-     */
-    private java.util.Map getEnvelopeNamespaces(
-            org.apache.axiom.soap.SOAPEnvelope env) {
-        java.util.Map returnMap = new java.util.HashMap();
-        java.util.Iterator namespaceIterator = env.getAllDeclaredNamespaces();
-        while (namespaceIterator.hasNext()) {
-            org.apache.axiom.om.OMNamespace ns = (org.apache.axiom.om.OMNamespace) namespaceIterator
-                    .next();
-            returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
-        }
-        return returnMap;
-    }
-
-    private org.apache.axis2.AxisFault createAxisFault(java.lang.Exception e) {
-        org.apache.axis2.AxisFault f;
-        Throwable cause = e.getCause();
-        if (cause != null) {
-            f = new org.apache.axis2.AxisFault(e.getMessage(), cause);
-        } else {
-            f = new org.apache.axis2.AxisFault(e.getMessage());
-        }
-
-        return f;
     }
 }// end of class

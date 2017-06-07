@@ -1,49 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- ================== Artifact ================== -->
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
         <artifactId>openncp-ncp-client</artifactId>
-        <version>2.5.0.RC1</version>
+        <version>2.5.0</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client</groupId>
     <artifactId>openncp-client-connector</artifactId>
-
-    <name>OpenNCP CC Client Connector</name>
-    <inceptionYear>2012</inceptionYear>
     <packaging>war</packaging>
 
+    <name>OpenNCP CC Client Connector</name>
+
     <properties>
-        <service.class.mock/> <!-- LP: in order use mock version use -Dservice.class.mock=Mock during maven
-			build -->
+        <!-- In order use mock version use -Dservice.class.mock=Mock during maven build -->
+        <service.class.mock/>
     </properties>
 
-    <!-- ================== Development ================== -->
-    <licenses>
-        <license>
-            <name>GNU Public License, Version 3.0</name>
-            <url>http://www.gnu.org/copyleft/gpl.html</url>
-        </license>
-    </licenses>
-    <scm>
-        <connection>git clone https://code.google.com/p/epsos-common-components.protocolterminators/</connection>
-        <url>http://code.google.com/p/epsos-common-components.protocolterminators/source/browse/</url>
-    </scm>
-    <issueManagement>
-        <system>JIRA</system>
-        <url>https://openncp.atlassian.net/browse/PT</url>
-    </issueManagement>
-
-    <!-- ================== Dependencies ================== -->
     <dependencies>
-
-        <!-- OpenNCP -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-data-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
+            <artifactId>openncp-integration-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client</groupId>
             <artifactId>openncp-xcpd-ws-client</artifactId>
             <exclusions>
                 <exclusion>
@@ -53,11 +40,11 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client</groupId>
             <artifactId>openncp-xca-ws-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client</groupId>
             <artifactId>openncp-xdr-ws-client</artifactId>
             <exclusions>
                 <exclusion>
@@ -67,11 +54,20 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-data-model</artifactId>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
+            <artifactId>openncp-ncp-pt-client-consumer</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>httpcore</artifactId>
+                    <groupId>org.apache.httpcomponents</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
-        <!-- axis2 -->
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2</artifactId>
@@ -104,37 +100,10 @@
             <artifactId>httpcore</artifactId>
             <version>4.4.4</version>
         </dependency>
-        <!-- tests -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
-            <artifactId>openncp-ncp-pt-client-consumer</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-logging</artifactId>
-                    <groupId>commons-logging</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>httpcore</artifactId>
-                    <groupId>org.apache.httpcomponents</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
         </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
-            <artifactId>openncp-integration-test</artifactId>
-        </dependency>
-
-        <!-- Ohter -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -142,24 +111,35 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>
-        <!--Security-->
-        <dependency>
             <groupId>com.matthewcasperson</groupId>
             <artifactId>parameter_validation_filter</artifactId>
             <version>1.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
-    <!-- ================== Build ================== -->
     <build>
         <finalName>${project.artifactId}</finalName>
-
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -169,10 +149,8 @@
                 <directory>${project.build.directory}/generated-sources/resources</directory>
             </resource>
         </resources>
-
         <plugins>
             <plugin>
-                <!-- Maven compiler plugin -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <executions>
@@ -190,12 +168,10 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- aar -->
             <plugin>
                 <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2-aar-maven-plugin</artifactId>
-                <version>${project.axis2ReleaseVersion}</version>
+                <version>${axis2.version}</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>
@@ -220,8 +196,6 @@
                     <wsdlFile>${project.build.outputDirectory}/wsdl/ClientConnectorService.wsdl</wsdlFile>
                 </configuration>
             </plugin>
-
-            <!-- war -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -250,9 +224,7 @@
         </plugins>
     </build>
 
-    <!-- ================== Profiles ================== -->
     <profiles>
-        <!-- Axis source code -->
         <profile>
             <id>generate-source</id>
             <activation>
@@ -265,7 +237,7 @@
                     <plugin>
                         <groupId>org.apache.axis2</groupId>
                         <artifactId>axis2-wsdl2code-maven-plugin</artifactId>
-                        <version>${project.axis2ReleaseVersion}</version>
+                        <version>${axis2.version}</version>
                         <executions>
                             <execution>
                                 <id>Generate_Server_Code</id>
@@ -289,8 +261,6 @@
                 </plugins>
             </build>
         </profile>
-
-        <!-- JavaDoc -->
         <profile>
             <id>generate-javadoc</id>
             <activation>
@@ -325,8 +295,6 @@
                 </plugins>
             </build>
         </profile>
-
-        <!-- Integration Tests -->
         <profile>
             <id>integration-tests</id>
             <dependencies>
@@ -337,7 +305,6 @@
                 <dependency>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-test</artifactId>
-                    <!--<version>3.0.5.RELEASE</version>-->
                     <version>${spring.version}</version>
                     <scope>test</scope>
                     <type>jar</type>
@@ -356,7 +323,6 @@
                 </testResources>
                 <plugins>
                     <plugin>
-                        <!-- Maven compiler plugin -->
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <executions>
@@ -410,7 +376,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- failsafe -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
