@@ -16,7 +16,7 @@ import java.net.URL;
 
 public class Utils {
 
-    private static final Logger log = LoggerFactory.getLogger(Utils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
     private static final String EMPTY_VALUE = "";
 
     private Utils() {
@@ -42,7 +42,7 @@ public class Utils {
 
             return value;
         } catch (Exception e) {
-            log.error("Error occurred while fetching property: " + e.getMessage(), e);
+            LOGGER.error("Error occurred while fetching property: " + e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -55,7 +55,7 @@ public class Utils {
             out = new BufferedWriter(fstream);
             out.write(am);
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         } finally {
             Utils.close(out);
             Utils.close(fstream);
@@ -77,7 +77,7 @@ public class Utils {
             dbFactory.setNamespaceAware(true);
             doc = dbFactory.newDocumentBuilder().parse(Utils.StringToStream(inputFile));
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         return doc;
 
@@ -86,7 +86,7 @@ public class Utils {
     /**
      * Validates an xml file against XMLSchema
      *
-     * @param XmlDocumentUrl is the path of the tsl file
+     * @param xmlDocumentUrl is the path of the tsl file
      * @param url            the url of the schema file
      * @return true/false if the source xml is valid against the rfc3881 xsd
      */
@@ -97,13 +97,16 @@ public class Utils {
         javax.xml.validation.Validator validator = schema.newValidator();
         Source source = new StreamSource(StringToStream(xmlDocumentUrl));
 
+        // LOGGER.info("XML Audit Document: '{}'", xmlDocumentUrl);
+        // LOGGER.info("Schema Url: '{}'", url.toString());
+
         try {
             validator.validate(source);
-            log.info("document is valid");
+            LOGGER.info("document is valid");
             return true;
         } catch (SAXException e) {
-            log.error("document is not valid because ");
-            log.error(e.getMessage(), e);
+            LOGGER.error("document is not valid because ");
+            LOGGER.error(e.getMessage(), e);
             return false;
         }
     }
@@ -131,7 +134,7 @@ public class Utils {
                 close(is);
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
 
         return sb.toString();
@@ -150,7 +153,7 @@ public class Utils {
         try {
             is = new ByteArrayInputStream(text.getBytes());
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         return is;
     }
@@ -190,7 +193,7 @@ public class Utils {
             if (closeable != null)
                 closeable.close();
         } catch (IOException e) {
-            log.warn("Unable to close.", e);
+            LOGGER.warn("Unable to close.", e);
         }
     }
 
@@ -202,7 +205,7 @@ public class Utils {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            log.warn("Sleep interrupted.");
+            LOGGER.warn("Sleep interrupted.");
         }
     }
 }

@@ -132,6 +132,8 @@ public enum AuditTrailUtils {
                         + e.getMessage(), e);
             }
         }
+        // TODO: Audit Message built is not displayed into the logs
+        // log.info("Audit Message: '{}'", auditmsg);
         return auditmsg;
     }
 
