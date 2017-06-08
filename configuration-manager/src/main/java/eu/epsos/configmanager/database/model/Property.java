@@ -15,6 +15,10 @@ public class Property {
     @Column(name = "is_smp")
     private boolean smp;
 
+    public Property() {
+        // Default constructor required by Hibernate
+    }
+
     public Property(String name, String value) {
         this.name = name;
         this.value = value;
