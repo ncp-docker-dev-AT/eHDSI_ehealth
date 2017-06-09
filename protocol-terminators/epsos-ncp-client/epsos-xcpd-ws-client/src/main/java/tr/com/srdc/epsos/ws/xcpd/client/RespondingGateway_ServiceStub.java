@@ -303,9 +303,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
                 ConfigurationManagerSMP configManagerSMP = ConfigurationManagerSMP.getInstance();
                 String key = this.countryCode.toLowerCase(Locale.ENGLISH) + ".PatientIdentificationService.WSE";
-                configManagerSMP.deleteKeyFromHashMap(key);
-                String value = configManagerSMP.getProperty(key);
+                String value  = configManagerSMP.queryProperty(key);
                 if (value != null) {
+                    configManagerSMP.updateProperty(key,value);
+                    configManagerSMP.updateCache(key,value);
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
                     LOG.debug("Retrying the request with the new configurations: [" + value + "]");
