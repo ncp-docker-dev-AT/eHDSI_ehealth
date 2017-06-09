@@ -30,11 +30,12 @@ public class XdrValidationService extends ValidationService {
 
     private static XdrValidationService instance;
 
-    @Override
-    public boolean validateModel(String object, String model, NcpSide ncpSide) {
-        return XcaValidationService.getInstance().validateModel(object, model, ncpSide);
+    /**
+     * Private constructor to avoid instantiation.
+     */
+    private XdrValidationService() {
     }
-    
+
     public static XdrValidationService getInstance() {
         if (instance == null) {
 
@@ -42,10 +43,9 @@ public class XdrValidationService extends ValidationService {
         }
         return instance;
     }
-    
-    /**
-     * Private constructor to avoid instantiation.
-     */
-    private XdrValidationService() {
+
+    @Override
+    public boolean validateModel(String object, String model, NcpSide ncpSide) {
+        return XcaValidationService.getInstance().validateModel(object, model, ncpSide);
     }
 }

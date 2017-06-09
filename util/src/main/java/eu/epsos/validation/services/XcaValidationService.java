@@ -23,8 +23,8 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.reporting.ReportBuilder;
-import net.ihe.gazelle.xd.ModelBasedValidationWS;
-import net.ihe.gazelle.xd.ModelBasedValidationWSService;
+//import net.ihe.gazelle.xd.ModelBasedValidationWS;
+//import net.ihe.gazelle.xd.ModelBasedValidationWSService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

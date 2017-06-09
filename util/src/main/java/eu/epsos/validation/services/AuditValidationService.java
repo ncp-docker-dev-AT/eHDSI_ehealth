@@ -24,8 +24,6 @@ import eu.epsos.validation.datamodel.audit.AuditSchematron;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.reporting.ReportBuilder;
-import net.ihe.gazelle.am.AuditMessageValidationWS;
-import net.ihe.gazelle.am.AuditMessageValidationWSService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

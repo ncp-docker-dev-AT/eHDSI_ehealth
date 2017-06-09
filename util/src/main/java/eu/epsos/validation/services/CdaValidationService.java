@@ -24,8 +24,9 @@ import eu.epsos.validation.datamodel.cda.CdaSchematron;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.reporting.ReportBuilder;
-import net.ihe.gazelle.document.ModelBasedValidationWS;
-import net.ihe.gazelle.document.ModelBasedValidationWSService;
+import net.ihe.gazelle.validator.mb.ws.ModelBasedValidationWS;
+import net.ihe.gazelle.validator.mb.ws.ModelBasedValidationWSService;
+import net.ihe.gazelle.validator.mb.ws.SOAPException_Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +76,15 @@ public class CdaValidationService extends ValidationService {
         //        } catch (SOAPException_Exception ex) {
         //            LOG.error("An error has occurred during the invocation of remote validation service, please check the stach trace.", ex);
         //        }
+        try {
+            LOG.info("Automated validation for CDA document...");
+            ModelBasedValidationWSService cdaService = new ModelBasedValidationWSService();
+            ModelBasedValidationWS cdaPort = cdaService.getModelBasedValidationWSPort();
+            // Invocation of Web Service client.
+            cdaXmlDetails = cdaPort.validateDocument(object, model);
+        } catch (SOAPException_Exception ex) {
+            LOG.error("An error has occurred during the invocation of remote validation service, please check the stach trace.", ex);
+        }
 
         if (!cdaXmlDetails.isEmpty()) {
             return ReportBuilder.build(model, CdaModel.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(cdaXmlDetails), cdaXmlDetails.toString(), ncpSide); // Report generation.

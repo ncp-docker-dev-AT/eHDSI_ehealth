@@ -76,6 +76,16 @@ public class XcpdValidationService extends ValidationService {
         //            LOG.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
         //            //return false;
         //        }
+        try {
+            LOG.info("Automated validation requested to Gazelle eHDSI platform...");
+            ModelBasedValidationWSService hl7Service = new net.ihe.gazelle.validator.mb.ws.ModelBasedValidationWSService();
+            ModelBasedValidationWS hl7v3Port = hl7Service.getModelBasedValidationWSPort();
+            // Invocation of Web Service client.
+            hl7v3XmlDetails = hl7v3Port.validateDocument(object, model);
+        } catch (Exception ex) {
+            LOG.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+            //return false;
+        }
 
         if (!hl7v3XmlDetails.isEmpty()) {
             return ReportBuilder.build(model, Hl7v3Model.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(hl7v3XmlDetails), hl7v3XmlDetails.toString(), ncpSide); // Report generation.
