@@ -446,14 +446,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (Exception ex) {
                 LOG.error(null, ex);
             }
-
-            LOG.info("Submission Time is : " + eventLog.getEI_EventDateTime());
-            LOG.info("EventType is : " + eventLog.getEventType());
-            LOG.info("Event Outcome is: " + eventLog.getEI_EventOutcomeIndicator().toString());
-            LOG.info("KEYSTORE PATH: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH);
-            LOG.info("KEYSTORE PWD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD);
-            LOG.info("KEY ALIAS: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS);
-            LOG.info("PRIVATE KEY PASSWORD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
+            
             // Audit end time
             end = System.currentTimeMillis();
             LOG.info("XCPD AUDIT TIME: " + (end - start) / 1000.0);

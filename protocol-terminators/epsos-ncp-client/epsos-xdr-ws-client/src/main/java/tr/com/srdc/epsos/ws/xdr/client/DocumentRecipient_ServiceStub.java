@@ -415,14 +415,6 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 //                LOG.error(ExceptionUtils.getStackTrace(e));
 //            }
 
-            LOG.info("Submission Time is : " + eventLog.getEI_EventDateTime());
-            LOG.info("EventType is : " + eventLog.getEventType());
-            LOG.info("Event Outcome is: " + eventLog.getEI_EventOutcomeIndicator().toString());
-            LOG.info("KEYSTORE PATH: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH);
-            LOG.info("KEYSTORE PWD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD);
-            LOG.info("KEY ALIAS: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS);
-            LOG.info("PRIVATE KEY PASSWORD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
-
             return registryResponse;
 
         } catch (AxisFault f) {
