@@ -1,6 +1,5 @@
 package eu.epsos.validation.services;
 
-import eu.epsos.util.net.ProxyUtil;
 import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.cda.CdaSchematron;
 import eu.epsos.validation.datamodel.common.NcpSide;
@@ -52,14 +51,6 @@ public class CdaValidationService extends ValidationService {
             return false;
         }
 
-        //TODO: Fix Gazelle timeout and validation error.
-        //        try {
-        //        ModelBasedValidationWSService cdaService = new ModelBasedValidationWSService();
-        //        ModelBasedValidationWS cdaPort = cdaService.getModelBasedValidationWSPort();
-        //            cdaXmlDetails = cdaPort.validateDocument(object, model); // Invocation of Web Service client.
-        //        } catch (SOAPException_Exception ex) {
-        //            LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stach trace.", ex);
-        //        }
         try {
             LOGGER.info("Automated validation for CDA document...");
             ModelBasedValidationWSService cdaService = new ModelBasedValidationWSService();

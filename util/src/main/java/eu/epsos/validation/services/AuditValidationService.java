@@ -1,6 +1,5 @@
 package eu.epsos.validation.services;
 
-import eu.epsos.util.net.ProxyUtil;
 import eu.epsos.validation.datamodel.audit.AuditModel;
 import eu.epsos.validation.datamodel.audit.AuditSchematron;
 import eu.epsos.validation.datamodel.common.NcpSide;
@@ -54,7 +53,6 @@ public class AuditValidationService extends ValidationService {
         }
 
         try {
-            ProxyUtil.initProxyConfiguration();
             AuditMessageValidationWSService amService = new AuditMessageValidationWSService();
             AuditMessageValidationWS amPort = amService.getAuditMessageValidationWSPort();
             LOGGER.info("Requesting online validation to '{}'", amService.getWSDLDocumentLocation());
@@ -63,16 +61,14 @@ public class AuditValidationService extends ValidationService {
             LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace: '{}'", ex.getMessage(), ex);
         }
 
+        // Report generation.
         if (!amXmlDetails.isEmpty()) {
             LOGGER.info("Audit message has been successfully validated through Gazelle endpoint as result");
-            // Report generation.
             result = ReportBuilder.build(model, AuditModel.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(amXmlDetails), amXmlDetails, ncpSide);
         } else {
             LOGGER.error("The webservice response is empty.");
-            // Report generation.
             result = ReportBuilder.build(model, AuditModel.checkModel(model).getObjectType().toString(), object, null, null, ncpSide);
         }
-
         return result;
     }
 

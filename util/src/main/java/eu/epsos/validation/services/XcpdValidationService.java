@@ -1,6 +1,5 @@
 package eu.epsos.validation.services;
 
-import eu.epsos.util.net.ProxyUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Model;
