@@ -234,14 +234,6 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
                     throw new java.lang.RuntimeException("method not found");
                 }
 
-                logger.info("Submission Time is : " + eventLog.getEI_EventDateTime());
-                logger.info("EventType is : " + eventLog.getEventType());
-                logger.info("Event Outcome is: " + eventLog.getEI_EventOutcomeIndicator().toString());
-                logger.info("KEYSTORE PATH: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH);
-                logger.info("KEYSTORE PWD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD);
-                logger.info("KEY ALIAS: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS);
-                logger.info("PRIVATE KEY PASSWORD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
-
                 Date endTime = new Date();
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
