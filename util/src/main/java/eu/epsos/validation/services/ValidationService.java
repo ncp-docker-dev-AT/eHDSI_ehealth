@@ -20,14 +20,13 @@
 package eu.epsos.validation.services;
 
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.epsos.util.net.ProxyUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.reporting.ReportBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.xml.bind.DatatypeConverter;
 
 /**
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>

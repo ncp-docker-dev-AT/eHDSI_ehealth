@@ -168,6 +168,8 @@ public enum AuditTrailUtils {
      * @return the Audit Message object
      */
     public AuditMessage createAuditMessage(EventLog eventLog) {
+
+        log.info("createAuditMessage(EventLog '{}')", eventLog.getEventType());
         AuditMessage am = new AuditMessage();
         AuditTrailUtils au = AuditTrailUtils.getInstance();
         if (eventLog.getEventType().equals("epsos-11")) {
@@ -1242,6 +1244,8 @@ public enum AuditTrailUtils {
      * @return the Audit Message Model
      */
     private boolean validateAuditMessage(EventLog eventLog, AuditMessage am) {
+
+        log.info("validateAuditMessage(EventLog '{}', AudiMessage '{}')", eventLog.getEventType(), am.getEventIdentification().getEventActionCode());
         String model = "";
         NcpSide ncpSide = null;
 

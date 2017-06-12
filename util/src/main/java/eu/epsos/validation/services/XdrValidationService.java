@@ -1,25 +1,8 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2013 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.validation.services;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents the wrapper for the XDR messages validation.
@@ -28,6 +11,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
  */
 public class XdrValidationService extends ValidationService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(XdrValidationService.class);
     private static XdrValidationService instance;
 
     /**
@@ -46,6 +30,7 @@ public class XdrValidationService extends ValidationService {
 
     @Override
     public boolean validateModel(String object, String model, NcpSide ncpSide) {
+        LOGGER.info("[Validation Service Model: '{}' on '{}' side]", model, ncpSide.getName());
         return XcaValidationService.getInstance().validateModel(object, model, ncpSide);
     }
 }

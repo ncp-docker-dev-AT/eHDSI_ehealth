@@ -1,40 +1,6 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.cc;
 
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocumentsDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocumentsResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryPatientDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryPatientResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocumentDocument1;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocumentResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.SayHelloDocument;
-import epsos.openncp.protocolterminator.clientconnector.SayHelloResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentDocument1;
-import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentResponseDocument;
-import eu.epsos.util.EvidenceUtils;
-import java.util.List;
-import java.util.Map;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.TransformerException;
+import epsos.openncp.protocolterminator.clientconnector.*;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMXMLBuilderFactory;
@@ -49,24 +15,25 @@ import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.xmlbeans.XmlBeansXMLReader;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.DateTime;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.securityman.SAML2Validator;
-import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
+
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.TransformerException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ClientConnectorServiceServiceMessageReceiverInOut message receiver.
- *
  */
 public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     protected static final Logger LOG = LoggerFactory.getLogger(ClientConnectorServiceMessageReceiverInOut.class);
-    
+
     static {
         LOG.debug("Loading the WS-Security init libraries in ClientConnectorServiceMessageReceiverInOut 2009");
         org.apache.xml.security.Init.init(); // Joao added 10/03/2017. 

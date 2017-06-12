@@ -16,6 +16,7 @@
  */
 package epsos.openncp.protocolterminator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
@@ -26,6 +27,8 @@ import org.opensaml.xml.Namespace;
 import org.opensaml.xml.XMLObjectBuilder;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.schema.XSAny;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,10 +52,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 public class HCPIAssertionCreator {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HCPIAssertionCreator.class);
+
     public Assertion createHCPIAssertion() {
+
         XMLSignatureFactory factory;
         KeyStore keyStore;
         KeyPair keyPair;
@@ -394,11 +399,10 @@ public class HCPIAssertionCreator {
 
             // Sign Assertion
             XMLSignature signature = factory.newXMLSignature(signedInfo, keyInfo);
-            DOMSignContext signContext = new DOMSignContext
-                    (keyPair.getPrivate(), assertion.getDOM());
+            DOMSignContext signContext = new DOMSignContext(keyPair.getPrivate(), assertion.getDOM());
             signature.sign(signContext);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
         // Set Signature's place
@@ -416,7 +420,7 @@ public class HCPIAssertionCreator {
             }
 
             if (child.getNodeType() == Node.ELEMENT_NODE &&
-                    child.getLocalName().equals("Issuer"))
+                    StringUtils.equals(child.getLocalName(), "Issuer"))
                 foundIssuer = true;
         }
 

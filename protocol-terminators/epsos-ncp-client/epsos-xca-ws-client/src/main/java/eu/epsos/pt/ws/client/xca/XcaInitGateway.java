@@ -32,10 +32,6 @@ import eu.epsos.validation.services.CdaValidationService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
@@ -55,9 +51,14 @@ import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.ws.xca.client.RespondingGateway_ServiceStub;
 import tr.com.srdc.epsos.ws.xca.client.retrieve.RetrieveDocumentSetRequestTypeCreator;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 /**
  * XCA Initiating Gateway
- *
+ * <p>
  * This is an implementation of a IHE XCA Initiation Gateway. This class
  * provides the necessary operations to query and retrieve documents.
  *
@@ -68,8 +69,14 @@ public class XcaInitGateway {
 
     private static Logger LOG = LoggerFactory.getLogger(XcaInitGateway.class);
 
+    /**
+     * Private constructor to disable class instantiation.
+     */
+    private XcaInitGateway() {
+    }
+
     public static QueryResponse crossGatewayQuery(final PatientId pid, final String countryCode, final GenericDocumentCode documentCode,
-            final Assertion idAssertion, final Assertion trcAssertion, String service) throws XCAException {
+                                                  final Assertion idAssertion, final Assertion trcAssertion, String service) throws XCAException {
 
         QueryResponse result = null;
 
@@ -172,21 +179,19 @@ public class XcaInitGateway {
 
         if (!queryResponse.getDocumentResponse().isEmpty()) {
             if (queryResponse.getDocumentResponse().size() > 1) {
-                LOG.error("More than one documents where retrieved for request: id: " + document.getDocumentUniqueId()
-                        + " comunit: " + homeCommunityId
-                        + "registry: " + document.getRepositoryUniqueId());
+                LOG.error("More than one documents where retrieved for the current request with parameters document ID: '{}' - homeCommunityId: '{}' - registry: ", document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
             }
             try {
                 CdaValidationService cdaValidationService = CdaValidationService.getInstance();
 
                 /* Validate CDA epSOS Pivot */
                 cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
-                
+
                 queryResponse.getDocumentResponse().get(0).setDocument(TMServices.transformDocument(queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage)); //Resets the response document to a translated version.
 
                 /* Validate CDA epSOS Friendly-B */
                 cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
-            
+
             } catch (DocumentTransformationException ex) {
                 LOG.error(ex.getLocalizedMessage(), ex);
             } catch (Exception ex) {
@@ -200,19 +205,13 @@ public class XcaInitGateway {
     }
 
     /**
-     * Private constructor to disable class instantiation.
-     */
-    private XcaInitGateway() {
-    }
-
-    /**
      * Processes registry errors from the {@link AdhocQueryResponse} message, by
      * reporting them to the logging system.
      *
      * @param registryErrorList the list of errors from the
-     * {@link AdhocQueryResponse} message.
+     *                          {@link AdhocQueryResponse} message.
      * @throws Exception thrown when an error has a severity of
-     * "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error" type.
+     *                   "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error" type.
      */
     private static void processRegistryErrors(RegistryErrorList registryErrorList) throws XCAException {
         // A.R. ++ Error processing. For retrive. Is it needed?
