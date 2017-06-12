@@ -347,9 +347,12 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         break;
                 }
                 String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
-                configManagerSMP.deleteKeyFromHashMap(key);
-                String value = configManagerSMP.getProperty(key);
+                String value = configManagerSMP.queryProperty(key);
+
                 if (value != null) {
+                    configManagerSMP.updateProperty(key, value);
+                    configManagerSMP.updateCache(key, value);
+
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
                     LOG.debug("Retrying the request with the new configurations: [" + value + "]");
@@ -700,9 +703,11 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         break;
                 }
                 String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
-                configManagerSMP.deleteKeyFromHashMap(key);
-                String value = configManagerSMP.getProperty(key);
+                String value = configManagerSMP.queryProperty(key);
                 if (value != null) {
+                    configManagerSMP.updateProperty(key, value);
+                    configManagerSMP.updateCache(key, value);
+
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
                     LOG.debug("Retrying the request with the new configurations: [" + value + "]");
