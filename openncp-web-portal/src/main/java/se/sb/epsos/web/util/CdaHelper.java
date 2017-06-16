@@ -133,12 +133,8 @@ public class CdaHelper {
 							XPathExpression productIdExpr = xpath.compile(
 									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code");
 							Node materialIDNode = (Node) productIdExpr.evaluate(entryNode, XPathConstants.NODE);
-							if ((materialIDNode != null) && (materialIDNode.getAttributes() != null)) {
-								if (materialIDNode.getAttributes().getNamedItem("nullFlavor") != null) {
-									materialID = NullFlavorManager.getNullFlavor(materialIDNode.getAttributes().getNamedItem("nullFlavor").getNodeValue());
-								} else if (materialIDNode.getAttributes().getNamedItem("code") != null) {
-									materialID = materialIDNode.getAttributes().getNamedItem("code").getNodeValue();
-								}
+							if (materialIDNode != null) {
+								materialID = materialIDNode.getAttributes().getNamedItem("code").getNodeValue();
 							}
 
 							XPathExpression nameExpr = xpath.compile(

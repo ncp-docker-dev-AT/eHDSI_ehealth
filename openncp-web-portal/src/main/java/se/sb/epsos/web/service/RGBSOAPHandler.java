@@ -62,10 +62,7 @@ public class RGBSOAPHandler implements SOAPHandler<SOAPMessageContext> {
             SOAPMessage message = context.getMessage();
             try {
             	SOAPEnvelope envelope = message.getSOAPPart().getEnvelope();
-            	SOAPHeader header = envelope.getHeader();
-            	if (header == null) {
-            		header = envelope.addHeader();
-            	}
+            	SOAPHeader header = envelope.addHeader();
             	Assertion assertion = user.getAssertion();
         	    
             	// If the user has not received an assertion yet, generate it
