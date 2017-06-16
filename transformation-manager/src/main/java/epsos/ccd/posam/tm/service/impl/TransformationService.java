@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -46,6 +47,11 @@ public class TransformationService implements ITransformationService, TMConstant
         LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [START]");
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
         LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [END]");
+        try {
+            LOGGER.info("*****************PIVOT CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return responseStructure;
     }
 
@@ -131,9 +137,14 @@ public class TransformationService implements ITransformationService, TMConstant
 
     public TMResponseStructure translate(Document epSosCDA, String targetLanguageCode) {
 
-        LOGGER.info("Translating OpenNCP CDA Document toEpsosPivot [START]");
+        LOGGER.info("Translating OpenNCP CDA Document [START]");
         TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
-        LOGGER.info("Translating OpenNCP CDA Document toEpsosPivot [END]");
+        LOGGER.info("Translating OpenNCP CDA Document [END]");
+        try {
+            LOGGER.info("*****************Translate CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return responseStructure;
     }
 
@@ -213,8 +224,7 @@ public class TransformationService implements ITransformationService, TMConstant
                         namespaceNotAwareDoc, targetLanguageCode, errors,
                         warnings, cdaDocumentType);
 
-                Document finalDoc = XmlUtil
-                        .removeEmptyXmlns(namespaceNotAwareDoc);
+                Document finalDoc = XmlUtil.removeEmptyXmlns(namespaceNotAwareDoc);
 
                 if (config.isModelValidationEnabled()) {
                     ModelValidatorResult validateMDA = Validator.validateMDA(
@@ -333,8 +343,7 @@ public class TransformationService implements ITransformationService, TMConstant
                                      List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings,
                                      String cdaDocumentType) throws TMException, Exception {
         LOGGER.info("Transcoding Document '{}'", cdaDocumentType);
-        return processDocument(document, null, errors, warnings,
-                cdaDocumentType, true);
+        return processDocument(document, null, errors, warnings, cdaDocumentType, true);
     }
 
     /**

@@ -214,6 +214,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             XDSDocument request = XdsDocumentDts.newInstance(xdsDocument);
             request.setClassCode(documentCode);
 
+            LOG.info("[ClientConnector retrieveDocument()] Document: '{}' homeCommunityId: '{}' targetLanguage: '{}'", request.getDocumentUniqueId(), homeCommunityId, targetLanguage);
             if (documentCode.getValue().equals(tr.com.srdc.epsos.util.Constants.PS_CLASSCODE)) {
                 response = PatientService.retrieve(request, homeCommunityId, countryCode, targetLanguage, hcpAssertion, trcAssertion);
             } else if (documentCode.getValue().equals(tr.com.srdc.epsos.util.Constants.EP_CLASSCODE)) {
