@@ -16,7 +16,7 @@
         <property name="transcodingLang" value="${transcodingLanguage}"/>
     </bean>
 
-    <bean id="tsamDatasource" class="org.apache.commons.dbcp.BasicDataSource">
+    <bean id="tsamDatasource" class="org.apache.commons.dbcp2.BasicDataSource">
         <property name="driverClassName" value="${ltr.db.driverClass}"/>
         <property name="url" value="${ltr.db.url}"/>
         <property name="username" value="${ltr.db.user}"/>
@@ -31,7 +31,8 @@
                 <prop key="hibernate.dialect">${ltr.hibernate.dialect}</prop>
                 <prop key="hibernate.show_sql">true</prop>
                 <prop key="hibernate.cache.use_query_cache">true</prop>
-                <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.EhCacheRegionFactory</prop>
                 <prop key="hibernate.cache.use_structured_entries">true</prop>
             </props>
         </property>
