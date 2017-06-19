@@ -45,7 +45,7 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    log.warn("Unable to close: " + e.getMessage(), e);
+                    log.warn("Unable to close: '{}'", e.getMessage(), e);
                 }
             }
             close(buffer);
@@ -54,22 +54,24 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
     }
 
     public void writeObjectToFile(Serializable message) {
+
         OutputStream file = null;
         OutputStream buffer = null;
         ObjectOutput output = null;
         try {
             if (message != null) {
-                String path = System.getenv("EPSOS_PROPS_PATH") + File.separatorChar + type.getNewFileName();
+                //String path = System.getenv("EPSOS_PROPS_PATH") + File.separatorChar + type.getNewFileName();
+                String path = System.getenv("EPSOS_PROPS_PATH") + type.getNewFileName();
 
                 file = new FileOutputStream(path);
                 buffer = new BufferedOutputStream(file);
                 output = new ObjectOutputStream(buffer);
                 output.writeObject(message);
 
-                log.error("Error occurred while writing AuditLog to OpenATNA! AuditLog saved to: " + path);
+                log.error("Error occurred while writing AuditLog to OpenATNA! AuditLog saved to: '{}'", path);
             }
         } catch (Exception e) {
-            log.error("Unable to send AuditLog to OpenATNA nor able write auditLog backup! Dumping to log: " + message.toString(), e);
+            log.error("Unable to send AuditLog to OpenATNA nor able write auditLog backup! Dumping to log: '{}'", message.toString(), e);
         } finally {
             if (output != null) {
                 try {
@@ -84,7 +86,9 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
     }
 
     private File getPath() {
-        return new File(System.getenv("EPSOS_PROPS_PATH") + File.separatorChar + type.getDir());
+
+        //return new File(System.getenv("EPSOS_PROPS_PATH") + File.separatorChar + type.getDir());
+        return new File(System.getenv("EPSOS_PROPS_PATH") + type.getDir());
     }
 
     private boolean isAuditLogBackupWriterFile(File file) {
@@ -94,10 +98,10 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
 
     private boolean isPathValid(File path) {
         if (!path.exists()) {
-            log.error("Source path (" + path + ") does not exist!");
+            log.error("Source path ('{}') does not exist!", path);
             return false;
         } else if (!path.isDirectory()) {
-            log.error("Source path (" + path + ") is not a diredtory!");
+            log.error("Source path ('{}') is not a diredtory!", path);
             return false;
         }
 
@@ -110,7 +114,7 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
                 c.close();
             }
         } catch (IOException e) {
-            log.warn("Unable to close closeable: " + e.getMessage(), e);
+            log.warn("Unable to close closeable: '{}'", e.getMessage(), e);
         }
     }
 }

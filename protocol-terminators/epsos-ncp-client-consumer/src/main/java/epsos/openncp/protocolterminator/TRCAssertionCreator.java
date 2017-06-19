@@ -1,21 +1,6 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package epsos.openncp.protocolterminator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
@@ -24,6 +9,8 @@ import org.opensaml.xml.Namespace;
 import org.opensaml.xml.XMLObjectBuilder;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.schema.XSAny;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,7 +36,10 @@ import java.util.List;
 
 public class TRCAssertionCreator {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TRCAssertionCreator.class);
+
     public Assertion createTRCAssertion() {
+
         XMLSignatureFactory factory;
         KeyStore keyStore;
         KeyPair keyPair;
@@ -185,7 +175,7 @@ public class TRCAssertionCreator {
                     (Collections.singletonList(entry.getCertificate()))));
 
             // Create Signature/SignedInfo/Reference
-            List<Transform> lst = new ArrayList<Transform>();
+            List<Transform> lst = new ArrayList<>();
             lst.add(factory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
             lst.add(factory.newTransform(CanonicalizationMethod.EXCLUSIVE, (TransformParameterSpec) null));
             Reference ref = factory.newReference("#" + assertion.getID(),
@@ -204,7 +194,7 @@ public class TRCAssertionCreator {
                     (keyPair.getPrivate(), assertion.getDOM());
             signature.sign(signContext);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
         // Set Signature's place
@@ -222,7 +212,7 @@ public class TRCAssertionCreator {
             }
 
             if (child.getNodeType() == Node.ELEMENT_NODE &&
-                    child.getLocalName().equals("Issuer"))
+                    StringUtils.equals(child.getLocalName(), "Issuer"))
                 foundIssuer = true;
         }
 
@@ -237,5 +227,4 @@ public class TRCAssertionCreator {
 
         return assertion;
     }
-
 }

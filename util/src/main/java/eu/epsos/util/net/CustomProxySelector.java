@@ -15,38 +15,9 @@ import java.util.List;
  */
 public class CustomProxySelector extends ProxySelector {
 
-    private Logger LOGGER = LoggerFactory.getLogger(CustomProxySelector.class);
-
-    private HashMap<SocketAddress, InnerProxy> proxies = new HashMap<>();
-
     private final ProxySelector defaultSelector;
-
-    /*
-     * Inner class representing a Proxy.
-     */
-    class InnerProxy {
-
-        Proxy proxy;
-        SocketAddress socketAddress;
-        int failedCount = 0;
-
-        InnerProxy(InetSocketAddress inetSocketAddress) {
-            socketAddress = inetSocketAddress;
-            proxy = new Proxy(Proxy.Type.HTTP, inetSocketAddress);
-        }
-
-        SocketAddress address() {
-            return socketAddress;
-        }
-
-        Proxy toProxy() {
-            return proxy;
-        }
-
-        int failed() {
-            return ++failedCount;
-        }
-    }
+    private Logger LOGGER = LoggerFactory.getLogger(CustomProxySelector.class);
+    private HashMap<SocketAddress, InnerProxy> proxies = new HashMap<>();
 
     public CustomProxySelector(ProxySelector def,
                                final ProxyCredentials credentials) {
@@ -81,7 +52,7 @@ public class CustomProxySelector extends ProxySelector {
         if (StringUtils.equalsIgnoreCase("http", protocol)
                 || StringUtils.equalsIgnoreCase("https", protocol)) {
 
-            List<Proxy> proxyList = new ArrayList<Proxy>();
+            List<Proxy> proxyList = new ArrayList<>();
             for (InnerProxy p : proxies.values()) {
 
                 proxyList.add(p.toProxy());
@@ -97,7 +68,7 @@ public class CustomProxySelector extends ProxySelector {
         if (defaultSelector != null) {
             return defaultSelector.select(uri);
         } else {
-            List<Proxy> proxyList = new ArrayList<Proxy>();
+            List<Proxy> proxyList = new ArrayList<>();
             proxyList.add(Proxy.NO_PROXY);
             return proxyList;
         }
@@ -121,6 +92,33 @@ public class CustomProxySelector extends ProxySelector {
             if (defaultSelector != null) {
                 defaultSelector.connectFailed(uri, sa, ioe);
             }
+        }
+    }
+
+    /*
+     * Inner class representing a Proxy.
+     */
+    class InnerProxy {
+
+        Proxy proxy;
+        SocketAddress socketAddress;
+        int failedCount = 0;
+
+        InnerProxy(InetSocketAddress inetSocketAddress) {
+            socketAddress = inetSocketAddress;
+            proxy = new Proxy(Proxy.Type.HTTP, inetSocketAddress);
+        }
+
+        SocketAddress address() {
+            return socketAddress;
+        }
+
+        Proxy toProxy() {
+            return proxy;
+        }
+
+        int failed() {
+            return ++failedCount;
         }
     }
 }

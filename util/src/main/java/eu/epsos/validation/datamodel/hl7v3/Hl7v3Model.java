@@ -39,6 +39,14 @@ public enum Hl7v3Model {
     XCPD_PATIENT_LOCATION_QUERY_REQUEST("XCPD - Patient Location Query Request", ObjectType.XCPD_QUERY_REQUEST),
     XCPD_PATIENT_LOCATION_QUERY_RESPONSE("XCPD - Patient Location Query Response", ObjectType.XCPD_QUERY_RESPONSE);
 
+    private String name;
+    private ObjectType objectType;
+
+    Hl7v3Model(String s, ObjectType ot) {
+        name = s;
+        objectType = ot;
+    }
+
     public static Hl7v3Model checkModel(String model) {
         for (Hl7v3Model m : Hl7v3Model.values()) {
             if (model.equals(m.toString())) {
@@ -46,13 +54,6 @@ public enum Hl7v3Model {
             }
         }
         return null;
-    }
-    private String name;
-    private ObjectType objectType;
-
-    private Hl7v3Model(String s, ObjectType ot) {
-        name = s;
-        objectType = ot;
     }
 
     @Override

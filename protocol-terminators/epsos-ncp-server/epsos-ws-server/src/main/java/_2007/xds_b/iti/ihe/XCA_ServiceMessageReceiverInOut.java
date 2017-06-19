@@ -26,6 +26,16 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCA_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCA_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
  */
 /**
  * XCA_ServiceMessageReceiverInOut.java
@@ -68,8 +78,8 @@ import java.util.UUID;
  */
 public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.AbstractInOutMessageReceiver {
 
-    public static final Logger logger = LoggerFactory.getLogger(XCA_ServiceMessageReceiverInOut.class);
-    //
+    private static final Logger logger = LoggerFactory.getLogger(XCA_ServiceMessageReceiverInOut.class);
+    
     private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
@@ -89,9 +99,7 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
                             ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType.class,
                             ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.class);
         } catch (javax.xml.bind.JAXBException ex) {
-            System.err.println("Unable to create JAXBContext: "
-                    + ex.getMessage());
-            ex.printStackTrace(System.err);
+            logger.error("Unable to create JAXBContext: '{}'", ex.getMessage(), ex);
             Runtime.getRuntime().exit(-1);
         } finally {
             wsContext = jc;
@@ -284,16 +292,6 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
                 } else {
                     throw new java.lang.RuntimeException("method not found");
                 }
-
-                log.info("SOAP MESSAGE IS: " + XMLUtils.toDOM(envelope));
-                log.info("Submission Time is : " + eventLog.getEI_EventDateTime());
-                log.info("EventType is : " + eventLog.getEventType());
-                log.info("Event Outcome is: " + eventLog.getEI_EventOutcomeIndicator().toString());
-                log.info("KEYSTORE PATH: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH);
-                log.info("KEYSTORE PWD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD);
-                log.info("KEY ALIAS: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS);
-                log.info("PRIVATE KEY PASSWORD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
-                log.info("CLIENT CERTIFICATE: " + clientDN);
 
                 Date endTime = new Date();
                 newMsgContext.setEnvelope(envelope);

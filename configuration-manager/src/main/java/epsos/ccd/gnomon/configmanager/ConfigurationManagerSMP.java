@@ -2,18 +2,12 @@ package epsos.ccd.gnomon.configmanager;
 
 import eu.epsos.configmanager.database.HibernateUtil;
 import eu.epsos.configmanager.database.model.Property;
-
 import org.apache.commons.codec.binary.Base64;
 import org.hibernate.PropertyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.KeyStore;
@@ -170,6 +164,28 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
         LOGGER.info("Loading in memory the full database took: '{}'ms", total);
     }
 
+    public void updateCache(String key, String value) {
+        if (value != null) {
+            PropertySearchableContainer psc1 = new PropertySearchableContainer();
+            psc1.setSearchable(true);
+            psc1.setValue(value);
+            configuration.put(key, psc1);
+        }
+    }
+
+    public String queryProperty(String key) {
+        LOGGER.debug("Searching for '{}'", key);
+        String value = query(key);
+        if (value != null) {
+            PropertySearchableContainer psc = new PropertySearchableContainer();
+            psc.setSearchable(true);
+            psc.setValue(value);
+            configuration.put(key, psc);
+            return psc.getValue();
+        }
+        return null;
+    }
+
     /**
      * Obtain a property configuration property.
      *
@@ -181,6 +197,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
     public String getProperty(String key) {
         LOGGER.debug("Searching for '{}'", key);
         LOGGER.debug("Trying hashmap first");
+
         PropertySearchableContainer psc = configuration.get(key);
 
         // Ok, here two things: one is that the entry does not exist, the second
