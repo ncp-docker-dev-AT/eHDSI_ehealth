@@ -337,12 +337,36 @@
                         <content ID="surgeries">No medical history.</content>
                     </text>
                     <entry>
-                        <procedure classCode="PROC" moodCode="EVN" nullFlavor="NA">
+                        <!--<procedure classCode="PROC" moodCode="EVN" nullFlavor="NA">-->
+                        <!--<templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>-->
+                        <!--<templateId root="2.16.840.1.113883.10.20.1.29"/>-->
+                        <!--<id root="5f971af4-c818-41e5-87c7-602617079dd8"/>-->
+                        <!--<code code="NA" nullFlavor="NA"/>-->
+                        <!--<statusCode code="completed"/>-->
+                        <!--</procedure>-->
+                        <!--<procedure classCode="PROC" moodCode="EVN">-->
+                        <!--<templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>-->
+                        <!--<templateId root="2.16.840.1.113883.10.20.1.29"/>-->
+                        <!--<id nullFlavor="NA"/>-->
+                        <!--<code code="112802009" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"-->
+                        <!--displayName="FR_Cardiovascular surgical procedure"/>-->
+                        <!--<text>-->
+                        <!--<reference value="#surgeries"/>-->
+                        <!--</text>-->
+                        <!--<statusCode code="completed"/>-->
+                        <!--<effectiveTime value="20130201"/>-->
+                        <!--</procedure>-->
+                        <procedure classCode="PROC" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>
                             <templateId root="2.16.840.1.113883.10.20.1.29"/>
-                            <id root="5f971af4-c818-41e5-87c7-602617079dd8"/>
-                            <code code="NA" nullFlavor="NA"/>
+                            <id nullFlavor="NA"/>
+                            <code code="80286-8" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                                  displayName="History of Surgical procedures of cardiovascular system"/>
+                            <text>
+                                <reference value="#surgeries"/>
+                            </text>
                             <statusCode code="completed"/>
+                            <effectiveTime value="20130201"/>
                         </procedure>
                     </entry>
                 </section>
