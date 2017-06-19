@@ -20,7 +20,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.util.Constants;
-import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -47,11 +46,11 @@ public class TransformationService implements ITransformationService, TMConstant
         LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [START]");
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
         LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [END]");
-        try {
-            LOGGER.info("*****************PIVOT CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            LOGGER.info("*****************PIVOT CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         return responseStructure;
     }
 
@@ -140,11 +139,11 @@ public class TransformationService implements ITransformationService, TMConstant
         LOGGER.info("Translating OpenNCP CDA Document [START]");
         TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
         LOGGER.info("Translating OpenNCP CDA Document [END]");
-        try {
-            LOGGER.info("*****************Translate CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            LOGGER.info("*****************Translate CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         return responseStructure;
     }
 
