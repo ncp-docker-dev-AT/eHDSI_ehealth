@@ -99,7 +99,7 @@ public class XDRConstants {
         public static final String EVENT_CODE_NODE_REPRESENTATION_OPT_OUT = "1.3.6.1.4.1.12559.11.10.1.3.2.4.1.2";
         public static final String EVENT_CODE_NODE_NAME_OPT_IN = "Opt-in";
         public static final String EVENT_CODE_NODE_NAME_OPT_OUT = "Opt-out";
-        
+
         /* XDSDocumentEntry.PatientID */
         public static final String XDSDOCENTRY_PATID_SCHEME = "urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427";
         public static final String XDSDOCENTRY_PATID_STR = "XDSDocumentEntry.patientId";
@@ -108,29 +108,30 @@ public class XDRConstants {
         public static final String XDSDOC_UNIQUEID_STR = "XDSDocumentEntry.uniqueId";
         public static final String VERSION_INFO = "1.1";
         public static final String SRC_PATIENT_INFO_STR = "sourcePatientInfo";
+
         /* Type Code */
         public final class TypeCode {
 
             public static final String TYPE_CODE_SCHEME = IheConstants.TYPE_CODE_SCHEME;
 
             public final class EDispensation {
-                    public static final String DISPLAY_NAME = "eDispensation";
-                    public static final String NODE_REPRESENTATION = "60593-1";
-                    public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
+                public static final String DISPLAY_NAME = "eDispensation";
+                public static final String NODE_REPRESENTATION = "60593-1";
+                public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
             }
 
             public final class Consent {
-                    public static final String DISPLAY_NAME = "Privacy Policy Acknowledgement Document";
-                    public static final String NODE_REPRESENTATION = "57016-8";
-                    public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
-                }
-            
-            public final class Hcer {
-                    public static final String DISPLAY_NAME = "Summarization of Episode Note";
-                    public static final String NODE_REPRESENTATION = "34133-9";
-                    public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
-                }
+                public static final String DISPLAY_NAME = "Privacy Policy Acknowledgement Document";
+                public static final String NODE_REPRESENTATION = "57016-8";
+                public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
             }
+
+            public final class Hcer {
+                public static final String DISPLAY_NAME = "Summarization of Episode Note";
+                public static final String NODE_REPRESENTATION = "34133-9";
+                public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
+            }
+        }
 
         /* Format Code */
         public final class FormatCode {
@@ -170,8 +171,8 @@ public class XDRConstants {
                     public static final String CODING_SCHEME = "IHE PCC";
                 }
             }
-            
-             public final class Hcer {
+
+            public final class Hcer {
 
                 public final class EpsosPivotCoded {
 

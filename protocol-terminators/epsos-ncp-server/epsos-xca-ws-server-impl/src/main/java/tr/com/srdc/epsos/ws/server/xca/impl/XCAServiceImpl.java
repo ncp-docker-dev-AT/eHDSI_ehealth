@@ -26,13 +26,7 @@
  */
 package tr.com.srdc.epsos.ws.server.xca.impl;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
-import epsos.ccd.gnomon.auditmanager.EventActionCode;
-import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
-import epsos.ccd.gnomon.auditmanager.EventType;
-import epsos.ccd.gnomon.auditmanager.IHEEventType;
-import epsos.ccd.gnomon.auditmanager.TransactionName;
+import epsos.ccd.gnomon.auditmanager.*;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
@@ -1170,8 +1164,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
             try {
                 Document doc = epsosDoc.getDocument();
-
-                logger.debug("Client userID: " + eventLog.getSC_UserID());
+                logger.debug("Client userID: '{}'", eventLog.getSC_UserID());
 
                 if (doc != null) {
 
@@ -1180,7 +1173,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     /* Validate CDA epSOS Friendly */
                     cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(), CdaModel.obtainCdaModel(epsosDoc.getClassCode(), false), NcpSide.NCP_A);
 
-                    doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog); // transcode to Epsos Pivot
+                    // Transcode to Epsos Pivot
+                    doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
 
                     /* Validate CDA epSOS Pivot */
                     cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(), CdaModel.obtainCdaModel(epsosDoc.getClassCode(), true), NcpSide.NCP_A);
@@ -1202,7 +1196,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 textData.setOptimize(true);
                 document.addChild(textData);
 
-                logger.debug("Returning document " + documentId);
+                logger.debug("Returning document '{}'", documentId);
                 documentResponse.addChild(document);
                 documentReturned = true;
             } catch (Exception e) {

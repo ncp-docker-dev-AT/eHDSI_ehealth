@@ -20,13 +20,13 @@ CREATE TABLE code_system_version (
   full_name           VARCHAR(255),
   local_name          VARCHAR(255),
   previous_version_id BIGINT,
-  effective_date      TIMESTAMP,
-  release_date        TIMESTAMP,
+  effective_date      DATETIME,
+  release_date        DATETIME,
   status              VARCHAR(255),
-  status_date         TIMESTAMP,
+  status_date         DATETIME,
   description         VARCHAR(4000),
   copyright           VARCHAR(255),
-  SOURCE              VARCHAR(255),
+  source              VARCHAR(255),
   code_system_id      BIGINT,
   PRIMARY KEY (id)
 );
@@ -35,7 +35,7 @@ CREATE TABLE code_system_concept (
   id                     BIGINT AUTO_INCREMENT NOT NULL,
   code                   VARCHAR(255),
   status                 VARCHAR(255),
-  status_date            TIMESTAMP,
+  status_date            DATETIME,
   definition             VARCHAR(4000),
   code_system_version_id BIGINT,
   PRIMARY KEY (id)
@@ -45,10 +45,10 @@ CREATE TABLE designation (
   id                     BIGINT AUTO_INCREMENT NOT NULL,
   designation            VARCHAR(4000),
   language_code          VARCHAR(255),
-  TYPE                   VARCHAR(255),
+  type                   VARCHAR(255),
   is_preferred           BOOLEAN,
   status                 VARCHAR(255),
-  status_date            TIMESTAMP,
+  status_date            DATETIME,
   code_system_concept_id BIGINT,
   PRIMARY KEY (id)
 );
@@ -60,7 +60,7 @@ CREATE TABLE transcoding_association (
   source_concept_id          BIGINT,
   quality                    VARCHAR(255),
   status                     VARCHAR(255),
-  status_date                TIMESTAMP,
+  status_date                DATETIME,
   PRIMARY KEY (id)
 );
 
@@ -76,10 +76,10 @@ CREATE TABLE value_set (
 CREATE TABLE value_set_version (
   id                  BIGINT AUTO_INCREMENT NOT NULL,
   version_name        VARCHAR(255),
-  effective_date      TIMESTAMP,
-  release_date        TIMESTAMP,
+  effective_date      DATETIME,
+  release_date        DATETIME,
   status              VARCHAR(255),
-  status_date         TIMESTAMP,
+  status_date         DATETIME,
   description         VARCHAR(4000),
   previous_version_id BIGINT,
   value_set_id        BIGINT,

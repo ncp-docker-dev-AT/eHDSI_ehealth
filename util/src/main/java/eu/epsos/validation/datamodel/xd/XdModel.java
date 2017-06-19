@@ -59,18 +59,9 @@ public enum XdModel {
     private String name;
     private ObjectType objectType;
 
-    private XdModel(String s, ObjectType ot) {
+    XdModel(String s, ObjectType ot) {
         name = s;
         objectType = ot;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    public ObjectType getObjectType() {
-        return objectType;
     }
 
     public static XdModel checkModel(String model) {
@@ -169,5 +160,14 @@ public enum XdModel {
             }
         }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public ObjectType getObjectType() {
+        return objectType;
     }
 }

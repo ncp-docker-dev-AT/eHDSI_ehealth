@@ -347,9 +347,11 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         break;
                 }
                 String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
-                configManagerSMP.deleteKeyFromHashMap(key);
-                String value = configManagerSMP.getProperty(key);
+                String value = configManagerSMP.queryProperty(key);
                 if (value != null) {
+                    configManagerSMP.updateProperty(key, value);
+                    configManagerSMP.updateCache(key, value);
+
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
                     LOG.debug("Retrying the request with the new configurations: [" + value + "]");
@@ -499,14 +501,6 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     _messageContext, _returnEnv, env, idAssertion, trcAssertion,
                     this._getServiceClient().getOptions().getTo().getAddress(),
                     classCode); // Audit
-
-            LOG.info("Submission Time is : " + eventLog.getEI_EventDateTime());
-            LOG.info("EventType is : " + eventLog.getEventType());
-            LOG.info("Event Outcome is: " + eventLog.getEI_EventOutcomeIndicator().toString());
-            LOG.info("KEYSTORE PATH: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH);
-            LOG.info("KEYSTORE PWD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD);
-            LOG.info("KEY ALIAS: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS);
-            LOG.info("PRIVATE KEY PASSWORD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
             // TMP
             // Audit end time
             end = System.currentTimeMillis();
@@ -700,9 +694,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         break;
                 }
                 String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
-                configManagerSMP.deleteKeyFromHashMap(key);
-                String value = configManagerSMP.getProperty(key);
+                String value = configManagerSMP.queryProperty(key);
                 if (value != null) {
+                    configManagerSMP.updateProperty(key, value);
+                    configManagerSMP.updateCache(key, value);
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
                     LOG.debug("Retrying the request with the new configurations: [" + value + "]");

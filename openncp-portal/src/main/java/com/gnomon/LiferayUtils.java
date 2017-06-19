@@ -28,30 +28,32 @@ import java.text.SimpleDateFormat;
 
 public class LiferayUtils {
 
-    private static final Logger log = LoggerFactory.getLogger("LiferayUtils");
     public static final String LPPharmacistRole = "Pharmacist";
     public static final String LPDoctorRole = "Doctor";
     public static final String LPNurseRole = "Nurse";
     public static final String LPAdministratorRole = "Administrator";
     public static final String LPPatientRole = "Patient";
+    private static final Logger log = LoggerFactory.getLogger("LiferayUtils");
+
+    private LiferayUtils() {
+        //avoid instantiation
+    }
 
     private static PortletRequest getPortletRequest() {
+
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
-        PortletRequest portletRequest = (PortletRequest) externalContext
-                .getRequest();
-        return portletRequest;
+        return (PortletRequest) externalContext.getRequest();
     }
 
     public static String getFromPrefs(String key) {
         PortletPreferences prefs = getPortletRequest().getPreferences();
-        String value = prefs.getValue(key, "");
-        return value;
+        return prefs.getValue(key, "");
     }
 
     public static void storeToSession(String param, Object value) {
         try {
-            log.info("Try to store to session the parameter : " + param + " with value : " + value);
+            log.info("Try to store to session the parameter: '{}' with value: '{}'", param, value);
             FacesContext facesContext = FacesContext.getCurrentInstance();
             ExternalContext externalContext = facesContext.getExternalContext();
             PortletRequest portletRequest = (PortletRequest) externalContext
@@ -59,7 +61,8 @@ public class LiferayUtils {
             PortletSession prtSession = portletRequest.getPortletSession();
             prtSession.setAttribute(param, value, PortletSession.APPLICATION_SCOPE);
         } catch (Exception e) {
-            log.error("ERROR: While trying to store to session the parameter : " + param + " with value : " + value + ": " + e.getMessage());
+            log.error("ERROR: While trying to store to session the parameter: '{}' with value: '{}' - '{}'",
+                    param, value, e.getMessage(), e);
         }
     }
 
@@ -74,7 +77,7 @@ public class LiferayUtils {
     public static Object getFromSession(String param) {
         Object ret = null;
         try {
-            log.info("Try to get from session the parameter : " + param);
+            log.info("Try to get from session the parameter: '{}'", param);
             FacesContext facesContext = FacesContext.getCurrentInstance();
             ExternalContext externalContext = facesContext.getExternalContext();
             PortletRequest portletRequest = (PortletRequest) externalContext
@@ -82,7 +85,7 @@ public class LiferayUtils {
             PortletSession prtSession = portletRequest.getPortletSession();
             ret = prtSession.getAttribute(param, PortletSession.APPLICATION_SCOPE);
         } catch (Exception e) {
-            log.error("ERROR: While trying to get from session the parameter : " + param + ": " + e.getMessage());
+            log.error("ERROR: While trying to get from session the parameter: '{}' - '{}'", param, e.getMessage(), e);
         }
         return ret;
     }
@@ -112,36 +115,18 @@ public class LiferayUtils {
         try {
             hasRole = RoleLocalServiceUtil.hasUserRole(userId, companyId, rolename, false);
             if (hasRole) {
-                log.info("User has role: " + rolename);
+                log.info("User has role: '{}'", rolename);
             }
         } catch (PortalException e) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e));
+            log.error(ExceptionUtils.getStackTrace(e), e);
         } catch (SystemException e) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e));
+            log.error(ExceptionUtils.getStackTrace(e), e);
         }
-//		try {
-//			List<Role> userRoles = RoleServiceUtil. getUserRoles(userid);
-//
-//			for (int i=0;i<userRoles.size();i++)	{
-//				Role role = userRoles.get(i);
-//				log.info("ROLE: " + role.getName());
-//				if (role.getName().equalsIgnoreCase(rolename))
-//					return true;
-//			}
-//		} catch (PortalException e) {
-//			// TODO Auto-generated catch block
-//			log.error(ExceptionUtils.getStackTrace(e));
-//		} catch (SystemException e) {
-//			// TODO Auto-generated catch block
-//			log.error(ExceptionUtils.getStackTrace(e));
-//		}
         return hasRole;
     }
 
     public static DateFormat getPortalUserDateFormat() {
-        User user = null;
+        User user;
         DateFormat df = null;
         PortletRequest portletRequest = getPortletRequest();
         try {
@@ -188,7 +173,7 @@ public class LiferayUtils {
             Class.forName(driverClassName);
             conn = DriverManager.getConnection(url, username, password);
         } catch (Exception e) {
-            log.error("Error getting session");
+            log.error("Error getting session: '{}'", e.getMessage(), e);
         }
         return conn;
     }
@@ -199,7 +184,6 @@ public class LiferayUtils {
         try {
             user = PortalUtil.getUser(portletRequest);
         } catch (PortalException e1) {
-            // TODO Auto-generated catch block
             log.error(ExceptionUtils.getStackTrace(e1));
         } catch (SystemException ex) {
             log.error(null, ex);
@@ -213,10 +197,8 @@ public class LiferayUtils {
         try {
             company = PortalUtil.getCompany(portletRequest);
         } catch (PortalException e1) {
-            // TODO Auto-generated catch block
             log.error(ExceptionUtils.getStackTrace(e1));
         } catch (SystemException e1) {
-            // TODO Auto-generated catch block
             log.error(ExceptionUtils.getStackTrace(e1));
         }
         return company;
@@ -224,9 +206,7 @@ public class LiferayUtils {
 
     public static String getPortalLanguage() {
         PortletRequest portletRequest = getPortletRequest();
-        String lang = portletRequest.getLocale().getLanguage() + "-"
-                + portletRequest.getLocale().getCountry();
-        return lang;
+        return portletRequest.getLocale().getLanguage() + "-" + portletRequest.getLocale().getCountry();
     }
 
     /**
@@ -252,5 +232,4 @@ public class LiferayUtils {
         PortletRequest request = ((PortletRequest) (FacesContext.getCurrentInstance().getExternalContext().getRequest()));
         return request.isUserInRole("administrator");
     }
-
 }

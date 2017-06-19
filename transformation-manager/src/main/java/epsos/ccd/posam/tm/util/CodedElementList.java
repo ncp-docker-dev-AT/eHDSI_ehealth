@@ -38,20 +38,6 @@ import java.util.HashMap;
 public class CodedElementList implements InitializingBean, TMConstants {
 
     private static final Logger log = LoggerFactory.getLogger(CodedElementList.class);
-
-    private boolean isInitialized = false;
-
-    /**
-     * path to xml file with Coded Element List
-     */
-    private String codedElementListPath;
-
-    /**
-     * true means configurable Element identification is used; false means no
-     */
-    private boolean configurableElementIdentification;
-
-    // collections of CodedElementListItem for CDA document types
     /**
      * Collection of Elements contained in Patient Summary CDA document (level
      * 3)
@@ -62,37 +48,41 @@ public class CodedElementList implements InitializingBean, TMConstants {
      * document (level 1 with pdf)
      */
     private static Collection<CodedElementListItem> patientSummaryl1;
-
     /**
      * Collection of Elements contained in header of ePrescription CDA document
      * (level 1 with pdf)
      */
     private static Collection<CodedElementListItem> ePrescriptionl1;
 
+    // collections of CodedElementListItem for CDA document types
     /**
      * Collection of Elements contained in ePrescription CDA document (level 3)
      */
     private static Collection<CodedElementListItem> ePrescriptionl3;
-
     /**
      * Collection of Elements contained in eDispensation CDA document (level 3)
      */
     private static Collection<CodedElementListItem> eDispensationl1;
-
     /**
      * Collection of Elements contained in header of eDispensation CDA document
      * (level 1 with pdf)
      */
     private static Collection<CodedElementListItem> eDispensationl3;
-
     private static Collection<CodedElementListItem> hcerl3;
     private static Collection<CodedElementListItem> hcerl1;
     private static Collection<CodedElementListItem> mrol3;
     private static Collection<CodedElementListItem> mrol1;
-
     private static CodedElementList instance = null;
-
     private static HashMap<String, Collection<CodedElementListItem>> hmDocAndLists = new HashMap<String, Collection<CodedElementListItem>>();
+    private boolean isInitialized = false;
+    /**
+     * path to xml file with Coded Element List
+     */
+    private String codedElementListPath;
+    /**
+     * true means configurable Element identification is used; false means no
+     */
+    private boolean configurableElementIdentification;
 
     private CodedElementList() {
     }
@@ -102,10 +92,6 @@ public class CodedElementList implements InitializingBean, TMConstants {
             instance = new CodedElementList();
         }
         return instance;
-    }
-
-    public void setCodedElementListPath(String codedElementListPath) {
-        this.codedElementListPath = codedElementListPath;
     }
 
     public boolean isConfigurableElementIdentification() {
@@ -119,6 +105,10 @@ public class CodedElementList implements InitializingBean, TMConstants {
 
     public String getCodedElementListPath() {
         return codedElementListPath;
+    }
+
+    public void setCodedElementListPath(String codedElementListPath) {
+        this.codedElementListPath = codedElementListPath;
     }
 
     public Collection<CodedElementListItem> getPatientSummaryl3() {
@@ -146,10 +136,10 @@ public class CodedElementList implements InitializingBean, TMConstants {
     }
 
     public void afterPropertiesSet() throws Exception {
+
         // read xml file (coded_element_list.xml)
         if (configurableElementIdentification && !isInitialized) {
-            log
-                    .info("Coded Element List - configurableElementIdentification USED");
+            log.info("Coded Element List - configurableElementIdentification USED");
             Document doc = XmlUtil.getDocument(new File(codedElementListPath), true);
             log.info("Coded Element List - read from xml BEGIN ");
 
@@ -243,7 +233,7 @@ public class CodedElementList implements InitializingBean, TMConstants {
                                                      Collection<CodedElementListItem> collection) {
         String usage = docTypeElement.getTextContent();
         if (collection == null) {
-            collection = new ArrayList<CodedElementListItem>();
+            collection = new ArrayList<>();
         }
         try {
             if (isNeeded(usage)) {
@@ -270,7 +260,7 @@ public class CodedElementList implements InitializingBean, TMConstants {
                 }
             }
         } catch (Exception e) {
-            log.error("", e);
+            log.error("Exception: '{}'", e.getMessage(), e);
         }
         return collection;
     }

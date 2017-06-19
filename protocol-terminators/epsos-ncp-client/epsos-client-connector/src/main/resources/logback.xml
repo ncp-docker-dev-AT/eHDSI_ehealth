@@ -2,7 +2,6 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <!--pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern-->
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </layout>
     </appender>
@@ -11,8 +10,7 @@
         <file>${catalina.base}/logs/openncp-client-connector.log</file>
         <append>true</append>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            <!--pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern-->
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -21,6 +19,10 @@
             <jndiLocation>java:comp/env/jdbc/LOGS</jndiLocation>
         </connectionSource>
     </appender>
+
+    <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
 
     <logger name="tr.com.srdc.epsos.ws.xca.client" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
@@ -57,15 +59,16 @@
         <appender-ref ref="DB"/>
     </logger>
 
-    <!--<logger name="epsos.ccd.posam.tsam.service" level="DEBUG" additivity="false">-->
-    <!--<appender-ref ref="FILE"/>-->
-    <!--&lt;!&ndash;<appender-ref ref="DB"/>&ndash;&gt;-->
-    <!--</logger>-->
+    <logger name="epsos.ccd.posam.tsam.service" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
 
-    <!--<logger name="epsos.ccd.posam.tm.service" level="DEBUG" additivity="false">-->
-    <!--<appender-ref ref="FILE"/>-->
-    <!--&lt;!&ndash;<appender-ref ref="DB"/>&ndash;&gt;-->
-    <!--</logger>-->
+    <logger name="epsos.ccd.posam.tm.service" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+    <logger name="eu.epsos.util.EvidenceUtils" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

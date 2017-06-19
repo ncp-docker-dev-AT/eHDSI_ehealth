@@ -1,7 +1,7 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://ws.mb.validator.gazelle.ihe.net"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-                  name="AuditMessageValidationWSService" targetNamespace="http://ws.mb.validator.gazelle.ihe.net">
+                  name="ModelBasedValidationWSService" targetNamespace="http://ws.mb.validator.gazelle.ihe.net">
     <wsdl:types>
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.mb.validator.gazelle.ihe.net"
                    attributeFormDefault="unqualified" elementFormDefault="unqualified"
@@ -98,7 +98,7 @@
         <wsdl:part element="tns:validateDocument" name="parameters">
         </wsdl:part>
     </wsdl:message>
-    <wsdl:portType name="AuditMessageValidationWS">
+    <wsdl:portType name="ModelBasedValidationWS">
         <wsdl:operation name="validateDocument">
             <wsdl:input message="tns:validateDocument" name="validateDocument">
             </wsdl:input>
@@ -130,7 +130,7 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:portType>
-    <wsdl:binding name="AuditMessageValidationWSServiceSoapBinding" type="tns:AuditMessageValidationWS">
+    <wsdl:binding name="ModelBasedValidationWSServiceSoapBinding" type="tns:ModelBasedValidationWS">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="validateDocument">
             <soap:operation soapAction="" style="document"/>
@@ -178,10 +178,10 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-    <wsdl:service name="AuditMessageValidationWSService">
-        <wsdl:port binding="tns:AuditMessageValidationWSServiceSoapBinding" name="AuditMessageValidationWSPort">
+    <wsdl:service name="ModelBasedValidationWSService">
+        <wsdl:port binding="tns:ModelBasedValidationWSServiceSoapBinding" name="ModelBasedValidationWSPort">
             <soap:address
-                    location="https://gazelle.ihe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS"/>
+                    location="https://gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

@@ -74,8 +74,6 @@ public class EpsosXSLTransformer {
 
         try {
             URL xslUrl = this.getClass().getResource(xsl);
-            //Paths.get(getClass().getClassLoader().getResource("fileTest.txt").toURI());
-            //InputStream xslStream = this.getClass().getResourceAsStream(xsl);
             InputStream xslStream = getClass().getClassLoader().getResourceAsStream("classpath*:" + xsl);
 
             String systemId = xslUrl.toExternalForm();

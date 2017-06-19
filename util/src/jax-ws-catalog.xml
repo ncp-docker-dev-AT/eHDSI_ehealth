@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
-    <system systemId="https://gazelle.ihe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS?wsdl"
-            uri="wsdl/gazelle.ihe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS.wsdl"/>
-    <system systemId="https://gazelle.ihe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl"
-            uri="wsdl/gazelle.ihe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS.wsdl"/>
-    <system systemId="https://gazelle.ihe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl"
-            uri="wsdl/gazelle.ihe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS.wsdl"/>
-    <system systemId="https://gazelle.ihe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator?wsdl"
-            uri="wsdl/gazelle.ihe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator.wsdl"/>
-    <system systemId="https://gazelle.ihe.net/GazelleHL7v2Validator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl"
-            uri="wsdl/gazelle.ihe.net/GazelleHL7v2Validator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS.wsdl"/>
+    <system systemId="https://gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl"
+            uri="wsdl/gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS.wsdl"/>
+    <system systemId="https://gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl"
+            uri="wsdl/gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS.wsdl"/>
+    <system systemId="https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS?wsdl"
+            uri="wsdl/gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS.wsdl"/>
+    <system systemId="https://gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl"
+            uri="wsdl/gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS.wsdl"/>
+    <system systemId="https://gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator?wsdl"
+            uri="wsdl/gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator.wsdl"/>
+    <system systemId="https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator?wsdl"
+            uri="wsdl/gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator.wsdl"/>
 </catalog>

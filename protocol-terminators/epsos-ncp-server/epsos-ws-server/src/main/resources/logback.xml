@@ -16,6 +16,10 @@
         </encoder>
     </appender>
 
+    <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
         <connectionSource class="ch.qos.logback.core.db.JNDIConnectionSource">
             <jndiLocation>java:comp/env/jdbc/LOGS</jndiLocation>
