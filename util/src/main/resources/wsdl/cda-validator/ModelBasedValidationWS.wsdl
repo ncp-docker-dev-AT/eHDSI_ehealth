@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://ws.mb.validator.gazelle.ihe.net"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
                   name="ModelBasedValidationWSService" targetNamespace="http://ws.mb.validator.gazelle.ihe.net">
@@ -181,7 +181,7 @@
     <wsdl:service name="ModelBasedValidationWSService">
         <wsdl:port binding="tns:ModelBasedValidationWSServiceSoapBinding" name="ModelBasedValidationWSPort">
             <soap:address
-                    location="https://gazelle.ihe.net/GazelleHL7v2Validator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS"/>
+                    location="https://gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

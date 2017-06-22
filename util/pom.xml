@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>2.5.1-SNAPSHOT</version>
+        <version>2.5.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>openncp-util</artifactId>
@@ -118,6 +118,8 @@
                 <version>2.3</version>
                 <executions>
                     <execution>
+                        <id>Assertions - Validator</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
@@ -125,26 +127,20 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
+                            <wsdlLocation>
+                                https://gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
+                            </wsdlLocation>
                             <wsdlFiles>
-                                <wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/GazelleObjectValidatorWS.xml
+                                <wsdlFile>
+                                    ${basedir}/src/main/resources/wsdl/assertion-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <wsdlLocation>
-                                https://gazelle.ihe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator?wsdl
-                            </wsdlLocation>
-                            <staleFile>${project.build.directory}/jaxws/stale/GazelleObjectValidatorWS.stale</staleFile>
-                            <verbose>false</verbose>
-                            <sourceDestDir>${project.build.directory}/generated-sources/jaxws-ihevalidators
-                            </sourceDestDir>
-                            <xnocompile>true</xnocompile>
-                            <verbose>false</verbose>
-                            <extension>true</extension>
-                            <catalog>${basedir}/src/jax-ws-catalog.xml</catalog>
+                            <packageName>net.ihe.gazelle.assertion</packageName>
                         </configuration>
-                        <id>wsimport-generate-GazelleObjectValidatorWS</id>
-                        <phase>generate-sources</phase>
                     </execution>
                     <execution>
+                        <id>AuditMessage - Validator</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
@@ -152,26 +148,20 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
+                            <wsdlLocation>
+                                https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS?wsdl
+                            </wsdlLocation>
                             <wsdlFiles>
-                                <wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/GazelleHL7v3ValidationWS.xml
+                                <wsdlFile>
+                                    ${basedir}/src/main/resources/wsdl/audit-validator/AuditMessageValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <wsdlLocation>
-                                https://gazelle.ihe.net/GazelleHL7v2Validator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
-                            </wsdlLocation>
-                            <staleFile>${project.build.directory}/jaxws/stale/HL7v3ValidatorWS.stale</staleFile>
-                            <verbose>false</verbose>
-                            <sourceDestDir>${project.build.directory}/generated-sources/jaxws-ihevalidators
-                            </sourceDestDir>
-                            <xnocompile>true</xnocompile>
-                            <verbose>false</verbose>
-                            <extension>true</extension>
-                            <catalog>${basedir}/src/jax-ws-catalog.xml</catalog>
+                            <packageName>net.ihe.gazelle.audit</packageName>
                         </configuration>
-                        <id>wsimport-generate-HL7v3ValidatorWS</id>
-                        <phase>generate-sources</phase>
                     </execution>
                     <execution>
+                        <id>Model-Based CDA Validator</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
@@ -179,27 +169,20 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <packageName>net.ihe.gazelle.xd</packageName>
+                            <wsdlLocation>
+                                https://gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
+                            </wsdlLocation>
                             <wsdlFiles>
-                                <wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/XDSMetadataValidatorWS.xml
+                                <wsdlFile>
+                                    ${basedir}/src/main/resources/wsdl/cda-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <wsdlLocation>
-                                https://gazelle.ihe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
-                            </wsdlLocation>
-                            <staleFile>${project.build.directory}/jaxws/stale/XDValidatorWS.stale</staleFile>
-                            <verbose>false</verbose>
-                            <sourceDestDir>${project.build.directory}/generated-sources/jaxws-ihevalidators
-                            </sourceDestDir>
-                            <xnocompile>true</xnocompile>
-                            <verbose>false</verbose>
-                            <extension>true</extension>
-                            <catalog>${basedir}/src/jax-ws-catalog.xml</catalog>
+                            <packageName>net.ihe.gazelle.cda</packageName>
                         </configuration>
-                        <id>wsimport-generate-XDValidatorWS</id>
-                        <phase>generate-sources</phase>
                     </execution>
                     <execution>
+                        <id>TLS certificate Validator</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
@@ -207,27 +190,20 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <packageName>net.ihe.gazelle.am</packageName>
+                            <wsdlLocation>
+                                https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator?wsdl
+                            </wsdlLocation>
                             <wsdlFiles>
-                                <wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/AuditMessageValidatorWS.xml
+                                <wsdlFile>
+                                    ${basedir}/src/main/resources/wsdl/certificate-validator/CertificateValidator.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <wsdlLocation>
-                                https://gazelle.ihe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS?wsdl
-                            </wsdlLocation>
-                            <staleFile>${project.build.directory}/jaxws/stale/XDValidatorWS.stale</staleFile>
-                            <verbose>false</verbose>
-                            <sourceDestDir>${project.build.directory}/generated-sources/jaxws-ihevalidators
-                            </sourceDestDir>
-                            <xnocompile>true</xnocompile>
-                            <verbose>false</verbose>
-                            <extension>true</extension>
-                            <catalog>${basedir}/src/jax-ws-catalog.xml</catalog>
+                            <packageName>net.ihe.gazelle.certificate</packageName>
                         </configuration>
-                        <id>wsimport-generate-AuditMessagesValidatorWS</id>
-                        <phase>generate-sources</phase>
                     </execution>
                     <execution>
+                        <id>Schematron - Validator</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
@@ -235,34 +211,208 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <packageName>net.ihe.gazelle.document</packageName>
-                            <wsdlFiles>
-                                <wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/CDAValidatorWS.xml</wsdlFile>
-                            </wsdlFiles>
                             <wsdlLocation>
-                                https://gazelle.ihe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
+                                https://gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator?wsdl
                             </wsdlLocation>
-                            <staleFile>${project.build.directory}/jaxws/stale/CDAValidatorWS.stale</staleFile>
-                            <verbose>false</verbose>
-                            <sourceDestDir>${project.build.directory}/generated-sources/jaxws-ihevalidators
-                            </sourceDestDir>
-                            <xnocompile>true</xnocompile>
-                            <verbose>false</verbose>
-                            <extension>true</extension>
-                            <catalog>${basedir}/src/jax-ws-catalog.xml</catalog>
+                            <wsdlFiles>
+                                <wsdlFile>
+                                    ${basedir}/src/main/resources/wsdl/schematron-validator/GazelleObjectValidator.wsdl
+                                </wsdlFile>
+                            </wsdlFiles>
+                            <packageName>net.ihe.gazelle.schematron</packageName>
                         </configuration>
-                        <id>wsimport-generate-CDAValidatorWS</id>
+                    </execution>
+                    <execution>
+                        <id>Model-based XDS Validator</id>
                         <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <vmArgs>
+                                <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
+                            </vmArgs>
+                            <wsdlLocation>
+                                https://gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
+                            </wsdlLocation>
+                            <wsdlFiles>
+                                <wsdlFile>
+                                    ${basedir}/src/main/resources/wsdl/xds-validator/ModelBasedValidationWS.wsdl
+                                </wsdlFile>
+                            </wsdlFiles>
+                            <packageName>net.ihe.gazelle.xds</packageName>
+                        </configuration>
                     </execution>
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>javax.xml</groupId>
-                        <artifactId>webservices-api</artifactId>
-                        <version>${webservices-api.version}</version>
+                        <groupId>com.sun.xml.ws</groupId>
+                        <artifactId>jaxws-rt</artifactId>
+                        <version>2.2.8</version>
+                    </dependency>
+                    <!-- to compile xjc-generated sources -->
+                    <dependency>
+                        <groupId>org.jvnet.jaxb2_commons</groupId>
+                        <artifactId>jaxb2-basics-runtime</artifactId>
+                        <version>0.6.4</version>
                     </dependency>
                 </dependencies>
             </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.jvnet.jax-ws-commons</groupId>-->
+            <!--<artifactId>jaxws-maven-plugin</artifactId>-->
+            <!--<version>2.3</version>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<goals>-->
+            <!--<goal>wsimport</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+            <!--<vmArgs>-->
+            <!--<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>-->
+            <!--</vmArgs>-->
+            <!--<wsdlFiles>-->
+            <!--<wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/GazelleObjectValidatorWS.xml-->
+            <!--</wsdlFile>-->
+            <!--</wsdlFiles>-->
+            <!--<wsdlLocation>-->
+            <!--https://gazelle.ihe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator?wsdl-->
+            <!--</wsdlLocation>-->
+            <!--<staleFile>${project.build.directory}/jaxws/stale/GazelleObjectValidatorWS.stale</staleFile>-->
+            <!--<verbose>false</verbose>-->
+            <!--<sourceDestDir>${project.build.directory}/generated-sources/jaxws-ihevalidators-->
+            <!--</sourceDestDir>-->
+            <!--<xnocompile>true</xnocompile>-->
+            <!--<verbose>false</verbose>-->
+            <!--<extension>true</extension>-->
+            <!--<catalog>${basedir}/src/jax-ws-catalog.xml</catalog>-->
+            <!--</configuration>-->
+            <!--<id>wsimport-generate-GazelleObjectValidatorWS</id>-->
+            <!--<phase>generate-sources</phase>-->
+            <!--</execution>-->
+
+            <!--<execution>-->
+            <!--<goals>-->
+            <!--<goal>wsimport</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+            <!--<vmArgs>-->
+            <!--<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>-->
+            <!--</vmArgs>-->
+            <!--<wsdlFiles>-->
+            <!--<wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/GazelleHL7v3ValidationWS.xml-->
+            <!--</wsdlFile>-->
+            <!--</wsdlFiles>-->
+            <!--<wsdlLocation>-->
+            <!--https://gazelle.ihe.net/GazelleHL7v2Validator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl-->
+            <!--</wsdlLocation>-->
+            <!--<staleFile>${project.build.directory}/jaxws/stale/HL7v3ValidatorWS.stale</staleFile>-->
+            <!--<verbose>false</verbose>-->
+            <!--<sourceDestDir>${project.build.directory}/generated-sources/jaxws-ihevalidators-->
+            <!--</sourceDestDir>-->
+            <!--<xnocompile>true</xnocompile>-->
+            <!--<verbose>false</verbose>-->
+            <!--<extension>true</extension>-->
+            <!--<catalog>${basedir}/src/jax-ws-catalog.xml</catalog>-->
+            <!--</configuration>-->
+            <!--<id>wsimport-generate-HL7v3ValidatorWS</id>-->
+            <!--<phase>generate-sources</phase>-->
+            <!--</execution>-->
+
+            <!--<execution>-->
+            <!--<goals>-->
+            <!--<goal>wsimport</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+            <!--<vmArgs>-->
+            <!--<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>-->
+            <!--</vmArgs>-->
+            <!--<packageName>net.ihe.gazelle.xd</packageName>-->
+            <!--<wsdlFiles>-->
+            <!--<wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/XDSMetadataValidatorWS.xml-->
+            <!--</wsdlFile>-->
+            <!--</wsdlFiles>-->
+            <!--<wsdlLocation>-->
+            <!--https://gazelle.ihe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl-->
+            <!--</wsdlLocation>-->
+            <!--<staleFile>${project.build.directory}/jaxws/stale/XDValidatorWS.stale</staleFile>-->
+            <!--<verbose>false</verbose>-->
+            <!--<sourceDestDir>${project.build.directory}/generated-sources/jaxws-ihevalidators-->
+            <!--</sourceDestDir>-->
+            <!--<xnocompile>true</xnocompile>-->
+            <!--<verbose>false</verbose>-->
+            <!--<extension>true</extension>-->
+            <!--<catalog>${basedir}/src/jax-ws-catalog.xml</catalog>-->
+            <!--</configuration>-->
+            <!--<id>wsimport-generate-XDValidatorWS</id>-->
+            <!--<phase>generate-sources</phase>-->
+            <!--</execution>-->
+
+            <!--<execution>-->
+            <!--<goals>-->
+            <!--<goal>wsimport</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+            <!--<vmArgs>-->
+            <!--<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>-->
+            <!--</vmArgs>-->
+            <!--<packageName>net.ihe.gazelle.am</packageName>-->
+            <!--<wsdlFiles>-->
+            <!--<wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/AuditMessageValidatorWS.xml-->
+            <!--</wsdlFile>-->
+            <!--</wsdlFiles>-->
+            <!--<wsdlLocation>-->
+            <!--https://gazelle.ihe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS?wsdl-->
+            <!--</wsdlLocation>-->
+            <!--<staleFile>${project.build.directory}/jaxws/stale/XDValidatorWS.stale</staleFile>-->
+            <!--<verbose>false</verbose>-->
+            <!--<sourceDestDir>${project.build.directory}/generated-sources/jaxws-ihevalidators-->
+            <!--</sourceDestDir>-->
+            <!--<xnocompile>true</xnocompile>-->
+            <!--<verbose>false</verbose>-->
+            <!--<extension>true</extension>-->
+            <!--<catalog>${basedir}/src/jax-ws-catalog.xml</catalog>-->
+            <!--</configuration>-->
+            <!--<id>wsimport-generate-AuditMessagesValidatorWS</id>-->
+            <!--<phase>generate-sources</phase>-->
+            <!--</execution>-->
+
+            <!--<execution>-->
+            <!--<goals>-->
+            <!--<goal>wsimport</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+            <!--<vmArgs>-->
+            <!--<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>-->
+            <!--</vmArgs>-->
+            <!--<packageName>net.ihe.gazelle.document</packageName>-->
+            <!--<wsdlFiles>-->
+            <!--<wsdlFile>${basedir}/src/main/resources/gazelle.wsdls/CDAValidatorWS.xml</wsdlFile>-->
+            <!--</wsdlFiles>-->
+            <!--<wsdlLocation>-->
+            <!--https://gazelle.ihe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl-->
+            <!--</wsdlLocation>-->
+            <!--<staleFile>${project.build.directory}/jaxws/stale/CDAValidatorWS.stale</staleFile>-->
+            <!--<verbose>false</verbose>-->
+            <!--<sourceDestDir>${project.build.directory}/generated-sources/jaxws-ihevalidators-->
+            <!--</sourceDestDir>-->
+            <!--<xnocompile>true</xnocompile>-->
+            <!--<verbose>false</verbose>-->
+            <!--<extension>true</extension>-->
+            <!--<catalog>${basedir}/src/jax-ws-catalog.xml</catalog>-->
+            <!--</configuration>-->
+            <!--<id>wsimport-generate-CDAValidatorWS</id>-->
+            <!--<phase>generate-sources</phase>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--<dependencies>-->
+            <!--<dependency>-->
+            <!--<groupId>javax.xml</groupId>-->
+            <!--<artifactId>webservices-api</artifactId>-->
+            <!--<version>${webservices-api.version}</version>-->
+            <!--</dependency>-->
+            <!--</dependencies>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 </project>

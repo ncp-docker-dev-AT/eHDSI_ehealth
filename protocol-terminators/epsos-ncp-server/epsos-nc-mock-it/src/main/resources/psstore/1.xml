@@ -194,7 +194,7 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <id root="af58c270-6f80-477a-ab05-47bcffbc62f7"/>
                                     <code code="419199007" codeSystem="2.16.840.1.113883.6.96"
-                                          codeSystemName="SNOMED CT" codeSystemVersion="July 2016"
+                                          codeSystemName="SNOMED CT" codeSystemVersion="2016-07"
                                           displayName="Allergy to substance"/>
                                     <text>
                                         <reference value="#noallergy"/>
@@ -203,9 +203,12 @@
                                     <effectiveTime>
                                         <low nullFlavor="UNK"/>
                                     </effectiveTime>
-                                    <value code="160244002" codeSystem="2.16.840.1.113883.6.96"
-                                           codeSystemName="SNOMED CT" codeSystemVersion="July 2016"
-                                           displayName="No known allergies" xsi:type="CD"/>
+                                    <value code="716186003" codeSystem="2.16.840.1.113883.6.96"
+                                           codeSystemName="SNOMED CT" codeSystemVersion="2016-07"
+                                           displayName="No known allergy" xsi:type="CD"/>
+                                    <!--<value code="160244002" codeSystem="2.16.840.1.113883.6.96"-->
+                                    <!--codeSystemName="SNOMED CT" codeSystemVersion="2016-07"-->
+                                    <!--displayName="No known allergies" xsi:type="CD"/>-->
                                     <participant nullFlavor="NA" typeCode="CSM">
                                         <participantRole classCode="MANU">
                                             <playingEntity classCode="MMAT" nullFlavor="NA">
@@ -237,7 +240,7 @@
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
                             <id root="ee9f61cb-5b8c-4f73-8ddc-e802cf5a44e8"/>
                             <code code="182904002" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
-                                  codeSystemVersion="July 2016" displayName="Drug treatment unknown">
+                                  codeSystemVersion="2016-07" displayName="Drug treatment unknown">
                                 <originalText>
                                     <reference value="#nomedicationdescription"/>
                                 </originalText>
@@ -312,7 +315,7 @@
                                         <high nullFlavor="UNK"/>
                                     </effectiveTime>
                                     <value code="160245001" codeSystem="2.16.840.1.113883.6.96"
-                                           codeSystemName="SNOMED CT" codeSystemVersion="July 2016"
+                                           codeSystemName="SNOMED CT" codeSystemVersion="2016-07"
                                            displayName="No current problems or disability" xsi:type="CD">
                                         <originalText>
                                             <reference value="#actnoproblem"/>

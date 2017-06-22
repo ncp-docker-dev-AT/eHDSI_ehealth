@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.cc;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
@@ -77,7 +58,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
          */
         final String methodName = "queryPatient";
         LoggingSlf4j.start(LOG, methodName);
-        String cc = Constants.COUNTRY_CODE;
 
         QueryPatientResponseDocument result = QueryPatientResponseDocument.Factory.newInstance();
 
@@ -154,7 +134,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         GenericDocumentCode tmpCode = arg0.getClassCode();
         tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
 
-        if (documentCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME) == false) {
+        if (!documentCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
             throw new RuntimeException("Unsupported Class Code scheme: " + documentCode.getSchema());
         }
 
@@ -225,15 +205,16 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         GenericDocumentCode tmpCode = arg0.getClassCode();
         tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
 
-        if (documentCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME) == false) {
+        if (!documentCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
             throw new RuntimeException("Unsupported Class Code scheme: " + documentCode.getSchema());
         }
 
         try {
-            DocumentResponse response = null;
+            DocumentResponse response;
             XDSDocument request = XdsDocumentDts.newInstance(xdsDocument);
             request.setClassCode(documentCode);
 
+            LOG.info("[ClientConnector retrieveDocument()] Document: '{}' homeCommunityId: '{}' targetLanguage: '{}'", request.getDocumentUniqueId(), homeCommunityId, targetLanguage);
             if (documentCode.getValue().equals(tr.com.srdc.epsos.util.Constants.PS_CLASSCODE)) {
                 response = PatientService.retrieve(request, homeCommunityId, countryCode, targetLanguage, hcpAssertion, trcAssertion);
             } else if (documentCode.getValue().equals(tr.com.srdc.epsos.util.Constants.EP_CLASSCODE)) {
@@ -287,7 +268,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
 
         try {
 
-            XdrResponse response = null;
+            XdrResponse response;
 
             /*  create Xdr request */
             SubmitDocument1 submitDocument1 = submitDocument.getSubmitDocument();
@@ -298,7 +279,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
 
             String classCode_node;
             GenericDocumentCode classCode = document.getClassCode();
-            if (classCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME) == false) {
+            if (!classCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
                 throw new RuntimeException("Unsupported Class Code scheme: " + classCode.getSchema());
             }
             classCode_node = classCode.getNodeRepresentation();

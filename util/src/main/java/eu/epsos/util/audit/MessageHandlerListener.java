@@ -4,6 +4,5 @@ import java.io.Serializable;
 
 public interface MessageHandlerListener {
 
-	public boolean handleMessage(Serializable message);
-	
+    boolean handleMessage(Serializable message);
 }

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://ws.pki.action.atna.gazelle.ihe.net"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  name="CertificateValidatorService" targetNamespace="http://ws.pki.action.atna.gazelle.ihe.net">
+    <wsdl:types>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.pki.action.atna.gazelle.ihe.net"
+                   attributeFormDefault="unqualified" elementFormDefault="unqualified"
+                   targetNamespace="http://ws.pki.action.atna.gazelle.ihe.net">
+            <xs:element name="about" type="tns:about"/>
+            <xs:element name="aboutResponse" type="tns:aboutResponse"/>
+            <xs:element name="getListOfValidators" type="tns:getListOfValidators"/>
+            <xs:element name="getListOfValidatorsResponse" type="tns:getListOfValidatorsResponse"/>
+            <xs:element name="validate" type="tns:validate"/>
+            <xs:element name="validateResponse" type="tns:validateResponse"/>
+            <xs:complexType name="about">
+                <xs:sequence/>
+            </xs:complexType>
+            <xs:complexType name="aboutResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="about" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="getListOfValidators">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="descriminator" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="getListOfValidatorsResponse">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="Validators" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="validate">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="certificatesInPEMFormat" type="xs:string"/>
+                    <xs:element minOccurs="0" name="type" type="xs:string"/>
+                    <xs:element name="checkRevocation" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="validateResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="DetailedResult" type="tns:certificateValidatorResult"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="certificateValidatorResult">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="errors" nillable="true"
+                                type="tns:certificateValidatorErrorTrace"/>
+                    <xs:element minOccurs="0" name="result" type="tns:certificateValidatorResultEnum"/>
+                    <xs:element minOccurs="0" name="validatedCertificates" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="warnings" nillable="true"
+                                type="tns:certificateValidatorErrorTrace"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="certificateValidatorErrorTrace">
+                <xs:complexContent>
+                    <xs:extension base="tns:certificateValidatorError">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="exceptionStackTrace" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:complexType name="certificateValidatorError">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="exceptionCause" type="tns:certificateValidatorError"/>
+                    <xs:element minOccurs="0" name="exceptionMessage" type="xs:string"/>
+                    <xs:element minOccurs="0" name="normMessage" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:simpleType name="certificateValidatorResultEnum">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="FAILED"/>
+                    <xs:enumeration value="PASSED"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="SOAPException" type="tns:SOAPException"/>
+            <xs:complexType name="SOAPException">
+                <xs:sequence>
+                    <xs:element name="message" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="about">
+        <wsdl:part element="tns:about" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="validate">
+        <wsdl:part element="tns:validate" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="aboutResponse">
+        <wsdl:part element="tns:aboutResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getListOfValidators">
+        <wsdl:part element="tns:getListOfValidators" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="validateResponse">
+        <wsdl:part element="tns:validateResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="SOAPException">
+        <wsdl:part element="tns:SOAPException" name="SOAPException">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getListOfValidatorsResponse">
+        <wsdl:part element="tns:getListOfValidatorsResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="CertificateValidator">
+        <wsdl:operation name="about">
+            <wsdl:input message="tns:about" name="about">
+            </wsdl:input>
+            <wsdl:output message="tns:aboutResponse" name="aboutResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getListOfValidators">
+            <wsdl:input message="tns:getListOfValidators" name="getListOfValidators">
+            </wsdl:input>
+            <wsdl:output message="tns:getListOfValidatorsResponse" name="getListOfValidatorsResponse">
+            </wsdl:output>
+            <wsdl:fault message="tns:SOAPException" name="SOAPException">
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="validate">
+            <wsdl:input message="tns:validate" name="validate">
+            </wsdl:input>
+            <wsdl:output message="tns:validateResponse" name="validateResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="CertificateValidatorServiceSoapBinding" type="tns:CertificateValidator">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="about">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="about">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="aboutResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getListOfValidators">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="getListOfValidators">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="getListOfValidatorsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SOAPException">
+                <soap:fault name="SOAPException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="validate">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="validate">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="validateResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="CertificateValidatorService">
+        <wsdl:port binding="tns:CertificateValidatorServiceSoapBinding" name="CertificateValidatorPort">
+            <soap:address
+                    location="https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

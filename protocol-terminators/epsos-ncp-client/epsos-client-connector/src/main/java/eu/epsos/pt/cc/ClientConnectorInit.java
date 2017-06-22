@@ -19,16 +19,16 @@
  */
 package eu.epsos.pt.cc;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+
 /**
  * ClientConnectorInit servlet.
- *
+ * <p>
  * This servlet is called at startup and set the environment
  * for security
  *
@@ -37,22 +37,21 @@ import tr.com.srdc.epsos.util.Constants;
  */
 public class ClientConnectorInit extends HttpServlet {
 
-    static Logger logger = LoggerFactory.getLogger(ConfigurationManagerService.class);
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorInit.class);
+
     @Override
     public void init() throws ServletException {
         super.init();
-       
-        logger.info("Initiating Client Connector");
-        
+
+        LOGGER.info("Initiating Client Connector");
+
         System.setProperty("javax.net.ssl.keyStore", Constants.SC_KEYSTORE_PATH);
         System.setProperty("javax.net.ssl.keyStorePassword", Constants.SC_KEYSTORE_PASSWORD);
         System.setProperty("javax.net.ssl.key.alias", Constants.SC_PRIVATEKEY_ALIAS);
         System.setProperty("javax.net.ssl.privateKeyPassword", Constants.SC_PRIVATEKEY_PASSWORD);
-        
+
         System.setProperty("javax.net.ssl.trustStore", Constants.TRUSTSTORE_PATH);
         System.setProperty("javax.net.ssl.trustStorePassword", Constants.TRUSTSTORE_PASSWORD);
-
+        //System.setProperty("http.nonProxyHosts", "127.0.0.1");
     }
-   
 }

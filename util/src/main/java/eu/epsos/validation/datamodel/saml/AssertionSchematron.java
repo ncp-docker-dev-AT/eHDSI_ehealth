@@ -33,6 +33,10 @@ public enum AssertionSchematron {
     EPSOS_TRC_ASSERTION("epSOS - TRC Assertion");
     private String name;
 
+    AssertionSchematron(String s) {
+        name = s;
+    }
+
     public static AssertionSchematron checkSchematron(String model) {
         for (AssertionSchematron s : AssertionSchematron.values()) {
             if (model.equals(s.toString())) {
@@ -40,10 +44,6 @@ public enum AssertionSchematron {
             }
         }
         return null;
-    }
-
-    private AssertionSchematron(String s) {
-        name = s;
     }
 
     @Override

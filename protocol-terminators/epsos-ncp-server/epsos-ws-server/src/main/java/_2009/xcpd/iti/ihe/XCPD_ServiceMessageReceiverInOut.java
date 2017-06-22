@@ -26,6 +26,11 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
  */
 /**
  * XCPD_ServiceMessageReceiverInOut.java
@@ -65,8 +70,8 @@ import java.util.UUID;
  */
 public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.AbstractInOutMessageReceiver {
 
-    public static final Logger logger = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
-    //
+    private static final Logger logger = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
+
     private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
@@ -83,9 +88,7 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
                     org.hl7.v3.PRPAIN201305UV02.class,
                     org.hl7.v3.PRPAIN201306UV02.class);
         } catch (javax.xml.bind.JAXBException ex) {
-            System.err.println("Unable to create JAXBContext: "
-                    + ex.getMessage());
-            ex.printStackTrace(System.err);
+            logger.error("Unable to create JAXBContext: '{}'", ex.getMessage(), ex);
             // Runtime.getRuntime().exit(-1);
         } finally {
             wsContext = jc;

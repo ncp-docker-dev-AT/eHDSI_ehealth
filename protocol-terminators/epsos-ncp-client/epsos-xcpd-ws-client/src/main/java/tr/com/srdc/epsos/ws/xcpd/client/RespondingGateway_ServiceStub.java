@@ -303,10 +303,11 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
                 ConfigurationManagerSMP configManagerSMP = ConfigurationManagerSMP.getInstance();
                 String key = this.countryCode.toLowerCase(Locale.ENGLISH) + ".PatientIdentificationService.WSE";
-                String value  = configManagerSMP.queryProperty(key);
+                String value = configManagerSMP.queryProperty(key);
                 if (value != null) {
-                    configManagerSMP.updateProperty(key,value);
-                    configManagerSMP.updateCache(key,value);
+                    configManagerSMP.updateProperty(key, value);
+                    configManagerSMP.updateCache(key, value);
+
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
                     LOG.debug("Retrying the request with the new configurations: [" + value + "]");
@@ -445,14 +446,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (Exception ex) {
                 LOG.error(null, ex);
             }
-
-            LOG.info("Submission Time is : " + eventLog.getEI_EventDateTime());
-            LOG.info("EventType is : " + eventLog.getEventType());
-            LOG.info("Event Outcome is: " + eventLog.getEI_EventOutcomeIndicator().toString());
-            LOG.info("KEYSTORE PATH: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH);
-            LOG.info("KEYSTORE PWD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD);
-            LOG.info("KEY ALIAS: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS);
-            LOG.info("PRIVATE KEY PASSWORD: " + tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
+            
             // Audit end time
             end = System.currentTimeMillis();
             LOG.info("XCPD AUDIT TIME: " + (end - start) / 1000.0);
