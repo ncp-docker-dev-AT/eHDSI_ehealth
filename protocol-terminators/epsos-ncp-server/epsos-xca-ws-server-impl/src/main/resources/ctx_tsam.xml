@@ -7,12 +7,12 @@
      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
      http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd">
 
-    <!--<bean id="placeholderConfig"
-        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location" value="file:tsam/tsam.properties">
-        </property>
+    <tx:annotation-driven transaction-manager="tsamTransactionManager"/>
+
+    <bean id="tsamTransactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="tsamSessionFactory"/>
     </bean>
-    -->
+
     <bean id="tsamConfig" class="epsos.ccd.posam.tsam.util.TsamConfiguration">
         <property name="translationLang" value="${translationLanguage}"/>
         <property name="transcodingLang" value="${transcodingLanguage}"/>
@@ -50,13 +50,6 @@
         </property>
     </bean>
 
-    <tx:annotation-driven transaction-manager="tsamTransactionManager"/>
-
-    <bean id="tsamTransactionManager"
-          class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-        <property name="sessionFactory" ref="tsamSessionFactory"/>
-    </bean>
-
     <bean id="epsos.ccd.posam.tsam.dao.ITsamDao" class="epsos.ccd.posam.tsam.dao.impl.TsamDao">
         <property name="sessionFactory" ref="tsamSessionFactory"/>
         <property name="config" ref="tsamConfig"/>
@@ -67,5 +60,4 @@
         <property name="dao" ref="epsos.ccd.posam.tsam.dao.ITsamDao"/>
         <property name="config" ref="tsamConfig"/>
     </bean>
-
 </beans>

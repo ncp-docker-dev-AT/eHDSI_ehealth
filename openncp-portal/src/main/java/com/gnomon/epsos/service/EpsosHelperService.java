@@ -2538,6 +2538,7 @@ public class EpsosHelperService {
             convertedcda = xlsClass.transformUsingStandardCDAXsl(input);
         } else {
             log.info("Transform the document using cdadisplay tool as this is epsos cda");
+            //log.info("CDA: '{}'", input);
             convertedcda = xlsClass.transform(input, lang, actionUrl);
         }
 

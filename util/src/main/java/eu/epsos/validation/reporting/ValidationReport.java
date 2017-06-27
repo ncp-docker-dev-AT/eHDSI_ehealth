@@ -53,11 +53,11 @@ public class ValidationReport {
 
         /* PRE-CONDITIONS VERIFICATION */
         if (!folder.exists()) {
-            LOG.error("The specified folder does not exists. (" + path + ")");
+            LOG.error("The specified folder does not exists. ({})", path);
             return null;
         }
         if (!folder.isDirectory()) {
-            LOG.error("The specified folder is not a folder. (" + path + ")");
+            LOG.error("The specified folder is not a folder. ({})", path);
             return null;
         }
         if (!folder.canRead()) {
@@ -154,19 +154,16 @@ public class ValidationReport {
             LOG.info("Not cleaning up the validation dir.");
             return;
         }
-
-        boolean success = true;
-
         if (!folder.exists()) {
-            LOG.error("The specified folder does not exists. (" + folder.getAbsolutePath() + ")");
+            LOG.error("The specified folder does not exists. ({})", folder.getAbsolutePath());
             return;
         }
         if (!folder.isDirectory()) {
-            LOG.error("The specified folder is not a folder. (" + folder.getAbsolutePath() + ")");
+            LOG.error("The specified folder is not a folder. ({})", folder.getAbsolutePath());
             return;
         }
         if (!folder.canRead()) {
-            LOG.error("Cannot read from specified folder. (" + folder.getAbsolutePath() + ")");
+            LOG.error("Cannot read from specified folder. ({})", folder.getAbsolutePath());
             return;
         }
 
@@ -182,7 +179,7 @@ public class ValidationReport {
     public static void cleanValidationDir(String path) {
         File folder = new File(path);
         if (!folder.isDirectory()) {
-            LOG.error("The specified folder is not a folder. (" + path + ")");
+            LOG.error("The specified folder is not a folder. ({})", path);
             return;
         }
         cleanValidationDir(folder);
@@ -210,9 +207,8 @@ public class ValidationReport {
         } else if (fileNameSplit.length == 3) {
             return fileNameSplit[1] + " [VALIDATOR: " + fileNameSplit[2].split(FILE_EXTENSION)[0] + ", STATUS: VALIDATION NOT PERFORMED]";
         } else {
-            LOG.error("The file name does not obey to the defined structure. (" + fileName + ")");
+            LOG.error("The file name does not obey to the defined structure. ({})", fileName);
             return null;
         }
-
     }
 }

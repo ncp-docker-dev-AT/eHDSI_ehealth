@@ -34,7 +34,7 @@ import java.util.*;
  */
 public class TransformationService implements ITransformationService, TMConstants, InitializingBean {
 
-    private static final Logger log = LoggerFactory.getLogger(TransformationService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransformationService.class);
 
     private ITerminologyService tsamApi = null;
     private HashMap<String, String> level1Type;
@@ -43,9 +43,14 @@ public class TransformationService implements ITransformationService, TMConstant
 
     public TMResponseStructure toEpSOSPivot(Document epSOSOriginalData) {
 
-        log.debug("toEpsosPivot BEGIN");
+        LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [START]");
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
-        log.debug("toEpsosPivot END");
+        LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [END]");
+//        try {
+//            LOGGER.info("*****************PIVOT CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         return responseStructure;
     }
 
@@ -61,10 +66,9 @@ public class TransformationService implements ITransformationService, TMConstant
      */
     public String getCDADocumentType(Document document) throws TMException, Exception {
 
-//		XPath xpath = XPathFactory.newInstance().newXPath();
-//		XPathExpression expr = xpath.compile(XPATH_CLINICALDOCUMENT_CODE);
-//		NodeList nodeList = (NodeList) expr.evaluate(document,
-//				XPathConstants.NODESET);
+        //		XPath xpath = XPathFactory.newInstance().newXPath();
+        //		XPathExpression expr = xpath.compile(XPATH_CLINICALDOCUMENT_CODE);
+        //		NodeList nodeList = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
         List<Node> nodeList = XmlUtil.getNodeList(document, XPATH_CLINICALDOCUMENT_CODE);
 
         // Document type code
@@ -73,7 +77,7 @@ public class TransformationService implements ITransformationService, TMConstant
         if (nodeList.size() == 1) {
             Element docTypeCodeElement = (Element) nodeList.get(0);
             docTypeCode = docTypeCodeElement.getAttribute(CODE);
-            log.debug("docTypeCode: '{}'", docTypeCode);
+            LOGGER.debug("docTypeCode: '{}'", docTypeCode);
             if (docTypeCode == null || docTypeCode.length() == 0) {
                 throw new TMException(TMError.ERROR_DOCUMENT_CODE_NOT_EXIST);
             } /*else if (!TMConfiguration.getInstance().getDocTypesCollection()
@@ -81,31 +85,30 @@ public class TransformationService implements ITransformationService, TMConstant
              throw new TMException(TMError.ERROR_DOCUMENT_CODE_UNKNOWN);
              }*/
         } else {
-            log.error("Problem obtaining document type code ! found /ClinicalDocument/code elements: '{}'", nodeList.size());
+            LOGGER.error("Problem obtaining document type code ! found /ClinicalDocument/code elements: '{}'", nodeList.size());
             throw new TMException(TMError.ERROR_DOCUMENT_CODE_NOT_EXIST);
         }
 
         // Document level (1 - unstructured or 3 - structured)
         boolean level3Doc = false;
         // check if structuredDocument
-//		XPathExpression expr2 = xpath.compile(XPATH_STRUCTUREDBODY);
-//		Node nodeStructuredBody = (Node) expr2.evaluate(document,
-//				XPathConstants.NODE);
+        //		XPathExpression expr2 = xpath.compile(XPATH_STRUCTUREDBODY);
+        //		Node nodeStructuredBody = (Node) expr2.evaluate(document, XPathConstants.NODE);
         Node nodeStructuredBody = XmlUtil.getNode(document, XPATH_STRUCTUREDBODY);
         ;
         if (nodeStructuredBody != null) {
-            log.debug("Found - '{}'", XPATH_STRUCTUREDBODY);
+            LOGGER.debug("Found - '{}'", XPATH_STRUCTUREDBODY);
             // LEVEL 3 document
             level3Doc = true;
         } else {
             // check if unstructured document
-            log.debug("Not Found - '{}'", XPATH_STRUCTUREDBODY);
-//			XPathExpression expr3 = xpath.compile(XPATH_NONXMLBODY);
-//			Node nodeNonXMLBody = (Node) expr3.evaluate(document,
-//					XPathConstants.NODE);
+            LOGGER.debug("Not Found - '{}'", XPATH_STRUCTUREDBODY);
+            // XPathExpression expr3 = xpath.compile(XPATH_NONXMLBODY);
+            // Node nodeNonXMLBody = (Node) expr3.evaluate(document,
+            // XPathConstants.NODE);
             Node nodeNonXMLBody = XmlUtil.getNode(document, XPATH_NONXMLBODY);
             if (nodeNonXMLBody != null) {
-                log.debug("Found - '{}'", NON_XML_BODY);
+                LOGGER.debug("Found - '{}'", NON_XML_BODY);
                 // LEVEL 1 document
                 level3Doc = false;
             } else {
@@ -127,14 +130,20 @@ public class TransformationService implements ITransformationService, TMConstant
             throw new TMException(new TmErrorCtx(TMError.ERROR_DOCUMENT_CODE_UNKNOWN, docTypeCode));
         }
 
-        log.debug("docTypeConstant is: '{}'", docTypeConstant);
+        LOGGER.debug("docTypeConstant is: '{}'", docTypeConstant);
         return docTypeConstant;
     }
 
     public TMResponseStructure translate(Document epSosCDA, String targetLanguageCode) {
-        log.debug("translate BEGIN");
+
+        LOGGER.info("Translating OpenNCP CDA Document [START]");
         TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
-        log.debug("translate END");
+        LOGGER.info("Translating OpenNCP CDA Document [END]");
+//        try {
+//            LOGGER.info("*****************Translate CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         return responseStructure;
     }
 
@@ -151,7 +160,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 status = STATUS_FAILURE;
                 errors.add(TMError.ERROR_NULL_INPUT_DOCUMENT);
                 responseStructure = new TMResponseStructure(inputDocument, status, errors, warnings);
-                log.error("Error, null input document!");
+                LOGGER.error("Error, null input document!");
                 return responseStructure;
             } else {
                 // validate schema
@@ -201,11 +210,11 @@ public class TransformationService implements ITransformationService, TMConstant
                     if (result == null || !result.isValid()) {
                         status = STATUS_FAILURE;
                         warnings.add(TMError.WARNING_INPUT_SCHEMATRON_VALIDATION_FAILED);
-                        log.error("Schematron validation error, input document is invalid!");
-                        log.error(result.toString());
+                        LOGGER.error("Schematron validation error, input document is invalid!");
+                        LOGGER.error(result.toString());
                     }
                 } else {
-                    log.info("Schematron validation disabled");
+                    LOGGER.info("Schematron validation disabled");
                 }
 
                 // transcode/translate document
@@ -214,8 +223,7 @@ public class TransformationService implements ITransformationService, TMConstant
                         namespaceNotAwareDoc, targetLanguageCode, errors,
                         warnings, cdaDocumentType);
 
-                Document finalDoc = XmlUtil
-                        .removeEmptyXmlns(namespaceNotAwareDoc);
+                Document finalDoc = XmlUtil.removeEmptyXmlns(namespaceNotAwareDoc);
 
                 if (config.isModelValidationEnabled()) {
                     ModelValidatorResult validateMDA = Validator.validateMDA(
@@ -239,19 +247,19 @@ public class TransformationService implements ITransformationService, TMConstant
                         warnings.add(TMError.WARNING_OUTPUT_SCHEMATRON_VALIDATION_FAILED);
                         responseStructure = new TMResponseStructure(finalDoc,
                                 status, errors, warnings);
-                        log.error("Schematron validation error, result document is invalid!");
-                        log.error(result.toString());
+                        LOGGER.error("Schematron validation error, result document is invalid!");
+                        LOGGER.error(result.toString());
                         return responseStructure;
                     }
                 } else {
-                    log.debug("Schematron validation disabled");
+                    LOGGER.debug("Schematron validation disabled");
                 }
 
                 // create & fill TMResponseStructure
                 responseStructure = new TMResponseStructure(finalDoc, status,
                         errors, warnings);
-                if (log.isInfoEnabled()) {
-                    log.info("TM result:\n" + responseStructure.toString());
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("TM result:\n" + responseStructure.toString());
                 }
             }
         } catch (TMException e) {
@@ -260,7 +268,7 @@ public class TransformationService implements ITransformationService, TMConstant
             responseStructure = new TMResponseStructure(inputDocument, status,
                     errors, warnings);
             // log ERROR
-            log.error(e.getReason().toString(), e);
+            LOGGER.error(e.getReason().toString(), e);
         } catch (Exception e) {
             // write ERROR to ResponseStructure
             status = STATUS_FAILURE;
@@ -268,7 +276,7 @@ public class TransformationService implements ITransformationService, TMConstant
             responseStructure = new TMResponseStructure(inputDocument, status,
                     errors, warnings);
             // log ERROR
-            log.error(TMError.ERROR_PROCESSING_ERROR.toString(), e);
+            LOGGER.error(TMError.ERROR_PROCESSING_ERROR.toString(), e);
         }
 
         // audit log
@@ -283,7 +291,7 @@ public class TransformationService implements ITransformationService, TMConstant
 
     private void writeAuditTrail(TMResponseStructure responseStructure) {
         if (config.isAuditTrailEnabled()) {
-            log.debug("Audit trail BEGIN");
+            LOGGER.debug("Audit trail BEGIN");
             try {
                 GregorianCalendar calendar = new GregorianCalendar();
                 calendar.setTime(new Date());
@@ -310,11 +318,11 @@ public class TransformationService implements ITransformationService, TMConstant
                         config.getAuditTrailFacility(), // the facility number according to log4j
                         config.getAuditTrailSeverity());// the severity of the message
             } catch (Exception e) {
-                log.error("Audit trial ERROR! ", e);
+                LOGGER.error("Audit trial ERROR! ", e);
             }
-            log.debug("Audit trail END");
+            LOGGER.debug("Audit trail END");
         } else {
-            log.debug("Audit trail DISABLED");
+            LOGGER.debug("Audit trail DISABLED");
         }
     }
 
@@ -333,13 +341,12 @@ public class TransformationService implements ITransformationService, TMConstant
     private String transcodeDocument(Document document,
                                      List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings,
                                      String cdaDocumentType) throws TMException, Exception {
-        return processDocument(document, null, errors, warnings,
-                cdaDocumentType, true);
+        LOGGER.info("Transcoding Document '{}'", cdaDocumentType);
+        return processDocument(document, null, errors, warnings, cdaDocumentType, true);
     }
 
     /**
-     * Search textContent for referenced values and replace it with
-     * transcoded/translated displayName for each key (reference id)
+     * Search textContent for referenced values and replace it with transcoded/translated displayName for each key (reference id)
      *
      * @param document
      * @param hmReffIdDisplayName
@@ -347,32 +354,29 @@ public class TransformationService implements ITransformationService, TMConstant
      */
     @SuppressWarnings("unused")
     @Deprecated
-    private void replaceReferencedValues(Document document,
-                                         HashMap<String, String> hmReffIdDisplayName, String process) {
+    private void replaceReferencedValues(Document document, HashMap<String, String> hmReffIdDisplayName, String process) {
         // just log referenced keys and displayNames
         logReferences(hmReffIdDisplayName, process);
-        log.debug("replaceReferencedValues BEGIN");
+        LOGGER.debug("replaceReferencedValues BEGIN");
         try {
             // find elements with ID attribute which id=remembered reference key
             // and
             // replace their textContent
             List<Node> idElements = XmlUtil.getNodeList(document,
                     XPATH_ALL_ELEMENTS_WITH_ID_ATTR);
-            String id = null;
-            for (int i = 0; i < idElements.size(); i++) {
-                Element idElement = (Element) idElements.get(i);
+            String id;
+            for (Node idElement1 : idElements) {
+                Element idElement = (Element) idElement1;
                 id = idElement.getAttribute(ID);
                 if (notEmpty(id) && hmReffIdDisplayName.containsKey(id)
                         && idElement.getChildNodes().getLength() == 1) {
-                    log.debug("replaced id: " + id + " "
-                            + idElement.getTextContent() + " -> "
-                            + hmReffIdDisplayName.get(id));
+                    LOGGER.debug("replaced id: '{}' '{}' --> '{}'", id, idElement.getTextContent(), hmReffIdDisplayName.get(id));
                     idElement.setTextContent(hmReffIdDisplayName.get(id));
                 }
             }
-            log.debug("replaceReferencedValues END");
+            LOGGER.debug("replaceReferencedValues END");
         } catch (Exception e) {
-            log.error("replaceReferencedValues error: ", e);
+            LOGGER.error("replaceReferencedValues error: ", e);
         }
     }
 
@@ -386,11 +390,10 @@ public class TransformationService implements ITransformationService, TMConstant
                                String process) {
         if (hmReffIdDisplayName != null && !hmReffIdDisplayName.isEmpty()) {
             Iterator<String> iKeys = hmReffIdDisplayName.keySet().iterator();
-            log.debug("List (" + process + ") - Reference id : displayName - ");
+            LOGGER.debug("List ('{}') - Reference id : displayName - ", process);
             while (iKeys.hasNext()) {
-                String key = (String) iKeys.next();
-                log.debug(EMPTY_STRING + key + COLON
-                        + hmReffIdDisplayName.get(key));
+                String key = iKeys.next();
+                LOGGER.debug("'{}':'{}'", key, hmReffIdDisplayName.get(key));
             }
         }
     }
@@ -442,14 +445,13 @@ public class TransformationService implements ITransformationService, TMConstant
                         key = key.replace(HASH, EMPTY_STRING);
                         if (!hmReffIdDisplayName.containsKey(key)) {
                             hmReffIdDisplayName.put(key, displayName);
-                            log.debug("remembered @reference= " + key + "|"
-                                    + displayName);
+                            LOGGER.debug("remembered @reference= '{}' | '{}'", key, displayName);
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            log.error("checkRememberReference error: ", e);
+            LOGGER.error("checkRememberReference error: ", e);
         }
     }
 
@@ -469,6 +471,7 @@ public class TransformationService implements ITransformationService, TMConstant
                                      String targetLanguageCode, List<ITMTSAMEror> errors,
                                      List<ITMTSAMEror> warnings, String cdaDocumentType)
             throws Exception {
+        LOGGER.info("Translating Document '{}' to target Language: '{}'", cdaDocumentType, targetLanguageCode);
         return processDocument(document, targetLanguageCode, errors, warnings,
                 cdaDocumentType, false);
     }
@@ -477,21 +480,19 @@ public class TransformationService implements ITransformationService, TMConstant
                                    String targetLanguageCode, List<ITMTSAMEror> errors,
                                    List<ITMTSAMEror> warnings, String cdaDocumentType,
                                    boolean isTranscode) throws Exception {
+
+        LOGGER.info("Processing Document '{}' to target Language: '{}' Transcoding: '{}", cdaDocumentType, targetLanguageCode, isTranscode);
         boolean processingOK = true;
         // hashMap for ID of referencedValues and transcoded/translated
         // DisplayNames
-        HashMap<String, String> hmReffId_DisplayName = new HashMap<String, String>();
+        HashMap<String, String> hmReffId_DisplayName = new HashMap<>();
         boolean isProcessingSuccesful;
 
         if (CodedElementList.getInstance()
                 .isConfigurableElementIdentification()) {
-            Collection<CodedElementListItem> ceList = CodedElementList
-                    .getInstance().getList(cdaDocumentType);
-            log
-                    .info("Configurable Element Identification is set, CodedElementList for "
-                            + cdaDocumentType
-                            + " contains elements: "
-                            + ceList.size());
+            Collection<CodedElementListItem> ceList = CodedElementList.getInstance().getList(cdaDocumentType);
+            LOGGER.info("Configurable Element Identification is set, CodedElementList for '{}' contains elements: '{}'",
+                    cdaDocumentType, ceList.size());
             if (ceList == null || ceList.isEmpty()) {
                 warnings.add(TMError.WARNING_CODED_ELEMENT_LIST_EMPTY);
                 return STATUS_SUCCESS;
@@ -504,8 +505,8 @@ public class TransformationService implements ITransformationService, TMConstant
             String celTargetLanguageCode = null;
             boolean useCELTargetLanguageCode = false;
             while (iProcessed.hasNext()) {
-                codedElementListItem = (CodedElementListItem) iProcessed.next();
-                log.debug("Looking for: " + codedElementListItem.toString());
+                codedElementListItem = iProcessed.next();
+                LOGGER.debug("Looking for: '{}'", codedElementListItem.toString());
                 xPathExpression = codedElementListItem.getxPath();
 
                 isRequired = codedElementListItem.isRequired();
@@ -525,13 +526,12 @@ public class TransformationService implements ITransformationService, TMConstant
                 }
 
                 nodeList = XmlUtil.getNodeList(document, xPathExpression);
-                log.debug("Found: "
+                LOGGER.debug("Found: "
                         + (nodeList == null ? "NULL" : nodeList.size())
                         + " elements");
                 if (isRequired
-                        && (nodeList == null || nodeList.size() == 0)) {
-                    log.error("Required element is missing: "
-                            + codedElementListItem.toString());
+                        && (nodeList == null || nodeList.isEmpty())) {
+                    LOGGER.error("Required element is missing: '{}'", codedElementListItem.toString());
                     processingOK = false;
                     errors.add(new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_MISSING, codedElementListItem.toString()));
                 } else {
@@ -559,18 +559,18 @@ public class TransformationService implements ITransformationService, TMConstant
                             errors
                                     .add(isTranscode ? new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED, ctx)
                                             : new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSLATED, ctx));
-                            log.error("Required coded element was not translated");
+                            LOGGER.error("Required coded element was not translated");
                         }
                     }
                 }
             }
         } else {
-            log
-                    .info("Configurable Element Identification is NOT set - looking for //*[@code] elements");
+
+            LOGGER.info("Configurable Element Identification is NOT set - looking for //*[@code] elements");
             // NodeList nodeList = epSosCDA.getElementsByTagName("code");
             List<Node> nodeList = XmlUtil.getNodeList(document,
                     XPATH_ALL_ELEMENTS_WITH_CODE_ATTR);
-            log.info("Found " + nodeList.size() + " elements to translate/transcode");
+            LOGGER.info("Found '{}' elements to translate/transcode", nodeList.size());
             Element originalElement;
             for (int i = 0; i < nodeList.size(); i++) {
                 // iterate elements for translation
@@ -579,7 +579,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 if (TRANSLATION.equals(originalElement.getLocalName())) {
 
                     CodedElement ce = new CodedElement(originalElement);
-                    log.debug("translation element - skipping: " + ce.toString());
+                    LOGGER.debug("translation element - skipping: '{}'", ce.toString());
                     continue;
                 }
                 // check if xsi:type is "CE" or "CD"
@@ -647,7 +647,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     (CodedElement) codedElement, targetLanguageCode);
 
             if (tsamResponse.isStatusSuccess()) {
-                log.debug("processing successful '{}'", codedElement.toString());
+                LOGGER.debug("processing successful '{}'", codedElement.toString());
                 // +++++ Element editing BEGIN +++++
 
                 // NEW TRANSLATION element
@@ -696,7 +696,7 @@ public class TransformationService implements ITransformationService, TMConstant
                             .getDisplayName());
                     attributesFilled = true;
                 } else {
-                    log.debug("Translation is same as original: " + tsamResponse.getDesignation());
+                    LOGGER.debug("Translation is same as original: " + tsamResponse.getDesignation());
                 }
                 if (attributesFilled) {
                     if (oldTranslationElement != null) {
@@ -737,14 +737,14 @@ public class TransformationService implements ITransformationService, TMConstant
                 warnings.addAll(tsamResponse.getWarnings());
                 return true;
             } else {
-                log.error("processing failure! for Code: '{}'", codedElement.toString());
+                LOGGER.error("processing failure! for Code: '{}'", codedElement.toString());
                 errors.addAll(tsamResponse.getErrors());
                 warnings.addAll(tsamResponse.getWarnings());
                 return false;
             }
         } catch (Exception e) {
             // system error
-            log.error("processing failure! ", e);
+            LOGGER.error("processing failure! ", e);
             return false;
         }
     }
@@ -764,7 +764,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     if (TMConstants.TRANSLATION.equals(node.getLocalName())) {
                         oldTranslationElement = node;
-                        log.debug("Old translation found");
+                        LOGGER.debug("Old translation found");
                         break;
                     }
                 }
@@ -786,7 +786,7 @@ public class TransformationService implements ITransformationService, TMConstant
         String elName = XmlUtil.getElementPath(originalElement);
         // ak je nullFlavor, neprekladat, nevyhadzovat chybu
         if (originalElement.hasAttribute("nullFlavor")) {
-            log.debug("nullFlavor, skippink: '{}'", elName);
+            LOGGER.debug("nullFlavor, skippink: '{}'", elName);
             return true;
         } else {
             // ak chyba code alebo codeSystem vyhodit warning
@@ -803,10 +803,10 @@ public class TransformationService implements ITransformationService, TMConstant
                 NodeList origText = originalElement.getElementsByTagName("originalText");
                 if (origText.getLength() > 0) {
                     // ak element obsahuje originalText, preskocit, nevyhazovat warning
-                    log.debug("Element without required attributes, but has originalText, ignoring: '{}'", elName);
+                    LOGGER.debug("Element without required attributes, but has originalText, ignoring: '{}'", elName);
                     return true;
                 } else {
-                    log.warn("Element has no \"code or \"codeSystem\" attribute: '{}'", elName);
+                    LOGGER.warn("Element has no \"code or \"codeSystem\" attribute: '{}'", elName);
                     warnings.add(new TmErrorCtx(TMError.WARNING_MANDATORY_ATTRIBUTES_MISSING, "Element " + elName));
                     return false;
                 }

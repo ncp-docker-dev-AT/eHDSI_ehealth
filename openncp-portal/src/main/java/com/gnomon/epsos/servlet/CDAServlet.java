@@ -31,15 +31,11 @@ import java.io.OutputStream;
 
 public class CDAServlet extends HttpServlet {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
     private static Logger log = LoggerFactory.getLogger(CDAServlet.class.getName());
 
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
         try {
             log.info("Rendering CDA Diplay view");

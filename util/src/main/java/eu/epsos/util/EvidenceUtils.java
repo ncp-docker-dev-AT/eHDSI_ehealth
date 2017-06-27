@@ -39,9 +39,9 @@ import java.util.UUID;
 public class EvidenceUtils {
 
     public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
+    private static final Logger LOGGER = LoggerFactory.getLogger(EvidenceUtils.class);
     private static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
     private static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
-    private static final Logger logger = LoggerFactory.getLogger(EvidenceUtils.class);
 
     private EvidenceUtils() {
     }
@@ -74,7 +74,7 @@ public class EvidenceUtils {
             messageType = messageInspector.getMessageType();
             msguuid = messageInspector.getMessageUUID();
         } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
@@ -127,7 +127,7 @@ public class EvidenceUtils {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             messageType = umt;
         }
@@ -201,7 +201,7 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nrr/" + getDocumentTitle(msguuid, title) + ".xml";
             }
-            logger.info("MSGUUID: '{}'  NRR TITLE: '{}'", msguuid, title);
+            LOGGER.info("MSGUUID: '{}'  NRR TITLE: '{}'", msguuid, title);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
     }
@@ -256,7 +256,7 @@ public class EvidenceUtils {
             messageType = messageInspector.getMessageType();
             msguuid = messageInspector.getMessageUUID();
         } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingSoap);
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
@@ -312,12 +312,12 @@ public class EvidenceUtils {
             MessageInspector messageInspector = new MessageInspector(incomingSoap);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingSoap);
             messageType = umt;
         }
         if (checkCorrectnessofIHEXCA(messageType)) {
-            logger.info("The message type : '{}' is correct.", messageType);
+            LOGGER.info("The message type : '{}' is correct.", messageType);
         }
 
         /*
@@ -377,10 +377,8 @@ public class EvidenceUtils {
         context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
         context.setRequest(request);
         context.setEnforcer(enforcePolicy);
-        ObligationHandlerFactory handlerFactory = ObligationHandlerFactory
-                .getInstance();
-        List<ObligationHandler> handlers = handlerFactory.createHandler(
-                messageType, obligations, context);
+        ObligationHandlerFactory handlerFactory = ObligationHandlerFactory.getInstance();
+        List<ObligationHandler> handlers = handlerFactory.createHandler(messageType, obligations, context);
 
         // Here I discharge manually. This behavior is to let free an implementation
         for (ObligationHandler handler : handlers) {
@@ -393,7 +391,7 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nro/" + getDocumentTitle(msguuid, title) + ".xml";
             }
-            logger.info("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
+            LOGGER.info("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
 
@@ -401,7 +399,9 @@ public class EvidenceUtils {
 
     private static String getPath() {
         String exportPath = System.getenv("EPSOS_PROPS_PATH");
-        return exportPath + "obligations/";
+        String evidencesPath = exportPath + "obligations/";
+        LOGGER.debug("Evidences Path: '{}'", evidencesPath);
+        return evidencesPath;
     }
 
     private static String getDocumentTitle(String uuid, String title) {
@@ -417,6 +417,7 @@ public class EvidenceUtils {
     }
 
     private static X509Certificate getCertificate(String keyStorePath, String keyPassword, String certAlias) throws KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
+        LOGGER.debug("X509Certificate getCertificate('{}', '{}', '{}", keyStorePath, keyPassword, certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
         ks.load(keyStream, keyPassword.toCharArray());
@@ -424,6 +425,7 @@ public class EvidenceUtils {
     }
 
     private static PrivateKey getSigningKey(String keyStorePath, String keyPassword, String certAlias) throws FileNotFoundException, KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+        LOGGER.debug("PrivateKey getSigningKey('{}', '{}', '{}", keyStorePath, keyPassword, certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
         ks.load(keyStream, keyPassword.toCharArray());

@@ -126,8 +126,6 @@ th {
 
                                         </xsl:text>
                 </style>
-
-
                 <script language="javascript">
                     function showhide(id){
                     if (document.getElementById){
@@ -139,18 +137,14 @@ th {
                     }
                     }
                     }
-
                 </script>
-
             </head>
-
             <body>
                 <h1 class="h1center">
                     <xsl:value-of select="$title"/>
                 </h1>
                 <!-- START display top portion of clinical document -->
                 <!--- BASIC HEADER INFORMATION -->
-
                 <xsl:choose>
                     <xsl:when test="$documentCode='60591-5'">
                         <xsl:call-template name="psCda"/>
@@ -172,7 +166,6 @@ th {
                         <br/>
                         <br/>
                     </xsl:when>
-
                 </xsl:choose>
                 <br/>
                 <br/>

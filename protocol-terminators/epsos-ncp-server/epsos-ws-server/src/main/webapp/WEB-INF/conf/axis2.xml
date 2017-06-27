@@ -18,7 +18,7 @@
   -->
 
 <axisconfig name="AxisJava2.0">
-	<!--  
+    <!--
     <module ref="rampart" />
     
     <parameter name="OutflowSecurity">
@@ -29,7 +29,7 @@
         </action>
     </parameter>
     -->
-    
+
     <!-- ================================================= -->
     <!-- Parameters -->
     <!-- ================================================= -->
@@ -200,12 +200,12 @@
          For more information, please have a look at the servlet transport documentation:
          http://axis.apache.org/axis2/java/core/docs/servlet-transport.html -->
     <transportReceiver name="http" class="org.apache.axis2.transport.http.AxisServletListener">
-		<parameter name="port">8080</parameter>
-	</transportReceiver>
-	
-	<transportReceiver name="https" class="org.apache.axis2.transport.http.AxisServletListener">
-		<parameter name="port">8443</parameter>
-	</transportReceiver>
+        <parameter name="port">8080</parameter>
+    </transportReceiver>
+
+    <transportReceiver name="https" class="org.apache.axis2.transport.http.AxisServletListener">
+        <parameter name="port">8443</parameter>
+    </transportReceiver>
     <!--Uncomment if you want to have TCP transport support-->
     <!--transportReceiver name="tcp"
                        class="org.apache.axis2.transport.tcp.TCPServer">
@@ -389,7 +389,7 @@
            The "enable" attribute indicates whether Node management has been enabled
         -->
         <nodeManager class="org.apache.axis2.clustering.management.DefaultNodeManager"
-                         enable="true"/>
+                     enable="true"/>
 
         <!--
            This interface is responsible for handling state replication. The property changes in
@@ -472,7 +472,7 @@
         <phase name="soapmonitorPhase"/>
         <phase name="EvidenceEmitterPhase">
             <handler name="EvidenceEmitterHandler"
-                class="ee.affecto.epsos.ws.handler.InFlowEvidenceEmitterHandler"/>
+                     class="ee.affecto.epsos.ws.handler.InFlowEvidenceEmitterHandler"/>
         </phase>
     </phaseOrder>
     <phaseOrder type="OutFlow">
@@ -487,7 +487,7 @@
         <phase name="Security"/>
         <phase name="EvidenceEmitterPhase">
             <handler name="EvidenceEmitterHandler"
-                class="ee.affecto.epsos.ws.handler.OutFlowEvidenceEmitterHandler"/>
+                     class="ee.affecto.epsos.ws.handler.OutFlowEvidenceEmitterHandler"/>
         </phase>
     </phaseOrder>
     <phaseOrder type="InFaultFlow">
