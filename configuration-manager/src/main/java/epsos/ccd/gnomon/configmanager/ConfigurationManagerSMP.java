@@ -124,7 +124,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
         if (instance == null) {
             synchronized (ConfigurationManagerSMP.class) {
                 if (instance == null) {
-                    LOGGER.info("Instatiating a new ConfigurationManagerSMP");
+                    LOGGER.info("Instantiating a new ConfigurationManagerSMP");
                     instance = new ConfigurationManagerSMP();
                 }
             }
@@ -257,6 +257,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 
         String[] values = key.split("\\.");
         if (values == null || values.length != 3) {
+            LOGGER.error("The key '{}' to be selected in SMP has a length which is not allowed", key);
             throw new RuntimeException("The key to be selected in SMP has a length which is not allowed");
         }
 

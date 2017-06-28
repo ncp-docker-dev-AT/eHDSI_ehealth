@@ -10,14 +10,11 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.xml.Configuration;
@@ -48,8 +45,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.io.StringReader;
-import org.xml.sax.InputSource;
 
 @ManagedBean
 @SessionScoped
@@ -306,7 +301,7 @@ public class MyBean implements Serializable {
     }
 
     public void searchPatients() {
-        log.info("Searching for patients (creating assertions) ....");
+        log.info("Searching for patients (creating assertions)...");
         Object obj = EpsosHelperService.getUserAssertion();
         if (obj instanceof Assertion) {
             hcpAssertion = (Assertion) obj;
@@ -542,18 +537,18 @@ public class MyBean implements Serializable {
 //				log.error(ExceptionUtils.getStackTrace(e));
 //			}
 
-			showMRO = true;
-			consentExists = true;
-			for (EpsosDocument1 aux : queryDocuments) {
-				PatientDocument document = EpsosHelperService.populateDocument(
-						aux, "mro");
-				patientDocuments.add(document);
-			}
-			queryDocumentsException = LiferayUtils
-					.getPortalTranslation("report.list.no.document");
-			log.debug("Selected Country: "
-					+ LiferayUtils.getFromSession("selectedCountry"));
-		} catch (Exception ex) {
+            showMRO = true;
+            consentExists = true;
+            for (EpsosDocument1 aux : queryDocuments) {
+                PatientDocument document = EpsosHelperService.populateDocument(
+                        aux, "mro");
+                patientDocuments.add(document);
+            }
+            queryDocumentsException = LiferayUtils
+                    .getPortalTranslation("report.list.no.document");
+            log.debug("Selected Country: "
+                    + LiferayUtils.getFromSession("selectedCountry"));
+        } catch (Exception ex) {
 //			try {
 //				EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
 //						"NI_DQ_MRO", new DateTime(),
@@ -563,18 +558,18 @@ public class MyBean implements Serializable {
 //			} catch (Exception e) {
 //				log.error(ExceptionUtils.getStackTrace(e));
 //			}
-			consentExists = true;
-			log.error(ExceptionUtils.getStackTrace(ex));
-			FacesContext.getCurrentInstance().addMessage(
-					null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"DOCUMENT QUERY", LiferayUtils
-									.getPortalTranslation(ex.getMessage())));
-			log.error("MRO QUERY: Error getting ps documents for : "
-					+ patientId.getExtension() + " from " + selectedCountry
-					+ " - " + ex.getMessage());
-			queryDocumentsException = LiferayUtils.getPortalTranslation(ex
-					.getMessage());
+            consentExists = true;
+            log.error(ExceptionUtils.getStackTrace(ex));
+            FacesContext.getCurrentInstance().addMessage(
+                    null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "DOCUMENT QUERY", LiferayUtils
+                            .getPortalTranslation(ex.getMessage())));
+            log.error("MRO QUERY: Error getting ps documents for : "
+                    + patientId.getExtension() + " from " + selectedCountry
+                    + " - " + ex.getMessage());
+            queryDocumentsException = LiferayUtils.getPortalTranslation(ex
+                    .getMessage());
 
             if (ex.getMessage().contains("4701")) {
                 consentExists = false;
@@ -616,7 +611,7 @@ public class MyBean implements Serializable {
                 log.info("patientId: " + patientId);
                 log.info("classCode: " + classCode);
 
-				// NRO
+                // NRO
 //				try {
 //					EvidenceUtils.createEvidenceREMNRO(patientId.toString(),
 //							"NI_DQ_PS", new DateTime(),
@@ -644,18 +639,18 @@ public class MyBean implements Serializable {
 //					log.error(ExceptionUtils.getStackTrace(e));
 //				}
 
-				showPS = true;
-				consentExists = true;
-				for (EpsosDocument1 aux : queryDocuments) {
-					PatientDocument document = EpsosHelperService
-							.populateDocument(aux, "ps");
-					patientDocuments.add(document);
-				}
-				queryDocumentsException = LiferayUtils
-						.getPortalTranslation("report.list.no.document");
-				log.debug("Selected Country: "
-						+ LiferayUtils.getFromSession("selectedCountry"));
-			} catch (Exception ex) {
+                showPS = true;
+                consentExists = true;
+                for (EpsosDocument1 aux : queryDocuments) {
+                    PatientDocument document = EpsosHelperService
+                            .populateDocument(aux, "ps");
+                    patientDocuments.add(document);
+                }
+                queryDocumentsException = LiferayUtils
+                        .getPortalTranslation("report.list.no.document");
+                log.debug("Selected Country: "
+                        + LiferayUtils.getFromSession("selectedCountry"));
+            } catch (Exception ex) {
 //				try {
 //					EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
 //							"NI_DQ_PS", new DateTime(),
@@ -956,18 +951,18 @@ public class MyBean implements Serializable {
 //				log.error(ExceptionUtils.getStackTrace(e));
 //			}
 
-			log.info("EP QUERY: Found " + queryDocuments.size() + " for : "
-					+ patientId.getExtension() + " from " + selectedCountry);
-			showEP = true;
-			for (EpsosDocument1 aux : queryDocuments) {
-				PatientDocument document = EpsosHelperService.populateDocument(
-						aux, "ep");
-				patientPrescriptions.add(document);
-			}
-			queryPrescriptionsException = LiferayUtils.getPortalTranslation(
-					"document.empty.list", FacesService.getPortalLanguage());
-			log.info("Documents are " + queryDocuments.size());
-		} catch (Exception ex) {
+            log.info("EP QUERY: Found " + queryDocuments.size() + " for : "
+                    + patientId.getExtension() + " from " + selectedCountry);
+            showEP = true;
+            for (EpsosDocument1 aux : queryDocuments) {
+                PatientDocument document = EpsosHelperService.populateDocument(
+                        aux, "ep");
+                patientPrescriptions.add(document);
+            }
+            queryPrescriptionsException = LiferayUtils.getPortalTranslation(
+                    "document.empty.list", FacesService.getPortalLanguage());
+            log.info("Documents are " + queryDocuments.size());
+        } catch (Exception ex) {
 //			try {
 //				EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
 //						"NI_DQ_EP", new DateTime(),

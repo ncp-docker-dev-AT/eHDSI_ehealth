@@ -1,40 +1,26 @@
-/**
- * *Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements. See the NOTICE file distributed with this
- * work for additional information regarding copyright ownership. The ASF
- * licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- *//*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package epsos.ccd.gnomon.auditmanager;
 
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.math.BigInteger;
+import java.util.Arrays;
 
 /**
- * Java Bean object for the Event Log object. Getters and setters for all the
- * proerties Constructors for EPSOS audit schemas
+ * Java Bean object for the Event Log object.
+ * Getters and setters for all the properties Constructors for OpenNCP audit schemas.
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
  * @author mail:k.karkaletsis@gnomon.com.gr
  * @version 1.0, 2010, 30 Jun EventLog is a java object with the minimal input
- * variables needed to construct an AuditMessage according to RFC3881
+ *          variables needed to construct an AuditMessage according to RFC3881
  */
 public class EventLog {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventLog.class);
 
     public String EI_TransactionNumber;  // Number of the transaction including the 'Epsos-' prefix
     public String EI_TransactionName;    // Name of the transaction, specified in the use cases diagram
@@ -48,9 +34,11 @@ public class EventLog {
     public String HR_UserName;
     public String HR_RoleID;
     // Service Consumer NCP
-    public String SC_UserID; // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
+    // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
+    public String SC_UserID;
     // Service Provider
-    public String SP_UserID; // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
+    // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
+    public String SP_UserID;
     // Audit Source
     public String AS_AuditSourceId; // The authority that is legally responsible for the audit source
     // Patient Source
@@ -83,37 +71,36 @@ public class EventLog {
     /**
      * This method creates an EventLog object for use in HCP Authentication
      *
-     * @param EI_EventActionCode Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime The datetime the event occured
-     * @param EI_EventOutcomeIndicator <br>
-     * 0 for full success <br>
-     * 1 in case of partial delivery <br>
-     * 4 for temporal failures <br>
-     * 8 for permanent failure <br>
-     * @param PC_UserID Point of Care: Oid of the department
-     * @param PC_RoleID Role of the department
-     * @param HR_UserID Identifier of the HCP initiated the event
-     * @param HR_RoleID Role of the HCP initiated the event
-     * @param HR_AlternativeUserID Human readable name of the HCP as given in
-     * the Subject-ID
-     * @param SC_UserID The string encoded CN of the TLS certificate of the NCP
-     * triggered the epsos operation
-     * @param SP_UserID The string encoded CN of the TLS certificate of the NCP
-     * processed the epsos operation
-     * @param AS_AuditSourceId the iso3166-2 code of the country responsible for
-     * the audit source
-     * @param ET_ObjectID The string encoded UUID of the returned document
-     * @param ReqM_ParticipantObjectID String-encoded UUID of the request
-     * message
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occured
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param PC_UserID                    Point of Care: Oid of the department
+     * @param PC_RoleID                    Role of the department
+     * @param HR_UserID                    Identifier of the HCP initiated the event
+     * @param HR_RoleID                    Role of the HCP initiated the event
+     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
+     *                                     the Subject-ID
+     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     triggered the epsos operation
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
+     *                                     the audit source
+     * @param ET_ObjectID                  The string encoded UUID of the returned document
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param ResM_ParticipantObjectID String-encoded UUID of the response
-     * message
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param sourceip The IP Address of the source Gateway
-     * @param targetip The IP Address of the target Gateway
-     *
+     *                                     encoded security header.
+     * @param sourceip                     The IP Address of the source Gateway
+     * @param targetip                     The IP Address of the target Gateway
      */
     public static EventLog createEventLogHCPIdentity(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                                      String PC_UserID, String PC_RoleID, String HR_UserID, String HR_RoleID, String HR_AlternativeUserID,
@@ -146,35 +133,35 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
+        LOGGER.info("EventLog: '{}'", el.toString());
         return el;
     }
 
     /**
      * This method creates an EventLog object for use in NLS Import
      *
-     * @param EI_EventActionCode Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime The datetime the event occured
-     * @param EI_EventOutcomeIndicator <br>
-     * 0 for full success <br>
-     * 1 in case of partial delivery <br>
-     * 4 for temporal failures <br>
-     * 8 for permanent failure <br>
-     * @param SC_UserID The string encoded CN of the TLS certificate of the NCP
-     * triggered the epsos operation
-     * @param SP_UserID The string encoded CN of the TLS certificate of the NCP
-     * processed the epsos operation
-     * @param ET_ObjectID The string encoded UUID of the returned document
-     * @param ReqM_ParticipantObjectID String-encoded UUID of the request
-     * message
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occured
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     triggered the epsos operation
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param ET_ObjectID                  The string encoded UUID of the returned document
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param ResM_ParticipantObjectID String-encoded UUID of the response
-     * message
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param sourceip The IP Address of the source Gateway
-     * @param targetip The IP Address of the target Gateway
-     *
+     *                                     encoded security header.
+     * @param sourceip                     The IP Address of the source Gateway
+     * @param targetip                     The IP Address of the target Gateway
      */
     public static EventLog createEventLogNCPTrustedServiceList(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                                                String SC_UserID, String SP_UserID,
@@ -200,33 +187,33 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
+        LOGGER.info("EventLog: '{}'", el.toString());
         return el;
     }
 
     /**
      * This method creates an EventLog object for use in Pivot Translation
      *
-     * @param EI_EventActionCode Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime The datetime the event occured
-     * @param EI_EventOutcomeIndicator <br>
-     * 0 for full success <br>
-     * 1 in case of partial delivery <br>
-     * 4 for temporal failures <br>
-     * 8 for permanent failure <br>
-     * @param SP_UserID The string encoded CN of the TLS certificate of the NCP
-     * processed the epsos operation
-     * @param ET_ObjectID_in The string encoded UUID of the source document
-     * @param ET_ObjectID_out The string encoded UUID of the target document
-     * @param ReqM_ParticipantObjectID String-encoded UUID of the request
-     * message
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occured
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param ET_ObjectID_in               The string encoded UUID of the source document
+     * @param ET_ObjectID_out              The string encoded UUID of the target document
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param ResM_ParticipantObjectID String-encoded UUID of the response
-     * message
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param targetip The IP Address of the target Gateway
-     *
+     *                                     encoded security header.
+     * @param targetip                     The IP Address of the target Gateway
      */
     public static EventLog createEventLogPivotTranslation(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                                           String SP_UserID, String ET_ObjectID_in,
@@ -252,6 +239,7 @@ public class EventLog {
         el.setResM_ParticipantObjectID(NullToEmptyString(ResM_ParticipantObjectID));
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setTargetip(NullToEmptyString(targetip));
+        LOGGER.info("EventLog: '{}'", el.toString());
         return el;
     }
 
@@ -275,39 +263,38 @@ public class EventLog {
     /**
      * This method creates an EventLog object for use in Consent PIN
      *
-     * @param TransactionName value is epsosConsentServicePin
-     * @param EI_EventActionCode Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime The datetime the event occured
-     * @param EI_EventOutcomeIndicator <br>
-     * 0 for full success <br>
-     * 1 in case of partial delivery <br>
-     * 4 for temporal failures <br>
-     * 8 for permanent failure <br>
-     * @param PC_UserID Point of Care: Oid of the department
-     * @param PC_RoleID Role of the point of care
-     * @param HR_UserID Identifier of the HCP initiated the event
-     * @param HR_AlternativeUserID Human readable name of the HCP as given in
-     * the Subject-ID
-     * @param HR_RoleID Role of the HCP initiated the event
-     * @param SC_UserID The string encoded CN of the TLS certificate of the NCP
-     * triggered the epsos operation
-     * @param SP_UserID The string encoded CN of the TLS certificate of the NCP
-     * processed the epsos operation
-     * @param AS_AuditSourceId the iso3166-2 code of the country responsible for
-     * the audit source
-     * @param PT_PatricipantObjectID Patient Identifier in HL7 II format
-     * @param ReqM_ParticipantObjectID String-encoded UUID of the request
-     * message
+     * @param TransactionName              value is epsosConsentServicePin
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occured
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param PC_UserID                    Point of Care: Oid of the department
+     * @param PC_RoleID                    Role of the point of care
+     * @param HR_UserID                    Identifier of the HCP initiated the event
+     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
+     *                                     the Subject-ID
+     * @param HR_RoleID                    Role of the HCP initiated the event
+     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     triggered the epsos operation
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
+     *                                     the audit source
+     * @param PT_PatricipantObjectID       Patient Identifier in HL7 II format
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param ResM_ParticipantObjectID String-encoded UUID of the response
-     * message
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param sourceip The IP Address of the source Gateway
-     * @param targetip The IP Address of the target Gateway
+     *                                     encoded security header.
+     * @param sourceip                     The IP Address of the source Gateway
+     * @param targetip                     The IP Address of the target Gateway
      * @return the EventLog object
-     *
      */
     public static EventLog createEventLogConsentPINack(TransactionName EI_TransactionName,
                                                        EventActionCode EI_EventActionCode,
@@ -332,39 +319,38 @@ public class EventLog {
     /**
      * This method creates an EventLog object for use in Consent PIN
      *
-     * @param TransactionName value is epsosConsentServicePin
-     * @param EI_EventActionCode Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime The datetime the event occured
-     * @param EI_EventOutcomeIndicator <br>
-     * 0 for full success <br>
-     * 1 in case of partial delivery <br>
-     * 4 for temporal failures <br>
-     * 8 for permanent failure <br>
-     * @param PC_UserID Point of Care: Oid of the department
-     * @param PC_RoleID Role of the point of care
-     * @param HR_UserID Identifier of the HCP initiated the event
-     * @param HR_AlternativeUserID Human readable name of the HCP as given in
-     * the Subject-ID
-     * @param HR_RoleID Role of the HCP initiated the event
-     * @param SC_UserID The string encoded CN of the TLS certificate of the NCP
-     * triggered the epsos operation
-     * @param SP_UserID The string encoded CN of the TLS certificate of the NCP
-     * processed the epsos operation
-     * @param AS_AuditSourceId the iso3166-2 code of the country responsible for
-     * the audit source
-     * @param PT_PatricipantObjectID Patient Identifier in HL7 II format
-     * @param ReqM_ParticipantObjectID String-encoded UUID of the request
-     * message
+     * @param TransactionName              value is epsosConsentServicePin
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occured
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param PC_UserID                    Point of Care: Oid of the department
+     * @param PC_RoleID                    Role of the point of care
+     * @param HR_UserID                    Identifier of the HCP initiated the event
+     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
+     *                                     the Subject-ID
+     * @param HR_RoleID                    Role of the HCP initiated the event
+     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     triggered the epsos operation
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
+     *                                     the audit source
+     * @param PT_PatricipantObjectID       Patient Identifier in HL7 II format
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param ResM_ParticipantObjectID String-encoded UUID of the response
-     * message
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param sourceip The IP Address of the source Gateway
-     * @param targetip The IP Address of the target Gateway
+     *                                     encoded security header.
+     * @param sourceip                     The IP Address of the source Gateway
+     * @param targetip                     The IP Address of the target Gateway
      * @return the EventLog object
-     *
      */
     public static EventLog createEventLogConsentPINdny(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                                        String PC_UserID, String PC_RoleID,
@@ -386,44 +372,42 @@ public class EventLog {
     /**
      * This method creates an EventLog object for use in HCP Assurance Schema
      *
-     *
-     * @param EI_EventActionCode Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime The datetime the event occured
-     * @param EI_EventOutcomeIndicator <br>
-     * 0 for full success <br>
-     * 1 in case of partial delivery <br>
-     * 4 for temporal failures <br>
-     * 8 for permanent failure <br>
-     * @param PC_UserID Point of Care: Oid of the department
-     * @param PC_RoleID Role of the point of care
-     * @param HR_UserID Identifier of the HCP initiated the event
-     * @param HR_RoleID Role of the HCP initiated the event
-     * @param HR_AlternativeUserID Human readable name of the HCP as given in
-     * the Subject-ID
-     * @param SC_UserID The string encoded CN of the TLS certificate of the NCP
-     * triggered the epsos operation
-     * @param SP_UserID The string encoded CN of the TLS certificate of the NCP
-     * processed the epsos operation
-     * @param AS_AuditSourceId the iso3166-2 code of the country responsible for
-     * the audit source
-     * @param PT_PatricipantObjectID Patient Identifier in HL7 II format
-     * @param EM_PatricipantObjectID The error code included with the response
-     * message
-     * @param EM_PatricipantObjectDetail Contains the base64 encoded error
-     * message
-     * @param ET_ObjectID The string encoded UUID of the returned document
-     * @param ReqM_ParticipantObjectID String-encoded UUID of the request
-     * message
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occured
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param PC_UserID                    Point of Care: Oid of the department
+     * @param PC_RoleID                    Role of the point of care
+     * @param HR_UserID                    Identifier of the HCP initiated the event
+     * @param HR_RoleID                    Role of the HCP initiated the event
+     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
+     *                                     the Subject-ID
+     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     triggered the epsos operation
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
+     *                                     the audit source
+     * @param PT_PatricipantObjectID       Patient Identifier in HL7 II format
+     * @param EM_PatricipantObjectID       The error code included with the response
+     *                                     message
+     * @param EM_PatricipantObjectDetail   Contains the base64 encoded error
+     *                                     message
+     * @param ET_ObjectID                  The string encoded UUID of the returned document
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param ResM_ParticipantObjectID String-encoded UUID of the response
-     * message
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param sourceip The IP Address of the source Gateway
-     * @param targetip The IP Address of the target Gateway
+     *                                     encoded security header.
+     * @param sourceip                     The IP Address of the source Gateway
+     * @param targetip                     The IP Address of the target Gateway
      * @return the EventLog object
-     *
      */
     public static EventLog createEventLogHCPAssurance(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                                       String PC_UserID, String PC_RoleID,
@@ -461,6 +445,7 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
+        LOGGER.info("EventLog: '{}'", el.toString());
         return el;
     }
 
@@ -500,40 +485,38 @@ public class EventLog {
      * This method creates an EventLog object for use in Issuance of a Treatment
      * Relationship Confirmation Assertion
      *
-     * @param EI_EventActionCode Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime The datetime the event occured
-     * @param EI_EventOutcomeIndicator <br>
-     * 0 for full success <br>
-     * 1 in case of partial delivery <br>
-     * 4 for temporal failures <br>
-     * 8 for permanent failure <br>
-     * @param PC_UserID Point of Care: Oid of the department
-     * @param PC_RoleID Role of the Point of Care: Oid of the department
-     * @param HR_UserID Identifier of the HCP initiated the event
-     * @param HR_RoleID Role of HCP initiated the event
-     * @param HR_AlternativeUserID Human readable name of the HCP as given in
-     * the Subject-ID
-     * @param SC_UserID The string encoded CN of the TLS certificate of the NCP
-     * triggered the epsos operation
-     * @param SP_UserID The string encoded CN of the TLS certificate of the NCP
-     * processed the epsos operation
-     *
-     * @param AS_AuditSourceId the iso3166-2 code of the country responsible for
-     * the audit source
-     * @param PT_PatricipantObjectID Patient Identifier in HL7 II format
-     * @param ET_ObjectID The string encoded UUID of the returned document
-     * @param ReqM_ParticipantObjectID String-encoded UUID of the request
-     * message
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occured
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param PC_UserID                    Point of Care: Oid of the department
+     * @param PC_RoleID                    Role of the Point of Care: Oid of the department
+     * @param HR_UserID                    Identifier of the HCP initiated the event
+     * @param HR_RoleID                    Role of HCP initiated the event
+     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
+     *                                     the Subject-ID
+     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     triggered the epsos operation
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
+     *                                     the audit source
+     * @param PT_PatricipantObjectID       Patient Identifier in HL7 II format
+     * @param ET_ObjectID                  The string encoded UUID of the returned document
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param ResM_ParticipantObjectID String-encoded UUID of the response
-     * message
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param sourceip The IP Address of the source Gateway
-     * @param targetip The IP Address of the target Gateway
+     *                                     encoded security header.
+     * @param sourceip                     The IP Address of the source Gateway
+     * @param targetip                     The IP Address of the target Gateway
      * @return the EventLog object
-     *
      */
     public static EventLog createEventLogTRCA(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                               String PC_UserID, String PC_RoleID, String HR_UserID, String HR_RoleID, String HR_AlternativeUserID, String SC_UserID,
@@ -567,6 +550,7 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
+        LOGGER.info("EventLog: '{}'", el.toString());
         return el;
     }
 
@@ -575,46 +559,45 @@ public class EventLog {
      * Audit Schema
      *
      * @param EI_TransactionName
-     * @param EI_EventActionCode Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime The datetime the event occured
-     * @param EI_EventOutcomeIndicator <br>
-     * 0 for full success <br>
-     * 1 in case of partial delivery <br>
-     * 4 for temporal failures <br>
-     * 8 for permanent failure <br>
-     * @param HR_UserID Identifier of the HCP initiated the event
-     * @param HR_RoleID Role of the HCP initiated the event
-     * @param HR_AlternativeUserID Human readable name of the HCP as given in
-     * the Subject-ID attrbute of the HCP identity assertion
-     * @param SC_UserID The string encoded CN of the TLS certificate of the NCP
-     * triggered the epsos operation
-     * @param SP_UserID The string encoded CN of the TLS certificate of the NCP
-     * processed the epsos operation
-     * @param PC_UserID Point of Care: Oid of the department
-     * @param AS_AuditSourceId the iso3166-2 code of the country responsible for
-     * the audit source
-     * @param PS_PatricipantObjectID Patient Identifier in HL7 II format
-     * (Patient Source)
-     * @param PT_PatricipantObjectID Patient Identifier in HL7 II format
-     * (Patient Target)
-     * @param EM_PatricipantObjectID The error code included with the response
-     * message
-     * @param EM_PatricipantObjectDetail Contains the base64 encoded error
-     * message
-     * @param MS_UserID The string encoded OID of the service instance performed
-     * the mapping
-     * @param ReqM_ParticipantObjectID String-encoded UUID of the request
-     * message
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occured
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param HR_UserID                    Identifier of the HCP initiated the event
+     * @param HR_RoleID                    Role of the HCP initiated the event
+     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
+     *                                     the Subject-ID attrbute of the HCP identity assertion
+     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     triggered the epsos operation
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param PC_UserID                    Point of Care: Oid of the department
+     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
+     *                                     the audit source
+     * @param PS_PatricipantObjectID       Patient Identifier in HL7 II format
+     *                                     (Patient Source)
+     * @param PT_PatricipantObjectID       Patient Identifier in HL7 II format
+     *                                     (Patient Target)
+     * @param EM_PatricipantObjectID       The error code included with the response
+     *                                     message
+     * @param EM_PatricipantObjectDetail   Contains the base64 encoded error
+     *                                     message
+     * @param MS_UserID                    The string encoded OID of the service instance performed
+     *                                     the mapping
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param ResM_ParticipantObjectID String-encoded UUID of the response
-     * message
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param sourceip The IP Address of the source Gateway
-     * @param targetip The IP Address of the target Gateway
+     *                                     encoded security header.
+     * @param sourceip                     The IP Address of the source Gateway
+     * @param targetip                     The IP Address of the target Gateway
      * @return the EventLog object
-     *
      */
     public static EventLog createEventLogPatientMapping(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                                         String HR_UserID, String HR_RoleID, String HR_AlternativeUserID,
@@ -651,46 +634,46 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
+        LOGGER.info("EventLog: '{}'", el.toString());
         return el;
     }
 
     /**
      * This method creates an EventLog object for use in HCP Assurance Schema
      *
-     * @param EI_EventActionCode Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime The datetime the event occured
-     * @param EI_EventOutcomeIndicator <br>
-     * 0 for full success <br>
-     * 1 in case of partial delivery <br>
-     * 4 for temporal failures <br>
-     * 8 for permanent failure <br>
-     * @param PC_UserID Point of Care: Oid of the department
-     * @param PC_RoleID Point of Care: Role of the department
-     * @param HR_UserID Identifier of the HCP initiated the event
-     * @param HR_RoleID Role of the HCP initiated the event
-     * @param HR_AlternativeUserID Human readable name of the HCP as given in
-     * the Subject-ID
-     * @param SC_UserID The string encoded CN of the TLS certificate of the NCP
-     * triggered the epsos operation
-     * @param SP_UserID The string encoded CN of the TLS certificate of the NCP
-     * processed the epsos operation
-     * @param PT_PatricipantObjectID Patient Identifier in HL7 II format
-     * @param EM_PatricipantObjectID The error code included with the response
-     * message
-     * @param EM_PatricipantObjectDetail Contains the base64 encoded error
-     * message
-     * @param ReqM_ParticipantObjectID String-encoded UUID of the request
-     * message
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occured
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param PC_UserID                    Point of Care: Oid of the department
+     * @param PC_RoleID                    Point of Care: Role of the department
+     * @param HR_UserID                    Identifier of the HCP initiated the event
+     * @param HR_RoleID                    Role of the HCP initiated the event
+     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
+     *                                     the Subject-ID
+     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     triggered the epsos operation
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param PT_PatricipantObjectID       Patient Identifier in HL7 II format
+     * @param EM_PatricipantObjectID       The error code included with the response
+     *                                     message
+     * @param EM_PatricipantObjectDetail   Contains the base64 encoded error
+     *                                     message
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param ResM_ParticipantObjectID String-encoded UUID of the response
-     * message
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param sourceip The IP Address of the source Gateway
-     * @param targetip The IP Address of the target Gateway
+     *                                     encoded security header.
+     * @param sourceip                     The IP Address of the source Gateway
+     * @param targetip                     The IP Address of the target Gateway
      * @return the EventLog object
-     *
      */
     public static EventLog createEventLogCommunicationFailure(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                                               String PC_UserID, String PC_RoleID,
@@ -725,11 +708,11 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
+        LOGGER.info("EventLog: '{}'", el.toString());
         return el;
     }
 
     /**
-     *
      * @param s represents a string
      * @return empty string if the param is null. Eitherwise returns the string
      * as is
@@ -960,42 +943,41 @@ public class EventLog {
      * This method creates an EventLog object for use in Patient Privacy Audit
      * Schema
      *
-     * @param EI_TransactionNumber The number of transaction including the
-     * epsos- prefix
-     * @param EI_EventActionCode Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime The datetime the event occured
-     * @param EI_EventOutcomeIndicator <br>
-     * 0 for full success <br>
-     * 1 in case of partial delivery <br>
-     * 4 for temporal failures <br>
-     * 8 for permanent failure <br>
-     * @param HR_UserID Identifier of the HCP initiated the event
-     * @param HR_AlternativeUserID Human readable name of the HCP as given in
-     * the Subject-ID
-     * @param SC_UserID The string encoded CN of the TLS certificate of the NCP
-     * triggered the epsos operation
-     * @param SP_UserID The string encoded CN of the TLS certificate of the NCP
-     * processed the epsos operation
-     * @param AS_AuditSourceId the iso3166-2 code of the country responsible for
-     * the audit source
-     * @param PT_PatricipantObjectID Patient Identifier in HL7 II format
-     * @param EM_PatricipantObjectID The error code included with the response
-     * message
-     * @param EM_PatricipantObjectDetail Contains the base64 encoded error
-     * message
-     * @param ET_ObjectID The string encoded UUID of the returned document
-     * @param ReqM_ParticipantObjectID String-encoded UUID of the request
-     * message
+     * @param EI_TransactionNumber         The number of transaction including the
+     *                                     epsos- prefix
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occured
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param HR_UserID                    Identifier of the HCP initiated the event
+     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
+     *                                     the Subject-ID
+     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     triggered the epsos operation
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
+     *                                     the audit source
+     * @param PT_PatricipantObjectID       Patient Identifier in HL7 II format
+     * @param EM_PatricipantObjectID       The error code included with the response
+     *                                     message
+     * @param EM_PatricipantObjectDetail   Contains the base64 encoded error
+     *                                     message
+     * @param ET_ObjectID                  The string encoded UUID of the returned document
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param ResM_ParticipantObjectID String-encoded UUID of the response
-     * message
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     * encoded security header.
-     * @param sourceip The IP Address of the source Gateway
-     * @param targetip The IP Address of the target Gateway
+     *                                     encoded security header.
+     * @param sourceip                     The IP Address of the source Gateway
+     * @param targetip                     The IP Address of the target Gateway
      * @return the EventLog object
-     *
      */
 //    public static EventLog createEventLogPrivacy(String EI_TransactionNumber,  TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
 //            String HR_UserID, String HR_AlternativeUserID,
@@ -1032,7 +1014,6 @@ public class EventLog {
 //        el.setTargetip(NullToEmptyString(targetip));
 //        return el;
 //    }
-
     public void setSC_UserID(String SC_UserID) {
         this.SC_UserID = SC_UserID;
     }
@@ -1043,5 +1024,39 @@ public class EventLog {
 
     public void setSP_UserID(String SP_UserID) {
         this.SP_UserID = SP_UserID;
+    }
+
+    @Override
+    public String toString() {
+        return "EventLog{" +
+                "EI_TransactionNumber='" + EI_TransactionNumber + '\'' +
+                ", EI_TransactionName='" + EI_TransactionName + '\'' +
+                ", EI_EventDateTime=" + EI_EventDateTime +
+                ", PC_UserID='" + PC_UserID + '\'' +
+                ", PC_RoleID='" + PC_RoleID + '\'' +
+                ", HR_UserID='" + HR_UserID + '\'' +
+                ", HR_AlternativeUserID='" + HR_AlternativeUserID + '\'' +
+                ", HR_UserName='" + HR_UserName + '\'' +
+                ", HR_RoleID='" + HR_RoleID + '\'' +
+                ", SC_UserID='" + SC_UserID + '\'' +
+                ", SP_UserID='" + SP_UserID + '\'' +
+                ", AS_AuditSourceId='" + AS_AuditSourceId + '\'' +
+                ", PS_PatricipantObjectID='" + PS_PatricipantObjectID + '\'' +
+                ", PT_PatricipantObjectID='" + PT_PatricipantObjectID + '\'' +
+                ", EM_PatricipantObjectID='" + EM_PatricipantObjectID + '\'' +
+                ", EM_PatricipantObjectDetail=" + Arrays.toString(EM_PatricipantObjectDetail) +
+                ", MS_UserID='" + MS_UserID + '\'' +
+                ", ET_ObjectID='" + ET_ObjectID + '\'' +
+                ", ET_ObjectID_additional='" + ET_ObjectID_additional + '\'' +
+                ", ReqM_ParticipantObjectID='" + ReqM_ParticipantObjectID + '\'' +
+                ", ReqM_PatricipantObjectDetail=" + Arrays.toString(ReqM_PatricipantObjectDetail) +
+                ", ResM_ParticipantObjectID='" + ResM_ParticipantObjectID + '\'' +
+                ", ResM_PatricipantObjectDetail=" + Arrays.toString(ResM_PatricipantObjectDetail) +
+                ", sourceip='" + sourceip + '\'' +
+                ", targetip='" + targetip + '\'' +
+                ", EventType='" + EventType + '\'' +
+                ", EI_EventActionCode='" + EI_EventActionCode + '\'' +
+                ", EI_EventOutcomeIndicator=" + EI_EventOutcomeIndicator +
+                '}';
     }
 }

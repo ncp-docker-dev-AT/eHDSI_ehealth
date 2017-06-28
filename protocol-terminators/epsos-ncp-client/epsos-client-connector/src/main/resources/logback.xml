@@ -2,7 +2,7 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
         </layout>
     </appender>
 
@@ -52,6 +52,10 @@
     <logger name="pt.spms.epsos.utils.logging" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
+    </logger>
+
+    <logger name="epsos.ccd.gnomon.auditmanager" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
     </logger>
 
     <logger name="epsos.ccd.gnomon.configmanager" level="INFO" additivity="false">
