@@ -41,6 +41,8 @@ import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.PrettyXmlSerializer;
 import org.htmlcleaner.TagNode;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLObjectBuilder;
@@ -1195,25 +1197,19 @@ public class EpsosHelperService {
         return assertion;
     }
 
-    public static Object getUserAssertion(String screenname, String fullname,
-                                          String emailaddress, String role) {
+    public static Object getUserAssertion(String screenname, String fullname, String emailaddress, String role) {
 
-        log.info("Screenname is: " + screenname + " and role is " + role);
-        Assertion assertion = null;
+        log.info("Screen name is: '{}' and role is: '{}'", screenname, role);
+        Assertion assertion;
 
         try {
-            boolean isPhysician = role
-                    .equalsIgnoreCase(LiferayUtils.LPDoctorRole);
-            boolean isPharmacist = role
-                    .equalsIgnoreCase(LiferayUtils.LPPharmacistRole);
+            boolean isPhysician = role.equalsIgnoreCase(LiferayUtils.LPDoctorRole);
+            boolean isPharmacist = role.equalsIgnoreCase(LiferayUtils.LPPharmacistRole);
             boolean isNurse = role.equalsIgnoreCase(LiferayUtils.LPNurseRole);
-            boolean isAdministrator = role
-                    .equalsIgnoreCase(LiferayUtils.LPAdministratorRole);
-            boolean isPatient = role
-                    .equalsIgnoreCase(LiferayUtils.LPPatientRole);
+            boolean isAdministrator = role.equalsIgnoreCase(LiferayUtils.LPAdministratorRole);
+            boolean isPatient = role.equalsIgnoreCase(LiferayUtils.LPPatientRole);
 
-            if (isPhysician || isPharmacist || isNurse || isAdministrator
-                    || isPatient) {
+            if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
                 log.info("The portal role is one of the expected. Continuing ...");
             } else {
                 log.error("The portal role is NOT one of the expected. Break");
@@ -1231,8 +1227,7 @@ public class EpsosHelperService {
             if (isPhysician) {
                 rolename = "medical doctor";
 
-                String doctor_perms = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
+                String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
                 String p[] = doctor_perms.split(",");
                 for (int k = 0; k < p.length; k++) {
                     perms.add(prefix + p[k]);
@@ -1240,8 +1235,7 @@ public class EpsosHelperService {
             }
             if (isPharmacist) {
                 rolename = "pharmacist";
-                String pharm_perms = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_PERMISSIONS);
+                String pharm_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_PERMISSIONS);
                 String p1[] = pharm_perms.split(",");
                 for (int k = 0; k < p1.length; k++) {
                     perms.add(prefix + p1[k]);
@@ -1250,8 +1244,7 @@ public class EpsosHelperService {
 
             if (isNurse) {
                 rolename = "nurse";
-                String nurse_perms = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_NURSE_PERMISSIONS);
+                String nurse_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_NURSE_PERMISSIONS);
                 String p1[] = nurse_perms.split(",");
                 for (int k = 0; k < p1.length; k++) {
                     perms.add(prefix + p1[k]);
@@ -1260,8 +1253,7 @@ public class EpsosHelperService {
 
             if (isPatient) {
                 rolename = "patient";
-                String patient_perms = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
+                String patient_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
                 String p1[] = patient_perms.split(",");
                 for (int k = 0; k < p1.length; k++) {
                     perms.add(prefix + p1[k]);
@@ -1270,8 +1262,7 @@ public class EpsosHelperService {
 
             if (isAdministrator) {
                 rolename = "administrator";
-                String admin_perms = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
+                String admin_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
                 String p1[] = admin_perms.split(",");
                 for (int k = 0; k < p1.length; k++) {
                     perms.add(prefix + p1[k]);
@@ -1288,42 +1279,32 @@ public class EpsosHelperService {
             if (isPhysician) {
                 orgType = "Resident Physician";
             }
-            assertion = EpsosHelperService.createAssertion(username, rolename,
-                    orgName, orgId, orgType, "TREATMENT", poc, perms);
+            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType,
+                    "TREATMENT", poc, perms);
 
             // send Audit message
             // GUI-27
             if (Validator.isNotNull(assertion)) {
-                log.info("AUDIT URL: "
-                        + ConfigurationManagerService.getInstance()
-                        .getProperty("audit.repository.url"));
-                log.debug("Sending epsos-91 audit message for " + fullname);
-                EpsosHelperService.sendAuditEpsos91(fullname, emailaddress,
-                        orgName, orgType, rolename, assertion.getID());
+                log.info("AUDIT URL: '{}'", ConfigurationManagerService.getInstance().getProperty("audit.repository.url"));
+                log.debug("Sending epsos-91 audit message for '{}'", fullname);
+                EpsosHelperService.sendAuditEpsos91(fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
             }
             // GUI-25
-            if (isPhysician || isPharmacist || isNurse || isAdministrator
-                    || isPatient) {
+            if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
                 String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-                log.info("KEY ALIAS: " + KEY_ALIAS);
-                //String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
+                log.info("KEY ALIAS: '{}'", KEY_ALIAS);
 
                 signSAMLAssertion(assertion, KEY_ALIAS);
                 AssertionMarshaller marshaller = new AssertionMarshaller();
-                Element element = null;
-
-                element = marshaller.marshall(assertion);
-
+                Element element = marshaller.marshall(assertion);
                 Document document = element.getOwnerDocument();
 
                 String hcpa = Utils.getDocumentAsXml(document, false);
                 log.debug("#### HCPA Start");
                 log.debug(hcpa);
                 log.debug("#### HCPA End");
-
             }
-
             log.info("Assertion: " + assertion.getID());
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
@@ -1373,7 +1354,7 @@ public class EpsosHelperService {
         String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
         String KEYSTORE_LOCATION = Constants.NCP_SIG_KEYSTORE_PATH;
         String KEY_STORE_PASS = Constants.NCP_SIG_KEYSTORE_PASSWORD;
-        log.info("KEY_ALIAS: " + Constants.NCP_SIG_PRIVATEKEY_ALIAS);
+        log.info("KEY_ALIAS: '{}'", Constants.NCP_SIG_PRIVATEKEY_ALIAS);
         if (Validator.isNull(KEY_ALIAS)) {
             log.error("Problem reading configuration parameters");
             return;
@@ -1381,19 +1362,21 @@ public class EpsosHelperService {
         java.security.cert.Certificate cert = null;
         String name = "";
         try (FileInputStream is = new FileInputStream(KEYSTORE_LOCATION)) {
-            // Load the keystore in the user's home directory
 
+            // Load the keystore in the user's home directory
             KeyStore keystore = KeyStore.getInstance("JKS");
             keystore.load(is, KEY_STORE_PASS.toCharArray());
             log.info("Keystore loaded ...");
+
             // Get certificate
             cert = keystore.getCertificate(KEY_ALIAS);
-            log.info("Certificate loaded ..." + cert.getPublicKey().toString());
+            log.info("Certificate loaded ... '{}'", cert.getPublicKey().toString());
+
             // List the aliases
             Enumeration enum1 = keystore.aliases();
-            for (; enum1.hasMoreElements(); ) {
+            while (enum1.hasMoreElements()) {
                 String alias = (String) enum1.nextElement();
-                log.info("ALIAS IS " + alias);
+                log.info("ALIAS IS '{}'", alias);
                 if (cert instanceof X509Certificate) {
                     X509Certificate x509cert = (X509Certificate) cert;
 
@@ -1418,7 +1401,7 @@ public class EpsosHelperService {
         InetAddress sourceIP = null;
         try {
             sourceIP = InetAddress.getLocalHost();
-            log.info("Source IP: " + sourceIP);
+            log.info("Source IP: '{}'", sourceIP);
         } catch (UnknownHostException ex) {
             log.error(ExceptionUtils.getStackTrace(ex));
         }
@@ -1532,53 +1515,50 @@ public class EpsosHelperService {
                                                   String purposeOfUse, String xspaLocality,
                                                   java.util.Vector permissions, String onBehalfId) {
         // assertion
-        log.info("username:" + username);
-        log.info("role:" + role);
-        log.info("organization:" + organization);
-        log.info("organizationId:" + organizationId);
-        log.info("facilityType:" + facilityType);
-        log.info("purposeOfUse:" + purposeOfUse);
-        log.info("xspaLocality:" + xspaLocality);
+        log.info("username: '{}'", username);
+        log.info("role: '{}'", role);
+        log.info("organization: '{}'", organization);
+        log.info("organizationId: '{}'", organizationId);
+        log.info("facilityType: '{}'", facilityType);
+        log.info("purposeOfUse: '{}'", purposeOfUse);
+        log.info("xspaLocality: '{}'", xspaLocality);
 
         Assertion assertion = null;
         try {
             DefaultBootstrap.bootstrap();
-            XMLObjectBuilderFactory builderFactory = Configuration
-                    .getBuilderFactory();
+            XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
 
             // Create the NameIdentifier
-            SAMLObjectBuilder nameIdBuilder = (SAMLObjectBuilder) builderFactory
-                    .getBuilder(NameID.DEFAULT_ELEMENT_NAME);
+            SAMLObjectBuilder nameIdBuilder = (SAMLObjectBuilder) builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME);
             NameID nameId = (NameID) nameIdBuilder.buildObject();
             nameId.setValue(username);
-            // nameId.setNameQualifier(strNameQualifier);
             nameId.setFormat(NameID.UNSPECIFIED);
 
             assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
 
+            org.joda.time.DateTime now = new org.joda.time.DateTime();
+            LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+
             String assId = "_" + UUID.randomUUID().toString();
             assertion.setID(assId);
             assertion.setVersion(SAMLVersion.VERSION_20);
-            assertion.setIssueInstant(new org.joda.time.DateTime()
-                    .minusHours(3));
+            assertion.setIssueInstant(nowUTC.toDateTime());
 
-            Subject subject = create(Subject.class,
-                    Subject.DEFAULT_ELEMENT_NAME);
+            Subject subject = create(Subject.class, Subject.DEFAULT_ELEMENT_NAME);
             assertion.setSubject(subject);
             subject.setNameID(nameId);
 
             // Create and add Subject Confirmation
-            SubjectConfirmation subjectConf = create(SubjectConfirmation.class,
-                    SubjectConfirmation.DEFAULT_ELEMENT_NAME);
+            SubjectConfirmation subjectConf = create(SubjectConfirmation.class, SubjectConfirmation.DEFAULT_ELEMENT_NAME);
             subjectConf.setMethod(SubjectConfirmation.METHOD_SENDER_VOUCHES);
             assertion.getSubject().getSubjectConfirmations().add(subjectConf);
 
             // Create and add conditions
-            Conditions conditions = create(Conditions.class,
-                    Conditions.DEFAULT_ELEMENT_NAME);
-            org.joda.time.DateTime now = new org.joda.time.DateTime();
-            conditions.setNotBefore(now.minusMinutes(1));
-            conditions.setNotOnOrAfter(now.plusHours(2)); // According to Spec
+            Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
+
+            conditions.setNotBefore(nowUTC.toDateTime().minusMinutes(1));
+            // According to Spec
+            conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
             assertion.setConditions(conditions);
 
             Issuer issuer = new IssuerBuilder().buildObject();
@@ -1587,39 +1567,30 @@ public class EpsosHelperService {
             assertion.setIssuer(issuer);
 
             // Add and create the authentication statement
-            AuthnStatement authStmt = create(AuthnStatement.class,
-                    AuthnStatement.DEFAULT_ELEMENT_NAME);
-            authStmt.setAuthnInstant(now.minusHours(2));
+            AuthnStatement authStmt = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
+            authStmt.setAuthnInstant(nowUTC.toDateTime());
             assertion.getAuthnStatements().add(authStmt);
 
             // Create and add AuthnContext
-            AuthnContext ac = create(AuthnContext.class,
-                    AuthnContext.DEFAULT_ELEMENT_NAME);
-            AuthnContextClassRef accr = create(AuthnContextClassRef.class,
-                    AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
+            AuthnContext ac = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
+            AuthnContextClassRef accr = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
             accr.setAuthnContextClassRef(AuthnContext.PASSWORD_AUTHN_CTX);
             ac.setAuthnContextClassRef(accr);
             authStmt.setAuthnContext(ac);
 
-            AttributeStatement attrStmt = create(AttributeStatement.class,
-                    AttributeStatement.DEFAULT_ELEMENT_NAME);
+            AttributeStatement attrStmt = create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
 
             // XSPA Subject
             Attribute attrPID = createAttribute(builderFactory, "XSPA subject",
                     "urn:oasis:names:tc:xacml:1.0:subject:subject-id",
                     username, "", "");
             attrStmt.getAttributes().add(attrPID);
+
             // XSPA Role
             Attribute attrPID_1 = createAttribute(builderFactory, "XSPA role",
                     "urn:oasis:names:tc:xacml:2.0:subject:role", role, "", "");
             attrStmt.getAttributes().add(attrPID_1);
-            // HITSP Clinical Speciality
-            /*
-             * Attribute attrPID_2 =
-             * createAttribute(builderFactory,"HITSP Clinical Speciality",
-             * "urn:epsos:names:wp3.4:subject:clinical-speciality",role,"","");
-             * attrStmt.getAttributes().add(attrPID_2);
-             */
+
             // XSPA Organization
             Attribute attrPID_3 = createAttribute(builderFactory,
                     "XSPA Organization",
@@ -1665,19 +1636,17 @@ public class EpsosHelperService {
             Attribute attrPID_8 = createAttribute(builderFactory,
                     "Hl7 Permissions",
                     "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission");
-            Iterator itr = permissions.iterator();
-            while (itr.hasNext()) {
-                attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, itr
-                        .next().toString(), "", "");
+            for (Object permission : permissions) {
+                attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, permission.toString(), "", "");
             }
             attrStmt.getAttributes().add(attrPID_8);
 
             assertion.getStatements().add(attrStmt);
 
+            log.info("AssertionId: '{}'", assertion.getID());
         } catch (ConfigurationException e) {
             log.error(ExceptionUtils.getStackTrace(e));
         }
-        log.info("AssertionId " + assertion.getID());
         return assertion;
     }
 
@@ -1716,11 +1685,12 @@ public class EpsosHelperService {
         return listOfCountries;
     }
 
-    public static List<Country> getCountriesFromCS(String lang,
-                                                   String portalPath) {
-        log.info("get Countries from CS with lang " + lang);
-        List<Country> listOfCountries = new ArrayList<Country>();
+    public static List<Country> getCountriesFromCS(String lang, String portalPath) {
+
+        log.info("Get Countries from CS with lang '{}'", lang);
+        List<Country> listOfCountries = new ArrayList<>();
         String filename = "InternationalSearch.xml";
+
         try {
             String wi = Constants.EPSOS_PROPS_PATH;
             String path = wi + "forms" + File.separator + filename;
@@ -1734,10 +1704,8 @@ public class EpsosHelperService {
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
                 String countryCode = link.getAttribute("code");
-                String countryName = EpsosHelperService.getCountryName(
-                        countryCode, lang);
-                log.debug("Lang is " + lang + " and Country code: "
-                        + countryCode + " name is " + countryName);
+                String countryName = EpsosHelperService.getCountryName(countryCode, lang);
+                log.debug("Lang is: '{}' and Country code: '{}' name is: '{}'", lang, countryCode + countryName);
                 Country country = new Country(countryName, countryCode);
                 listOfCountries.add(country);
             }
@@ -1751,11 +1719,12 @@ public class EpsosHelperService {
     }
 
     public static List<Country> getCountriesFromCS(String lang) {
-        log.info("get Countries from CS with lang " + lang);
+
+        log.info("Get Countries from CS with lang '{}'", lang);
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
         String wi = externalContext.getRealPath("/");
-        log.info("Countries definition path is " + wi);
+        log.info("Countries definition path is '{}'", wi);
         return getCountriesFromCS(lang, wi);
     }
 
@@ -1854,7 +1823,7 @@ public class EpsosHelperService {
 
     public static List<Identifier> getCountryIdentifiers(String country,
                                                          String language, String path, User user) {
-        List<Identifier> identifiers = new ArrayList<Identifier>();
+        List<Identifier> identifiers = new ArrayList<>();
 
         Vector vec = EpsosHelperService.getCountryIdsFromCS(country, path);
         for (int i = 0; i < vec.size(); i++) {
@@ -2634,7 +2603,7 @@ public class EpsosHelperService {
             patients = EpsosHelperService.getMockPatients();
         } else {
             try {
-                patients = new ArrayList<Patient>();
+                patients = new ArrayList<>();
                 String serviceUrl = EpsosHelperService
                         .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
                 log.info("CONNECTOR URL IS: " + serviceUrl);
@@ -2683,7 +2652,7 @@ public class EpsosHelperService {
         List<PatientDocument> patientDocuments = null;
         PatientId patientId = null;
         try {
-            patientDocuments = new ArrayList<PatientDocument>();
+            patientDocuments = new ArrayList<>();
             String serviceUrl = EpsosHelperService
                     .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
             log.info("CLIENTCONNECTOR: " + serviceUrl);

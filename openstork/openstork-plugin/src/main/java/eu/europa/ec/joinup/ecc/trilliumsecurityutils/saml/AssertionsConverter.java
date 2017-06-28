@@ -19,6 +19,8 @@ import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
 import eu.epsos.assertionvalidator.AssertionHelper;
 import eu.epsos.assertionvalidator.PolicyManagerInterface;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLObjectBuilder;
 import org.opensaml.common.SAMLVersion;
@@ -222,7 +224,7 @@ public class AssertionsConverter {
         HashMap<String, String> auditDataMap;
 
         ksm = new DefaultKeyStoreManager();
-        auditDataMap = new HashMap<String, String>();
+        auditDataMap = new HashMap<>();
 
         try {
             //initializing the map
@@ -236,21 +238,21 @@ public class AssertionsConverter {
             try {
                 sman.verifySAMLAssestion(hcpIdentityAssertion);
             } catch (SMgrException ex) {
-                LOG.error("SMgrException: " + ex);
+                LOG.error("SMgrException: '{}'", ex);
                 //java.util.logging.LoggerFactory.getLogger(SamlTRCIssuer.class.getName()).log(Level.SEVERE, null, ex);
                 LOG.error("SMgrException: " + ex);
                 throw new SMgrException("SAML Assertion Validation Failed: " + ex.getMessage());
             }
             if (hcpIdentityAssertion.getConditions().getNotBefore().isAfterNow()) {
                 String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't ne used before " + hcpIdentityAssertion.getConditions().getNotBefore();
-                LOG.error("SMgrException: " + msg);
+                LOG.error("SMgrException: '{}'", msg);
                 //java.util.logging.LoggerFactory.getLogger(SamlTRCIssuer.class.getName()).log(Level.SEVERE, msg);
                 throw new SMgrException(msg);
             }
             if (hcpIdentityAssertion.getConditions().getNotOnOrAfter().isBeforeNow()) {
                 String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used after " + hcpIdentityAssertion.getConditions().getNotOnOrAfter();
                 //java.util.logging.LoggerFactory.getLogger(SamlTRCIssuer.class.getName()).log(Level.SEVERE, msg);
-                LOG.error("SMgrException: " + msg);
+                LOG.error("SMgrException: '{}'", msg);
                 throw new SMgrException(msg);
             }
 
@@ -263,8 +265,10 @@ public class AssertionsConverter {
             }
 
             auditDataMap.put("patientID", patientID);
+            DateTime now = new DateTime();
+            LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
 
-            trc.setIssueInstant(new DateTime());
+            trc.setIssueInstant(nowUTC.toDateTime());
             trc.setID("_" + UUID.randomUUID());
             auditDataMap.put("trcAssertionID", trc.getID());
 
@@ -296,9 +300,9 @@ public class AssertionsConverter {
 
             //Create and add conditions
             Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
-            DateTime now = new DateTime();
-            conditions.setNotBefore(now);
-            conditions.setNotOnOrAfter(now.plusHours(2)); // According to Spec
+
+            conditions.setNotBefore(nowUTC.toDateTime());
+            conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2)); // According to Spec
             trc.setConditions(conditions);
 
             //Create and add Advice
@@ -312,7 +316,7 @@ public class AssertionsConverter {
 
             //Add and create the authentication statement
             AuthnStatement authStmt = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
-            authStmt.setAuthnInstant(now);
+            authStmt.setAuthnInstant(nowUTC.toDateTime());
             trc.getAuthnStatements().add(authStmt);
 
             //Creata and add AuthnContext
@@ -470,26 +474,25 @@ public class AssertionsConverter {
             assId = "_" + UUID.randomUUID().toString();
             assertion.setID(assId);
             assertion.setVersion(SAMLVersion.VERSION_20);
-            assertion.setIssueInstant(new org.joda.time.DateTime()
-                    .minusHours(3));
+            org.joda.time.DateTime now = new org.joda.time.DateTime();
+            LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
 
-            Subject subject = create(Subject.class,
-                    Subject.DEFAULT_ELEMENT_NAME);
+            assertion.setIssueInstant(nowUTC.toDateTime());
+
+            Subject subject = create(Subject.class, Subject.DEFAULT_ELEMENT_NAME);
             assertion.setSubject(subject);
             subject.setNameID(nameId);
 
             // Create and add Subject Confirmation
-            SubjectConfirmation subjectConf = create(SubjectConfirmation.class,
-                    SubjectConfirmation.DEFAULT_ELEMENT_NAME);
+            SubjectConfirmation subjectConf = create(SubjectConfirmation.class, SubjectConfirmation.DEFAULT_ELEMENT_NAME);
             subjectConf.setMethod(SubjectConfirmation.METHOD_SENDER_VOUCHES);
             assertion.getSubject().getSubjectConfirmations().add(subjectConf);
 
             // Create and add conditions
-            Conditions conditions = create(Conditions.class,
-                    Conditions.DEFAULT_ELEMENT_NAME);
-            org.joda.time.DateTime now = new org.joda.time.DateTime();
-            conditions.setNotBefore(now.minusMinutes(1));
-            conditions.setNotOnOrAfter(now.plusHours(2)); // According to Spec
+            Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
+
+            conditions.setNotBefore(nowUTC.toDateTime().minusMinutes(1));
+            conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2)); // According to Spec
             assertion.setConditions(conditions);
 
             // AudienceRestriction ar =
@@ -504,22 +507,18 @@ public class AssertionsConverter {
             assertion.setIssuer(issuer);
 
             // Add and create the authentication statement
-            AuthnStatement authStmt = create(AuthnStatement.class,
-                    AuthnStatement.DEFAULT_ELEMENT_NAME);
-            authStmt.setAuthnInstant(now.minusHours(2));
+            AuthnStatement authStmt = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
+            authStmt.setAuthnInstant(nowUTC.toDateTime());
             assertion.getAuthnStatements().add(authStmt);
 
             // Create and add AuthnContext
-            AuthnContext ac = create(AuthnContext.class,
-                    AuthnContext.DEFAULT_ELEMENT_NAME);
-            AuthnContextClassRef accr = create(AuthnContextClassRef.class,
-                    AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
+            AuthnContext ac = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
+            AuthnContextClassRef accr = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
             accr.setAuthnContextClassRef(AuthnContext.PASSWORD_AUTHN_CTX);
             ac.setAuthnContextClassRef(accr);
             authStmt.setAuthnContext(ac);
 
-            AttributeStatement attrStmt = create(AttributeStatement.class,
-                    AttributeStatement.DEFAULT_ELEMENT_NAME);
+            AttributeStatement attrStmt = create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
 
             // XSPA Subject
             Attribute attrPID = createAttribute(builderFactory, "XSPA subject",
@@ -577,18 +576,15 @@ public class AssertionsConverter {
             Attribute attrPID_8 = createAttribute(builderFactory,
                     "Hl7 Permissions",
                     "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission");
-            Iterator itr = permissions.iterator();
-            while (itr.hasNext()) {
-                attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, itr
-                        .next().toString(), "", "");
+            for (Object permission : permissions) {
+                attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, permission.toString(), "", "");
             }
             attrStmt.getAttributes().add(attrPID_8);
 
             assertion.getStatements().add(attrStmt);
 
         } catch (ConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error("ConfigurationException: '{}'", e.getMessage(), e);
         }
         return assertion;
     }
@@ -634,7 +630,7 @@ public class AssertionsConverter {
                     .hcpIdentifier(hcpId)
                     .hcpRole(hcpRole);
         } catch (MissingFieldException ex) {
-            LOG.error("One or more required attributes were not found in the original assertion", ex);
+            LOG.error("One or more required attributes were not found in the original assertion: '{}'", ex.getMessage(), ex);
             return result;
         }
 
@@ -644,7 +640,7 @@ public class AssertionsConverter {
             assertionBuilder
                     .hcpSpecialty(hcpSpecialty);
         } catch (MissingFieldException ex) {
-            LOG.info("Optional attribute not found, proceeding with conversion (HCP Specialty).");
+            LOG.info("Optional attribute not found, proceeding with conversion (HCP Specialty).", ex);
         }
 
         // OPTIONAL: HCP Organization ID and HCP Organization Name
@@ -654,7 +650,7 @@ public class AssertionsConverter {
             assertionBuilder
                     .healthCareProfessionalOrganisation(orgId, orgName);
         } catch (MissingFieldException ex) {
-            LOG.info("Optional attribute not found, proceeding with conversion ( HCP Organization ID and HCP Organization Name.");
+            LOG.info("Optional attribute not found, proceeding with conversion ( HCP Organization ID and HCP Organization Name.", ex);
         }
 
         // MANDATORY: HealthCare Facility Type
