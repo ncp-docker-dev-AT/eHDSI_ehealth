@@ -1,6 +1,7 @@
 package epsos.ccd.gnomon.tsam;
 
 import epsos.ccd.gnomon.tsam.configuration.Settings;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +41,6 @@ public class XMLExporter {
     private static String export() {
 
         StringBuilder output = new StringBuilder();
-        //Statement stat = null;
-        //ResultSet result = null;
-        //Statement stat1 = null;
-        //ResultSet resultcodes = null;
-        //Statement stat2 = null;
-        //ResultSet result1 = null;
-        //Connection conn = null;
 
         try {
             LOG.info("Starting ...");
@@ -64,8 +58,6 @@ public class XMLExporter {
             try (Connection conn = DriverManager.getConnection(databaseUrl, userName, userPassword);
                  Statement stat = conn.createStatement();
                  ResultSet result = stat.executeQuery(query)) {
-                //String codes = Settings.getInstance().getSettingValue("oid.codes");
-                //String query = "SELECT * FROM code_system where id in (" + codes +")";
 
                 String cs_id;
                 String cs_oid;
@@ -75,12 +67,11 @@ public class XMLExporter {
                     StringBuilder sb = new StringBuilder();
 
                     cs_id = result.getString("id");
-                    LOG.info("CS_ID IS : '{}'", cs_id);
                     cs_oid = result.getString("oid");
                     cs_name = result.getString("name");
                     String cs_name_nopaces = cs_name.replaceAll(" ", "");
 
-                    LOG.info("Writing code with OID = '{}' and name = '{}'", cs_oid, cs_name);
+                    LOG.info("Writing code for CS_ID: '{}' with OID = '{}' and name = '{}'", cs_id, cs_oid, cs_name);
                     output.append("Writing code with OID = ").append(cs_oid).append(" and name ").append(cs_name);
                     output.append("<br/>");
                     sb.append("<?xml version=\'1.0\' encoding=\'utf-8\' ?>\r\n");
@@ -100,8 +91,8 @@ public class XMLExporter {
                         while (resultcodes.next()) {
 
                             String csdistinct_id = resultcodes.getString("code");
-                            csdistinct_id = StringUtils.replaceAll(csdistinct_id, "'", "''");
-                            //LOG.info("Getting Info for CODE: '{}'", csdistinct_id);
+                            csdistinct_id = escapeSql(csdistinct_id);
+
                             String subquery = "SELECT value_set.oid, "
                                     + " value_set.epsos_name, "
                                     + " code_system_concept.code, "
@@ -122,7 +113,7 @@ public class XMLExporter {
                                     + " designation.is_preferred = 1 AND "
                                     + " value_set.oid IS NOT NULL "
                                     + "ORDER BY value_set.epsos_name";
-                            //LOG.info("SUBQUERY: {}", subquery);
+
                             try (Statement stat2 = conn.createStatement();
                                  ResultSet result1 = stat2.executeQuery(subquery)) {
 
@@ -139,11 +130,10 @@ public class XMLExporter {
                                             append(cs_name_nopaces).
                                             append("Entry oid='").append(oid).append("'").
                                             append(" epsosName='").append(epsosName).append("'").
-                                            append(" code='").append(StringUtils.replace(code, "'", "''")).append("'").
-                                            append(">\r\n");
+                                            append(" code='").append(StringEscapeUtils.escapeXml10(code)).append("'").append(">\r\n");
 
                                     sb.append("<displayName").append(" lang='").append(lang_code).append("'>").
-                                            append(description).
+                                            append(StringEscapeUtils.escapeXml10(description)).
                                             append("</displayName>\r\n");
 
                                     while (result1.next()) {
@@ -151,17 +141,14 @@ public class XMLExporter {
                                         lang_code = result1.getString("language_code");
                                         description = result1.getString("designation");
                                         sb.append("<displayName").append(" lang='").append(lang_code).append("'>").
-                                                append(description).
+                                                append(StringEscapeUtils.escapeXml10(description)).
                                                 append("</displayName>\r\n");
                                     }
-
                                     sb.append("</").append(cs_name_nopaces).append("Entry>\r\n");
                                 }
                             }
                         }
-
                         sb.append("</").append(cs_name_nopaces).append("Information>\r\n");
-
                         output.append(createFile(sb, cs_name_nopaces));
                     }
                 }
@@ -169,32 +156,6 @@ public class XMLExporter {
         } catch (Exception e) {
             LOG.error("Exception '{}'", e.getMessage(), e);
         }
-//        finally {
-//            // IOUtils.closeQuietly(stat);
-//
-//            try {
-////                //result.close();
-////                stat.close();
-////                resultcodes.close();
-////                stat1.close();
-////                result1.close();
-////                stat2.close();
-//               // conn.close();
-//            } catch (SQLException ex) {
-//                LOG.error("Exception '{}'", ex.getMessage(), ex);
-//            } finally {
-//                if (conn != null) {
-//                    try {
-//                        conn.close();
-////                        stat.close();
-////                        stat1.close();
-////                        resultcodes.close();
-//                    } catch (SQLException ex) {
-//                        LOG.error(null, ex);
-//                    }
-//                }
-//            }
-        //}
         return output.toString();
     }
 
@@ -222,15 +183,22 @@ public class XMLExporter {
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8"));
             out.write(sb.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("IOException: '{}'", e.getMessage(), e);
         } finally {
             try {
                 out.close();
             } catch (IOException e) {
 
-                e.printStackTrace();
+                LOG.error("IOException: '{}'", e.getMessage(), e);
             }
         }
         return output.toString();
+    }
+
+    private static String escapeSql(String str) {
+        if (str == null) {
+            return null;
+        }
+        return StringUtils.replace(str, "'", "''");
     }
 }
