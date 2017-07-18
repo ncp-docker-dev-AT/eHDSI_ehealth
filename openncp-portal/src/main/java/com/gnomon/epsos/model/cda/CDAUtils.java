@@ -1,5 +1,6 @@
 package com.gnomon.epsos.model.cda;
 
+import com.gnomon.LiferayUtils;
 import com.gnomon.epsos.service.EpsosHelperService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -7,6 +8,10 @@ import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
@@ -427,7 +432,7 @@ public class CDAUtils {
         sb.append("\r\n");
         sb.append("<administrativeGenderCode code=\"").append(cda.getPatientSex()).append("\" codeSystem=\"2.16.840.1.113883.5.1\" />");
         sb.append("\r\n");
-        sb.append(addTag("birthTime", cda.getPatientBirthDate()));
+        sb.append(addTag("birthTime", getBirthTime(cda.getPatientBirthDate())));
         sb.append("\r\n");
         sb.append("<languageCommunication><languageCode code=\"").append(cda.getPatientLanguageCommunication()).append("\"/></languageCommunication>");
         sb.append("\r\n");
@@ -1174,5 +1179,17 @@ public class CDAUtils {
             _log.error(e.getMessage());
         }
         return sameBarcode;
+    }
+
+    private static String getBirthTime(String cdaBirthDate) {
+        final DateFormat portalUserDateFormat = LiferayUtils.getPortalUserDateFormat();
+        Date patientBirthDate = null;
+        try {
+            patientBirthDate = portalUserDateFormat.parse(cdaBirthDate);
+        } catch (ParseException e) {
+            _log.error(e.getMessage());
+        }
+        SimpleDateFormat format = new SimpleDateFormat("YYYYMMdd");
+        return format.format(patientBirthDate);
     }
 }
