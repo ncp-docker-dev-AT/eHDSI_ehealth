@@ -58,7 +58,6 @@ public class QueryPersonPage extends BasePage {
     private DefaultDataTable<Person> datatablePersonList;
 
     private ModalWindow personInfoModalWindow;
-    private List<PatientIdVO> patientIdVOList = new ArrayList<>();
 
     public QueryPersonPage() {
 
@@ -203,15 +202,6 @@ public class QueryPersonPage extends BasePage {
     }
 
     /**
-     * Do not use as needed only for tests.
-     */
-    @Deprecated
-    protected void setPatientVOList(List<PatientIdVO> testContent) {
-
-        this.patientIdVOList = testContent;
-    }
-
-    /**
      * Added as an explicit method for the content to be substituted in test
      * (QueryPersonPageTest).
      *
@@ -219,12 +209,7 @@ public class QueryPersonPage extends BasePage {
      * @return A list of PatientIdVO objects
      */
     protected List<PatientIdVO> getPatientVOList(CountryVO selectedCountry) {
-
-        if (this.patientIdVOList == null) {
-            return CountryConfigManager.getPatientIdentifiers(selectedCountry);
-        } else {
-            return this.patientIdVOList;
-        }
+        return CountryConfigManager.getPatientIdentifiers(selectedCountry);
     }
 
     public class QueryPersonForm extends Form<QueryPerson> {
