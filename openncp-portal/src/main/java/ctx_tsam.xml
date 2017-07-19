@@ -19,24 +19,31 @@
     <!-- Is this DataSource used? Below there is the representation of the TSAM Connection.
 	<jee:jndi-lookup id="dbDataSource" jndi-name="jdbc/TSAM" expected-type="javax.sql.DataSource" />
     -->
-    <bean id="tsamDatasource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${ltr.db.driverClass}"/>
-        <property name="url" value="${ltr.db.url}"/>
-        <property name="username" value="${ltr.db.user}"/>
-        <property name="password" value="${ltr.db.password}"/>
+    <!--<bean id="tsamDatasource" class="org.apache.commons.dbcp.BasicDataSource">-->
+    <!--<property name="driverClassName" value="${ltr.db.driverClass}"/>-->
+    <!--<property name="url" value="${ltr.db.url}"/>-->
+    <!--<property name="username" value="${ltr.db.user}"/>-->
+    <!--<property name="password" value="${ltr.db.password}"/>-->
+    <!--</bean>-->
+    <bean id="tsamDatasource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="java:comp/env/jdbc/TSAM"/>
     </bean>
 
     <bean id="tsamSessionFactory"
-          class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+          class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <property name="dataSource" ref="tsamDatasource"/>
         <property name="hibernateProperties">
             <props>
                 <prop key="hibernate.dialect">${ltr.hibernate.dialect}</prop>
                 <prop key="hibernate.show_sql">false</prop>
-                <prop key="hibernate.cache.use_query_cache">true</prop>
-                <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
                 <prop key="hibernate.generate_statistics">true</prop>
                 <prop key="hibernate.cache.use_structured_entries">true</prop>
+                <!--Configuration Second Level Cache using EhCache  -->
+                <prop key="hibernate.cache.use_second_level_cache">false</prop>
+                <!--<prop key="hibernate.cache.use_query_cache">true</prop>-->
+                <!--<prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>-->
+                <!--<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>-->
+                <!--<prop key="org.hibernate.cache.ehcache.configurationResourceName">/ehcache.xml</prop>-->
             </props>
         </property>
         <property name="mappingResources">
@@ -55,7 +62,7 @@
     <tx:annotation-driven transaction-manager="tsamTransactionManager"/>
 
     <bean id="tsamTransactionManager"
-          class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+          class="org.springframework.orm.hibernate5.HibernateTransactionManager">
         <property name="sessionFactory" ref="tsamSessionFactory"/>
     </bean>
 
