@@ -15,6 +15,9 @@ public class Ingredient implements Serializable {
 	private static final long serialVersionUID = 5984829943046464308L;
 
 	private String activeIngredient;
+
+	private String activeIngredientName;
+
 	private String strength;
 
 	public String getActiveIngredient() {
@@ -23,6 +26,14 @@ public class Ingredient implements Serializable {
 
 	public void setActiveIngredient(String activeIngredient) {
 		this.activeIngredient = activeIngredient;
+	}
+
+	public String getActiveIngredientName() {
+		return activeIngredientName;
+	}
+
+	public void setActiveIngredientName(String activeIngredientName) {
+		this.activeIngredientName = activeIngredientName;
 	}
 
 	public String getStrength() {

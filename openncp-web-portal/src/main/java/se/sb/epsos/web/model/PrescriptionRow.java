@@ -23,6 +23,7 @@ public class PrescriptionRow implements Serializable {
 	private String formName;
 	private String atcCode;
 	private String atcName;
+	private String strength;
 	private String dosage;
 	private String frequency;
 	private String route;
@@ -104,6 +105,14 @@ public class PrescriptionRow implements Serializable {
 
 	public void setAtcName(String atcName) {
 		this.atcName = atcName;
+	}
+
+	public String getStrength() {
+		return strength;
+	}
+
+	public void setStrength(String strength) {
+		this.strength = strength;
 	}
 
 	public String getDosage() {
@@ -228,18 +237,25 @@ public class PrescriptionRow implements Serializable {
 
 	public String getDescription() {
 		String descr = "";
-		if (this.ingredient != null) {
-			for (Ingredient in : this.ingredient) {
-				descr = descr + (in.getActiveIngredient() != null ? (in.getActiveIngredient()) : "");
-				descr = descr + (in.getStrength() != null ? (" " + in.getStrength()) : "");
-				descr = descr + ", ";
+		if ((this.atcCode) != null && !this.atcCode.isEmpty()) {
+			descr += this.atcCode;
+			if ((this.atcName != null) && !this.atcName.isEmpty()) {
+				descr += " - " + this.atcName;
+			}
+		} else {
+			if (this.ingredient != null) {
+				for (Ingredient in : this.ingredient) {
+					descr += (in.getActiveIngredient() != null ? (in.getActiveIngredient()) : "");
+					descr += (in.getStrength() != null ? (" " + in.getStrength()) : "");
+					descr += ", ";
+				}
 			}
 		}
 
-		descr = descr + (this.packageSize.getQuantityValue() != null ? ("" + this.packageSize.getQuantityValue()) : "");
-		descr = descr + (this.packageSize.getQuantityUnit() != null ? (" " + this.packageSize.getQuantityUnit()) : "");
-		descr = descr + (this.formName != null ? (" " + this.formName) : "");
-		descr = descr + (this.productName != null ? (" (" + this.productName + ")") : "");
+		descr += (this.packageSize.getQuantityValue() != null ? ("" + this.packageSize.getQuantityValue()) : "");
+		descr += (this.packageSize.getQuantityUnit() != null ? (" " + this.packageSize.getQuantityUnit()) : "");
+		descr += (this.formName != null ? (" " + this.formName) : "");
+		descr += (this.productName != null ? (" (" + this.productName + ")") : "");
 		return descr;
 	}
 
