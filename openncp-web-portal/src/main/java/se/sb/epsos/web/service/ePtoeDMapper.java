@@ -303,6 +303,13 @@ public class ePtoeDMapper {
             eD_Document_material.getCode().setDisplayName(dispRow.getProductName());
             eD_Document_material.getName().newCursor().setTextValue(dispRow.getProductName());
 
+            // Overall strength, if provided as a text
+            String overallStrength = dispRow.getPrescriptionRow().getStrength();
+            if(overallStrength != null && overallStrength.length() > 0) {
+            	eD_Document_material.addNewDesc();
+            	eD_Document_material.getDesc().newCursor().setTextValue(overallStrength);
+            }
+            
             // Form code
             eD_Document_material.getFormCode().setCode(dispRow.getPrescriptionRow().getFormCode());
             eD_Document_material.getFormCode().setDisplayName(dispRow.getPrescriptionRow().getFormName());
