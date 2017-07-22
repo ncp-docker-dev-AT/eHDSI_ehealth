@@ -89,46 +89,55 @@ CREATE TABLE value_set_version (
 CREATE TABLE x_concept_value_set (
   code_system_concept_id BIGINT NOT NULL,
   value_set_version_id   BIGINT NOT NULL,
-  PRIMARY KEY (code_system_concept_id,
-               value_set_version_id)
+  PRIMARY KEY (code_system_concept_id, value_set_version_id)
 );
 
 ALTER TABLE code_system_concept
   ADD CONSTRAINT fk_code_system_version_id
-FOREIGN KEY (code_system_version_id) REFERENCES code_system_version (id);
+FOREIGN KEY (code_system_version_id)
+REFERENCES code_system_version (id);
 
 ALTER TABLE code_system_version
   ADD CONSTRAINT fk_code_system_id
-FOREIGN KEY (code_system_id) REFERENCES code_system (id);
+FOREIGN KEY (code_system_id)
+REFERENCES code_system (id);
 
 ALTER TABLE designation
   ADD CONSTRAINT fk_des_code_system_concept_id
-FOREIGN KEY (code_system_concept_id) REFERENCES code_system_concept (id);
+FOREIGN KEY (code_system_concept_id)
+REFERENCES code_system_concept (id);
 
 ALTER TABLE transcoding_association
   ADD CONSTRAINT fk_source_concept_id
-FOREIGN KEY (source_concept_id) REFERENCES code_system_concept (id);
+FOREIGN KEY (source_concept_id)
+REFERENCES code_system_concept (id);
 
 ALTER TABLE transcoding_association
   ADD CONSTRAINT fk_target_concept_id
-FOREIGN KEY (target_concept_id) REFERENCES code_system_concept (id);
+FOREIGN KEY (target_concept_id)
+REFERENCES code_system_concept (id);
 
 ALTER TABLE value_set
   ADD CONSTRAINT fk_parent_code_system_id
-FOREIGN KEY (parent_code_system_id) REFERENCES code_system (id);
+FOREIGN KEY (parent_code_system_id)
+REFERENCES code_system (id);
 
 ALTER TABLE value_set_version
   ADD CONSTRAINT fk_previous_version_id
-FOREIGN KEY (previous_version_id) REFERENCES value_set_version (id);
+FOREIGN KEY (previous_version_id)
+REFERENCES value_set_version (id);
 
 ALTER TABLE value_set_version
   ADD CONSTRAINT fk_value_set_id
-FOREIGN KEY (value_set_id) REFERENCES value_set (id);
+FOREIGN KEY (value_set_id)
+REFERENCES value_set (id);
 
 ALTER TABLE x_concept_value_set
   ADD CONSTRAINT fk_con_code_system_concept_id
-FOREIGN KEY (code_system_concept_id) REFERENCES code_system_concept (id);
+FOREIGN KEY (code_system_concept_id)
+REFERENCES code_system_concept (id);
 
 ALTER TABLE x_concept_value_set
   ADD CONSTRAINT fk_value_set_version_id
-FOREIGN KEY (value_set_version_id) REFERENCES value_set_version (id);
+FOREIGN KEY (value_set_version_id)
+REFERENCES value_set_version (id);

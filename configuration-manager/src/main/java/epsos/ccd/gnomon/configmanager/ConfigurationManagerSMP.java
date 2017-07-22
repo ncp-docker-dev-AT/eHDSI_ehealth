@@ -4,6 +4,7 @@ import eu.epsos.configmanager.database.HibernateUtil;
 import eu.epsos.configmanager.database.model.Property;
 import org.apache.commons.codec.binary.Base64;
 import org.hibernate.PropertyNotFoundException;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +94,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
     /**
      * The hibernate session. Here I may have problems of thread safety.
      */
-    private org.hibernate.classic.Session session;
+    private Session session;
     /**
      * This is the Hash Map that holds the configuration entries.
      */
@@ -106,6 +107,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 
         long start = System.currentTimeMillis();
         LOGGER.info("Loading the Hibernate session object");
+        // TODO Code refactoring, close the SessionFactory
         session = HibernateUtil.getSessionFactory().openSession();
         long end = System.currentTimeMillis();
         long total = end - start;
@@ -124,7 +126,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
         if (instance == null) {
             synchronized (ConfigurationManagerSMP.class) {
                 if (instance == null) {
-                    LOGGER.info("Instatiating a new ConfigurationManagerSMP");
+                    LOGGER.info("Instantiating a new ConfigurationManagerSMP");
                     instance = new ConfigurationManagerSMP();
                 }
             }
@@ -139,7 +141,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
         LOGGER.info("Loading all the values");
         long start = System.currentTimeMillis();
 
-        @SuppressWarnings("unchecked")
+        //List<Property> properties = session.createQuery("select p from Property p", Property.class).list();
         List<Property> properties = session.createCriteria(Property.class).list();
 
         long end = System.currentTimeMillis();
@@ -389,8 +391,6 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
      * @param binary
      */
     private boolean exportCertificate(java.security.cert.Certificate cert, File file, boolean binary) throws SMLSMPClientException {
-
-        boolean exp = false;
         try {
             // Get the encoded form which is suitable for exporting
             byte[] buf = cert.getEncoded();
@@ -404,10 +404,8 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
                     wr.write("\n-----END CERTIFICATE-----\n");
                     wr.flush();
                 }
-                //exp = true;
             }
         } catch (CertificateEncodingException | IOException e) {
-            exp = false;
             throw new SMLSMPClientException(e);
         }
         return true;

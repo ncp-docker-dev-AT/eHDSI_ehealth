@@ -1,35 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!--
-
-
-*****************************************************************************************************
-*                                                             										*
-* NOTE: This file is an example, as opposed to a working copy,                   					*
-* until the logMessageClass property in the serviceConfig bean                                 		*
-* has been set, i.e. the place holder variable log.message.class            				        *
-* surrounded by @ symbols has been replaced															*
-*                                                                       							*
-*****************************************************************************************************
-
-
-
--->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.springframework.org/schema/tx
-       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
-       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd"
        default-lazy-init="true">
 
     <bean id="propertyConfigurer" class="org.openhealthtools.openatna.audit.OpenAtnaPropertiesLoader">
         <property name="location">
             <value>${openATNA.properties.path}</value>
         </property>
-        <property name="ignoreUnresolvablePlaceholders" value="true" />
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
 
     <!-- =============================================================================== -->
@@ -94,12 +74,10 @@
         <property name="actorFile" value="${ihe.actors.file}"/>
     </bean>
 
-
     <bean id="auditService" class="org.openhealthtools.openatna.audit.service.AuditServiceImpl">
         <property name="serviceConfig" ref="serviceConfig"/>
         <property name="serverConfig" ref="serverConfig"/>
     </bean>
-
 
     <!-- =============================================================================== -->
     <!-- ============================ Persistence Configuration ======================== -->
@@ -115,7 +93,7 @@
     <!-- Hibernate SessionFactory
     NOTE: after_transaction connection release mode. Could this be a problem in certain environments?
     -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="configLocation" value="classpath:openatna-hibernate.cfg.xml"/>
         <property name="hibernateProperties">
@@ -131,7 +109,7 @@
     </bean>
 
     <!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
-    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
@@ -171,22 +149,26 @@
         <constructor-arg ref="sessionFactory"/>
     </bean>
 
-    <bean id="provisionalDao" class="org.openhealthtools.openatna.audit.persistence.dao.hibernate.HibernateProvisionalDao">
+    <bean id="provisionalDao"
+          class="org.openhealthtools.openatna.audit.persistence.dao.hibernate.HibernateProvisionalDao">
         <constructor-arg ref="sessionFactory"/>
     </bean>
 
     <bean id="errorDao" class="org.openhealthtools.openatna.audit.persistence.dao.hibernate.HibernateErrorDao">
         <constructor-arg ref="sessionFactory"/>
     </bean>
+
     <bean id="queryDao" class="org.openhealthtools.openatna.audit.persistence.dao.hibernate.HibernateQueryDao">
         <constructor-arg ref="sessionFactory"/>
     </bean>
 
-    <bean id="auditLoggerPluginManager" class="org.openhealthtools.openatna.all.logging.AuditLoggerPluginManagerImpl" init-method="start" destroy-method="destroy" 
-    	lazy-init="false" scope="singleton">
-    	<property name="loggers" value="${openATNA.auditLoggers}"/>
+    <bean id="auditLoggerPluginManager" class="org.openhealthtools.openatna.all.logging.AuditLoggerPluginManagerImpl"
+          init-method="start" destroy-method="destroy"
+          lazy-init="false" scope="singleton">
+        <property name="loggers" value="${openATNA.auditLoggers}"/>
     </bean>
 
-    <bean id="OpenATNAServiceLoaderListener" class="org.openhealthtools.openatna.web.OpenATNAServiceLoaderListener" 
-    	init-method="start" destroy-method="destroy" lazy-init="false" scope="singleton" />
+    <bean id="OpenATNAServiceLoaderListener" class="org.openhealthtools.openatna.web.OpenATNAServiceLoaderListener"
+          init-method="start" destroy-method="destroy" lazy-init="false" scope="singleton"/>
 </beans>
+

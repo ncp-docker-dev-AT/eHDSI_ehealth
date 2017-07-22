@@ -58,16 +58,17 @@ public class OLDConfigurationManagerDb implements ConfigurationManagerInt {
      * @return the property value.
      */
     public String getProperty(final String key) {
+        // TODO Code refactoring, close the SessionFactory
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Property p = (Property) session.get(Property.class, key);
+        Property p = session.get(Property.class, key);
 
         if (p == null) {
-            logger.debug("GETTING PROPERTY = [" + key + "] = " + "NOT FOUND!");
+            logger.debug("GETTING PROPERTY = [{}] = NOT FOUND!", key);
             session.close();
             return "";
         }
 
-        logger.debug("GETTING PROPERTY = [" + key + "] = [" + p.getValue().trim() + "]");
+        logger.debug("GETTING PROPERTY = [{}] = [{}]", key,  p.getValue());
 
         session.close();
         return p.getValue().trim();
@@ -77,8 +78,8 @@ public class OLDConfigurationManagerDb implements ConfigurationManagerInt {
      * Allows the retrieval of a Web-service endpoint, based on ISO country code
      * and service name.
      *
-     *  @param isoCountryCode - the country code in ISO format.
-     * @param ServiceName - the specific service name.
+     * @param isoCountryCode - the country code in ISO format.
+     * @param ServiceName    - the specific service name.
      * @return the web-service endpoint url.
      */
     public String getServiceWSE(final String isoCountryCode, final String ServiceName) {
@@ -90,8 +91,8 @@ public class OLDConfigurationManagerDb implements ConfigurationManagerInt {
      * Service name.
      *
      * @param isoCountryCode - the country code in ISO format.
-     * @param serviceName - the service name.
-     * @param url - the web-service url value to be setted.
+     * @param serviceName    - the service name.
+     * @param url            - the web-service url value to be setted.
      */
     public void setServiceWSE(final String isoCountryCode, final String serviceName, final String url) {
         updateProperty(isoCountryCode + "." + serviceName + ".WSE", url);
@@ -100,18 +101,19 @@ public class OLDConfigurationManagerDb implements ConfigurationManagerInt {
     /**
      * Permits the update of a specified property and value.
      *
-     * @param key - the name of the property to be updated.
+     * @param key   - the name of the property to be updated.
      * @param value - the new value to be set.
      * @return the newly updated value.
      */
     public String updateProperty(final String key, final String value) {
+        // TODO Code refactoring, close the SessionFactory
         final Session session = HibernateUtil.getSessionFactory().openSession();
 
-        Property p = (Property) session.get(Property.class, key);
+        Property p = session.get(Property.class, key);
 
         if (p == null) {
 
-            logger.error("PROPERTY: [" + key + "] NOT FOUND. ADDING NEW ENTRY TO DB.");
+            logger.error("PROPERTY: [{}] NOT FOUND. ADDING NEW ENTRY TO DB.", key);
 
             session.beginTransaction();
 
@@ -127,7 +129,7 @@ public class OLDConfigurationManagerDb implements ConfigurationManagerInt {
 
         } else {
 
-            logger.debug("UPDATING PROPERTY: [" + key + "]=[" + value + "]");
+            logger.debug("UPDATING PROPERTY: [{}]=[{}]", key, value);
 
             session.beginTransaction();
 

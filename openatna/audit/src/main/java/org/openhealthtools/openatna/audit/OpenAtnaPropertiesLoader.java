@@ -16,7 +16,6 @@
  * Contributors:
  * Cardiff University - intial API and implementation
  */
-
 package org.openhealthtools.openatna.audit;
 
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -27,17 +26,15 @@ import org.springframework.core.io.Resource;
 /**
  * @author Andrew Harrison
  * @version 1.0.0
- * @date Mar 13, 2010: 11:10:05 AM
  */
-
 public class OpenAtnaPropertiesLoader extends PropertyPlaceholderConfigurer {
 
     public void setLocation(Resource location) {
         String loc = AtnaFactory.getPropertiesLocation();
         if (loc != null && loc.length() > 0) {
-        	
+
             location = new ClassPathResource(loc);
-            if(!location.exists()) {
+            if (!location.exists()) {
                 location = new FileSystemResource(loc);
             }
         }

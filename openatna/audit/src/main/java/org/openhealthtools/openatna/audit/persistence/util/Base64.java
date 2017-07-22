@@ -25,8 +25,6 @@ package org.openhealthtools.openatna.audit.persistence.util;
  *
  * @author Andrew Harrison
  * @version $Revision:$
- * @created Dec 18, 2007: 7:42:00 PM
- * @date $Date:$ modified by $Author:$
  * @todo Put your notes here...
  */
 
@@ -71,7 +69,7 @@ public class Base64 {
      * @return A String with the Base64 encoded data.
      */
     public static String encodeString(String s) {
-        return new String(encode(s.getBytes()));
+        return encode(s.getBytes());
     }
 
     /**
@@ -82,8 +80,7 @@ public class Base64 {
      * @return A character array with the Base64 encoded data.
      */
     public static String encode(byte[] in) {
-        String s = new String(encode(in, in.length));
-        return s;
+        return new String(encode(in, in.length));
     }
 
     /**

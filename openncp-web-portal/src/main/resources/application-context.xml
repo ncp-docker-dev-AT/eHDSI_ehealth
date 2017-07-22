@@ -14,7 +14,7 @@
        http://www.springframework.org/schema/aop
        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
        >
-	
+
     <import resource="security-context.xml"/>
 
     <context:spring-configured/>
@@ -22,7 +22,7 @@
     <aop:aspectj-autoproxy/>
     <context:component-scan base-package="se.sb.epsos.web"/>
     <tx:annotation-driven/>
-    
+
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 	    <property name="ignoreUnresolvablePlaceholders" value="true"/>
 	</bean>
@@ -44,7 +44,7 @@
     <bean id="serviceFacade" class="${serviceFacadeClass}" scope="prototype"/>
 
     <!-- bean id="ncpServiceFacadeOnline" class="se.sb.epsos.web.service.ShelobServiceFacadeImpl"/-->
-    
+
     <!-- bean id="ncpServiceFacadeMock" class="se.sb.epsos.web.service.mock.NcpServiceFacadeMock"/-->
 
 </beans>
