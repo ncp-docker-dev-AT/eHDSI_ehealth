@@ -141,7 +141,8 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
         LOGGER.info("Loading all the values");
         long start = System.currentTimeMillis();
 
-        List<Property> properties = session.createQuery("select p from Property p", Property.class).list();
+        //List<Property> properties = session.createQuery("select p from Property p", Property.class).list();
+        List<Property> properties = session.createCriteria(Property.class).list();
 
         long end = System.currentTimeMillis();
         long total = end - start;
