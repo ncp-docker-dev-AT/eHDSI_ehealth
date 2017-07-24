@@ -16,16 +16,14 @@
  * Contributors:
  * Cardiff University - intial API and implementation
  */
-
 package org.openhealthtools.openatna.jaxb21;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
+import org.apache.xml.security.utils.XMLUtils;
+import org.openhealthtools.openatna.anom.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -34,38 +32,16 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openhealthtools.openatna.anom.AtnaCode;
-import org.openhealthtools.openatna.anom.AtnaException;
-import org.openhealthtools.openatna.anom.AtnaIOFactory;
-import org.openhealthtools.openatna.anom.AtnaMessage;
-import org.openhealthtools.openatna.anom.AtnaMessageObject;
-import org.openhealthtools.openatna.anom.AtnaMessageParticipant;
-import org.openhealthtools.openatna.anom.AtnaObject;
-import org.openhealthtools.openatna.anom.AtnaObjectDetail;
-import org.openhealthtools.openatna.anom.AtnaParticipant;
-import org.openhealthtools.openatna.anom.AtnaSource;
-import org.openhealthtools.openatna.anom.EventAction;
-import org.openhealthtools.openatna.anom.EventOutcome;
-import org.openhealthtools.openatna.anom.NetworkAccessPoint;
-import org.openhealthtools.openatna.anom.ObjectDataLifecycle;
-import org.openhealthtools.openatna.anom.ObjectDescription;
-import org.openhealthtools.openatna.anom.ObjectType;
-import org.openhealthtools.openatna.anom.ObjectTypeCodeRole;
-import org.openhealthtools.openatna.anom.ProvisionalMessage;
-import org.openhealthtools.openatna.anom.SopClass;
-
-import org.apache.xml.security.utils.XMLUtils;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Andrew Harrison
@@ -73,10 +49,9 @@ import org.apache.xml.security.utils.XMLUtils;
  * @created Sep 30, 2009: 11:18:47 AM
  * @date $Date:$ modified by $Author:$
  */
-
 public class JaxbIOFactory implements AtnaIOFactory {
 
-    static Log log = LogFactory.getLog("org.openhealthtools.openatna.jaxb21.JaxbIOFactory");
+    private static final Logger LOGGER = LoggerFactory.getLogger("org.openhealthtools.openatna.jaxb21.JaxbIOFactory");
 
 
     static JAXBContext jc;
@@ -100,7 +75,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
             if (doc.getDocumentElement().getTagName().equalsIgnoreCase("IHEYr4")) {
                 return createProv(doc);
             }
-            log.debug(XMLUtils.getFullTextChildrenFromElement(doc.getDocumentElement()));
+            LOGGER.debug(XMLUtils.getFullTextChildrenFromElement(doc.getDocumentElement()));
             Unmarshaller u = jc.createUnmarshaller();
             AuditMessage a = (AuditMessage) u.unmarshal(doc);
             AtnaMessage am = null;
@@ -108,22 +83,21 @@ public class JaxbIOFactory implements AtnaIOFactory {
             try {
                 am = createMessage(a);
             } catch (AtnaException e) {
-            	log.error(e);
-            	e.printStackTrace();
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
                 ae = e;
             }
             try {
-                if (log.isInfoEnabled()) {
+                if (LOGGER.isInfoEnabled()) {
                     ByteArrayOutputStream bout = new ByteArrayOutputStream();
                     Marshaller marshaller = jc.createMarshaller();
                     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                     marshaller.marshal(a, bout);
-                    log.info("\n" + new String(bout.toByteArray()));
-                    log.debug(am.getEventOutcome());
+                    LOGGER.info("\n" + new String(bout.toByteArray()));
+                    LOGGER.debug("Event Outcome: '{}'", am.getEventOutcome());
                 }
 
             } catch (JAXBException e) {
-
+                LOGGER.error("JAXBException: '{}'", e.getMessage(), e);
             }
             if (ae != null) {
                 throw ae;
@@ -135,15 +109,17 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private Document newDocument(InputStream stream) throws IOException {
-        Document doc = null;
+        Document doc;
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
             doc = db.parse(stream);
         } catch (ParserConfigurationException e) {
+            LOGGER.error("ParserConfigurationException: '{}'", e.getMessage(), e);
             throw new IOException(e.getMessage());
         } catch (SAXException e) {
+            LOGGER.error("SAXException: '{}'", e.getMessage(), e);
             throw new IOException(e.getMessage());
         }
         return doc;
@@ -158,6 +134,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
             t.setOutputProperty(OutputKeys.METHOD, "xml");
             t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         } catch (TransformerConfigurationException tce) {
+            LOGGER.error("TransformerConfigurationException: '{}'", tce.getMessage(), tce);
             assert (false);
         }
         DOMSource doms = new DOMSource(doc);
@@ -165,6 +142,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
         try {
             t.transform(doms, sr);
         } catch (TransformerException te) {
+            LOGGER.error("TransformerException: '{}'", te.getMessage(), te);
             throw new IOException(te.getMessage());
         }
         return sr;
@@ -174,8 +152,8 @@ public class JaxbIOFactory implements AtnaIOFactory {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         transform(doc, bout);
         byte[] bytes = bout.toByteArray();
-        if (log.isInfoEnabled()) {
-            log.info("\n" + new String(bytes));
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("\n" + new String(bytes));
         }
         return new ProvisionalMessage(bytes);
     }
@@ -198,11 +176,11 @@ public class JaxbIOFactory implements AtnaIOFactory {
                 marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
             }
             marshaller.marshal(jmessage, out);
-            if (log.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 marshaller.marshal(jmessage, bout);
-                log.debug("Written Audit Message:\n" + new String(bout.toByteArray()));
+                LOGGER.debug("Written Audit Message:\n" + new String(bout.toByteArray()));
             }
 
         } catch (JAXBException e) {
@@ -283,11 +261,11 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private AtnaMessageObject createObject(ParticipantObjectIdentificationType obj) throws AtnaException {
-        
-    	log.info("Display NAME:" + obj.getParticipantObjectIDTypeCode().displayName);
-    	if (obj.getParticipantObjectID() == null) {
-            //throw new AtnaException("object has no Id");
-        }
+
+        LOGGER.info("Display NAME: '{}'", obj.getParticipantObjectIDTypeCode().displayName);
+        //if (obj.getParticipantObjectID() == null) {
+        //throw new AtnaException("object has no Id");
+        //}
         if (obj.getParticipantObjectIDTypeCode() == null) {
             throw new AtnaException("object has no Id type code");
         }
@@ -453,8 +431,8 @@ public class JaxbIOFactory implements AtnaIOFactory {
             ret.setNetworkAccessPointTypeCode((short) participant.getNetworkAccessPointType().value());
         }
         // [Mustafa: May 8, 2012]: The following line was missing, and causing default value "true" for UserIsRequestor.
-        ret.setUserIsRequestor(participant.isUserIsRequestor()); 
-        
+        ret.setUserIsRequestor(participant.isUserIsRequestor());
+
         return ret;
 
     }
@@ -480,15 +458,15 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private AtnaCode createCode(String type, CodedValueType code) throws AtnaException {
+
         if (code.getCode() == null) {
             throw new AtnaException("Code has no code");
         }
-        AtnaCode ac = new AtnaCode(type, code.getCode(),
+        return new AtnaCode(type, code.getCode(),
                 code.getCodeSystem(),
                 code.getCodeSystemName(),
                 code.getDisplayName(),
                 code.getOriginalText());
-        return ac;
     }
 
     private CodedValueType createCode(AtnaCode code) throws AtnaException {
@@ -503,5 +481,4 @@ public class JaxbIOFactory implements AtnaIOFactory {
         type.setOriginalText(code.getOriginalText());
         return type;
     }
-
 }

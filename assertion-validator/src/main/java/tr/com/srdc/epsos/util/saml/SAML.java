@@ -1,6 +1,8 @@
 package tr.com.srdc.epsos.util.saml;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.impl.SecureRandomIdentifierGenerator;
 import org.opensaml.saml2.core.*;
@@ -263,22 +265,22 @@ public class SAML {
      * @param subject Subject of the assertion
      */
     public Assertion createAssertion(Subject subject) {
-        Assertion assertion =
-                create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
+
+        Assertion assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
         assertion.setID(generator.generateIdentifier());
 
         DateTime now = new DateTime();
-        assertion.setIssueInstant(now);
+        LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+        assertion.setIssueInstant(nowUTC.toDateTime());
 
-        if (issuerURL != null)
+        if (issuerURL != null) {
             assertion.setIssuer(spawnIssuer());
-
+        }
         assertion.setSubject(subject);
 
-        Conditions conditions = create
-                (Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
-        conditions.setNotBefore(now.minusSeconds(10));
-        conditions.setNotOnOrAfter(now.plusMinutes(30));
+        Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
+        conditions.setNotBefore(nowUTC.toDateTime().minusSeconds(10));
+        conditions.setNotOnOrAfter(nowUTC.toDateTime().plusMinutes(30));
         assertion.setConditions(conditions);
 
         return assertion;
@@ -305,24 +307,25 @@ public class SAML {
      * Helper method to generate a shell response with a given status code,
      * status message, and query ID.
      */
-    public Response createResponse
-    (String statusCode, String message, String inResponseTo)
+    public Response createResponse(String statusCode, String message, String inResponseTo)
             throws IOException, MarshallingException, TransformerException {
-        Response response = create
-                (Response.class, Response.DEFAULT_ELEMENT_NAME);
+
+        Response response = create(Response.class, Response.DEFAULT_ELEMENT_NAME);
         response.setID(generator.generateIdentifier());
 
-        if (inResponseTo != null)
+        if (inResponseTo != null) {
             response.setInResponseTo(inResponseTo);
+        }
 
         DateTime now = new DateTime();
-        response.setIssueInstant(now);
+        LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+        response.setIssueInstant(nowUTC.toDateTime());
 
-        if (issuerURL != null)
+        if (issuerURL != null) {
             response.setIssuer(spawnIssuer());
+        }
 
-        StatusCode statusCodeElement = create
-                (StatusCode.class, StatusCode.DEFAULT_ELEMENT_NAME);
+        StatusCode statusCodeElement = create(StatusCode.class, StatusCode.DEFAULT_ELEMENT_NAME);
         statusCodeElement.setValue(statusCode);
 
         Status status = create(Status.class, Status.DEFAULT_ELEMENT_NAME);

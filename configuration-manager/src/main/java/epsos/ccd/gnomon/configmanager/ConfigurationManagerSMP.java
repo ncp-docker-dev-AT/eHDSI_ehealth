@@ -124,7 +124,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
         if (instance == null) {
             synchronized (ConfigurationManagerSMP.class) {
                 if (instance == null) {
-                    LOGGER.info("Instatiating a new ConfigurationManagerSMP");
+                    LOGGER.info("Instantiating a new ConfigurationManagerSMP");
                     instance = new ConfigurationManagerSMP();
                 }
             }
@@ -195,10 +195,10 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
      *                                   after TSLSynchronizer
      */
     public String getProperty(String key) {
-        LOGGER.debug("Searching for '{}'", key);
-        LOGGER.debug("Trying hashmap first");
 
+        LOGGER.info("Searching for '{}'", key);
         PropertySearchableContainer psc = configuration.get(key);
+        LOGGER.info("Trying hashmap first among '{}' element(s)", configuration.size());
 
         // Ok, here two things: one is that the entry does not exist, the second
         // is that it is not
@@ -245,8 +245,9 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
      */
     private String query(String key) {
 
-		/*
-         * Participant identifier is: urn:ehealth:lu:ncpb-idp document
+        LOGGER.info("*************************** Querying MetaData for key: '{}'", key);
+        /*
+         * Participant identifier is: urn:ehealth:lu:ncp-id document
 		 * identifier is relatd to the transaction
 		 * epsos-resid-qns::urn:ehealth:PatientIdentificationAndAuthentication::XCPD::CrossGatewayPatientDiscovery##ITI-55.
 		 * 
@@ -254,24 +255,25 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 		 * three (must be three). The first is the country, the second is the to
 		 * be mapped into the transaction
 		 */
-
+        //https://smp-test.publisher.ehealth.testa.eu/ehealth-participantid-qns%3A%3Aurn%3Aehealth%3Ahr%3Ancp-idp
         String[] values = key.split("\\.");
         if (values == null || values.length != 3) {
+            LOGGER.error("The key '{}' to be selected in SMP has a length which is not allowed", key);
             throw new RuntimeException("The key to be selected in SMP has a length which is not allowed");
         }
 
         String countryCode = values[0];
-        LOGGER.debug("Found country code: '{}'", countryCode);
+        LOGGER.info("Found country code: '{}'", countryCode);
         String documentType = mapMap.get(values[1]);
-        LOGGER.debug("Found documentType: '{}'", documentType);
+        LOGGER.info("Found documentType: '{}'", documentType);
         SMLSMPClient client = new SMLSMPClient();
         try {
-            LOGGER.debug("Doing SML/SMP");
+            LOGGER.info("Doing SML/SMP");
             client.lookup(countryCode, documentType);
-            LOGGER.debug("Found values!!!!");
+            LOGGER.info("Found values!!!!");
             /*
-             * What to do with the property? One is to return to the caller the
-			 * endpoint, the second is to put it into the certificate
+             * What to do with the property? One is to return to the caller the endpoint,
+             * the second is to put it into the certificate.
 			 */
             X509Certificate cert = client.getCertificate();
             if (cert != null) {
@@ -326,10 +328,16 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 
             keystore.setCertificateEntry(alias, cert);
             LOGGER.debug("CERTALIAS: '{}'", alias);
+
             // Save the new keystore contents
             try (FileOutputStream out = new FileOutputStream(keystoreFile)) {
                 keystore.store(out, TRUST_STORE_PASS.toCharArray());
             }
+//            Certificate[] certificates = keystore.getCertificateChain(alias);
+//            for (Certificate certificate : certificates) {
+//                LOGGER.info("Certificate: '{}'-'{}'", certificate.getPublicKey().toString(), certificate.getType());
+//
+//            }
 
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
             LOGGER.error("Unable to store the message in the truststore", e);
@@ -355,6 +363,11 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
         String storepath = configuration.get("certificates.storepath").getValue();
         String filename = countryCode + "_" + eventId;
         boolean exp = exportCertificate(certificate, new File(storepath + filename + ".der"), true);
+//        Certificate[] certificates = keystore.getCertificateChain(certificate.get);
+//        for (Certificate certificate1 : certificates) {
+//            LOGGER.info("Certificate: '{}'-'{}'", certificate1.getPublicKey().toString(), certificate.getType());
+//
+//        }
         if (exp) {
             LOGGER.info("Certificate '{}'.der exported successfully", filename);
         } else {

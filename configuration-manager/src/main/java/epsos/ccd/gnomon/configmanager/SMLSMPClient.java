@@ -2,7 +2,10 @@ package epsos.ccd.gnomon.configmanager;
 
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
+import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
+import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
+import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidator;
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.Endpoint;
@@ -40,7 +43,7 @@ public class SMLSMPClient {
      * Static constants for SMP identifiers
      */
     private static final String PARTICIPANT_IDENTIFIER_SCHEME = "ehealth-participantid-qns";
-    private static final String PARTICIPANT_IDENTIFIER_VALUE = "urn:ehealth:%2s:ncpb-idp";
+    private static final String PARTICIPANT_IDENTIFIER_VALUE = "urn:ehealth:%2s:ncp-idp";
     private static final String DOCUMENT_IDENTIFIER_SCHEME = "ehealth-resid-qns";
 
     /**
@@ -121,14 +124,17 @@ public class SMLSMPClient {
      * @throws SMLSMPClientException For any error (including not found)
      */
     public void lookup(String countryCode, String documentType) throws SMLSMPClientException {
+
+        L.info("SML Client: '{}'-'{}'", countryCode, documentType);
         try {
             KeyStore ks = this.loadTrustStore();
 
             DynamicDiscovery smpClient = this.createDynamicDiscoveryClient(ks);
-
+            L.info("DynamicDiscovery '{}' instantiated.", smpClient.toString());
             String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
+            L.info("participantIdentifierValue '{}'.", participantIdentifierValue);
             ServiceMetadata sm = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
-
+            L.info("ServiceMetadata '{}'.", sm.toString());
             List<Endpoint> endpoints = sm.getEndpoints();
 
 			/*
@@ -151,7 +157,7 @@ public class SMLSMPClient {
             if (certificate == null) {
                 throw new Exception("no certificate found for endpoint: " + e.getAddress());
             }
-
+            L.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
             setAddress(urlAddress);
             setCertificate(certificate);
 
@@ -318,8 +324,8 @@ public class SMLSMPClient {
      * @return The Dynamic Discovery Client ready to use.
      * @throws TechnicalException
      */
-    private DynamicDiscovery createDynamicDiscoveryClient(KeyStore ks) throws TechnicalException {
-        L.debug("Instantiating the smpClient.");
+    private DynamicDiscovery createDynamicDiscoveryClient(KeyStore ks) throws TechnicalException, KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
+        L.info("Instantiating the smpClient.");
         L.warn("TODO: make configurable the keystore");
 
         // Instantiate the DIGIT client using our customized signature
@@ -329,7 +335,7 @@ public class SMLSMPClient {
         // in case they're needed.
         // TODO: Jerome cycling dependency confmanager --> util and util -->
         // confmanager
-        DynamicDiscovery smpClient = null;
+        // DynamicDiscovery smpClient = null;
         // ProxyCredentials proxyCredentials = null;
         // if (ProxyUtil.isProxyAnthenticationMandatory()) {
         // proxyCredentials = ProxyUtil.getProxyCredentials();
@@ -346,10 +352,33 @@ public class SMLSMPClient {
         // .reader(new CustomizedBDXRReader(new
         // CustomizedSignatureValidator(ks))).build();
         // } else {
-        smpClient = DynamicDiscoveryBuilder.newInstance()
-                .locator(new DefaultBDXRLocator(ConfigurationManagerService.getInstance().getProperty("SML_DOMAIN")))
-                .reader(new CustomizedBDXRReader(new CustomizedSignatureValidator(ks))).build();
+//        smpClient = DynamicDiscoveryBuilder.newInstance()
+//                .locator(new DefaultBDXRLocator(ConfigurationManagerService.getInstance().getProperty("SML_DOMAIN")))
+//                .reader(new CustomizedBDXRReader(new CustomizedSignatureValidator(ks))).build();
         // }
+
+
+//        KeyStore trustStore = KeyStore.getInstance("JKS");
+//        trustStore.load(new FileInputStream(ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PATH")),
+//                ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+        KeyStore trustStore = KeyStore.getInstance("JKS");
+        trustStore.load(new FileInputStream(ConfigurationManagerSMP.getInstance().getProperty("SMP_KEYSTORE")),
+                null);
+
+        DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+                .locator(new DefaultBDXRLocator(ConfigurationManagerService.getInstance().getProperty("SML_DOMAIN"),
+                        new DefaultDNSLookup()))
+                //.locator(new DefaultBDXRLocator("ehealth.acc.edelivery.tech.ec.europa.eu", new DefaultDNSLookup()))
+                .reader(new DefaultBDXRReader(new DefaultSignatureValidator(trustStore)))
+                .build();
+
+        //ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PATH")
+
+//        ParticipantIdentifier participantIdentifier = new ParticipantIdentifier("9925:0367302178", "iso6523-actorid-upis");
+//
+//        List<DocumentIdentifier> documentIdentifiers = smpClient.getDocumentIdentifiers(participantIdentifier);
+//        ServiceMetadata sm = smpClient.getServiceMetadata(participantIdentifier, new DocumentIdentifier("urn::epsos:services## epsos-21", "epsos-docid-qns"));
+
         return smpClient;
     }
 
@@ -366,12 +395,13 @@ public class SMLSMPClient {
      */
     private ServiceMetadata getServiceMetadata(DynamicDiscovery smpClient, String participantIdentifierValue,
                                                String documentType) throws TechnicalException {
-        L.debug("Querying for participant identifier {}", participantIdentifierValue);
+
+        L.info("Querying for participant identifier {}", participantIdentifierValue);
         ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue,
                 PARTICIPANT_IDENTIFIER_SCHEME);
 
-        L.debug("Querying for service metadata");
-        return smpClient.getServiceMetadata(participantIdentifier,
-                new DocumentIdentifier(documentType, DOCUMENT_IDENTIFIER_SCHEME));
+        L.info("Querying for service metadata");
+        return smpClient.getServiceMetadata(participantIdentifier, new DocumentIdentifier(documentType,
+                DOCUMENT_IDENTIFIER_SCHEME));
     }
 }

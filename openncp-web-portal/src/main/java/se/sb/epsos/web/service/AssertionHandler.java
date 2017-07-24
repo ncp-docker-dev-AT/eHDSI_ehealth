@@ -14,6 +14,8 @@ import epsos.ccd.gnomon.auditmanager.*;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLObjectBuilder;
@@ -56,9 +58,10 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 public class AssertionHandler implements Serializable {
+
     private static final long serialVersionUID = 5209063407337843010L;
 
-    private static Logger LOGGER = LoggerFactory.getLogger(AssertionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssertionHandler.class);
     private AssertionHandlerConfigManager configHandler;
     private Assertion assertion;
 
@@ -71,6 +74,7 @@ public class AssertionHandler implements Serializable {
     }
 
     public Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws ConfigurationException, AssertionException {
+
         LOGGER.debug("################################################");
         LOGGER.debug("# createSAMLAssertion() - start                #");
         LOGGER.debug("################################################");
@@ -85,10 +89,13 @@ public class AssertionHandler implements Serializable {
 
         assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
 
+        DateTime now = new DateTime();
+        LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+
         String assertionId = "_" + UUID.randomUUID();
         assertion.setID(assertionId);
         assertion.setVersion(SAMLVersion.VERSION_20);
-        assertion.setIssueInstant(new DateTime().minusHours(3));
+        assertion.setIssueInstant(nowUTC.toDateTime());
 
         Subject subject = create(Subject.class, Subject.DEFAULT_ELEMENT_NAME);
         assertion.setSubject(subject);
@@ -99,9 +106,9 @@ public class AssertionHandler implements Serializable {
         assertion.getSubject().getSubjectConfirmations().add(subjectConf);
 
         Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
-        DateTime now = new DateTime();
-        conditions.setNotBefore(now.minusHours(2));
-        conditions.setNotOnOrAfter(now.plusHours(2));
+
+        conditions.setNotBefore(nowUTC.toDateTime());
+        conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
         assertion.setConditions(conditions);
 
         Issuer issuer = new IssuerBuilder().buildObject();
@@ -110,7 +117,7 @@ public class AssertionHandler implements Serializable {
         assertion.setIssuer(issuer);
 
         AuthnStatement authnStatement = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
-        authnStatement.setAuthnInstant(now.minusHours(2));
+        authnStatement.setAuthnInstant(nowUTC.toDateTime());
         assertion.getAuthnStatements().add(authnStatement);
 
         AuthnContext authnContext = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
@@ -152,7 +159,7 @@ public class AssertionHandler implements Serializable {
 
         Attribute attrPID_8 = createAttribute(builderFactory, "Hl7 Permissions",
                 "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission");
-        Set<String> permissions = new HashSet<String>();
+        Set<String> permissions = new HashSet<>();
         for (String r : userDetails.getRoles()) {
             permissions.addAll(AssertionHandlerConfigManager.getPersmissions(r));
         }

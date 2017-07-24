@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.*;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SMPConverter;
@@ -81,10 +82,12 @@ public class SMPUpdateFileController {
     public String post(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, Model model, final RedirectAttributes redirectAttributes) {
         logger.debug("\n==== in post ====");
         model.addAttribute("smpfileupdate", smpfileupdate);
-        logger.debug("\n**********  smpfileupdate - " + smpfileupdate.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n**********  smpfileupdate - '{}'" + smpfileupdate.toString());
+        }
         isSigned = false;
 
-        File convFile = new File("/" + smpfileupdate.getUpdateFile().getOriginalFilename());
+        File convFile = new File(Constants.SMP_DIR_PATH + smpfileupdate.getUpdateFile().getOriginalFilename());
         try {
             smpfileupdate.getUpdateFile().transferTo(convFile);
         } catch (IOException ex) {
@@ -291,12 +294,14 @@ public class SMPUpdateFileController {
             smpfileupdate.setEndpointURI(endpoint.getEndpointURI());
 
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            Calendar cal = endpoint.getServiceActivationDate();
-            String formatted = format.format(cal.getTime());
+            //Calendar cal = endpoint.getServiceActivationDate();
+            Date cal = endpoint.getServiceActivationDate().toGregorianCalendar().getTime();
+            String formatted = format.format(cal);
             Date datead = null;
             Date dateed = null;
-            Calendar cal2 = endpoint.getServiceExpirationDate();
-            String formatted2 = format.format(cal2.getTime());
+            //Calendar cal2 = endpoint.getServiceExpirationDate();
+            Date cal2 = endpoint.getServiceExpirationDate().toGregorianCalendar().getTime();
+            String formatted2 = format.format(cal2);
             try {
                 datead = format.parse(formatted);
                 dateed = format.parse(formatted2);

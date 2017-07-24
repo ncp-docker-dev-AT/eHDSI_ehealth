@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ClinicalDocument xmlns:epsos="urn:epsos-org:ep:medication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns="urn:hl7-org:v3">
+    <realmCode code="cs"/>
+    <typeId extension="POCD_HD000040" root="2.16.840.1.113883.1.3"/>
+    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.3"/>
+    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.1"/>
+    <id extension="0003.1" root="1.3.154.70890749.98"/>
+    <code code="60591-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+          displayName="Patient summary Document"/>
+    <title>Pacientský souhrn - Otakar Všudybyl - 7.6.2017</title>
+    <effectiveTime value="20170323232900+0200"/>
+    <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+    <languageCode code="cs-CZ"/>
+    <setId extension="0003" root="1.3.154.70890749.99"/>
+    <versionNumber value="1"/>
+    <!--   RECORD TARGET  -->
+    <recordTarget contextControlCode="OP" typeCode="RCT">
+        <templateId root="2.16.840.1.113883.3.1937.777.11.10.100"/>
+        <patientRole classCode="PAT">
+            <id extension="0006185366" root="2.16.840.1.113883.2.40.1"/>
+            <addr>
+                <streetAddressLine>Příčná č.p. 19</streetAddressLine>
+                <city>Praha 1</city>
+                <postalCode>110 00</postalCode>
+                <country>CZ</country>
+            </addr>
+            <telecom use="WP" value="tel:+420603608611"/>
+            <telecom use="HP" value="mailto:otakar@csudybyl.cz"/>
+            <patient classCode="PSN" determinerCode="INSTANCE">
+                <name>
+                    <given>Otakar</given>
+                    <family>Všudybyl</family>
+                </name>
+                <administrativeGenderCode code="M" codeSystem="2.16.840.1.113883.5.1"
+                                          codeSystemName="AdministrativeGender"/>
+                <birthTime value="19551013"/>
+                <guardian classCode="GUARD">
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.2.4"/>
+                    <code code="FAMMEMB" codeSystem="2.16.840.1.113883.5.111" displayName="Family member"/>
+                    <addr nullFlavor="NI"/>
+                    <telecom use="WP" value="tel:+420603608612"/>
+                    <telecom use="WP" value="mailto:jana@vsudybyl.cz"/>
+                    <guardianPerson classCode="PSN" determinerCode="INSTANCE">
+                        <name>
+                            <given>Jana</given>
+                            <family>Všudybylová</family>
+                        </name>
+                    </guardianPerson>
+                </guardian>
+                <languageCommunication>
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.2.1"/>
+                    <languageCode code="cs-CZ"/>
+                </languageCommunication>
+            </patient>
+        </patientRole>
+    </recordTarget>
+    <!--   AUTHOR  -->
+    <author contextControlCode="OP" typeCode="AUT">
+        <time value="20160316135535+0000"/>
+        <assignedAuthor>
+            <id extension="90647" root="2.16.620.1.101.10.2.5"/>
+            <telecom use="WP" value="tel:+420605740492"/>
+            <assignedPerson>
+                <name>
+                    <family>Kajzar</family>
+                    <given>Petr</given>
+                </name>
+            </assignedPerson>
+            <representedOrganization>
+                <id extension="54259" root="2.16.620.1.101.10.3.29"/>
+                <name>Nemocnice Frýdek Místek</name>
+                <addr>
+                    <country>CZ</country>
+                    <postalCode>450 00</postalCode>
+                    <streetAddressLine>K Nemocnici 4</streetAddressLine>
+                    <city>Frýdek Místek</city>
+                </addr>
+            </representedOrganization>
+        </assignedAuthor>
+    </author>
+    <!--   Document CUSTODIAN  -->
+    <custodian>
+        <assignedCustodian>
+            <representedCustodianOrganization>
+                <id extension="54259" root="2.16.620.1.101.10.3.29"/>
+                <name>Kraj Vysočina</name>
+                <telecom use="WP" value="tel:+420605740492"/>
+                <addr>
+                    <country>CZ</country>
+                    <postalCode>587 33</postalCode>
+                    <streetAddressLine>Žižkova 57</streetAddressLine>
+                    <city>Jihlava</city>
+                </addr>
+            </representedCustodianOrganization>
+        </assignedCustodian>
+    </custodian>
+    <!--   LEGAL AUTHENTICATOR  -->
+    <legalAuthenticator contextControlCode="OP" typeCode="LA">
+        <time value="20170607101010+0200"/>
+        <signatureCode code="S"/>
+        <assignedEntity>
+            <id extension="54259" root="2.16.620.1.101.10.3.29"/>
+            <telecom use="WP" value="tel:+420724650193"/>
+            <assignedPerson>
+                <name>
+                    <family>Krotký</family>
+                    <given>Jaroslav</given>
+                </name>
+            </assignedPerson>
+            <representedOrganization>
+                <id extension="54259" root="2.16.620.1.101.10.3.29"/>
+                <name>Kraj Vysočina</name>
+                <telecom use="WP" value="tel:+420724111111"/>
+                <addr>
+                    <country>CZ</country>
+                    <postalCode>560 00</postalCode>
+                    <streetAddressLine>Žižkova 57</streetAddressLine>
+                    <city>Jihlava</city>
+                </addr>
+            </representedOrganization>
+        </assignedEntity>
+    </legalAuthenticator>
+    <!--   PARTICIPANT  -->
+    <participant contextControlCode="OP" typeCode="IND">
+        <templateId root="1.3.6.1.4.1.19376.1.5.3.1.2.4"/>
+        <functionCode code="PCP" codeSystem="2.16.840.1.113883.5.88"/>
+        <time value="20160316135535+0000"/>
+        <associatedEntity classCode="PRS">
+            <id extension="90647" root="2.16.620.1.101.10.2.5"/>
+            <addr nullFlavor="NI"/>
+            <telecom use="WP" value="tel:+420605740492"/>
+            <telecom use="WP" value="mailto:petr@kajzar.cz"/>
+            <associatedPerson>
+                <name>
+                    <family>Kajzar</family>
+                    <given>Petr</given>
+                </name>
+            </associatedPerson>
+        </associatedEntity>
+    </participant>
+    <!--   DOCUMENTATION OF ....  -->
+    <documentationOf>
+        <serviceEvent classCode="PCPR">
+            <effectiveTime>
+                <low value="20110316135535+0000"/>
+                <high value="20170316135535+0000"/>
+            </effectiveTime>
+            <performer typeCode="PRF">
+                <templateId root="1.3.6.1.4.1.19376.1.5.3.1.2.3"/>
+                <time>
+                    <low value="20150316135535+0000"/>
+                    <high value="20150316135535+0000"/>
+                </time>
+                <assignedEntity classCode="ASSIGNED">
+                    <id extension="0" root="2.16.620.1.101.10.2"/>
+                    <telecom use="WP" value="tel:+420605740492"/>
+                    <assignedPerson>
+                        <name>
+                            <family>Kajzar</family>
+                            <given>Petr</given>
+                        </name>
+                    </assignedPerson>
+                    <representedOrganization>
+                        <id extension="54259" root="2.16.620.1.101.10.3.12"/>
+                        <name>Nemocnice Frýdek Místek</name>
+                        <telecom use="WP" value="tel:+420605740492"/>
+                        <addr>
+                            <country>CZ</country>
+                            <postalCode>160 00</postalCode>
+                            <streetAddressLine>K Nemocnici 5</streetAddressLine>
+                            <city>Frýdek Místek</city>
+                        </addr>
+                    </representedOrganization>
+                </assignedEntity>
+            </performer>
+        </serviceEvent>
+    </documentationOf>
+    <!--   RELATED DOCUMENT  -->
+    <relatedDocument typeCode="XFRM">
+        <parentDocument>
+            <id extension="1001" root="2.16.620.1.101.10.3.29.54259"/>
+        </parentDocument>
+    </relatedDocument>
+    <!--   STRUCTRED BODY  -->
+    <component>
+        <structuredBody
+                classCode="DOCBODY">                        <!-- S1 - Medication History Section        <component>          <section classCode="DOCSECT">            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.3"/>            <templateId root="2.16.840.1.113883.10.20.1.8"/>            <code code="10160-0" codeSystem="2.16.840.1.113883.6.1" />            <title>Medication History</title>            <text>              The Medication history will be generated automatically here.             </text>          </section>        </component>-->        <!-- S1 - Medication History Section -->
+            <component>
+                <section classCode="DOCSECT">
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.3"/>
+                    <templateId root="2.16.840.1.113883.10.20.1.8"/>
+                    <code code="10160-0" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                          displayName="History of medication use"/>
+                    <title>Medication history</title>
+                    <text>Známá medikační historie (nezahrnuje doplňky stravy a volně prodejné léky):
+                        <content ID="nomedicationdescription">Bez známé medikace</content>
+                    </text>
+                    <entry>
+                        <substanceAdministration classCode="SBADM" moodCode="EVN">
+                            <templateId root="2.16.840.1.113883.10.20.1.24"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
+                            <id root="EE9F61CB-5B8C-4F73-8DDC-E802CF5A44E8"/>
+                            <code code="182904002" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
+                                  displayName="Drug treatment unknown">
+                                <originalText>
+                                    <reference value="#nomedicationdescription"/>
+                                </originalText>
+                            </code>
+                            <statusCode code="completed"/>
+                            <effectiveTime xsi:type="IVL_TS">
+                                <low nullFlavor="UNK"/>
+                                <high nullFlavor="UNK"/>
+                            </effectiveTime>
+                            <effectiveTime nullFlavor="UNK" operator="A" xsi:type="PIVL_TS"/>
+                            <!-- <routeCode nullFlavor="NI"/> -->
+                            <doseQuantity nullFlavor="NI"/>
+                            <consumable>
+                                <manufacturedProduct>
+                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2"/>
+                                    <templateId root="2.16.840.1.113883.10.20.1.53"/>
+                                    <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
+                                        <code nullFlavor="NA"/>
+                                        <name nullFlavor="NA"/>
+                                        <epsos:ingredient classCode="ACTI" nullFlavor="NA">
+                                            <epsos:quantity>
+                                                <epsos:numerator nullFlavor="NA" xsi:type="epsos:PQ"/>
+                                                <epsos:denominator nullFlavor="NA" xsi:type="epsos:PQ"/>
+                                            </epsos:quantity>
+                                            <epsos:ingredient classCode="MMAT" determinerCode="KIND">
+                                                <epsos:code nullFlavor="NA"/>
+                                            </epsos:ingredient>
+                                        </epsos:ingredient>
+                                    </manufacturedMaterial>
+                                </manufacturedProduct>
+                            </consumable>
+                        </substanceAdministration>
+                    </entry>
+                </section>
+            </component>
+            <!-- S2 - Allergy Section -->
+            <component>
+                <section classCode="DOCSECT">
+                    <templateId root="2.16.840.1.113883.10.20.1.2"/>
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.13"/>
+                    <id extension="193" root="1.3.154.8888888.99.1"/>
+                    <code code="48765-2" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                          displayName="Allergies, adverse reactions, alerts"/>
+                    <title>Allergies and Other Adverse Reactions</title>
+                    <text>Známé alergie a intolerance jsou:
+                        <list>
+                            <item>
+                                <content ID="A1">Reakce na psí chlupy</content>
+                            </item>
+                        </list>
+                    </text>
+                    <entry>
+                        <act classCode="ACT" moodCode="EVN">
+                            <templateId root="2.16.840.1.113883.10.20.1.27"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3"/>
+                            <id extension="99" root="1.3.512.999.1"/>
+                            <code nullFlavor="NA"/>
+                            <text>a placeholder id=1</text>
+                            <statusCode code="active"/>
+                            <effectiveTime>
+                                <low nullFlavor="NA"/>
+                            </effectiveTime>
+                            <entryRelationship inversionInd="false" typeCode="SUBJ">
+                                <observation classCode="OBS" moodCode="EVN" negationInd="true">
+                                    <templateId root="2.16.840.1.113883.10.20.1.18"/>
+                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.6"/>
+                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
+                                    <templateId root="2.16.840.1.113883.10.20.1.28"/>
+                                    <id root="af58c270-6f80-477a-ab05-47bcffbc62f7"/>
+                                    <code code="419199007" codeSystem="2.16.840.1.113883.6.96"
+                                          codeSystemName="SNOMED CT" displayName="Allergy to substance"/>
+                                    <text>
+                                        <reference value="#A1"/>
+                                    </text>
+                                    <statusCode code="completed"/>
+                                    <effectiveTime>
+                                        <low nullFlavor="UNK"/>
+                                    </effectiveTime>
+                                    <value code="260154005" codeSystem="2.16.840.1.113883.6.96"
+                                           codeSystemName="SNOMED CT" displayName="Dog dander" xsi:type="CD"/>
+                                    <participant nullFlavor="NA" typeCode="CSM">
+                                        <participantRole classCode="MANU">
+                                            <playingEntity classCode="MMAT" nullFlavor="NA">
+                                                <code code="NA" codeSystem="NA" nullFlavor="NA"/>
+                                            </playingEntity>
+                                        </participantRole>
+                                    </participant>
+                                </observation>
+                            </entryRelationship>
+                        </act>
+                    </entry>
+                </section>
+            </component>
+            <!--  S3  -  Section Coded List of Surgerie          The list of surgeries section shall include entries for procedures and references to procedure reports         when known as described in the Entry Content Modules. In epSOS this section should be used to describe         the Surgical Procedures prior past six months (optional) and shall be used to record the Major Surgical         Procedures past 6 months (required).         -->
+            <component>
+                <section classCode="DOCSECT">
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.12"/>
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.11"/>
+                    <code code="47519-4" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                          displayName="History of Procedures"/>
+                    <title>Coded List of Surgeries - Operační zákroky za 6m+</title>
+                    <text>Operační zákroky za posledních šest měsíců a relevantní starší:
+                        <list>
+                            <item>
+                                <content ID="s1">Chirurgická operace - Cardiovascular surgical procedure.</content>
+                            </item>
+                        </list>
+                    </text>
+                    <entry>
+                        <procedure classCode="PROC" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>
+                            <templateId root="2.16.840.1.113883.10.20.1.29"/>
+                            <id nullFlavor="NA"/>
+                            <code code="112802009" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
+                                  displayName="Cardiovascular surgical procedure"/>
+                            <text>
+                                <reference value="#s1"/>
+                            </text>
+                            <statusCode code="completed"/>
+                            <effectiveTime value="20130201"/>
+                        </procedure>
+                    </entry>
+                </section>
+            </component>
+            <!--  S4 - Section Active Problems        The active problem section shall contain a narrative description of the conditions currently         being monitored for the patient. It shall include entries for patient conditions as described         in the Entry Content Module.           -->
+            <component>
+                <section classCode="DOCSECT">
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.6"/>
+                    <templateId root="2.16.840.1.113883.10.20.1.11"/>
+                    <code code="11450-4" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                          displayName="Problem list"/>
+                    <title>Active Problems - Aktuální obtíže</title>
+                    <text>Aktuální sledované obtíže obsahují:
+                        <list>
+                            <item>
+                                <content ID="no1">Zlomenina jiného prstu</content>
+                            </item>
+                        </list>
+                    </text>
+                    <entry>
+                        <act classCode="ACT" moodCode="EVN">
+                            <templateId root="2.16.840.1.113883.10.20.1.27"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
+                            <id extension="k3542" root="2.1.234.333.223"/>
+                            <code nullFlavor="NA"/>
+                            <statusCode code="active"/>
+                            <effectiveTime>
+                                <low value="20140501"/>
+                            </effectiveTime>
+                            <entryRelationship inversionInd="false" typeCode="SUBJ">
+                                <observation classCode="OBS" moodCode="EVN">
+                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
+                                    <templateId root="2.16.840.1.113883.10.20.1.28"/>
+                                    <id root="af58c270-6f80-477a-ab05-5555555"/>
+                                    <code code="55607006" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
+                                          displayName="Problem"/>
+                                    <text>
+                                        <reference value="#no1"/>
+                                    </text>
+                                    <statusCode code="completed"/>
+                                    <effectiveTime>
+                                        <low value="20140501"/>
+                                    </effectiveTime>
+                                    <value code="S62.6" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"
+                                           codeSystemName="ICD-10" displayName="Fracture of other finger"
+                                           xsi:type="CD"/>
+                                    <participant nullFlavor="NA" typeCode="CSM">
+                                        <participantRole classCode="MANU">
+                                            <playingEntity classCode="MMAT" nullFlavor="NA">
+                                                <code code="NA" codeSystem="NA" nullFlavor="NA"/>
+                                            </playingEntity>
+                                        </participantRole>
+                                    </participant>
+                                </observation>
+                            </entryRelationship>
+                        </act>
+                    </entry>
+                </section>
+            </component>
+            <!--          S5 - Medical Devices Coded         -->
+            <component>
+                <section classCode="DOCSECT">
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.4"/>
+                    <templateId root="2.16.840.1.113883.10.20.1.7"/>
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.5.3.5"/>
+                    <id nullFlavor="NI"/>
+                    <code code="46264-8" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                          displayName="History of medical device use"/>
+                    <title>Medical Devices Coded - Implantovaný materiál a zařízení</title>
+                    <text>Seznam voperovaných zdravotnických pomůcek:
+                        <list>
+                            <item>
+                                <content ID="mdc1">Arteriální stent</content>
+                            </item>
+                        </list>
+                    </text>
+                    <entry>
+                        <supply classCode="SPLY" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.5"/>
+                            <code code="SURG" codeSystem="2.16.840.1.113883.5.4" codeSystemName="ActCode"
+                                  displayName="Surgical"/>
+                            <text>
+                                <reference value="#mdc1"/>
+                            </text>
+                            <effectiveTime value="20100330"/>
+                            <participant typeCode="DEV">
+                                <participantRole classCode="MANU">
+                                    <id root="1.2.3.4.6"/>
+                                    <playingDevice classCode="DEV" determinerCode="INSTANCE">
+                                        <code code="360046005" codeSystem="2.16.840.1.113883.6.96"
+                                              codeSystemName="SNOMED CT" displayName="Arterial stent"/>
+                                    </playingDevice>
+                                </participantRole>
+                            </participant>
+                        </supply>
+                    </entry>
+                </section>
+            </component>
+        </structuredBody>
+    </component>
+</ClinicalDocument>
