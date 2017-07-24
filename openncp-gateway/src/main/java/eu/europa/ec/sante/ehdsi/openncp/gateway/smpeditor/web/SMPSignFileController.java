@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.*;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.exception.GenericException;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
@@ -174,7 +175,7 @@ public class SMPSignFileController {
 
             smpfile.setSignFile(signFiles.get(k));
 
-            File convFile = new File("/" + smpfile.getSignFile().getOriginalFilename());
+            File convFile = new File(Constants.SMP_DIR_PATH + smpfile.getSignFile().getOriginalFilename());
             try {
                 smpfile.getSignFile().transferTo(convFile);
             } catch (IOException ex) {
@@ -420,9 +421,9 @@ public class SMPSignFileController {
                 smpfile.setEndpointURI(endpoint.getEndpointURI());
 
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                Calendar cal = endpoint.getServiceActivationDate();
-                String formatted = format.format(cal.getTime());
-                Calendar cal2 = endpoint.getServiceExpirationDate();
+                Date cal = endpoint.getServiceActivationDate().toGregorianCalendar().getTime();
+                String formatted = format.format(cal);
+                Date cal2 = endpoint.getServiceExpirationDate().toGregorianCalendar().getTime();
                 String formatted2 = format.format(cal2.getTime());
 
                 smpfile.setServiceActivationDateS(formatted);
