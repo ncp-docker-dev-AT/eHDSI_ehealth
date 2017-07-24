@@ -684,16 +684,18 @@ public class MyBean implements Serializable {
     }
 
     private void createTRCA(String docType, String purposeOfUse) {
+
+        log.info("Creating TRCAssertion for '{}' request and Purpose of Use: '{}'", docType, purposeOfUse);
         String runningMode = MyServletContextListener.getRunningMode();
 
-        if (docType.equals("ps")) {
+        if (StringUtils.equals(docType, "ps")) {
             showPS = false;
         }
-        if (docType.equals("ep")) {
+        if (StringUtils.equals(docType, "ep")) {
             showEP = false;
         }
-        log.info("TRCA: Starting setting the purpose of use: " + purposeOfUse);
-        log.info("signedTRC: " + getSignedTRC());
+        log.info("signedTRC: '{}'", getSignedTRC());
+
         PatientId patientId = null;
         try {
             patientId = PatientId.Factory.newInstance();
@@ -707,9 +709,7 @@ public class MyBean implements Serializable {
             if (runningMode.equals("demo")) {
                 log.info("demo running so trca not created");
             } else if (getSignedTRC() == null) {
-                trcAssertion = EpsosHelperService
-                        .createPatientConfirmationPlain(purposeOfUse,
-                                hcpAssertion, patientId);
+                trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, hcpAssertion, patientId);
                 log.info("TRCA: Created " + trcAssertion.getID() + " for : "
                         + hcpAssertion.getID() + " for patient "
                         + patientId.getRoot() + "_" + patientId.getExtension()
@@ -744,19 +744,15 @@ public class MyBean implements Serializable {
             }
 
         } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(
-                    null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "TRCA ERROR",
-                            LiferayUtils.getPortalTranslation(e.getMessage())));
-            log.error("TRCA: Error creating trca for patient : "
-                    + patientId.getExtension() + " with hcpAssetion : "
-                    + hcpAssertion.getID() + ". Purpose of use is : "
-                    + purposeOfUse + " - " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "TRCA ERROR", LiferayUtils.getPortalTranslation(e.getMessage())));
+            log.error("TRCA: Error creating trca for patient: '{}' with hcpAssetion: '{}'. " +
+                            "Purpose of use is: '{} - '{}", patientId.getExtension(), hcpAssertion.getID(), purposeOfUse,
+                    e.getMessage(), e);
             log.error(ExceptionUtils.getStackTrace(e));
             trcassertionexists = false;
             trcassertionnotexists = true;
-            queryDocumentsException = LiferayUtils.getPortalTranslation(e
-                    .getMessage());
+            queryDocumentsException = LiferayUtils.getPortalTranslation(e.getMessage());
         }
     }
 
@@ -1351,7 +1347,8 @@ public class MyBean implements Serializable {
     }
 
     public void setSignedTRC(String signedTRC) throws Exception {
-        log.info("signedTRC: " + signedTRC);
+
+        log.info("signedTRC: '{}'", signedTRC);
         if (signedTRC != null && !signedTRC.isEmpty()) {
             // Initialize the library
             DefaultBootstrap.bootstrap();
@@ -1361,28 +1358,20 @@ public class MyBean implements Serializable {
             ppMgr.setNamespaceAware(true);
 
             // Parse metadata file
-            InputStream in = new ByteArrayInputStream(
-                    signedTRC.getBytes("UTF-8"));
+            InputStream in = new ByteArrayInputStream(signedTRC.getBytes("UTF-8"));
             Document inCommonMDDoc = ppMgr.parse(in);
             Element metadataRoot = inCommonMDDoc.getDocumentElement();
 
             // Get apropriate unmarshaller
-            UnmarshallerFactory unmarshallerFactory = Configuration
-                    .getUnmarshallerFactory();
-            Unmarshaller unmarshaller = unmarshallerFactory
-                    .getUnmarshaller(metadataRoot);
+            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(metadataRoot);
 
-            // Unmarshall using the document root element, an EntitiesDescriptor
-            // in this case
+            // Unmarshall using the document root element, an EntitiesDescriptor in this case
             trcAssertion = (Assertion) unmarshaller.unmarshall(metadataRoot);
 
-            // Assertion trca = (Assertion)
-            // EpsosHelperService.fromElement(doc.getDocumentElement());
-            log.info("TRCA " + trcAssertion + " with ID: "
-                    + trcAssertion.getID());
+            log.info("TRCA '{}' with ID: '{}'", trcAssertion, trcAssertion.getID());
             LiferayUtils.storeToSession("trcAssertion", trcAssertion);
             this.signedTRC = signedTRC;
         }
     }
-
 }

@@ -200,7 +200,7 @@ public class MessageSender extends java.lang.Thread {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
             Date now = new Date();
-            StringBuffer nowStr = new StringBuffer(sdf.format(now));
+            StringBuilder nowStr = new StringBuilder(sdf.format(now));
             if (nowStr.charAt(4) == '0') {
                 nowStr.setCharAt(4, ' ');
             }
