@@ -19,6 +19,7 @@ package epsos.ccd.netsmart.securitymanager.sts.client;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.Configuration;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.xml.io.MarshallingException;
@@ -133,9 +134,8 @@ public class TRCAssertionRequest {
         try {
             UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(e);
-            // Unmarshall using the document root element, an EntitiesDescriptor in this case
-            Assertion as = (Assertion) unmarshaller.unmarshall(e);
-            return as;
+            // Unmarshalling using the document root element, an EntitiesDescriptor in this case
+            return (Assertion) unmarshaller.unmarshall(e);
         } catch (UnmarshallingException ex) {
             LOGGER.error(null, ex);
         }
@@ -200,7 +200,7 @@ public class TRCAssertionRequest {
      */
     public Assertion request() throws Exception {
         try {
-
+            LOGGER.info("TRC-STS client request Assertion");
             HttpURLConnection httpConnection = (HttpURLConnection) STSLocation.openConnection();
             //Set headers
             httpConnection.setRequestProperty("Content-Type", "application/soap+xml");
@@ -209,9 +209,10 @@ public class TRCAssertionRequest {
             httpConnection.setDoInput(true);
             httpConnection.setDoOutput(true);
 
+            LOGGER.info("CHECK_FOR_HOSTNAME SSL");
             if (httpConnection instanceof HttpsURLConnection) {  // Going SSL
                 ((HttpsURLConnection) httpConnection).setSSLSocketFactory(getEpsosSSLSocketFactory());
-                if (CHECK_FOR_HOSTNAME.equals("false"))
+                if (StringUtils.equals(CHECK_FOR_HOSTNAME, "false"))
                     ((HttpsURLConnection) httpConnection).setHostnameVerifier(
                             new javax.net.ssl.HostnameVerifier() {
 
@@ -223,11 +224,12 @@ public class TRCAssertionRequest {
             }
 
             //Write and send the SOAP message
+            LOGGER.info("Sending SOAP request");
             rstMsg.writeTo(httpConnection.getOutputStream());
-            SOAPMessage response = MessageFactory
-                    .newInstance(SOAPConstants.SOAP_1_2_PROTOCOL)
+            SOAPMessage response = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL)
                     .createMessage(new MimeHeaders(), httpConnection.getInputStream());
 
+            LOGGER.info("Receiving SOAP response");
             if (response.getSOAPBody().hasFault()) {
                 SOAPFault newFault = response.getSOAPBody().getFault();
                 String code = newFault.getFaultCode();
@@ -237,8 +239,7 @@ public class TRCAssertionRequest {
 
             }
 
-            Assertion trcAssertion = extractTRCAssertionFromRSTC(response);
-            return trcAssertion;
+            return extractTRCAssertionFromRSTC(response);
 
         } catch (SOAPException ex) {
             LOGGER.error(null, ex);
@@ -266,8 +267,7 @@ public class TRCAssertionRequest {
 
             UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
-            Assertion trcAssertion = (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
-            return trcAssertion;
+            return (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
 
         } catch (Exception ex) {
             LOGGER.error(null, ex);
@@ -291,13 +291,7 @@ public class TRCAssertionRequest {
 
             ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
-        } catch (KeyManagementException ex) {
-            LOGGER.error(null, ex);
-        } catch (UnrecoverableKeyException ex) {
-            LOGGER.error(null, ex);
-        } catch (KeyStoreException ex) {
-            LOGGER.error(null, ex);
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (KeyManagementException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException ex) {
             LOGGER.error(null, ex);
         } finally {
             if (ctx != null) {
@@ -353,7 +347,7 @@ public class TRCAssertionRequest {
         }
 
         /**
-         * method to incrementaly add the STS URL the request. If not added, the
+         * method to incrementally add the STS URL the request. If not added, the
          * builder will use the one that exists in the secman.sts.url parameter
          * of the epsos.properties file (see ConfigurationManagerService)
          *
