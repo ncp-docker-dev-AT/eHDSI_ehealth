@@ -41,6 +41,7 @@ import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.PrettyXmlSerializer;
 import org.htmlcleaner.TagNode;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.opensaml.Configuration;
@@ -1051,31 +1052,24 @@ public class EpsosHelperService {
 
     public static Object getUserAssertion(User user) {
 
-        log.info("User is: " + user.getScreenName());
-        Assertion assertion = null;
+        log.info("User is: '{}'", user.getScreenName());
+        Assertion assertion;
 
         try {
-            boolean isPhysician = LiferayUtils.isDoctor(user.getUserId(),
-                    user.getCompanyId());
-            boolean isPharmacist = LiferayUtils.isPharmacist(user.getUserId(),
-                    user.getCompanyId());
-            boolean isNurse = LiferayUtils.isNurse(user.getUserId(),
-                    user.getCompanyId());
-            boolean isAdministrator = LiferayUtils.isAdministrator(
-                    user.getUserId(), user.getCompanyId());
-            boolean isPatient = LiferayUtils.isPatient(user.getUserId(),
-                    user.getCompanyId());
+            boolean isPhysician = LiferayUtils.isDoctor(user.getUserId(), user.getCompanyId());
+            boolean isPharmacist = LiferayUtils.isPharmacist(user.getUserId(), user.getCompanyId());
+            boolean isNurse = LiferayUtils.isNurse(user.getUserId(), user.getCompanyId());
+            boolean isAdministrator = LiferayUtils.isAdministrator(user.getUserId(), user.getCompanyId());
+            boolean isPatient = LiferayUtils.isPatient(user.getUserId(), user.getCompanyId());
 
-            if (isPhysician || isPharmacist || isNurse || isAdministrator
-                    || isPatient) {
+            if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
                 log.info("The portal role is one of the expected. Continuing ...");
             } else {
                 log.error("The portal role is NOT one of the expected. Break");
-                return "Error creating assertion for user. Role not compatible with EPSOS";
+                return "Error creating assertion for user. Role not compatible with OpenNCP Reference Implementation";
             }
 
-            String orgName = "";
-
+            String orgName;
             Vector perms = new Vector();
 
             String username = user.getScreenName();
@@ -1085,8 +1079,7 @@ public class EpsosHelperService {
             if (isPhysician) {
                 rolename = "medical doctor";
 
-                String doctor_perms = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
+                String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
                 String p[] = doctor_perms.split(",");
                 for (int k = 0; k < p.length; k++) {
                     perms.add(prefix + p[k]);
@@ -1094,8 +1087,7 @@ public class EpsosHelperService {
             }
             if (isPharmacist) {
                 rolename = "pharmacist";
-                String pharm_perms = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_PERMISSIONS);
+                String pharm_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_PERMISSIONS);
                 String p1[] = pharm_perms.split(",");
                 for (int k = 0; k < p1.length; k++) {
                     perms.add(prefix + p1[k]);
@@ -1104,8 +1096,7 @@ public class EpsosHelperService {
 
             if (isNurse) {
                 rolename = "nurse";
-                String nurse_perms = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_NURSE_PERMISSIONS);
+                String nurse_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_NURSE_PERMISSIONS);
                 String p1[] = nurse_perms.split(",");
                 for (int k = 0; k < p1.length; k++) {
                     perms.add(prefix + p1[k]);
@@ -1114,8 +1105,7 @@ public class EpsosHelperService {
 
             if (isPatient) {
                 rolename = "patient";
-                String patient_perms = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
+                String patient_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
                 String p1[] = patient_perms.split(",");
                 for (int k = 0; k < p1.length; k++) {
                     perms.add(prefix + p1[k]);
@@ -1124,15 +1114,13 @@ public class EpsosHelperService {
 
             if (isAdministrator) {
                 rolename = "administrator";
-                String admin_perms = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
+                String admin_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
                 String p1[] = admin_perms.split(",");
                 for (int k = 0; k < p1.length; k++) {
                     perms.add(prefix + p1[k]);
                 }
             }
-            Company company = CompanyLocalServiceUtil.getCompany(user
-                    .getCompanyId());
+            Company company = CompanyLocalServiceUtil.getCompany(user.getCompanyId());
             orgName = company.getName();
             String poc = "POC";
             // fixed for consent creation AuthorInstitution Validation problem
@@ -1148,28 +1136,22 @@ public class EpsosHelperService {
                     orgType = "Hospital";
                 }
             }
-            assertion = EpsosHelperService.createAssertion(username, rolename,
-                    orgName, orgId, orgType, "TREATMENT", poc, perms);
+            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType, "TREATMENT", poc, perms);
 
             // send Audit message
             // GUI-27
             if (Validator.isNotNull(assertion)) {
-                log.info("AUDIT URL: "
-                        + ConfigurationManagerService.getInstance()
-                        .getProperty("audit.repository.url"));
-                log.debug("Sending epsos-91 audit message for "
-                        + user.getFullName());
+                log.info("AUDIT URL: '{}'", ConfigurationManagerService.getInstance().getProperty("audit.repository.url"));
+                log.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
                 EpsosHelperService.sendAuditEpsos91(user.getFullName(),
                         user.getEmailAddress(), orgName, orgType, rolename,
                         assertion.getID());
             }
             // GUI-25
-            if (isPhysician || isPharmacist || isNurse || isAdministrator
-                    || isPatient) {
+            if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
                 String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-                log.info("KEY ALIAS: " + KEY_ALIAS);
-                String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
+                log.info("KEY ALIAS: '{}'", KEY_ALIAS);
 
                 signSAMLAssertion(assertion, KEY_ALIAS);
                 AssertionMarshaller marshaller = new AssertionMarshaller();
@@ -1180,13 +1162,10 @@ public class EpsosHelperService {
                 Document document = element.getOwnerDocument();
 
                 String hcpa = Utils.getDocumentAsXml(document, false);
-                log.info("#### HCPA Start");
-                log.info(hcpa);
-                log.info("#### HCPA End");
-
+                log.info("#### HCPA Start\n '{}' \n#### HCPA End", hcpa);
             }
 
-            log.info("Assertion: " + assertion.getID());
+            log.info("Assertion: '{}'", assertion.getID());
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
             return e.getMessage();
@@ -1536,7 +1515,7 @@ public class EpsosHelperService {
 
             assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
 
-            org.joda.time.DateTime now = new org.joda.time.DateTime();
+            DateTime now = new DateTime();
             LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
 
             String assId = "_" + UUID.randomUUID().toString();
@@ -1984,24 +1963,19 @@ public class EpsosHelperService {
         log.info("##################### ASSERTION End");
     }
 
-    public static Assertion createPatientConfirmationPlain(String purpose,
-                                                           Assertion idAs, PatientId patient) throws Exception {
-        Assertion trc = null;
+    public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
+        Assertion trc;
         log.debug("Try to create TRCA for patient : " + patient.getExtension());
-        String pat = "";
-        pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
-        log.info("TRCA Patient ID : " + pat);
-        log.info("Assertion ID :" + idAs.getID());
-        log.info("SECMAN URL: "
-                + ConfigurationManagerService.getInstance().getProperty(
-                "secman.sts.url"));
-        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat)
-                .PurposeOfUse(purpose).build();
+        String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
+        log.info("TRCA Patient ID: '{}'", pat);
+        log.info("Assertion ID: '{}'", idAs.getID());
+        log.info("SECMAN URL: '{}'", ConfigurationManagerService.getInstance().getProperty("secman.sts.url"));
+        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).PurposeOfUse(purpose).build();
+        log.info("TRCAssertionRequest: '{}", req1.toString());
         trc = req1.request();
 
         AssertionMarshaller marshaller = new AssertionMarshaller();
-        Element element = null;
-        element = marshaller.marshall(trc);
+        Element element = marshaller.marshall(trc);
         Document document = element.getOwnerDocument();
 
         String trca = Utils.getDocumentAsXml(document, false);
@@ -2010,8 +1984,8 @@ public class EpsosHelperService {
         log.info(trca);
         log.info("#### TRCA End");
 
-        log.debug("TRCA CREATED: " + trc.getID());
-        log.debug("TRCA WILL BE STORED TO SESSION: " + trc.getID());
+        log.debug("TRCA CREATED: '{}'", trc.getID());
+        log.debug("TRCA WILL BE STORED TO SESSION: '{}'", trc.getID());
         LiferayUtils.storeToSession("trcAssertion", trc);
         return trc;
     }

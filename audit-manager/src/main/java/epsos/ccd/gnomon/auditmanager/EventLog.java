@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
-import java.util.Arrays;
 
 /**
  * Java Bean object for the Event Log object.
@@ -133,7 +132,7 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
-        LOGGER.info("EventLog: '{}'", el.toString());
+        LOGGER.info("'{}'", el.toString());
         return el;
     }
 
@@ -187,7 +186,7 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
-        LOGGER.info("EventLog: '{}'", el.toString());
+        LOGGER.info("'{}'", el.toString());
         return el;
     }
 
@@ -239,7 +238,7 @@ public class EventLog {
         el.setResM_ParticipantObjectID(NullToEmptyString(ResM_ParticipantObjectID));
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setTargetip(NullToEmptyString(targetip));
-        LOGGER.info("EventLog: '{}'", el.toString());
+        LOGGER.info("'{}'", el.toString());
         return el;
     }
 
@@ -445,7 +444,7 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
-        LOGGER.info("EventLog: '{}'", el.toString());
+        LOGGER.info("'{}'", el.toString());
         return el;
     }
 
@@ -550,7 +549,7 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
-        LOGGER.info("EventLog: '{}'", el.toString());
+        LOGGER.info("'{}'", el.toString());
         return el;
     }
 
@@ -634,7 +633,7 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
-        LOGGER.info("EventLog: '{}'", el.toString());
+        LOGGER.info("'{}'", el.toString());
         return el;
     }
 
@@ -708,7 +707,7 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
-        LOGGER.info("EventLog: '{}'", el.toString());
+        LOGGER.info("'{}'", el.toString());
         return el;
     }
 
@@ -1044,14 +1043,11 @@ public class EventLog {
                 ", PS_PatricipantObjectID='" + PS_PatricipantObjectID + '\'' +
                 ", PT_PatricipantObjectID='" + PT_PatricipantObjectID + '\'' +
                 ", EM_PatricipantObjectID='" + EM_PatricipantObjectID + '\'' +
-                ", EM_PatricipantObjectDetail=" + Arrays.toString(EM_PatricipantObjectDetail) +
                 ", MS_UserID='" + MS_UserID + '\'' +
                 ", ET_ObjectID='" + ET_ObjectID + '\'' +
                 ", ET_ObjectID_additional='" + ET_ObjectID_additional + '\'' +
                 ", ReqM_ParticipantObjectID='" + ReqM_ParticipantObjectID + '\'' +
-                ", ReqM_PatricipantObjectDetail=" + Arrays.toString(ReqM_PatricipantObjectDetail) +
                 ", ResM_ParticipantObjectID='" + ResM_ParticipantObjectID + '\'' +
-                ", ResM_PatricipantObjectDetail=" + Arrays.toString(ResM_PatricipantObjectDetail) +
                 ", sourceip='" + sourceip + '\'' +
                 ", targetip='" + targetip + '\'' +
                 ", EventType='" + EventType + '\'' +
