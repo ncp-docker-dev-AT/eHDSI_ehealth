@@ -404,12 +404,12 @@
 
     <build>
         <resources>
-            <resource>
-                <directory>src/main/resources/content</directory>
-                <includes>
-                    <include>../*.properties</include>
-                </includes>
-            </resource>
+            <!--<resource>-->
+                <!--<directory>src/main/resources/content</directory>-->
+                <!--<includes>-->
+                    <!--<include>../*.properties</include>-->
+                <!--</includes>-->
+            <!--</resource>-->
             <resource>
                 <directory>src/main/java</directory>
                 <includes>
@@ -418,33 +418,36 @@
                     <include>**/*.jasper</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
         </resources>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>native2ascii-maven-plugin</artifactId>
-                    <version>1.0-beta-1</version>
-                    <configuration>
-                        <workDir>target/classes/content/</workDir>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>native2ascii</goal>
-                            </goals>
-                            <configuration>
-                                <includes>
-                                    <include>**/Language*.properties</include>
-                                </includes>
-                                <encoding>UTF8</encoding>
-                                <!--src>src/main/resources/content</src>
-                                <dest>target/classes</dest-->
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.codehaus.mojo</groupId>-->
+                    <!--<artifactId>native2ascii-maven-plugin</artifactId>-->
+                    <!--<version>1.0-beta-1</version>-->
+                    <!--<configuration>-->
+                        <!--<workDir>target/classes/content/</workDir>-->
+                    <!--</configuration>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<phase>compile</phase>-->
+                            <!--<goals>-->
+                                <!--<goal>native2ascii</goal>-->
+                            <!--</goals>-->
+                            <!--<configuration>-->
+                                <!--<includes>-->
+                                    <!--<include>**/Language*.properties</include>-->
+                                <!--</includes>-->
+                                <!--<encoding>UTF8</encoding>-->
+                                <!--&lt;!&ndash;src>src/main/resources/content</src>-->
+                                <!--<dest>target/classes</dest&ndash;&gt;-->
+                            <!--</configuration>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                <!--</plugin>-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
@@ -487,7 +490,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.3</version>
+                    <version>2.6</version>
                     <!-- <configuration> -->
                     <!-- <webResources> -->
                     <!-- <resource> -->
