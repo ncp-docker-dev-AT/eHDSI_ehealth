@@ -403,7 +403,7 @@ public class MASISMLSMPClient {
              * HERE SML ENDS, BEGIN SMP
 			 */
             // Get the service group,
-            // http://ehealth-test-uprc.publisher.acc.edelivery.tech.ec.europa.eu/ehealth-actorid-qns%3A%3Aurn%3Aehealth%3Apt%3Ancpb-idp
+            // http://ehealth-test-uprc.publisher.acc.edelivery.tech.ec.europa.eu/ehealth-actorid-qns%3A%3Aurn%3Aehealth%3Apt%3Ancp-idp
 
             // TODO: how this sgName is defined?
             String sgName = url1 + "/ehealth-participantid-qns" + new URLCodec().encode("::" + processIdentifier);
@@ -445,7 +445,7 @@ public class MASISMLSMPClient {
     private String prepareSmlQuery(String countryCode) throws UnsupportedEncodingException {
 
         LOGGER.debug("Creating the SML hostname (party identifier)");
-        processIdentifier = "urn:ehealth:" + countryCode + ":ncpb-idp";
+        processIdentifier = "urn:ehealth:" + countryCode + ":ncp-idp";
 
         LOGGER.debug("Caluclated process identifier '{}'", processIdentifier);
 

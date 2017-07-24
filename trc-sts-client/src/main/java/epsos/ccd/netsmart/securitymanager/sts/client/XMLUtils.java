@@ -19,13 +19,13 @@ package epsos.ccd.netsmart.securitymanager.sts.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.OutputStream;
+import java.io.StringWriter;
 
 /**
  * @author Jerry Dimitriou <jerouris at netsmart.gr>
@@ -43,5 +43,24 @@ public class XMLUtils {
         } catch (TransformerException ex) {
             LOGGER.error(null, ex);
         }
+    }
+
+    private String asString(Node node) {
+        StringWriter writer = new StringWriter();
+        try {
+            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            // @checkstyle MultipleStringLiterals (1 line)
+            trans.setOutputProperty(OutputKeys.INDENT, "yes");
+            trans.setOutputProperty(OutputKeys.VERSION, "1.0");
+            if (!(node instanceof Document)) {
+                trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            }
+            trans.transform(new DOMSource(node), new StreamResult(writer));
+        } catch (final TransformerConfigurationException ex) {
+            throw new IllegalStateException(ex);
+        } catch (final TransformerException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+        return writer.toString();
     }
 }

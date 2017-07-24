@@ -2,29 +2,41 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.util.net.ProxyCredentials;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
+import eu.epsos.util.net.ProxyUtil;
+import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
+import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
+import eu.europa.ec.dynamicdiscovery.core.fetcher.impl.DefaultURLFetcher;
+import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
+import eu.europa.ec.dynamicdiscovery.exception.ConnectionException;
+import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
+import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
+import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp.ReferenceCollection;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPType;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.Audit;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.CustomProxy;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.net.ssl.SSLContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.PrivateKeyDetails;
+import org.apache.http.ssl.PrivateKeyStrategy;
+import org.apache.http.ssl.SSLContexts;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -39,47 +51,27 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import eu.epsos.util.net.ProxyUtil;
-import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
-import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
-import eu.europa.ec.dynamicdiscovery.core.fetcher.impl.DefaultURLFetcher;
-import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
-import eu.europa.ec.dynamicdiscovery.exception.ConnectionException;
-import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
-import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
-import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.Audit;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.CustomProxy;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPProperties;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+
+import javax.net.ssl.SSLContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.PrivateKeyDetails;
-import org.apache.http.ssl.PrivateKeyStrategy;
-import org.apache.http.ssl.SSLContexts;
+import java.io.*;
+import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.util.*;
 
 /**
  *
@@ -90,7 +82,7 @@ import org.apache.http.ssl.SSLContexts;
 @SessionAttributes("smpdelete")
 public class SMPDeleteFileController {
 
-  org.slf4j.Logger logger = LoggerFactory.getLogger(SMPUploadFileController.class);
+  private static final Logger logger = LoggerFactory.getLogger(SMPUploadFileController.class);
 
   @Autowired
   private Environment env;
@@ -124,7 +116,7 @@ public class SMPDeleteFileController {
     logger.debug("\n==== in postDelete ====");
     model.addAttribute("smpdelete", smpdelete);
    
-    String partID ="urn:ehealth:" + smpdelete.getCountry().name() + ":ncpb-idp"; //SPECIFICATION
+    String partID ="urn:ehealth:" + smpdelete.getCountry().name() + ":ncp-idp"; //SPECIFICATION
     String partScheme = env.getProperty("ParticipantIdentifier.Scheme");
 
     Boolean success = true;

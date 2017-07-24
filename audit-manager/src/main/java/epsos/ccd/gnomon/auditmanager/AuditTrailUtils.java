@@ -352,8 +352,7 @@ public enum AuditTrailUtils {
     }
 
     /**
-     * Constructs an Audit Message for NCP Trusted Service List According schema
-     * is HCP Assurcance
+     * Constructs an Audit Message for NCP Trusted Service List According schema is HCP Assurance
      *
      * @param eventLog the EventLog object
      * @return the created AuditMessage object
@@ -361,8 +360,8 @@ public enum AuditTrailUtils {
     private AuditMessage _CreateAuditTrailNCPTrustedServiceList(EventLog eventLog) {
         AuditMessage am = createAuditTrailForNCPTrustedServiceList(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "NSL", "epSOS Security",
-                    "Trusted Service List");
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "NSL",
+                    "epSOS Security", "Trusted Service List");
         }
         return am;
     }

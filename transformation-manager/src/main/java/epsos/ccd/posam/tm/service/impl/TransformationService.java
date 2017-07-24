@@ -12,6 +12,7 @@ import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,6 +21,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -45,12 +47,25 @@ public class TransformationService implements ITransformationService, TMConstant
 
         LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [START]");
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
+        try {
+            LOGGER.info("*****************PIVOT CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
+        } catch (Exception e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+        }
         LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [END]");
-//        try {
-//            LOGGER.info("*****************PIVOT CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        return responseStructure;
+    }
+
+    public TMResponseStructure translate(Document epSosCDA, String targetLanguageCode) {
+
+        LOGGER.info("Translating OpenNCP CDA Document [START]");
+        TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
+        try {
+            LOGGER.info("*****************Translate CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
+        } catch (Exception e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+        }
+        LOGGER.info("Translating OpenNCP CDA Document [END]");
         return responseStructure;
     }
 
@@ -134,18 +149,6 @@ public class TransformationService implements ITransformationService, TMConstant
         return docTypeConstant;
     }
 
-    public TMResponseStructure translate(Document epSosCDA, String targetLanguageCode) {
-
-        LOGGER.info("Translating OpenNCP CDA Document [START]");
-        TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
-        LOGGER.info("Translating OpenNCP CDA Document [END]");
-//        try {
-//            LOGGER.info("*****************Translate CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        return responseStructure;
-    }
 
     private TMResponseStructure process(Document inputDocument, String targetLanguageCode, boolean isTranscode) {
 
@@ -626,6 +629,8 @@ public class TransformationService implements ITransformationService, TMConstant
                                    HashMap<String, String> hmReffIdDisplayName, String valueSet,
                                    String valueSetVersion, boolean isTranscode,
                                    List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings) {
+
+        //TODO: Update the translation Node while the translation/transcoding process
         try {
             // kontrola na povinne atributy
             Boolean checkAttributes = checkAttributes(originalElement, warnings);
@@ -633,8 +638,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 return checkAttributes.booleanValue();
             }
 
-            CodedElement codedElement = new CodedElement(
-                    (Element) originalElement);
+            CodedElement codedElement = new CodedElement((Element) originalElement);
             codedElement.setVsOid(valueSet);
             codedElement.setValueSetVersion(valueSetVersion);
 
@@ -651,8 +655,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 // +++++ Element editing BEGIN +++++
 
                 // NEW TRANSLATION element
-                Element newTranslation = null;
-                newTranslation = document.createElementNS(originalElement.getNamespaceURI(), TRANSLATION);
+                Element newTranslation = document.createElementNS(originalElement.getNamespaceURI(), TRANSLATION);
                 if (originalElement.getPrefix() != null) {
                     newTranslation.setPrefix(originalElement.getPrefix());
                 }
@@ -660,13 +663,10 @@ public class TransformationService implements ITransformationService, TMConstant
                 // check - no repeated attributed in translation element by
                 // transcoding
                 // if codeSystem && code for source and target are same
-                if (notEmpty(tsamResponse.getCodeSystem())
-                        && notEmpty(codedElement.getOid())
-                        && !codedElement.getOid().equalsIgnoreCase(
-                        tsamResponse.getCodeSystem())
-                        || (codedElement.getOid().equalsIgnoreCase(
-                        tsamResponse.getCodeSystem()) && !codedElement
-                        .getCode().equals(tsamResponse.getCode()))) {
+                if (notEmpty(tsamResponse.getCodeSystem()) && notEmpty(codedElement.getOid())
+                        && !codedElement.getOid().equalsIgnoreCase(tsamResponse.getCodeSystem())
+                        || (codedElement.getOid().equalsIgnoreCase(tsamResponse.getCodeSystem())
+                        && !codedElement.getCode().equals(tsamResponse.getCode()))) {
                     // code
                     if (notEmpty(codedElement.getCode())) {
                         newTranslation.setAttribute(CODE, codedElement
@@ -690,10 +690,24 @@ public class TransformationService implements ITransformationService, TMConstant
                     attributesFilled = true;
                 }
                 // designation (only if source and target differs)
-                if (!tsamResponse.getDesignation().equals(
-                        codedElement.getDisplayName())) {
-                    newTranslation.setAttribute(DISPLAY_NAME, codedElement
-                            .getDisplayName());
+                if (!tsamResponse.getDesignation().equals(codedElement.getDisplayName())) {
+                    if (StringUtils.isNotBlank(codedElement.getDisplayName())) {
+                        newTranslation.setAttribute(DISPLAY_NAME, codedElement.getDisplayName());
+                    }
+                    if (notEmpty(codedElement.getCode())) {
+                        newTranslation.setAttribute(CODE, codedElement
+                                .getCode());
+                    }
+                    // codeSystem
+                    if (notEmpty(codedElement.getOid())) {
+                        newTranslation.setAttribute(CODE_SYSTEM, codedElement
+                                .getOid());
+                    }
+                    // codeSystemName
+                    if (notEmpty(codedElement.getCodeSystem())) {
+                        newTranslation.setAttribute(CODE_SYSTEM_NAME,
+                                codedElement.getCodeSystem());
+                    }
                     attributesFilled = true;
                 } else {
                     LOGGER.debug("Translation is same as original: " + tsamResponse.getDesignation());

@@ -2,7 +2,7 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSSXXX} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
         </layout>
     </appender>
 
@@ -10,7 +10,7 @@
         <file>${catalina.base}/logs/openncp-client-connector.log</file>
         <append>true</append>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSSXXX} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -19,6 +19,14 @@
             <jndiLocation>java:comp/env/jdbc/LOGS</jndiLocation>
         </connectionSource>
     </appender>
+
+    <logger name="org.apache.http.client" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="eu.europa.ec.dynamicdiscovery" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
 
     <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
@@ -52,6 +60,10 @@
     <logger name="pt.spms.epsos.utils.logging" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
+    </logger>
+
+    <logger name="epsos.ccd.gnomon.auditmanager" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
     </logger>
 
     <logger name="epsos.ccd.gnomon.configmanager" level="INFO" additivity="false">

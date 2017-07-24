@@ -39,6 +39,10 @@
                     <artifactId>bcprov-jdk15</artifactId>
                     <groupId>org.bouncycastle</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>xercesImpl</artifactId>
+                    <groupId>xerces</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -138,6 +142,11 @@
         <!-- TODO: Validate this dependency issue:
         Specific JEE dependency needed by MOXy to parse dates
         http://stackoverflow.com/questions/22022994/moxy-2-5-1-dependency-on-javaee-causes-noclassdeffounderror-in-javase -->
+        <!--<dependency>-->
+            <!--<groupId>org.eclipse.persistence</groupId>-->
+            <!--<artifactId>org.eclipse.persistence.moxy</artifactId>-->
+            <!--<version>2.5.3-RC1</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.moxy</artifactId>
@@ -152,6 +161,10 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>4.3.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
 

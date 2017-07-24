@@ -76,7 +76,7 @@
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
-            <version>2.5.1-1</version>
+            <version>${opensaml.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
