@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.exception.GenericException;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,9 +26,8 @@ import java.io.*;
  */
 @Service
 public class SignFile {
+
     private static final String C14N_METHOD = CanonicalizationMethod.INCLUSIVE;
-    //private static final String KEY_PAIR_NI_ALIAS = "sample_national_infrastructure";
-    //private static final String KEY_PAIR_NI_PASS = "mock";
     private static final String OASIS_NS = "http://docs.oasis-open.org/bdxr/ns/SMP/2016/05";
     private static final String XMLDSIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     private static Signer NATIONAL_INFRASTRUCTURE_SIGNER;
@@ -85,7 +85,7 @@ public class SignFile {
         Element siSigPointer = findSig(type, docUnwrapped);
         SignatureValidator.validateSignature(siSigPointer);
 
-        generatedSignFile = new File("/" + fileName);
+        generatedSignFile = new File(Constants.SMP_DIR_PATH + fileName);
         Source source = new DOMSource(docServiceMetadata);
         Result result = new StreamResult(generatedSignFile);
         Transformer xformer = TransformerFactory.newInstance().newTransformer();
