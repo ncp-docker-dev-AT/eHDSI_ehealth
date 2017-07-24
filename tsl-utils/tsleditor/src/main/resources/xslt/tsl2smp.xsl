@@ -208,7 +208,7 @@
                         <xsl:call-template name="ServiceMetadata">
                             <xsl:with-param name="country" select="$country"/>
                             <xsl:with-param name="documentIdentifier" select="'epsos::91'"/>
-                            <xsl:with-param name="processIdentifier" select="concat('urn:ehealth:ncp:',lower-case($country),':ncpb-idp')"/>
+                            <xsl:with-param name="processIdentifier" select="concat('urn:ehealth:ncp:',lower-case($country),':ncp-idp')"/>
                             <xsl:with-param name="transportProfile" select="'urn:oasis:names:tc:SAML:2.0:protocol'"/>
                             <xsl:with-param name="endpointURI" select="'urn:idp:countryB'"/>
                             <xsl:with-param name="serviceActivationDate" select="$activationDate"/>
@@ -266,7 +266,7 @@
     
     <xsl:template name="ParticipantIdentifier">
         <xsl:param name="country"/>
-        <ids:ParticipantIdentifier scheme="ehealth-actorid-qns">urn:ehealth:<xsl:value-of select="lower-case($country)"/>:ncpb-idp</ids:ParticipantIdentifier>
+        <ids:ParticipantIdentifier scheme="ehealth-actorid-qns">urn:ehealth:<xsl:value-of select="lower-case($country)"/>:ncp-idp</ids:ParticipantIdentifier>
     </xsl:template>
     
     <xsl:template name="DocumentIdentifier">
