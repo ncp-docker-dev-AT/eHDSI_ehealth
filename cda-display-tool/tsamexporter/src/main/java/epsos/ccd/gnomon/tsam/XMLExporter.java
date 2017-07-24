@@ -1,6 +1,6 @@
 package epsos.ccd.gnomon.tsam;
 
-import epsos.ccd.gnomon.tsam.configuration.Settings;
+import eu.europa.ec.sante.ehdsi.openncp.tsam.exporter.LtrDatabase;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -47,15 +46,16 @@ public class XMLExporter {
             LOG.info("EPSOS Repository in '{}'", USER_HOME);
             output.append("EPSOS Repository in ").append(USER_HOME);
             output.append("<br/>");
-            Class.forName(Settings.getInstance().getSettingValue("database.class.name")).newInstance();
-            String databaseUrl = Settings.getInstance().getSettingValue("database.url");
-            String userName = Settings.getInstance().getSettingValue("database.username");
-            String userPassword = Settings.getInstance().getSettingValue("database.password");
+//            Class.forName(Settings.getInstance().getSettingValue("database.class.name")).newInstance();
+//            String databaseUrl = Settings.getInstance().getSettingValue("database.url");
+//            String userName = Settings.getInstance().getSettingValue("database.username");
+//            String userPassword = Settings.getInstance().getSettingValue("database.password");
 
             LOG.info("Connecting to database ...");
             String query = "SELECT * FROM code_system";
-
-            try (Connection conn = DriverManager.getConnection(databaseUrl, userName, userPassword);
+            LtrDatabase ltrDatabase = LtrDatabase.getInstance();
+            // try (Connection conn = DriverManager.getConnection(databaseUrl, userName, userPassword);
+            try (Connection conn = ltrDatabase.getDataSource().getConnection();
                  Statement stat = conn.createStatement();
                  ResultSet result = stat.executeQuery(query)) {
 
@@ -125,7 +125,7 @@ public class XMLExporter {
                                     String lang_code = result1.getString("language_code");
                                     String description = result1.getString("designation");
 
-                                    LOG.info("    OID: '{}' epSOS Name: '{}' Language: '{}' Description: '{}", oid, epsosName, lang_code, description);
+                                    //LOG.info("    OID: '{}' epSOS Name: '{}' Language: '{}' Description: '{}", oid, epsosName, lang_code, description);
                                     sb.append("<").
                                             append(cs_name_nopaces).
                                             append("Entry oid='").append(oid).append("'").
