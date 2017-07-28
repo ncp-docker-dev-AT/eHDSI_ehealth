@@ -13,7 +13,7 @@ import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.OpenNcpProperties;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
@@ -258,24 +258,22 @@ public class SMPUploadFileController {
 
             StringEntity entityPut = new StringEntity(content, ContentType.create("application/xml", "UTF-8"));
 
-            PrivateKeyStrategy privatek = new PrivateKeyStrategy() {
-                @Override
-                public String chooseAlias(Map<String, PrivateKeyDetails> map, Socket socket) {
-                    return ConfigurationManagerService.getInstance().getProperty("SC_SMP_CLIENT_PRIVATEKEY_ALIAS");
-                }
-            };
+
+            ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
+
+            PrivateKeyStrategy privatek = (map, socket) -> configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_ALIAS);
 
 
             // Trust own CA and all self-signed certs
             SSLContext sslcontext = null;
             try {
                 sslcontext = SSLContexts.custom()
-                        .loadKeyMaterial(new File(ConfigurationManagerService.getInstance().getProperty("SC_KEYSTORE_PATH")),
-                                ConfigurationManagerService.getInstance().getProperty("SC_KEYSTORE_PASSWORD").toCharArray(),
-                                ConfigurationManagerService.getInstance().getProperty("SC_SMP_CLIENT_PRIVATEKEY_PASSWORD").toCharArray(), //must be the same as SC_KEYSTORE_PASSWORD
+                        .loadKeyMaterial(new File(configurationManager.getProperty(StandardProperties.NCP_KEYSTORE)),
+                                configurationManager.getProperty(StandardProperties.NCP_KEYSTORE_PASSWORD).toCharArray(),
+                                configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_PASSWORD).toCharArray(), //must be the same as SC_KEYSTORE_PASSWORD
                                 privatek)
-                        .loadTrustMaterial(new File(ConfigurationManagerService.getInstance().getProperty("TRUSTSTORE_PATH")),
-                                ConfigurationManagerService.getInstance().getProperty("TRUSTSTORE_PASSWORD").toCharArray(),
+                        .loadTrustMaterial(new File(configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD)),
+                                configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE).toCharArray(),
                                 new TrustSelfSignedStrategy())
                         .build();
             } catch (NoSuchAlgorithmException ex) {
@@ -351,15 +349,15 @@ public class SMPUploadFileController {
             logger.debug("\n ********** response status code - " + response.getStatusLine().getStatusCode());
             logger.debug("\n ********** response reason - " + response.getStatusLine().getReasonPhrase());
 
-            ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
+
             //Audit vars
             String ncp = configurationManager.getProperty("ncp.country");
             String ncpemail = configurationManager.getProperty("ncp.email");
             String country = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-            String localip = configurationManager.getProperty("SMP_ADMIN_URL");//Source Gateway
+            String localip = configurationManager.getProperty(StandardProperties.SMP_SML_ADMIN_URL);//Source Gateway
             String remoteip = configurationManager.getProperty("SERVER_IP");//Target Gateway
-            String smp = configurationManager.getProperty(OpenNcpProperties.SMP_SML_SUPPORT);
-            String smpemail = configurationManager.getProperty(OpenNcpProperties.SMP_SML_SUPPORT_EMAIL);
+            String smp = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT);
+            String smpemail = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT_EMAIL);
             //ET_ObjectID --> Base64 of url
             String objectID = uri.toString(); //ParticipantObjectID
             byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
@@ -471,7 +469,7 @@ public class SMPUploadFileController {
             if (proxyCredentials != null) {
                 try {
                     smpClient = DynamicDiscoveryBuilder.newInstance()
-                            .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(OpenNcpProperties.SMP_SML_DNS_DOMAIN)))
+                            .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
                             .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(), proxyCredentials.getProxyPassword())))
                             .build();
                 } catch (ConnectionException ex) {
@@ -481,7 +479,7 @@ public class SMPUploadFileController {
                 }
             } else {
                 smpClient = DynamicDiscoveryBuilder.newInstance()
-                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(OpenNcpProperties.SMP_SML_DNS_DOMAIN)))
+                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
                         .build();
             }
             if (smpClient == null) {

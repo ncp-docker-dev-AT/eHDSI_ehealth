@@ -12,7 +12,7 @@ import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.OpenNcpProperties;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp.ReferenceCollection;
@@ -132,7 +132,7 @@ public class SMPDeleteFileController {
         if (proxyCredentials != null) {
             try {
                 smpClient = DynamicDiscoveryBuilder.newInstance()
-                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(OpenNcpProperties.SMP_SML_DNS_DOMAIN)))
+                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
                         .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(), proxyCredentials.getProxyPassword())))
                         .build();
             } catch (ConnectionException ex) {
@@ -142,7 +142,7 @@ public class SMPDeleteFileController {
             }
         } else {
             smpClient = DynamicDiscoveryBuilder.newInstance()
-                    .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(OpenNcpProperties.SMP_SML_DNS_DOMAIN)))
+                    .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
                     .build();
         }
 
@@ -203,13 +203,13 @@ public class SMPDeleteFileController {
 
         //Audit
         ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
-        String ncp = configurationManager.getProperty(OpenNcpProperties.NCP_COUNTRY);
-        String ncpemail = configurationManager.getProperty(OpenNcpProperties.NCP_EMAIL);
-        String country = configurationManager.getProperty(OpenNcpProperties.COUNTRY_PRINCIPAL_SUBDIVISION);
+        String ncp = configurationManager.getProperty(StandardProperties.NCP_COUNTRY);
+        String ncpemail = configurationManager.getProperty(StandardProperties.NCP_EMAIL);
+        String country = configurationManager.getProperty(StandardProperties.NCP_COUNTRY_PRINCIPAL_SUBDIVISION);
         String localip = smpdelete.getSmpURI();
-        String remoteip = configurationManager.getProperty(OpenNcpProperties.SERVER_IP);
-        String smp = configurationManager.getProperty(OpenNcpProperties.SMP_SML_SUPPORT);
-        String smpemail = configurationManager.getProperty(OpenNcpProperties.SMP_SML_SUPPORT_EMAIL);
+        String remoteip = configurationManager.getProperty(StandardProperties.NCP_SERVER);
+        String smp = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT);
+        String smpemail = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT_EMAIL);
         //ET_ObjectID --> Base64 of url
         String objectID = serviceGroup.toString();
         byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
@@ -305,7 +305,7 @@ public class SMPDeleteFileController {
 
         ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
 
-        String urlServer = configurationManager.getProperty(OpenNcpProperties.SMP_SML_ADMIN_URL);
+        String urlServer = configurationManager.getProperty(StandardProperties.SMP_SML_ADMIN_URL);
         if (urlServer.endsWith("/")) {
             urlServer = urlServer.substring(0, urlServer.length() - 1);
         }
@@ -360,7 +360,7 @@ public class SMPDeleteFileController {
             PrivateKeyStrategy privatek = new PrivateKeyStrategy() {
                 @Override
                 public String chooseAlias(Map<String, PrivateKeyDetails> map, Socket socket) {
-                    return configurationManager.getProperty("SC_SMP_CLIENT_PRIVATEKEY_ALIAS");
+                    return configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_ALIAS);
                 }
             };
 
@@ -373,8 +373,8 @@ public class SMPDeleteFileController {
                                 configurationManager.getProperty("SC_KEYSTORE_PASSWORD").toCharArray(),
                                 configurationManager.getProperty("SC_SMP_CLIENT_PRIVATEKEY_PASSWORD").toCharArray(), //must be the same as SC_KEYSTORE_PASSWORD
                                 privatek)
-                        .loadTrustMaterial(new File(configurationManager.getProperty(OpenNcpProperties.TRUSTSTORE)),
-                                configurationManager.getProperty(OpenNcpProperties.TRUSTSTORE_PASS).toCharArray(),
+                        .loadTrustMaterial(new File(configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE)),
+                                configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD).toCharArray(),
                                 new TrustSelfSignedStrategy())
                         .build();
             } catch (NoSuchAlgorithmException ex) {
@@ -454,9 +454,9 @@ public class SMPDeleteFileController {
             String ncpemail = configurationManager.getProperty("ncp.email");
             String country = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
             String remoteip = configurationManager.getProperty("SERVER_IP");//Target Gateway
-            String localip = configurationManager.getProperty(OpenNcpProperties.SMP_SML_ADMIN_URL);
-            String smp = configurationManager.getProperty(OpenNcpProperties.SMP_SML_SUPPORT);
-            String smpemail = configurationManager.getProperty(OpenNcpProperties.SMP_SML_SUPPORT_EMAIL);
+            String localip = configurationManager.getProperty(StandardProperties.SMP_SML_ADMIN_URL);
+            String smp = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT);
+            String smpemail = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT_EMAIL);
             //ET_ObjectID --> Base64 of url
             String objectID = uri.toString();
             byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());

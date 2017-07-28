@@ -105,8 +105,8 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 
     private void storeEndpointCertificate(String endpointId, X509Certificate certificate) {
         // Store the endpoint certificate in the truststore
-        String trustStorePath = getProperty(OpenNcpProperties.TRUSTSTORE);
-        char[] trustStorePassword = getProperty(OpenNcpProperties.TRUSTSTORE_PASS).toCharArray();
+        String trustStorePath = getProperty(StandardProperties.NCP_TRUSTSTORE);
+        char[] trustStorePassword = getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD).toCharArray();
 
         try {
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -123,7 +123,7 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         }
 
         // Store the endpoint certificate in the file system
-        File certificateFile = new File(getProperty(OpenNcpProperties.CERTIFICATES_DIRECTORY), endpointId + ".der");
+        File certificateFile = new File(getProperty(StandardProperties.NCP_CERTIFICATES_DIRECTORY), endpointId + ".der");
         try (OutputStream os = new FileOutputStream(certificateFile)) {
             os.write(certificate.getEncoded());
 

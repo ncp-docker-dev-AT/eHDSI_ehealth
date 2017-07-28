@@ -40,7 +40,7 @@ public class ConfigurationManagerImplTest {
 
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
-        session.save(new Property(OpenNcpProperties.NCP_COUNTRY, COUNTRY_VALUE));
+        session.save(new Property(StandardProperties.NCP_COUNTRY, COUNTRY_VALUE));
         transaction.commit();
     }
 
@@ -59,7 +59,7 @@ public class ConfigurationManagerImplTest {
     @Test
     public void testGetProperty() {
         ConfigurationManager configurationManager = new ConfigurationManagerImpl(sessionFactory);
-        String value = configurationManager.getProperty(OpenNcpProperties.NCP_COUNTRY);
+        String value = configurationManager.getProperty(StandardProperties.NCP_COUNTRY);
 
         Assert.assertEquals(COUNTRY_VALUE, value);
     }
@@ -68,14 +68,14 @@ public class ConfigurationManagerImplTest {
     @SuppressWarnings("JpaQlInspection")
     public void testSetProperty() {
         ConfigurationManager configurationManager = new ConfigurationManagerImpl(sessionFactory);
-        configurationManager.setProperty(OpenNcpProperties.NCP_EMAIL, EMAIL_VALUE);
+        configurationManager.setProperty(StandardProperties.NCP_EMAIL, EMAIL_VALUE);
 
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
         TypedQuery<Long> query = session.createQuery("select count(p.key) from Property p", Long.class);
         long result = query.getSingleResult();
 
-        Property property = session.get(Property.class, OpenNcpProperties.NCP_EMAIL);
+        Property property = session.get(Property.class, StandardProperties.NCP_EMAIL);
         transaction.commit();
 
         Assert.assertEquals(2L, result);
