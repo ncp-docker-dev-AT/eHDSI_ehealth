@@ -14,7 +14,6 @@ import org.junit.Test;
 
 import javax.persistence.TypedQuery;
 
-@SuppressWarnings("JpaQlInspection")
 public class ConfigurationManagerImplTest {
 
     private static final String COUNTRY_VALUE = "FR";
@@ -66,6 +65,7 @@ public class ConfigurationManagerImplTest {
     }
 
     @Test
+    @SuppressWarnings("JpaQlInspection")
     public void testSetProperty() {
         ConfigurationManager configurationManager = new ConfigurationManagerImpl(sessionFactory);
         configurationManager.setProperty(OpenNcpProperties.NCP_EMAIL, EMAIL_VALUE);
