@@ -11,6 +11,9 @@ import eu.europa.ec.dynamicdiscovery.exception.ConnectionException;
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.OpenNcpProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
@@ -85,9 +88,12 @@ public class SMPUploadFileController {
 
     @Autowired
     private final SMPConverter smpconverter = new SMPConverter();
+
     @Autowired
     private final XMLValidator xmlValidator = new XMLValidator();
+
     org.slf4j.Logger logger = LoggerFactory.getLogger(SMPUploadFileController.class);
+
     @Autowired
     private Environment env;
 
@@ -345,14 +351,15 @@ public class SMPUploadFileController {
             logger.debug("\n ********** response status code - " + response.getStatusLine().getStatusCode());
             logger.debug("\n ********** response reason - " + response.getStatusLine().getReasonPhrase());
 
+            ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
             //Audit vars
-            String ncp = ConfigurationManagerService.getInstance().getProperty("ncp.country");
-            String ncpemail = ConfigurationManagerService.getInstance().getProperty("ncp.email");
-            String country = ConfigurationManagerService.getInstance().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-            String localip = ConfigurationManagerService.getInstance().getProperty("SMP_ADMIN_URL");//Source Gateway
-            String remoteip = ConfigurationManagerService.getInstance().getProperty("SERVER_IP");//Target Gateway
-            String smp = ConfigurationManagerService.getInstance().getProperty("SMP_SUPPORT");
-            String smpemail = ConfigurationManagerService.getInstance().getProperty("SMP_SUPPORT_EMAIL");
+            String ncp = configurationManager.getProperty("ncp.country");
+            String ncpemail = configurationManager.getProperty("ncp.email");
+            String country = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
+            String localip = configurationManager.getProperty("SMP_ADMIN_URL");//Source Gateway
+            String remoteip = configurationManager.getProperty("SERVER_IP");//Target Gateway
+            String smp = configurationManager.getProperty(OpenNcpProperties.SMP_SML_SUPPORT);
+            String smpemail = configurationManager.getProperty(OpenNcpProperties.SMP_SML_SUPPORT_EMAIL);
             //ET_ObjectID --> Base64 of url
             String objectID = uri.toString(); //ParticipantObjectID
             byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
@@ -464,7 +471,7 @@ public class SMPUploadFileController {
             if (proxyCredentials != null) {
                 try {
                     smpClient = DynamicDiscoveryBuilder.newInstance()
-                            .locator(new DefaultBDXRLocator(ConfigurationManagerService.getInstance().getProperty("SML_DOMAIN")))
+                            .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(OpenNcpProperties.SMP_SML_DNS_DOMAIN)))
                             .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(), proxyCredentials.getProxyPassword())))
                             .build();
                 } catch (ConnectionException ex) {
@@ -474,7 +481,7 @@ public class SMPUploadFileController {
                 }
             } else {
                 smpClient = DynamicDiscoveryBuilder.newInstance()
-                        .locator(new DefaultBDXRLocator(ConfigurationManagerService.getInstance().getProperty("SML_DOMAIN")))
+                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(OpenNcpProperties.SMP_SML_DNS_DOMAIN)))
                         .build();
             }
             if (smpClient == null) {

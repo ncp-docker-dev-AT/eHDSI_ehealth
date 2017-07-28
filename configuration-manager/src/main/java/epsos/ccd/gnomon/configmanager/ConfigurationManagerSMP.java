@@ -54,6 +54,7 @@ import java.util.List;
  *
  * @author massimiliano.masi@bmg.gv.at
  */
+@Deprecated
 public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 
     /**
@@ -93,7 +94,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
     /**
      * The hibernate session. Here I may have problems of thread safety.
      */
-    private org.hibernate.classic.Session session;
+    private org.hibernate.Session session;
     /**
      * This is the Hash Map that holds the configuration entries.
      */

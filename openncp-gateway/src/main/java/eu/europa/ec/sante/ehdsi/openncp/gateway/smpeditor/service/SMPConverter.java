@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPFieldProperties;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.*;
 import org.slf4j.LoggerFactory;
@@ -162,8 +162,8 @@ public class SMPConverter {
                 try {
                     String certPass = env.getProperty(type + ".certificate.password");
                     String certAlias = env.getProperty(type + ".certificate.alias");
-                    String certificatePass = ConfigurationManagerService.getInstance().getProperty(certPass);
-                    String certificateAlias = ConfigurationManagerService.getInstance().getProperty(certAlias);
+                    String certificatePass = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPass);
+                    String certificateAlias = ConfigurationManagerFactory.getConfigurationManager().getProperty(certAlias);
 
                     KeyStore ks = null;
                     try {
@@ -198,7 +198,7 @@ public class SMPConverter {
                             certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
                         }
                     } else {
-                        logger.debug("\n ********** " + certificateAlias + " is unknown to this keystore");
+                        logger.debug("\n ********** {} is unknown to this keystore", certificateAlias);
                     }
 
                 } catch (KeyStoreException ex) {
@@ -416,8 +416,8 @@ public class SMPConverter {
                 try {
                     String certPass = env.getProperty(type + ".certificate.password");
                     String certAlias = env.getProperty(type + ".certificate.alias");
-                    String certificatePass = ConfigurationManagerService.getInstance().getProperty(certPass);
-                    String certificateAlias = ConfigurationManagerService.getInstance().getProperty(certAlias);
+                    String certificatePass = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPass);
+                    String certificateAlias = ConfigurationManagerFactory.getConfigurationManager().getProperty(certAlias);
 
                     KeyStore ks = null;
                     try {
@@ -656,7 +656,7 @@ public class SMPConverter {
         XMLStreamWriter xsw = null;
         //FileOutputStream generatedFileOS = null;
 
-        try (FileOutputStream generatedFileOS = new FileOutputStream(generatedFile)){
+        try (FileOutputStream generatedFileOS = new FileOutputStream(generatedFile)) {
             //generatedFileOS = new FileOutputStream(generatedFile);
 
             xsw = XMLOutputFactory.newFactory().createXMLStreamWriter(generatedFileOS, "UTF-8");
