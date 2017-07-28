@@ -53,6 +53,7 @@ public class ConfigurationManagerImplTest {
     @Test(expected = PropertyNotFoundException.class)
     public void testGetInvalidProperty() {
         ConfigurationManager configurationManager = new ConfigurationManagerImpl(sessionFactory);
+//        ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
         configurationManager.getProperty("INVALID_OPENNCP_PROPERTY");
     }
 
