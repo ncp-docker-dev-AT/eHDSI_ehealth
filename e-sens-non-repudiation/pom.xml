@@ -24,7 +24,7 @@
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
-            <version>2.6.1</version>
+            <version>${opensaml.version}</version>
         </dependency>
         <dependency>
             <groupId>org.herasaf.xacml.core</groupId>
