@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-c3p0</artifactId>
-            <version>5.2.10.Final</version>
+            <version>${hibernate.version}</version>
             <!-- TODO Change scope to runtime but refactor TRCAssertionRequestTest first-->
         </dependency>
         <dependency>
