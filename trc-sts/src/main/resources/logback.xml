@@ -23,17 +23,9 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <!--logger name="epsos.ccd.posam.tm" level="DEBUG" additivity="false">
+    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
-    </logger-->
-
-    <!--logger name="epsos.ccd.posam.tsam" level="DEBUG" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger-->
-
-    <!--logger name="com.mchange" level="warn" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger-->
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
