@@ -117,9 +117,9 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
             String eventType = this.evidenceEmitterHandlerUtils.getEventTypeFromMessage(soapBody);
             String title = this.evidenceEmitterHandlerUtils.getTransactionNameFromMessage(soapBody);
             String msgUUID = this.evidenceEmitterHandlerUtils.getMsgUUID(soapHeader, soapBody);
-            LOG.debug("eventType: " + eventType);
-            LOG.debug("title: " + title);
-            LOG.debug("msgUUID: " + msgUUID);
+            LOG.debug("eventType: '{}'", eventType);
+            LOG.debug("title: '{}'", title);
+            LOG.debug("msgUUID: '{}", msgUUID);
             
             /* Portal sends request to NCP-B*/
             EvidenceUtils.createEvidenceREMNRO(envCanonicalized,

@@ -338,7 +338,6 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 //            Certificate[] certificates = keystore.getCertificateChain(alias);
 //            for (Certificate certificate : certificates) {
 //                LOGGER.info("Certificate: '{}'-'{}'", certificate.getPublicKey().toString(), certificate.getType());
-//
 //            }
 
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
