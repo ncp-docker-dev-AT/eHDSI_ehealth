@@ -115,7 +115,7 @@
         <mail.version>1.4.7</mail.version>
         <mysql-connector.version>5.1.23</mysql-connector.version>
         <naming-java.version>0.8</naming-java.version>
-        <opensaml.version>2.6.6</opensaml.version>
+        <opensaml.version>2.6.1</opensaml.version>
         <openws.version>1.5.1</openws.version>
         <peppol-lookup.version>0.9.5</peppol-lookup.version>
         <portlet-api.version>2.0</portlet-api.version>
