@@ -84,11 +84,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- TODO: Harmonizing the opensaml dependencies versions used in the diferents components -->
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
-            <version>2.5.3</version>
+            <version>${opensaml.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.xerces</groupId>
