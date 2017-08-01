@@ -134,8 +134,7 @@ REFERENCES value_set (id);
 
 ALTER TABLE x_concept_value_set
   ADD CONSTRAINT fk_con_code_system_concept_id
-FOREIGN KEY (code_system_concept_id)
-REFERENCES code_system_concept (id);
+FOREIGN KEY (code_system_concept_id) REFERENCES code_system_concept (id);
 
 ALTER TABLE x_concept_value_set
   ADD CONSTRAINT fk_value_set_version_id

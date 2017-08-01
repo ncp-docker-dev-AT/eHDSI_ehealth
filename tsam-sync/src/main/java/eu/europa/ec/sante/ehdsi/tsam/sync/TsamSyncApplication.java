@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.tsam.sync;
 
+import eu.europa.ec.sante.ehdsi.tsam.sync.client.TermServerClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -24,11 +25,15 @@ public class TsamSyncApplication {
 
         TsamSyncManager manager = context.getBean(TsamSyncManager.class);
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        logger.info("Start synchronization process");
-        manager.synchronize();
-        stopWatch.stop();
-        logger.info("Synchronization done in {} s", stopWatch.getTotalTimeSeconds());
+        try {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            logger.info("Start synchronization process");
+            manager.synchronize();
+            stopWatch.stop();
+            logger.info("Synchronization done in {} s", stopWatch.getTotalTimeSeconds());
+        } catch (TermServerClientException e) {
+            logger.error("An error has occurred during the sync process:\nHTTP status: {} {}\nDetails: {}", e.statusCode(), e.statusText(), e.body(), e);
+        }
     }
 }
