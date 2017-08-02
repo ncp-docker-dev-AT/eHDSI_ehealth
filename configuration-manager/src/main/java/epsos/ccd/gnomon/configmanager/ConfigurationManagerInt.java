@@ -24,6 +24,7 @@ package epsos.ccd.gnomon.configmanager;
  *
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
+@Deprecated
 public interface ConfigurationManagerInt {
 
     /**

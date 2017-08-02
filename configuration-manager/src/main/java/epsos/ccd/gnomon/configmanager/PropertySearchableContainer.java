@@ -1,5 +1,6 @@
 package epsos.ccd.gnomon.configmanager;
 
+@Deprecated
 public class PropertySearchableContainer {
 	private String value;
 	private boolean isSearchable;

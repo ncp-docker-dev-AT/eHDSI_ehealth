@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPFieldProperties;
@@ -183,8 +184,8 @@ public class SMPConverter {
                 try {
                     String certPass = env.getProperty(type + ".certificate.password");
                     String certAlias = env.getProperty(type + ".certificate.alias");
-                    String certificatePass = ConfigurationManagerService.getInstance().getProperty(certPass);
-                    String certificateAlias = ConfigurationManagerService.getInstance().getProperty(certAlias);
+                    String certificatePass = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPass);
+                    String certificateAlias = ConfigurationManagerFactory.getConfigurationManager().getProperty(certAlias);
 
                     KeyStore ks = null;
                     try {
@@ -450,8 +451,8 @@ public class SMPConverter {
                 try {
                     String certPass = env.getProperty(type + ".certificate.password");
                     String certAlias = env.getProperty(type + ".certificate.alias");
-                    String certificatePass = ConfigurationManagerService.getInstance().getProperty(certPass);
-                    String certificateAlias = ConfigurationManagerService.getInstance().getProperty(certAlias);
+                    String certificatePass = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPass);
+                    String certificateAlias = ConfigurationManagerFactory.getConfigurationManager().getProperty(certAlias);
 
                     KeyStore ks = null;
                     try {
@@ -692,24 +693,25 @@ public class SMPConverter {
         XMLStreamWriter xsw = null;
 
         try (FileOutputStream generatedFileOS = new FileOutputStream(generatedFile)) {
+            //generatedFileOS = new FileOutputStream(generatedFile);
 
             xsw = XMLOutputFactory.newFactory().createXMLStreamWriter(generatedFileOS, "UTF-8");
-//            xsw.setNamespaceContext(new NamespaceContext() {
-//                @Override
-//                public Iterator getPrefixes(String namespaceURI) {
-//                    return null;
-//                }
-//
-//                @Override
-//                public String getPrefix(String namespaceURI) {
-//                    return "";
-//                }
-//
-//                @Override
-//                public String getNamespaceURI(String prefix) {
-//                    return null;
-//                }
-//            });
+            xsw.setNamespaceContext(new NamespaceContext() {
+                @Override
+                public Iterator getPrefixes(String namespaceURI) {
+                    return null;
+                }
+
+                @Override
+                public String getPrefix(String namespaceURI) {
+                    return "";
+                }
+
+                @Override
+                public String getNamespaceURI(String prefix) {
+                    return null;
+                }
+            });
 
             JAXBContext jaxbContext = JAXBContext.newInstance(ServiceMetadata.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();

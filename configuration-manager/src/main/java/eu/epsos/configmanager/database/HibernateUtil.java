@@ -32,6 +32,7 @@ import java.io.File;
  *
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
+@Deprecated
 public final class HibernateUtil {
 
     private static final SessionFactory sessionFactory;

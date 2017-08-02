@@ -55,6 +55,7 @@ import java.util.List;
  *
  * @author massimiliano.masi@bmg.gv.at
  */
+@Deprecated
 public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 
     /**
@@ -107,7 +108,6 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
 
         long start = System.currentTimeMillis();
         LOGGER.info("Loading the Hibernate session object");
-        // TODO Code refactoring, close the SessionFactory
         session = HibernateUtil.getSessionFactory().openSession();
         long end = System.currentTimeMillis();
         long total = end - start;
@@ -141,7 +141,7 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
         LOGGER.info("Loading all the values");
         long start = System.currentTimeMillis();
 
-        //List<Property> properties = session.createQuery("select p from Property p", Property.class).list();
+        @SuppressWarnings("unchecked")
         List<Property> properties = session.createCriteria(Property.class).list();
 
         long end = System.currentTimeMillis();
