@@ -1,4 +1,4 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
+/*    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
  *
  *    This file is part of epSOS-WEB.
  *
@@ -12,7 +12,7 @@ package se.sb.epsos.web.service;
 
 import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import junit.framework.TestCase;
 import org.mockito.MockSettings;
 import org.mockito.invocation.InvocationOnMock;
@@ -37,20 +37,20 @@ public class AssertionHandlerTest extends TestCase {
     private AssertionHandler assertionHandler;
     private AuthenticatedUser userDetailsMock;
     private Assertion assertionMock;
-    private ConfigurationManager cms;
+    private ConfigurationManagerService cms;
     private AuditService as;
     private MockSettings settings = withSettings().serializable();
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        cms = mock(ConfigurationManager.class, settings);
+        cms = mock(ConfigurationManagerService.class, settings);
         as = mock(AuditService.class, settings);
 
         assertionHandler = new AssertionHandler() {
             private static final long serialVersionUID = 1L;
 
-            protected ConfigurationManager getConfigurationManagerService() {
+            protected ConfigurationManagerService getConfigurationManagerService() {
                 return cms;
             }
 
