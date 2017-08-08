@@ -19,12 +19,14 @@
         <java.version>1.8</java.version>
         <commons-lang3.version>3.5</commons-lang3.version>
         <ehealth-termservice-server.version>1.0.0</ehealth-termservice-server.version>
-        <hikaricp.version>2.6.3</hikaricp.version>
         <httpclient.version>4.5.2</httpclient.version>
         <jackson.version>2.8.4</jackson.version>
         <javax-el.version>3.0.1-b08</javax-el.version>
-        <mysql-connector.version>5.1.39</mysql-connector.version>
+        <mysql-connector.version>5.1.43</mysql-connector.version>
         <ojdbc.version>11.2.0.4</ojdbc.version>
+        <spring.version>4.3.10.RELEASE</spring.version>
+        <spring-boot.version>1.5.6.RELEASE</spring-boot.version>
+        <hibernate.version>5.2.10.Final</hibernate.version>
     </properties>
 
     <dependencies>
@@ -52,6 +54,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -73,11 +76,6 @@
             <version>${httpclient.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
@@ -95,7 +93,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.5</version>
+            <version>${commons-io.version}</version>
         </dependency>
     </dependencies>
 
