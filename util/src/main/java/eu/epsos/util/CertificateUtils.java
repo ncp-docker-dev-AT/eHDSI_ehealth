@@ -19,9 +19,9 @@
  */
 package eu.epsos.util;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
@@ -41,14 +41,13 @@ import java.security.cert.X509Certificate;
  */
 public class CertificateUtils {
 
-    public static Logger logger = LoggerFactory
-            .getLogger(CertificateUtils.class);
+    public static final Logger logger = LoggerFactory.getLogger(CertificateUtils.class);
 
     public static String getServerCertificate(String country) {
         String oid = OidUtil.getHomeCommunityId(country);
-        String endpoint = ConfigurationManagerService.getInstance().getProperty(country + ".PatientIdentificationService.WSE");
-        logger.info("OID IS " + oid + " for country " + country);
-        logger.info("ENDPOINT " + endpoint);
+        String endpoint = ConfigurationManagerFactory.getConfigurationManager().getProperty(country + ".PatientIdentificationService.WSE");
+        logger.info("OID IS '{}' for country '{}'", oid, country);
+        logger.info("ENDPOINT '{}'", endpoint);
         return HTTPUtil.getServerCertificate(endpoint);
     }
 

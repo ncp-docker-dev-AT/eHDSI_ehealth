@@ -18,13 +18,13 @@
  */
 package tr.com.srdc.epsos.util;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Constants {
 
-    public static final Logger logger = LoggerFactory.getLogger(Constants.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(Constants.class);
 
     public static final String UUID_PREFIX = "urn:uuid:";
     public static final String OID_PREFIX = "urn:oid:";
@@ -56,47 +56,36 @@ public class Constants {
 
     public static final String NOT_USED_FIELD = "Not Used";
     public static final String MIME_TYPE = "text/xml";
-
+    /**
+     * Name of the System Variable containing the path to the folder containing the configuration files.
+     */
+    private static final String PROPS_ENV_VAR = "EPSOS_PROPS_PATH";
     public static String SERVER_IP = "127.0.0.1"; // default value
     public static String HOME_COMM_ID;
     public static String COUNTRY_CODE;
     public static String COUNTRY_NAME;
     public static String COUNTRY_PRINCIPAL_SUBDIVISION; // ISO 3166-2
     public static String LANGUAGE_CODE;
-
     public static String HR_ID_PREFIX = "SPProvidedID";
-
-
     /**
      * Path to the folder containing the configuration files.
      */
     public static String EPSOS_PROPS_PATH;
-
     public static String TRUSTSTORE_PATH;
     public static String TRUSTSTORE_PASSWORD;
-
     public static String SP_KEYSTORE_PATH;
     public static String SP_KEYSTORE_PASSWORD;
     public static String SP_PRIVATEKEY_ALIAS;
     public static String SP_PRIVATEKEY_PASSWORD;
-
     public static String SC_KEYSTORE_PATH;
     public static String SC_KEYSTORE_PASSWORD;
     public static String SC_PRIVATEKEY_ALIAS;
     public static String SC_PRIVATEKEY_PASSWORD;
-
     public static String NCP_SIG_KEYSTORE_PATH;
     public static String NCP_SIG_KEYSTORE_PASSWORD;
     public static String NCP_SIG_PRIVATEKEY_ALIAS;
     public static String NCP_SIG_PRIVATEKEY_PASSWORD;
-
     public static String WRITE_TEST_AUDITS;
-
-
-    /**
-     * Name of the System Variable containing the path to the folder containing the configuration files.
-     */
-    private static final String PROPS_ENV_VAR = "EPSOS_PROPS_PATH";
 
     static {
         String epsosPath = System.getenv(PROPS_ENV_VAR);
@@ -108,34 +97,38 @@ public class Constants {
         fill();
     }
 
+    private Constants() {
+    }
+
     private static void fill() {
-        SERVER_IP = ConfigurationManagerService.getInstance().getProperty("SERVER_IP");
+        LOGGER.info("OpenNCP Util Constants Initialization!!!");
+        SERVER_IP = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");
 
-        HOME_COMM_ID = ConfigurationManagerService.getInstance().getProperty("HOME_COMM_ID");
-        COUNTRY_CODE = ConfigurationManagerService.getInstance().getProperty("COUNTRY_CODE");
-        COUNTRY_NAME = ConfigurationManagerService.getInstance().getProperty("COUNTRY_NAME");
-        COUNTRY_PRINCIPAL_SUBDIVISION = ConfigurationManagerService.getInstance().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-        LANGUAGE_CODE = ConfigurationManagerService.getInstance().getProperty("LANGUAGE_CODE");
+        HOME_COMM_ID = ConfigurationManagerFactory.getConfigurationManager().getProperty("HOME_COMM_ID");
+        COUNTRY_CODE = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
+        COUNTRY_NAME = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_NAME");
+        COUNTRY_PRINCIPAL_SUBDIVISION = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
+        LANGUAGE_CODE = ConfigurationManagerFactory.getConfigurationManager().getProperty("LANGUAGE_CODE");
 
-        TRUSTSTORE_PATH = globalizePath(ConfigurationManagerService.getInstance().getProperty("TRUSTSTORE_PATH"));
-        TRUSTSTORE_PASSWORD = ConfigurationManagerService.getInstance().getProperty("TRUSTSTORE_PASSWORD");
+        TRUSTSTORE_PATH = globalizePath(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH"));
+        TRUSTSTORE_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD");
 
-        SP_KEYSTORE_PATH = globalizePath(ConfigurationManagerService.getInstance().getProperty("SP_KEYSTORE_PATH"));
-        SP_KEYSTORE_PASSWORD = ConfigurationManagerService.getInstance().getProperty("SP_KEYSTORE_PASSWORD");
-        SP_PRIVATEKEY_ALIAS = ConfigurationManagerService.getInstance().getProperty("SP_PRIVATEKEY_ALIAS");
-        SP_PRIVATEKEY_PASSWORD = ConfigurationManagerService.getInstance().getProperty("SP_PRIVATEKEY_PASSWORD");
+        SP_KEYSTORE_PATH = globalizePath(ConfigurationManagerFactory.getConfigurationManager().getProperty("SP_KEYSTORE_PATH"));
+        SP_KEYSTORE_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("SP_KEYSTORE_PASSWORD");
+        SP_PRIVATEKEY_ALIAS = ConfigurationManagerFactory.getConfigurationManager().getProperty("SP_PRIVATEKEY_ALIAS");
+        SP_PRIVATEKEY_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("SP_PRIVATEKEY_PASSWORD");
 
-        SC_KEYSTORE_PATH = globalizePath(ConfigurationManagerService.getInstance().getProperty("SC_KEYSTORE_PATH"));
-        SC_KEYSTORE_PASSWORD = ConfigurationManagerService.getInstance().getProperty("SC_KEYSTORE_PASSWORD");
-        SC_PRIVATEKEY_ALIAS = ConfigurationManagerService.getInstance().getProperty("SC_PRIVATEKEY_ALIAS");
-        SC_PRIVATEKEY_PASSWORD = ConfigurationManagerService.getInstance().getProperty("SC_PRIVATEKEY_PASSWORD");
+        SC_KEYSTORE_PATH = globalizePath(ConfigurationManagerFactory.getConfigurationManager().getProperty("SC_KEYSTORE_PATH"));
+        SC_KEYSTORE_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("SC_KEYSTORE_PASSWORD");
+        SC_PRIVATEKEY_ALIAS = ConfigurationManagerFactory.getConfigurationManager().getProperty("SC_PRIVATEKEY_ALIAS");
+        SC_PRIVATEKEY_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("SC_PRIVATEKEY_PASSWORD");
 
-        NCP_SIG_KEYSTORE_PATH = globalizePath(ConfigurationManagerService.getInstance().getProperty("NCP_SIG_KEYSTORE_PATH"));
-        NCP_SIG_KEYSTORE_PASSWORD = ConfigurationManagerService.getInstance().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
-        NCP_SIG_PRIVATEKEY_ALIAS = ConfigurationManagerService.getInstance().getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
-        NCP_SIG_PRIVATEKEY_PASSWORD = ConfigurationManagerService.getInstance().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
+        NCP_SIG_KEYSTORE_PATH = globalizePath(ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PATH"));
+        NCP_SIG_KEYSTORE_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
+        NCP_SIG_PRIVATEKEY_ALIAS = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
+        NCP_SIG_PRIVATEKEY_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
 
-        WRITE_TEST_AUDITS = ConfigurationManagerService.getInstance().getProperty("WRITE_TEST_AUDITS");
+        WRITE_TEST_AUDITS = ConfigurationManagerFactory.getConfigurationManager().getProperty("WRITE_TEST_AUDITS");
 
     }
 
@@ -156,10 +149,5 @@ public class Constants {
         }
 
         return path;
-    }
-
-    public static void main(String[] args) {
-        Constants c = new Constants();
-
     }
 }

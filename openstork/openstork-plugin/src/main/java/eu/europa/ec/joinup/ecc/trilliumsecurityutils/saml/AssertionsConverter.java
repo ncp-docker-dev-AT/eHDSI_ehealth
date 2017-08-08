@@ -9,7 +9,6 @@
  */
 package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.SamlTRCIssuer;
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
@@ -18,6 +17,7 @@ import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
 import eu.epsos.assertionvalidator.AssertionHelper;
 import eu.epsos.assertionvalidator.PolicyManagerInterface;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
@@ -78,12 +78,12 @@ public class AssertionsConverter {
     public static Assertion createTRCA(String purpose,
                                        Assertion idAs, String root, String extension) throws Exception {
         Assertion trc = null;
-        LOG.debug("Try to create TRCA for patient : " + extension);
+        LOG.debug("Try to create TRCA for patient : '{}'", extension);
         String pat = "";
         pat = extension + "^^^&" + root + "&ISO";
-        LOG.info("TRCA Patient ID : " + pat);
+        LOG.info("TRCA Patient ID : '{}'", pat);
         LOG.info("Asserion ID :" + idAs.getID());
-        LOG.info("SECMAN URL: " + ConfigurationManagerService.getInstance().getProperty("secman.sts.url"));
+        LOG.info("SECMAN URL: " + ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
         TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(
                 idAs, pat).PurposeOfUse(purpose).build();
         trc = req1.request();
@@ -129,45 +129,45 @@ public class AssertionsConverter {
 
         if (isPhysician) {
             rolename = "medical doctor";
-            String doctor_perms = ConfigurationManagerService.getInstance().getProperty(PORTAL_DOCTOR_PERMISSIONS);
+            String doctor_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_DOCTOR_PERMISSIONS);
             String p[] = doctor_perms.split(",");
-            for (int k = 0; k < p.length; k++) {
-                perms.add(prefix + p[k]);
+            for (String aP : p) {
+                perms.add(prefix + aP);
             }
         }
         if (isPharmacist) {
             rolename = "pharmacist";
-            String pharm_perms = ConfigurationManagerService.getInstance().getProperty(PORTAL_PHARMACIST_PERMISSIONS);
+            String pharm_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PHARMACIST_PERMISSIONS);
             String p1[] = pharm_perms.split(",");
-            for (int k = 0; k < p1.length; k++) {
-                perms.add(prefix + p1[k]);
+            for (String aP1 : p1) {
+                perms.add(prefix + aP1);
             }
         }
 
         if (isNurse) {
             rolename = "nurse";
-            String nurse_perms = ConfigurationManagerService.getInstance().getProperty(PORTAL_NURSE_PERMISSIONS);
+            String nurse_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_NURSE_PERMISSIONS);
             String p1[] = nurse_perms.split(",");
-            for (int k = 0; k < p1.length; k++) {
-                perms.add(prefix + p1[k]);
+            for (String aP1 : p1) {
+                perms.add(prefix + aP1);
             }
         }
 
         if (isPatient) {
             rolename = "patient";
-            String patient_perms = ConfigurationManagerService.getInstance().getProperty(PORTAL_PATIENT_PERMISSIONS);
+            String patient_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PATIENT_PERMISSIONS);
             String p1[] = patient_perms.split(",");
-            for (int k = 0; k < p1.length; k++) {
-                perms.add(prefix + p1[k]);
+            for (String aP1 : p1) {
+                perms.add(prefix + aP1);
             }
         }
 
         if (isAdministrator) {
             rolename = "administrator";
-            String admin_perms = ConfigurationManagerService.getInstance().getProperty(PORTAL_ADMIN_PERMISSIONS);
+            String admin_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_ADMIN_PERMISSIONS);
             String p1[] = admin_perms.split(",");
-            for (int k = 0; k < p1.length; k++) {
-                perms.add(prefix + p1[k]);
+            for (String aP1 : p1) {
+                perms.add(prefix + aP1);
             }
         }
 
@@ -185,18 +185,16 @@ public class AssertionsConverter {
                 orgName, orgId, orgType, "TREATMENT", poc, perms);
 
         LOG.debug("Getting config manager");
-        ConfigurationManagerService cms = ConfigurationManagerService
-                .getInstance();
 
         String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-        LOG.debug("KEY ALIAS: " + KEY_ALIAS);
+        LOG.debug("KEY ALIAS: '{}'", KEY_ALIAS);
         String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
 
         AssertionUtils.signSAMLAssertion(assertion, KEY_ALIAS,
                 PRIVATE_KEY_PASS.toCharArray());
 
         AssertionMarshaller marshaller = new AssertionMarshaller();
-        Element element = null;
+        Element element;
 
         element = marshaller.marshall(assertion);
 
@@ -280,9 +278,9 @@ public class AssertionsConverter {
             trc.setSubject(subject);
             Issuer issuer = new IssuerBuilder().buildObject();
 
-            String confIssuer = ConfigurationManagerService.getInstance().getProperty("secman.trc.endpoint");
+            String confIssuer = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.trc.endpoint");
             if (confIssuer.isEmpty()) {
-                ConfigurationManagerService.getInstance().updateProperty("secman.trc.endpoint", "urn:initgw:countryB");
+                ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.trc.endpoint", "urn:initgw:countryB");
                 confIssuer = "urn:initgw:countryB";
             }
             issuer.setValue(confIssuer);

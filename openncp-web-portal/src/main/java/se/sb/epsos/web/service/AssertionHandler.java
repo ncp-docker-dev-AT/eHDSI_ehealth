@@ -11,7 +11,8 @@
 package se.sb.epsos.web.service;
 
 import epsos.ccd.gnomon.auditmanager.*;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -184,8 +185,8 @@ public class AssertionHandler implements Serializable {
         return assertion;
     }
 
-    protected ConfigurationManagerService getConfigurationManagerService() {
-        return ConfigurationManagerService.getInstance();
+    protected ConfigurationManager getConfigurationManagerService() {
+        return ConfigurationManagerFactory.getConfigurationManager();
     }
 
     protected AuditService getAuditService() {
@@ -209,7 +210,7 @@ public class AssertionHandler implements Serializable {
         String KEYSTORE_LOCATION = getPrivateKeystoreLocation();
         String KEY_STORE_PASS = getPrivateKeyPassword();
 
-        ConfigurationManagerService cms = getConfigurationManagerService();
+        ConfigurationManager cms = getConfigurationManagerService();
         if (Validator.isNull(KEY_ALIAS)) {
             LOGGER.error("Problem reading configuration parameters");
             return;
@@ -241,14 +242,8 @@ public class AssertionHandler implements Serializable {
                     String issuerDn = principal.getName();
                 }
             }
-        } catch (KeyStoreException e) {
-            LOGGER.error(e.getMessage());
-        } catch (java.security.cert.CertificateException e) {
-            LOGGER.error(e.getMessage());
-        } catch (NoSuchAlgorithmException e) {
-            LOGGER.error(e.getMessage());
-        } catch (java.io.IOException e) {
-            LOGGER.error(e.getMessage());
+        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | java.io.IOException e) {
+            LOGGER.error(e.getMessage(), e);
         }
 
         String secHead = "No security header provided";

@@ -6,9 +6,11 @@ import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 public class ConfigurationManagerFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigurationManagerFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManagerFactory.class);
 
     private static ConfigurationManager configurationManager;
 
@@ -26,11 +28,10 @@ public class ConfigurationManagerFactory {
         try {
             String path = System.getenv("EPSOS_PROPS_PATH");
             Assert.notNull(path, "Environment variable 'EPSOS_PROPS_PATH' is not set!");
-
-            return new Configuration().configure(path + "/configmanager.cfg.xml")
-                    .buildSessionFactory();
+            return new Configuration().configure(new File(path + "configmanager.cfg.xml")).buildSessionFactory();
+            //return new Configuration().configure(path + "configmanager.cfg.xml").buildSessionFactory();
         } catch (Exception e) {
-            logger.error("SessionFactory creation failed!", e);
+            LOGGER.error("SessionFactory creation failed!", e);
             throw new ExceptionInInitializerError(e);
         }
     }

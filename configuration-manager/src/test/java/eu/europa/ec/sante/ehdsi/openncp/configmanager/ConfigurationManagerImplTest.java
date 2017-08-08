@@ -1,10 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.configmanager;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.domain.Property;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.junit.After;
@@ -12,7 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.persistence.TypedQuery;
+import java.util.List;
 
 public class ConfigurationManagerImplTest {
 
@@ -72,13 +69,14 @@ public class ConfigurationManagerImplTest {
 
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
-        TypedQuery<Long> query = session.createQuery("select count(p.key) from Property p", Long.class);
-        long result = query.getSingleResult();
+        //TypedQuery<Long> query = session.createQuery("select count(p.key) from Property p", Long.class);
+        Query query = session.createQuery("select count(p.key) from Property p");
+        List result = query.list();
 
         Property property = session.get(Property.class, StandardProperties.NCP_EMAIL);
         transaction.commit();
 
-        Assert.assertEquals(2L, result);
+        Assert.assertEquals(2L, result.get(0));
         Assert.assertEquals(EMAIL_VALUE, property.getValue());
     }
 }

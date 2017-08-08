@@ -25,7 +25,7 @@ import java.util.Optional;
 
 public class ConfigurationManagerImpl implements ConfigurationManager {
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigurationManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManagerImpl.class);
 
     private SessionFactory sessionFactory;
 
@@ -59,7 +59,7 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
     public String getEndpointUrl(String countryCode, RegisteredService service) {
         Assert.notNull(countryCode, "countryCode must not be null!");
         Assert.notNull(service, "service must not be null!");
-
+        LOGGER.info("getEndpointUrl('{}', '{}')", countryCode, service.getServiceName());
         String key = countryCode.toLowerCase() + "." + service.getServiceName() + ".WSE";
         return findProperty(key).orElseGet(() -> {
             SMLSMPClient client = new SMLSMPClient();
@@ -84,6 +84,10 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
                 throw new ConfigurationManagerException("An internal error occurred while retrieving the endpoint URL", e);
             }
         });
+    }
+
+    public void setServiceWSE(String ISOCountryCode, String ServiceName, String URL) {
+        setProperty(ISOCountryCode + "." + ServiceName + ".WSE", URL);
     }
 
     private Optional<String> findProperty(String key) {

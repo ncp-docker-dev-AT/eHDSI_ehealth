@@ -20,4 +20,11 @@ public interface ConfigurationManager {
      * @return
      */
     String getEndpointUrl(String countryCode, RegisteredService service);
+
+    /**
+     * @param ISOCountryCode
+     * @param ServiceName
+     * @param URL
+     */
+    void setServiceWSE(String ISOCountryCode, String ServiceName, String URL);
 }
