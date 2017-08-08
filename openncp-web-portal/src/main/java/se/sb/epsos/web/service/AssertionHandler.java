@@ -11,7 +11,8 @@
 package se.sb.epsos.web.service;
 
 import epsos.ccd.gnomon.auditmanager.*;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -184,10 +185,6 @@ public class AssertionHandler implements Serializable {
         return assertion;
     }
 
-    protected ConfigurationManagerService getConfigurationManagerService() {
-        return ConfigurationManagerService.getInstance();
-    }
-
     protected AuditService getAuditService() {
         return new AuditService();
     }
@@ -204,6 +201,10 @@ public class AssertionHandler implements Serializable {
         return  NcpServiceConfigManager.getPrivateKeyPassword("assertion");
     }
 
+    protected ConfigurationManager getConfigurationManager() {
+        return ConfigurationManagerFactory.getConfigurationManager();
+    }
+
     void sendAuditEpsos91(AuthenticatedUser userDetails, Assertion assertion) throws KeyStoreException, CertificateException, NoSuchAlgorithmException {
         String KEY_ALIAS = getPrivateKeyAlias();
         LOGGER.debug("KEY_ALIAS : " + KEY_ALIAS);
@@ -212,8 +213,8 @@ public class AssertionHandler implements Serializable {
         String KEY_STORE_PASS = getPrivateKeyPassword();
         LOGGER.debug("KEY_STORE_PASS : " + KEY_STORE_PASS);
 
+        final ConfigurationManager configurationManager = getConfigurationManager();
 
-        ConfigurationManagerService cms = getConfigurationManagerService();
         if (Validator.isNull(KEY_ALIAS)) {
             LOGGER.error("Problem reading configuration parameters");
             return;
@@ -260,7 +261,7 @@ public class AssertionHandler implements Serializable {
             LOGGER.error(ex.getMessage());
         }
 
-        String email = userDetails.getUserId() + "@" + cms.getProperty("ncp.country");
+        String email = userDetails.getUserId() + "@" + configurationManager.getProperty("ncp.country");
 
         String PC_UserID = userDetails.getOrganizationName() + "<saml:" + email + ">";
         String PC_RoleID = "Other";
@@ -270,7 +271,7 @@ public class AssertionHandler implements Serializable {
         String SC_UserID = name;
         String SP_UserID = name;
 
-        String AS_AuditSourceId = cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
+        String AS_AuditSourceId = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
         String ET_ObjectID = "urn:uuid:" + assertion.getID();
         byte[] ResM_PatricipantObjectDetail = new byte[1];
 
