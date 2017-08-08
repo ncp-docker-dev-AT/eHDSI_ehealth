@@ -19,7 +19,6 @@
         <serviceFacadeClass/>
         <!-- in order to run selenium integrationtests use mvn -DserviceFacadeClass=se.sb.epsos.web.service.mock.NcpServiceFacadeMock -Plocal,integration clean install -->
         <wicket.version>1.4.17</wicket.version>
-        <spring.version>3.1.4.RELEASE</spring.version>
         <spring-security.version>3.1.4.RELEASE</spring-security.version>
         <jetty.version>7.3.0.v20110203</jetty.version>
         <!-- Global properties & plugin config -->
@@ -111,11 +110,11 @@
             <version>1.6</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>jboss</groupId>
-            <artifactId>jboss-common</artifactId>
-            <version>4.0.2</version>
-        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>jboss</groupId>-->
+        <!--<artifactId>jboss-common</artifactId>-->
+        <!--<version>4.0.2</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
@@ -158,11 +157,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-asm</artifactId>
             <version>${spring.version}</version>
         </dependency>
         <dependency>
@@ -248,11 +242,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-struts</artifactId>
             <version>${spring.version}</version>
         </dependency>
         <dependency>
