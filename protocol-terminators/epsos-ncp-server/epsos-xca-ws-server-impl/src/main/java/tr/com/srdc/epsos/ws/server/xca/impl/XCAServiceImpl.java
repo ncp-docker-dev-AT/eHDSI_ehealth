@@ -27,7 +27,6 @@
 package tr.com.srdc.epsos.ws.server.xca.impl;
 
 import epsos.ccd.gnomon.auditmanager.*;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
@@ -80,7 +79,7 @@ import java.util.*;
 
 public class XCAServiceImpl implements XCAServiceInterface {
 
-    public static Logger logger = LoggerFactory.getLogger(XCAServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XCAServiceImpl.class);
     ITransformationService transformationService;
     OMFactory factory;
     private oasis.names.tc.ebxml_regrep.xsd.query._3.ObjectFactory ofQuery;
@@ -94,11 +93,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         serviceLoader = ServiceLoader.load(DocumentSearchInterface.class);
         try {
-            logger.info("Loading National implementation of DocumentSearchInterface...");
+            LOGGER.info("Loading National implementation of DocumentSearchInterface...");
             documentSearchService = serviceLoader.iterator().next();
-            logger.info("Successfully loaded documentSearchService");
+            LOGGER.info("Successfully loaded documentSearchService");
         } catch (Exception e) {
-            logger.error("Failed to load implementation of DocumentSearchInterface: " + e.getMessage(), e);
+            LOGGER.error("Failed to load implementation of DocumentSearchInterface: " + e.getMessage(), e);
             throw e;
         }
 
@@ -114,8 +113,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     public void prepareEventLogForQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, Element sh, String classCode) {
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
-
 
         if (classCode.equals(Constants.EP_CLASSCODE)) {
             eventLog.setEventType(EventType.epsosOrderServiceList);
@@ -131,7 +128,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
-            logger.error("DatatypeConfigurationException: {}", e.getMessage());
+            LOGGER.error("DatatypeConfigurationException: {}", e.getMessage());
         }
         eventLog.setPS_PatricipantObjectID(getDocumentEntryPatientId(request));
 
@@ -194,7 +191,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
             OMElement registryErrorList,
             Element sh,
             String classCode) {
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
 
         if (classCode == null || classCode.equals(Constants.EP_CLASSCODE)) {
             // In case the document is not found, audit log cannot be properly filled, as we don't know the event type
@@ -213,7 +209,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
-            logger.error("DatatypeConfigurationException: {}", e.getMessage());
+            LOGGER.error("DatatypeConfigurationException: {}", e.getMessage(), e);
         }
 
         eventLog.setET_ObjectID(Constants.UUID_PREFIX + request.getDocumentRequest().get(0).getDocumentUniqueId());
@@ -240,11 +236,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
             Iterator<OMElement> re = registryErrorList.getChildElements();
             //Include only the first error in the audit log.
             if (re.hasNext()) {
-                OMElement error = (OMElement) re.next();
+                OMElement error = re.next();
                 try {
-                    logger.debug("Error to be included in audit: " + XMLUtil.prettyPrint(XMLUtils.toDOM(error)));
+                    LOGGER.debug("Error to be included in audit: '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(error)));
                 } catch (Exception e) {
-                    logger.debug(e.getMessage());
+                    LOGGER.debug(e.getMessage());
                 }
                 eventLog.setEM_PatricipantObjectID(error.getAttributeValue(new QName("", "errorCode")));
                 eventLog.setEM_PatricipantObjectDetail(error.getAttributeValue(new QName("", "codeContext")).getBytes());
@@ -379,7 +375,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 classCode = "";
                 nodeRepresentation = "";
                 displayName = "";
-                logger.error("Unsupported document for query in epSOS. Requested document type: " + docType.name());
+                LOGGER.error("Unsupported document for query in epSOS. Requested document type: " + docType.name());
                 return "";
             }
         }
@@ -638,12 +634,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private String getLocation() {
-        ConfigurationManagerService configManager = ConfigurationManagerService.getInstance();
-        //String location = configManager.getServiceWSE(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
-        //                Constants.PatientService);
+
+        //String location = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
+        //              RegisteredService.PATIENT_SERVICE);
         // EHNCP-1131
-        String location = "urn:oid:" + Constants.HOME_COMM_ID;
-        return location;
+        return "urn:oid:" + Constants.HOME_COMM_ID;
     }
 
     private RegistryError createErrorMessage(String errorCode, String codeContext, String value, boolean isWarning) {
@@ -691,13 +686,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
             documentSearchService.setSOAPHeader(shElement);
             sigCountryCode = SAML2Validator.validateXCAHeader(shElement, classCodeValue);
         } catch (InsufficientRightsException e) {
-            logger.debug(e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
-            logger.debug(e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
             throw e;
         }
@@ -725,13 +720,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // ships within the HCP assertion
         // TODO: Might be necessary to remove later, although it does no harm in reality!
         else {
-            logger.info("Could not get client country code from the service consumer certificate. The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
+            LOGGER.info("Could not get client country code from the service consumer certificate. The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
             if (sigCountryCode != null) {
-                logger.info("Found the client country code via the signature certificate.");
+                LOGGER.info("Found the client country code via the signature certificate.");
                 countryCode = sigCountryCode;
             }
         }
-        logger.info("The client country code to be used by the PDP: " + countryCode);
+        LOGGER.info("The client country code to be used by the PDP: " + countryCode);
 
         // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
@@ -765,7 +760,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     "NI_XCA_LIST_REQ",
                     Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
         } catch (Exception e) {
-            logger.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
         if (rel.getRegistryError().size() > 0) {
@@ -773,7 +768,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             response.setStatus(IheConstants.REGREP_RESPONSE_FAILURE);
         } else {
             if (classCodeValue.equals(Constants.EP_CLASSCODE) || classCodeValue.equals(Constants.PS_CLASSCODE) || classCodeValue.equals(Constants.MRO_CLASSCODE)) {
-                logger.info("XCA Query Request for " + getDocumentName(classCodeValue) + " is valid.");
+                LOGGER.info("XCA Query Request for " + getDocumentName(classCodeValue) + " is valid.");
                 if (classCodeValue.contains(Constants.EP_CLASSCODE)) { // Document search for ePrescription service.
                     List<DocumentAssociation<EPDocumentMetaData>> prescriptions
                             = documentSearchService.getEPDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
@@ -889,7 +884,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 //                            "NI_XCA_LIST_RES",
 //                            Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
 //                } catch (Exception e) {
-//                    logger.error(ExceptionUtils.getStackTrace(e));
+//                    LOGGER.error(ExceptionUtils.getStackTrace(e));
 //                }
             } else {
                 // Evidence for response from NI for XCA List in case of failure
@@ -911,7 +906,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 //                            "NI_XCA_LIST_RES_FAIL",
 //                            Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
 //                } catch (Exception e) {
-//                    logger.error(ExceptionUtils.getStackTrace(e));
+//                    LOGGER.error(ExceptionUtils.getStackTrace(e));
 //                }
 
                 rel.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
@@ -923,35 +918,43 @@ public class XCAServiceImpl implements XCAServiceInterface {
         try {
             prepareEventLogForQuery(eventLog, request, response, shElement, classCodeValue);
         } catch (Exception e) {
-            logger.error("Prepare Audit log failed", e);
+            LOGGER.error("Prepare Audit log failed", e);
             // Is this fatal?
         }
     }
 
+    /**
+     * @param doc
+     * @param registryErrorList
+     * @param registryResponseElement
+     * @param isTranscode
+     * @param eventLog
+     * @return
+     * @throws Exception
+     */
     private Document transformDocument(Document doc,
                                        OMElement registryErrorList,
                                        OMElement registryResponseElement,
                                        boolean isTranscode,
                                        EventLog eventLog) throws Exception {
 
-        logger.debug("Transforming document, isTranscode: " + isTranscode);
+        LOGGER.debug("Transforming document, isTranscode: '{}'", isTranscode);
 
-        Document returnDoc = null;
+        Document returnDoc;
         try {
             TMResponseStructure tmResponse;
             String operationType;
             if (isTranscode) {
                 operationType = "toEpSOSPivot";
-                logger.debug("Transforming document to epSOS pivot...");
+                LOGGER.debug("Transforming document to epSOS pivot...");
                 tmResponse = transformationService.toEpSOSPivot(doc);
             } else {
                 operationType = "translate";
-                logger.debug("Translating document to " + Constants.LANGUAGE_CODE + "...");
+                LOGGER.debug("Translating document to '{}'", Constants.LANGUAGE_CODE);
                 tmResponse = transformationService.translate(doc, Constants.LANGUAGE_CODE);
             }
 
             OMNamespace ns = registryResponseElement.getNamespace();
-            // TODO: This was most probably due to an issue we had with Tiani portal
             OMNamespace ons = factory.createOMNamespace(ns.getNamespaceURI(), "a");
 
             for (int i = 0; i < tmResponse.getErrors().size(); i++) {
@@ -981,7 +984,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 registryResponseElement.addChild(registryErrorList);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
             throw e;
         }
         return returnDoc;
@@ -1009,7 +1012,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             try {
                 soapHeaderElement = XMLUtils.toDOM(soapHeader);
             } catch (Exception e) {
-                logger.error(null, e);
+                LOGGER.error(null, e);
                 throw e;
             }
 
@@ -1032,10 +1035,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
             // ships within the HCP assertion
             // TODO: Might be necessary to remove later, although it does no harm in reality!
             if (countryCode == null) {
-                logger.info("Could not get client country code from the service consumer certificate. The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
+                LOGGER.info("Could not get client country code from the service consumer certificate. The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
                 countryCode = SAML2Validator.getCountryCodeFromHCPAssertion(soapHeaderElement);
                 if (countryCode != null) {
-                    logger.info("Found the client country code via the signature certificate.");
+                    LOGGER.info("Found the client country code via the signature certificate.");
                 } else {
                     InsufficientRightsException e = new InsufficientRightsException();
                     registryErrorList.addChild(createErrorOMMessage(ns, e.getCode(), e.getMessage(), "", false));
@@ -1043,7 +1046,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 }
             }
 
-            logger.info("The client country code to be used by the PDP '{}' ", countryCode);
+            LOGGER.info("The client country code to be used by the PDP '{}' ", countryCode);
 
             // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
             if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
@@ -1074,7 +1077,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         "NI_XCA_RETRIEVE_REQ",
                         Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {
-                logger.error("createEvidenceREMNRO: " + ExceptionUtils.getStackTrace(e));
+                LOGGER.error("createEvidenceREMNRO: " + ExceptionUtils.getStackTrace(e));
             }
 
             EPSOSDocument epsosDoc = documentSearchService.getDocument(DocumentFactory.createSearchCriteria()
@@ -1100,7 +1103,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 //                            "NI_XCA_RETRIEVE_RES_FAIL",
 //                            Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
 //                } catch (Exception e) {
-//                    logger.error(ExceptionUtils.getStackTrace(e));
+//                    LOGGER.error(ExceptionUtils.getStackTrace(e));
 //                }
                 registryErrorList.addChild(createErrorOMMessage(ns, "XDSMissingDocument", "Requested document not found.", "", false));
                 break processLabel;
@@ -1124,7 +1127,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 //                        "NI_XCA_RETRIEVE_RES_SUCC",
 //                        DateUtil.getCurrentTimeGMT());
 //            } catch (Exception e) {
-//                logger.error(ExceptionUtils.getStackTrace(e));
+//                LOGGER.error(ExceptionUtils.getStackTrace(e));
 //            }
 
             classCodeValue = epsosDoc.getClassCode();
@@ -1142,7 +1145,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 break processLabel;
             }
 
-            logger.info("XCA Retrieve Request is valid.");
+            LOGGER.info("XCA Retrieve Request is valid.");
 
             OMElement homeCommunityId = factory.createOMElement("HomeCommunityId", ns2);
             homeCommunityId.setText(request.getDocumentRequest().get(0).getHomeCommunityId());
@@ -1164,7 +1167,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
             try {
                 Document doc = epsosDoc.getDocument();
-                logger.debug("Client userID: '{}'", eventLog.getSC_UserID());
+                LOGGER.debug("Client userID: '{}'", eventLog.getSC_UserID());
 
                 if (doc != null) {
 
@@ -1196,11 +1199,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 textData.setOptimize(true);
                 document.addChild(textData);
 
-                logger.debug("Returning document '{}'", documentId);
+                LOGGER.debug("Returning document '{}'", documentId);
                 documentResponse.addChild(document);
                 documentReturned = true;
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
                 registryResponse.addAttribute(factory.createOMAttribute("status", null, IheConstants.REGREP_RESPONSE_FAILURE));
                 registryErrorList.addChild(createErrorOMMessage(ns, "", e.getMessage(), "", false));
             }
@@ -1216,7 +1219,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             }
             prepareEventLogForRetrieve(eventLog, request, errorsDiscovered, documentReturned, registryErrorList, soapHeaderElement, classCodeValue);
         } catch (Exception ex) {
-            logger.error("Prepare Audit log failed.", ex);
+            LOGGER.error("Prepare Audit log failed.", ex);
             // Is this fatal?
         }
     }

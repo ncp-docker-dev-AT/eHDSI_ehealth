@@ -23,6 +23,8 @@ import ee.affecto.epsos.util.EventLogClientUtil;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
@@ -85,11 +87,11 @@ public class XDSbRepositoryServiceInvoker {
         String epr = null;
 
         if (docClassCode.equals(Constants.ED_CLASSCODE)) {
-            epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), Constants.DispensationService);
+            epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE);
         } else if (docClassCode.equals(Constants.CONSENT_CLASSCODE)) {
-            epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), Constants.ConsentService);
+            epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE);
         } else if (docClassCode.equals(Constants.HCER_CLASSCODE)) {
-            epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), Constants.ConsentService);
+            epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE);
         }
 
         stub = new DocumentRecipient_ServiceStub(epr);

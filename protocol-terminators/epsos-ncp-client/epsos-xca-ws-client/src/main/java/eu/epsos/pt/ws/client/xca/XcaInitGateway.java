@@ -20,7 +20,6 @@
 package eu.epsos.pt.ws.client.xca;
 
 import ee.affecto.epsos.util.EventLogClientUtil;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.dts.xds.AdhocQueryRequestCreator;
 import eu.epsos.dts.xds.AdhocQueryResponseConverter;
 import eu.epsos.exceptions.DocumentTransformationException;
@@ -29,6 +28,8 @@ import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.services.CdaValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
@@ -67,7 +68,7 @@ import java.util.Locale;
  */
 public class XcaInitGateway {
 
-    private static Logger LOG = LoggerFactory.getLogger(XcaInitGateway.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XcaInitGateway.class);
 
     /**
      * Private constructor to disable class instantiation.
@@ -78,6 +79,9 @@ public class XcaInitGateway {
     public static QueryResponse crossGatewayQuery(final PatientId pid, final String countryCode, final GenericDocumentCode documentCode,
                                                   final Assertion idAssertion, final Assertion trcAssertion, String service) throws XCAException {
 
+
+        LOGGER.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
+                documentCode.getValue(), idAssertion.getID(), trcAssertion.getID(), service);
         QueryResponse result = null;
 
         try {
@@ -88,7 +92,8 @@ public class XcaInitGateway {
 
             /* Stub */
             RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub();
-            String epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), service);
+            //String epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), service);
+            String epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
             stub.setAddr(epr);
             stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
             EventLogClientUtil.createDummyMustUnderstandHandler(stub);
@@ -96,7 +101,8 @@ public class XcaInitGateway {
 
             /* queryRespose */
             AdhocQueryResponse queryResponse = stub.respondingGateway_CrossGatewayQuery(queryRequest, idAssertion, trcAssertion, documentCode.getValue());   // Request
-            processRegistryErrors(queryResponse.getRegistryErrorList()); // Check result //TODO: Review generic exception throwed and remove last catch from try, catch sequence.
+            // Check result //TODO: Review generic exception throwed and remove last catch from try, catch sequence.
+            processRegistryErrors(queryResponse.getRegistryErrorList());
 
             if (queryResponse.getRegistryObjectList() != null) {
                 result = AdhocQueryResponseConverter.convertAdhocQueryResponse(queryResponse);
@@ -116,20 +122,18 @@ public class XcaInitGateway {
         return result;
     }
 
-    public static DocumentResponse crossGatewayRetrieve(
-            final XDSDocument document,
-            final String homeCommunityId,
-            final String countryCode,
-            final String targetLanguage,
-            final Assertion idAssertion,
-            final Assertion trcAssertion,
-            String service) throws XCAException {
+    public static DocumentResponse crossGatewayRetrieve(final XDSDocument document, final String homeCommunityId,
+                                                        final String countryCode, final String targetLanguage,
+                                                        final Assertion idAssertion, final Assertion trcAssertion,
+                                                        String service) throws XCAException {
+
+        LOGGER.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}', '{}')", document.getDocumentUniqueId(),
+                homeCommunityId, countryCode, targetLanguage, idAssertion.getID(), trcAssertion.getID(), service);
 
         DocumentResponse result = null;
-
         RetrieveDocumentSetResponseType queryResponse;
-
         String classCode = null;
+
         try {
 
             /* Request */
@@ -142,9 +146,10 @@ public class XcaInitGateway {
 
             String epr;
             if (service.equals(Constants.MroService)) {
-                epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), Constants.PatientService);
+                epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE);
             } else {
-                epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), service);
+                //epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), service);
+                epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
             }
             stub.setAddr(epr);
             stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
@@ -168,10 +173,10 @@ public class XcaInitGateway {
             }
 
         } catch (PhaseException ex) {
-            LOG.error(ex.getLocalizedMessage(), ex);
+            LOGGER.error(ex.getLocalizedMessage(), ex);
             throw new RuntimeException(ex);
         } catch (AxisFault ex) {
-            LOG.error(ex.getLocalizedMessage(), ex);
+            LOGGER.error(ex.getLocalizedMessage(), ex);
             throw new RuntimeException(ex);
         } catch (RemoteException ex) {
             throw new RuntimeException(ex);
@@ -179,7 +184,7 @@ public class XcaInitGateway {
 
         if (!queryResponse.getDocumentResponse().isEmpty()) {
             if (queryResponse.getDocumentResponse().size() > 1) {
-                LOG.error("More than one documents where retrieved for the current request with parameters document ID: '{}' - homeCommunityId: '{}' - registry: ", document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
+                LOGGER.error("More than one documents where retrieved for the current request with parameters document ID: '{}' - homeCommunityId: '{}' - registry: ", document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
             }
             try {
                 CdaValidationService cdaValidationService = CdaValidationService.getInstance();
@@ -193,9 +198,9 @@ public class XcaInitGateway {
                 cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
 
             } catch (DocumentTransformationException ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             } catch (Exception ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             } finally {
                 result = queryResponse.getDocumentResponse().get(0); //Returns the original document, even if the translation process fails.
             }
@@ -229,7 +234,7 @@ public class XcaInitGateway {
                     String location = error.getLocation();
                     String severity = error.getSeverity();
                     String codeContext = error.getCodeContext();
-                    LOG.error("errorCode=" + errorCode + "\ncodeContext=" + codeContext
+                    LOGGER.error("errorCode=" + errorCode + "\ncodeContext=" + codeContext
                             + "\nlocation=" + location + "\nseverity=" + severity + "\n" + value + "\n");
 
                     if ("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".equals(severity)) {
@@ -248,7 +253,7 @@ public class XcaInitGateway {
 
                     //Throw all the remaining errors
                     if (hasError) {
-                        LOG.error(msg);
+                        LOGGER.error(msg);
                         throw new XCAException(errorCode);
                     }
 
