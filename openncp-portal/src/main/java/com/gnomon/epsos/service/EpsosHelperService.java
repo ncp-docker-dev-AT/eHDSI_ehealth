@@ -15,7 +15,6 @@ import com.liferay.util.portlet.PortletProps;
 import edu.mayo.trilliumbridge.core.TrilliumBridgeTransformer;
 import edu.mayo.trilliumbridge.core.xslt.XsltTrilliumBridgeTransformer;
 import epsos.ccd.gnomon.auditmanager.*;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.gnomon.xslt.EpsosXSLTransformer;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
@@ -25,6 +24,7 @@ import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -128,18 +128,17 @@ public class EpsosHelperService {
     public static final String PORTAL_CUSTODIAN_OID = "PORTAL_CUSTODIAN_OID";
     public static final String PORTAL_LEGAL_AUTHENTICATOR_PERSON_OID = "PORTAL_LEGAL_AUTHENTICATOR_PERSON_OID";
     public static final String PORTAL_LEGAL_AUTHENTICATOR_ORG_OID = "PORTAL_LEGAL_AUTHENTICATOR_ORG_OID";
-    public final static SimpleDateFormat dateMetaDataFormat = new SimpleDateFormat(
-            "yyyyMMdd");
-    private static final Logger log = LoggerFactory.getLogger(EpsosHelperService.class.getName());
+    public final static SimpleDateFormat dateMetaDataFormat = new SimpleDateFormat("yyyyMMdd");
+    private static final Logger LOGGER = LoggerFactory.getLogger(EpsosHelperService.class.getName());
     private static final Base64 decode = new Base64();
 
-    public EpsosHelperService() {
+    private EpsosHelperService() {
         super();
     }
 
     public static List getEHPLTRLanguages() {
-        Map<String, String> langs = new HashMap<String, String>();
-        List<String> ltrLanguages = new ArrayList();
+        Map<String, String> langs = new HashMap<>();
+        List<String> ltrLanguages = new ArrayList<>();
         try {
             ITransformationService tService = MyServletContextListener
                     .getTransformationService();
@@ -152,8 +151,8 @@ public class EpsosHelperService {
                 ltrLanguages.set(i, language);
             }
         } catch (Exception e) {
-            log.error("Error getting ltrlanguages");
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error getting ltrlanguages");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         if (langs.isEmpty()) {
             langs.put("en_GB", "en_GB");
@@ -162,7 +161,7 @@ public class EpsosHelperService {
     }
 
     public static Map<String, String> getLTRLanguages() {
-        Map<String, String> langs = new HashMap<String, String>();
+        Map<String, String> langs = new HashMap<>();
         try {
             ITransformationService tService = MyServletContextListener
                     .getTransformationService();
@@ -172,11 +171,11 @@ public class EpsosHelperService {
             for (int i = 0; i < ltrLanguages.size(); i++) {
                 langs.put(ltrLanguages.get(i).trim(), ltrLanguages.get(i)
                         .trim());
-                log.debug("Language is: " + ltrLanguages.get(i));
+                LOGGER.debug("Language is: " + ltrLanguages.get(i));
             }
         } catch (Exception e) {
-            log.error("Error getting ltrlanguages");
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error getting ltrlanguages");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         if (langs.isEmpty()) {
             langs.put("en-GB", "en-GB");
@@ -208,10 +207,8 @@ public class EpsosHelperService {
                                        String consentDisplayName, String consentStartDate,
                                        String consentEndDate) {
         String rolename = "";
-        String pharmacistsOid = EpsosHelperService
-                .getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_OID);
-        String doctorsOid = EpsosHelperService
-                .getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_OID);
+        String pharmacistsOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_OID);
+        String doctorsOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_OID);
 
         User user = LiferayUtils.getPortalUser();
         PersonDetail pd = getUserInfo(pharmacistsOid, user);
@@ -247,9 +244,9 @@ public class EpsosHelperService {
         cda.setPatientEmail(patient.getEmail());
         cda.setPatientPostalCode(patient.getPostalCode());
         String consent = CDAUtils.CDAModelToConsent(cda, rolename);
-        log.info("#### Consent CDA Start");
-        log.info(consent);
-        log.info("#### Consent CDA End");
+        LOGGER.info("#### Consent CDA Start");
+        LOGGER.info(consent);
+        LOGGER.info("#### Consent CDA End");
         return consent;
     }
 
@@ -280,14 +277,13 @@ public class EpsosHelperService {
                 pd.setCity(address.getCity());
                 pd.setPostalCode(address.getZip());
             }
-            pd.setCountry(ConfigurationManagerService.getInstance()
-                    .getProperty("ncp.country"));
+            pd.setCountry(ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country"));
             if (!phones.isEmpty()) {
                 pd.setTelephone(phones.get(0).getNumber());
             }
         } catch (SystemException e1) {
-            log.error("Error getting contact info addreses");
-            log.error(ExceptionUtils.getStackTrace(e1));
+            LOGGER.error("Error getting contact info addreses");
+            LOGGER.error(ExceptionUtils.getStackTrace(e1));
         }
 
         return pd;
@@ -306,9 +302,9 @@ public class EpsosHelperService {
         cda.setLanguageCode(language);
         cda = setPharmInfo(cda, pd);
 
-        List<EDDetail> edDetails = new ArrayList<EDDetail>();
-        for (int i = 0; i < dispensedLines.size(); i++) {
-            ViewResult d_line = (ViewResult) dispensedLines.get(i);
+        List<EDDetail> edDetails = new ArrayList<>();
+        for (ViewResult dispensedLine : dispensedLines) {
+            ViewResult d_line = dispensedLine;
             EDDetail ed = new EDDetail();
             ed.setRelativePrescriptionLineId(d_line.getField1().toString());
             ed.setDispensedQuantity(d_line.getField7().toString());
@@ -325,15 +321,14 @@ public class EpsosHelperService {
             Document epDoc = db.parse(new ByteArrayInputStream(bytes));
             cda.setPrescriptionBarcode(CDAUtils
                     .getRelativePrescriptionBarcode(epDoc));
-            cda.setDispensationId("D-"
-                    + CDAUtils.getRelativePrescriptionBarcode(epDoc));
+            cda.setDispensationId("D-" + CDAUtils.getRelativePrescriptionBarcode(epDoc));
             edDoc = CDAUtils.createDispensation(epDoc, cda);
-            log.info("### DISPENSATION START ###");
-            log.info(edDoc);
-            log.info("### DISPENSATION END ###");
+            LOGGER.info("### DISPENSATION START ###");
+            LOGGER.info(edDoc);
+            LOGGER.info("### DISPENSATION END ###");
         } catch (Exception e) {
-            log.error("error creating disp doc");
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("error creating disp doc");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return edDoc.getBytes();
     }
@@ -346,7 +341,7 @@ public class EpsosHelperService {
         CleanerProperties props = cleaner.getProperties();
         // props.setTreatUnknownTagsAsContent(true);
         props.setOmitUnknownTags(true);
-        log.info("Cleaner init");
+        LOGGER.info("Cleaner init");
         TagNode node = cleaner.clean(htmlin);
         cleanCDA = new PrettyXmlSerializer(props).getAsString(node);
 
@@ -374,15 +369,15 @@ public class EpsosHelperService {
             out.flush();
             out.close();
         } catch (Exception e) {
-            log.error("Error converting html to pdf");
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error converting html to pdf");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return out;
     }
 
-    public static List<ViewResult> parsePrescriptionDocumentForPrescriptionLines(
-            byte[] bytes) {
-        List<ViewResult> lines = new ArrayList<ViewResult>();
+    public static List<ViewResult> parsePrescriptionDocumentForPrescriptionLines(byte[] bytes) {
+
+        List<ViewResult> lines = new ArrayList<>();
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -466,8 +461,7 @@ public class EpsosHelperService {
                 address += ", " + country.getTextContent().trim();
             }
 
-            // for each prescription component, search for its entries and make
-            // up the list
+            // for each prescription component, search for its entries and make up the list
             String prescriptionID = "";
             NodeList prescriptionIDNodes = (NodeList) prescriptionIDExpr
                     .evaluate(dom, XPathConstants.NODESET);
@@ -538,7 +532,7 @@ public class EpsosHelperService {
                             // prescriptionID =
                             // pIDNode.getAttributes().getNamedItem("root").getNodeValue();
                         } catch (Exception e) {
-                            log.error(ExceptionUtils.getStackTrace(e));
+                            LOGGER.error(ExceptionUtils.getStackTrace(e));
                         }
                     } else {
                         prescriptionID = "";
@@ -585,8 +579,8 @@ public class EpsosHelperService {
                                             .getNamedItem("extension")
                                             .getNodeValue();
                                 } catch (Exception e) {
-                                    log.error("Error getting material");
-                                    log.error(ExceptionUtils.getStackTrace(e));
+                                    LOGGER.error("Error getting material");
+                                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                                 }
                             }
 
@@ -597,8 +591,8 @@ public class EpsosHelperService {
                             try {
                                 name = materialName.getTextContent().trim();
                             } catch (Exception e) {
-                                log.error("Error getting material name");
-                                log.error(ExceptionUtils.getStackTrace(e));
+                                LOGGER.error("Error getting material name");
+                                LOGGER.error(ExceptionUtils.getStackTrace(e));
                             }
 
                             String packsString = "";
@@ -681,8 +675,8 @@ public class EpsosHelperService {
                                             .getNamedItem("value")
                                             .getNodeValue();
                                 } catch (Exception e) {
-                                    log.error("Error parsing strength");
-                                    log.error(ExceptionUtils.getStackTrace(e));
+                                    LOGGER.error("Error parsing strength");
+                                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                                     strength = "";
                                 }
                                 String unit = "";
@@ -692,8 +686,8 @@ public class EpsosHelperService {
                                             .getNamedItem("unit")
                                             .getNodeValue();
                                 } catch (Exception e) {
-                                    log.error("Error parsing unit");
-                                    log.error(ExceptionUtils.getStackTrace(e));
+                                    LOGGER.error("Error parsing unit");
+                                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                                 }
                                 if (unit != null && !unit.equals("1")) {
                                     strength += " " + unit;
@@ -704,8 +698,8 @@ public class EpsosHelperService {
                                             .getNamedItem("value")
                                             .getNodeValue();
                                 } catch (Exception e) {
-                                    log.error("Error parsing denom");
-                                    log.error(ExceptionUtils.getStackTrace(e));
+                                    LOGGER.error("Error parsing denom");
+                                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                                 }
                                 if (denom != null) // && !denom.equals("1"))
                                 {
@@ -716,8 +710,8 @@ public class EpsosHelperService {
                                                 .getNamedItem("unit")
                                                 .getNodeValue();
                                     } catch (Exception e) {
-                                        log.error("Error parsing unit 2");
-                                        log.error(ExceptionUtils
+                                        LOGGER.error("Error parsing unit 2");
+                                        LOGGER.error(ExceptionUtils
                                                 .getStackTrace(e));
                                     }
                                     if (unit2 != null && !unit2.equals("1")) {
@@ -834,8 +828,8 @@ public class EpsosHelperService {
                                             .getNamedItem("unit")
                                             .getNodeValue());
                                 } catch (Exception e) {
-                                    log.error("Error getting freqstring");
-                                    log.error(ExceptionUtils.getStackTrace(e));
+                                    LOGGER.error("Error getting freqstring");
+                                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                                 }
                             }
 
@@ -849,8 +843,8 @@ public class EpsosHelperService {
                                             .getNamedItem("displayName")
                                             .getNodeValue());
                                 } catch (Exception e) {
-                                    log.error("error getting route string");
-                                    log.error(ExceptionUtils.getStackTrace(e));
+                                    LOGGER.error("error getting route string");
+                                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                                 }
                             }
 
@@ -864,8 +858,8 @@ public class EpsosHelperService {
                                             .getNamedItem("value")
                                             .getNodeValue());
                                 } catch (Exception e) {
-                                    log.error("error getting route string");
-                                    log.error(ExceptionUtils.getStackTrace(e));
+                                    LOGGER.error("error getting route string");
+                                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                                 }
                             }
 
@@ -879,8 +873,8 @@ public class EpsosHelperService {
                                             .getNamedItem("value")
                                             .getNodeValue());
                                 } catch (Exception e) {
-                                    log.error("error getting route string");
-                                    log.error(ExceptionUtils.getStackTrace(e));
+                                    LOGGER.error("error getting route string");
+                                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                                 }
                             }
 
@@ -894,8 +888,8 @@ public class EpsosHelperService {
                                             .getNodeValue();
                                     lowString = dateDecorate(lowString);
                                 } catch (Exception e) {
-                                    log.error("Error parsing low node ...");
-                                    log.error(ExceptionUtils.getStackTrace(e));
+                                    LOGGER.error("Error parsing low node ...");
+                                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                                 }
 
                             }
@@ -910,8 +904,8 @@ public class EpsosHelperService {
                                             .getNodeValue();
                                     highString = dateDecorate(highString);
                                 } catch (Exception e) {
-                                    log.error("Error parsing high node ...");
-                                    log.error(ExceptionUtils.getStackTrace(e));
+                                    LOGGER.error("Error parsing high node ...");
+                                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                                 }
                             }
 
@@ -982,7 +976,7 @@ public class EpsosHelperService {
                 }
             }
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return lines;
     }
@@ -996,7 +990,7 @@ public class EpsosHelperService {
         String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
 
         KeyStoreManager keyManager = new DefaultKeyStoreManager();
-        X509Certificate cert = null;
+        X509Certificate cert;
         PrivateKey privateKey = null;
         if (keyAlias == null) {
             cert = (X509Certificate) keyManager.getDefaultCertificate();
@@ -1041,7 +1035,7 @@ public class EpsosHelperService {
         try {
             org.opensaml.xml.signature.Signer.signObject(sig);
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -1052,7 +1046,7 @@ public class EpsosHelperService {
 
     public static Object getUserAssertion(User user) {
 
-        log.info("User is: '{}'", user.getScreenName());
+        LOGGER.info("User is: '{}'", user.getScreenName());
         Assertion assertion;
 
         try {
@@ -1063,9 +1057,9 @@ public class EpsosHelperService {
             boolean isPatient = LiferayUtils.isPatient(user.getUserId(), user.getCompanyId());
 
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
-                log.info("The portal role is one of the expected. Continuing ...");
+                LOGGER.info("The portal role is one of the expected. Continuing ...");
             } else {
-                log.error("The portal role is NOT one of the expected. Break");
+                LOGGER.error("The portal role is NOT one of the expected. Break");
                 return "Error creating assertion for user. Role not compatible with OpenNCP Reference Implementation";
             }
 
@@ -1141,8 +1135,8 @@ public class EpsosHelperService {
             // send Audit message
             // GUI-27
             if (Validator.isNotNull(assertion)) {
-                log.info("AUDIT URL: '{}'", ConfigurationManagerService.getInstance().getProperty("audit.repository.url"));
-                log.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
+                LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
+                LOGGER.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
                 EpsosHelperService.sendAuditEpsos91(user.getFullName(),
                         user.getEmailAddress(), orgName, orgType, rolename,
                         assertion.getID());
@@ -1151,7 +1145,7 @@ public class EpsosHelperService {
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
                 String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-                log.info("KEY ALIAS: '{}'", KEY_ALIAS);
+                LOGGER.info("KEY ALIAS: '{}'", KEY_ALIAS);
 
                 signSAMLAssertion(assertion, KEY_ALIAS);
                 AssertionMarshaller marshaller = new AssertionMarshaller();
@@ -1162,12 +1156,12 @@ public class EpsosHelperService {
                 Document document = element.getOwnerDocument();
 
                 String hcpa = Utils.getDocumentAsXml(document, false);
-                log.info("#### HCPA Start\n '{}' \n#### HCPA End", hcpa);
+                LOGGER.info("#### HCPA Start\n '{}' \n#### HCPA End", hcpa);
             }
 
-            log.info("Assertion: '{}'", assertion.getID());
+            LOGGER.info("Assertion: '{}'", assertion.getID());
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
             return e.getMessage();
         }
 
@@ -1178,7 +1172,7 @@ public class EpsosHelperService {
 
     public static Object getUserAssertion(String screenname, String fullname, String emailaddress, String role) {
 
-        log.info("Screen name is: '{}' and role is: '{}'", screenname, role);
+        LOGGER.info("Screen name is: '{}' and role is: '{}'", screenname, role);
         Assertion assertion;
 
         try {
@@ -1189,9 +1183,9 @@ public class EpsosHelperService {
             boolean isPatient = role.equalsIgnoreCase(LiferayUtils.LPPatientRole);
 
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
-                log.info("The portal role is one of the expected. Continuing ...");
+                LOGGER.info("The portal role is one of the expected. Continuing ...");
             } else {
-                log.error("The portal role is NOT one of the expected. Break");
+                LOGGER.error("The portal role is NOT one of the expected. Break");
                 return "Error creating assertion for user. Role not compatible with EPSOS";
             }
 
@@ -1208,16 +1202,16 @@ public class EpsosHelperService {
 
                 String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
                 String p[] = doctor_perms.split(",");
-                for (int k = 0; k < p.length; k++) {
-                    perms.add(prefix + p[k]);
+                for (String aP : p) {
+                    perms.add(prefix + aP);
                 }
             }
             if (isPharmacist) {
                 rolename = "pharmacist";
                 String pharm_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_PERMISSIONS);
                 String p1[] = pharm_perms.split(",");
-                for (int k = 0; k < p1.length; k++) {
-                    perms.add(prefix + p1[k]);
+                for (String aP1 : p1) {
+                    perms.add(prefix + aP1);
                 }
             }
 
@@ -1225,8 +1219,8 @@ public class EpsosHelperService {
                 rolename = "nurse";
                 String nurse_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_NURSE_PERMISSIONS);
                 String p1[] = nurse_perms.split(",");
-                for (int k = 0; k < p1.length; k++) {
-                    perms.add(prefix + p1[k]);
+                for (String aP1 : p1) {
+                    perms.add(prefix + aP1);
                 }
             }
 
@@ -1234,8 +1228,8 @@ public class EpsosHelperService {
                 rolename = "patient";
                 String patient_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
                 String p1[] = patient_perms.split(",");
-                for (int k = 0; k < p1.length; k++) {
-                    perms.add(prefix + p1[k]);
+                for (String aP1 : p1) {
+                    perms.add(prefix + aP1);
                 }
             }
 
@@ -1243,8 +1237,8 @@ public class EpsosHelperService {
                 rolename = "administrator";
                 String admin_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
                 String p1[] = admin_perms.split(",");
-                for (int k = 0; k < p1.length; k++) {
-                    perms.add(prefix + p1[k]);
+                for (String aP1 : p1) {
+                    perms.add(prefix + aP1);
                 }
             }
             orgName = "eHealthPass";
@@ -1264,15 +1258,15 @@ public class EpsosHelperService {
             // send Audit message
             // GUI-27
             if (Validator.isNotNull(assertion)) {
-                log.info("AUDIT URL: '{}'", ConfigurationManagerService.getInstance().getProperty("audit.repository.url"));
-                log.debug("Sending epsos-91 audit message for '{}'", fullname);
+                LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
+                LOGGER.debug("Sending epsos-91 audit message for '{}'", fullname);
                 EpsosHelperService.sendAuditEpsos91(fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
             }
             // GUI-25
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
                 String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-                log.info("KEY ALIAS: '{}'", KEY_ALIAS);
+                LOGGER.info("KEY ALIAS: '{}'", KEY_ALIAS);
 
                 signSAMLAssertion(assertion, KEY_ALIAS);
                 AssertionMarshaller marshaller = new AssertionMarshaller();
@@ -1280,13 +1274,13 @@ public class EpsosHelperService {
                 Document document = element.getOwnerDocument();
 
                 String hcpa = Utils.getDocumentAsXml(document, false);
-                log.debug("#### HCPA Start");
-                log.debug(hcpa);
-                log.debug("#### HCPA End");
+                LOGGER.debug("#### HCPA Start");
+                LOGGER.debug(hcpa);
+                LOGGER.debug("#### HCPA End");
             }
-            log.info("Assertion: " + assertion.getID());
+            LOGGER.info("Assertion: " + assertion.getID());
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
             return e.getMessage();
         }
 
@@ -1333,9 +1327,9 @@ public class EpsosHelperService {
         String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
         String KEYSTORE_LOCATION = Constants.NCP_SIG_KEYSTORE_PATH;
         String KEY_STORE_PASS = Constants.NCP_SIG_KEYSTORE_PASSWORD;
-        log.info("KEY_ALIAS: '{}'", Constants.NCP_SIG_PRIVATEKEY_ALIAS);
+        LOGGER.info("KEY_ALIAS: '{}'", Constants.NCP_SIG_PRIVATEKEY_ALIAS);
         if (Validator.isNull(KEY_ALIAS)) {
-            log.error("Problem reading configuration parameters");
+            LOGGER.error("Problem reading configuration parameters");
             return;
         }
         java.security.cert.Certificate cert = null;
@@ -1345,17 +1339,17 @@ public class EpsosHelperService {
             // Load the keystore in the user's home directory
             KeyStore keystore = KeyStore.getInstance("JKS");
             keystore.load(is, KEY_STORE_PASS.toCharArray());
-            log.info("Keystore loaded ...");
+            LOGGER.info("Keystore loaded ...");
 
             // Get certificate
             cert = keystore.getCertificate(KEY_ALIAS);
-            log.info("Certificate loaded ... '{}'", cert.getPublicKey().toString());
+            LOGGER.info("Certificate loaded ... '{}'", cert.getPublicKey().toString());
 
             // List the aliases
             Enumeration enum1 = keystore.aliases();
             while (enum1.hasMoreElements()) {
                 String alias = (String) enum1.nextElement();
-                log.info("ALIAS IS '{}'", alias);
+                LOGGER.info("ALIAS IS '{}'", alias);
                 if (cert instanceof X509Certificate) {
                     X509Certificate x509cert = (X509Certificate) cert;
 
@@ -1368,10 +1362,10 @@ public class EpsosHelperService {
                 }
             }
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
-        log.info("##########");
+        LOGGER.info("##########");
         String secHead = "No security header provided";
         String basedSecHead = Base64.encodeBase64String(secHead.getBytes());
         String reqm_participantObjectID = "urn:uuid:00000000-0000-0000-0000-000000000000";
@@ -1380,9 +1374,9 @@ public class EpsosHelperService {
         InetAddress sourceIP = null;
         try {
             sourceIP = InetAddress.getLocalHost();
-            log.info("Source IP: '{}'", sourceIP);
+            LOGGER.info("Source IP: '{}'", sourceIP);
         } catch (UnknownHostException ex) {
-            log.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
 
         String PC_UserID = orgName + "<saml:" + email + ">";
@@ -1404,7 +1398,7 @@ public class EpsosHelperService {
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-            log.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
         EventLog eventLog1 = EventLog.createEventLogHCPIdentity(
                 TransactionName.epsosHcpAuthentication,
@@ -1415,7 +1409,7 @@ public class EpsosHelperService {
                 reqm_participantObjectID, basedSecHead.getBytes(),
                 resm_participantObjectID, ResM_PatricipantObjectDetail,
                 sourceIP.getHostAddress(), "N/A");
-        log.info("The audit has been prepared");
+        LOGGER.info("The audit has been prepared");
         eventLog1.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog1, "13", "2");
     }
@@ -1494,13 +1488,13 @@ public class EpsosHelperService {
                                                   String purposeOfUse, String xspaLocality,
                                                   java.util.Vector permissions, String onBehalfId) {
         // assertion
-        log.info("username: '{}'", username);
-        log.info("role: '{}'", role);
-        log.info("organization: '{}'", organization);
-        log.info("organizationId: '{}'", organizationId);
-        log.info("facilityType: '{}'", facilityType);
-        log.info("purposeOfUse: '{}'", purposeOfUse);
-        log.info("xspaLocality: '{}'", xspaLocality);
+        LOGGER.info("username: '{}'", username);
+        LOGGER.info("role: '{}'", role);
+        LOGGER.info("organization: '{}'", organization);
+        LOGGER.info("organizationId: '{}'", organizationId);
+        LOGGER.info("facilityType: '{}'", facilityType);
+        LOGGER.info("purposeOfUse: '{}'", purposeOfUse);
+        LOGGER.info("xspaLocality: '{}'", xspaLocality);
 
         Assertion assertion = null;
         try {
@@ -1622,15 +1616,15 @@ public class EpsosHelperService {
 
             assertion.getStatements().add(attrStmt);
 
-            log.info("AssertionId: '{}'", assertion.getID());
+            LOGGER.info("AssertionId: '{}'", assertion.getID());
         } catch (ConfigurationException e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return assertion;
     }
 
     public static String getCountriesFromCS() {
-        log.debug("get Countries from CS");
+        LOGGER.debug("get Countries from CS");
         String listOfCountries = "";
         String filename = "InternationalSearch.xml";
         try {
@@ -1658,7 +1652,7 @@ public class EpsosHelperService {
                 }
             }
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
         return listOfCountries;
@@ -1666,7 +1660,7 @@ public class EpsosHelperService {
 
     public static List<Country> getCountriesFromCS(String lang, String portalPath) {
 
-        log.info("Get Countries from CS with lang '{}'", lang);
+        LOGGER.info("Get Countries from CS with lang '{}'", lang);
         List<Country> listOfCountries = new ArrayList<>();
         String filename = "InternationalSearch.xml";
 
@@ -1684,26 +1678,26 @@ public class EpsosHelperService {
                 Element link = (Element) nodeLst.item(s);
                 String countryCode = link.getAttribute("code");
                 String countryName = EpsosHelperService.getCountryName(countryCode, lang);
-                log.debug("Lang is: '{}' and Country code: '{}' name is: '{}'", lang, countryCode + countryName);
+                LOGGER.debug("Lang is: '{}' and Country code: '{}' name is: '{}'", lang, countryCode + countryName);
                 Country country = new Country(countryName, countryCode);
                 listOfCountries.add(country);
             }
             getCountryListNameFromCS(lang, listOfCountries);
 
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
-            log.error("getCountriesFromCS: " + e.getMessage());
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("getCountriesFromCS: " + e.getMessage());
         }
         return listOfCountries;
     }
 
     public static List<Country> getCountriesFromCS(String lang) {
 
-        log.info("Get Countries from CS with lang '{}'", lang);
+        LOGGER.info("Get Countries from CS with lang '{}'", lang);
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
         String wi = externalContext.getRealPath("/");
-        log.info("Countries definition path is '{}'", wi);
+        LOGGER.info("Countries definition path is '{}'", wi);
         return getCountriesFromCS(lang, wi);
     }
 
@@ -1723,17 +1717,17 @@ public class EpsosHelperService {
                 translation = LiferayUtils.getPortalTranslation(
                         country.getCode(), lang);
                 country.setName(translation);
-                log.info("Country is : " + country.getName());
+                LOGGER.info("Country is : " + country.getName());
             }
         } catch (Exception ex) {
-            log.error("getCountriesNamesFromCS: " + ex.getMessage());
-            log.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error("getCountriesNamesFromCS: " + ex.getMessage());
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
 
     }
 
     public static String getCountriesLabelsFromCS(String language) {
-        log.debug("get Countries labels from CS");
+        LOGGER.debug("get Countries labels from CS");
         String listOfCountries = "";
 
         String filename = "InternationalSearch.xml";
@@ -1742,7 +1736,7 @@ public class EpsosHelperService {
             ExternalContext externalContext = facesContext.getExternalContext();
             String wi = Constants.EPSOS_PROPS_PATH;
             // String path = cl.getResource(".").getPath();
-            // log.info("#### 1: " + a1);
+            // LOGGER.info("#### 1: " + a1);
             String path = wi + "forms" + File.separator + filename;
             File file = new File(path);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -1767,7 +1761,7 @@ public class EpsosHelperService {
             }
 
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return listOfCountries;
     }
@@ -1777,7 +1771,7 @@ public class EpsosHelperService {
         Vector v = new Vector();
         String filename = "InternationalSearch_" + country + ".xml";
         path = getSearchMaskPath() + "forms" + File.separator + filename;
-        log.info("#### Path is :" + path);
+        LOGGER.info("#### Path is: '{}'", path);
         try {
             File file = new File(path);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -1794,8 +1788,8 @@ public class EpsosHelperService {
                 v.add(sm);
             }
         } catch (Exception e) {
-            log.error("Error getting country ids " + e.getMessage());
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error getting country ids " + e.getMessage());
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return v;
     }
@@ -1820,7 +1814,7 @@ public class EpsosHelperService {
             if (Validator.isNotNull(user)) {
                 String idvalue = (String) user.getExpandoBridge().getAttribute(
                         id.getDomain());
-                log.info("Identifiers: " + id.getKey() + "_" + idvalue);
+                LOGGER.info("Identifiers: " + id.getKey() + "_" + idvalue);
                 id.setUserValue(idvalue);
             }
 
@@ -1926,9 +1920,9 @@ public class EpsosHelperService {
                 v.add(dem);
             }
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
-        log.info("Demographics size :" + v.size());
+        LOGGER.info("Demographics size :" + v.size());
         return v;
     }
 
@@ -1958,20 +1952,20 @@ public class EpsosHelperService {
 
         String asstring = Utils.getDocumentAsXml(document, false);
 
-        log.info("##################### ASSERTION Start");
-        log.info(asstring);
-        log.info("##################### ASSERTION End");
+        LOGGER.info("##################### ASSERTION Start");
+        LOGGER.info(asstring);
+        LOGGER.info("##################### ASSERTION End");
     }
 
     public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
         Assertion trc;
-        log.debug("Try to create TRCA for patient : " + patient.getExtension());
+        LOGGER.debug("Try to create TRCA for patient : " + patient.getExtension());
         String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
-        log.info("TRCA Patient ID: '{}'", pat);
-        log.info("Assertion ID: '{}'", idAs.getID());
-        log.info("SECMAN URL: '{}'", ConfigurationManagerService.getInstance().getProperty("secman.sts.url"));
+        LOGGER.info("TRCA Patient ID: '{}'", pat);
+        LOGGER.info("Assertion ID: '{}'", idAs.getID());
+        LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
         TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).PurposeOfUse(purpose).build();
-        log.info("TRCAssertionRequest: '{}", req1.toString());
+        LOGGER.info("TRCAssertionRequest: '{}", req1.toString());
         trc = req1.request();
 
         AssertionMarshaller marshaller = new AssertionMarshaller();
@@ -1980,12 +1974,12 @@ public class EpsosHelperService {
 
         String trca = Utils.getDocumentAsXml(document, false);
 
-        log.info("#### TRCA Start");
-        log.info(trca);
-        log.info("#### TRCA End");
+        LOGGER.info("#### TRCA Start");
+        LOGGER.info(trca);
+        LOGGER.info("#### TRCA End");
 
-        log.debug("TRCA CREATED: '{}'", trc.getID());
-        log.debug("TRCA WILL BE STORED TO SESSION: '{}'", trc.getID());
+        LOGGER.debug("TRCA CREATED: '{}'", trc.getID());
+        LOGGER.debug("TRCA WILL BE STORED TO SESSION: '{}'", trc.getID());
         LiferayUtils.storeToSession("trcAssertion", trc);
         return trc;
     }
@@ -2006,7 +2000,7 @@ public class EpsosHelperService {
             Node pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
             if (pdfNode != null) {
                 String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                log.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
+                LOGGER.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                 result = base64EncodedPdfString;//decode.decode(base64EncodedPdfString);
                 result = "data:application/pdf;base64," + result;
             } else {
@@ -2016,14 +2010,14 @@ public class EpsosHelperService {
                 if (pdfNode != null) {
                     String base64EncodedPdfString = pdfNode.getTextContent()
                             .trim();
-                    log.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
+                    LOGGER.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                     result = base64EncodedPdfString;//decode.decode(base64EncodedPdfString.getBytes());
                     result = "data:application/pdf;base64," + result;
                 }
 
             }
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return result;
     }
@@ -2045,8 +2039,7 @@ public class EpsosHelperService {
             Node pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
             if (pdfNode != null) {
                 String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                log.info("##### base64EncodedPdfString: "
-                        + base64EncodedPdfString);
+                LOGGER.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                 result = decode.decode(base64EncodedPdfString.getBytes());
             } else {
                 pdfTag = xpath
@@ -2055,14 +2048,14 @@ public class EpsosHelperService {
                 if (pdfNode != null) {
                     String base64EncodedPdfString = pdfNode.getTextContent()
                             .trim();
-                    log.info("##### base64EncodedPdfString: "
+                    LOGGER.info("##### base64EncodedPdfString: "
                             + base64EncodedPdfString);
                     result = decode.decode(base64EncodedPdfString.getBytes());
                 }
 
             }
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
         return result;
@@ -2072,14 +2065,14 @@ public class EpsosHelperService {
         String result = "";
         try {
             if (Validator.isNull(arg0)) {
-                log.error("Error getting safe string. USING N/A");
+                LOGGER.error("Error getting safe string. USING N/A");
                 result = "N/A";
             } else {
                 result = arg0;
             }
         } catch (Exception e) {
-            log.error("Error getting safe string");
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error getting safe string");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return result;
     }
@@ -2101,8 +2094,8 @@ public class EpsosHelperService {
                 }
             }
         } catch (Exception e) {
-            log.error("Error fixing node ...");
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error fixing node ...");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -2142,21 +2135,20 @@ public class EpsosHelperService {
     }
 
     public static String getUniqueId() {
-        String uniqueId = "";
-        ConfigurationManagerService cms = ConfigurationManagerService
-                .getInstance();
-        String pnoid = cms.getProperty("HOME_COMM_ID");
+
+        String uniqueId;
+        String pnoid = ConfigurationManagerFactory.getConfigurationManager().getProperty("HOME_COMM_ID");
         String prop = "pn.uniqueid";
-        String id = cms.getProperty(prop);
-        int pid = 0;
+        String id = ConfigurationManagerFactory.getConfigurationManager().getProperty(prop);
+        int pid;
         if (Validator.isNull(id)) {
-            cms.updateProperty(prop, "1");
+            ConfigurationManagerFactory.getConfigurationManager().setProperty(prop, "1");
             uniqueId = pnoid + "." + "1";
         } else {
-            pid = Integer.parseInt(cms.getProperty(prop));
+            pid = Integer.parseInt(ConfigurationManagerFactory.getConfigurationManager().getProperty(prop));
             pid = pid + 1;
             uniqueId = pnoid + "." + pid;
-            cms.updateProperty(prop, pid + "");
+            ConfigurationManagerFactory.getConfigurationManager().setProperty(prop, pid + "");
         }
         return uniqueId;
     }
@@ -2228,19 +2220,17 @@ public class EpsosHelperService {
     }
 
     private static void updatePortalProperty(String key, String value) {
-        if (Validator.isNull(ConfigurationManagerService.getInstance()
+        if (Validator.isNull(ConfigurationManagerFactory.getConfigurationManager()
                 .getProperty(key))) {
-            ConfigurationManagerService.getInstance()
-                    .updateProperty(key, value);
+            ConfigurationManagerFactory.getConfigurationManager().setProperty(key, value);
         }
     }
 
     public static String getConfigProperty(String key) {
-        return ConfigurationManagerService.getInstance().getProperty(key);
+        return ConfigurationManagerFactory.getConfigurationManager().getProperty(key);
     }
 
-    public static byte[] getConsentReport(String lang2, String fullname,
-                                          Patient patient) {
+    public static byte[] getConsentReport(String lang2, String fullname, Patient patient) {
         byte[] bytes = null;
         try {
             String language = "";
@@ -2251,8 +2241,8 @@ public class EpsosHelperService {
                 langFromCountry = LocaleUtils.languagesByCountry(country)
                         .get(0) + "";
             } catch (Exception e) {
-                log.error("Error getting country from patient");
-                log.error(ExceptionUtils.getStackTrace(e));
+                LOGGER.error("Error getting country from patient");
+                LOGGER.error(ExceptionUtils.getStackTrace(e));
             }
 
             // String patientLang = patient.getLanguage();
@@ -2267,7 +2257,7 @@ public class EpsosHelperService {
                 language = "en_GB";
             }
             String language2 = lang2;
-            log.debug("LANGUAGE=" + language + "-" + lang2);
+            LOGGER.debug("LANGUAGE=" + language + "-" + lang2);
             Map parameters = new HashMap();
             parameters.put("IS_IGNORE_PAGINATION", false);
             String birthDate = patient.getBirthDate();
@@ -2325,12 +2315,12 @@ public class EpsosHelperService {
             URL url = cl
                     .getResource("com/gnomon/epsos/reports/epsosConsent.jasper");
             String path = url.getPath();
-            log.debug("PATH IS " + path);
+            LOGGER.debug("PATH IS " + path);
             bytes = generatePdfReport(LiferayUtils.getCurrentConnection(),
                     path, parameters);
         } catch (Exception e) {
-            log.error("Error creating pin document. " + e.getMessage());
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error creating pin document. " + e.getMessage());
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return bytes;
     }
@@ -2358,7 +2348,7 @@ public class EpsosHelperService {
                     XPathConstants.NODESET);
             translation = nodes.item(0).getTextContent();
         } catch (Exception e) {
-            log.error("Error getting consent text for country " + language);
+            LOGGER.error("Error getting consent text for country " + language);
         }
         return translation;
     }
@@ -2461,12 +2451,12 @@ public class EpsosHelperService {
 
         ITransformationService tService = MyServletContextListener.getTransformationService();
         if (Validator.isNotNull(tService)) {
-            log.info("The Transformation Service started correctly. Translating to {}", lang);
+            LOGGER.info("The Transformation Service started correctly. Translating to {}", lang);
             TMResponseStructure tmResponse = tService.translate(doc, lang);
             return tmResponse.getResponseCDA();
 
         } else {
-            log.info("The Transformation Service did not started correctly");
+            LOGGER.info("The Transformation Service did not started correctly");
             return doc;
         }
     }
@@ -2477,11 +2467,11 @@ public class EpsosHelperService {
         EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
 
         if (commonstyle) {
-            log.info("Transform the document using standard stylesheet as this is ccda");
+            LOGGER.info("Transform the document using standard stylesheet as this is ccda");
             convertedcda = xlsClass.transformUsingStandardCDAXsl(input);
         } else {
-            log.info("Transform the document using cdadisplay tool as this is epsos cda");
-            //log.info("CDA: '{}'", input);
+            LOGGER.info("Transform the document using cdadisplay tool as this is epsos cda");
+            //LOGGER.info("CDA: '{}'", input);
             convertedcda = xlsClass.transform(input, lang, actionUrl);
         }
 
@@ -2499,9 +2489,9 @@ public class EpsosHelperService {
             Document doc1 = com.gnomon.epsos.model.cda.Utils
                     .createDomFromString(input);
             isCDA = EpsosHelperService.isCDA(doc1);
-            log.info("########## IS CDA {}", isCDA);
+            LOGGER.info("########## IS CDA {}", isCDA);
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         InputStream cdaInputStream;
         ByteArrayOutputStream cdaOutputStream;
@@ -2558,11 +2548,11 @@ public class EpsosHelperService {
             InputSource is = new InputSource(new StringReader(xml));
             doc = builder.parse(is);
         } catch (ParserConfigurationException ex) {
-            log.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
         } catch (SAXException ex) {
-            log.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
         } catch (IOException ex) {
-            log.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
 
         return doc;
@@ -2571,7 +2561,7 @@ public class EpsosHelperService {
     public static List<Patient> searchPatients(Assertion assertion,
                                                PatientDemographics pd, String country) {
         List<Patient> patients = null;
-        log.info("Selected country is: " + country);
+        LOGGER.info("Selected country is: " + country);
         String runningMode = MyServletContextListener.getRunningMode();
         if (runningMode.equals("demo")) {
             patients = EpsosHelperService.getMockPatients();
@@ -2580,13 +2570,13 @@ public class EpsosHelperService {
                 patients = new ArrayList<>();
                 String serviceUrl = EpsosHelperService
                         .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-                log.info("CONNECTOR URL IS: " + serviceUrl);
+                LOGGER.info("CONNECTOR URL IS: " + serviceUrl);
                 ClientConnectorConsumer proxy = MyServletContextListener
                         .getClientConnectorConsumer();
                 Assertion ass = assertion;
-                log.info("Searching for patients in " + country);
-                log.info("Assertion id: " + ass.getID());
-                log.info("PD: " + pd.toString());
+                LOGGER.info("Searching for patients in " + country);
+                LOGGER.info("Assertion id: " + ass.getID());
+                LOGGER.info("PD: " + pd.toString());
                 List<PatientDemographics> queryPatient = proxy.queryPatient(
                         ass, country, pd);
                 for (PatientDemographics aux : queryPatient) {
@@ -2610,10 +2600,10 @@ public class EpsosHelperService {
                     patient.setPatientDemographics(aux);
                     patients.add(patient);
                 }
-                log.info("Found " + patients.size() + " patients");
+                LOGGER.info("Found " + patients.size() + " patients");
             } catch (Exception ex) {
-                log.error(ExceptionUtils.getStackTrace(ex));
-                log.error(ex.getMessage());
+                LOGGER.error(ExceptionUtils.getStackTrace(ex));
+                LOGGER.error(ex.getMessage());
                 patients = new ArrayList<Patient>();
             }
         }
@@ -2622,14 +2612,14 @@ public class EpsosHelperService {
 
     public static List<PatientDocument> getPSDocs(Assertion assertion,
                                                   Assertion trca, String root, String extension, String country) {
-        log.info("getPSDocs");
+        LOGGER.info("getPSDocs");
         List<PatientDocument> patientDocuments = null;
         PatientId patientId = null;
         try {
             patientDocuments = new ArrayList<>();
             String serviceUrl = EpsosHelperService
                     .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-            log.info("CLIENTCONNECTOR: " + serviceUrl);
+            LOGGER.info("CLIENTCONNECTOR: " + serviceUrl);
             ClientConnectorConsumer clientConectorConsumer = MyServletContextListener
                     .getClientConnectorConsumer();
             patientId = PatientId.Factory.newInstance();
@@ -2641,24 +2631,24 @@ public class EpsosHelperService {
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.PS_TITLE); // Patient
 
-            log.info("PS QUERY: Getting ps documents for : "
+            LOGGER.info("PS QUERY: Getting ps documents for : "
                     + patientId.getExtension() + " from " + country);
             List<EpsosDocument1> queryDocuments = clientConectorConsumer
                     .queryDocuments(assertion, trca, country, patientId,
                             classCode);
-            log.info("PS QUERY: Found " + queryDocuments.size() + " for : "
+            LOGGER.info("PS QUERY: Found " + queryDocuments.size() + " for : "
                     + patientId.getRoot() + "-" + patientId.getExtension() + " from " + country);
             for (EpsosDocument1 aux : queryDocuments) {
                 PatientDocument document = new PatientDocument();
                 document.setAuthor(aux.getAuthor());
                 Calendar cal = aux.getCreationDate();
-                log.info("DATE IS " + aux.getCreationDate());
+                LOGGER.info("DATE IS " + aux.getCreationDate());
                 // DateFormat sdf = LiferayUtils.getPortalUserDateFormat();
                 // try {
                 // document.setCreationDate(sdf.format(cal.getTime()));
                 // } catch (Exception e) {
                 // document.setCreationDate(aux.getCreationDate() + "");
-                // log.error("Problem converting date" + aux.getCreationDate());
+                // LOGGER.error("Problem converting date" + aux.getCreationDate());
                 // };
                 document.setDescription(aux.getDescription());
                 document.setHealthcareFacility("");
@@ -2671,9 +2661,9 @@ public class EpsosHelperService {
                 document.setDocType("ps");
                 patientDocuments.add(document);
             }
-            log.debug("Selected Country: " + country);
+            LOGGER.debug("Selected Country: " + country);
         } catch (Exception ex) {
-            log.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
         return patientDocuments;
     }
@@ -2688,7 +2678,7 @@ public class EpsosHelperService {
                     .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL); // serviceUrl
             // =
             // LiferayUtils.getFromPrefs("client_connector_url");
-            log.info("CLIENTCONNECTOR: " + serviceUrl);
+            LOGGER.info("CLIENTCONNECTOR: " + serviceUrl);
             ClientConnectorConsumer clientConectorConsumer = MyServletContextListener
                     .getClientConnectorConsumer();
             patientId = PatientId.Factory.newInstance();
@@ -2700,24 +2690,24 @@ public class EpsosHelperService {
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.EP_TITLE); // Patient
 
-            log.info("EP QUERY: Getting ep documents for : "
+            LOGGER.info("EP QUERY: Getting ep documents for : "
                     + patientId.getExtension() + " from " + country);
             List<EpsosDocument1> queryDocuments = clientConectorConsumer
                     .queryDocuments(assertion, trca, country, patientId,
                             classCode);
-            log.info("EP QUERY: Found " + queryDocuments.size() + " for : "
+            LOGGER.info("EP QUERY: Found " + queryDocuments.size() + " for : "
                     + patientId.getExtension() + " from " + country);
             for (EpsosDocument1 aux : queryDocuments) {
                 PatientDocument document = new PatientDocument();
                 document.setAuthor(aux.getAuthor());
                 Calendar cal = aux.getCreationDate();
-                log.info("DATE IS " + aux.getCreationDate());
+                LOGGER.info("DATE IS " + aux.getCreationDate());
                 // DateFormat sdf = LiferayUtils.getPortalUserDateFormat();
                 // try {
                 // document.setCreationDate(sdf.format(cal.getTime()));
                 // } catch (Exception e) {
                 // document.setCreationDate(aux.getCreationDate() + "");
-                // log.error("Problem converting date" + aux.getCreationDate());
+                // LOGGER.error("Problem converting date" + aux.getCreationDate());
                 // };
                 document.setDescription(aux.getDescription());
                 document.setHealthcareFacility("");
@@ -2730,9 +2720,9 @@ public class EpsosHelperService {
                 document.setDocType("ps");
                 patientDocuments.add(document);
             }
-            log.debug("Selected Country: " + country);
+            LOGGER.debug("Selected Country: " + country);
         } catch (Exception ex) {
-            log.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
             // if (ex.getMessage().contains("4701")) {
             // //throw new ConsentException();
             // }
@@ -2754,18 +2744,18 @@ public class EpsosHelperService {
         Assertion trcAssertion = trca;
         String selectedCountry = country;
 
-        log.info("HCP ASS: " + hcpAssertion.getID());
-        log.info("TRCA ASS: " + trcAssertion.getID());
-        log.info("SELECTED COUNTRY: " + selectedCountry);
+        LOGGER.info("HCP ASS: " + hcpAssertion.getID());
+        LOGGER.info("TRCA ASS: " + trcAssertion.getID());
+        LOGGER.info("SELECTED COUNTRY: " + selectedCountry);
 
         DocumentId documentId = DocumentId.Factory.newInstance();
-        log.info("Setting DocumenUniqueID " + documentid);
+        LOGGER.info("Setting DocumenUniqueID " + documentid);
         documentId.setDocumentUniqueId(documentid);
-        log.info("Setting RepositoryUniqueId " + repositoryid);
+        LOGGER.info("Setting RepositoryUniqueId " + repositoryid);
         documentId.setRepositoryUniqueId(repositoryid);
         GenericDocumentCode classCode = GenericDocumentCode.Factory
                 .newInstance();
-        log.info("Document : " + documentid + " is " + doctype);
+        LOGGER.info("Document : " + documentid + " is " + doctype);
         if (doctype.equals("ep")) {
             classCode.setNodeRepresentation(Constants.EP_CLASSCODE);
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
@@ -2782,13 +2772,13 @@ public class EpsosHelperService {
             classCode.setValue(Constants.MRO_TITLE);
         }
 
-        log.info("selectedCountry: " + selectedCountry);
-        log.info("classCode: " + classCode);
+        LOGGER.info("selectedCountry: " + selectedCountry);
+        LOGGER.info("classCode: " + classCode);
 
         String lang1 = lang.replace("_", "-");
         lang1 = lang1.replace("en-US", "en");
 
-        log.info("Selected language is : " + lang + " - " + lang1);
+        LOGGER.info("Selected language is : " + lang + " - " + lang1);
         EpsosDocument1 eps = null;
         try {
             eps = clientConectorConsumer.retrieveDocument(
@@ -2796,7 +2786,7 @@ public class EpsosHelperService {
                     homecommunityid, classCode, lang1);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("Error getting document " + documentid);
+            LOGGER.error("Error getting document " + documentid);
         }
         String xmlfile = "";
         if (Validator.isNotNull(eps)) {
@@ -2804,16 +2794,16 @@ public class EpsosHelperService {
             try {
                 selectedEpsosDocument.setCreationDate(eps.getCreationDate());
             } catch (Exception ex) {
-                log.error(ExceptionUtils.getStackTrace(ex));
+                LOGGER.error(ExceptionUtils.getStackTrace(ex));
             }
             selectedEpsosDocument.setDescription(eps.getDescription());
             selectedEpsosDocument.setTitle(eps.getTitle());
 
             xmlfile = new String(eps.getBase64Binary(), "UTF-8");
 
-            log.debug("#### CDA XML Start");
-            log.info(xmlfile);
-            log.debug("#### CDA XML End");
+            LOGGER.debug("#### CDA XML Start");
+            LOGGER.info(xmlfile);
+            LOGGER.debug("#### CDA XML End");
         }
         return xmlfile;
     }
@@ -2828,8 +2818,8 @@ public class EpsosHelperService {
             document.setCreationDate(sdf.format(cal.getTime()));
         } catch (Exception e) {
             document.setCreationDate(aux.getCreationDate() + "");
-            log.error("Problem converting date" + aux.getCreationDate());
-            log.error(org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Problem converting date" + aux.getCreationDate());
+            LOGGER.error(org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(e));
         }
         document.setDescription(aux.getDescription());
         document.setHealthcareFacility("");
@@ -2871,7 +2861,7 @@ public class EpsosHelperService {
             id.setRoot(identifiers.get(i).getDomain());
             id.setExtension(identifiers.get(i).getUserValue());
             idArray[i] = id;
-            log.info(identifiers.get(i).getDomain() + ": "
+            LOGGER.info(identifiers.get(i).getDomain() + ": "
                     + identifiers.get(i).getUserValue());
         }
 
@@ -2887,7 +2877,7 @@ public class EpsosHelperService {
                     cal.setTime(dem.getUserDateValue());
                     pd.setBirthDate(cal);
                 } catch (Exception ex) {
-                    log.error("Invalid Date Format for date "
+                    LOGGER.error("Invalid Date Format for date "
                             + dem.getUserValue());
                 }
             } else if (dem.getKey().equals("patient.data.street.address")) {
@@ -2899,7 +2889,7 @@ public class EpsosHelperService {
             } else if (dem.getKey().equals("patient.data.sex")) {
                 pd.setAdministrativeGender(dem.getUserValue());
             }
-            log.info(demographics.get(i).getKey() + ": "
+            LOGGER.info(demographics.get(i).getKey() + ": "
                     + demographics.get(i).getUserValue());
         }
 

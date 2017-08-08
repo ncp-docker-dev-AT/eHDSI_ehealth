@@ -1,6 +1,7 @@
 package epsos.ccd.gnomon.auditmanager;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -224,8 +225,8 @@ public class EventLog {
                                                           String targetip) {
         EventLog el = new EventLog();
         // Set Audit Source
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
-        el.setAS_AuditSourceId(cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"));
+        ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
+        el.setAS_AuditSourceId(configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"));
         el.setEI_TransactionName(EI_TransactionName);
         el.setEI_EventActionCode(EI_EventActionCode);
         el.setEI_EventDateTime(EI_EventDateTime);
@@ -255,8 +256,11 @@ public class EventLog {
                                                         String sourceip,
                                                         String targetip) {
 
-        EventLog el = EventLog.createEventLogHCPAssurance(EI_TransactionName, EI_EventActionCode, EI_EventDateTime, EI_EventOutcomeIndicator, null, null, HR_UserID, HR_AlternativeUserID, HR_RoleID, SC_UserID, SP_UserID, AS_AuditSourceId, PT_PatricipantObjectID, EM_PatricipantObjectID, EM_PatricipantObjectDetail, ET_ObjectID, ReqM_ParticipantObjectID, ReqM_PatricipantObjectDetail, ResM_ParticipantObjectID, ResM_PatricipantObjectDetail, sourceip, targetip);
-        return el;
+        return EventLog.createEventLogHCPAssurance(EI_TransactionName, EI_EventActionCode, EI_EventDateTime,
+                EI_EventOutcomeIndicator, null, null, HR_UserID, HR_AlternativeUserID, HR_RoleID,
+                SC_UserID, SP_UserID, AS_AuditSourceId, PT_PatricipantObjectID, EM_PatricipantObjectID,
+                EM_PatricipantObjectDetail, ET_ObjectID, ReqM_ParticipantObjectID, ReqM_PatricipantObjectDetail,
+                ResM_ParticipantObjectID, ResM_PatricipantObjectDetail, sourceip, targetip);
     }
 
     /**

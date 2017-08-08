@@ -19,9 +19,10 @@
  */
 package tr.com.srdc.epsos.util.http;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.util.proxy.CustomProxySelector;
 import eu.epsos.util.proxy.ProxyCredentials;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,16 +152,14 @@ public class HTTPUtil {
 
     public static boolean isProxyAnthenticationMandatory() {
 
-        ConfigurationManagerService configService = ConfigurationManagerService
-                .getInstance();
+        ConfigurationManager configService = ConfigurationManagerFactory.getConfigurationManager();
 
-        return Boolean.parseBoolean(configService
-                .getProperty("APP_BEHIND_PROXY"));
+        return Boolean.parseBoolean(configService.getProperty("APP_BEHIND_PROXY"));
     }
 
     public static ProxyCredentials getProxyCredentials() {
         ProxyCredentials credentials = new ProxyCredentials();
-        ConfigurationManagerService configService = ConfigurationManagerService.getInstance();
+        ConfigurationManager configService = ConfigurationManagerFactory.getConfigurationManager();
         credentials.setProxyAuthenticated(Boolean.parseBoolean(configService
                 .getProperty("APP_BEHIND_PROXY")));
         credentials.setHostname(configService.getProperty("APP_PROXY_HOST"));

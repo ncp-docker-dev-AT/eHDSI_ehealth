@@ -21,7 +21,8 @@ package ee.affecto.epsos.util;
 import ee.affecto.epsos.ws.handler.DummyMustUnderstandHandler;
 import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Phase;
@@ -120,7 +121,6 @@ public class EventLogClientUtil {
             url = new URL(epr);
             ipAddress = InetAddress.getByName(url.getHost()).getHostAddress();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             LOG.error(null, e);
         }
         return ipAddress;
@@ -133,7 +133,7 @@ public class EventLogClientUtil {
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
-            e.printStackTrace();
+            LOG.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
         }
 
         // Set Active Participant Identification: Service Consumer NCP
@@ -141,7 +141,7 @@ public class EventLogClientUtil {
         eventLog.setSP_UserID(HTTPUtil.getServerCertificate(address));
 
         // Set Audit Source
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
         eventLog.setAS_AuditSourceId(cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"));
 
         // Set Source Ip
@@ -172,7 +172,7 @@ public class EventLogClientUtil {
 
     public static void logIdAssertion(EventLog eventLog, Assertion idAssertion) {
 
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
         eventLog.setHR_UserID(cms.getProperty("ncp.country") + "<" + idAssertion.getSubject().getNameID().getValue() +
                 "@" + cms.getProperty("ncp.country") + ">");
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {

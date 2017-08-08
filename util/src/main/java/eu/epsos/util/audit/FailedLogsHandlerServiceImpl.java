@@ -1,7 +1,7 @@
 package eu.epsos.util.audit;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.util.audit.AuditLogSerializer.Type;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,7 @@ public class FailedLogsHandlerServiceImpl implements FailedLogsHandlerService {
      */
     private long getTimeBetween() {
 
-        String sValue = ConfigurationManagerService.getInstance().getProperty(KEY_SCHEDULED_TIME_BETWEEN_FAILED_LOGS_HANDLING);
+        String sValue = ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_SCHEDULED_TIME_BETWEEN_FAILED_LOGS_HANDLING);
         if (StringUtils.isBlank(sValue)) {
             return DEFAULT_SCHEDULER_TIME_MINUTES;
         }
