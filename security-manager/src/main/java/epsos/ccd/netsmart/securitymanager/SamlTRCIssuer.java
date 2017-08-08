@@ -1,12 +1,12 @@
 /*
  *  Copyright 2010 Jerry Dimitriou <jerouris at netsmart.gr>.
- * 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.opensaml.common.SAMLVersion;
-import org.opensaml.common.impl.SecureRandomIdentifierGenerator;
 import org.opensaml.saml2.core.*;
 import org.opensaml.saml2.core.impl.IssuerBuilder;
 import org.opensaml.xml.Configuration;
@@ -52,7 +51,7 @@ public class SamlTRCIssuer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SamlTRCIssuer.class);
 
-    KeyStoreManager ksm;
+    private KeyStoreManager ksm;
     HashMap<String, String> auditDataMap;
 
     public SamlTRCIssuer() throws IOException {
@@ -187,7 +186,7 @@ public class SamlTRCIssuer {
             if (purposeOfUse == null) {
                 attrPoU = createAttribute(purposeOfUse, "Purpose Of Use", Attribute.NAME_FORMAT_ATTRIB_NAME, "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
                 if (attrPoU == null) {
-                    throw new SMgrException("Puprose of use not found in the assertion and is not passed as a parameter");
+                    throw new SMgrException("Purpose of use not found in the assertion and is not passed as a parameter");
                 }
             } else {
                 XSString attrValPoU = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
@@ -244,12 +243,16 @@ public class SamlTRCIssuer {
         }
         LOGGER.info("Assertion validity: '{}' - '{}", hcpIdentityAssertion.getConditions().getNotBefore(),
                 hcpIdentityAssertion.getConditions().getNotOnOrAfter());
-        if (hcpIdentityAssertion.getConditions().getNotBefore().isAfterNow()) {
-            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't ne used before " + hcpIdentityAssertion.getConditions().getNotBefore();
+
+        DateTime now = new DateTime();
+        LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+
+        if (hcpIdentityAssertion.getConditions().getNotBefore().isAfter(nowUTC.toDateTime())) {
+            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used before " + hcpIdentityAssertion.getConditions().getNotBefore();
             LOGGER.error(msg);
             throw new SMgrException(msg);
         }
-        if (hcpIdentityAssertion.getConditions().getNotOnOrAfter().isBeforeNow()) {
+        if (hcpIdentityAssertion.getConditions().getNotOnOrAfter().isBefore(nowUTC.toDateTime())) {
             String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used after " + hcpIdentityAssertion.getConditions().getNotOnOrAfter();
             LOGGER.error(msg);
             throw new SMgrException(msg);
@@ -259,7 +262,6 @@ public class SamlTRCIssuer {
 
         // Create the assertion
         Assertion trc = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
-        DateTime nowUTC = new DateTime(DateTimeZone.UTC);
 
         if (patientID == null) {
             throw new SMgrException("Patiend ID cannot be null");
