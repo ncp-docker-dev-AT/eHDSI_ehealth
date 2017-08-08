@@ -23,11 +23,12 @@ package epsos.ccd.gnomon.auditmanager;
 
 import epsos.ccd.gnomon.auditmanager.ssl.AuthSSLSocketFactory;
 import epsos.ccd.gnomon.auditmanager.ssl.KeystoreDetails;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.gnomon.utils.SerializableMessage;
 import epsos.ccd.gnomon.utils.Utils;
 import eu.epsos.util.audit.AuditLogSerializer;
 import eu.europa.ec.sante.ehdsi.openncp.audit.Configuration;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import net.RFC3881.AuditMessage;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -132,19 +133,20 @@ public class MessageSender extends java.lang.Thread {
      * @return true/false depending of the success of sending the message
      */
     protected boolean sendMessage(String auditmsg, String facility, String severity) {
+
         boolean sent = false;
         String facsev = facility + severity;
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
 
-        String host = cms.getProperty(AUDIT_REPOSITORY_URL); // "office.tiani-spirit.com";
-        int port = Integer.parseInt(cms.getProperty(AUDIT_REPOSITORY_PORT));
+        String host = configurationManager.getProperty(AUDIT_REPOSITORY_URL);
+        int port = Integer.parseInt(configurationManager.getProperty(AUDIT_REPOSITORY_PORT));
         if (log.isDebugEnabled()) {
             log.debug("Set the security properties");
-            log.debug(cms.getProperty(KEYSTORE_FILE));
-            log.debug(cms.getProperty(Configuration.KEYSTORE_PWD.getValue()));
-            log.debug(cms.getProperty(TRUSTSTORE));
-            log.debug(cms.getProperty(Configuration.TRUSTSTORE_PWD.getValue()));
-            log.debug(cms.getProperty(KEY_ALIAS));
+            log.debug(configurationManager.getProperty(KEYSTORE_FILE));
+            log.debug(configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()));
+            log.debug(configurationManager.getProperty(TRUSTSTORE));
+            log.debug(configurationManager.getProperty(Configuration.TRUSTSTORE_PWD.getValue()));
+            log.debug(configurationManager.getProperty(KEY_ALIAS));
         }
 
         if (log.isTraceEnabled()) {
@@ -152,13 +154,13 @@ public class MessageSender extends java.lang.Thread {
             InputStream stream = null;
             try {
                 KeyStore ks = KeyStore.getInstance("JKS");
-                ks.load(Utils.fullStream(cms.getProperty(KEYSTORE_FILE)), cms.getProperty(Configuration.KEYSTORE_PWD.getValue()).toCharArray());
-                X509Certificate cert = (X509Certificate) ks.getCertificate(cms.getProperty(KEY_ALIAS));
+                ks.load(Utils.fullStream(configurationManager.getProperty(KEYSTORE_FILE)), configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()).toCharArray());
+                X509Certificate cert = (X509Certificate) ks.getCertificate(configurationManager.getProperty(KEY_ALIAS));
                 log.debug("KEYSTORE");
                 log.debug(cert.toString());
                 KeyStore ks1 = KeyStore.getInstance("JKS");
-                stream = Utils.fullStream(cms.getProperty(TRUSTSTORE));
-                ks1.load(stream, cms.getProperty(Configuration.TRUSTSTORE_PWD.getValue()).toCharArray());
+                stream = Utils.fullStream(configurationManager.getProperty(TRUSTSTORE));
+                ks1.load(stream, configurationManager.getProperty(Configuration.TRUSTSTORE_PWD.getValue()).toCharArray());
                 Enumeration<String> enu = ks1.aliases();
                 int i = 0;
                 while (enu.hasMoreElements()) {
@@ -178,12 +180,12 @@ public class MessageSender extends java.lang.Thread {
         SSLSocket sslsocket = null;
         try {
             log.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Initialize the SSL socket");
-            File u = new File(cms.getProperty(TRUSTSTORE));
-            KeystoreDetails trust = new KeystoreDetails(u.toString(), cms.getProperty(Configuration.TRUSTSTORE_PWD.getValue()),
-                    cms.getProperty(KEY_ALIAS));
-            File uu = new File(cms.getProperty(KEYSTORE_FILE));
-            KeystoreDetails key = new KeystoreDetails(uu.toString(), cms.getProperty(Configuration.KEYSTORE_PWD.getValue()),
-                    cms.getProperty(KEY_ALIAS), cms.getProperty(Configuration.KEYSTORE_PWD.getValue()));
+            File u = new File(configurationManager.getProperty(TRUSTSTORE));
+            KeystoreDetails trust = new KeystoreDetails(u.toString(), configurationManager.getProperty(Configuration.TRUSTSTORE_PWD.getValue()),
+                    configurationManager.getProperty(KEY_ALIAS));
+            File uu = new File(configurationManager.getProperty(KEYSTORE_FILE));
+            KeystoreDetails key = new KeystoreDetails(uu.toString(), configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()),
+                    configurationManager.getProperty(KEY_ALIAS), configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()));
             AuthSSLSocketFactory f = new AuthSSLSocketFactory(key, trust);
             log.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Create socket");
 
