@@ -591,9 +591,8 @@ public class MyBean implements Serializable {
             trcassertionexists = true;
             PatientId patientId = null;
             try {
-                patientDocuments = new ArrayList<PatientDocument>();
-                ClientConnectorConsumer clientConectorConsumer = MyServletContextListener
-                        .getClientConnectorConsumer();
+                patientDocuments = new ArrayList<>();
+                ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
                 patientId = PatientId.Factory.newInstance();
                 patientId.setExtension(selectedPatient.getExtension());
                 patientId.setRoot(selectedPatient.getRoot());
@@ -603,8 +602,7 @@ public class MyBean implements Serializable {
                 classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
                 classCode.setValue(Constants.PS_TITLE);
 
-                log.info("PS QUERY: Getting ps documents for : "
-                        + patientId.getExtension() + " from " + selectedCountry);
+                log.info("PS QUERY: Getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry);
                 log.info("HCP ASSERTION IS : " + hcpAssertion.getID());
                 log.info("TRCA ASSERTION IS : " + trcAssertion.getID());
                 log.info("selectedCountry : " + selectedCountry);
