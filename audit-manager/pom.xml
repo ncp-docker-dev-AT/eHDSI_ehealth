@@ -74,7 +74,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <packageName>eu.europa.ec.sante.ehdsi.openncp.audit.jaxb.rfc3881</packageName>
+                    <packageName>net.RFC3881</packageName>
                     <sources>
                         <source>src/main/resources/RFC3881.xsd</source>
                     </sources>
@@ -82,4 +82,5 @@
             </plugin>
         </plugins>
     </build-->
+    <!--eu.europa.ec.sante.ehdsi.openncp.audit.jaxb.rfc3881-->
 </project>
