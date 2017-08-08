@@ -1,15 +1,11 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerSMP;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.util.net.ProxyCredentials;
 import eu.epsos.util.net.ProxyUtil;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import eu.europa.ec.dynamicdiscovery.core.fetcher.impl.DefaultURLFetcher;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
-import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
-import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidator;
 import eu.europa.ec.dynamicdiscovery.exception.ConnectionException;
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
@@ -37,7 +33,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.PrivateKeyDetails;
 import org.apache.http.ssl.PrivateKeyStrategy;
 import org.apache.http.ssl.SSLContexts;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.ServiceMetadata;
@@ -68,14 +63,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -224,7 +217,7 @@ public class SMPUploadFileController {
                 documentTypeID = docScheme + "::" + docID;
             }
 
-            String urlServer = ConfigurationManagerService.getInstance().getProperty("SMP_ADMIN_URL");
+            String urlServer = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");
             if (urlServer.endsWith("/")) {
                 urlServer = urlServer.substring(0, urlServer.length() - 1);
             }
@@ -611,8 +604,8 @@ public class SMPUploadFileController {
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
-        ks.load(new FileInputStream(ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PATH")),
-                ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+        ks.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH")),
+                ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
         return ks;
     }
 }

@@ -20,6 +20,7 @@ import com.liferay.util.PwdGenerator;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.europa.ec.joinup.ecc.openstork.utils.StorkUtils;
 import eu.europa.ec.joinup.ecc.openstork.utils.datamodel.HcpRole;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.stork.peps.auth.commons.IPersonalAttributeList;
 import eu.stork.peps.auth.commons.PEPSUtil;
 import eu.stork.peps.auth.commons.PersonalAttribute;
@@ -300,7 +301,7 @@ public class StorkAutoLogin implements AutoLogin {
             e.printStackTrace();
         }
 
-        String countryCode = ConfigurationManagerService.getInstance().getProperty("COUNTRY_CODE");
+        String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
         _log.info("The country code is :" + countryCode);
         _log.info("Reading the required attributes from International Search Mask");
         Map<String, String> attributes = PatientSearchAttributes.getRequiredAttributesByCountry(countryCode);

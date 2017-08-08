@@ -19,6 +19,7 @@ package epsos.ccd.netsmart.securitymanager.sts.client;
 import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.Configuration;
 import org.opensaml.saml2.core.Assertion;
@@ -70,15 +71,15 @@ public class TRCAssertionRequest {
     private static final String CHECK_FOR_HOSTNAME;
 
     static {
-        if (ConfigurationManagerService.getInstance().getProperty("secman.sts.url").length() == 0) {
-            ConfigurationManagerService.getInstance().updateProperty("secman.sts.url", "https://localhost:8443/TRC-STS/SecurityTokenService");
+        if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url").length() == 0) {
+            ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.url", "https://localhost:8443/TRC-STS/SecurityTokenService");
         }
-        DEFAULT_STS_URL = ConfigurationManagerService.getInstance().getProperty("secman.sts.url");
+        DEFAULT_STS_URL = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url");
 
-        if (ConfigurationManagerService.getInstance().getProperty("secman.sts.checkHostname").length() == 0) {
-            ConfigurationManagerService.getInstance().updateProperty("secman.sts.checkHostname", "false");
+        if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.checkHostname").length() == 0) {
+            ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.checkHostname", "false");
         }
-        CHECK_FOR_HOSTNAME = ConfigurationManagerService.getInstance().getProperty("secman.sts.checkHostname");
+        CHECK_FOR_HOSTNAME = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.checkHostname");
     }
 
     private final Assertion idAssert;
@@ -279,7 +280,7 @@ public class TRCAssertionRequest {
         SSLContext ctx = null;
         try {
             KeyStoreManager ksm = new DefaultKeyStoreManager();
-            String KEYSTORE_PASS = ConfigurationManagerService.getInstance().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
+            String KEYSTORE_PASS = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
 
             ctx = SSLContext.getInstance("TLS");
 

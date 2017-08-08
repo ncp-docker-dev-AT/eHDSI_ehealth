@@ -11,6 +11,7 @@ import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.Endpoint;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,13 +163,13 @@ public class SMLSMPClient {
             setCertificate(certificate);
 
             //Audit vars
-            String ncp = ConfigurationManagerService.getInstance().getProperty("ncp.country");
-            String ncpemail = ConfigurationManagerService.getInstance().getProperty("ncp.email");
-            String country = ConfigurationManagerService.getInstance().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-            String localip = ConfigurationManagerService.getInstance().getProperty("SMP_ADMIN_URL");//Source Gateway
-            String remoteip = ConfigurationManagerService.getInstance().getProperty("SERVER_IP");//Target Gateway
-            String smp = ConfigurationManagerService.getInstance().getProperty("SMP_SUPPORT");
-            String smpemail = ConfigurationManagerService.getInstance().getProperty("SMP_SUPPORT_EMAIL");
+            String ncp = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
+            String ncpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.email");
+            String country = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
+            String localip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");//Source Gateway
+            String remoteip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");//Target Gateway
+            String smp = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT");
+            String smpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT_EMAIL");
             //ET_ObjectID --> Base64 of url
             String objectID = urlAddress.toString(); //ParticipantObjectID
             byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
@@ -308,8 +309,8 @@ public class SMLSMPClient {
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
-        ks.load(new FileInputStream(ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PATH")),
-                ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+        ks.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH")),
+                ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
         return ks;
     }
 
@@ -358,21 +359,16 @@ public class SMLSMPClient {
         // }
 
 
-//        KeyStore trustStore = KeyStore.getInstance("JKS");
-//        trustStore.load(new FileInputStream(ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PATH")),
-//                ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
         KeyStore trustStore = KeyStore.getInstance("JKS");
-        trustStore.load(new FileInputStream(ConfigurationManagerSMP.getInstance().getProperty("SMP_KEYSTORE")),
+        trustStore.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_KEYSTORE")),
                 null);
 
         DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
-                .locator(new DefaultBDXRLocator(ConfigurationManagerService.getInstance().getProperty("SML_DOMAIN"),
+                .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"),
                         new DefaultDNSLookup()))
                 //.locator(new DefaultBDXRLocator("ehealth.acc.edelivery.tech.ec.europa.eu", new DefaultDNSLookup()))
                 .reader(new DefaultBDXRReader(new DefaultSignatureValidator(trustStore)))
                 .build();
-
-        //ConfigurationManagerSMP.getInstance().getProperty("TRUSTSTORE_PATH")
 
 //        ParticipantIdentifier participantIdentifier = new ParticipantIdentifier("9925:0367302178", "iso6523-actorid-upis");
 //

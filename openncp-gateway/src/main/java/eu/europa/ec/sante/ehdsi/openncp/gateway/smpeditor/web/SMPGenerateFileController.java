@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Countries;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPFields;
@@ -162,7 +162,7 @@ public class SMPGenerateFileController {
                     } else {
 
                         String certPath = env.getProperty(smpfile.getType().name() + ".certificate");
-                        String certificatePath = ConfigurationManagerService.getInstance().getProperty(certPath);
+                        String certificatePath = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPath);
                         LOGGER.info("Generating SMP file with certificate: '{}' '{}'", certPath, certificatePath);
 
                         FileInputStream fis = null;
@@ -182,17 +182,6 @@ public class SMPGenerateFileController {
                     if (smpfile.getIssuanceType() == null) {
                         smpfile.setIssuanceType("");
                     }
-          
-         /* int clientServer;
-          LOGGER.debug("\n ***************** clientServer 1 - " + smpfile.getClientServer());
-          if (smpfile.getClientServer() == null) {
-            clientServer = 0;
-            LOGGER.debug("\n ***************** clientServer 2 - " + clientServer);
-          } else {
-            clientServer = Integer.parseInt(smpfile.getClientServer());
-            LOGGER.debug("\n ***************** clientServer 2 - " + clientServer);
-          }*/
-
 
                     smpconverter.convertToXml(smpfile.getType().name(), /*clientServer,*/ smpfile.getIssuanceType(), smpfile.getCountry(), smpfile.getEndpointURI(), smpfile.getServiceDescription(),
                             smpfile.getTechnicalContactUrl(), smpfile.getTechnicalInformationUrl(), smpfile.getServiceActivationDate(),

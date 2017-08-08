@@ -1,5 +1,10 @@
 package eu.europa.ec.sante.ehdsi.openncp.configmanager;
 
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public enum RegisteredService {
 
     PATIENT_IDENTIFICATION_SERVICE("PatientIdentificationService", "urn:ehealth:PatientIdentificationAndAuthentication::XCPD::CrossGatewayPatientDiscovery##ITI-55"),
@@ -15,13 +20,17 @@ public enum RegisteredService {
     EHEALTH_106("ehealth-106", "urn:ehealth:VPN::VPNGatewayClient##ehealth-106"),
     EHEALTH_107("ehealth-107", "urn:ehealth:ISM::InternationalSearchMask##ehealth-107");
 
+    private static final Map<String, RegisteredService> MAP = Stream.of(RegisteredService.values()).collect(Collectors.toMap(RegisteredService::getServiceName, Function.identity()));
     private String serviceName;
-
     private String urn;
 
     RegisteredService(String serviceName, String urn) {
         this.serviceName = serviceName;
         this.urn = urn;
+    }
+
+    public static RegisteredService fromName(String name) {
+        return MAP.get(name);
     }
 
     public String getServiceName() {

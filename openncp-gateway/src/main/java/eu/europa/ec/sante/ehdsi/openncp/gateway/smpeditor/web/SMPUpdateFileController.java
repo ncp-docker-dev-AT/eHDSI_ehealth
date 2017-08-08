@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.*;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPProperties;
@@ -91,9 +91,9 @@ public class SMPUpdateFileController {
         try {
             smpfileupdate.getUpdateFile().transferTo(convFile);
         } catch (IOException ex) {
-            logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (IllegalStateException ex) {
-            logger.error("\n IllegalStateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
     
     /*Validate xml file*/
@@ -399,7 +399,7 @@ public class SMPUpdateFileController {
                     } else {
 
                         String certPath = env.getProperty(smpfileupdate.getType().name() + ".certificate");
-                        String certificatePath = ConfigurationManagerService.getInstance().getProperty(certPath);
+                        String certificatePath = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPath);
 
                         FileInputStream fis = null;
                         try {

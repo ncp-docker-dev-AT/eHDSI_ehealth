@@ -20,13 +20,13 @@
 package eu.europa.ec.joinup.ecc.openstork.utils;
 
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.util.validation.StringPool;
 import eu.europa.ec.joinup.ecc.openstork.utils.assertions.HCPIAssertionCreator;
 import eu.europa.ec.joinup.ecc.openstork.utils.datamodel.HcpRole;
 import eu.europa.ec.joinup.ecc.openstork.utils.datamodel.StorkAttributes;
 import eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml.HCPIAssertionBuilder;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.stork.peps.auth.commons.IPersonalAttributeList;
 import eu.stork.peps.auth.commons.PersonalAttribute;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
@@ -457,23 +457,28 @@ public class StorkUtils {
 
         switch (role) {
             case ADMINISTRATOR: {
-                result = fillRolePermissions(ConfigurationManagerService.getInstance().getProperty(PORTAL_ADMIN_PERMISSIONS));
+                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager()
+                        .getProperty(PORTAL_ADMIN_PERMISSIONS));
                 break;
             }
             case MEDICAL_DOCTOR: {
-                result = fillRolePermissions(ConfigurationManagerService.getInstance().getProperty(PORTAL_DOCTOR_PERMISSIONS));
+                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager()
+                        .getProperty(PORTAL_DOCTOR_PERMISSIONS));
                 break;
             }
             case NURSE: {
-                result = fillRolePermissions(ConfigurationManagerService.getInstance().getProperty(PORTAL_NURSE_PERMISSIONS));
+                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager()
+                        .getProperty(PORTAL_NURSE_PERMISSIONS));
                 break;
             }
             case PATIENT: {
-                result = fillRolePermissions(ConfigurationManagerService.getInstance().getProperty(PORTAL_PATIENT_PERMISSIONS));
+                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager()
+                        .getProperty(PORTAL_PATIENT_PERMISSIONS));
                 break;
             }
             case PHARMACIST: {
-                result = fillRolePermissions(ConfigurationManagerService.getInstance().getProperty(PORTAL_PHARMACIST_PERMISSIONS));
+                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager()
+                        .getProperty(PORTAL_PHARMACIST_PERMISSIONS));
                 break;
             }
         }
@@ -488,10 +493,8 @@ public class StorkUtils {
      * @return
      */
     public static List<String> fillRolePermissions(String permissions) {
-        final List result = new ArrayList<>();
 
         String[] p = permissions.split(",");
-
         return Arrays.asList(p);
     }
 
@@ -541,14 +544,8 @@ public class StorkUtils {
             XPath xpath = xpathFactory.newXPath();
             result = xpath.evaluate(xpathExpression, document);
 
-        } catch (ParserConfigurationException ex) {
-            LOG.error("An error has orccurred while obtaining the Node value from an XML file.", ex);
-        } catch (SAXException ex) {
-            LOG.error("An error has orccurred while obtaining the Node value from an XML file.", ex);
-        } catch (IOException ex) {
-            LOG.error("An error has orccurred while obtaining the Node value from an XML file.", ex);
-        } catch (XPathExpressionException ex) {
-            LOG.error("An error has orccurred while obtaining the Node value from an XML file.", ex);
+        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException ex) {
+            LOG.error("An error has occurred while obtaining the Node value from an XML file: '{}'", ex.getMessage(), ex);
         }
         return result;
     }
@@ -625,12 +622,10 @@ public class StorkUtils {
                     result.put(storkAttrValue, searchMaskAttrId);
                 }
             } else {
-                LOG.error("There is no STORK attribute defined for required searchmask attribute " + searchMaskAttrId + " present in Search Mask file for country " + countryCode + ".");
+                LOG.error("There is no STORK attribute defined for required searchmask attribute '{}' present in Search Mask file for country '{}'.", searchMaskAttrId, countryCode);
             }
         }
 
         return result;
-
     }
-
 }

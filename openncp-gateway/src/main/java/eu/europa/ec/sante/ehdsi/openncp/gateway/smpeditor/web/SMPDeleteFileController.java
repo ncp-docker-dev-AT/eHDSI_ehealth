@@ -39,10 +39,6 @@ import org.apache.http.ssl.PrivateKeyDetails;
 import org.apache.http.ssl.PrivateKeyStrategy;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.PrivateKeyDetails;
-import org.apache.http.ssl.PrivateKeyStrategy;
-import org.apache.http.ssl.SSLContexts;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -87,7 +83,7 @@ import java.util.*;
 @SessionAttributes("smpdelete")
 public class SMPDeleteFileController {
 
-  private static final Logger logger = LoggerFactory.getLogger(SMPUploadFileController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SMPUploadFileController.class);
 
     @Autowired
     private Environment env;
@@ -108,21 +104,21 @@ public class SMPDeleteFileController {
         return "smpeditor/deletesmpfile";
     }
 
-  /**
-   * DELETE files from server
-   *
-   * @param smpdelete
-   * @param model
-   * @param redirectAttributes
-   * @return
-   */
-  @RequestMapping(value = "smpeditor/deletesmpfile", method = RequestMethod.POST)
-  public String postDelete(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model, final RedirectAttributes redirectAttributes) {
-    logger.debug("\n==== in postDelete ====");
-    model.addAttribute("smpdelete", smpdelete);
-   
-    String partID ="urn:ehealth:" + smpdelete.getCountry().name() + ":ncp-idp"; //SPECIFICATION
-    String partScheme = env.getProperty("ParticipantIdentifier.Scheme");
+    /**
+     * DELETE files from server
+     *
+     * @param smpdelete
+     * @param model
+     * @param redirectAttributes
+     * @return
+     */
+    @RequestMapping(value = "smpeditor/deletesmpfile", method = RequestMethod.POST)
+    public String postDelete(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model, final RedirectAttributes redirectAttributes) {
+        logger.debug("\n==== in postDelete ====");
+        model.addAttribute("smpdelete", smpdelete);
+
+        String partID = "urn:ehealth:" + smpdelete.getCountry().name() + ":ncp-idp"; //SPECIFICATION
+        String partScheme = env.getProperty("ParticipantIdentifier.Scheme");
 
         Boolean success = true;
         String errorType = "";

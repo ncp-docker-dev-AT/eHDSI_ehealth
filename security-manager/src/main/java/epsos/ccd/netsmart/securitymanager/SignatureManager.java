@@ -16,10 +16,11 @@
  */
 package epsos.ccd.netsmart.securitymanager;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.security.SAMLSignatureProfileValidator;
@@ -97,7 +98,7 @@ public class SignatureManager {
     }
 
     private void init() throws IOException {
-        ConfigurationManagerService cm = ConfigurationManagerService.getInstance();
+        ConfigurationManager cm = ConfigurationManagerFactory.getConfigurationManager();
         signatureAlgorithm = cm.getProperty(SIG_ALG_PROP);
 
         // If not defined
@@ -113,7 +114,6 @@ public class SignatureManager {
             digestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA1;
             //cm.updateProperty(DGST_ALG_PROP, digestAlgorithm);
         }
-
     }
 
     /**

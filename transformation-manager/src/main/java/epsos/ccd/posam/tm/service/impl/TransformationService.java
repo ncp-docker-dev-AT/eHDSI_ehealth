@@ -1,7 +1,6 @@
 package epsos.ccd.posam.tm.service.impl;
 
 import epsos.ccd.gnomon.auditmanager.*;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.posam.tm.exception.TMError;
 import epsos.ccd.posam.tm.exception.TMException;
 import epsos.ccd.posam.tm.exception.TmErrorCtx;
@@ -12,6 +11,7 @@ import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,10 +47,12 @@ public class TransformationService implements ITransformationService, TMConstant
 
         LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [START]");
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
-        try {
-            LOGGER.info("*****************PIVOT CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
-        } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+        if (LOGGER.isDebugEnabled()) {
+            try {
+                LOGGER.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
+            } catch (Exception e) {
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            }
         }
         LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [END]");
         return responseStructure;
@@ -60,10 +62,12 @@ public class TransformationService implements ITransformationService, TMConstant
 
         LOGGER.info("Translating OpenNCP CDA Document [START]");
         TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
-        try {
-            LOGGER.info("*****************Translate CDA: '{}'", XMLUtil.DocumentToString(responseStructure.getDocument()));
-        } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+        if (LOGGER.isDebugEnabled()) {
+            try {
+                LOGGER.debug("Translate CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
+            } catch (Exception e) {
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            }
         }
         LOGGER.info("Translating OpenNCP CDA Document [END]");
         return responseStructure;
@@ -168,8 +172,7 @@ public class TransformationService implements ITransformationService, TMConstant
             } else {
                 // validate schema
                 inputDocbytes = XmlUtil.doc2bytes(inputDocument);
-                Document namespaceAwareDoc = XmlUtil
-                        .getNamespaceAwareDocument(inputDocbytes);
+                Document namespaceAwareDoc = XmlUtil.getNamespaceAwareDocument(inputDocbytes);
 
                 // check document type
                 // check if document is structured or unstructured
@@ -312,7 +315,7 @@ public class TransformationService implements ITransformationService, TMConstant
                         new byte[0], // ReqM_PatricipantObjectDetail - The value MUST contain the base64 encoded security header
                         Constants.UUID_PREFIX + "", // String-encoded UUID of the response message
                         new byte[0], // ResM_PatricipantObjectDetail - The value MUST contain the base64 encoded security header
-                        ConfigurationManagerService.getInstance().getProperty("SERVER_IP") // The IP Address of the target Gateway
+                        ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP") // The IP Address of the target Gateway
                 );
                 logg.setEventType(EventType.epsosPivotTranslation);
 

@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.*;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.exception.GenericException;
@@ -500,7 +500,7 @@ public class SMPSignFileController {
     mock
     */
 
-        File file = new File(ConfigurationManagerService.getInstance().getProperty("NCP_SIG_KEYSTORE_PATH"));
+        File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PATH"));
         FileInputStream input = null;
         try {
             input = new FileInputStream(file);
@@ -520,9 +520,9 @@ public class SMPSignFileController {
                 signFile.signFiles(smpfilesign.getAllFiles().get(i).getType().name(),
                         smpfilesign.getAllFiles().get(i).getFileName(),
                         keystore,
-                        ConfigurationManagerService.getInstance().getProperty("NCP_SIG_KEYSTORE_PASSWORD"),
-                        ConfigurationManagerService.getInstance().getProperty("NCP_SIG_PRIVATEKEY_ALIAS"),
-                        ConfigurationManagerService.getInstance().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD"),
+                        ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD"),
+                        ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_ALIAS"),
+                        ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD"),
                         smpfilesign.getAllFiles().get(i).getSignFile());
             } catch (Exception ex) {
                 logger.error("\nException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
