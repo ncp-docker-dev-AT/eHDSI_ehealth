@@ -58,6 +58,10 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="epsos.ccd.gnomon.auditmanager.ssl" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="epsos.ccd.posam.tm.service" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>

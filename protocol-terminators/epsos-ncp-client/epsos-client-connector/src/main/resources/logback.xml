@@ -66,6 +66,10 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="epsos.ccd.gnomon.auditmanager.ssl" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="epsos.ccd.gnomon.configmanager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
