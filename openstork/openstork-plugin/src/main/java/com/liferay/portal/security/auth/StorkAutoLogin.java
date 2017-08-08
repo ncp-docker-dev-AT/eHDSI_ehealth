@@ -17,7 +17,6 @@ import com.liferay.portlet.expando.model.ExpandoTable;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
 import com.liferay.util.PwdGenerator;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.europa.ec.joinup.ecc.openstork.utils.StorkUtils;
 import eu.europa.ec.joinup.ecc.openstork.utils.datamodel.HcpRole;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;

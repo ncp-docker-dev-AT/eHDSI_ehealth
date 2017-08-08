@@ -356,7 +356,6 @@ public class SignatureManager {
      *            SAML Assertion
      * @throws SMgrException When signing fails
      * @see org.opensaml.common.SignableSAMLObject
-     * @see epsos.ccd.gnomon.configmanager.ConfigurationManagerService
      */
     public void signSAMLAssertion(Assertion trc) throws SMgrException {
         signSAMLAssertion(trc, null, null);
