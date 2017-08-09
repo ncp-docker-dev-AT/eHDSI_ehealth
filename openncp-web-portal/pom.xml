@@ -320,6 +320,7 @@
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
             <version>${saxon-he.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <!-- JUNIT DEPENDENCY FOR TESTING -->
         <dependency>
