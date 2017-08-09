@@ -24,7 +24,7 @@ import eu.epsos.configmanager.database.HibernateConfigFile;
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
  * @author mail:k.karkaletsis@gnomon.com.gr
- * @version 1.0, 2010, 30 Jun
+ * @version 1.0, 2010, 30 JunMyServletContextListener
  */
 @Deprecated
 public class ConfigurationManagerService {

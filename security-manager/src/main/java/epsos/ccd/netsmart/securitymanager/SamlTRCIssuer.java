@@ -23,6 +23,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.opensaml.common.SAMLVersion;
+import org.opensaml.common.impl.SecureRandomIdentifierGenerator;
 import org.opensaml.saml2.core.*;
 import org.opensaml.saml2.core.impl.IssuerBuilder;
 import org.opensaml.xml.Configuration;
@@ -51,7 +52,7 @@ public class SamlTRCIssuer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SamlTRCIssuer.class);
 
-    private KeyStoreManager ksm;
+    KeyStoreManager ksm;
     HashMap<String, String> auditDataMap;
 
     public SamlTRCIssuer() throws IOException {
@@ -241,19 +242,20 @@ public class SamlTRCIssuer {
             LOGGER.error(null, ex);
             throw new SMgrException("SAML Assertion Validation Failed: " + ex.getMessage());
         }
+
+        DateTime nowUTC = new DateTime(DateTimeZone.UTC);
+
         LOGGER.info("Assertion validity: '{}' - '{}", hcpIdentityAssertion.getConditions().getNotBefore(),
                 hcpIdentityAssertion.getConditions().getNotOnOrAfter());
-
-        DateTime now = new DateTime();
-        LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
-
         if (hcpIdentityAssertion.getConditions().getNotBefore().isAfter(nowUTC.toDateTime())) {
-            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used before " + hcpIdentityAssertion.getConditions().getNotBefore();
+            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used before " +
+                    hcpIdentityAssertion.getConditions().getNotBefore() + ". Current UTC time is " + nowUTC.toDateTime();
             LOGGER.error(msg);
             throw new SMgrException(msg);
         }
         if (hcpIdentityAssertion.getConditions().getNotOnOrAfter().isBefore(nowUTC.toDateTime())) {
-            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used after " + hcpIdentityAssertion.getConditions().getNotOnOrAfter();
+            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used after " +
+                    hcpIdentityAssertion.getConditions().getNotOnOrAfter() + ". Current UTC time is " + nowUTC.toDateTime();
             LOGGER.error(msg);
             throw new SMgrException(msg);
         }

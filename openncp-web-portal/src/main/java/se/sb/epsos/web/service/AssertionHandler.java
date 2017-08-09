@@ -91,7 +91,7 @@ public class AssertionHandler implements Serializable {
         assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
 
         DateTime now = new DateTime();
-        LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
 
         String assertionId = "_" + UUID.randomUUID();
         assertion.setID(assertionId);
@@ -108,7 +108,9 @@ public class AssertionHandler implements Serializable {
 
         Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
 
-        conditions.setNotBefore(nowUTC.toDateTime());
+        LOGGER.debug("NotBefore : " + nowUTC.toDateTime().minusMinutes(1));
+        conditions.setNotBefore(nowUTC.toDateTime().minusMinutes(1));
+        LOGGER.debug("NotOnOrAfter : " + nowUTC.toDateTime().plusHours(2));
         conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
         assertion.setConditions(conditions);
 
@@ -165,9 +167,9 @@ public class AssertionHandler implements Serializable {
             permissions.addAll(AssertionHandlerConfigManager.getPersmissions(r));
         }
 
-        String permisssionPrefix = AssertionHandlerConfigManager.getPersmissionsPrefix();
+        String permissionPrefix = AssertionHandlerConfigManager.getPersmissionsPrefix();
         for (String permission : permissions) {
-            attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, permisssionPrefix + permission, "", "");
+            attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, permissionPrefix + permission, "", "");
         }
 
         attributeStatement.getAttributes().add(attrPID_8);
@@ -285,8 +287,6 @@ public class AssertionHandler implements Serializable {
             LOGGER.error(ex.getMessage());
         }
 
-        LOGGER.debug("Get here 3?");
-
         EventLog eventLog = EventLog.createEventLogHCPIdentity(
                 TransactionName.epsosHcpAuthentication,
                 EventActionCode.EXECUTE, date2,
@@ -401,5 +401,12 @@ public class AssertionHandler implements Serializable {
             }
         }
         return returnValue;
+    }
+
+    public static void main(String[] args) {
+        DateTime now = new DateTime();
+        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
+        System.out.println("NotBefore : " + nowUTC.toDateTime().minusMinutes(1));
+        System.out.println("NotOnOrAfter : " + nowUTC.toDateTime().plusHours(2));
     }
 }
