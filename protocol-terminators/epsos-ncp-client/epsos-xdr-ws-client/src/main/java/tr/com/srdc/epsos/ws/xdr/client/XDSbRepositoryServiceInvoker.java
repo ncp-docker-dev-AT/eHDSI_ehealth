@@ -20,7 +20,6 @@
 package tr.com.srdc.epsos.ws.xdr.client;
 
 import ee.affecto.epsos.util.EventLogClientUtil;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;

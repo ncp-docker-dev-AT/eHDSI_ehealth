@@ -1,4 +1,4 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
+/*    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
  *
  *    This file is part of epSOS-WEB.
  *
@@ -7,7 +7,7 @@
  *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
  *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
- **/
+ */
 package se.sb.epsos.web.service;
 
 import epsos.ccd.gnomon.auditmanager.*;
@@ -70,11 +70,11 @@ public class AssertionHandler implements Serializable {
         this.configHandler = config;
     }
 
-    public AssertionHandler() {
+    AssertionHandler() {
         this(new AssertionHandlerConfigManager());
     }
 
-    public Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws ConfigurationException, AssertionException {
+    Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws ConfigurationException, AssertionException {
 
         LOGGER.debug("################################################");
         LOGGER.debug("# createSAMLAssertion() - start                #");
@@ -91,7 +91,7 @@ public class AssertionHandler implements Serializable {
         assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
 
         DateTime now = new DateTime();
-        LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
 
         String assertionId = "_" + UUID.randomUUID();
         assertion.setID(assertionId);
@@ -108,7 +108,7 @@ public class AssertionHandler implements Serializable {
 
         Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
 
-        conditions.setNotBefore(nowUTC.toDateTime());
+        conditions.setNotBefore(nowUTC.toDateTime().minusMinutes(1));
         conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
         assertion.setConditions(conditions);
 
@@ -165,9 +165,9 @@ public class AssertionHandler implements Serializable {
             permissions.addAll(AssertionHandlerConfigManager.getPersmissions(r));
         }
 
-        String permisssionPrefix = AssertionHandlerConfigManager.getPersmissionsPrefix();
+        String permissionPrefix = AssertionHandlerConfigManager.getPersmissionsPrefix();
         for (String permission : permissions) {
-            attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, permisssionPrefix + permission, "", "");
+            attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, permissionPrefix + permission, "", "");
         }
 
         attributeStatement.getAttributes().add(attrPID_8);
@@ -179,14 +179,10 @@ public class AssertionHandler implements Serializable {
         try {
             sendAuditEpsos91(userDetails, assertion);
         } catch (Exception e) {
-            // Is this fatal?
+            LOGGER.error(e.getMessage());
         }
 
         return assertion;
-    }
-
-    protected ConfigurationManager getConfigurationManagerService() {
-        return ConfigurationManagerFactory.getConfigurationManager();
     }
 
     protected AuditService getAuditService() {
@@ -202,20 +198,28 @@ public class AssertionHandler implements Serializable {
     }
 
     protected String getPrivateKeyPassword() {
-        return NcpServiceConfigManager.getPrivateKeyPassword("assertion");
+        return  NcpServiceConfigManager.getPrivateKeyPassword("assertion");
     }
 
-    protected void sendAuditEpsos91(AuthenticatedUser userDetails, Assertion assertion) throws KeyStoreException, CertificateException, NoSuchAlgorithmException {
-        String KEY_ALIAS = getPrivateKeyAlias();
-        String KEYSTORE_LOCATION = getPrivateKeystoreLocation();
-        String KEY_STORE_PASS = getPrivateKeyPassword();
+    protected ConfigurationManager getConfigurationManager() {
+        return ConfigurationManagerFactory.getConfigurationManager();
+    }
 
-        ConfigurationManager cms = getConfigurationManagerService();
+    void sendAuditEpsos91(AuthenticatedUser userDetails, Assertion assertion) throws KeyStoreException, CertificateException, NoSuchAlgorithmException {
+        String KEY_ALIAS = getPrivateKeyAlias();
+        LOGGER.debug("KEY_ALIAS : " + KEY_ALIAS);
+        String KEYSTORE_LOCATION = getPrivateKeystoreLocation();
+        LOGGER.debug("KEYSTORE_LOCATION : " + KEYSTORE_LOCATION);
+        String KEY_STORE_PASS = getPrivateKeyPassword();
+        LOGGER.debug("KEY_STORE_PASS : " + KEY_STORE_PASS);
+
+        final ConfigurationManager configurationManager = getConfigurationManager();
+
         if (Validator.isNull(KEY_ALIAS)) {
             LOGGER.error("Problem reading configuration parameters");
             return;
         }
-        java.security.cert.Certificate cert = null;
+        java.security.cert.Certificate cert;
         String name = "";
         try (FileInputStream is = new FileInputStream(KEYSTORE_LOCATION)) {
 
@@ -227,23 +231,22 @@ public class AssertionHandler implements Serializable {
             // List the aliases
             Enumeration<String> enum1 = keystore.aliases();
             for (; enum1.hasMoreElements(); ) {
-                String alias = (String) enum1.nextElement();
+                String alias = enum1.nextElement();
 
                 if (cert instanceof X509Certificate) {
                     X509Certificate x509cert = (X509Certificate) cert;
 
                     // Get subject
                     Principal principal = x509cert.getSubjectDN();
-                    String subjectDn = principal.getName();
-                    name = subjectDn;
+                    name = principal.getName();
 
                     // Get issuer
                     principal = x509cert.getIssuerDN();
                     String issuerDn = principal.getName();
                 }
             }
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | java.io.IOException e) {
-            LOGGER.error(e.getMessage(), e);
+        } catch (KeyStoreException | NoSuchAlgorithmException | java.io.IOException | java.security.cert.CertificateException e) {
+            LOGGER.error(e.getMessage());
         }
 
         String secHead = "No security header provided";
@@ -258,7 +261,7 @@ public class AssertionHandler implements Serializable {
             LOGGER.error(ex.getMessage());
         }
 
-        String email = userDetails.getUserId() + "@" + cms.getProperty("ncp.country");
+        String email = userDetails.getUserId() + "@" + configurationManager.getProperty("ncp.country");
 
         String PC_UserID = userDetails.getOrganizationName() + "<saml:" + email + ">";
         String PC_RoleID = "Other";
@@ -268,7 +271,7 @@ public class AssertionHandler implements Serializable {
         String SC_UserID = name;
         String SP_UserID = name;
 
-        String AS_AuditSourceId = cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
+        String AS_AuditSourceId = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
         String ET_ObjectID = "urn:uuid:" + assertion.getID();
         byte[] ResM_PatricipantObjectDetail = new byte[1];
 
@@ -281,6 +284,7 @@ public class AssertionHandler implements Serializable {
         } catch (DatatypeConfigurationException ex) {
             LOGGER.error(ex.getMessage());
         }
+
         EventLog eventLog = EventLog.createEventLogHCPIdentity(
                 TransactionName.epsosHcpAuthentication,
                 EventActionCode.EXECUTE, date2,
@@ -292,6 +296,9 @@ public class AssertionHandler implements Serializable {
                 sourceIP.getHostAddress(), "N/A");
         eventLog.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog, "13", "2");
+        LOGGER.debug("################################################");
+        LOGGER.debug("# sendAuditEpsos91 - stop                      #");
+        LOGGER.debug("################################################");
     }
 
     public Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String FriendlyName, String oasisName) {
@@ -302,7 +309,7 @@ public class AssertionHandler implements Serializable {
         return attrPID;
     }
 
-    public Attribute AddAttributeValue(XMLObjectBuilderFactory builderFactory, Attribute attribute, String value, String namespace, String xmlschema) {
+    private Attribute AddAttributeValue(XMLObjectBuilderFactory builderFactory, Attribute attribute, String value, String namespace, String xmlschema) {
         @SuppressWarnings("unchecked")
         XMLObjectBuilder<Assertion> stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
         XSString attrValPID = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
@@ -311,23 +318,23 @@ public class AssertionHandler implements Serializable {
         return attribute;
     }
 
-    public Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String FriendlyName, String oasisName, String value, String namespace,
-                                     String xmlschema) {
+    private Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String FriendlyName, String oasisName, String value, String namespace,
+                                      String xmlschema) {
         Attribute attrPID = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
         attrPID.setFriendlyName(FriendlyName);
         attrPID.setName(oasisName);
         attrPID.setNameFormat(Attribute.URI_REFERENCE);
 
-        XMLObjectBuilder<Assertion> stringBuilder = null;
+        XMLObjectBuilder<Assertion> stringBuilder;
 
         if (namespace.equals("")) {
-            XSString attrValPID = null;
+            XSString attrValPID;
             stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
             attrValPID = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
             attrValPID.setValue(value);
             attrPID.getAttributeValues().add(attrValPID);
         } else {
-            XSURI attrValPID = null;
+            XSURI attrValPID;
             stringBuilder = builderFactory.getBuilder(XSURI.TYPE_NAME);
             attrValPID = (XSURI) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSURI.TYPE_NAME);
             attrValPID.setValue(value);
@@ -338,7 +345,7 @@ public class AssertionHandler implements Serializable {
     }
 
     public <T> T create(Class<T> cls, QName qname) {
-        return (T) ((XMLObjectBuilder) Configuration.getBuilderFactory().getBuilder(qname)).buildObject(qname);
+        return (T) Configuration.getBuilderFactory().getBuilder(qname).buildObject(qname);
     }
 
     public void signSAMLAssertion(SignableSAMLObject assertion) throws KeyStoreInitializationException, KeyStoreException, UnrecoverableKeyException,
@@ -347,7 +354,7 @@ public class AssertionHandler implements Serializable {
         LOGGER.debug("# signSAMLAssertion() - start                  #");
         LOGGER.debug("################################################");
         KeyStoreManager keyManager = new KeyStoreManagerImpl();
-        X509Certificate certificate = (X509Certificate) keyManager.getCertificate();
+        X509Certificate certificate = keyManager.getCertificate();
         KeyPair privateKeyPair = keyManager.getPrivateKey();
 
         PrivateKey privateKey = privateKeyPair.getPrivate();
@@ -382,8 +389,8 @@ public class AssertionHandler implements Serializable {
 
     private String getAttributeValue(String key) {
         String returnValue = null;
-        List<AttributeStatement> attrStatementents = assertion.getAttributeStatements();
-        for (AttributeStatement stat : attrStatementents) {
+        List<AttributeStatement> attrStatements = assertion.getAttributeStatements();
+        for (AttributeStatement stat : attrStatements) {
             List<Attribute> attributes = stat.getAttributes();
             for (Attribute attr : attributes) {
                 if (attr.getName().equals(key)) {
@@ -392,5 +399,12 @@ public class AssertionHandler implements Serializable {
             }
         }
         return returnValue;
+    }
+
+    public static void main(String[] args) {
+        DateTime now = new DateTime();
+        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
+        System.out.println("NotBefore : " + nowUTC.toDateTime().minusMinutes(1));
+        System.out.println("NotOnOrAfter : " + nowUTC.toDateTime().plusHours(2));
     }
 }

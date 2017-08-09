@@ -1,4 +1,4 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
+/*    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
  *
  *    This file is part of epSOS-WEB.
  *
@@ -13,6 +13,7 @@ package se.sb.epsos.web.service;
 import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import junit.framework.TestCase;
 import org.mockito.MockSettings;
 import org.mockito.invocation.InvocationOnMock;
@@ -37,22 +38,20 @@ public class AssertionHandlerTest extends TestCase {
     private AssertionHandler assertionHandler;
     private AuthenticatedUser userDetailsMock;
     private Assertion assertionMock;
-    private ConfigurationManager cms;
+    private ConfigurationManager configurationManager;
     private AuditService as;
     private MockSettings settings = withSettings().serializable();
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        cms = mock(ConfigurationManager.class, settings);
         as = mock(AuditService.class, settings);
+        configurationManager = mock(ConfigurationManager.class);
 
         assertionHandler = new AssertionHandler() {
             private static final long serialVersionUID = 1L;
 
-            protected ConfigurationManager getConfigurationManagerService() {
-                return cms;
-            }
+            protected ConfigurationManager getConfigurationManager() { return configurationManager; }
 
             protected AuditService getAuditService() {
                 return as;
@@ -74,15 +73,13 @@ public class AssertionHandlerTest extends TestCase {
         assertionMock = mock(Assertion.class, settings);
 
         when(as.write(any(EventLog.class), eq("13"), eq("2"))).thenAnswer(
-                new Answer<Boolean>() {
-                    public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                        EventLog el = (EventLog) invocation.getArguments()[0];
-                        assertEquals("identityProvider::HPAuthentication", el.getEI_TransactionName());
-                        assertEquals("pharmacist", el.getHR_RoleID());
-                        assertTrue(el.getReqM_ParticipantObjectID().startsWith("urn:uuid:"));
-                        assertTrue(el.getResM_ParticipantObjectID().startsWith("urn:uuid:"));
-                        return false;
-                    }
+                invocation -> {
+                    EventLog el = (EventLog) invocation.getArguments()[0];
+                    assertEquals("identityProvider::HPAuthentication", el.getEI_TransactionName());
+                    assertEquals("pharmacist", el.getHR_RoleID());
+                    assertTrue(el.getReqM_ParticipantObjectID().startsWith("urn:uuid:"));
+                    assertTrue(el.getResM_ParticipantObjectID().startsWith("urn:uuid:"));
+                    return false;
                 });
 
         when(userDetailsMock.getUsername()).thenReturn("username");

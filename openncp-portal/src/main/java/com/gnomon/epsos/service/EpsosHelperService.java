@@ -1510,7 +1510,7 @@ public class EpsosHelperService {
             assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
 
             DateTime now = new DateTime();
-            LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+            DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
 
             String assId = "_" + UUID.randomUUID().toString();
             assertion.setID(assId);

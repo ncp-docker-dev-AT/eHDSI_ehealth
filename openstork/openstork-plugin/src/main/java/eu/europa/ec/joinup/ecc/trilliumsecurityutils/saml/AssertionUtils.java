@@ -9,7 +9,6 @@
  */
 package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
@@ -251,8 +250,6 @@ public class AssertionUtils {
     public static void signSAMLAssertion(SignableSAMLObject as,
             String keyAlias, char[] keyPassword) throws Exception {
 
-        ConfigurationManagerService cms = ConfigurationManagerService
-                .getInstance();
         String KEYSTORE_LOCATION = Constants.NCP_SIG_KEYSTORE_PATH; //cms.getProperty("javax.net.ssl.keyStore");
         String KEY_STORE_PASS = Constants.NCP_SIG_KEYSTORE_PASSWORD;  //cms.getProperty("javax.net.ssl.keyStorePassword"); // GetterUtil.getString(GnPropsUtil.get("portalb",
         // "KEYSTORE_PASSWORD"),"spirit");
@@ -264,7 +261,7 @@ public class AssertionUtils {
 
         KeyStoreManager keyManager = new DefaultKeyStoreManager();
         // KeyPair kp = null;
-        X509Certificate cert = null;
+        X509Certificate cert;
         // check if we must use the default key
         PrivateKey privateKey = null;
         PublicKey publicKey = null;

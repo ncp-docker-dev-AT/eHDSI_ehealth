@@ -1,12 +1,12 @@
 /*
  *  Copyright 2010 Jerry Dimitriou <jerouris at netsmart.gr>.
- * 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -101,7 +101,7 @@ public class SamlTRCIssuer {
             }
 
             DateTime now = new DateTime();
-            LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+            DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
 
             trc.setIssueInstant(nowUTC.toDateTime());
             trc.setID("_" + UUID.randomUUID());
@@ -187,7 +187,7 @@ public class SamlTRCIssuer {
             if (purposeOfUse == null) {
                 attrPoU = createAttribute(purposeOfUse, "Purpose Of Use", Attribute.NAME_FORMAT_ATTRIB_NAME, "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
                 if (attrPoU == null) {
-                    throw new SMgrException("Puprose of use not found in the assertion and is not passed as a parameter");
+                    throw new SMgrException("Purpose of use not found in the assertion and is not passed as a parameter");
                 }
             } else {
                 XSString attrValPoU = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
@@ -242,15 +242,20 @@ public class SamlTRCIssuer {
             LOGGER.error(null, ex);
             throw new SMgrException("SAML Assertion Validation Failed: " + ex.getMessage());
         }
+
+        DateTime nowUTC = new DateTime(DateTimeZone.UTC);
+
         LOGGER.info("Assertion validity: '{}' - '{}", hcpIdentityAssertion.getConditions().getNotBefore(),
                 hcpIdentityAssertion.getConditions().getNotOnOrAfter());
-        if (hcpIdentityAssertion.getConditions().getNotBefore().isAfterNow()) {
-            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't ne used before " + hcpIdentityAssertion.getConditions().getNotBefore();
+        if (hcpIdentityAssertion.getConditions().getNotBefore().isAfter(nowUTC.toDateTime())) {
+            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used before " +
+                    hcpIdentityAssertion.getConditions().getNotBefore() + ". Current UTC time is " + nowUTC.toDateTime();
             LOGGER.error(msg);
             throw new SMgrException(msg);
         }
-        if (hcpIdentityAssertion.getConditions().getNotOnOrAfter().isBeforeNow()) {
-            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used after " + hcpIdentityAssertion.getConditions().getNotOnOrAfter();
+        if (hcpIdentityAssertion.getConditions().getNotOnOrAfter().isBefore(nowUTC.toDateTime())) {
+            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used after " +
+                    hcpIdentityAssertion.getConditions().getNotOnOrAfter() + ". Current UTC time is " + nowUTC.toDateTime();
             LOGGER.error(msg);
             throw new SMgrException(msg);
         }
@@ -259,7 +264,6 @@ public class SamlTRCIssuer {
 
         // Create the assertion
         Assertion trc = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
-        DateTime nowUTC = new DateTime(DateTimeZone.UTC);
 
         if (patientID == null) {
             throw new SMgrException("Patiend ID cannot be null");
