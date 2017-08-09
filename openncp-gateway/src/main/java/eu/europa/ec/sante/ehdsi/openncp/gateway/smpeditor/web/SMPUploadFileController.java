@@ -5,7 +5,10 @@ import eu.epsos.util.net.ProxyUtil;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import eu.europa.ec.dynamicdiscovery.core.fetcher.impl.DefaultURLFetcher;
+import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
+import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
+import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidator;
 import eu.europa.ec.dynamicdiscovery.exception.ConnectionException;
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
@@ -35,7 +38,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.PrivateKeyStrategy;
 import org.apache.http.ssl.SSLContexts;
-import org.oasis_open.docs.bdxr.ns.smp._2016._05.ServiceMetadata;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.ServiceMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -261,13 +264,14 @@ public class SMPUploadFileController {
             // Trust own CA and all self-signed certs
             SSLContext sslcontext = null;
             try {
+                //must be the same as SC_KEYSTORE_PASSWORD
                 sslcontext = SSLContexts.custom()
                         .loadKeyMaterial(new File(configurationManager.getProperty(StandardProperties.NCP_KEYSTORE)),
                                 configurationManager.getProperty(StandardProperties.NCP_KEYSTORE_PASSWORD).toCharArray(),
-                                configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_PASSWORD).toCharArray(), //must be the same as SC_KEYSTORE_PASSWORD
+                                configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_PASSWORD).toCharArray(),
                                 privatek)
-                        .loadTrustMaterial(new File(configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD)),
-                                configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE).toCharArray(),
+                        .loadTrustMaterial(new File(configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE)),
+                                configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD).toCharArray(),
                                 new TrustSelfSignedStrategy())
                         .build();
             } catch (NoSuchAlgorithmException ex) {
@@ -457,15 +461,19 @@ public class SMPUploadFileController {
             String errorType = "";
             ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(partID, partScheme);
             DocumentIdentifier documentIdentifier = new DocumentIdentifier(docID, docScheme);
-            DynamicDiscovery smpClient = null;
 
+            LOGGER.info("Instantiating DynamicDiscovery: '{}', '{}', '{}', '{}'", partID, partScheme, docID, docScheme);
+            DynamicDiscovery smpClient = null;
             KeyStore truststore = loadTrustStore();
 
             if (proxyCredentials != null) {
                 try {
                     smpClient = DynamicDiscoveryBuilder.newInstance()
-                            .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
-                            .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(), proxyCredentials.getProxyPassword())))
+                            .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
+                                    .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
+                            .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(),
+                                    Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(),
+                                    proxyCredentials.getProxyPassword())))
                             .build();
                 } catch (ConnectionException ex) {
                     success = false;
@@ -473,8 +481,15 @@ public class SMPUploadFileController {
                     LOGGER.error("ConnectionException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
             } else {
+//                smpClient = DynamicDiscoveryBuilder.newInstance()
+//                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
+//                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
+//                        .build();
+
                 smpClient = DynamicDiscoveryBuilder.newInstance()
-                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
+                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
+                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
+                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
                         .build();
             }
             if (smpClient == null) {
@@ -491,6 +506,8 @@ public class SMPUploadFileController {
 
             URI serviceGroup = smpClient.getService().getMetadataProvider().resolveDocumentIdentifiers(smpURI, participantIdentifier);
             URI serviceMetadataUri = smpClient.getService().getMetadataProvider().resolveServiceMetadata(smpURI, participantIdentifier, documentIdentifier);
+
+            LOGGER.info("URI ServiceGroup: '{}'\nURI serviceMetadataUri: '{}'", serviceGroup.toASCIIString(), serviceMetadataUri.toASCIIString());
 
             itemUpload.setServiceGroupUrl(serviceGroup.toString());
             itemUpload.setSignedServiceMetadataUrl(serviceMetadataUri.toString());
@@ -600,8 +617,7 @@ public class SMPUploadFileController {
         return "smpeditor/uploadsmpinfo";
     }
 
-    private KeyStore loadTrustStore()
-            throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+    private KeyStore loadTrustStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
         ks.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH")),

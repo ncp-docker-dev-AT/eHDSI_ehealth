@@ -5,7 +5,10 @@ import eu.epsos.util.net.ProxyUtil;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import eu.europa.ec.dynamicdiscovery.core.fetcher.impl.DefaultURLFetcher;
+import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
+import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
+import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidator;
 import eu.europa.ec.dynamicdiscovery.exception.ConnectionException;
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
@@ -68,10 +71,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.*;
 
@@ -129,7 +129,18 @@ public class SMPDeleteFileController {
         if (ProxyUtil.isProxyAnthenticationMandatory()) {
             proxyCredentials = ProxyUtil.getProxyCredentials();
         }
-
+        KeyStore truststore = null;
+        try {
+            truststore = loadTrustStore();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
         if (proxyCredentials != null) {
             try {
                 smpClient = DynamicDiscoveryBuilder.newInstance()
@@ -142,9 +153,15 @@ public class SMPDeleteFileController {
                 logger.error("\n ConnectionException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             }
         } else {
-            smpClient = DynamicDiscoveryBuilder.newInstance()
-                    .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
-                    .build();
+            try {
+                smpClient = DynamicDiscoveryBuilder.newInstance()
+                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
+                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
+                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
+                        .build();
+            } catch (TechnicalException e) {
+                e.printStackTrace();
+            }
         }
 
         List<DocumentIdentifier> documentIdentifiers = new ArrayList<>();
@@ -163,9 +180,8 @@ public class SMPDeleteFileController {
             String documentID = "";
             HashMap<String, String> propertiesMap = readProperties.readPropertiesFile();
             Set set2 = propertiesMap.entrySet();
-            Iterator iterator2 = set2.iterator();
-            while (iterator2.hasNext()) {
-                Map.Entry mentry2 = (Map.Entry) iterator2.next();
+            for (Object aSet2 : set2) {
+                Map.Entry mentry2 = (Map.Entry) aSet2;
                 //logger.debug("\n ****** KEY - " + mentry2.getKey().toString());
                 if (documentIdentifiers.get(i).getIdentifier().equals(mentry2.getKey().toString())) {
                     String[] docs = mentry2.getValue().toString().split("\\.");
@@ -175,12 +191,12 @@ public class SMPDeleteFileController {
                 }
             }
             String smpType = documentID;
-            logger.debug("\n******** DOC ID - " + documentIdentifiers.get(i).getIdentifier());
-            logger.debug("\n******** SMP Type - " + smpType);
+            logger.debug("\n******** DOC ID - '{}'", documentIdentifiers.get(i).getIdentifier());
+            logger.debug("\n******** SMP Type - '{}'", smpType);
             SMPType[] smptypes = SMPType.getALL();
-            for (int l = 0; l < smptypes.length; l++) {
-                if (smptypes[l].name().equals(smpType)) {
-                    smptype = smptypes[l].getDescription();
+            for (SMPType smptype1 : smptypes) {
+                if (smptype1.name().equals(smpType)) {
+                    smptype = smptype1.getDescription();
                     break;
                 }
             }
@@ -233,11 +249,8 @@ public class SMPDeleteFileController {
             redirectAttributes.addFlashAttribute("alert", alert);
             return "redirect:/smpeditor/deletesmpinfo";
         }
-
-
-        logger.debug("\n********* MODEL - " + model.toString());
+        logger.debug("\n********* MODEL - '{}'", model.toString());
         return "redirect:/smpeditor/deletesmpinfo";
-
     }
 
     /**
@@ -622,5 +635,13 @@ public class SMPDeleteFileController {
 
         logger.debug("\n********* MODEL - {}", model.toString());
         return "smpeditor/deletesmpresult";
+    }
+
+    private KeyStore loadTrustStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+
+        ks.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH")),
+                ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+        return ks;
     }
 }

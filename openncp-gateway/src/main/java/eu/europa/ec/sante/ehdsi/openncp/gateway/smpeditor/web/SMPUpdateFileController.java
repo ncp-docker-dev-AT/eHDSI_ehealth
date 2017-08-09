@@ -7,9 +7,9 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPPropert
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SMPConverter;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.XMLValidator;
-import org.oasis_open.docs.bdxr.ns.smp._2016._05.EndpointType;
-import org.oasis_open.docs.bdxr.ns.smp._2016._05.RedirectType;
-import org.oasis_open.docs.bdxr.ns.smp._2016._05.ServiceMetadata;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.EndpointType;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.RedirectType;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.ServiceMetadata;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
