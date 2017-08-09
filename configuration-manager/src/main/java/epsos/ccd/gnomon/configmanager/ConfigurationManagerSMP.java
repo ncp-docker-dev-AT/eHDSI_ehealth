@@ -316,9 +316,9 @@ public final class ConfigurationManagerSMP implements ConfigurationManagerInt {
      */
     private void storeCertificateToTrustStore(X509Certificate cert, String alias) throws SMLSMPClientException {
 
-        ConfigurationManager cm = ConfigurationManagerFactory.getConfigurationManager();
-        String TRUST_STORE = cm.getProperty("TRUSTSTORE_PATH");
-        String TRUST_STORE_PASS = cm.getProperty("TRUSTSTORE_PASSWORD");
+        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        String TRUST_STORE = cms.getProperty("TRUSTSTORE_PATH");
+        String TRUST_STORE_PASS = cms.getProperty("TRUSTSTORE_PASSWORD");
         LOGGER.debug("Storing in truststore: '{}'", TRUST_STORE);
         LOGGER.debug("Storing the certificate with DN: '{}' and SN: '{}'", cert.getSubjectDN(), cert.getSerialNumber());
 
