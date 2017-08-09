@@ -11,6 +11,7 @@ import epsos.ccd.posam.tsam.response.RetrievedConcept;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
+import epsos.ccd.posam.tsam.util.DebugUtils;
 import epsos.ccd.posam.tsam.util.TsamConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ public class TerminologyService implements ITerminologyService {
     public TSAMResponseStructure getDesignationByEpSOSConcept(
             CodedElement epSOSRefConcept, String targetLanguageCode) {
         log.debug("getDesignationByEpSOSConcept BEGIN (" + epSOSRefConcept + ",lang: " + targetLanguageCode + ")");
+        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
         TSAMResponseStructure response = new TSAMResponseStructure(epSOSRefConcept);
         try {
             String code = epSOSRefConcept.getCode();
@@ -79,6 +81,7 @@ public class TerminologyService implements ITerminologyService {
 
     public TSAMResponseStructure getEpSOSConceptByCode(CodedElement localConcept) {
         log.debug("getEpSOSConceptByCode BEGIN (" + localConcept + ")");
+        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
         TSAMResponseStructure response = new TSAMResponseStructure(localConcept);
 
         try {
@@ -142,15 +145,17 @@ public class TerminologyService implements ITerminologyService {
     }
 
     public List<RetrievedConcept> getValueSetConcepts(String valueSetOid, String valueSetVersionName, String language) {
+        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
         return dao.getConcepts(valueSetOid, valueSetVersionName, language);
     }
 
     public List<String> getLtrLanguages() {
+        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
         return dao.getLtrLanguages();
     }
 
     private void checkCodeSystemName(CodeSystem codeSystem, String name, TSAMResponseStructure response) {
-
+        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
         if (name == null || codeSystem == null || !name.equals(codeSystem.getName())) {
             String ctx = codeSystem.getName() + " != " + name;
             response.addWarning(TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
@@ -165,6 +170,7 @@ public class TerminologyService implements ITerminologyService {
      * @throws TSAMException
      */
     private void checkTargedVersion(CodeSystemVersion version) throws TSAMException {
+        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
         if (version == null) {
             throw new TSAMException(TSAMError.ERROR_EPSOS_VERSION_NOTFOUND);
         }
@@ -177,6 +183,7 @@ public class TerminologyService implements ITerminologyService {
      * @throws TSAMException
      */
     private void checkTargetCodeSystem(CodeSystem codeSystem) throws TSAMException {
+        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
         if (codeSystem == null) {
             throw new TSAMException(TSAMError.ERROR_EPSOS_CODE_SYSTEM_NOTFOUND);
         }
@@ -193,6 +200,8 @@ public class TerminologyService implements ITerminologyService {
      * @param designations
      */
     private void checkManyDesignations(TSAMResponseStructure response, List<Designation> designations) {
+        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
+        
         if (designations.size() > 1) {
             int preffered = 0;
             for (Designation designation : designations) {

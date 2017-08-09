@@ -1,6 +1,6 @@
 package epsos.ccd.gnomon.utils;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -32,17 +32,17 @@ public class Utils {
 
     public synchronized static String getProperty(String key, String defaultValue, boolean persistIfNotFound) {
         try {
-            String value = ConfigurationManagerService.getInstance().getProperty(key);
+            String value = ConfigurationManagerFactory.getConfigurationManager().getProperty(key);
             if (isEmpty(value)) {
                 value = defaultValue;
                 if (persistIfNotFound) {
-                    ConfigurationManagerService.getInstance().updateProperty(key, value);
+                    ConfigurationManagerFactory.getConfigurationManager().setProperty(key, value);
                 }
             }
 
             return value;
         } catch (Exception e) {
-            LOGGER.error("Error occurred while fetching property: " + e.getMessage(), e);
+            LOGGER.error("Error occurred while fetching property: '{}'", e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -96,9 +96,6 @@ public class Utils {
         Schema schema = factory.newSchema(url);
         javax.xml.validation.Validator validator = schema.newValidator();
         Source source = new StreamSource(StringToStream(xmlDocumentUrl));
-
-        // LOGGER.info("XML Audit Document: '{}'", xmlDocumentUrl);
-        // LOGGER.info("Schema Url: '{}'", url.toString());
 
         try {
             validator.validate(source);
@@ -205,7 +202,7 @@ public class Utils {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            LOGGER.warn("Sleep interrupted.");
+            LOGGER.error("Sleep interrupted: '{}'", e.getMessage(), e);
         }
     }
 }

@@ -258,7 +258,7 @@ public class SignatureConfirmationDialog extends javax.swing.JDialog {
      * @param smpFile The SMP file to parse.
      * @param smpKey The name of the XML tag to search for.
      * @param namespace The namespace of the smpKey.
-     * @return Returns value of SMP element. E.g., "ParticipantIdentifier" -> "urn:ehealth:pt:ncpb-idp"
+     * @return Returns value of SMP element. E.g., "ParticipantIdentifier" -> "urn:ehealth:pt:ncp-idp"
      * @throws ParserConfigurationException
      * @throws SAXException
      * @throws IOException

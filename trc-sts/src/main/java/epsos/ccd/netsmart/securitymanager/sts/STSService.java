@@ -1,28 +1,12 @@
-/***Licensed to the Apache Software Foundation (ASF) under one
- *or more contributor license agreements.  See the NOTICE file
- *distributed with this work for additional information
- *regarding copyright ownership.  The ASF licenses this file
- *to you under the Apache License, Version 2.0 (the
- *"License"); you may not use this file except in compliance
- *with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- *Unless required by applicable law or agreed to in writing,
- *software distributed under the License is distributed on an
- *"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *KIND, either express or implied.  See the License for the
- *specific language governing permissions and limitations
- *under the License.
- **/
 package epsos.ccd.netsmart.securitymanager.sts;
 
 import com.sun.xml.ws.api.security.trust.WSTrustException;
 import epsos.ccd.gnomon.auditmanager.*;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.SamlTRCIssuer;
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -75,24 +59,15 @@ import java.util.UUID;
 @BindingType(value = "http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 public class STSService implements Provider<SOAPMessage> {
 
-    private static final Logger logger = LoggerFactory.getLogger(STSService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(STSService.class);
 
     private static final QName Messaging_To = new QName("http://www.w3.org/2005/08/addressing", "To");
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion"; // What
-    // can
-    // be
-    // only
-    // requested
-    // from
-    // the
-    // STS
+    // can be only requested from the STS
     private static final String SUPPORTED_ACTION_URI = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue"; // Only
-    // Issuance
-    // is
-    // supported
+    // Issuance is supported
     private static final String TRC_NS = "http://epsos.eu/trc"; // TRC
-    // Parameters
-    // Namespace
+    // Parameters Namespace
     private static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512"; // WS-Trust
     // Namespace
     private static final String ADDRESSING_NS = "http://www.w3.org/2005/08/addressing"; // WSA
@@ -106,10 +81,13 @@ public class STSService implements Provider<SOAPMessage> {
     @Override
     public SOAPMessage invoke(SOAPMessage source) {
 
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Incoming SOAP Message request: '{}'", source.toString());
+        }
         log(source);
 
-        SOAPBody body = null;
-        SOAPHeader header = null;
+        SOAPBody body;
+        SOAPHeader header;
         try {
             body = source.getSOAPBody();
             header = source.getSOAPHeader();
@@ -120,7 +98,7 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             DefaultBootstrap.bootstrap();
         } catch (ConfigurationException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
         try {
             if (!SUPPORTED_ACTION_URI.equals(getRSTAction(body))) {
@@ -151,7 +129,17 @@ public class STSService implements Provider<SOAPMessage> {
             // The response TRC Assertion Issuer.
             SamlTRCIssuer samlTRCIssuer = new SamlTRCIssuer();
             Assertion hcpIdAssertion = getIdAssertionFromHeader(header);
+            if (hcpIdAssertion != null) {
+                LOGGER.info("hcpIdAssertion: '{}'", hcpIdAssertion.getID());
+                if (hcpIdAssertion.getIssueInstant() != null) {
+                    LOGGER.info("hcpIdAssertion Issue Instant: '{}'", hcpIdAssertion.getIssueInstant());
+                }
+            }
             Assertion trc = samlTRCIssuer.issueTrcToken(hcpIdAssertion, patientID, purposeOfUse, null);
+            LOGGER.info("HCP Assertion Date: '{}' TRC Assertion Date: '{}' -- '{}'",
+                    hcpIdAssertion.getIssueInstant().withZone(DateTimeZone.UTC),
+                    trc.getIssueInstant().withZone(DateTimeZone.UTC), trc.getAuthnStatements().isEmpty());
+
             Document signedDoc = builder.newDocument();
             Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
 
@@ -163,7 +151,7 @@ public class STSService implements Provider<SOAPMessage> {
             String strReqHeader = domElementToString(header);
 
             String tls_cn = getSSLCertPeer();
-            logger.info("tls_cn: " + tls_cn);
+            LOGGER.info("tls_cn: '{}'", tls_cn);
 
             if (context.getUserPrincipal() != null) {
                 tls_cn = context.getUserPrincipal().getName();
@@ -175,30 +163,14 @@ public class STSService implements Provider<SOAPMessage> {
                     Base64.encodeBase64(strReqHeader.getBytes()), getMessageIdFromHeader(resp.getSOAPHeader()),
                     Base64.encodeBase64(strRespHeader.getBytes()));
 
-            // Logger.getLogger(STSService.class.getName()).log(Level.INFO,
-            // "header1:{0}", new String(strReqHeader.getBytes()));
-            // Logger.getLogger(STSService.class.getName()).log(Level.INFO,
-            // "header2:{0}", new String(strRespHeader.getBytes()));
-            log(resp);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Outgoing SOAP Message response: '{}'", resp.toString());
+            }
             return resp;
 
-        } catch (SOAPException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (WSTrustException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (MarshallingException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (ParserConfigurationException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (SMgrException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (IOException ex) {
-            logger.error(null, ex);
+        } catch (SOAPException | WSTrustException | MarshallingException | SMgrException | ParserConfigurationException
+                | IOException ex) {
+            LOGGER.error(null, ex);
             throw new WebServiceException(ex);
         }
     }
@@ -228,12 +200,10 @@ public class STSService implements Provider<SOAPMessage> {
 
         SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "PatientId").item(0) == null) {
-            throw new WebServiceException("Patient ID is Missing from the RST"); // Cannot
-            // be
-            // null!
+            // Cannot be null!
+            throw new WebServiceException("Patient ID is Missing from the RST");
         }
-        String patientId = trcDetails.getElementsByTagNameNS(TRC_NS, "PatientId").item(0).getTextContent();
-        return patientId;
+        return trcDetails.getElementsByTagNameNS(TRC_NS, "PatientId").item(0).getTextContent();
     }
 
     private Assertion getIdAssertionFromHeader(SOAPHeader header) throws WSTrustException {
@@ -256,23 +226,22 @@ public class STSService implements Provider<SOAPMessage> {
                 try {
                     sm.verifyEnvelopedSignature(assertDoc);
                 } catch (SMgrException ex) {
-                    logger.error(null, ex);
+                    LOGGER.error(null, ex);
                     throw new WSTrustException("Error validating SAML Assertion signature", ex);
                 }
             }
             UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
-            Assertion hcpIdentityAssertion = (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
-            return hcpIdentityAssertion;
+            return (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
 
         } catch (ParserConfigurationException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new WSTrustException("Error Parsing SAML Assertion in Message Header", ex);
         } catch (UnmarshallingException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new WSTrustException("Error Parsing SAML Assertion in Message Header", ex);
         } catch (IOException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new WSTrustException("Error Parsing SAML Assertion in Message Header", ex);
         }
     }
@@ -282,8 +251,7 @@ public class STSService implements Provider<SOAPMessage> {
             throw new WebServiceException("Message ID not found in Header");
         }
         String mid = header.getElementsByTagNameNS(ADDRESSING_NS, "MessageID").item(0).getTextContent();
-        // PT-236 has to be checked again why is coming like this from soap
-        // header
+        // PT-236 has to be checked again why is coming like this from soap header
         if (mid.startsWith("uuid"))
             mid = "urn:" + mid;
         return mid;
@@ -318,12 +286,13 @@ public class STSService implements Provider<SOAPMessage> {
             relatesToElem.setTextContent(messageId);
 
         } catch (SOAPException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new WebServiceException("Could not create Response Header");
         }
     }
 
     private Document createRSTRC(Document assertion) {
+
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document respBody = builder.newDocument();
@@ -363,7 +332,7 @@ public class STSService implements Provider<SOAPMessage> {
             return respBody;
 
         } catch (Exception ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new WebServiceException("Cannot create RSTSC Message");
         }
     }
@@ -395,14 +364,15 @@ public class STSService implements Provider<SOAPMessage> {
             trans.transform(new DOMSource(elem), new StreamResult(sw));
             return sw.toString();
         } catch (TransformerException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new WebServiceException("Error Creating audit message");
         }
     }
 
     private void audit(String pointOfCareID, String humanRequestorNameID, String humanRequestorSubjectID,
-                       String humanRequestorRole, String patientID, String facilityType, String assertionId, String tls_cn,
-                       String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
+                       String humanRequestorRole, String patientID, String facilityType, String assertionId,
+                       String tls_cn, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
+
         AuditService asd = new AuditService();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
@@ -410,10 +380,10 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
 
         EventLog evLogTRC = EventLog.createEventLogTRCA(TransactionName.epsosTRCAssertion, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType,
@@ -429,28 +399,32 @@ public class STSService implements Provider<SOAPMessage> {
     }
 
     private String getServerIP() {
+
         try {
             InetAddress thisIp = InetAddress.getLocalHost();
             return thisIp.getHostAddress();
         } catch (Exception e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             return "Unknown IP";
         }
     }
 
     private String getClientIP() {
+
         MessageContext mc = context.getMessageContext();
         HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
         return req.getRemoteAddr();
     }
 
     private String getSSLCertPeer() {
+
         String user = "Unknown(No Client Certificate)";
         MessageContext msgCtx = context.getMessageContext();
 
         javax.servlet.ServletRequest sreq = (javax.servlet.ServletRequest) msgCtx.get(MessageContext.SERVLET_REQUEST);
 
         if (sreq instanceof HttpServletRequest && sreq.isSecure()) {
-            logger.info("Secure and http");
+            LOGGER.info("Secure and http");
             HttpServletRequest hreq = (HttpServletRequest) sreq;
             X509Certificate peerCert[] = (X509Certificate[]) hreq.getAttribute("javax.servlet.request.X509Certificate");
             if (peerCert != null) {
@@ -461,17 +435,18 @@ public class STSService implements Provider<SOAPMessage> {
     }
 
     private String log(SOAPMessage message) {
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             message.writeTo(out);
         } catch (IOException | SOAPException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
-        logger.info(out.toString());
-        logger.info("***************************************************************************************");
-        logger.info(out.toString());
-        logger.info("***************************************************************************************");
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("************************************************************");
+            LOGGER.info(out.toString());
+            LOGGER.info("************************************************************");
+        }
         return out.toString();
     }
 }

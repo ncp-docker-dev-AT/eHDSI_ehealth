@@ -286,6 +286,10 @@ public class EvidenceUtils {
             String msguuid
     ) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
+        LOGGER.info("createEvidenceREMNRO('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')", issuerKeyStorePath,
+                issuerKeyPassword, issuerCertAlias, senderKeyStorePath, senderKeyPassword, senderCertAlias,
+                recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType);
+
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
 

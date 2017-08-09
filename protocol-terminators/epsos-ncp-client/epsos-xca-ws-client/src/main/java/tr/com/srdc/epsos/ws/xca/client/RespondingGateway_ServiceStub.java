@@ -23,7 +23,6 @@ import com.spirit.epsos.cc.adc.EadcEntry;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerSMP;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.pt.transformation.TMServices;
@@ -31,6 +30,8 @@ import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XcaValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
@@ -80,7 +81,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     RetrieveDocumentSetRequestType.class,
                     RetrieveDocumentSetResponseType.class);
         } catch (javax.xml.bind.JAXBException ex) {
-            System.err.println(XCAConstants.EXCEPTIONS.UNABLE_CREATE_JAXB_CONTEXT + " " + ex.getMessage());
+            LOG.error(XCAConstants.EXCEPTIONS.UNABLE_CREATE_JAXB_CONTEXT + " " + ex.getMessage());
             ex.printStackTrace(System.err);
             Runtime.getRuntime().exit(-1);
         } finally {
@@ -333,7 +334,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (AxisFault e) {
                 LOG.error("Axis Fault error: " + e.getMessage());
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
-                ConfigurationManagerSMP configManagerSMP = ConfigurationManagerSMP.getInstance();
+                ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
                 String service = null;
                 LOG.debug("ClassCode: " + classCode);
                 switch (classCode) {
@@ -347,10 +348,11 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         break;
                 }
                 String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
-                String value = configManagerSMP.queryProperty(key);
+                String value = configurationManager.getProperty(key);
                 if (value != null) {
-                    configManagerSMP.updateProperty(key, value);
-                    configManagerSMP.updateCache(key, value);
+                    configurationManager.setProperty(key, value);
+                    //TODO: Check SMP DG Sante
+                    //configManagerSMP.updateCache(key, value);
 
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
@@ -680,7 +682,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (AxisFault e) {
                 LOG.error("Axis Fault error: " + e.getMessage());
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
-                ConfigurationManagerSMP configManagerSMP = ConfigurationManagerSMP.getInstance();
+                ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
                 String service = null;
                 LOG.debug("ClassCode: " + classCode);
                 switch (classCode) {
@@ -694,10 +696,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         break;
                 }
                 String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
-                String value = configManagerSMP.queryProperty(key);
+                String value = configurationManager.getProperty(key);
                 if (value != null) {
-                    configManagerSMP.updateProperty(key, value);
-                    configManagerSMP.updateCache(key, value);
+                    configurationManager.setProperty(key, value);
+                    //configManagerSMP.updateCache(key, value);
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
                     LOG.debug("Retrying the request with the new configurations: [" + value + "]");

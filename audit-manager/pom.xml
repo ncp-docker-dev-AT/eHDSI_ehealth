@@ -5,7 +5,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>2.5.1</version>
+        <version>2.5.2.RC1</version>
     </parent>
 
     <artifactId>openncp-audit-manager</artifactId>
@@ -58,4 +58,29 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <!--build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>xjc</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <packageName>net.RFC3881</packageName>
+                    <sources>
+                        <source>src/main/resources/RFC3881.xsd</source>
+                    </sources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build-->
+    <!--eu.europa.ec.sante.ehdsi.openncp.audit.jaxb.rfc3881-->
 </project>

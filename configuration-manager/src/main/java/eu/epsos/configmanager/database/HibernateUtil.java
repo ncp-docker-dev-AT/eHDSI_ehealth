@@ -1,29 +1,29 @@
 /*
  * This file is part of epSOS OpenNCP implementation
  * Copyright (C) 2012  SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Contact email: epsos@iuz.pt
  */
 package eu.epsos.configmanager.database;
 
-import org.hibernate.HibernateException;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import java.io.File;
 
@@ -32,46 +32,37 @@ import java.io.File;
  *
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
+@Deprecated
 public final class HibernateUtil {
 
-    /**
-     * Holds the Session Factory
-     */
-    private static final SessionFactory SESSION_FACTORY;
-    /**
-     * Class logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
+    private static final SessionFactory sessionFactory;
 
     static {
+        final String hibernateConfigFile;
 
-        // Holds the Hibernate Configuration File name
-        String hibernateConfigFile;
-
-        if (!HibernateConfigFile.name.contains("/")) {
-            try {
-                hibernateConfigFile = System.getenv("EPSOS_PROPS_PATH") + HibernateConfigFile.name;
-            } catch (NullPointerException ex) {
-                LOGGER.error("EPSOS_PROPS_PATH not defined!" + ex);
-                throw new ExceptionInInitializerError(ex);
+        if (!StringUtils.contains(HibernateConfigFile.name, "/")) {
+            String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH");
+            if (epsosPropsPath == null) {
+                throw new ExceptionInInitializerError("EPSOS_PROPS_PATH is not defined in the system environment");
             }
+            hibernateConfigFile = epsosPropsPath + HibernateConfigFile.name;
         } else {
             hibernateConfigFile = HibernateConfigFile.name;
         }
+
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+                .configure(new File(hibernateConfigFile))
+                .build();
         try {
-            final File configFile = new File(hibernateConfigFile);
-            SESSION_FACTORY = new Configuration().configure(configFile).buildSessionFactory();
-        } catch (RuntimeException ex) {
-            // Log the exception. 
-            LOGGER.error("Initial SessionFactory creation failed." + ex);
-            throw new ExceptionInInitializerError(ex);
+            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+        } catch (RuntimeException e) {
+            StandardServiceRegistryBuilder.destroy(registry);
+            throw new ExceptionInInitializerError(e);
         }
     }
 
-    /**
-     * Private constructor to avoid instantiation
-     */
     private HibernateUtil() {
+        throw new IllegalAccessError("Utility class");
     }
 
     /**
@@ -80,16 +71,6 @@ public final class HibernateUtil {
      * @return The build {@link SessionFactory}.
      */
     public static SessionFactory getSessionFactory() {
-        return SESSION_FACTORY;
-    }
-
-    public static void closeFactory() {
-        if (SESSION_FACTORY != null) {
-            try {
-                SESSION_FACTORY.close();
-            } catch (HibernateException ignored) {
-                LOGGER.error("Couldn't close SessionFactory", ignored);
-            }
-        }
+        return sessionFactory;
     }
 }

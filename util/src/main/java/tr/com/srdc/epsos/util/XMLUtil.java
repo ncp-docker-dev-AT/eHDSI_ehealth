@@ -34,7 +34,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
@@ -112,7 +115,7 @@ public class XMLUtil {
      */
     public static org.w3c.dom.Document parseContent(String content) throws ParserConfigurationException, SAXException, IOException {
 
-        LOGGER.debug("parseContent(): " + content);
+        LOGGER.debug("parseContent(): \n'{}'", content);
         org.w3c.dom.Document doc = null;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         //dbf.setIgnoringComments(false);
@@ -125,15 +128,10 @@ public class XMLUtil {
         return doc;
     }
 
-    /**
-     * @param doc
-     * @return
-     * @throws TransformerConfigurationException
-     * @throws TransformerException
-     */
     public static String DocumentToString(Document doc) throws TransformerException {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
+        //transformer.setOutputProperty(OutputKeys.INDENT, indent);
         //transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(doc), new StreamResult(writer));

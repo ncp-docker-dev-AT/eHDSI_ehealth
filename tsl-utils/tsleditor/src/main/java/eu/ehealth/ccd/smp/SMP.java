@@ -203,7 +203,7 @@ public class SMP {
 
     //        logger.info("Creating the new service group");
             // SimpleParticipantIdentifier(scheme, id);
-    //        SimpleParticipantIdentifier newParticipantId = new SimpleParticipantIdentifier("ehealth-participantid-qns","urn:ehealth:pt:ncpb-idp");
+    //        SimpleParticipantIdentifier newParticipantId = new SimpleParticipantIdentifier("ehealth-participantid-qns","urn:ehealth:pt:ncp-idp");
     //        aClient.saveServiceGroup (newParticipantId, SMP_CREDENTIALS);
     //        logger.info("ServiceGroup for PT created");
     
@@ -236,7 +236,7 @@ public class SMP {
         Document document = builder.parse(smpFile);
         Element rootElement = document.getDocumentElement();
         String participantIdentifier = getXmlTagValue("ParticipantIdentifier", IDENTIFIERS_NAMESPACE, rootElement);
-        String country = participantIdentifier.split(":")[2]; // E.g., urn:ehealth:lu:ncpb-idp -> lu   
+        String country = participantIdentifier.split(":")[2]; // E.g., urn:ehealth:lu:ncp-idp -> lu
         logger.info("Country: " + country);
         return country;
     }

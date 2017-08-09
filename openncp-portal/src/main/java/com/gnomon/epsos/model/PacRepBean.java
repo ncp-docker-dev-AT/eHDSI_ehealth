@@ -9,7 +9,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.HCPIAssertionCreator;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
@@ -18,6 +17,7 @@ import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
 import epsos.openncp.protocolterminator.clientconnector.PatientId;
 import eu.epsos.util.IheConstants;
 import eu.europa.ec.joinup.ecc.openstork.utils.StorkUtils;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -92,7 +92,7 @@ public class PacRepBean implements Serializable {
 
     public PacRepBean() {
         log.info("PAC REP BEAN CREATED");
-        selectedCountry = ConfigurationManagerService.getInstance().getProperty("ncp.country");
+        selectedCountry = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
         STORKSAMLEngine engine = STORKSAMLEngine.getInstance("SP");
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
@@ -145,6 +145,10 @@ public class PacRepBean implements Serializable {
 
     public String getSelectedCountry() {
         return selectedCountry;
+    }
+
+    public void setSelectedCountry(String selectedCountry) {
+        this.selectedCountry = selectedCountry;
     }
 
     public void displayLocation() {
@@ -294,10 +298,6 @@ public class PacRepBean implements Serializable {
         }
     }
 
-    public void setPatients(List<Patient> patients) {
-        this.patients = patients;
-    }
-
     public List<PatientDocument> getPatientDocuments() {
         return patientDocuments;
     }
@@ -378,6 +378,10 @@ public class PacRepBean implements Serializable {
         return selectedPrescriptionFile;
     }
 
+    public void setSelectedPrescriptionFile(PatientDocument selectedPrescriptionFile) {
+        this.selectedPrescriptionFile = selectedPrescriptionFile;
+    }
+
     public List<Identifier> getIdentifiers() {
         return identifiers;
     }
@@ -389,6 +393,10 @@ public class PacRepBean implements Serializable {
     public List<Patient> getPatients() {
 
         return patients;
+    }
+
+    public void setPatients(List<Patient> patients) {
+        this.patients = patients;
     }
 
     public List<Demographics> getDemographics() {
@@ -417,6 +425,10 @@ public class PacRepBean implements Serializable {
 
     public String getPurposeOfUse() {
         return purposeOfUse;
+    }
+
+    public void setPurposeOfUse(String purposeOfUse) {
+        this.purposeOfUse = purposeOfUse;
     }
 
     public boolean getShowConfirmation() {
@@ -526,12 +538,12 @@ public class PacRepBean implements Serializable {
         createTRCA("ep", purposeOfUse);
     }
 
-    public void setPurposeOfUseForPS(String purposeOfUse) {
-        createTRCA("ps", purposeOfUse);
-    }
-
     public String getPurposeOfUseForPS() {
         return purposeOfUseForPS;
+    }
+
+    public void setPurposeOfUseForPS(String purposeOfUse) {
+        createTRCA("ps", purposeOfUse);
     }
 
     public String getQueryPatientsException() {
@@ -604,18 +616,6 @@ public class PacRepBean implements Serializable {
 
     public void setConsentExists(boolean consentExists) {
         this.consentExists = consentExists;
-    }
-
-    public void setSelectedCountry(String selectedCountry) {
-        this.selectedCountry = selectedCountry;
-    }
-
-    public void setSelectedPrescriptionFile(PatientDocument selectedPrescriptionFile) {
-        this.selectedPrescriptionFile = selectedPrescriptionFile;
-    }
-
-    public void setPurposeOfUse(String purposeOfUse) {
-        this.purposeOfUse = purposeOfUse;
     }
 
     public Map<String, String> getLtrlanguages() {

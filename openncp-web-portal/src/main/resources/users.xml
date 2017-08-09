@@ -193,13 +193,13 @@
 				<role>ROLE_ADMIN</role>
 			</roles>
 		</daniel>
-		<oskari password="1234">
+		<marjo password="1234">
 			<userId>1234</userId>
 			<organizationName>Kela testiapteekki</organizationName>
 			<organizationId>1.2.246.553.999</organizationId>
-			<commonName>Oskari Kettinen</commonName>
-			<givenName>Oskari</givenName>
-			<familyName>Kettinen</familyName>
+			<commonName>Marjo Vesala</commonName>
+			<givenName>Marjo</givenName>
+			<familyName>Vesala</familyName>
 			<telecom>tel:+3581234567890</telecom>
 			<street>Jokukatu 443</street>
 			<city>Jyväskylä</city>
@@ -210,25 +210,7 @@
 				<role>ROLE_NURSE</role>
 				<role>ROLE_ADMIN</role>
 			</roles>
-		</oskari>
-		<marko password="1234">
-			<userId>1234</userId>
-			<organizationName>Kela testiapteekki</organizationName>
-			<organizationId>1.2.246.553.999</organizationId>
-			<commonName>Marko Jalonen</commonName>
-			<givenName>Marko</givenName>
-			<familyName>Jalonen</familyName>
-			<telecom>tel:+3581234567890</telecom>
-			<street>Jokukatu 443a</street>
-			<city>Jyväskylä</city>
-			<postalCode>40500</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</marko>
+		</marjo>
 		<konsta password="1234">
 			<userId>1234</userId>
 			<organizationName>Kela testiapteekki</organizationName>
@@ -247,24 +229,6 @@
 				<role>ROLE_ADMIN</role>
 			</roles>
 		</konsta>
-		<mika password="1234">
-			<userId>4321</userId>
-			<organizationName>Kela testiapteekki</organizationName>
-			<organizationId>1.2.246.553.999</organizationId>
-			<commonName>Mika Myllyvirta</commonName>
-			<givenName>Mika</givenName>
-			<familyName>Myllyvirta</familyName>
-			<telecom>tel:+3581234567890</telecom>
-			<street>Jokukatu 443c</street>
-			<city>Jyväskylä</city>
-			<postalCode>40500</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</mika>
 		<jaakko password="1234">
 			<userId>1244</userId>
 			<organizationName>Kela testiapteekki</organizationName>
@@ -328,5 +292,20 @@
 				<role>ROLE_ADMIN</role>
 			</roles>
 		</jussi>
+        <harri password="1234">
+            <userId>1248</userId>
+            <organizationName>THL testiapteekki</organizationName>
+            <organizationId>1.2.246.553.998</organizationId>
+            <commonName>Harri Nurmi</commonName>
+            <givenName>Harri</givenName>
+            <familyName>Nurmi</familyName>
+            <telecom>tel:+3581234567890</telecom>
+            <street>Jokukatu 123a</street>
+            <city>Tampere</city>
+            <postalCode>33100</postalCode>
+            <roles>
+                <role>ROLE_PHARMACIST</role>
+            </roles>
+        </harri>
 	</Users>
 </Configuration>

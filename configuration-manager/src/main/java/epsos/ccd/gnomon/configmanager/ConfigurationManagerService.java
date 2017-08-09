@@ -5,30 +5,28 @@
  * licenses this file to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- *
  */
 package epsos.ccd.gnomon.configmanager;
 
 import eu.epsos.configmanager.database.HibernateConfigFile;
 
 /**
- *
  * This service provides access to the system defined properties
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
  * @author mail:k.karkaletsis@gnomon.com.gr
  * @version 1.0, 2010, 30 Jun
- *
  */
+@Deprecated
 public class ConfigurationManagerService {
 
     private volatile static ConfigurationManagerService instance;
@@ -52,9 +50,8 @@ public class ConfigurationManagerService {
             }
         }
         return instance;
-
-
     }
+
     /**
      * Gets the value of a specific key stored in the properties file. It
      * consists of key/value pairs. First the method searches in the properties
@@ -72,7 +69,7 @@ public class ConfigurationManagerService {
     /**
      * Updates a property of the properties file
      *
-     * @param key the key we want to update its value
+     * @param key   the key we want to update its value
      * @param value the new value of the property
      * @return
      */
@@ -86,7 +83,7 @@ public class ConfigurationManagerService {
      * Get the endpoint URL for a specified country and a service name
      *
      * @param ISOCountryCode the iso country code
-     * @param ServiceName the service name
+     * @param ServiceName    the service name
      * @return
      */
     public String getServiceWSE(
@@ -100,8 +97,8 @@ public class ConfigurationManagerService {
      * service name the service endpoint
      *
      * @param ISOCountryCode the country code
-     * @param ServiceName the service name
-     * @param URL the endpoint url to be set
+     * @param ServiceName    the service name
+     * @param URL            the endpoint url to be set
      */
     public void setServiceWSE(
             String ISOCountryCode,

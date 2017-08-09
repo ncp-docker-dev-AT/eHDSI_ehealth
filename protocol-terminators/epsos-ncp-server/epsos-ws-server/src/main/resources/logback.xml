@@ -3,7 +3,7 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <!--pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern-->
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
         </layout>
     </appender>
 
@@ -11,8 +11,7 @@
         <file>${catalina.base}/logs/openncp-ws-server.log</file>
         <append>true</append>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            <!--pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern-->
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -55,6 +54,14 @@
         <appender-ref ref="DB"/>
     </logger>
 
+    <logger name="epsos.ccd.gnomon.auditmanager" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="epsos.ccd.gnomon.auditmanager.ssl" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="epsos.ccd.posam.tm.service" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
@@ -68,6 +75,10 @@
     </logger>
 
     <logger name="epsos.ccd.posam.tsam.dao" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

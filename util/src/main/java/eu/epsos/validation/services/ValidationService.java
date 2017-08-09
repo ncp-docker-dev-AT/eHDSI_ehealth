@@ -1,10 +1,10 @@
 package eu.epsos.validation.services;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.reporting.ReportBuilder;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import net.ihe.gazelle.schematron.GazelleObjectValidator;
 import net.ihe.gazelle.schematron.GazelleObjectValidatorService;
 import net.ihe.gazelle.schematron.SOAPException_Exception;
@@ -29,7 +29,7 @@ public abstract class ValidationService {
      */
     protected static boolean isValidationOn() {
 
-        String validationOnVal = ConfigurationManagerService.getInstance().getProperty(VALIDATION_STATUS_PROPERTY_NAME);
+        String validationOnVal = ConfigurationManagerFactory.getConfigurationManager().getProperty(VALIDATION_STATUS_PROPERTY_NAME);
 
         if (validationOnVal == null) {
             LOGGER.error("The value of Validation Property in properties database is null.");

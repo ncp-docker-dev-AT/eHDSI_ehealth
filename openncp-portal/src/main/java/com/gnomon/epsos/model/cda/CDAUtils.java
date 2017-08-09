@@ -1,14 +1,19 @@
 package com.gnomon.epsos.model.cda;
 
+import com.gnomon.LiferayUtils;
 import com.gnomon.epsos.service.EpsosHelperService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,15 +21,14 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-
-import org.slf4j.Logger;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CDAUtils {
 
@@ -355,7 +359,7 @@ public class CDAUtils {
     }
 
     public static String getRelativePrescriptionRoot(Document doc) {
-        NodeList nl = null;
+        NodeList nl;
         String refBarcode = "";
         try {
             XPath xpath = getXPathFactory();
@@ -365,14 +369,14 @@ public class CDAUtils {
                 refBarcode = nl.item(0).getNodeValue();
             }
         } catch (Exception e) {
-            _log.error(e.getMessage());
+            _log.error(e.getMessage(), e);
         }
         return refBarcode;
     }
 
     public static String CDAModelToConsent(CDAHeader cda, String rolename) {
 
-        String edCountry = GetterUtil.getString(ConfigurationManagerService.getInstance().getProperty("ncp.country"), "");
+        String edCountry = GetterUtil.getString(ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country"), "");
         String consentOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CONSENT_OID);
         String patientOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PATIENTS_OID);
         String custodianOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CUSTODIAN_OID);
@@ -427,7 +431,7 @@ public class CDAUtils {
         sb.append("\r\n");
         sb.append("<administrativeGenderCode code=\"").append(cda.getPatientSex()).append("\" codeSystem=\"2.16.840.1.113883.5.1\" />");
         sb.append("\r\n");
-        sb.append(addTag("birthTime", cda.getPatientBirthDate()));
+        sb.append(addTag("birthTime", getBirthTime(cda.getPatientBirthDate())));
         sb.append("\r\n");
         sb.append("<languageCommunication><languageCode code=\"").append(cda.getPatientLanguageCommunication()).append("\"/></languageCommunication>");
         sb.append("\r\n");
@@ -518,7 +522,7 @@ public class CDAUtils {
 
     private static String CDAModelToEDXML(Document epDoc, CDAHeader cda) {
 
-        String edCountry = GetterUtil.getString(ConfigurationManagerService.getInstance().getProperty("ncp.country"), "");
+        String edCountry = GetterUtil.getString(ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country"), "");
         String pharmacistsOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_OID);
         String pharmaciesOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIES_OID);
         String custodianOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CUSTODIAN_OID);
@@ -1174,5 +1178,17 @@ public class CDAUtils {
             _log.error(e.getMessage());
         }
         return sameBarcode;
+    }
+
+    private static String getBirthTime(String cdaBirthDate) {
+        final DateFormat portalUserDateFormat = LiferayUtils.getPortalUserDateFormat();
+        Date patientBirthDate = null;
+        try {
+            patientBirthDate = portalUserDateFormat.parse(cdaBirthDate);
+        } catch (ParseException e) {
+            _log.error(e.getMessage());
+        }
+        SimpleDateFormat format = new SimpleDateFormat("YYYYMMdd");
+        return format.format(patientBirthDate);
     }
 }

@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>2.5.1</version>
+        <version>2.5.2.RC1</version>
     </parent>
 
     <artifactId>openncp-security-manager</artifactId>
@@ -38,12 +38,12 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.1</version>
+            <version>${joda-time.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
-            <version>2.5.3</version>
+            <version>${opensaml.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.xerces</groupId>

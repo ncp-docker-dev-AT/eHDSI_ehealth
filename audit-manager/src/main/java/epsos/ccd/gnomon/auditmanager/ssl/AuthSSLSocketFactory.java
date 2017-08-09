@@ -50,7 +50,6 @@ public class AuthSSLSocketFactory {
     private X509TrustManager defaultTrustManager = null;
 
     /**
-     *
      * @param details
      * @param truststore
      * @param defaultTrustManager
@@ -74,7 +73,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @param details
      * @param truststore
      * @throws IOException
@@ -84,7 +82,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @param details
      * @param defaultTrustManager
      * @throws IOException
@@ -94,7 +91,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @param details
      * @throws IOException
      */
@@ -103,7 +99,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @param details
      * @return
      * @throws KeyStoreException
@@ -137,7 +132,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @param location
      * @return
      */
@@ -156,12 +150,11 @@ public class AuthSSLSocketFactory {
         } catch (Exception e) {
 
         }
-        LOGGER.info("could not open stream to:" + location);
+        LOGGER.info("could not open stream to: '{}'", location);
         return null;
     }
 
     /**
-     *
      * @param keystore
      * @param details
      * @return
@@ -183,7 +176,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @param truststore
      * @param keystore
      * @param defaultTrustManager
@@ -212,7 +204,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @return
      * @throws IOException
      */
@@ -285,7 +276,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @return
      * @throws IOException
      */
@@ -297,7 +287,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @param host
      * @param port
      * @return
@@ -308,7 +297,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @param port
      * @param mutualAuth
      * @return
@@ -323,7 +311,6 @@ public class AuthSSLSocketFactory {
     }
 
     /**
-     *
      * @return
      */
     public boolean isSecured() {

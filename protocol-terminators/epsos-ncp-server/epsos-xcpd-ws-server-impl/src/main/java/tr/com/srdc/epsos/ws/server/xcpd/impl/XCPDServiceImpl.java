@@ -92,7 +92,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
-            logger.error("DatatypeConfigurationException: {}", e.getMessage());
+            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
         }
         eventLog.setHR_UserID(Constants.HR_ID_PREFIX + "<" + Helper.getUserID(sh) + "@" + Helper.getOrganization(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));

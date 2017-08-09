@@ -22,14 +22,7 @@
  */
 package tr.com.srdc.epsos.ws.server.xdr;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
-import epsos.ccd.gnomon.auditmanager.EventActionCode;
-import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
-import epsos.ccd.gnomon.auditmanager.EventType;
-import epsos.ccd.gnomon.auditmanager.IHEEventType;
-import epsos.ccd.gnomon.auditmanager.TransactionName;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import epsos.ccd.gnomon.auditmanager.*;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
@@ -42,6 +35,9 @@ import eu.epsos.util.IheConstants;
 import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.services.CdaValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import fi.kela.se.epsos.data.model.DocumentFactory;
 import fi.kela.se.epsos.data.model.EPSOSDocument;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
@@ -115,11 +111,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
     }
 
     protected String getLocation() {
-        ConfigurationManagerService configManager = ConfigurationManagerService.getInstance();
-        String location = configManager.getServiceWSE(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
-                Constants.ConsentService);
 
-        return location;
+        return ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
+                RegisteredService.CONSENT_SERVICE);
     }
 
     /**
@@ -133,7 +127,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                                                          ProvideAndRegisterDocumentSetRequestType request,
                                                          RegistryResponseType response, Element sh) {
 
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        //ConfigurationManagerFactory.getConfigurationManager();
         eventLog.setEventType(EventType.epsosDispensationServiceInitialize);
         eventLog.setEI_TransactionName(TransactionName.epsosDispensationServiceInitialize);
         eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
@@ -201,7 +195,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
      */
     public void prepareEventLogForConsentPut(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request, RegistryResponseType response, Element sh) {
 
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
         eventLog.setEventType(EventType.epsosConsentServicePut);
         eventLog.setEI_TransactionName(TransactionName.epsosConsentServicePut);
         eventLog.setEI_EventActionCode(EventActionCode.UPDATE);

@@ -10,14 +10,11 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.xml.Configuration;
@@ -48,8 +45,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.io.StringReader;
-import org.xml.sax.InputSource;
 
 @ManagedBean
 @SessionScoped
@@ -306,7 +301,7 @@ public class MyBean implements Serializable {
     }
 
     public void searchPatients() {
-        log.info("Searching for patients (creating assertions) ....");
+        log.info("Searching for patients (creating assertions)...");
         Object obj = EpsosHelperService.getUserAssertion();
         if (obj instanceof Assertion) {
             hcpAssertion = (Assertion) obj;
@@ -542,18 +537,18 @@ public class MyBean implements Serializable {
 //				log.error(ExceptionUtils.getStackTrace(e));
 //			}
 
-			showMRO = true;
-			consentExists = true;
-			for (EpsosDocument1 aux : queryDocuments) {
-				PatientDocument document = EpsosHelperService.populateDocument(
-						aux, "mro");
-				patientDocuments.add(document);
-			}
-			queryDocumentsException = LiferayUtils
-					.getPortalTranslation("report.list.no.document");
-			log.debug("Selected Country: "
-					+ LiferayUtils.getFromSession("selectedCountry"));
-		} catch (Exception ex) {
+            showMRO = true;
+            consentExists = true;
+            for (EpsosDocument1 aux : queryDocuments) {
+                PatientDocument document = EpsosHelperService.populateDocument(
+                        aux, "mro");
+                patientDocuments.add(document);
+            }
+            queryDocumentsException = LiferayUtils
+                    .getPortalTranslation("report.list.no.document");
+            log.debug("Selected Country: "
+                    + LiferayUtils.getFromSession("selectedCountry"));
+        } catch (Exception ex) {
 //			try {
 //				EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
 //						"NI_DQ_MRO", new DateTime(),
@@ -563,18 +558,18 @@ public class MyBean implements Serializable {
 //			} catch (Exception e) {
 //				log.error(ExceptionUtils.getStackTrace(e));
 //			}
-			consentExists = true;
-			log.error(ExceptionUtils.getStackTrace(ex));
-			FacesContext.getCurrentInstance().addMessage(
-					null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"DOCUMENT QUERY", LiferayUtils
-									.getPortalTranslation(ex.getMessage())));
-			log.error("MRO QUERY: Error getting ps documents for : "
-					+ patientId.getExtension() + " from " + selectedCountry
-					+ " - " + ex.getMessage());
-			queryDocumentsException = LiferayUtils.getPortalTranslation(ex
-					.getMessage());
+            consentExists = true;
+            log.error(ExceptionUtils.getStackTrace(ex));
+            FacesContext.getCurrentInstance().addMessage(
+                    null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "DOCUMENT QUERY", LiferayUtils
+                            .getPortalTranslation(ex.getMessage())));
+            log.error("MRO QUERY: Error getting ps documents for : "
+                    + patientId.getExtension() + " from " + selectedCountry
+                    + " - " + ex.getMessage());
+            queryDocumentsException = LiferayUtils.getPortalTranslation(ex
+                    .getMessage());
 
             if (ex.getMessage().contains("4701")) {
                 consentExists = false;
@@ -596,9 +591,8 @@ public class MyBean implements Serializable {
             trcassertionexists = true;
             PatientId patientId = null;
             try {
-                patientDocuments = new ArrayList<PatientDocument>();
-                ClientConnectorConsumer clientConectorConsumer = MyServletContextListener
-                        .getClientConnectorConsumer();
+                patientDocuments = new ArrayList<>();
+                ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
                 patientId = PatientId.Factory.newInstance();
                 patientId.setExtension(selectedPatient.getExtension());
                 patientId.setRoot(selectedPatient.getRoot());
@@ -608,15 +602,14 @@ public class MyBean implements Serializable {
                 classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
                 classCode.setValue(Constants.PS_TITLE);
 
-                log.info("PS QUERY: Getting ps documents for : "
-                        + patientId.getExtension() + " from " + selectedCountry);
+                log.info("PS QUERY: Getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry);
                 log.info("HCP ASSERTION IS : " + hcpAssertion.getID());
                 log.info("TRCA ASSERTION IS : " + trcAssertion.getID());
                 log.info("selectedCountry : " + selectedCountry);
                 log.info("patientId: " + patientId);
                 log.info("classCode: " + classCode);
 
-				// NRO
+                // NRO
 //				try {
 //					EvidenceUtils.createEvidenceREMNRO(patientId.toString(),
 //							"NI_DQ_PS", new DateTime(),
@@ -644,18 +637,18 @@ public class MyBean implements Serializable {
 //					log.error(ExceptionUtils.getStackTrace(e));
 //				}
 
-				showPS = true;
-				consentExists = true;
-				for (EpsosDocument1 aux : queryDocuments) {
-					PatientDocument document = EpsosHelperService
-							.populateDocument(aux, "ps");
-					patientDocuments.add(document);
-				}
-				queryDocumentsException = LiferayUtils
-						.getPortalTranslation("report.list.no.document");
-				log.debug("Selected Country: "
-						+ LiferayUtils.getFromSession("selectedCountry"));
-			} catch (Exception ex) {
+                showPS = true;
+                consentExists = true;
+                for (EpsosDocument1 aux : queryDocuments) {
+                    PatientDocument document = EpsosHelperService
+                            .populateDocument(aux, "ps");
+                    patientDocuments.add(document);
+                }
+                queryDocumentsException = LiferayUtils
+                        .getPortalTranslation("report.list.no.document");
+                log.debug("Selected Country: "
+                        + LiferayUtils.getFromSession("selectedCountry"));
+            } catch (Exception ex) {
 //				try {
 //					EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
 //							"NI_DQ_PS", new DateTime(),
@@ -689,16 +682,18 @@ public class MyBean implements Serializable {
     }
 
     private void createTRCA(String docType, String purposeOfUse) {
+
+        log.info("Creating TRCAssertion for '{}' request and Purpose of Use: '{}'", docType, purposeOfUse);
         String runningMode = MyServletContextListener.getRunningMode();
 
-        if (docType.equals("ps")) {
+        if (StringUtils.equals(docType, "ps")) {
             showPS = false;
         }
-        if (docType.equals("ep")) {
+        if (StringUtils.equals(docType, "ep")) {
             showEP = false;
         }
-        log.info("TRCA: Starting setting the purpose of use: " + purposeOfUse);
-        log.info("signedTRC: " + getSignedTRC());
+        log.info("signedTRC: '{}'", getSignedTRC());
+
         PatientId patientId = null;
         try {
             patientId = PatientId.Factory.newInstance();
@@ -712,9 +707,7 @@ public class MyBean implements Serializable {
             if (runningMode.equals("demo")) {
                 log.info("demo running so trca not created");
             } else if (getSignedTRC() == null) {
-                trcAssertion = EpsosHelperService
-                        .createPatientConfirmationPlain(purposeOfUse,
-                                hcpAssertion, patientId);
+                trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, hcpAssertion, patientId);
                 log.info("TRCA: Created " + trcAssertion.getID() + " for : "
                         + hcpAssertion.getID() + " for patient "
                         + patientId.getRoot() + "_" + patientId.getExtension()
@@ -749,19 +742,15 @@ public class MyBean implements Serializable {
             }
 
         } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(
-                    null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "TRCA ERROR",
-                            LiferayUtils.getPortalTranslation(e.getMessage())));
-            log.error("TRCA: Error creating trca for patient : "
-                    + patientId.getExtension() + " with hcpAssetion : "
-                    + hcpAssertion.getID() + ". Purpose of use is : "
-                    + purposeOfUse + " - " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "TRCA ERROR", LiferayUtils.getPortalTranslation(e.getMessage())));
+            log.error("TRCA: Error creating trca for patient: '{}' with hcpAssetion: '{}'. " +
+                            "Purpose of use is: '{} - '{}", patientId.getExtension(), hcpAssertion.getID(), purposeOfUse,
+                    e.getMessage(), e);
             log.error(ExceptionUtils.getStackTrace(e));
             trcassertionexists = false;
             trcassertionnotexists = true;
-            queryDocumentsException = LiferayUtils.getPortalTranslation(e
-                    .getMessage());
+            queryDocumentsException = LiferayUtils.getPortalTranslation(e.getMessage());
         }
     }
 
@@ -956,18 +945,18 @@ public class MyBean implements Serializable {
 //				log.error(ExceptionUtils.getStackTrace(e));
 //			}
 
-			log.info("EP QUERY: Found " + queryDocuments.size() + " for : "
-					+ patientId.getExtension() + " from " + selectedCountry);
-			showEP = true;
-			for (EpsosDocument1 aux : queryDocuments) {
-				PatientDocument document = EpsosHelperService.populateDocument(
-						aux, "ep");
-				patientPrescriptions.add(document);
-			}
-			queryPrescriptionsException = LiferayUtils.getPortalTranslation(
-					"document.empty.list", FacesService.getPortalLanguage());
-			log.info("Documents are " + queryDocuments.size());
-		} catch (Exception ex) {
+            log.info("EP QUERY: Found " + queryDocuments.size() + " for : "
+                    + patientId.getExtension() + " from " + selectedCountry);
+            showEP = true;
+            for (EpsosDocument1 aux : queryDocuments) {
+                PatientDocument document = EpsosHelperService.populateDocument(
+                        aux, "ep");
+                patientPrescriptions.add(document);
+            }
+            queryPrescriptionsException = LiferayUtils.getPortalTranslation(
+                    "document.empty.list", FacesService.getPortalLanguage());
+            log.info("Documents are " + queryDocuments.size());
+        } catch (Exception ex) {
 //			try {
 //				EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
 //						"NI_DQ_EP", new DateTime(),
@@ -1356,7 +1345,8 @@ public class MyBean implements Serializable {
     }
 
     public void setSignedTRC(String signedTRC) throws Exception {
-        log.info("signedTRC: " + signedTRC);
+
+        log.info("signedTRC: '{}'", signedTRC);
         if (signedTRC != null && !signedTRC.isEmpty()) {
             // Initialize the library
             DefaultBootstrap.bootstrap();
@@ -1366,28 +1356,20 @@ public class MyBean implements Serializable {
             ppMgr.setNamespaceAware(true);
 
             // Parse metadata file
-            InputStream in = new ByteArrayInputStream(
-                    signedTRC.getBytes("UTF-8"));
+            InputStream in = new ByteArrayInputStream(signedTRC.getBytes("UTF-8"));
             Document inCommonMDDoc = ppMgr.parse(in);
             Element metadataRoot = inCommonMDDoc.getDocumentElement();
 
             // Get apropriate unmarshaller
-            UnmarshallerFactory unmarshallerFactory = Configuration
-                    .getUnmarshallerFactory();
-            Unmarshaller unmarshaller = unmarshallerFactory
-                    .getUnmarshaller(metadataRoot);
+            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(metadataRoot);
 
-            // Unmarshall using the document root element, an EntitiesDescriptor
-            // in this case
+            // Unmarshall using the document root element, an EntitiesDescriptor in this case
             trcAssertion = (Assertion) unmarshaller.unmarshall(metadataRoot);
 
-            // Assertion trca = (Assertion)
-            // EpsosHelperService.fromElement(doc.getDocumentElement());
-            log.info("TRCA " + trcAssertion + " with ID: "
-                    + trcAssertion.getID());
+            log.info("TRCA '{}' with ID: '{}'", trcAssertion, trcAssertion.getID());
             LiferayUtils.storeToSession("trcAssertion", trcAssertion);
             this.signedTRC = signedTRC;
         }
     }
-
 }

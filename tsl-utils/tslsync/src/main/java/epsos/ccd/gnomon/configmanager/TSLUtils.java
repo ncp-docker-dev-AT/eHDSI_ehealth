@@ -17,6 +17,8 @@
 package epsos.ccd.gnomon.configmanager;
 
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +77,7 @@ public class TSLUtils {
 		 * Everytime load a keystore, and passing all these values is bad code. 
 		 */
 
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
         KEY_STORE_NAME = cms.getProperty("NCP_SIG_KEYSTORE_PATH");
         KEY_STORE_PASS = cms.getProperty("NCP_SIG_KEYSTORE_PASSWORD");
         PRIVATE_KEY_PASS = cms.getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
@@ -186,9 +188,9 @@ public class TSLUtils {
                                             X509Certificate t = TSLUtils.getCertificateFromIS(in);
                                             // create a keypair value with
                                             // certid and country code
-                                            ConfigurationManagerService cm = ConfigurationManagerService.getInstance();
+                                            ConfigurationManager cm = ConfigurationManagerFactory.getConfigurationManager();
                                             String storepath = cm.getProperty("certificates.storepath");
-                                            cm.updateProperty(t.getSerialNumber() + "",
+                                            cm.setProperty(t.getSerialNumber() + "",
                                                     getNCP(s + "") + "_" + countrycode + "_" + tagValue.trim());
                                             // export the certificate to der
                                             // format
@@ -255,7 +257,7 @@ public class TSLUtils {
                 Node certNode = certs.item(s4);
                 InputStream in = new ByteArrayInputStream(coder.decodeBase64(certNode.getTextContent()));
                 X509Certificate t = TSLUtils.getCertificateFromIS(in);
-                ConfigurationManagerService cm = ConfigurationManagerService.getInstance();
+                ConfigurationManager cm = ConfigurationManagerFactory.getConfigurationManager();
                 String storepath = cm.getProperty("certificates.storepath");
                 // export the certificate to der format
                 boolean exp = TSLUtils.exportCertificate(t,
@@ -498,8 +500,7 @@ public class TSLUtils {
     public static X509Certificate getCertificateFromString(String cert) {
         Base64 encoder = new Base64();
         InputStream in = new ByteArrayInputStream(encoder.decodeBase64(cert));
-        X509Certificate t = getCertificateFromIS(in);
-        return t;
+        return getCertificateFromIS(in);
     }
 
     /**

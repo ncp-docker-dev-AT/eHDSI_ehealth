@@ -29,6 +29,13 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
     private HashMap<String, String> friendlyTypes;
     private HashMap<String, String> pivotTypes;
 
+    public static ModelBasedValidator getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ModelBasedValidator();
+        }
+        return INSTANCE;
+    }
+
     public ModelValidatorResult validate(String document, String docType, boolean friendly) {
         log.info("MDA validator start");
 
@@ -45,9 +52,9 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
         // if no validator is found set validationError to true a log it
         if (validator == null) {
             result.setValidationError(true);
-            log.error("No validator found for document type " + docType + ", friendly: " + friendly);
+            log.error("No validator found for document type '{}', friendly: '{}'", docType, friendly);
         } else {
-            log.info("Using " + validator + " validator" + ", friendly: " + friendly);
+            log.info("Using '{}' validator, friendly: '{}'", validator, friendly);
 
             result.setSchemaValid(false);
             result.setModelValid(false);
@@ -55,6 +62,7 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
 
             try {
                 String mdaResult = GazelleValidatorCore.validateDocument(document, validator);
+                log.info("MDAResult: '{}'", mdaResult);
                 Document mdaResultDoc = XmlUtil.stringToDom(mdaResult);
 
                 // log validation errors
@@ -93,13 +101,6 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
         return result;
     }
 
-    public static ModelBasedValidator getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ModelBasedValidator();
-        }
-        return INSTANCE;
-    }
-
     public void setConfig(TMConfiguration config) {
         this.config = config;
     }
@@ -111,7 +112,7 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
         ProjectDependencies.CDA_XSL_TRANSFORMER = config.getMdaCdaXslTransformerPath();
         ProjectDependencies.VALUE_SET_REPOSITORY = config.getMdaValuesetRepositoryPath();
 
-        friendlyTypes = new HashMap<String, String>();
+        friendlyTypes = new HashMap<>();
         friendlyTypes.put(PATIENT_SUMMARY3, Validators.EPSOS_PS_FRIENDLY.getValue());
         friendlyTypes.put(PATIENT_SUMMARY1, Validators.EPSOS_PS_FRIENDLY.getValue());
         friendlyTypes.put(EDISPENSATION3, Validators.EPSOS_ED_FRIENDLY.getValue());
@@ -123,7 +124,7 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
         friendlyTypes.put(MRO3, Validators.EPSOS_MRO.getValue());
         friendlyTypes.put(MRO1, Validators.EPSOS_MRO.getValue());
 
-        pivotTypes = new HashMap<String, String>();
+        pivotTypes = new HashMap<>();
         pivotTypes.put(PATIENT_SUMMARY3, Validators.EPSOS_PS_PIVOT.getValue());
         pivotTypes.put(PATIENT_SUMMARY1, Validators.EPSOS_PS_PIVOT.getValue());
         pivotTypes.put(EDISPENSATION3, Validators.EPSOS_ED_PIVOT.getValue());

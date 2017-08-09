@@ -23,13 +23,14 @@ import com.spirit.epsos.cc.adc.EadcEntry;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerSMP;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.services.XcpdValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -81,8 +82,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     org.hl7.v3.PRPAIN201305UV02.class,
                     org.hl7.v3.PRPAIN201306UV02.class);
         } catch (javax.xml.bind.JAXBException ex) {
-            System.err.println("Unable to create JAXBContext: "
-                    + ex.getMessage());
+            LOG.error("Unable to create JAXBContext: '{}'", ex.getMessage(), ex);
             ex.printStackTrace(System.err);
             Runtime.getRuntime().exit(-1);
         } finally {
@@ -276,7 +276,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // XCPD response end time
             long end = System.currentTimeMillis();
-            LOG.info("XCPD REQUEST-RESPONSE TIME: " + (end - start) / 1000.0);
+            LOG.info("XCPD REQUEST-RESPONSE TIME: '{}'", (end - start) / 1000.0);
 
             // TMP
             // Validation start time
@@ -288,7 +288,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // Transaction end time
             end = System.currentTimeMillis();
-            LOG.info("XCPD VALIDATION REQ TIME: " + (end - start) / 1000.0);
+            LOG.info("XCPD VALIDATION REQ TIME: '{}'", (end - start) / 1000.0);
 
             // TMP
             // Transaction start time
@@ -301,12 +301,12 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (AxisFault e) {
                 LOG.error("Axis Fault error: " + e.getMessage());
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
-                ConfigurationManagerSMP configManagerSMP = ConfigurationManagerSMP.getInstance();
+                ConfigurationManager configManager = ConfigurationManagerFactory.getConfigurationManager();
                 String key = this.countryCode.toLowerCase(Locale.ENGLISH) + ".PatientIdentificationService.WSE";
-                String value = configManagerSMP.queryProperty(key);
+                String value = configManager.getProperty(key);
                 if (value != null) {
-                    configManagerSMP.updateProperty(key, value);
-                    configManagerSMP.updateCache(key, value);
+                    configManager.setProperty(key, value);
+                    //configManagerSMP.updateCache(key, value);
 
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
@@ -362,7 +362,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // Transaction end time
             end = System.currentTimeMillis();
-            LOG.info("XCPD TRANSACTION TIME: " + (end - start) / 1000.0);
+            LOG.info("XCPD TRANSACTION TIME: '{}'", (end - start) / 1000.0);
 
             // TMP
             // Validation start time
@@ -446,7 +446,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (Exception ex) {
                 LOG.error(null, ex);
             }
-            
+
             // Audit end time
             end = System.currentTimeMillis();
             LOG.info("XCPD AUDIT TIME: " + (end - start) / 1000.0);

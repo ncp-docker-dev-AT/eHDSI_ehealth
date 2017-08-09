@@ -86,8 +86,8 @@ public class SimpleTermServerClient implements TermServerClient {
         HttpContext httpContext = new BasicHttpContext();
         httpContext.setAttribute(HttpClientContext.COOKIE_STORE, new BasicCookieStore());
 
-        restTemplate = new RestTemplate(
-                new CustomHttpComponentsClientHttpRequestFactory(builder.build(), httpContext));
+        restTemplate = new RestTemplate(new CustomHttpComponentsClientHttpRequestFactory(builder.build(), httpContext));
+        restTemplate.setErrorHandler(new CustomResponseErrorHandler());
     }
 
     @Override

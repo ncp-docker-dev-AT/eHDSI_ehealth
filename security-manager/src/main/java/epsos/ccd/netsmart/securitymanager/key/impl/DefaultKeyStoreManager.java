@@ -16,9 +16,10 @@
  */
 package epsos.ccd.netsmart.securitymanager.key.impl;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +45,10 @@ public final class DefaultKeyStoreManager implements KeyStoreManager {
     private final String PRIVATEKEY_PASSWORD;
     private KeyStore keyStore;
     private KeyStore trustStore;
-    private ConfigurationManagerService cm;
+    private ConfigurationManager cm;
 
     public DefaultKeyStoreManager() throws IOException {
-        cm = ConfigurationManagerService.getInstance();
+        cm = ConfigurationManagerFactory.getConfigurationManager();
 
         // Constants Initialization
         KEYSTORE_LOCATION = cm.getProperty("NCP_SIG_KEYSTORE_PATH");
@@ -101,13 +102,7 @@ public final class DefaultKeyStoreManager implements KeyStoreManager {
 
             return keyStore;
 
-        } catch (IOException ex) {
-            logger.error(null, ex);
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(null, ex);
-        } catch (CertificateException ex) {
-            logger.error(null, ex);
-        } catch (KeyStoreException ex) {
+        } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException ex) {
             logger.error(null, ex);
         }
         return null;
@@ -116,8 +111,8 @@ public final class DefaultKeyStoreManager implements KeyStoreManager {
     @Override
     public Certificate getCertificate(String alias) throws SMgrException {
         try {
-            java.security.cert.Certificate cert = keyStore.getCertificate(alias);
-            return cert;
+            return keyStore.getCertificate(alias);
+
         } catch (KeyStoreException ex) {
             logger.error(null, ex);
             throw new SMgrException("Certificate with alias: " + alias + " not found in keystore", ex);
@@ -131,13 +126,7 @@ public final class DefaultKeyStoreManager implements KeyStoreManager {
             InputStream keystoreStream = new FileInputStream(TRUSTSTORE_LOCATION);
             trustStore.load(keystoreStream, TRUSTSTORE_PASSWORD.toCharArray());
             return trustStore;
-        } catch (IOException ex) {
-            logger.error(null, ex);
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(null, ex);
-        } catch (CertificateException ex) {
-            logger.error(null, ex);
-        } catch (KeyStoreException ex) {
+        } catch (IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException ex) {
             logger.error(null, ex);
         }
         return null;

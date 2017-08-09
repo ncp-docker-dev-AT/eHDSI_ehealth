@@ -17,7 +17,8 @@
  **/
 package epsos.ccd.gnomon.utils;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -67,11 +68,11 @@ public class SecurityMgr {
     private static String KEY_ALIAS = "server1";
 
     public static void init_variables() {
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
-        KEY_STORE_NAME = cms.getProperty("NCP_SIG_KEYSTORE_PATH");
-        KEY_STORE_PASS = cms.getProperty("NCP_SIG_KEYSTORE_PASSWORD");
-        PRIVATE_KEY_PASS = cms.getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
-        KEY_ALIAS = cms.getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
+        ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
+        KEY_STORE_NAME = configurationManager.getProperty("NCP_SIG_KEYSTORE_PATH");
+        KEY_STORE_PASS = configurationManager.getProperty("NCP_SIG_KEYSTORE_PASSWORD");
+        PRIVATE_KEY_PASS = configurationManager.getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
+        KEY_ALIAS = configurationManager.getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
     }
 
     public static String getSignedDocumentAsString(Document doc) {
@@ -83,7 +84,7 @@ public class SecurityMgr {
             trans.transform(new DOMSource(doc), new StreamResult(bas));
             signed = bas.toString();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
         return signed;
     }

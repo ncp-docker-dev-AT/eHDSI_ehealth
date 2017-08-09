@@ -1,4 +1,4 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
+/*    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
  *
  *    This file is part of epSOS-WEB.
  *
@@ -13,12 +13,12 @@ package se.sb.epsos.web.service;
 import epsos.ccd.gnomon.configmanager.OLDConfigurationManagerDb;
 import epsosOrgEpMedication.COCTMT230100UVPackagedMedicine;
 import hl7OrgV3.*;
-import org.apache.util.Base64;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.codec.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -93,8 +93,7 @@ public class ePtoeDMapper {
     }
 
     private ClinicalDocumentDocument1 buildCdafromTemplate(InputStream is) throws XmlException, IOException {
-        ClinicalDocumentDocument1 docCDA = ClinicalDocumentDocument1.Factory.parse(is);
-        return (docCDA == null ? null : docCDA);
+        return ClinicalDocumentDocument1.Factory.parse(is);
     }
 
     public ClinicalDocumentDocument1 createDispensation_PDF(byte[] bytesPDF, Dispensation dispensation,
@@ -303,6 +302,13 @@ public class ePtoeDMapper {
             eD_Document_material.getCode().setDisplayName(dispRow.getProductName());
             eD_Document_material.getName().newCursor().setTextValue(dispRow.getProductName());
 
+            // Overall strength, if provided as a text
+            String overallStrength = dispRow.getPrescriptionRow().getStrength();
+            if(overallStrength != null && overallStrength.length() > 0) {
+                eD_Document_material.addNewDesc();
+                eD_Document_material.getDesc().newCursor().setTextValue(overallStrength);
+            }
+
             // Form code
             eD_Document_material.getFormCode().setCode(dispRow.getPrescriptionRow().getFormCode());
             eD_Document_material.getFormCode().setDisplayName(dispRow.getPrescriptionRow().getFormName());
@@ -409,8 +415,8 @@ public class ePtoeDMapper {
         return handleReferences(eP_Document, eD_Document, refTargetsToPreserve);
     }
 
-    public byte[] handleReferences(ClinicalDocumentDocument1 eP_Document, ClinicalDocumentDocument1 eD_Document,
-                                   ArrayList<String> refTargetsToPreserve) {
+    private byte[] handleReferences(ClinicalDocumentDocument1 eP_Document, ClinicalDocumentDocument1 eD_Document,
+                                    ArrayList<String> refTargetsToPreserve) {
         Document doc = transformCDADocumenttoDomDocument(eD_Document);
 
         Pattern pattern = Pattern.compile("<[^<>]*ID=\"([^\"]*)\"[^<>]*>", Pattern.DOTALL);

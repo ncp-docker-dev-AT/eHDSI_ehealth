@@ -9,7 +9,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.HCPIAssertionCreator;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
@@ -18,6 +17,7 @@ import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
 import epsos.openncp.protocolterminator.clientconnector.PatientId;
 import eu.epsos.util.IheConstants;
 import eu.europa.ec.joinup.ecc.openstork.utils.StorkUtils;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -106,7 +106,7 @@ public class PacBean implements Serializable {
             log.error("REPRESENTATIVE ACCESS CONFIGURATION ERROR " + e.getMessage());
         }
 
-        selectedCountry = ConfigurationManagerService.getInstance().getProperty("ncp.country");
+        selectedCountry = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
         log.info("Selected Country: " + selectedCountry);
         identifiers = new ArrayList<Identifier>();
         demographics = new ArrayList<Demographics>();

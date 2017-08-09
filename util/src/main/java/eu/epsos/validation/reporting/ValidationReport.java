@@ -19,8 +19,8 @@
  */
 package eu.epsos.validation.reporting;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
@@ -140,7 +140,7 @@ public class ValidationReport {
 
     public static void cleanValidationDir(File folder) {
 
-        String cleanUpValidationDir = ConfigurationManagerService.getInstance().getProperty(CLEANUP_VALIDATION_DIR_AFTER_TEST);
+        String cleanUpValidationDir = ConfigurationManagerFactory.getConfigurationManager().getProperty(CLEANUP_VALIDATION_DIR_AFTER_TEST);
 
         if (cleanUpValidationDir == null) {
             LOG.error("The value of Clean Up Validation Drr in properties database is null.");

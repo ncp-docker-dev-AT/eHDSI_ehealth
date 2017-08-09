@@ -21,10 +21,8 @@
  */
 package tr.com.srdc.epsos.securityman;
 
-import java.io.IOException;
-
-import javax.xml.transform.dom.DOMSource;
-
+import epsos.ccd.netsmart.securitymanager.SignatureManager;
+import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import eu.epsos.assertionvalidator.PolicyManagerInterface;
 import org.opensaml.common.xml.SAMLSchemaBuilder;
 import org.opensaml.saml2.core.Assertion;
@@ -34,15 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import epsos.ccd.netsmart.securitymanager.SignatureManager;
-import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
-
-
 import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
 import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
 import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
@@ -51,12 +40,17 @@ import tr.com.srdc.epsos.securityman.validators.FieldValueValidators;
 import tr.com.srdc.epsos.securityman.validators.RequiredFieldValidators;
 import tr.com.srdc.epsos.util.saml.SAML;
 
-public class SAML2Validator {
+import javax.xml.transform.dom.DOMSource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
 
-    private static Logger logger = LoggerFactory.getLogger(SAML2Validator.class);
+public class SAML2Validator {
 
     private static final ServiceLoader<PolicyManagerInterface> serviceLoader
             = ServiceLoader.load(PolicyManagerInterface.class);
+    private static Logger logger = LoggerFactory.getLogger(SAML2Validator.class);
     private static PolicyManagerInterface policyManager;
 
     static {
@@ -122,7 +116,7 @@ public class SAML2Validator {
             // Since the XCA Simulator sends this value wrong, we are trying it as follows for now
             NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
             //NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0","Security");
-            Element security = null;
+            Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
             } else {
@@ -169,13 +163,7 @@ public class SAML2Validator {
             checkTRCAssertion(trcAssertion, classCode);
 
             checkTRCAdviceIdReferenceAgainstHCPId(trcAssertion, hcpAssertion);
-        } catch (IOException e) {
-            logger.error("", e);
-            throw new InsufficientRightsException(4703);
-        } catch (UnmarshallingException e) {
-            logger.error("", e);
-            throw new InsufficientRightsException(4703);
-        } catch (SAXException e) {
+        } catch (IOException | UnmarshallingException | SAXException e) {
             logger.error("", e);
             throw new InsufficientRightsException(4703);
         }
@@ -185,6 +173,7 @@ public class SAML2Validator {
 
     /**
      * Validates the contents of the XDR Header
+     *
      * @author Konstantin.Hypponen@kela.fi
      */
     public static String validateXDRHeader(Element sh, String classCode) throws InsufficientRightsException, MissingFieldException, InvalidFieldException, SMgrException {
@@ -239,13 +228,7 @@ public class SAML2Validator {
             checkTRCAssertion(trcAssertion, classCode);
 
             checkTRCAdviceIdReferenceAgainstHCPId(trcAssertion, hcpAssertion);
-        } catch (IOException e) {
-            logger.error("", e);
-            throw new InsufficientRightsException(4703);
-        } catch (UnmarshallingException e) {
-            logger.error("", e);
-            throw new InsufficientRightsException(4703);
-        } catch (SAXException e) {
+        } catch (IOException | UnmarshallingException | SAXException e) {
             logger.error("", e);
             throw new InsufficientRightsException(4703);
         }
@@ -272,6 +255,7 @@ public class SAML2Validator {
 
     /**
      * Check if consent is given for patient
+     *
      * @param patientId patient ID
      * @param countryId country ID
      * @return true if consent is given, else false.
@@ -286,7 +270,7 @@ public class SAML2Validator {
 
         Element security = (Element) securityList.item(0);
         NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "Assertion");
-        List<Assertion> result = new ArrayList<Assertion>();
+        List<Assertion> result = new ArrayList<>();
 
         for (int i = 0; i < assertionList.getLength(); i++) {
             Element ass = (Element) assertionList.item(i);
@@ -299,11 +283,7 @@ public class SAML2Validator {
                 SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(ass));    // Validate Assertion according to SAML XSD
                 result.add((Assertion) SAML.fromElement(ass));
 
-            } catch (UnmarshallingException ex) {
-                logger.error(null, ex);
-            } catch (IOException ex) {
-                logger.error(null, ex);
-            } catch (SAXException ex) {
+            } catch (UnmarshallingException | IOException | SAXException ex) {
                 logger.error(null, ex);
             }
         }
@@ -400,7 +380,7 @@ public class SAML2Validator {
         String sigCountryCode = null;
 
         NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
-        Element security = null;
+        Element security;
         if (securityList.getLength() > 0) {
             security = (Element) securityList.item(0);
         } else {
@@ -408,7 +388,7 @@ public class SAML2Validator {
         }
 
         NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "Assertion");
-        Element hcpAss = null;
+        Element hcpAss;
         Assertion hcpAssertion = null;
         try {
             if (assertionList.getLength() > 0) {
