@@ -101,7 +101,7 @@ public class SamlTRCIssuer {
             }
 
             DateTime now = new DateTime();
-            LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+            DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
 
             trc.setIssueInstant(nowUTC.toDateTime());
             trc.setID("_" + UUID.randomUUID());

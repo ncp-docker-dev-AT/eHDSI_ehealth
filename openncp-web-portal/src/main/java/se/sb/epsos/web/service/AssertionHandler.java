@@ -108,9 +108,7 @@ public class AssertionHandler implements Serializable {
 
         Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
 
-        LOGGER.debug("NotBefore : " + nowUTC.toDateTime().minusMinutes(1));
         conditions.setNotBefore(nowUTC.toDateTime().minusMinutes(1));
-        LOGGER.debug("NotOnOrAfter : " + nowUTC.toDateTime().plusHours(2));
         conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
         assertion.setConditions(conditions);
 

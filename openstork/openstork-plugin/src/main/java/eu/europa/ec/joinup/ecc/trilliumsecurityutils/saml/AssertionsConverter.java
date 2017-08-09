@@ -264,7 +264,7 @@ public class AssertionsConverter {
 
             auditDataMap.put("patientID", patientID);
             DateTime now = new DateTime();
-            LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+            DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
 
             trc.setIssueInstant(nowUTC.toDateTime());
             trc.setID("_" + UUID.randomUUID());
@@ -468,12 +468,11 @@ public class AssertionsConverter {
 
             assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
 
-            String assId = "_" + UUID.randomUUID();
-            assId = "_" + UUID.randomUUID().toString();
+            String assId = "_" + UUID.randomUUID().toString();
             assertion.setID(assId);
             assertion.setVersion(SAMLVersion.VERSION_20);
             org.joda.time.DateTime now = new org.joda.time.DateTime();
-            LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+            DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
 
             assertion.setIssueInstant(nowUTC.toDateTime());
 

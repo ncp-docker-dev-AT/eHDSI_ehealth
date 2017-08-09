@@ -270,7 +270,7 @@ public class SAML {
         assertion.setID(generator.generateIdentifier());
 
         DateTime now = new DateTime();
-        LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
         assertion.setIssueInstant(nowUTC.toDateTime());
 
         if (issuerURL != null) {
@@ -318,7 +318,7 @@ public class SAML {
         }
 
         DateTime now = new DateTime();
-        LocalDateTime nowUTC = now.withZone(DateTimeZone.UTC).toLocalDateTime();
+        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
         response.setIssueInstant(nowUTC.toDateTime());
 
         if (issuerURL != null) {
