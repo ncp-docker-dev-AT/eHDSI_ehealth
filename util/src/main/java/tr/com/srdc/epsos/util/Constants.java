@@ -93,7 +93,7 @@ public class Constants {
             epsosPath += System.getProperty("file.separator");
         }
         EPSOS_PROPS_PATH = epsosPath;
-
+        LOGGER.info("OpenNCP Util Constants Initialization - EPSOS_PROPS_PATH: '{}'", EPSOS_PROPS_PATH);
         fill();
     }
 
@@ -101,7 +101,7 @@ public class Constants {
     }
 
     private static void fill() {
-        LOGGER.info("OpenNCP Util Constants Initialization!!!");
+
         SERVER_IP = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");
 
         HOME_COMM_ID = ConfigurationManagerFactory.getConfigurationManager().getProperty("HOME_COMM_ID");
@@ -129,7 +129,6 @@ public class Constants {
         NCP_SIG_PRIVATEKEY_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
 
         WRITE_TEST_AUDITS = ConfigurationManagerFactory.getConfigurationManager().getProperty("WRITE_TEST_AUDITS");
-
     }
 
     /**
