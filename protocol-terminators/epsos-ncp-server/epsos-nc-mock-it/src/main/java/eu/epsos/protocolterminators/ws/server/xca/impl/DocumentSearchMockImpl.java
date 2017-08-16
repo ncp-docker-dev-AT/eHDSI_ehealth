@@ -162,8 +162,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
     }
 
-    private
-    static Document loadCDADocument(String content) throws ParserConfigurationException, SAXException, IOException {
+    private static Document loadCDADocument(String content) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(false);
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
