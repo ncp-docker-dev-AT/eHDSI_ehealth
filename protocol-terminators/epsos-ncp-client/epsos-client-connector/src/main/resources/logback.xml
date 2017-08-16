@@ -47,6 +47,10 @@
         <appender-ref ref="DB"/>
     </logger>
 
+    <logger name="ee.affecto.epsos.ws.handler" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="eu.epsos.pt.ws.client.xdr" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>

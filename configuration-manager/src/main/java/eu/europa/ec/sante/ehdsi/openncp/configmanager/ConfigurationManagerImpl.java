@@ -108,6 +108,7 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
     }
 
     private void storeEndpointCertificate(String endpointId, X509Certificate certificate) {
+
         // Store the endpoint certificate in the truststore
         String trustStorePath = getProperty(StandardProperties.NCP_TRUSTSTORE);
         char[] trustStorePassword = getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD).toCharArray();
