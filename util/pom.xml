@@ -177,7 +177,7 @@
                                     ${basedir}/src/main/resources/wsdl/cda-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.cda</packageName>
+                            <packageName>net.ihe.gazelle.cda_</packageName>
                         </configuration>
                     </execution>
                     <execution>
