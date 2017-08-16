@@ -75,6 +75,12 @@ public class MyServletContextListener implements ServletContextListener {
             System.setProperty("javax.net.ssl.keyStorePassword", Constants.NCP_SIG_KEYSTORE_PASSWORD);
             System.setProperty("javax.net.ssl.key.alias", Constants.NCP_SIG_PRIVATEKEY_ALIAS);
             System.setProperty("javax.net.ssl.privateKeyPassword", Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
+            //  EHNCP-1293 OpenNCP Portal - Certificate initialization
+            // System.setProperty("javax.net.ssl.keyStore", Constants.SC_KEYSTORE_PATH);
+            // System.setProperty("javax.net.ssl.keyStorePassword", Constants.SC_KEYSTORE_PASSWORD);
+            // System.setProperty("javax.net.ssl.key.alias", Constants.SC_PRIVATEKEY_ALIAS);
+            // System.setProperty("javax.net.ssl.privateKeyPassword", Constants.SC_PRIVATEKEY_PASSWORD);
+            //EHNCP-1293 OpenNCP Portal - Certificate initialization
             System.setProperty("javax.net.ssl.trustStore", Constants.TRUSTSTORE_PATH);
             System.setProperty("javax.net.ssl.trustStorePassword", Constants.TRUSTSTORE_PASSWORD);
         } catch (Exception e) {

@@ -22,17 +22,25 @@ import java.util.Arrays;
 import java.util.List;
 
 /*
- *  ClientConnectorServiceServiceTest Junit test case
+ *  ClientConnectorServiceService
  */
 public class ClientConnectorConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientConnectorConsumer.class.getName());
 
-    private static final long TIMEOUT = 3 * 60 * 1000; // Three minutes
+    // Three minutes
+    private static final long TIMEOUT = 180000;
 
     private String epr;
 
     public ClientConnectorConsumer(String epr) {
+
+        // EHNCP-1293 OpenNCP Portal - Certificate initialization
+        // System.setProperty("javax.net.ssl.keyStore", Constants.SC_KEYSTORE_PATH);
+        // System.setProperty("javax.net.ssl.keyStorePassword", Constants.SC_KEYSTORE_PASSWORD);
+        // System.setProperty("javax.net.ssl.key.alias", Constants.SC_PRIVATEKEY_ALIAS);
+        // System.setProperty("javax.net.ssl.privateKeyPassword", Constants.SC_PRIVATEKEY_PASSWORD);
+        // EHNCP-1293 OpenNCP Portal - Certificate initialization
         this.epr = epr;
     }
 
@@ -109,8 +117,7 @@ public class ClientConnectorConsumer {
      * @param pd
      * @return
      */
-    public List<PatientDemographics> queryPatient(Assertion idAssertion, String countryCode,
-                                                  PatientDemographics pd) {
+    public List<PatientDemographics> queryPatient(Assertion idAssertion, String countryCode, PatientDemographics pd) {
         /*
          * Stub
          */
@@ -156,13 +163,18 @@ public class ClientConnectorConsumer {
     /**
      * Auto generated test method
      */
-    public String sayHello(String name) {
+    public String sayHello(Assertion idAssertion, String name) {
         ClientConnectorServiceServiceStub stub;
         try {
             stub = new ClientConnectorServiceServiceStub(epr);
             stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
             this.registerEvidenceEmitterHandler(stub);
         } catch (AxisFault ex) {
+            throw new RuntimeException(ex);
+        }
+        try {
+            addAssertions(stub, idAssertion, null);
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
 
