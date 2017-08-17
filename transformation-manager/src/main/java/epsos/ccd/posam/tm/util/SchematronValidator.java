@@ -35,7 +35,8 @@ public class SchematronValidator implements InitializingBean, TMConstants {
     private static final String phase3Template = "iso_svrl_for_xslt2.xsl";
 
     private static final String SVRL_FAILED_ASSERT_XPATH = "//svrl:failed-assert";
-    private static final String SCH_TEMP_DIR = "schemaTemp";
+    private static final String SCH_TEMP_DIR = System.getenv("EPSOS_PROPS_PATH") + "validation" +
+            File.separatorChar + "schematron";
     private static SchematronValidator instance = null;
     /**
      * path to XSL directory
