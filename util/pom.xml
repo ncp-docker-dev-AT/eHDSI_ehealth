@@ -135,7 +135,7 @@
                                     ${basedir}/src/main/resources/wsdl/assertion-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.assertion</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.assertion</packageName>
                         </configuration>
                     </execution>
                     <execution>
@@ -156,7 +156,7 @@
                                     ${basedir}/src/main/resources/wsdl/audit-validator/AuditMessageValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.audit</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.audit</packageName>
                         </configuration>
                     </execution>
                     <execution>
@@ -177,7 +177,7 @@
                                     ${basedir}/src/main/resources/wsdl/cda-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.cda_</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.cda</packageName>
                         </configuration>
                     </execution>
                     <execution>
@@ -198,7 +198,7 @@
                                     ${basedir}/src/main/resources/wsdl/certificate-validator/CertificateValidator.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.certificate</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.certificate</packageName>
                         </configuration>
                     </execution>
                     <execution>
@@ -219,7 +219,7 @@
                                     ${basedir}/src/main/resources/wsdl/schematron-validator/GazelleObjectValidator.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.schematron</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.schematron</packageName>
                         </configuration>
                     </execution>
                     <execution>
@@ -240,7 +240,7 @@
                                     ${basedir}/src/main/resources/wsdl/xds-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.xds</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.xds</packageName>
                         </configuration>
                     </execution>
                 </executions>
