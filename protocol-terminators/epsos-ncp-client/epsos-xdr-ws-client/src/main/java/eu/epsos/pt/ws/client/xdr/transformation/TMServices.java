@@ -23,10 +23,6 @@ import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 import eu.epsos.exceptions.DocumentTransformationException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.axis2.util.XMLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +30,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.util.XMLUtil;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * Encapsulates all the usage of Transformation Manager for transcoding or
@@ -43,7 +44,10 @@ import tr.com.srdc.epsos.util.XMLUtil;
  */
 public final class TMServices {
 
-    private static Logger LOG = LoggerFactory.getLogger(TMServices.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TMServices.class);
+
+    private TMServices() {
+    }
 
     /**
      * Encapsulates the TM usage, by accepting the document to translate and
@@ -56,16 +60,16 @@ public final class TMServices {
     public static byte[] transformDocument(byte[] document) throws DocumentTransformationException {
 
         ITransformationService transformationService;
-         Document resultDoc = null;
+        Document resultDoc;
         TMResponseStructure tmResponse;
-        byte[] result = null;
+        byte[] result;
 
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("ctx_tm.xml");
         transformationService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
 
         resultDoc = byteToDocument(document);
-        
-        LOG.debug("STARTING TRANSLATING DOCUMENT TO PIVOT.");
+
+        LOGGER.debug("STARTING TRANSLATING DOCUMENT TO PIVOT.");
 
         tmResponse = transformationService.toEpSOSPivot(resultDoc); //Perform the translation into pivot.
 
@@ -74,13 +78,15 @@ public final class TMServices {
             throw new DocumentTransformationException("DOCUMENT TRANSLATION FAILED."); //If the translation process fails, an exception is thrown.
         }
         try {
-            resultDoc = tmResponse.getResponseCDA(); //Obtain the translated document in the Document type format, only if translation succeeds.
-            result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes("UTF-8"); //Obtains a byte array from the translation result.
+            // Obtain the translated document in the Document type format, only if translation succeeds.
+            resultDoc = tmResponse.getResponseCDA();
+            //Obtains a byte array from the translation result.
+            result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes("UTF-8");
         } catch (Exception ex) {
             throw new DocumentTransformationException(ex);
         }
 
-        LOG.debug("TRANSLATION SUCCESSFULLY ENDED.");
+        LOGGER.debug("TRANSLATION SUCCESSFULLY ENDED.");
 
         return result; //Return the Document as a byte array.
     }
@@ -98,11 +104,7 @@ public final class TMServices {
 
         try {
             resultDoc = XMLUtil.parseContent(docString); //Parse the String into a Document object.
-        } catch (ParserConfigurationException ex) {
-            throw new DocumentTransformationException(ex);
-        } catch (SAXException ex) {
-            throw new DocumentTransformationException(ex);
-        } catch (IOException ex) {
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
             throw new DocumentTransformationException(ex);
         }
 
@@ -117,13 +119,10 @@ public final class TMServices {
      */
     private static void processErrors(List<ITMTSAMEror> errors) {
 
-        LOG.debug("TRANSLATION PROCESS ERRORS:/n");
+        LOGGER.debug("TRANSLATION PROCESS ERRORS:/n");
 
         for (ITMTSAMEror error : errors) {
-            LOG.info("Error: (Code: " + error.getCode() + ", Description: " + error.getDescription());
+            LOGGER.info("Error: (Code: " + error.getCode() + ", Description: " + error.getDescription());
         }
-    }
-
-    private TMServices() {
     }
 }

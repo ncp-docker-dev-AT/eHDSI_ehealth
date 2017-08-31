@@ -1,18 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{HH:mm:ss.SSSXXX} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
+        </layout>
+    </appender>
+
+    <!--<timestamp key="byDay" datePattern="yyyy-MM-dd"/>-->
+    <!--<appender name="FILE" class="ch.qos.logback.core.FileAppender">-->
+    <!--<file>${catalina.base}/logs/smpeditor-${byDay}.log</file>-->
+    <!--<append>true</append>-->
+    <!--<encoder>-->
+    <!--<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>-->
+    <!--</encoder>-->
+    <!--</appender>-->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${catalina.base}/logs/openncp-gateway.log</file>
+        <append>true</append>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSSXXX} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
         </encoder>
     </appender>
-    <timestamp key="byDay" datePattern="yyyy-MM-dd"/>
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${catalina.base}/logs/smpeditor-${byDay}.log</file>
-      <append>true</append>
-      <encoder>
-        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-      </encoder>
-  </appender>
-    <root level="debug">
+
+    <logger name="eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="org.apache.http" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>
 </configuration>

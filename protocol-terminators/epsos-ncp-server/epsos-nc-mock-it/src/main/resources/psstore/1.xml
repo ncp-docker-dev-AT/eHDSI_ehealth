@@ -6,7 +6,7 @@
     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.3"/>
     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.1"/>
     <id extension="1001" root="2.16.620.1.101.10.3.29.54259"/>
-    <code code="60591-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" codeSystemVersion="2.59"
+    <code code="60591-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" codeSystemVersion="2.34"
           displayName="Patient Summary"/>
     <title>Patient Summary</title>
     <effectiveTime value="20150316135535+0000"/>

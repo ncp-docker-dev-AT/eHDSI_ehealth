@@ -10,9 +10,13 @@
  **/
 package se.sb.epsos.web.service;
 
-import epsos.ccd.gnomon.configmanager.OLDConfigurationManagerDb;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NcpServiceConfigManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NcpServiceConfigManager.class);
 
     private static final String CONFIG_PREFIX = "NcpServiceConfigManager.";
     private static final String SECURITY = "security.";
@@ -29,7 +33,7 @@ public class NcpServiceConfigManager {
     }
 
     private static String getProperty(String property) {
-        return OLDConfigurationManagerDb.getInstance().getProperty(property);
+        return ConfigurationManagerFactory.getConfigurationManager().getProperty(property);
     }
 
     public static String getPrivateKeystoreLocation(String assertionortls) {
@@ -60,6 +64,7 @@ public class NcpServiceConfigManager {
         try {
             return getProperty(CONFIG_PREFIX + DOCUMENTS_DATATABLE_PAGE_SIZE);
         } catch (Exception e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             // Hack for tests. Missing HibernateUtil and Hibernate configuration
             // file for ConfigurationManagerDb.
             // (NoClassDefFoundError and ExceptionInInitializerError)

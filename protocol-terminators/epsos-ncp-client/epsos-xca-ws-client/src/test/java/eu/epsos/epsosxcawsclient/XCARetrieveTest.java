@@ -6,13 +6,13 @@ import eu.epsos.protocolterminators.integrationtest.common.HCPIAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TRCAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
 import eu.epsos.pt.ws.client.xca.XcaInitGateway;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
 import org.junit.Ignore;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
-import tr.com.srdc.epsos.util.Constants;
 
 import java.io.UnsupportedEncodingException;
 
@@ -61,7 +61,7 @@ public class XCARetrieveTest {
                 PATIENT_COUNTRY,
                 TestConstants.TARGET_LANGUAGE,
                 idAssertion,
-                trcAssertion, Constants.PatientService);
+                trcAssertion, RegisteredService.PATIENT_SERVICE.getServiceName());
 
         printResult(result);
     }

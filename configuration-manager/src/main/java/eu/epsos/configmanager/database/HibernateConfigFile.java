@@ -25,6 +25,7 @@ package eu.epsos.configmanager.database;
  *
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
+@Deprecated
 public final class HibernateConfigFile {
 
     /**

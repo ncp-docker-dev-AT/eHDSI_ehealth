@@ -1,4 +1,4 @@
-/**
+/*
  *  Copyright (c) 2009-2011 University of Cardiff and others
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,33 +17,30 @@
  *    University of Cardiff - initial API and implementation
  *    -
  */
-
 package org.openhealthtools.openatna.audit.log;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class logs errors that are not specific to ATNA
  *
  * @author Andrew Harrison
  * @version $Revision:$
- * @created Sep 6, 2009: 11:26:36 AM
- * @date $Date:$ modified by $Author:$
  */
-
 public class ErrorLogger {
 
-    private static Log log = LogFactory.getLog("ATNA.ERROR_LOG");
+    private static Logger logger = LoggerFactory.getLogger("ATNA.ERROR_LOG");
 
-    private static List<ErrorHandler<Throwable>> handlers = new ArrayList<ErrorHandler<Throwable>>();
+    private static List<ErrorHandler<Throwable>> handlers = new ArrayList<>();
 
     private ErrorLogger() {
     }
 
+    @SuppressWarnings("unused")
     public static void addErrorHandler(ErrorHandler<Throwable> handler) {
         handlers.add(handler);
     }
@@ -56,8 +53,7 @@ public class ErrorLogger {
 
     public static void log(Throwable e) {
         invokeHandlers(e);
-        StringBuilder sb = new StringBuilder("===> EXCEPTION THROWN\n");
-        sb.append("** ERROR:").append(e.getClass().getName()).append("**\n");
-        log.error(sb.toString(), e);
+
+        logger.error("===> EXCEPTION THROWN\n** ERROR: {} **", e.getClass().getName(), e);
     }
 }

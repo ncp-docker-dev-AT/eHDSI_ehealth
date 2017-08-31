@@ -4,11 +4,11 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.reporting.ReportBuilder;
-import net.ihe.gazelle.assertion.ModelBasedValidationWS;
-import net.ihe.gazelle.assertion.ModelBasedValidationWSService;
-import net.ihe.gazelle.schematron.GazelleObjectValidator;
-import net.ihe.gazelle.schematron.GazelleObjectValidatorService;
-import net.ihe.gazelle.schematron.SOAPException_Exception;
+import net.ihe.gazelle.jaxb.assertion.ModelBasedValidationWS;
+import net.ihe.gazelle.jaxb.assertion.ModelBasedValidationWSService;
+import net.ihe.gazelle.jaxb.schematron.GazelleObjectValidator;
+import net.ihe.gazelle.jaxb.schematron.GazelleObjectValidatorService;
+import net.ihe.gazelle.jaxb.schematron.SOAPException_Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

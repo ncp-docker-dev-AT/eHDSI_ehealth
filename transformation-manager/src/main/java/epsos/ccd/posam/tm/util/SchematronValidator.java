@@ -16,6 +16,7 @@ import javax.xml.xpath.*;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Schematron validator. Based on ISO schematron implementation.
@@ -34,20 +35,16 @@ public class SchematronValidator implements InitializingBean, TMConstants {
     private static final String phase3Template = "iso_svrl_for_xslt2.xsl";
 
     private static final String SVRL_FAILED_ASSERT_XPATH = "//svrl:failed-assert";
-    private static final String SCH_TEMP_DIR = "schemaTemp";
-
+    private static final String SCH_TEMP_DIR = System.getenv("EPSOS_PROPS_PATH") + "validation" +
+            File.separatorChar + "schematron";
+    private static SchematronValidator instance = null;
     /**
      * path to XSL directory
      */
     private String xslDirectoryPath;
-
     private File phase1OutFile;
     private File phase2OutFile;
     private File phase3OutFile;
-
-
-    private static SchematronValidator instance = null;
-
     private HashMap<String, String> friendlyType;
 
     private HashMap<String, String> pivotType;
@@ -72,7 +69,7 @@ public class SchematronValidator implements InitializingBean, TMConstants {
         SchematronResult result = new SchematronResult();
         try {
             log.info("...Schematron validation BEGIN");
-            log.info("schematron file: " + inputSchemeFile.getAbsolutePath());
+            log.info("Schematron file: '{}'", inputSchemeFile.getAbsolutePath());
             ensureTempExist();
             System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -92,7 +89,7 @@ public class SchematronValidator implements InitializingBean, TMConstants {
             phase3OutFile = getSchema(phase3Out);
 
             if (!phase3OutFile.exists()) {
-                // if final schemaatron xsl does not exists
+                // if final Schematron xsl does not exists
                 // delete all old files
                 File[] files = new File(SCH_TEMP_DIR).listFiles();
                 for (File file : files) {
@@ -135,13 +132,13 @@ public class SchematronValidator implements InitializingBean, TMConstants {
             NodeList errorNodes = evaluateResult(domOut);
             result.setErrors(errorNodes);
             result.setValid(errorNodes.getLength() == 0);
-            log.info("...Schematron validation END - result is valid ? " + result.isValid());
+            log.info("...Schematron validation END - result is valid ? '{}'", result.isValid());
         } catch (XPathException e) {
-            log.error("XPathException: " + e.getMessage(), e);
+            log.error("XPathException: '{}'", e.getMessage(), e);
         } catch (TransformerFactoryConfigurationError e) {
-            log.error("TransformerFactoryConfigurationError: " + e.getMessage(), e);
+            log.error("TransformerFactoryConfigurationError: '{}'", e.getMessage(), e);
         } catch (TransformerException e) {
-            log.error("TransformerException: " + e.getMessage(), e);
+            log.error("TransformerException: '{}'", e.getMessage(), e);
         }
         return result;
     }
@@ -169,8 +166,7 @@ public class SchematronValidator implements InitializingBean, TMConstants {
             }
         });
         XPathExpression exp = xpath.compile(SVRL_FAILED_ASSERT_XPATH);
-        NodeList evaluate = (NodeList) exp.evaluate((domOut).getNode(), XPathConstants.NODESET);
-        return evaluate;
+        return (NodeList) exp.evaluate((domOut).getNode(), XPathConstants.NODESET);
     }
 
     private File getXsl(String name) {
@@ -189,11 +185,11 @@ public class SchematronValidator implements InitializingBean, TMConstants {
         this.xslDirectoryPath = xslDirectoryPath;
     }
 
-    public HashMap<String, String> getFriendlyType() {
+    public Map<String, String> getFriendlyType() {
         return friendlyType;
     }
 
-    public HashMap<String, String> getPivotType() {
+    public Map<String, String> getPivotType() {
         return pivotType;
     }
 
@@ -202,7 +198,7 @@ public class SchematronValidator implements InitializingBean, TMConstants {
     }
 
     public void afterPropertiesSet() throws Exception {
-        friendlyType = new HashMap<String, String>();
+        friendlyType = new HashMap<>();
         friendlyType.put(PATIENT_SUMMARY3, config.getPatientSummarySchematronFriendlyPath());
         friendlyType.put(EPRESCRIPTION3, config.getePrescriptionSchematronFriendlyPath());
         friendlyType.put(EDISPENSATION3, config.geteDispensationSchematronFriendlyPath());
@@ -210,13 +206,12 @@ public class SchematronValidator implements InitializingBean, TMConstants {
         friendlyType.put(MRO3, config.getMroSchematronFriendlyPath());
         friendlyType.put(SCANNED1, config.getScannedDocFriendlyPath());
 
-        pivotType = new HashMap<String, String>();
+        pivotType = new HashMap<>();
         pivotType.put(PATIENT_SUMMARY3, config.getPatientSummarySchematronPivotPath());
         pivotType.put(EPRESCRIPTION3, config.getePrescriptionSchematronPivotPath());
         pivotType.put(EDISPENSATION3, config.geteDispensationSchematronPivotPath());
         pivotType.put(HCER3, config.getHcerSchematronPivotPath());
         pivotType.put(MRO3, config.getMroSchematronPivotPath());
         pivotType.put(SCANNED3, config.getScannedDocPivotPath());
-
     }
 }

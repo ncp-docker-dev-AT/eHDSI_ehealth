@@ -16,41 +16,22 @@
  */
 package epsos.ccd.netsmart.securitymanager;
 
+import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.crypto.*;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.Key;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.cert.CertStore;
-import java.security.cert.CertStoreParameters;
+import java.security.*;
+import java.security.cert.*;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.PKIXBuilderParameters;
-import java.security.cert.PKIXParameters;
-import java.security.cert.X509CertSelector;
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-
-import javax.xml.crypto.AlgorithmMethod;
-import javax.xml.crypto.KeySelector;
-import javax.xml.crypto.KeySelectorException;
-import javax.xml.crypto.KeySelectorResult;
-import javax.xml.crypto.XMLCryptoContext;
-import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
-
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
-import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The Certificate Validator is a component that is responsible for validating
@@ -63,29 +44,36 @@ import org.slf4j.LoggerFactory;
  */
 public final class CertificateValidator extends KeySelector {
 
-    private static final Logger logger = LoggerFactory.getLogger(CertificateValidator.class);
-
-    private Certificate cert = null;
-    private final KeyStore trustStore;
-    private boolean isRevocationEnabled = false;
     public static final String CRLDP_OID = "2.5.29.31";
     public static final String AIA_OID = "1.3.6.1.5.5.7.1.1";
     public static final String PROP_CHECK_FOR_KEYUSAGE = "secman.cert.validator.checkforkeyusage";
-
+    private static final Logger logger = LoggerFactory.getLogger(CertificateValidator.class);
+    private final KeyStore trustStore;
     /**
      *
      */
     public boolean CHECK_FOR_KEYUSAGE;
+    private Certificate cert = null;
+    private boolean isRevocationEnabled = false;
 
     public CertificateValidator(KeyStore _trustStore) throws FileNotFoundException, IOException {
         CHECK_FOR_KEYUSAGE = false;
         trustStore = _trustStore;
-        ConfigurationManagerService cm = ConfigurationManagerService.getInstance();
 
-        if (cm.getProperty(PROP_CHECK_FOR_KEYUSAGE).trim().equalsIgnoreCase("true")) {
+        if (ConfigurationManagerFactory.getConfigurationManager().getProperty(PROP_CHECK_FOR_KEYUSAGE).trim().equalsIgnoreCase("true")) {
             CHECK_FOR_KEYUSAGE = true;
         }
+    }
 
+    static boolean algEquals(String algURI, String algName) {
+        if ((algName.equalsIgnoreCase("DSA")
+                && algURI.contains("#dsa"))
+                || (algName.equalsIgnoreCase("RSA")
+                && algURI.contains("#rsa"))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -93,12 +81,12 @@ public final class CertificateValidator extends KeySelector {
      * structure
      *
      * @param keyInfo The keyInfo structure that contains the certificate
-     * (X509).
+     *                (X509).
      * @throws SMgrException when the validation of the certificate fails
      */
     public void validateCertificate(KeyInfo keyInfo) throws SMgrException {
 
-        for (Iterator<?> it = keyInfo.getContent().iterator(); it.hasNext();) {
+        for (Iterator<?> it = keyInfo.getContent().iterator(); it.hasNext(); ) {
             Object object = it.next();
 
             if (object instanceof X509Data) {
@@ -125,7 +113,7 @@ public final class CertificateValidator extends KeySelector {
 
     public void validateCertificate(org.opensaml.xml.signature.KeyInfo keyInfo) throws SMgrException {
 
-        for (Iterator<?> it = keyInfo.getX509Datas().iterator(); it.hasNext();) {
+        for (Iterator<?> it = keyInfo.getX509Datas().iterator(); it.hasNext(); ) {
             Object object = it.next();
 
             if (object instanceof org.opensaml.xml.signature.X509Data) {
@@ -171,10 +159,10 @@ public final class CertificateValidator extends KeySelector {
             try {
                 cert.checkValidity(new Date());
             } catch (CertificateExpiredException ex) {
-                logger.error( null, ex);
+                logger.error(null, ex);
                 throw new SMgrException("Certificate Expired", ex);
             } catch (CertificateNotYetValidException ex) {
-                logger.error( null, ex);
+                logger.error(null, ex);
                 throw new SMgrException("Certificate Not Valid Yet", ex);
             }
 
@@ -217,23 +205,23 @@ public final class CertificateValidator extends KeySelector {
 
         } catch (NoSuchAlgorithmException ex) {
 
-            logger.error( null, ex);
+            logger.error(null, ex);
             throw new SMgrException("Certificate's Public key algorithm is unknown", ex);
 
         } catch (KeyStoreException ex) {
-            logger.error( null, ex);
+            logger.error(null, ex);
             throw new SMgrException("Error when tried to use the TrustStore", ex);
         } catch (InvalidAlgorithmParameterException ex) {
-            logger.error( null, ex);
+            logger.error(null, ex);
             throw new SMgrException("Invalid Algorith parameters for building Certificate Path", ex);
         }
 
     }
 
     public KeySelectorResult select(KeyInfo keyInfo,
-            KeySelector.Purpose purpose,
-            AlgorithmMethod method,
-            XMLCryptoContext context)
+                                    KeySelector.Purpose purpose,
+                                    AlgorithmMethod method,
+                                    XMLCryptoContext context)
             throws KeySelectorException {
         Iterator<?> ki = keyInfo.getContent().iterator();
         while (ki.hasNext()) {
@@ -251,7 +239,7 @@ public final class CertificateValidator extends KeySelector {
                 try {
                     validateCertificate(keyInfo);
                 } catch (SMgrException ex) {
-                    logger.error( null, ex);
+                    logger.error(null, ex);
                     throw new KeySelectorException("Validation Failed: " + ex.getMessage());
                 }
                 final PublicKey key = ((X509Certificate) o).getPublicKey();
@@ -267,17 +255,6 @@ public final class CertificateValidator extends KeySelector {
             }
         }
         throw new KeySelectorException("No key found!");
-    }
-
-    static boolean algEquals(String algURI, String algName) {
-        if ((algName.equalsIgnoreCase("DSA")
-                && algURI.contains("#dsa"))
-                || (algName.equalsIgnoreCase("RSA")
-                && algURI.contains("#rsa"))) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**

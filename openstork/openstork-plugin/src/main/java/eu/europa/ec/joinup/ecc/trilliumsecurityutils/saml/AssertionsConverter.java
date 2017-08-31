@@ -9,7 +9,6 @@
  */
 package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.SamlTRCIssuer;
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
@@ -18,7 +17,10 @@ import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
 import eu.epsos.assertionvalidator.AssertionHelper;
 import eu.epsos.assertionvalidator.PolicyManagerInterface;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLObjectBuilder;
 import org.opensaml.common.SAMLVersion;
@@ -76,12 +78,12 @@ public class AssertionsConverter {
     public static Assertion createTRCA(String purpose,
                                        Assertion idAs, String root, String extension) throws Exception {
         Assertion trc = null;
-        LOG.debug("Try to create TRCA for patient : " + extension);
+        LOG.debug("Try to create TRCA for patient : '{}'", extension);
         String pat = "";
         pat = extension + "^^^&" + root + "&ISO";
-        LOG.info("TRCA Patient ID : " + pat);
+        LOG.info("TRCA Patient ID : '{}'", pat);
         LOG.info("Asserion ID :" + idAs.getID());
-        LOG.info("SECMAN URL: " + ConfigurationManagerService.getInstance().getProperty("secman.sts.url"));
+        LOG.info("SECMAN URL: " + ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
         TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(
                 idAs, pat).PurposeOfUse(purpose).build();
         trc = req1.request();
@@ -127,45 +129,45 @@ public class AssertionsConverter {
 
         if (isPhysician) {
             rolename = "medical doctor";
-            String doctor_perms = ConfigurationManagerService.getInstance().getProperty(PORTAL_DOCTOR_PERMISSIONS);
+            String doctor_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_DOCTOR_PERMISSIONS);
             String p[] = doctor_perms.split(",");
-            for (int k = 0; k < p.length; k++) {
-                perms.add(prefix + p[k]);
+            for (String aP : p) {
+                perms.add(prefix + aP);
             }
         }
         if (isPharmacist) {
             rolename = "pharmacist";
-            String pharm_perms = ConfigurationManagerService.getInstance().getProperty(PORTAL_PHARMACIST_PERMISSIONS);
+            String pharm_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PHARMACIST_PERMISSIONS);
             String p1[] = pharm_perms.split(",");
-            for (int k = 0; k < p1.length; k++) {
-                perms.add(prefix + p1[k]);
+            for (String aP1 : p1) {
+                perms.add(prefix + aP1);
             }
         }
 
         if (isNurse) {
             rolename = "nurse";
-            String nurse_perms = ConfigurationManagerService.getInstance().getProperty(PORTAL_NURSE_PERMISSIONS);
+            String nurse_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_NURSE_PERMISSIONS);
             String p1[] = nurse_perms.split(",");
-            for (int k = 0; k < p1.length; k++) {
-                perms.add(prefix + p1[k]);
+            for (String aP1 : p1) {
+                perms.add(prefix + aP1);
             }
         }
 
         if (isPatient) {
             rolename = "patient";
-            String patient_perms = ConfigurationManagerService.getInstance().getProperty(PORTAL_PATIENT_PERMISSIONS);
+            String patient_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PATIENT_PERMISSIONS);
             String p1[] = patient_perms.split(",");
-            for (int k = 0; k < p1.length; k++) {
-                perms.add(prefix + p1[k]);
+            for (String aP1 : p1) {
+                perms.add(prefix + aP1);
             }
         }
 
         if (isAdministrator) {
             rolename = "administrator";
-            String admin_perms = ConfigurationManagerService.getInstance().getProperty(PORTAL_ADMIN_PERMISSIONS);
+            String admin_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_ADMIN_PERMISSIONS);
             String p1[] = admin_perms.split(",");
-            for (int k = 0; k < p1.length; k++) {
-                perms.add(prefix + p1[k]);
+            for (String aP1 : p1) {
+                perms.add(prefix + aP1);
             }
         }
 
@@ -183,18 +185,16 @@ public class AssertionsConverter {
                 orgName, orgId, orgType, "TREATMENT", poc, perms);
 
         LOG.debug("Getting config manager");
-        ConfigurationManagerService cms = ConfigurationManagerService
-                .getInstance();
 
         String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-        LOG.debug("KEY ALIAS: " + KEY_ALIAS);
+        LOG.debug("KEY ALIAS: '{}'", KEY_ALIAS);
         String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
 
         AssertionUtils.signSAMLAssertion(assertion, KEY_ALIAS,
                 PRIVATE_KEY_PASS.toCharArray());
 
         AssertionMarshaller marshaller = new AssertionMarshaller();
-        Element element = null;
+        Element element;
 
         element = marshaller.marshall(assertion);
 
@@ -222,7 +222,7 @@ public class AssertionsConverter {
         HashMap<String, String> auditDataMap;
 
         ksm = new DefaultKeyStoreManager();
-        auditDataMap = new HashMap<String, String>();
+        auditDataMap = new HashMap<>();
 
         try {
             //initializing the map
@@ -236,21 +236,21 @@ public class AssertionsConverter {
             try {
                 sman.verifySAMLAssestion(hcpIdentityAssertion);
             } catch (SMgrException ex) {
-                LOG.error("SMgrException: " + ex);
+                LOG.error("SMgrException: '{}'", ex);
                 //java.util.logging.LoggerFactory.getLogger(SamlTRCIssuer.class.getName()).log(Level.SEVERE, null, ex);
                 LOG.error("SMgrException: " + ex);
                 throw new SMgrException("SAML Assertion Validation Failed: " + ex.getMessage());
             }
             if (hcpIdentityAssertion.getConditions().getNotBefore().isAfterNow()) {
                 String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't ne used before " + hcpIdentityAssertion.getConditions().getNotBefore();
-                LOG.error("SMgrException: " + msg);
+                LOG.error("SMgrException: '{}'", msg);
                 //java.util.logging.LoggerFactory.getLogger(SamlTRCIssuer.class.getName()).log(Level.SEVERE, msg);
                 throw new SMgrException(msg);
             }
             if (hcpIdentityAssertion.getConditions().getNotOnOrAfter().isBeforeNow()) {
                 String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used after " + hcpIdentityAssertion.getConditions().getNotOnOrAfter();
                 //java.util.logging.LoggerFactory.getLogger(SamlTRCIssuer.class.getName()).log(Level.SEVERE, msg);
-                LOG.error("SMgrException: " + msg);
+                LOG.error("SMgrException: '{}'", msg);
                 throw new SMgrException(msg);
             }
 
@@ -263,8 +263,10 @@ public class AssertionsConverter {
             }
 
             auditDataMap.put("patientID", patientID);
+            DateTime now = new DateTime();
+            DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
 
-            trc.setIssueInstant(new DateTime());
+            trc.setIssueInstant(nowUTC.toDateTime());
             trc.setID("_" + UUID.randomUUID());
             auditDataMap.put("trcAssertionID", trc.getID());
 
@@ -276,9 +278,9 @@ public class AssertionsConverter {
             trc.setSubject(subject);
             Issuer issuer = new IssuerBuilder().buildObject();
 
-            String confIssuer = ConfigurationManagerService.getInstance().getProperty("secman.trc.endpoint");
+            String confIssuer = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.trc.endpoint");
             if (confIssuer.isEmpty()) {
-                ConfigurationManagerService.getInstance().updateProperty("secman.trc.endpoint", "urn:initgw:countryB");
+                ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.trc.endpoint", "urn:initgw:countryB");
                 confIssuer = "urn:initgw:countryB";
             }
             issuer.setValue(confIssuer);
@@ -296,9 +298,9 @@ public class AssertionsConverter {
 
             //Create and add conditions
             Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
-            DateTime now = new DateTime();
-            conditions.setNotBefore(now);
-            conditions.setNotOnOrAfter(now.plusHours(2)); // According to Spec
+
+            conditions.setNotBefore(nowUTC.toDateTime());
+            conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2)); // According to Spec
             trc.setConditions(conditions);
 
             //Create and add Advice
@@ -312,7 +314,7 @@ public class AssertionsConverter {
 
             //Add and create the authentication statement
             AuthnStatement authStmt = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
-            authStmt.setAuthnInstant(now);
+            authStmt.setAuthnInstant(nowUTC.toDateTime());
             trc.getAuthnStatements().add(authStmt);
 
             //Creata and add AuthnContext
@@ -466,30 +468,28 @@ public class AssertionsConverter {
 
             assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
 
-            String assId = "_" + UUID.randomUUID();
-            assId = "_" + UUID.randomUUID().toString();
+            String assId = "_" + UUID.randomUUID().toString();
             assertion.setID(assId);
             assertion.setVersion(SAMLVersion.VERSION_20);
-            assertion.setIssueInstant(new org.joda.time.DateTime()
-                    .minusHours(3));
+            org.joda.time.DateTime now = new org.joda.time.DateTime();
+            DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
 
-            Subject subject = create(Subject.class,
-                    Subject.DEFAULT_ELEMENT_NAME);
+            assertion.setIssueInstant(nowUTC.toDateTime());
+
+            Subject subject = create(Subject.class, Subject.DEFAULT_ELEMENT_NAME);
             assertion.setSubject(subject);
             subject.setNameID(nameId);
 
             // Create and add Subject Confirmation
-            SubjectConfirmation subjectConf = create(SubjectConfirmation.class,
-                    SubjectConfirmation.DEFAULT_ELEMENT_NAME);
+            SubjectConfirmation subjectConf = create(SubjectConfirmation.class, SubjectConfirmation.DEFAULT_ELEMENT_NAME);
             subjectConf.setMethod(SubjectConfirmation.METHOD_SENDER_VOUCHES);
             assertion.getSubject().getSubjectConfirmations().add(subjectConf);
 
             // Create and add conditions
-            Conditions conditions = create(Conditions.class,
-                    Conditions.DEFAULT_ELEMENT_NAME);
-            org.joda.time.DateTime now = new org.joda.time.DateTime();
-            conditions.setNotBefore(now.minusMinutes(1));
-            conditions.setNotOnOrAfter(now.plusHours(2)); // According to Spec
+            Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
+
+            conditions.setNotBefore(nowUTC.toDateTime().minusMinutes(1));
+            conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2)); // According to Spec
             assertion.setConditions(conditions);
 
             // AudienceRestriction ar =
@@ -504,22 +504,18 @@ public class AssertionsConverter {
             assertion.setIssuer(issuer);
 
             // Add and create the authentication statement
-            AuthnStatement authStmt = create(AuthnStatement.class,
-                    AuthnStatement.DEFAULT_ELEMENT_NAME);
-            authStmt.setAuthnInstant(now.minusHours(2));
+            AuthnStatement authStmt = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
+            authStmt.setAuthnInstant(nowUTC.toDateTime());
             assertion.getAuthnStatements().add(authStmt);
 
             // Create and add AuthnContext
-            AuthnContext ac = create(AuthnContext.class,
-                    AuthnContext.DEFAULT_ELEMENT_NAME);
-            AuthnContextClassRef accr = create(AuthnContextClassRef.class,
-                    AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
+            AuthnContext ac = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
+            AuthnContextClassRef accr = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
             accr.setAuthnContextClassRef(AuthnContext.PASSWORD_AUTHN_CTX);
             ac.setAuthnContextClassRef(accr);
             authStmt.setAuthnContext(ac);
 
-            AttributeStatement attrStmt = create(AttributeStatement.class,
-                    AttributeStatement.DEFAULT_ELEMENT_NAME);
+            AttributeStatement attrStmt = create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
 
             // XSPA Subject
             Attribute attrPID = createAttribute(builderFactory, "XSPA subject",
@@ -577,18 +573,15 @@ public class AssertionsConverter {
             Attribute attrPID_8 = createAttribute(builderFactory,
                     "Hl7 Permissions",
                     "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission");
-            Iterator itr = permissions.iterator();
-            while (itr.hasNext()) {
-                attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, itr
-                        .next().toString(), "", "");
+            for (Object permission : permissions) {
+                attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, permission.toString(), "", "");
             }
             attrStmt.getAttributes().add(attrPID_8);
 
             assertion.getStatements().add(attrStmt);
 
         } catch (ConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error("ConfigurationException: '{}'", e.getMessage(), e);
         }
         return assertion;
     }
@@ -634,7 +627,7 @@ public class AssertionsConverter {
                     .hcpIdentifier(hcpId)
                     .hcpRole(hcpRole);
         } catch (MissingFieldException ex) {
-            LOG.error("One or more required attributes were not found in the original assertion", ex);
+            LOG.error("One or more required attributes were not found in the original assertion: '{}'", ex.getMessage(), ex);
             return result;
         }
 
@@ -644,7 +637,7 @@ public class AssertionsConverter {
             assertionBuilder
                     .hcpSpecialty(hcpSpecialty);
         } catch (MissingFieldException ex) {
-            LOG.info("Optional attribute not found, proceeding with conversion (HCP Specialty).");
+            LOG.info("Optional attribute not found, proceeding with conversion (HCP Specialty).", ex);
         }
 
         // OPTIONAL: HCP Organization ID and HCP Organization Name
@@ -654,7 +647,7 @@ public class AssertionsConverter {
             assertionBuilder
                     .healthCareProfessionalOrganisation(orgId, orgName);
         } catch (MissingFieldException ex) {
-            LOG.info("Optional attribute not found, proceeding with conversion ( HCP Organization ID and HCP Organization Name.");
+            LOG.info("Optional attribute not found, proceeding with conversion ( HCP Organization ID and HCP Organization Name.", ex);
         }
 
         // MANDATORY: HealthCare Facility Type

@@ -9,8 +9,8 @@ import com.liferay.portal.security.auth.StorkAutoLogin;
 import com.liferay.portal.security.auth.StorkHelper;
 import com.liferay.portal.security.auth.StorkProperties;
 import com.liferay.portal.stork.util.PatientSearchAttributes;
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.europa.ec.joinup.ecc.openstork.utils.StorkUtils;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.stork.peps.auth.commons.IPersonalAttributeList;
 import eu.stork.peps.auth.commons.PEPSUtil;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
@@ -117,7 +117,7 @@ public class StorkRestService {
         resp.setEpsosRole(epsosRole);
         resp.setAttrs(attrs);
 
-        String countryCode = ConfigurationManagerService.getInstance().getProperty("COUNTRY_CODE");
+        String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
         log.info("The country code is: '{}'", countryCode);
         log.info("Reading the required attributes from International Search Mask");
         Map<String, String> attributes = PatientSearchAttributes.getRequiredAttributesByCountry(countryCode);

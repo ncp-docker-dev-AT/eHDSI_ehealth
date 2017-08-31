@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
@@ -24,10 +25,8 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringWriter;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -163,14 +162,13 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
     }
 
-    public static Document loadCDADocument(String content) throws ParserConfigurationException, SAXException, IOException {
-
-        //LOGGER.debug("loadCDADocument(): '{}'", content);
+    private static Document loadCDADocument(String content) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(false);
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-        StreamResult result = new StreamResult(new StringWriter());
-        return docBuilder.parse(new ByteArrayInputStream(result.toString().getBytes()));
+        InputSource is = new InputSource();
+        is.setCharacterStream(new StringReader(content));
+        return docBuilder.parse(is);
     }
 
     @Override

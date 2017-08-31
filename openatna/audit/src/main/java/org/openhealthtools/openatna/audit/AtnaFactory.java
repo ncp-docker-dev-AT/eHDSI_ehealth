@@ -1,4 +1,4 @@
-/**
+/*
  *  Copyright (c) 2009-2011 University of Cardiff and others
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,19 +17,9 @@
  *    University of Cardiff - initial API and implementation
  *    -
  */
-
 package org.openhealthtools.openatna.audit;
 
-import org.openhealthtools.openatna.audit.persistence.dao.CodeDao;
-import org.openhealthtools.openatna.audit.persistence.dao.EntityDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ErrorDao;
-import org.openhealthtools.openatna.audit.persistence.dao.MessageDao;
-import org.openhealthtools.openatna.audit.persistence.dao.NetworkAccessPointDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ObjectDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ParticipantDao;
-import org.openhealthtools.openatna.audit.persistence.dao.ProvisionalDao;
-import org.openhealthtools.openatna.audit.persistence.dao.QueryDao;
-import org.openhealthtools.openatna.audit.persistence.dao.SourceDao;
+import org.openhealthtools.openatna.audit.persistence.dao.*;
 import org.openhealthtools.openatna.audit.service.AuditService;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -38,14 +28,13 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * @author Andrew Harrison
  * @version $Revision:$
- * @created Nov 1, 2009: 10:31:59 AM
- * @date $Date:$ modified by $Author:$
  */
-
 public class AtnaFactory {
 
     private ApplicationContext context;
+
     private static AtnaFactory instance;
+
     private static String openatnaProperties = null;
 
 
@@ -66,11 +55,11 @@ public class AtnaFactory {
      */
     public static synchronized void initialize(ApplicationContext context) {
         if (context == null) {
-    		try {
-    			context = new ClassPathXmlApplicationContext(new String[]{"classpath*:/*Context.xml"});
-    		} catch(BeansException e) {
+            try {
+                context = new ClassPathXmlApplicationContext(new String[]{"classpath*:/*Context.xml"});
+            } catch (BeansException e) {
                 throw new RuntimeException("FATAL: Could not create Spring Application Context.", e);
-    		}
+            }
         }
         instance = new AtnaFactory(context);
     }
@@ -133,5 +122,4 @@ public class AtnaFactory {
     public static QueryDao queryDao() {
         return (QueryDao) getBean("queryDao");
     }
-
 }

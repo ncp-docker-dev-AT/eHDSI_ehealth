@@ -5,9 +5,9 @@ import eu.epsos.validation.datamodel.audit.AuditSchematron;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.reporting.ReportBuilder;
-import net.ihe.gazelle.audit.AuditMessageValidationWS;
-import net.ihe.gazelle.audit.AuditMessageValidationWSService;
-import net.ihe.gazelle.audit.SOAPException_Exception;
+import net.ihe.gazelle.jaxb.audit.AuditMessageValidationWS;
+import net.ihe.gazelle.jaxb.audit.AuditMessageValidationWSService;
+import net.ihe.gazelle.jaxb.audit.SOAPException_Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,9 +5,9 @@
 
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
-    <xsl:param name="userLang" select="'en'"/>
+    <xsl:param name="userLang" select="'en-GB'"/>
     <xsl:param name="epsosLangDir" select="'../EpsosRepository'"/>
-    <xsl:param name="defaultUserLang" select="'en'"/>
+    <xsl:param name="defaultUserLang" select="'en-GB'"/>
     <xsl:param name="actionpath" select="''"/>
     <xsl:param name="allowDispense" select="'false'"/>
     <xsl:param name="shownarrative" select="''"/>

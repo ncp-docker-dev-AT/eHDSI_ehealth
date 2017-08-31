@@ -16,41 +16,11 @@
  */
 package epsos.ccd.netsmart.securitymanager;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.security.auth.x500.X500Principal;
-import javax.xml.crypto.MarshalException;
-import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dsig.CanonicalizationMethod;
-import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.Transform;
-import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.crypto.dsig.XMLSignatureException;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.dom.DOMValidateContext;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
-import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.security.SAMLSignatureProfileValidator;
@@ -72,21 +42,42 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import javax.security.auth.x500.X500Principal;
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dsig.*;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.IOException;
+import java.io.Serializable;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * The NCP Signature Manager is a JAVA library for applying and verifying
- * detached digital signatures on XML documents and for applying and verifying
- * enveloped signatures on SAML assertions and Audit Trail Messages
+ * The NCP Signature Manager is a JAVA library for applying and verifying detached digital signatures on XML documents
+ * and for applying and verifying enveloped signatures on SAML assertions and Audit Trail Messages
  *
  * @author Jerry Dimitriou <jerouris at netsmart.gr>
  */
 public class SignatureManager {
 
     private static final Logger logger = LoggerFactory.getLogger(SignatureManager.class);
-
-    private KeyStoreManager keyManager;
-    private String signatureAlgorithm;
     private static final String SIG_ALG_PROP = "secman.signature.algorithm.default";
     private static final String DGST_ALG_PROP = "secman.digest.algorithm.default";
+    private KeyStoreManager keyManager;
+    private String signatureAlgorithm;
     private String digestAlgorithm;
 
     public SignatureManager() throws IOException {
@@ -107,7 +98,7 @@ public class SignatureManager {
     }
 
     private void init() throws IOException {
-        ConfigurationManagerService cm = ConfigurationManagerService.getInstance();
+        ConfigurationManager cm = ConfigurationManagerFactory.getConfigurationManager();
         signatureAlgorithm = cm.getProperty(SIG_ALG_PROP);
 
         // If not defined
@@ -123,7 +114,6 @@ public class SignatureManager {
             digestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA1;
             //cm.updateProperty(DGST_ALG_PROP, digestAlgorithm);
         }
-
     }
 
     /**
@@ -147,11 +137,11 @@ public class SignatureManager {
                 profileValidator.validate(sig);
             } catch (ValidationException e) {
                 // Indicates signature did not conform to SAML Signature profile
-                logger.error(e.getMessage());
+                logger.error("ValidationException: '{}'", e.getMessage(), e);
                 throw new SMgrException("SAML Signature Profile Validation: " + e.getMessage());
             }
 
-            X509Certificate cert = null;
+            X509Certificate cert;
             List<X509Certificate> certificates = KeyInfoHelper.getCertificates(sig.getKeyInfo());
             if (certificates.size() == 1) {
                 cert = certificates.get(0);
@@ -170,7 +160,7 @@ public class SignatureManager {
                 sigValidator.validate(sig);
             } catch (ValidationException e) {
                 // Indicates signature was not cryptographically valid, or possibly a processing error
-                logger.error(e.getMessage());
+                logger.error("ValidationException: '{}'", e.getMessage(), e);
                 throw new SMgrException("Signature Validation: " + e.getMessage());
             }
             CertificateValidator cv = new CertificateValidator(keyManager.getTrustStore());
@@ -190,7 +180,7 @@ public class SignatureManager {
      * validation.
      *
      * @param doc The XML Document that will be validated.
-     * @throws SMgrException When the validation of the signature fails
+     * @throws SMgrException       When the validation of the signature fails
      * @throws java.io.IOException
      */
     public void verifyEnvelopedSignature(Document doc) throws SMgrException, IOException {
@@ -215,14 +205,11 @@ public class SignatureManager {
 
             boolean coreValidity = signature.validate(valContext);
 
-            if (coreValidity == false) {
+            if (!coreValidity) {
                 throw new SMgrException("Invalid Signature: Mathematic check failed");
             }
 
-        } catch (XMLSignatureException ex) {
-            logger.error(null, ex);
-            throw new SMgrException("Signature Invalid: " + ex.getMessage(), ex);
-        } catch (MarshalException ex) {
+        } catch (XMLSignatureException | MarshalException ex) {
             logger.error(null, ex);
             throw new SMgrException("Signature Invalid: " + ex.getMessage(), ex);
         }
@@ -233,10 +220,10 @@ public class SignatureManager {
      * Signs a Signable SAML Object using the private key with alias
      * <i>keyAlias</i>. Uses the opesaml2 library
      *
-     * @param as The Signable SAML Object that is going to be signed. Usually a
-     * SAML Assertion
-     * @param keyAlias The NCP Trust Store Key Alias of the private key that
-     * will be used for signing.
+     * @param as          The Signable SAML Object that is going to be signed. Usually a
+     *                    SAML Assertion
+     * @param keyAlias    The NCP Trust Store Key Alias of the private key that
+     *                    will be used for signing.
      * @param keyPassword
      * @throws SMgrException When signing fails
      * @see org.opensaml.common.SignableSAMLObject
@@ -244,8 +231,8 @@ public class SignatureManager {
     public void signSAMLAssertion(SignableSAMLObject as, String keyAlias, char[] keyPassword)
             throws SMgrException {
 
-        KeyPair kp = null;
-        X509Certificate cert = null;
+        KeyPair kp;
+        X509Certificate cert;
         //check if we must use the default key
         if (keyAlias == null) {
             kp = keyManager.getDefaultPrivateKey();
@@ -284,7 +271,6 @@ public class SignatureManager {
         } catch (org.opensaml.xml.signature.SignatureException ex) {
             throw new SMgrException(ex.getMessage(), ex);
         }
-
     }
 
     /**
@@ -302,9 +288,9 @@ public class SignatureManager {
      * Signs an XML document using the private key with alias <i>keyAlias</i>.
      * Uses enveloped XML Signatures
      *
-     * @param doc The Document that is going to be signed.
-     * @param keyAlias The NCP Trust Store Key Alias of the private key that
-     * will be used for signing.
+     * @param doc         The Document that is going to be signed.
+     * @param keyAlias    The NCP Trust Store Key Alias of the private key that
+     *                    will be used for signing.
      * @param keyPassword
      * @throws SMgrException When signing fails
      */
@@ -313,8 +299,8 @@ public class SignatureManager {
 
         Logger logger = LoggerFactory.getLogger(SignatureManager.class.getName());
 
-        KeyPair kp = null;
-        X509Certificate cert = null;
+        KeyPair kp;
+        X509Certificate cert;
 
         if (keyAlias == null) {
             kp = keyManager.getDefaultPrivateKey();
@@ -334,18 +320,17 @@ public class SignatureManager {
 
             Reference ref
                     = fac.newReference("", fac.newDigestMethod(digestAlgorithm, null),
-                            Collections.singletonList(
-                                    fac.newTransform(Transform.ENVELOPED, (XMLStructure) null)),
-                            null, null);
+                    Collections.singletonList(
+                            fac.newTransform(Transform.ENVELOPED, (XMLStructure) null)),
+                    null, null);
 
-            SignedInfo si
-                    = fac.newSignedInfo(fac.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null),
-                            fac.newSignatureMethod(signatureAlgorithm, null),
-                            Collections.singletonList(ref));
+            SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
+                    (C14NMethodParameterSpec) null), fac.newSignatureMethod(signatureAlgorithm, null),
+                    Collections.singletonList(ref));
 
             KeyInfoFactory kif = fac.getKeyInfoFactory();
 
-            List<Serializable> x509Content = new ArrayList<Serializable>();
+            List<Serializable> x509Content = new ArrayList<>();
             x509Content.add(cert.getSubjectX500Principal().getName(X500Principal.RFC1779));
             x509Content.add(cert);
             X509Data xd = kif.newX509Data(x509Content);
@@ -356,25 +341,8 @@ public class SignatureManager {
             XMLSignature signature = fac.newXMLSignature(si, ki);
             signature.sign(dsc);
 
-        } catch (ClassNotFoundException ex) {
-            logger.error(null, ex);
-            throw new SMgrException(ex.getMessage(), ex);
-        } catch (InstantiationException ex) {
-            logger.error(null, ex);
-            throw new SMgrException(ex.getMessage(), ex);
-        } catch (IllegalAccessException ex) {
-            logger.error(null, ex);
-            throw new SMgrException(ex.getMessage(), ex);
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(null, ex);
-            throw new SMgrException(ex.getMessage(), ex);
-        } catch (InvalidAlgorithmParameterException ex) {
-            logger.error(null, ex);
-            throw new SMgrException(ex.getMessage(), ex);
-        } catch (MarshalException ex) {
-            logger.error(null, ex);
-            throw new SMgrException(ex.getMessage(), ex);
-        } catch (XMLSignatureException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchAlgorithmException
+                | InvalidAlgorithmParameterException | MarshalException | XMLSignatureException ex) {
             logger.error(null, ex);
             throw new SMgrException(ex.getMessage(), ex);
         }
@@ -385,10 +353,9 @@ public class SignatureManager {
      * the Configuration Manager. Uses the opesaml2 library
      *
      * @param trc The Signable SAML Object that is going to be signed. Usually a
-     * SAML Assertion
+     *            SAML Assertion
      * @throws SMgrException When signing fails
      * @see org.opensaml.common.SignableSAMLObject
-     * @see epsos.ccd.gnomon.configmanager.ConfigurationManagerService
      */
     public void signSAMLAssertion(Assertion trc) throws SMgrException {
         signSAMLAssertion(trc, null, null);

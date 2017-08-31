@@ -1,12 +1,13 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.*;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.exception.GenericException;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
-import org.oasis_open.docs.bdxr.ns.smp._2016._05.EndpointType;
-import org.oasis_open.docs.bdxr.ns.smp._2016._05.RedirectType;
-import org.oasis_open.docs.bdxr.ns.smp._2016._05.ServiceMetadata;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.EndpointType;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.RedirectType;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.ServiceMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,7 +175,7 @@ public class SMPSignFileController {
 
             smpfile.setSignFile(signFiles.get(k));
 
-            File convFile = new File("/" + smpfile.getSignFile().getOriginalFilename());
+            File convFile = new File(Constants.SMP_DIR_PATH + smpfile.getSignFile().getOriginalFilename());
             try {
                 smpfile.getSignFile().transferTo(convFile);
             } catch (IOException ex) {
@@ -420,9 +421,9 @@ public class SMPSignFileController {
                 smpfile.setEndpointURI(endpoint.getEndpointURI());
 
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                Calendar cal = endpoint.getServiceActivationDate();
-                String formatted = format.format(cal.getTime());
-                Calendar cal2 = endpoint.getServiceExpirationDate();
+                Date cal = endpoint.getServiceActivationDate().toGregorianCalendar().getTime();
+                String formatted = format.format(cal);
+                Date cal2 = endpoint.getServiceExpirationDate().toGregorianCalendar().getTime();
                 String formatted2 = format.format(cal2.getTime());
 
                 smpfile.setServiceActivationDateS(formatted);
@@ -499,7 +500,7 @@ public class SMPSignFileController {
     mock
     */
 
-        File file = new File(ConfigurationManagerService.getInstance().getProperty("NCP_SIG_KEYSTORE_PATH"));
+        File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PATH"));
         FileInputStream input = null;
         try {
             input = new FileInputStream(file);
@@ -519,9 +520,9 @@ public class SMPSignFileController {
                 signFile.signFiles(smpfilesign.getAllFiles().get(i).getType().name(),
                         smpfilesign.getAllFiles().get(i).getFileName(),
                         keystore,
-                        ConfigurationManagerService.getInstance().getProperty("NCP_SIG_KEYSTORE_PASSWORD"),
-                        ConfigurationManagerService.getInstance().getProperty("NCP_SIG_PRIVATEKEY_ALIAS"),
-                        ConfigurationManagerService.getInstance().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD"),
+                        ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD"),
+                        ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_ALIAS"),
+                        ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD"),
                         smpfilesign.getAllFiles().get(i).getSignFile());
             } catch (Exception ex) {
                 logger.error("\nException - " + SimpleErrorHandler.printExceptionStackTrace(ex));

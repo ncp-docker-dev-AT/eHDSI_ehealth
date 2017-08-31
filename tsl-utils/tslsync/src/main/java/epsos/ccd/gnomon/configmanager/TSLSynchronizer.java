@@ -17,6 +17,8 @@
 package epsos.ccd.gnomon.configmanager;
 
 import epsos.ccd.gnomon.auditmanager.*;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -33,7 +35,6 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 
-
 /**
  * Synchronizes the countries tsl content to the configuration parameters Read
  * the list of countries from the configuration manager parameter name =
@@ -41,7 +42,7 @@ import java.util.Hashtable;
  * the property tsl.location.[country_code] It verifies the tsl file It parses
  * the tsl file and extracts the endpoint wse and writes them to the
  * configuration manager Finally it exports all the certificates and add them to
- * the truststor
+ * the truststore
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -59,17 +60,17 @@ public class TSLSynchronizer {
 
         StringBuilder sb1 = new StringBuilder();
         String sb = "";
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
         String ncp = cms.getProperty("ncp.country");
         String ncpemail = cms.getProperty("ncp.email");
 
         if (ncp.equals("")) {
             ncp = "GR-12";
-            cms.updateProperty("ncp.country", ncp);
+            cms.setProperty("ncp.country", ncp);
         }
         if (ncpemail.equals("")) {
             ncpemail = "ncpgr@epsos.gr";
-            cms.updateProperty("ncp.email", ncpemail);
+            cms.setProperty("ncp.email", ncpemail);
         }
 
         // read the country codes of the epSOS countries from the NCP configuration
@@ -106,17 +107,17 @@ public class TSLSynchronizer {
         logger.info("Synchronizing a specific country...");
         StringBuilder sb1 = new StringBuilder();
         String sb = "";
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
         String ncp = cms.getProperty("ncp.country");
         String ncpemail = cms.getProperty("ncp.email");
 
         if (ncp.equals("")) {
             ncp = "GR-12";
-            cms.updateProperty("ncp.country", ncp);
+            cms.setProperty("ncp.country", ncp);
         }
         if (ncpemail.equals("")) {
             ncpemail = "ncpgr@epsos.gr";
-            cms.updateProperty("ncp.email", ncpemail);
+            cms.setProperty("ncp.email", ncpemail);
         }
 
         logger.info("Exporting configuration for: '{}'", country);
@@ -131,7 +132,7 @@ public class TSLSynchronizer {
      * @param cms the instance of configuration manager
      * @return the comma seperated list of ncp countries
      */
-    private static String getCountriesList(ConfigurationManagerService cms) {
+    private static String getCountriesList(ConfigurationManager cms) {
         return cms.getProperty("ncp.countries");
     }
 
@@ -192,7 +193,7 @@ public class TSLSynchronizer {
     }
 
     private static String exportCountryConfig(StringBuilder sb, String country) {
-        ConfigurationManagerService cms = ConfigurationManagerService.getInstance();
+        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
         String ncp = cms.getProperty("ncp.country");
         String ncpemail = cms.getProperty("ncp.email");
         Hashtable serviceNames = null;

@@ -1,18 +1,14 @@
 package eu.epsos.validation.services;
 
-import eu.epsos.util.net.ProxyUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.reporting.ReportBuilder;
-import net.ihe.gazelle.xds.ModelBasedValidationWS;
-import net.ihe.gazelle.xds.ModelBasedValidationWSService;
-import net.ihe.gazelle.xds.SOAPException_Exception;
+import net.ihe.gazelle.jaxb.xds.ModelBasedValidationWS;
+import net.ihe.gazelle.jaxb.xds.ModelBasedValidationWSService;
+import net.ihe.gazelle.jaxb.xds.SOAPException_Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-//import net.ihe.gazelle.xd.ModelBasedValidationWS;
-//import net.ihe.gazelle.xd.ModelBasedValidationWSService;
 
 /**
  * This class represents the wrapper for the XCA messages validation.

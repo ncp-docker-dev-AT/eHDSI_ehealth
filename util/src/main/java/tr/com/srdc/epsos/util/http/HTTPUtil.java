@@ -1,27 +1,9 @@
-/**
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * <p>
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- */
 package tr.com.srdc.epsos.util.http;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
 import eu.epsos.util.proxy.CustomProxySelector;
 import eu.epsos.util.proxy.ProxyCredentials;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +13,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.ProxySelector;
 import java.net.URL;
 import java.security.KeyStore;
@@ -44,35 +24,48 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+/**
+ *
+ */
 public class HTTPUtil {
 
-    public static final Logger logger = LoggerFactory.getLogger(HTTPUtil.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(HTTPUtil.class);
 
-    public static String getClientCertificate(HttpServletRequest req) {
+    /**
+     * @param request
+     * @return
+     */
+    public static String getClientCertificate(HttpServletRequest request) {
+
+        LOGGER.info("Trying to find certificate from : '{}'", request.getRequestURI());
         String result;
-        X509Certificate[] certs = (X509Certificate[]) req.getAttribute("javax.servlet.request.X509Certificate");
+        X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
 
-        if (certs != null) {
-            //			for (int i = 0; i < certs.length; i++) {
-            //				logger.info("Client Certificate [" + i + "] = " + certs[i].getSubjectDN().getName());
-            //			}
+        if (certs != null && certs.length > 0) {
+
             result = certs[0].getSubjectDN().getName();
         } else {
-            if ("https".equals(req.getScheme())) {
-                logger.warn("This was an HTTPS request, " + "but no client certificate is available");
+            if ("https".equals(request.getScheme())) {
+                LOGGER.warn("This was an HTTPS request, " + "but no client certificate is available");
             } else {
-                logger.warn("This was not an HTTPS request, " + "so no client certificate is available");
+                LOGGER.warn("This was not an HTTPS request, " + "so no client certificate is available");
             }
             result = "Warning!: No Client certificate found!";
         }
-
+        LOGGER.debug("Client Certificate: '{}'", result);
         return result;
     }
 
+    /**
+     * @param endpoint
+     * @return
+     */
     public static String getServerCertificate(String endpoint) {
-        logger.info("Trying to find certificate from : '{}'", endpoint);
+
+        LOGGER.info("Trying to find certificate from : '{}'", endpoint);
         String result = "";
         HttpsURLConnection con = null;
+
         try {
             if (!endpoint.startsWith("https")) {
                 result = "Warning!: No Server certificate found!";
@@ -87,82 +80,76 @@ public class HTTPUtil {
                 Certificate[] certs = con.getServerCertificates();
 
                 // Get the first certificate
-                //
-                if (certs == null) {
-                    result = "Warning!: No Server certificate found!";
-                } else {
+                if (certs != null && certs.length > 0) {
                     X509Certificate cert = (X509Certificate) certs[0];
                     result = cert.getSubjectDN().getName();
+                } else {
+                    result = "Warning!: No Server certificate found!";
                 }
             }
-        } catch (MalformedURLException e) {
-            logger.error("", e);
         } catch (IOException e) {
-            logger.error("", e);
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         } finally {
             if (con != null) {
                 con.disconnect();
             }
         }
-
+        LOGGER.debug("Server Certificate: '{}'", result);
         return result;
 
     }
 
+    /**
+     * @param isProvider
+     * @return
+     */
     public static String getSubjectDN(boolean isProvider) {
 
-        FileInputStream is = null;
+        FileInputStream inputStream = null;
         Certificate cert;
 
         try {
             if (isProvider) {
-                is = new FileInputStream(Constants.SP_KEYSTORE_PATH);
+                inputStream = new FileInputStream(Constants.SP_KEYSTORE_PATH);
                 KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-                keystore.load(is, Constants.SP_KEYSTORE_PASSWORD.toCharArray());
+                keystore.load(inputStream, Constants.SP_KEYSTORE_PASSWORD.toCharArray());
                 cert = keystore.getCertificate(Constants.SP_PRIVATEKEY_ALIAS);
             } else {
-                is = new FileInputStream(Constants.SC_KEYSTORE_PATH);
+                inputStream = new FileInputStream(Constants.SC_KEYSTORE_PATH);
                 KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-                keystore.load(is, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
+                keystore.load(inputStream, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
                 cert = keystore.getCertificate(Constants.SC_PRIVATEKEY_ALIAS);
             }
             if (cert instanceof X509Certificate) {
                 X509Certificate x509cert = (X509Certificate) cert;
-
-                // Get subject
                 Principal principal = x509cert.getSubjectDN();
                 return principal.getName();
             }
-        } catch (FileNotFoundException e) {
-            logger.error("", e);
-        } catch (KeyStoreException e) {
-            logger.error("", e);
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("", e);
-        } catch (CertificateException e) {
-            logger.error("", e);
-        } catch (IOException e) {
-            logger.error("", e);
+        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         } finally {
-            IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(inputStream);
         }
         return "";
     }
 
+    /**
+     * @return
+     */
     public static boolean isProxyAnthenticationMandatory() {
 
-        ConfigurationManagerService configService = ConfigurationManagerService
-                .getInstance();
+        ConfigurationManager configService = ConfigurationManagerFactory.getConfigurationManager();
 
-        return Boolean.parseBoolean(configService
-                .getProperty("APP_BEHIND_PROXY"));
+        return Boolean.parseBoolean(configService.getProperty("APP_BEHIND_PROXY"));
     }
 
+    /**
+     * @return
+     */
     public static ProxyCredentials getProxyCredentials() {
         ProxyCredentials credentials = new ProxyCredentials();
-        ConfigurationManagerService configService = ConfigurationManagerService.getInstance();
-        credentials.setProxyAuthenticated(Boolean.parseBoolean(configService
-                .getProperty("APP_BEHIND_PROXY")));
+        ConfigurationManager configService = ConfigurationManagerFactory.getConfigurationManager();
+        credentials.setProxyAuthenticated(Boolean.parseBoolean(configService.getProperty("APP_BEHIND_PROXY")));
         credentials.setHostname(configService.getProperty("APP_PROXY_HOST"));
         credentials.setPassword(configService.getProperty("APP_PROXY_PASSWORD"));
         credentials.setPort(configService.getProperty("APP_PROXY_PORT"));
@@ -170,6 +157,9 @@ public class HTTPUtil {
         return credentials;
     }
 
+    /**
+     * @return
+     */
     public CustomProxySelector setCustomProxyServerForURLConnection() {
         CustomProxySelector ps = null;
         if (isProxyAnthenticationMandatory()) {

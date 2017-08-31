@@ -2,6 +2,7 @@ package epsos.openncp.protocolterminator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
 import org.opensaml.xml.Configuration;
@@ -64,7 +65,8 @@ public class TRCAssertionCreator {
         assertion.setVersion(version);
 
         // Set AuthnStatement
-        DateTime dateTime = new DateTime();
+        DateTime dateTime = new DateTime().toDateTime(DateTimeZone.UTC);
+        ;
         AuthnStatement authnStatement = saml.create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
         authnStatement.setAuthnInstant(dateTime);
         authnStatement.setSessionNotOnOrAfter(dateTime.plusHours(2));

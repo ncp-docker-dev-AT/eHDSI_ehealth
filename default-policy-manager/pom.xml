@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>2.5.2-SNAPSHOT</version>
+        <version>2.5.2.RC2-SNAPSHOT</version>
     </parent>
 
     <artifactId>openncp-defaultpolicymanager</artifactId>
@@ -84,11 +84,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- TODO: Harmonizing the opensaml dependencies versions used in the diferents components -->
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
-            <version>2.5.3</version>
+            <version>${opensaml.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.xerces</groupId>

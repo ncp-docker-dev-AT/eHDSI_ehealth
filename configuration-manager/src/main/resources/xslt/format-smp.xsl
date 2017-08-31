@@ -6,7 +6,7 @@
     xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
     xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" 
     xmlns:ids="http://busdox.org/transport/identifiers/1.0/" 
-    xmlns:ns="urn:esens:smp" 
+    xmlns:ns="urn:esens:isSmp"
     xmlns:wsa="http://www.w3.org/2005/08/addressing" 
     xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
     xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" 
@@ -55,7 +55,7 @@
         <xsl:element name="{local-name()}" namespace="http://busdox.org/serviceMetadata/publishing/1.0/">
             <xsl:namespace name="ds" select="'http://www.w3.org/2000/09/xmldsig#'"/>
             <xsl:namespace name="ids" select="'http://busdox.org/transport/identifiers/1.0/'"/>
-            <xsl:namespace name="ns" select="'urn:esens:smp'"/>
+            <xsl:namespace name="ns" select="'urn:esens:isSmp'"/>
             <xsl:namespace name="wsa" select="'http://www.w3.org/2005/08/addressing'"/>
             <xsl:namespace name="wsu" select="'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd'"/>
             <xsl:namespace name="xades" select="'http://uri.etsi.org/01903/v1.3.2#'"/>

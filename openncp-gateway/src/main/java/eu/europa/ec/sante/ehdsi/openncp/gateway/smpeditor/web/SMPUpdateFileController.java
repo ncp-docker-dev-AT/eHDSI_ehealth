@@ -1,14 +1,15 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
-import epsos.ccd.gnomon.configmanager.ConfigurationManagerService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.*;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SMPConverter;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.XMLValidator;
-import org.oasis_open.docs.bdxr.ns.smp._2016._05.EndpointType;
-import org.oasis_open.docs.bdxr.ns.smp._2016._05.RedirectType;
-import org.oasis_open.docs.bdxr.ns.smp._2016._05.ServiceMetadata;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.EndpointType;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.RedirectType;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.ServiceMetadata;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -81,16 +82,18 @@ public class SMPUpdateFileController {
     public String post(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, Model model, final RedirectAttributes redirectAttributes) {
         logger.debug("\n==== in post ====");
         model.addAttribute("smpfileupdate", smpfileupdate);
-        logger.debug("\n**********  smpfileupdate - " + smpfileupdate.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n**********  smpfileupdate - '{}'" + smpfileupdate.toString());
+        }
         isSigned = false;
 
-        File convFile = new File("/" + smpfileupdate.getUpdateFile().getOriginalFilename());
+        File convFile = new File(Constants.SMP_DIR_PATH + smpfileupdate.getUpdateFile().getOriginalFilename());
         try {
             smpfileupdate.getUpdateFile().transferTo(convFile);
         } catch (IOException ex) {
-            logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (IllegalStateException ex) {
-            logger.error("\n IllegalStateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
     
     /*Validate xml file*/
@@ -291,12 +294,14 @@ public class SMPUpdateFileController {
             smpfileupdate.setEndpointURI(endpoint.getEndpointURI());
 
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            Calendar cal = endpoint.getServiceActivationDate();
-            String formatted = format.format(cal.getTime());
+            //Calendar cal = endpoint.getServiceActivationDate();
+            Date cal = endpoint.getServiceActivationDate().toGregorianCalendar().getTime();
+            String formatted = format.format(cal);
             Date datead = null;
             Date dateed = null;
-            Calendar cal2 = endpoint.getServiceExpirationDate();
-            String formatted2 = format.format(cal2.getTime());
+            //Calendar cal2 = endpoint.getServiceExpirationDate();
+            Date cal2 = endpoint.getServiceExpirationDate().toGregorianCalendar().getTime();
+            String formatted2 = format.format(cal2);
             try {
                 datead = format.parse(formatted);
                 dateed = format.parse(formatted2);
@@ -394,7 +399,7 @@ public class SMPUpdateFileController {
                     } else {
 
                         String certPath = env.getProperty(smpfileupdate.getType().name() + ".certificate");
-                        String certificatePath = ConfigurationManagerService.getInstance().getProperty(certPath);
+                        String certificatePath = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPath);
 
                         FileInputStream fis = null;
                         try {

@@ -133,8 +133,12 @@ public class CdaHelper {
 							XPathExpression productIdExpr = xpath.compile(
 									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code");
 							Node materialIDNode = (Node) productIdExpr.evaluate(entryNode, XPathConstants.NODE);
-							if (materialIDNode != null) {
-								materialID = materialIDNode.getAttributes().getNamedItem("code").getNodeValue();
+							if ((materialIDNode != null) && (materialIDNode.getAttributes() != null)) {
+								if (materialIDNode.getAttributes().getNamedItem("nullFlavor") != null) {
+									materialID = NullFlavorManager.getNullFlavor(materialIDNode.getAttributes().getNamedItem("nullFlavor").getNodeValue());
+								} else if (materialIDNode.getAttributes().getNamedItem("code") != null) {
+									materialID = materialIDNode.getAttributes().getNamedItem("code").getNodeValue();
+								}
 							}
 
 							XPathExpression nameExpr = xpath.compile(
@@ -148,31 +152,35 @@ public class CdaHelper {
 									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:formCode");
 							Node doseForm = (Node) doseFormExpr.evaluate(entryNode, XPathConstants.NODE);
 							if (doseForm != null) {
-								packsString = doseForm.getAttributes().getNamedItem("displayName").getNodeValue();
-								formCode = doseForm.getAttributes().getNamedItem("code").getNodeValue();
+								Node displayNameNode = doseForm.getAttributes().getNamedItem("displayName");
+								if (displayNameNode != null) {
+									packsString = displayNameNode.getNodeValue();
+								}
+								Node codeNode = doseForm.getAttributes().getNamedItem("code");
+								if (codeNode != null) {
+									formCode = codeNode.getNodeValue();
+								}
 							}
 
-							XPathExpression packQuantityExpr = xpath.compile(
-									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:ingredient/epsos:quantity/epsos:numerator[@xsi:type='epsos:PQ']");
-							Node packQuant = (Node) packQuantityExpr.evaluate(entryNode, XPathConstants.NODE);
+							String atcCode = null;
+							XPathExpression atcCodeExpr = xpath.compile("hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:asSpecializedKind[@classCode='GEN']/epsos:generalizedMedicineClass[@classCode='MMAT']/epsos:code");
+							Node atcCodeNode = (Node) atcCodeExpr.evaluate(entryNode, XPathConstants.NODE);
+							if (atcCodeNode != null) {
+								atcCode = atcCodeNode.getAttributes().getNamedItem("code").getNodeValue();
+							}
 
-							XPathExpression packQuantityExpr2 = xpath.compile(
-									"hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:ingredient/epsos:quantity/epsos:denominator[@xsi:type='epsos:PQ']");
-							Node packQuant2 = (Node) packQuantityExpr2.evaluate(entryNode, XPathConstants.NODE);
-							if (packQuant != null && packQuant2 != null) {
-								String unit = packQuant.getAttributes().getNamedItem("unit").getNodeValue();
-								if (unit != null && !unit.equals(CHAR_ONE)) {
-									packsString += CHAR_SPACE + unit;
-								}
+							String atcName = null;
+							XPathExpression atcNameExpr = xpath.compile("hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:asSpecializedKind[@classCode='GEN']/epsos:generalizedMedicineClass[@classCode='MMAT']/epsos:name");
+							Node atcNameNode = (Node) atcNameExpr.evaluate(entryNode, XPathConstants.NODE);
+							if (atcNameNode != null) {
+								atcName = atcNameNode.getTextContent().trim();
+							}
 
-								String denom = packQuant2.getAttributes().getNamedItem("value").getNodeValue();
-								if (denom != null && !denom.equals(CHAR_ONE)) {
-									packsString += CHAR_FORWARD_SLASH + denom;
-									unit = packQuant2.getAttributes().getNamedItem("unit").getNodeValue();
-									if (unit != null && !unit.equals(CHAR_ONE)) {
-										packsString += CHAR_SPACE + unit;
-									}
-								}
+							String strength = null;
+							XPathExpression strengthExpr = xpath.compile("hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:desc");
+							Node strengthNode = (Node) strengthExpr.evaluate(entryNode, XPathConstants.NODE);
+							if (strengthNode != null) {
+								strength = strengthNode.getTextContent().trim();
 							}
 
 							row.setIngredient(handleIngredients(xpath, entryNode));
@@ -239,6 +247,10 @@ public class CdaHelper {
 
 							row.setFormName(packsString);
 							row.setFormCode(formCode);
+
+							row.setAtcCode(atcCode);
+							row.setAtcName(atcName);
+							row.setStrength(strength);
 
 							row.setDosage(doseString);
 
@@ -364,7 +376,7 @@ public class CdaHelper {
 
 				Node ingredientNode = ingredientRowNodeList.item(a);
 
-				ingredientVO.setActiveIngredient(handleIngredient(xpath, ingredientNode));
+				handleIngredient(ingredientVO, xpath, ingredientNode);
 				ingredientVO.setStrength(handleStrength(xpath, ingredientNode));
 				ingredientList.add(ingredientVO);
 			}
@@ -438,15 +450,28 @@ public class CdaHelper {
 	// return new StrengthVO(handleQuantity(strengthExpr, ingredientNode), handleQuantity(strengthExpr2, ingredientNode));
 	// }
 
-	private String handleIngredient(XPath xpath, Node ingredientNode) throws XPathExpressionException {
-		String ingredient = "";
+	private void handleIngredient(Ingredient ingredientVO, XPath xpath, Node ingredientNode) throws XPathExpressionException {
 		XPathExpression ingredientExpression = xpath.compile("epsos:ingredient/epsos:code");
 		Node ingrNode = (Node) ingredientExpression.evaluate(ingredientNode, XPathConstants.NODE);
 		if (ingrNode != null) {
-			ingredient += ingrNode.getAttributes().getNamedItem("code").getNodeValue() + " - "
-					+ ingrNode.getAttributes().getNamedItem("displayName").getNodeValue();
+			Node nf = ingrNode.getAttributes().getNamedItem("nullFlavor");
+			if (nf != null) {
+				ingredientVO.setActiveIngredient(NullFlavorManager.getNullFlavor(nf.getNodeValue()));
+			} else {
+				ingredientVO.setActiveIngredient(ingrNode.getAttributes().getNamedItem("code").getNodeValue()
+					+ " - " + ingrNode.getAttributes().getNamedItem("displayName").getNodeValue());
+			}
 		}
-		return ingredient;
+		XPathExpression nameExpression = xpath.compile("epsos:ingredient/epsos:name");
+		Node nameNode = (Node) nameExpression.evaluate(ingredientNode, XPathConstants.NODE);
+		if (nameNode != null) {
+			Node nf = nameNode.getAttributes().getNamedItem("nullFlavor");
+			if (nf != null) {
+				ingredientVO.setActiveIngredientName(NullFlavorManager.getNullFlavor(nf.getNodeValue()));
+			} else {
+				ingredientVO.setActiveIngredientName(nameNode.getTextContent());
+			}
+		}
 	}
 
 	private QuantityVO handleQuantity(XPathExpression exp, Node inNode) throws XPathExpressionException {

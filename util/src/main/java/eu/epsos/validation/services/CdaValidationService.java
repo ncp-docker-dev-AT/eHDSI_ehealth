@@ -5,9 +5,9 @@ import eu.epsos.validation.datamodel.cda.CdaSchematron;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.reporting.ReportBuilder;
-import net.ihe.gazelle.cda.ModelBasedValidationWS;
-import net.ihe.gazelle.cda.ModelBasedValidationWSService;
-import net.ihe.gazelle.cda.SOAPException_Exception;
+import net.ihe.gazelle.jaxb.cda.ModelBasedValidationWS;
+import net.ihe.gazelle.jaxb.cda.ModelBasedValidationWSService;
+import net.ihe.gazelle.jaxb.cda.SOAPException_Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

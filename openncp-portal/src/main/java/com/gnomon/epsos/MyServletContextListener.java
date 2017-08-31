@@ -5,28 +5,54 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import tr.com.srdc.epsos.util.Constants;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import org.slf4j.Logger;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import tr.com.srdc.epsos.util.Constants;
 
 @WebListener
 public class MyServletContextListener implements ServletContextListener {
 
     private static final Logger log = LoggerFactory.getLogger("MyServletContextListener");
-    private ServletContext context = null;
     private static String runningMode;
     private static String encryptionKey;
     private static ITransformationService tService;
-    private static ClientConnectorConsumer clientConectorConsumer;
+    private static ClientConnectorConsumer clientConnectorConsumer;
+    private ServletContext context = null;
 
-    // Public constructor is required by servlet spec
+
     public MyServletContextListener() {
+        // Public constructor is required by servlet spec
+    }
+
+    public static ITransformationService getTransformationService() {
+        return tService;
+    }
+
+    public static ClientConnectorConsumer getClientConnectorConsumer() {
+        return clientConnectorConsumer;
+    }
+
+    public static String getRunningMode() {
+        return runningMode;
+    }
+
+    public static void setRunningMode(String runningMode) {
+        MyServletContextListener.runningMode = runningMode;
+    }
+
+    public static String getEncryptionKey() {
+        return encryptionKey;
+    }
+
+    public static void setEncryptionKey(String encryptionKey) {
+        MyServletContextListener.encryptionKey = encryptionKey;
     }
 
     // -------------------------------------------------------
@@ -49,10 +75,16 @@ public class MyServletContextListener implements ServletContextListener {
             System.setProperty("javax.net.ssl.keyStorePassword", Constants.NCP_SIG_KEYSTORE_PASSWORD);
             System.setProperty("javax.net.ssl.key.alias", Constants.NCP_SIG_PRIVATEKEY_ALIAS);
             System.setProperty("javax.net.ssl.privateKeyPassword", Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
+            //  EHNCP-1293 OpenNCP Portal - Certificate initialization
+            // System.setProperty("javax.net.ssl.keyStore", Constants.SC_KEYSTORE_PATH);
+            // System.setProperty("javax.net.ssl.keyStorePassword", Constants.SC_KEYSTORE_PASSWORD);
+            // System.setProperty("javax.net.ssl.key.alias", Constants.SC_PRIVATEKEY_ALIAS);
+            // System.setProperty("javax.net.ssl.privateKeyPassword", Constants.SC_PRIVATEKEY_PASSWORD);
+            //EHNCP-1293 OpenNCP Portal - Certificate initialization
             System.setProperty("javax.net.ssl.trustStore", Constants.TRUSTSTORE_PATH);
             System.setProperty("javax.net.ssl.trustStorePassword", Constants.TRUSTSTORE_PASSWORD);
         } catch (Exception e) {
-            log.error("#### ERROR INITIALIZING KEYSTORE/TRUSTSTORE ####");
+            log.error("#### ERROR INITIALIZING KEYSTORE/TRUSTSTORE #### - '{}'", e.getMessage(), e);
         }
 
         log.info("Initializing TM component");
@@ -63,42 +95,18 @@ public class MyServletContextListener implements ServletContextListener {
             log.error("#### ERROR INITIALIZING TM ####", e);
         }
         try {
-            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);			//serviceUrl = LiferayUtils.getFromPrefs("client_connector_url");
-            log.info("SERVICE URL IS " + serviceUrl);
-            clientConectorConsumer = new ClientConnectorConsumer(serviceUrl);
+            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);            //serviceUrl = LiferayUtils.getFromPrefs("client_connector_url");
+            log.info("SERVICE URL IS '{}'", serviceUrl);
+            clientConnectorConsumer = new ClientConnectorConsumer(serviceUrl);
         } catch (Exception e) {
-            log.error("ERROR INITIALIZING CLIENT CONNECTOR PROXY");
+            log.error("ERROR INITIALIZING CLIENT CONNECTOR PROXY - '{}'", e.getMessage(), e);
         }
 
-        log.info("Running Mode: " + runningMode);
+        log.info("Running Mode: '{}'", runningMode);
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
 
         this.context = null;
-    }
-
-    public static ITransformationService getTransformationService() {
-        return tService;
-    }
-
-    public static ClientConnectorConsumer getClientConnectorConsumer() {
-        return clientConectorConsumer;
-    }
-
-    public static String getRunningMode() {
-        return runningMode;
-    }
-
-    public static void setRunningMode(String runningMode) {
-        MyServletContextListener.runningMode = runningMode;
-    }
-
-    public static String getEncryptionKey() {
-        return encryptionKey;
-    }
-
-    public static void setEncryptionKey(String encryptionKey) {
-        MyServletContextListener.encryptionKey = encryptionKey;
     }
 }
