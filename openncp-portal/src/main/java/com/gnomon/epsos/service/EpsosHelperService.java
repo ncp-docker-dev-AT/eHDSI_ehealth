@@ -43,7 +43,6 @@ import org.htmlcleaner.PrettyXmlSerializer;
 import org.htmlcleaner.TagNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLObjectBuilder;
@@ -308,6 +307,7 @@ public class EpsosHelperService {
             EDDetail ed = new EDDetail();
             ed.setRelativePrescriptionLineId(d_line.getField1().toString());
             ed.setDispensedQuantity(d_line.getField7().toString());
+            ed.setDispensedNumberOfPackages(d_line.getField8().toString());
             ed.setMedicineFormCode(d_line.getField5().toString());
             ed.setMedicineCommercialName(d_line.getField2().toString());
             // Setting the substitution indicator
@@ -336,7 +336,7 @@ public class EpsosHelperService {
     public static ByteArrayOutputStream ConvertHTMLtoPDF(String htmlin,
                                                          String uri, String fontpath) {
 
-        String cleanCDA = "";
+        String cleanCDA;
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties props = cleaner.getProperties();
         // props.setTreatUnknownTagsAsContent(true);

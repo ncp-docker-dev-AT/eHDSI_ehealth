@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.withSettings;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -57,7 +56,7 @@ public class DispensePrescriptionPageTest extends AbstractPageTest {
     }
 
     @Test
-    public void testRenderPageSucessfully() throws Exception {
+    public void testRenderPageSuccessfully() throws Exception {
         NcpServiceFacade serviceFacade = ((EpsosAuthenticatedWebSession) tester.getWicketSession()).getServiceFacade();
         AuthenticatedUser user = ((EpsosAuthenticatedWebSession) tester.getWicketSession()).getUserDetails();
         List<MetaDocument> docs = serviceFacade.queryDocuments(person, "EP", user);
@@ -65,7 +64,7 @@ public class DispensePrescriptionPageTest extends AbstractPageTest {
         assertNotNull(docs);
         assertTrue(docs.size() > 0);
         PageParameters params = new PageParameters("personId=" + person.getEpsosId());
-        params.put("prescription", new LoadableDocumentModel<Prescription>(prescription));
+        params.put("prescription", new LoadableDocumentModel<>(prescription));
         tester.startPage(new DispensePrescriptionPage(params));
         tester.assertRenderedPage(DispensePrescriptionPage.class);
         tester.assertNoErrorMessage();
@@ -75,7 +74,7 @@ public class DispensePrescriptionPageTest extends AbstractPageTest {
     @Ignore
     public void testBackButtonReturnsUserToViewPrescriptionsFromModalWindow() throws Exception {
         ((EpsosAuthenticatedWebSession) tester.getWicketSession()).addToBreadCrumbList(new BreadCrumbVO("title", new QueryDocumentsPage(new PageParameters("personId=" + person.getEpsosId() + ",docType=EP"))));
-        testRenderPageSucessfully();
+        testRenderPageSuccessfully();
         tester.executeAjaxEvent("dispensationForm:dispenseRows:0:submit", "onclick");
         tester.assertRenderedPage(DispensePrescriptionPage.class);
         tester.clickLink("dispenseModalWindow:content:backToQueryDocuments:link");
@@ -84,7 +83,7 @@ public class DispensePrescriptionPageTest extends AbstractPageTest {
 
     @Test
     public void testClickViewOriginalKnownNcpExceptionsHandledCorrectly() throws Exception {
-        testRenderPageSucessfully();
+        testRenderPageSuccessfully();
         mockedFacade = mock(NcpServiceFacade.class, settings);
         ((EpsosAuthenticatedWebSession) tester.getWicketSession()).setServiceFacade(mockedFacade);
         for (Entry<String, String> knownExceptionEntry : epsosErrorCodesAndExpectedTexts.entrySet()) {
@@ -95,7 +94,7 @@ public class DispensePrescriptionPageTest extends AbstractPageTest {
     @Test
     @Ignore
     public void testClickPrintKnownNcpExceptionsHandledCorrectly() throws Exception {
-        testRenderPageSucessfully();
+        testRenderPageSuccessfully();
         mockedFacade = mock(NcpServiceFacade.class, settings);
         ((EpsosAuthenticatedWebSession) tester.getWicketSession()).setServiceFacade(mockedFacade);
         for (Entry<String, String> knownExceptionEntry : epsosErrorCodesAndExpectedTexts.entrySet()) {
@@ -106,7 +105,7 @@ public class DispensePrescriptionPageTest extends AbstractPageTest {
     @Test
     @Ignore
     public void testSubmitDispensationKnownNcpExceptionsHandledCorrectly() throws Exception {
-        testRenderPageSucessfully();
+        testRenderPageSuccessfully();
         mockedFacade = mock(NcpServiceFacade.class, settings);
         ((EpsosAuthenticatedWebSession) tester.getWicketSession()).setServiceFacade(mockedFacade);
         for (Entry<String, String> knownExceptionEntry : epsosErrorCodesAndExpectedTexts.entrySet()) {
@@ -117,7 +116,7 @@ public class DispensePrescriptionPageTest extends AbstractPageTest {
     @Test
     public void testBackButtonReturnsToQueryDocPage() throws Exception {
         ((EpsosAuthenticatedWebSession) tester.getWicketSession()).addToBreadCrumbList(new BreadCrumbVO("title", new QueryDocumentsPage(new PageParameters("personId=" + person.getEpsosId() + ",docType=EP"))));
-        testRenderPageSucessfully();
+        testRenderPageSuccessfully();
         tester.executeAjaxEvent("form:back", "onclick");
         tester.assertRenderedPage(QueryDocumentsPage.class);
     }
