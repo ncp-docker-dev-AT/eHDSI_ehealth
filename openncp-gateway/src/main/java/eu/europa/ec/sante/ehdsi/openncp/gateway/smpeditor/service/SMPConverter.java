@@ -3,6 +3,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPFieldProperties;
+import org.apache.commons.lang.StringUtils;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,9 +80,9 @@ public class SMPConverter {
      * @param redirectHref
      * @param minimumAuthLevel
      */
-    public void convertToXml(String type, /*int clientServer,*/ String issuanceType, String CC, String endpointUri, String servDescription,
-                             String tecContact, String tecInformation, Date servActDate, Date servExpDate,
-                             MultipartFile extension, FileInputStream certificateFile, String fileName,
+    public void convertToXml(String type, /*int clientServer,*/ String issuanceType, String CC, String endpointUri,
+                             String servDescription, String tecContact, String tecInformation, Date servActDate,
+                             Date servExpDate, MultipartFile extension, FileInputStream certificateFile, String fileName,
                              SMPFieldProperties businessLevelSignature, SMPFieldProperties minimumAuthLevel,
                              String certificateUID, String redirectHref) {
 
@@ -150,7 +151,7 @@ public class SMPConverter {
                 XMLGregorianCalendar xmlGregorianCalendarAD = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarAD);
                 endpointType.setServiceActivationDate(xmlGregorianCalendarAD);//Set by user
             } catch (DatatypeConfigurationException e) {
-                e.printStackTrace();
+                LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
             }
 
 
@@ -170,7 +171,7 @@ public class SMPConverter {
                     XMLGregorianCalendar xmlGregorianCalendarED = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarED);
                     endpointType.setServiceExpirationDate(xmlGregorianCalendarED);//Set by user
                 } catch (DatatypeConfigurationException e) {
-                    e.printStackTrace();
+                    LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
                 }
 
             }
@@ -184,7 +185,7 @@ public class SMPConverter {
                     String certAlias = env.getProperty(type + ".certificate.alias");
                     String certificatePass = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPass);
                     String certificateAlias = ConfigurationManagerFactory.getConfigurationManager().getProperty(certAlias);
-
+                    LOGGER.info("Certificate Info: '{}', '{}', '{}', '{}'", certPass, certAlias, certificatePass, certificateAlias);
                     KeyStore ks = null;
                     try {
                         ks = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -198,15 +199,18 @@ public class SMPConverter {
                     } catch (CertificateException ex) {
                         LOGGER.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                     }
+
                     if (ks != null && ks.isKeyEntry(certificateAlias)) {
                         char c[] = new char[certificatePass.length()];
                         certificatePass.getChars(0, c.length, c, 0);
                         Certificate certs[] = ks.getCertificateChain(certificateAlias);
+                        if (LOGGER.isDebugEnabled()) {
+                            for (Certificate certificate : certs) {
+                                LOGGER.debug("Certificate Info: '{}' - '{}'", ((X509Certificate) certificate).getSerialNumber(), ((X509Certificate) certificate).getSubjectDN().getName());
+                            }
+                        }
                         if (certs[0] instanceof X509Certificate) {
                             X509Certificate x509 = (X509Certificate) certs[0];
-                        }
-                        if (certs[certs.length - 1] instanceof X509Certificate) {
-                            X509Certificate x509 = (X509Certificate) certs[certs.length - 1];
                             endpointType.setCertificate(x509.getEncoded());
                             certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
                         }
@@ -218,7 +222,7 @@ public class SMPConverter {
                             certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
                         }
                     } else {
-                        LOGGER.debug("\n ********** " + certificateAlias + " is unknown to this keystore");
+                        LOGGER.debug("\n ********** '{}' is unknown to this keystore", certificateAlias);
                     }
 
                 } catch (KeyStoreException ex) {
@@ -258,8 +262,6 @@ public class SMPConverter {
                 Document docOriginal = null;
                 try {
                     String content = new Scanner(extension.getInputStream()).useDelimiter("\\Z").next();
-                    //LOGGER.debug("\n*****Content from extension file - " + content);
-
                     docOriginal = parseDocument(content);
 
                 } catch (FileNotFoundException ex) {
@@ -332,13 +334,12 @@ public class SMPConverter {
      * @param redirectHref
      * @param certificateUID
      */
-    public void updateToXml(String type, String CC, String documentID, String documentIDScheme,
-                            String participantID, String participantIDScheme, String processID,
-                            String processIDScheme, String transportProfile, Boolean requiredBusinessLevelSig,
-                            String minimumAutenticationLevel, String endpointUri, String servDescription, String tecContact,
-                            String tecInformation, Date servActDate, Date servExpDate, byte[] certificate, FileInputStream certificateFile,
-                            Element extension, MultipartFile extensionFile,
-                            String fileName, String certificateUID, String redirectHref) {
+    public void updateToXml(String type, String CC, String documentID, String documentIDScheme, String participantID,
+                            String participantIDScheme, String processID, String processIDScheme, String transportProfile,
+                            Boolean requiredBusinessLevelSig, String minimumAutenticationLevel, String endpointUri,
+                            String servDescription, String tecContact, String tecInformation, Date servActDate,
+                            Date servExpDate, byte[] certificate, FileInputStream certificateFile, Element extension,
+                            MultipartFile extensionFile, String fileName, String certificateUID, String redirectHref) {
 
         LOGGER.debug("\n==== in updateToXml ====");
 
@@ -418,7 +419,7 @@ public class SMPConverter {
                 XMLGregorianCalendar xmlGregorianCalendarAD = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarAD);
                 endpointType.setServiceActivationDate(xmlGregorianCalendarAD);//Set by user
             } catch (DatatypeConfigurationException e) {
-                e.printStackTrace();
+                LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
             }
 
 
@@ -438,7 +439,7 @@ public class SMPConverter {
                     XMLGregorianCalendar xmlGregorianCalendarED = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarED);
                     endpointType.setServiceExpirationDate(xmlGregorianCalendarED);//Set by user
                 } catch (DatatypeConfigurationException e) {
-                    e.printStackTrace();
+                    LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
                 }
             }
 
@@ -485,15 +486,13 @@ public class SMPConverter {
                             certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
                         }
                     } else {
-                        LOGGER.debug("\n ********** " + certificateAlias + " is unknown to this keystore");
+                        LOGGER.debug("\n ********** '{}' is unknown to this keystore", certificateAlias);
                     }
-
                 } catch (KeyStoreException ex) {
                     LOGGER.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (CertificateEncodingException ex) {
                     LOGGER.error("\n CertificateEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
-
             } else {
                 byte[] by = "".getBytes();
                 endpointType.setCertificate(by);
@@ -619,9 +618,10 @@ public class SMPConverter {
     /**
      * Defines the static fields of the SMP File
      */
-    private void createStaticFields(String type, /*int clientServer,*/ String issuanceType, String CC, DocumentIdentifier documentIdentifier, EndpointType endpointType,
-                                    ParticipantIdentifierType participantIdentifierType, ProcessIdentifier processIdentifier,
-                                    SMPFieldProperties businessLevelSignature, SMPFieldProperties minimumAuthLevel) {
+    private void createStaticFields(String type, String issuanceType, String CC, DocumentIdentifier documentIdentifier,
+                                    EndpointType endpointType, ParticipantIdentifierType participantIdentifierType,
+                                    ProcessIdentifier processIdentifier, SMPFieldProperties businessLevelSignature,
+                                    SMPFieldProperties minimumAuthLevel) {
 
     /*
      Document and Participant identifiers definition
@@ -643,7 +643,8 @@ public class SMPConverter {
 
         documentIdentifier.setScheme(env.getProperty(type + ".DocumentIdentifier.Scheme"));//in smpeditor.properties
 
-        if (!issuanceType.equals("")) {
+        //if (!issuanceType.equals("")) {
+        if (StringUtils.isNotBlank(issuanceType)) {
             documentIdentifier.setValue(env.getProperty(type + ".DocumentIdentifier." + issuanceType));//in smpeditor.properties
         } else {
             documentIdentifier.setValue(env.getProperty(type + ".DocumentIdentifier"));//in smpeditor.properties
@@ -653,7 +654,8 @@ public class SMPConverter {
      Process identifiers definition
      */
         processIdentifier.setScheme(env.getProperty(type + ".ProcessIdentifier.Scheme"));//in smpeditor.properties
-        if (!issuanceType.equals("")) {
+        //if (!issuanceType.equals("")) {
+        if (StringUtils.isNotBlank(issuanceType)) {
             processIdentifier.setValue(env.getProperty(type + ".ProcessIdentifier." + issuanceType));
         } else {
             String processID = env.getProperty(type + ".ProcessIdentifier");//in smpeditor.properties
@@ -676,7 +678,6 @@ public class SMPConverter {
         if (minimumAuthLevel.isEnable()) {
             endpointType.setMinimumAuthenticationLevel(env.getProperty(type + ".MinimumAuthenticationLevel")); //in smpeditor.properties
         }
-
     }
 
     /**
@@ -684,8 +685,7 @@ public class SMPConverter {
      */
     private void getXMLFile(ServiceMetadata serviceMetadata) {
 
-        LOGGER.info("Generate XML SMP file: '{}'", serviceMetadata.getServiceInformation().
-                getParticipantIdentifier().getValue());
+        LOGGER.info("Generate XML SMP file: '{}'", serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue());
 
         // Generates the final SMP XML file
         XMLStreamWriter xsw = null;
