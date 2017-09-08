@@ -385,8 +385,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             }
 
             /* Perform validation of response message */
-            XdrValidationService.getInstance().validateModel(responseLogMsg, XdModel.obtainModelXdr(responseLogMsg).toString(), NcpSide.NCP_B);
-
+            XdrValidationService.getInstance().validateModel(responseLogMsg, XdModel.obtainResponseModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
             /*
              * Return
              */

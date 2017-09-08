@@ -78,6 +78,8 @@ public class XDSbRepositoryServiceInvoker {
     public RegistryResponseType provideAndRegisterDocumentSet(final XdrRequest request, final String countryCode, String docClassCode)
             throws AxisFault, RemoteException {
         RegistryResponseType response;
+        
+        String submissionSetUuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
 
         /*
          * Stub
@@ -118,13 +120,13 @@ public class XDSbRepositoryServiceInvoker {
         ExtrinsicObjectType eotXML = makeExtrinsicObject(request, uuid, docClassCode);
         prds.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
 
-        RegistryPackageType rptXML = prepareRegistryPackage(request, docClassCode);
+        RegistryPackageType rptXML = prepareRegistryPackage(request, docClassCode, submissionSetUuid);
         prds.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().add(ofRim.createRegistryPackage(rptXML));
 
-        ClassificationType clXML = prepareClassification();
+        ClassificationType clXML = prepareClassification(submissionSetUuid);
         prds.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().add(ofRim.createClassification(clXML));
 
-        AssociationType1 astXML = prepareAssociation(uuid);
+        AssociationType1 astXML = prepareAssociation(uuid, submissionSetUuid);
         prds.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(astXML));
 
         /* XDR Document */
@@ -393,12 +395,13 @@ public class XDSbRepositoryServiceInvoker {
         return result;
     }
 
-    private RegistryPackageType prepareRegistryPackage(XdrRequest request, String docClassCode) {
+    private RegistryPackageType prepareRegistryPackage(XdrRequest request, String docClassCode, String submissionSetUuid) {
         RegistryPackageType rpt = ofRim.createRegistryPackageType();
 
         PatientId patientId = request.getPatient().getIdList().get(0);
+        
 
-        rpt.setId(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_SET_STR);
+        rpt.setId(submissionSetUuid);
         rpt.setObjectType(XDRConstants.REGISTRY_PACKAGE.OBJECT_TYPE_UUID);
 
         rpt.getSlot().add(makeSlot(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_TIME_STR, DateUtil.getDateByDateFormat(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_TIME_FORMAT)));
@@ -406,52 +409,52 @@ public class XDSbRepositoryServiceInvoker {
         rpt.setDescription(makeInternationalString(getDescrFromClassCode(docClassCode)));
 
         ClassificationType classification;
-        classification = makeClassification0(XDRConstants.REGISTRY_PACKAGE.AUTHOR_CLASSIFICATION_UUID, XDRConstants.REGISTRY_PACKAGE.SUBMISSION_SET_STR, "");
+        classification = makeClassification0(XDRConstants.REGISTRY_PACKAGE.AUTHOR_CLASSIFICATION_UUID, submissionSetUuid, "");
         classification.getSlot().add(makeSlot(XDRConstants.REGISTRY_PACKAGE.AUTHOR_INSTITUTION_STR, getAuthorInstitution(request)));
         classification.getSlot().add(makeSlot(XDRConstants.REGISTRY_PACKAGE.AUTHOR_PERSON_STR, getAuthorPerson(request)));
         rpt.getClassification().add(classification);
 
         rpt.getClassification().add(makeClassification(XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_UUID,
-                XDRConstants.REGISTRY_PACKAGE.SUBMISSION_SET_STR,
+                submissionSetUuid,
                 docClassCode,
                 XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_VALUE,
                 getSbmsSetFromClassCode(docClassCode)));
 
         rpt.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_UNIQUEID_SCHEME,
-                XDRConstants.REGISTRY_PACKAGE.SUBMISSION_SET_STR,
+                submissionSetUuid,
                 request.getCdaId(),
                 XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_UNIQUEID_STR));
 
         rpt.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_PATIENTID_SCHEME,
-                XDRConstants.REGISTRY_PACKAGE.SUBMISSION_SET_STR,
+                submissionSetUuid,
                 patientId.toString(),
                 XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_PATIENTID_STR));
 
         // Marcelo: The XDSSubmissionSet.SourceId value should be the OID of the sender (e.g. HCID), according to ITI TF-3, Table 4.1-6, but not all OID prefixes are supported in IHE validator;
         rpt.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_SOURCEID_SCHEME,
-                XDRConstants.REGISTRY_PACKAGE.SUBMISSION_SET_STR,
+                submissionSetUuid,
                 XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_SOURCEID_VALUE,
                 XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_SOURCEID_STR));
         return rpt;
     }
 
-    private ClassificationType prepareClassification() {
+    private ClassificationType prepareClassification(String submissionSetUuid) {
         ClassificationType classification = ofRim.createClassificationType();
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
         classification.setId(uuid);
         classification.setClassificationNode(XDRConstants.SUBMISSION_SET_CLASSIFICATION.CLASSIFICATION_NODE_UUID);
-        classification.setClassifiedObject(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_SET_STR);
+        classification.setClassifiedObject(submissionSetUuid);
 
         return classification;
     }
 
-    private AssociationType1 prepareAssociation(String targetObject) {
+    private AssociationType1 prepareAssociation(String targetObject, String submissionSetUuid) {
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
 
         AssociationType1 ast = ofRim.createAssociationType1();
         ast.setId(uuid);
         ast.setAssociationType(XDRConstants.REGREP_HAS_MEMBER);
-        ast.setSourceObject(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_SET_STR);
+        ast.setSourceObject(submissionSetUuid);
         ast.setTargetObject(targetObject);
         ast.getSlot().add(makeSlot(XDRConstants.SUBMISSION_SET_STATUS_STR, XDRConstants.ORIGINAL_STR));
 
