@@ -1,5 +1,6 @@
 package epsos.ccd.gnomon.configmanager;
 
+import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
@@ -8,22 +9,26 @@ import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
 import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidator;
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
-import eu.europa.ec.dynamicdiscovery.model.Endpoint;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
-import org.apache.commons.codec.binary.Base64;
+import org.oasis_open.docs.bdxr.ns.smp._2016._05.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -38,7 +43,7 @@ public class SMLSMPClient {
     /**
      * The logger.
      */
-    private final static Logger L = LoggerFactory.getLogger(SMLSMPClient.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(SMLSMPClient.class);
 
     /**
      * Static constants for SMP identifiers
@@ -74,7 +79,7 @@ public class SMLSMPClient {
 //            try {
 //                date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 //            } catch (DatatypeConfigurationException ex) {
-//                L.error(null, ex);
+//                LOGGER.error(null, ex);
 //            }
 //
 //            String sc_userid = sc_fullname + "<saml:" + sc_email + ">";
@@ -98,7 +103,7 @@ public class SMLSMPClient {
 //			 * logger.error(null, ex); }
 //			 */
 //        } catch (Exception e) {
-//            L.error("Error sending audit for eHealth SMP Query: '{}'", e.getMessage(), e);
+//            LOGGER.error("Error sending audit for eHealth SMP Query: '{}'", e.getMessage(), e);
 //        }
 //    }
 
@@ -126,57 +131,131 @@ public class SMLSMPClient {
      */
     public void lookup(String countryCode, String documentType) throws SMLSMPClientException {
 
-        L.info("SML Client: '{}'-'{}'", countryCode, documentType);
+        LOGGER.info("SML Client: '{}'-'{}'", countryCode, documentType);
         try {
-            KeyStore ks = this.loadTrustStore();
-
-            DynamicDiscovery smpClient = this.createDynamicDiscoveryClient(ks);
-            L.info("DynamicDiscovery '{}' instantiated.", smpClient.toString());
+//            KeyStore ks = this.loadTrustStore();
+//
+//            DynamicDiscovery smpClient = this.createDynamicDiscoveryClient(ks);
+//            LOGGER.info("DynamicDiscovery '{}' instantiated.", smpClient.toString());
             String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
-            L.info("participantIdentifierValue '{}'.", participantIdentifierValue);
-            ServiceMetadata sm = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
-            L.info("ServiceMetadata '{}'.", sm.toString());
-            List<Endpoint> endpoints = sm.getEndpoints();
+            LOGGER.info("participantIdentifierValue '{}'.", participantIdentifierValue);
+            //ServiceMetadata serviceMetadata = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
+            //LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
+
+            // 2.5.2.RC2 DG Sante
+
+            KeyStore ks = KeyStore.getInstance("JKS");
+            //KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+
+//            ks.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH")),
+//                    ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+
+            //File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_KEYSTORE"));
+            File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH"));
+            FileInputStream fileInputStream = new FileInputStream(file);
+            ks.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+
+            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+                    //.locator(new DefaultBDXRLocator("ehealth.testa.eu", new DefaultDNSLookup()))
+                    .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
+                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
+                    .build();
+
+            DocumentIdentifier documentIdentifier = new DocumentIdentifier(documentType,
+                    DOCUMENT_IDENTIFIER_SCHEME);
+
+            ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue,
+                    PARTICIPANT_IDENTIFIER_SCHEME);
+
+            LOGGER.info("Querying for service metadata");
+
+            //ServiceMetadata serviceMetadata = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
+            ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
+            LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
+            ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList();
+            for (ProcessType processType : processListType.getProcess()) {
+
+                LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier().getScheme());
+                ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
+                for (EndpointType endpointType : serviceEndpointList.getEndpoint()) {
+                    LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
+
+                }
+
+                List<EndpointType> endpoints = serviceEndpointList.getEndpoint();
 
 			/*
              * Constraint: here I think I have just one endpoint
 			 */
-            int size = endpoints.size();
-            if (size != 1) {
-                throw new Exception(
-                        "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
+                int size = endpoints.size();
+                if (size != 1) {
+                    throw new Exception(
+                            "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
+                }
+
+                EndpointType e = endpoints.get(0);
+                String address = e.getEndpointURI();
+                if (address == null) {
+                    throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
+                }
+                URL urlAddress = new URL(address);
+
+
+                InputStream inStream = new ByteArrayInputStream(e.getCertificate());
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
+
+                // X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
+                if (certificate == null) {
+                    throw new Exception("no certificate found for endpoint: " + e.getEndpointURI());
+                }
+                LOGGER.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
+
+                setAddress(urlAddress);
+                setCertificate(certificate);
             }
+            // 2.5.2.RC2 DG Sante
 
-            Endpoint e = endpoints.get(0);
-            String address = e.getAddress();
-            if (address == null) {
-                throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
-            }
-            URL urlAddress = new URL(address);
+//            List<Endpoint> endpoints = serviceMetadata.getEndpoints();
+//
+//			/*
+//             * Constraint: here I think I have just one endpoint
+//			 */
+//            int size = endpoints.size();
+//            if (size != 1) {
+//                throw new Exception(
+//                        "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
+//            }
+//
+//            Endpoint e = endpoints.get(0);
+//            String address = e.getAddress();
+//            if (address == null) {
+//                throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
+//            }
+//            URL urlAddress = new URL(address);
+//
+//            X509Certificate certificate = e.getCertificate();
+//            if (certificate == null) {
+//                throw new Exception("no certificate found for endpoint: " + e.getAddress());
+//            }
+//            LOGGER.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
 
-            X509Certificate certificate = e.getCertificate();
-            if (certificate == null) {
-                throw new Exception("no certificate found for endpoint: " + e.getAddress());
-            }
-            L.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
-            setAddress(urlAddress);
-            setCertificate(certificate);
 
-            //Audit vars
-            String ncp = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
-            String ncpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.email");
-            String country = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-            String localip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");//Source Gateway
-            String remoteip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");//Target Gateway
-            String smp = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT");
-            String smpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT_EMAIL");
-            //ET_ObjectID --> Base64 of url
-            String objectID = urlAddress.toString(); //ParticipantObjectID
-            byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
-
-            L.debug("Sending audit trail");
-            //TODO: Request Audit SMP Query
-            //sendAuditQuery(smp, smpemail, ncp, ncpemail, country, localip, remoteip, new String(encodedObjectID), null, null);
+//            //Audit vars
+//            String ncp = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
+//            String ncpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.email");
+//            String country = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
+//            String localip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");//Source Gateway
+//            String remoteip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");//Target Gateway
+//            String smp = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT");
+//            String smpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT_EMAIL");
+//            //ET_ObjectID --> Base64 of url
+//            String objectID = urlAddress.toString(); //ParticipantObjectID
+//            byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
+//
+//            LOGGER.debug("Sending audit trail");
+//            //TODO: Request Audit SMP Query
+//            //sendAuditQuery(smp, smpemail, ncp, ncpemail, country, localip, remoteip, new String(encodedObjectID), null, null);
 
 
         } catch (Exception e) {
@@ -209,28 +288,58 @@ public class SMLSMPClient {
      * @throws SMLSMPClientException For any error (including not found)
      */
     public void fetchSearchMask(String countryCode, String documentType) throws SMLSMPClientException {
-        try {
-            KeyStore ks = this.loadTrustStore();
 
-            DynamicDiscovery smpClient = this.createDynamicDiscoveryClient(ks);
+        String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH") + "forms";
+        try {
+            //KeyStore ks = this.loadTrustStore();
+            //DynamicDiscovery smpClient = this.createDynamicDiscoveryClient(ks);
+            KeyStore truststore = KeyStore.getInstance("JKS");
+
+            File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH"));
+            FileInputStream fileInputStream = new FileInputStream(file);
+            truststore.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+
+            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+                    .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
+                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
+                    .build();
+
+            // ParticipantIdentifier participantIdentifier = new ParticipantIdentifier("urn:ehealth:ch:ncp-idp", "ehealth-participantid-qns");
+            // DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
+            // DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:ism::internationalsearchmask##ehealth-107", "ehealth-resid-qns");
 
             String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
             ServiceMetadata sm = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
 
-            List<Endpoint> endpoints = sm.getEndpoints();
-            /*
-             * Constraint: here I think I have just one endpoint
-			 */
-            int size = endpoints.size();
-            if (size != 1) {
-                throw new Exception(
-                        "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
-            }
-            Endpoint e = endpoints.get(0);
-            L.debug("Endpoint discovered: '{}'", e.getAddress());
-            // TODO: when DDC 1.3 is released: obtain the Extension of the
-            // Endpoint and read the search mask into the Document
+            LOGGER.info("DocumentIdentifier: '{}' - '{}'",
+                    sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getDocumentIdentifier().getScheme(),
+                    sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getDocumentIdentifier().getValue());
 
+            LOGGER.info("ParticipantIdentifier: '{}' - '{}'",
+                    sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getParticipantIdentifier().getScheme(),
+                    sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getParticipantIdentifier().getValue());
+
+            List<ProcessType> processTypes = sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList().getProcess();
+            if (!processTypes.isEmpty()) {
+                List<EndpointType> endpointTypes = processTypes.get(0).getServiceEndpointList().getEndpoint();
+                if (!endpointTypes.isEmpty()) {
+                    List<ExtensionType> extensionTypes = endpointTypes.get(0).getExtension();
+                    if (!extensionTypes.isEmpty()) {
+                        Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
+
+                        DOMSource source = new DOMSource(document.getElementsByTagName("patientSearch").item(0));
+                        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                        Transformer transformer = transformerFactory.newTransformer();
+                        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+                        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                        StreamResult result = new StreamResult(epsosPropsPath + "InternationalSearch_" + countryCode + ".xml");
+                        transformer.transform(source, result);
+                    }
+
+                }
+            }
         } catch (Exception e) {
             throw new SMLSMPClientException(e);
         }
@@ -320,14 +429,15 @@ public class SMLSMPClient {
      * specific national authority signature of the SMP file. OpenNCP proxy
      * settings are also taken into account.
      *
-     * @param ks The truststore containing the certificate used by SMP server
-     *           to sign SMP files.
+     * @param keyStore The truststore containing the certificate used by SMP server
+     *                 to sign SMP files.
      * @return The Dynamic Discovery Client ready to use.
      * @throws TechnicalException
      */
-    private DynamicDiscovery createDynamicDiscoveryClient(KeyStore ks) throws TechnicalException, KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
-        L.info("Instantiating the smpClient.");
-        L.warn("TODO: make configurable the keystore");
+    private DynamicDiscovery createDynamicDiscoveryClient(KeyStore keyStore) throws TechnicalException, KeyStoreException,
+            IOException, CertificateException, NoSuchAlgorithmException {
+
+        LOGGER.info("Instantiating the smpClient.");
 
         // Instantiate the DIGIT client using our customized signature
         // validator. This is due to
@@ -357,25 +467,14 @@ public class SMLSMPClient {
 //                .locator(new DefaultBDXRLocator(ConfigurationManagerService.getInstance().getProperty("SML_DOMAIN")))
 //                .reader(new CustomizedBDXRReader(new CustomizedSignatureValidator(ks))).build();
         // }
-
-
         KeyStore trustStore = KeyStore.getInstance("JKS");
-        trustStore.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_KEYSTORE")),
-                null);
+        trustStore.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager()
+                .getProperty("SMP_KEYSTORE")), null);
 
-        DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
-                .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"),
-                        new DefaultDNSLookup()))
-                //.locator(new DefaultBDXRLocator("ehealth.acc.edelivery.tech.ec.europa.eu", new DefaultDNSLookup()))
+        return DynamicDiscoveryBuilder.newInstance().locator(new DefaultBDXRLocator(
+                ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
                 .reader(new DefaultBDXRReader(new DefaultSignatureValidator(trustStore)))
                 .build();
-
-//        ParticipantIdentifier participantIdentifier = new ParticipantIdentifier("9925:0367302178", "iso6523-actorid-upis");
-//
-//        List<DocumentIdentifier> documentIdentifiers = smpClient.getDocumentIdentifiers(participantIdentifier);
-//        ServiceMetadata sm = smpClient.getServiceMetadata(participantIdentifier, new DocumentIdentifier("urn::epsos:services## epsos-21", "epsos-docid-qns"));
-
-        return smpClient;
     }
 
     /**
@@ -392,11 +491,11 @@ public class SMLSMPClient {
     private ServiceMetadata getServiceMetadata(DynamicDiscovery smpClient, String participantIdentifierValue,
                                                String documentType) throws TechnicalException {
 
-        L.info("Querying for participant identifier {}", participantIdentifierValue);
+        LOGGER.info("Querying for participant identifier {}", participantIdentifierValue);
         ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue,
                 PARTICIPANT_IDENTIFIER_SCHEME);
 
-        L.info("Querying for service metadata");
+        LOGGER.info("Querying for service metadata");
         return smpClient.getServiceMetadata(participantIdentifier, new DocumentIdentifier(documentType,
                 DOCUMENT_IDENTIFIER_SCHEME));
     }
