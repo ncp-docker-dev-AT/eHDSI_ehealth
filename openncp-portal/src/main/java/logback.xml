@@ -34,6 +34,10 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="eu.europa.ec.sante.ehdsi.openncp.configmanager" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="epsos.ccd.gnomon.configmanager" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
@@ -46,7 +50,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
+    <logger name="tr.com.srdc.epsos.ws" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

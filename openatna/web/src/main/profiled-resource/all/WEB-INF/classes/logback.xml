@@ -42,7 +42,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="org.hibernate" level="WARN" additivity="false">
+    <logger name="org.hibernate" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
