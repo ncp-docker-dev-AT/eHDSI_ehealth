@@ -25,6 +25,7 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.CustomProxy;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -76,17 +77,18 @@ import java.security.cert.CertificateException;
 import java.util.*;
 
 /**
- * @author InÃªs Garganta
+ * @author Ines Garganta
  */
 
 @Controller
 @SessionAttributes("smpdelete")
 public class SMPDeleteFileController {
 
-    private static final Logger logger = LoggerFactory.getLogger(SMPUploadFileController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SMPDeleteFileController.class);
 
     @Autowired
     private Environment env;
+
     @Autowired
     private ReadSMPProperties readProperties = new ReadSMPProperties();
 
@@ -133,13 +135,13 @@ public class SMPDeleteFileController {
         try {
             truststore = loadTrustStore();
         } catch (KeyStoreException e) {
-            e.printStackTrace();
+            logger.error("KeyStoreException: '{}'", e.getMessage(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("IOException: '{}'", e.getMessage(), e);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.error("NoSuchAlgorithmException: '{}'", e.getMessage(), e);
         } catch (CertificateException e) {
-            e.printStackTrace();
+            logger.error("CertificateException: '{}'", e.getMessage(), e);
         }
         if (proxyCredentials != null) {
             try {
@@ -160,17 +162,18 @@ public class SMPDeleteFileController {
                         .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
                         .build();
             } catch (TechnicalException e) {
-                e.printStackTrace();
+                logger.error("Technical Exception: '{}'", e.getMessage(), e);
             }
         }
 
         List<DocumentIdentifier> documentIdentifiers = new ArrayList<>();
         try {
-            documentIdentifiers = smpClient.getDocumentIdentifiers(participantIdentifier);
+            //documentIdentifiers = smpClient.getDocumentIdentifiers(participantIdentifier);
+            documentIdentifiers = smpClient.getService().getServiceGroup(participantIdentifier).getDocumentIdentifiers();
         } catch (TechnicalException ex) {
             success = false;
             errorType = "TechnicalException";
-            logger.error("\n TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
         URI serviceGroup = null;
@@ -182,11 +185,11 @@ public class SMPDeleteFileController {
             Set set2 = propertiesMap.entrySet();
             for (Object aSet2 : set2) {
                 Map.Entry mentry2 = (Map.Entry) aSet2;
-                //logger.debug("\n ****** KEY - " + mentry2.getKey().toString());
-                if (documentIdentifiers.get(i).getIdentifier().equals(mentry2.getKey().toString())) {
+                if (StringUtils.equalsIgnoreCase(documentIdentifiers.get(i).getIdentifier(), mentry2.getKey().toString())) {
+                    //if (documentIdentifiers.get(i).getIdentifier().equals(mentry2.getKey().toString())) {
+                    //urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55
                     String[] docs = mentry2.getValue().toString().split("\\.");
                     documentID = docs[0];
-                    // logger.debug("\n ****** documentID - " + documentID);
                     break;
                 }
             }
@@ -217,7 +220,6 @@ public class SMPDeleteFileController {
         }
         smpdelete.setReferenceCollection(referenceCollection);
 
-
         //Audit
         ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
         String ncp = configurationManager.getProperty(StandardProperties.NCP_COUNTRY);
@@ -241,7 +243,6 @@ public class SMPDeleteFileController {
                     new String(encodedObjectID), "500", errorType.getBytes());//TODO
         }
 
-
         if (referenceCollection.isEmpty()) {
             String message = env.getProperty("error.nodoc"); //messages.properties
             Alert alert = new Alert(message, Alert.alertType.warning);
@@ -249,7 +250,9 @@ public class SMPDeleteFileController {
             redirectAttributes.addFlashAttribute("alert", alert);
             return "redirect:/smpeditor/deletesmpinfo";
         }
-        logger.debug("\n********* MODEL - '{}'", model.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n********* MODEL - '{}'", model.toString());
+        }
         return "redirect:/smpeditor/deletesmpinfo";
     }
 
@@ -264,7 +267,6 @@ public class SMPDeleteFileController {
     @RequestMapping(value = "smpeditor/deletesmpinfo", method = RequestMethod.GET)
     public String deleteInfo(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model, final RedirectAttributes redirectAttributes) {
         logger.debug("\n==== in deleteInfo ====");
-
    
     /* Builds html colors and alerts */
         if (smpdelete.getStatusCode() == 400) {
@@ -300,7 +302,9 @@ public class SMPDeleteFileController {
         model.addAttribute("smpdelete", smpdelete);
         model.addAttribute("referenceCollection", smpdelete.getReferenceCollection());
 
-        logger.debug("\n********* MODEL - " + model.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n********* MODEL - '{}'", model.toString());
+        }
         return "smpeditor/deletesmpinfo";
     }
 
@@ -341,8 +345,8 @@ public class SMPDeleteFileController {
             logger.debug("\n ************** referencesSelected.get(i) - " + referencesSelected.get(i));
             String[] refs = referencesSelected.get(i).split("&&");
 
-            logger.debug("\n ************** SMPTYPEEEE - " + refs[1]);
-            logger.debug("\n ************** reference - " + refs[0]);
+            logger.debug("\n ************** SMPTYPEEEE - '{}'", refs[1]);
+            logger.debug("\n ************** reference - '{}'", refs[0]);
             itemDelete.setSmptype(refs[1]);
 
             String reference = refs[0];
@@ -377,7 +381,6 @@ public class SMPDeleteFileController {
                     return configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_ALIAS);
                 }
             };
-
 
             // Trust own CA and all self-signed certs
             SSLContext sslcontext = null;
@@ -446,7 +449,7 @@ public class SMPDeleteFileController {
             //DELETE
             HttpDelete httpdelete = new HttpDelete(uri);
 
-            CloseableHttpResponse response = null;
+            CloseableHttpResponse response;
             try {
                 response = httpclient.execute(httpdelete);
             } catch (IOException ex) {
@@ -456,7 +459,7 @@ public class SMPDeleteFileController {
                 return "redirect:/smpeditor/deletesmpfile";
             }
 
-      /*Get response*/
+            /*Get response*/
             itemDelete.setStatusCode(response.getStatusLine().getStatusCode());
             org.apache.http.HttpEntity entity = response.getEntity();
 
@@ -474,7 +477,6 @@ public class SMPDeleteFileController {
             //ET_ObjectID --> Base64 of url
             String objectID = uri.toString();
             byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
-
 
             if (itemDelete.getStatusCode() == 503 || itemDelete.getStatusCode() == 405) {
                 String message = env.getProperty("error.server.failed"); //messages.properties
@@ -496,9 +498,8 @@ public class SMPDeleteFileController {
                 return "redirect:/smpeditor/deletesmpfile";
             }
 
-
             if (!(itemDelete.getStatusCode() == 200 || itemDelete.getStatusCode() == 201)) {
-        /* Get BusinessCode and ErrorDescription from response */
+            /* Get BusinessCode and ErrorDescription from response */
 
                 //Save InputStream of response in ByteArrayOutputStream in order to read it more than once.
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -537,7 +538,7 @@ public class SMPDeleteFileController {
                     logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
         
-        /*transform xml to string in order to send in Audit*/
+                /*transform xml to string in order to send in Audit*/
                 StringWriter sw = new StringWriter();
                 try {
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
@@ -561,7 +562,7 @@ public class SMPDeleteFileController {
                     logger.error("\n IOException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
                 String errorresult = sw.toString();
-                logger.debug("\n ***************** ERROR RESULT - " + errorresult);
+                logger.debug("\n ***************** ERROR RESULT - '{}'", errorresult);
                 //Audit error
                 Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
                         new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), errorresult.getBytes());
@@ -577,10 +578,11 @@ public class SMPDeleteFileController {
         }
         smpdelete.setAllItems(allItems);
 
-        logger.debug("\n********* MODEL - " + model.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n********* MODEL - " + model.toString());
+        }
         return "redirect:/smpeditor/deletesmpresult";
     }
-
 
     /**
      * Generate deleteInfo page
@@ -593,7 +595,7 @@ public class SMPDeleteFileController {
     public String postInfo(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model) {
         logger.debug("\n==== in deletesmpresult ====");
     
-    /* Builds html colors and alerts */
+        /* Builds html colors and alerts */
         for (int i = 0; i < smpdelete.getAllItems().size(); i++) {
             if (smpdelete.getAllItems().get(i).getStatusCode() == 200) {
                 String message = env.getProperty("http.deleted");//messages.properties
@@ -632,11 +634,19 @@ public class SMPDeleteFileController {
         model.addAttribute("smpdelete", smpdelete);
         model.addAttribute("items", smpdelete.getAllItems());
 
-
-        logger.debug("\n********* MODEL - {}", model.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n********* MODEL - {}", model.toString());
+        }
         return "smpeditor/deletesmpresult";
     }
 
+    /**
+     * @return
+     * @throws KeyStoreException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws CertificateException
+     */
     private KeyStore loadTrustStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
