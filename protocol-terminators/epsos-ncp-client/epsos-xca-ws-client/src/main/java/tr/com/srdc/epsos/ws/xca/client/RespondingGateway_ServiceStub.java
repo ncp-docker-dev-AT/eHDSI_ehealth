@@ -30,8 +30,8 @@ import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XcaValidationService;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
@@ -42,6 +42,7 @@ import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang.StringUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -319,7 +320,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // Transaction end time
             end = System.currentTimeMillis();
-            LOG.info("XCA LIST VALIDATION REQ TIME: " + (end - start) / 1000.0);
+            LOG.info("XCA LIST VALIDATION REQ TIME: '{}'", (end - start) / 1000.0);
 
             // TMP
             // Transaction start time
@@ -334,30 +335,27 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (AxisFault e) {
                 LOG.error("Axis Fault error: " + e.getMessage());
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
-                ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
-                String service = null;
+                String endpoint = null;
                 LOG.debug("ClassCode: " + classCode);
                 switch (classCode) {
                     case Constants.PS_CLASSCODE:
-                        service = ".PatientService.WSE";
+                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE, true);
                         break;
                     case Constants.EP_CLASSCODE:
-                        service = ".OrderService.WSE";
+                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.ORDER_SERVICE, true);
                         break;
                     default:
                         break;
                 }
-                String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
-                String value = configurationManager.getProperty(key);
-                if (value != null) {
-                    configurationManager.setProperty(key, value);
-                    //TODO: Check SMP DG Sante
-                    //configManagerSMP.updateCache(key, value);
+
+                if (StringUtils.isNotEmpty(endpoint)) {
 
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
-                    LOG.debug("Retrying the request with the new configurations: [" + value + "]");
-                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value));
+                    LOG.debug("Retrying the request with the new configurations: [{}]", endpoint);
+                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(endpoint));
 
                     /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
                     org.apache.axis2.client.OperationClient newOperationClient = _serviceClient.createClient(_operations[0].getName());
@@ -379,7 +377,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
                     /* Creating the new WSA To header with the new endpoint */
                     to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
-                    node3 = newSoapFactory.createOMText(value);
+                    node3 = newSoapFactory.createOMText(endpoint);
                     to.addChild(node3);
                     to.addAttribute(att2);
 
@@ -409,7 +407,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
+                    LOG.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
                     throw e;
                 }
             }
@@ -421,7 +419,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // Transaction end time
             end = System.currentTimeMillis();
-            LOG.info("XCA LIST TRANSACTION TIME: " + (end - start) / 1000.0);
+            LOG.info("XCA LIST TRANSACTION TIME: '{}'", (end - start) / 1000.0);
 
             // TMP
             // Transaction start time
@@ -444,7 +442,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // Validation end time
             end = System.currentTimeMillis();
-            LOG.info("XCA LIST VALIDATION RES TIME: " + (end - start) / 1000);
+            LOG.info("XCA LIST VALIDATION RES TIME: '{}'", (end - start) / 1000);
 
             // TMP
             // eADC start time
@@ -682,28 +680,27 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (AxisFault e) {
                 LOG.error("Axis Fault error: " + e.getMessage());
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
-                ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
-                String service = null;
+
+                String endpoint = null;
                 LOG.debug("ClassCode: " + classCode);
                 switch (classCode) {
                     case Constants.PS_CLASSCODE:
-                        service = ".PatientService.WSE";
+                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE, true);
                         break;
                     case Constants.EP_CLASSCODE:
-                        service = ".OrderService.WSE";
+                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.ORDER_SERVICE, true);
                         break;
                     default:
                         break;
                 }
-                String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
-                String value = configurationManager.getProperty(key);
-                if (value != null) {
-                    configurationManager.setProperty(key, value);
-                    //configManagerSMP.updateCache(key, value);
+                if (StringUtils.isNotEmpty(endpoint)) {
+
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
-                    LOG.debug("Retrying the request with the new configurations: [" + value + "]");
-                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value));
+                    LOG.debug("Retrying the request with the new configurations: [{}]", endpoint);
+                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(endpoint));
 
                     /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
                     org.apache.axis2.client.OperationClient newOperationClient = _serviceClient.createClient(_operations[1].getName());
@@ -729,7 +726,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
                     /* Creating the new WSA To header with the new endpoint */
                     to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
-                    node3 = newSoapFactory.createOMText(value);
+                    node3 = newSoapFactory.createOMText(endpoint);
                     to.addChild(node3);
 //                    to.addAttribute(att2);
 
@@ -759,7 +756,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
+                    LOG.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
                     throw e;
                 }
             }

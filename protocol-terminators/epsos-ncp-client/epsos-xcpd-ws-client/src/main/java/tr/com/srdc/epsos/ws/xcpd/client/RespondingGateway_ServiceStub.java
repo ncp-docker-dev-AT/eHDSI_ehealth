@@ -29,8 +29,8 @@ import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.services.XcpdValidationService;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -42,6 +42,7 @@ import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.commons.lang.StringUtils;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml2.core.Assertion;
@@ -189,6 +190,9 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
      */
     public org.hl7.v3.PRPAIN201306UV02 respondingGateway_PRPA_IN201305UV02(PRPAIN201305UV02 pRPA_IN201305UV02, Assertion idAssertion) {
         org.apache.axis2.context.MessageContext _messageContext = null;
+
+        LOG.info("respondingGateway_PRPA_IN201305UV02('{}', '{}'", pRPA_IN201305UV02.getId().getRoot(), idAssertion.getID());
+
         try {
             // TMP
             // XCPD request start time
@@ -255,7 +259,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
 
 //                LOG.info("XCPD Request sent. EVIDENCE NRO");
-                // NRO
+//                NRO
 //                try {
 //                    EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
 //                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
@@ -299,14 +303,13 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 operationClient.execute(true);
             } catch (AxisFault e) {
-                LOG.error("Axis Fault error: " + e.getMessage());
+                LOG.error("Axis Fault: Code-'{}' Message-'{}'", e.getFaultCode(), e.getMessage());
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
-                ConfigurationManager configManager = ConfigurationManagerFactory.getConfigurationManager();
-                String key = this.countryCode.toLowerCase(Locale.ENGLISH) + ".PatientIdentificationService.WSE";
-                String value = configManager.getProperty(key);
-                if (value != null) {
-                    configManager.setProperty(key, value);
-                    //configManagerSMP.updateCache(key, value);
+
+                String value = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                        this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_IDENTIFICATION_SERVICE, true);
+
+                if (StringUtils.isNotEmpty(value)) {
 
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
@@ -350,7 +353,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
+                    LOG.error("Could not find configurations in the Central Services for [" + this.countryCode.toLowerCase(Locale.ENGLISH)
+                            + RegisteredService.PATIENT_IDENTIFICATION_SERVICE.getServiceName() + "], the service will fail.");
                     throw e;
                 }
             }
@@ -387,7 +391,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // Validation end time
             end = System.currentTimeMillis();
-            LOG.info("XCPD VALIDATION RES TIME: " + (end - start) / 1000.0);
+            LOG.info("XCPD VALIDATION RES TIME: '{}'", (end - start) / 1000.0);
 
             // TMP
             // eADC start time
@@ -424,15 +428,15 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         EadcEntry.DsTypes.XCPD, // Data source type
                         EadcUtil.Direction.OUTBOUND); // Transaction direction
             } catch (ParserConfigurationException ex) {
-                LOG.error("EADC INVOCATION FAILED!", ex);
+                LOG.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
             } catch (Exception ex) {
-                LOG.error("EADC INVOCATION FAILED!", ex);
+                LOG.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
             }
 
             // TMP
             // eADC end time
             end = System.currentTimeMillis();
-            LOG.info("XCPD eADC TIME: " + (end - start) / 1000.0);
+            LOG.info("XCPD eADC TIME: '{}'", (end - start) / 1000.0);
 
             // TMP
             // Audit start time
@@ -442,14 +446,14 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             EventLog eventLog = createAndSendEventLog(pRPA_IN201305UV02, (org.hl7.v3.PRPAIN201306UV02) object, messageContext, _returnEnv, env, idAssertion, this._getServiceClient().getOptions().getTo().getAddress());
 
             try {
-                LOG.info("SOAP MESSAGE IS: " + XMLUtils.toDOM(_returnEnv));
+                LOG.info("SOAP MESSAGE IS: '{}'", XMLUtils.toDOM(_returnEnv));
             } catch (Exception ex) {
                 LOG.error(null, ex);
             }
 
             // Audit end time
             end = System.currentTimeMillis();
-            LOG.info("XCPD AUDIT TIME: " + (end - start) / 1000.0);
+            LOG.info("XCPD AUDIT TIME: '{}'", (end - start) / 1000.0);
 
             return (org.hl7.v3.PRPAIN201306UV02) object;
 
