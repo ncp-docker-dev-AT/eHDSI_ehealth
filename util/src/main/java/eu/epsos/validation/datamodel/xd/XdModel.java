@@ -19,6 +19,9 @@
  */
 package eu.epsos.validation.datamodel.xd;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.epsos.validation.datamodel.common.ObjectType;
 import tr.com.srdc.epsos.util.Constants;
 
@@ -59,6 +62,8 @@ public enum XdModel {
     private String name;
     private ObjectType objectType;
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(XdModel.class);
+	
     XdModel(String s, ObjectType ot) {
         name = s;
         objectType = ot;
@@ -141,6 +146,7 @@ public enum XdModel {
         final String PROVIDE_AND_REGISTER_RESPONSE = "RegistryResponse";
 
         XdModel result = null;
+        
 
         if (message.contains(PROVIDE_AND_REGISTER_REQUEST)) {
             if (message.contains(Constants.CONSENT_CLASSCODE)) {
@@ -160,6 +166,19 @@ public enum XdModel {
             }
         }
         return result;
+    }
+
+    public static XdModel obtainResponseModelXdr(String message) {
+    	XdModel result = null;
+
+    	if (message.contains(Constants.CONSENT_CLASSCODE)) {
+    		result = EPSOS_CS_PUT_RESPONSE;
+    	} else if (message.contains(Constants.ED_CLASSCODE)) {
+    		result = EPSOS_ED_INIT_RESPONSE;
+    	} else {
+    		result = EPSOS2_PROVIDE_DATA_RESPONSE;
+    	}
+    	return result;
     }
 
     @Override
