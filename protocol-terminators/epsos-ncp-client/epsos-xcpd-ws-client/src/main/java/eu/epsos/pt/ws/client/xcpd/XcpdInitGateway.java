@@ -19,17 +19,18 @@
  */
 package eu.epsos.pt.ws.client.xcpd;
 
-import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.dts.xcpd.RespondingGateway_RequestReceiver;
-import java.util.List;
+import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml2.core.Assertion;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.ws.xcpd.client.RespondingGateway_RequestSender;
 
+import java.util.List;
+
 /**
  * XCPD Initiating Gateway
- *
+ * <p>
  * This is an implementation of a IHE XCPD Initiation Gateway. This class provides the necessary operations to perform
  * PatientDiscovery.
  *
@@ -39,34 +40,24 @@ import tr.com.srdc.epsos.ws.xcpd.client.RespondingGateway_RequestSender;
 public class XcpdInitGateway {
 
     /**
-     * Performs a Patient Discovery for the given Patient Demographics.
-     *
-     * @param pd the Patient Demographics set to be used in the request.
-     * @param idAssertion HCP identity assertion.
-     * @param countryCode country code - ISO 3166-1 alpha-2
-     *
-     * @return a List of matching Patient Demographics, each representing a patient person.
-     *
-     * @throws NoPatientIdDiscoveredException contains the error message
-     */
-    public static List<PatientDemographics> patientDiscovery(final PatientDemographics pd,
-                                                             final Assertion idAssertion,
-                                                             final String countryCode)
-            throws NoPatientIdDiscoveredException {
-        List<PatientDemographics> result;
-
-        PRPAIN201306UV02 response;
-        response = RespondingGateway_RequestSender.respondingGateway_PRPA_IN201305UV02(pd,
-                                                                                       idAssertion,
-                                                                                       countryCode);
-        result = RespondingGateway_RequestReceiver.respondingGateway_PRPA_IN201306UV02(response);
-
-        return result;
-    }
-
-    /**
      * Private constructor to disable class instantiation.
      */
     private XcpdInitGateway() {
+    }
+
+    /**
+     * Performs a Patient Discovery for the given Patient Demographics.
+     *
+     * @param pd          the Patient Demographics set to be used in the request.
+     * @param idAssertion HCP identity assertion.
+     * @param countryCode country code - ISO 3166-1 alpha-2
+     * @return a List of matching Patient Demographics, each representing a patient person.
+     * @throws NoPatientIdDiscoveredException contains the error message
+     */
+    public static List<PatientDemographics> patientDiscovery(final PatientDemographics pd, final Assertion idAssertion,
+                                                             final String countryCode) throws NoPatientIdDiscoveredException {
+
+        PRPAIN201306UV02 response = RespondingGateway_RequestSender.respondingGateway_PRPA_IN201305UV02(pd, idAssertion, countryCode);
+        return RespondingGateway_RequestReceiver.respondingGateway_PRPA_IN201306UV02(response);
     }
 }
