@@ -75,7 +75,8 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
 
             String countryCode = arg0.getCountryCode();
 
-            xcpdResp = IdentificationService.findIdentityByTraits(request, assertion, countryCode); // call XCPD Client
+            // call XCPD Client
+            xcpdResp = IdentificationService.findIdentityByTraits(request, assertion, countryCode);
 
             /* result */
             QueryPatientResponse response;
