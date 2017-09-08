@@ -30,8 +30,8 @@ import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XdrValidationService;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
@@ -44,6 +44,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang.StringUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.activation.DataHandler;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.namespace.QName;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -66,7 +67,6 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
     static {
         LOG.debug("Loading the WS-Security init libraries in DocumentRecipient_ServiceStub");
-
         org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
     }
 
@@ -126,11 +126,6 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         _serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_MTOM, Constants.VALUE_TRUE);
 
     }
-
-
-    /*
-     * Contructors
-     */
 
     /**
      * Default Constructor
@@ -257,8 +252,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             String requestLogMsg;
             try {
                 String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
-                LOG.debug(XDRConstants.LOG.OUTGOING_XDR_PROVIDEANDREGISTER_MESSAGE
-                        + System.getProperty("line.separator") + logRequestMsg);
+                LOG.debug("{} {} '{}'", XDRConstants.LOG.OUTGOING_XDR_PROVIDEANDREGISTER_MESSAGE,
+                        System.getProperty("line.separator"), logRequestMsg);
                 requestLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody()));
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -289,30 +284,30 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 _operationClient.execute(true);
             } catch (AxisFault e) {
-                LOG.error("Axis Fault error: " + e.getMessage());
+                LOG.error("Axis Fault error: '{}'", e.getMessage());
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
-                ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
-                String service = null;
-                LOG.debug("ClassCode: " + this.classCode);
+                String endpoint = null;
+
+                LOG.debug("ClassCode: '{}'", this.classCode);
                 switch (classCode) {
                     case tr.com.srdc.epsos.util.Constants.ED_CLASSCODE:
-                        service = ".DispensationService.WSE";
+                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE, true);
                         break;
                     case tr.com.srdc.epsos.util.Constants.CONSENT_CLASSCODE:
-                        service = ".ConsentService.WSE";
+                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE, true);
                         break;
                     default:
                         break;
                 }
-                String key = this.countryCode.toLowerCase(Locale.ENGLISH) + service;
-                String value = configurationManager.getProperty(key);
-                if (value != null) {
-                    configurationManager.setProperty(key, value);
-                    //configManagerSMP.updateCache(key, value);
+
+                if (StringUtils.isNotEmpty(endpoint)) {
+
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
-                    LOG.debug("Retrying the request with the new configurations: [" + value + "]");
-                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value));
+                    LOG.debug("Retrying the request with the new configurations: [{}]", endpoint);
+                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(endpoint));
 
                     /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
                     org.apache.axis2.client.OperationClient newOperationClient = _serviceClient.createClient(_operations[0].getName());
@@ -351,7 +346,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                     LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOG.error("Could not find configurations in the Central Services for [" + key + "], the service will fail.");
+                    LOG.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
                     throw e;
                 }
             }
@@ -374,18 +369,16 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                         this.countryCode, // Country A ISO Code
                         EadcEntry.DsTypes.XDR, // Data source type
                         EadcUtil.Direction.OUTBOUND); // Transaction direction
-            } catch (ParserConfigurationException ex) {
-                LOG.error("EADC INVOCATION FAILED!", ex);
             } catch (Exception ex) {
-                LOG.error("EADC INVOCATION FAILED!", ex);
+                LOG.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
             }
 
             /* Log soap response */
             String responseLogMsg;
             try {
                 String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv));
-                LOG.debug(XDRConstants.LOG.INCOMING_XDR_PROVIDEANDREGISTER_MESSAGE
-                        + System.getProperty("line.separator") + logResponseMsg);
+                LOG.debug("{} {} '{}'", XDRConstants.LOG.INCOMING_XDR_PROVIDEANDREGISTER_MESSAGE,
+                        System.getProperty("line.separator"), logResponseMsg);
                 responseLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv.getBody()));
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -440,7 +433,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
                     } catch (Exception e) {
-                        throw new RuntimeException(e.getMessage(), e);    // we cannot intantiate the class - throw the original Axis fault
+                        throw new RuntimeException(e.getMessage(), e);    // we cannot instantiate the class - throw the original Axis fault
                     }
                 }
             }
@@ -458,15 +451,17 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
      * get the default envelope
      */
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory) {
+
         return factory.getDefaultEnvelope();
     }
 
     private boolean optimizeContent(javax.xml.namespace.QName opName) {
+
         if (opNameArray == null) {
             return false;
         }
-        for (int i = 0; i < opNameArray.length; i++) {
-            if (opName.equals(opNameArray[i])) {
+        for (QName anOpNameArray : opNameArray) {
+            if (opName.equals(anOpNameArray)) {
                 return true;
             }
         }
@@ -475,6 +470,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
     private org.apache.axiom.om.OMElement toOM(oasis.names.tc.ebxml_regrep.xsd.lcm._3.SubmitObjectsRequest param)
             throws AxisFault {
+
         try {
             javax.xml.bind.JAXBContext context = wsContext;
             javax.xml.bind.Marshaller marshaller = context.createMarshaller();
@@ -494,10 +490,11 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         }
     }
 
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType param, boolean optimizeContent)
-            throws AxisFault {
-        org.apache.axiom.soap.SOAPEnvelope envelope = factory.getDefaultEnvelope();
+    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory,
+                                                          ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType param,
+                                                          boolean optimizeContent) throws AxisFault {
 
+        org.apache.axiom.soap.SOAPEnvelope envelope = factory.getDefaultEnvelope();
         org.apache.axiom.om.OMNamespace namespace = factory.createOMNamespace(XDRConstants.NAMESPACE_URI, "xdr");
 
         OMElement provideAndRegisterDoc = factory.createOMElement(XDRConstants.PROVIDE_AND_REGISTER_DOCUMENT_SET_REQ_STR, namespace);
@@ -528,8 +525,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         return envelope;
     }
 
-    private Object fromOM(org.apache.axiom.om.OMElement param, Class type)
-            throws AxisFault {
+    private Object fromOM(org.apache.axiom.om.OMElement param, Class type) throws AxisFault {
+
         try {
             javax.xml.bind.JAXBContext context = wsContext;
             javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -544,7 +541,10 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
     // TODO A.R. eDispensation handling
     private EventLog createAndSendEventLogConsent(ProvideAndRegisterDocumentSetRequestType request, RegistryErrorList rel,
                                                   org.apache.axis2.context.MessageContext msgContext,
-                                                  org.apache.axiom.soap.SOAPEnvelope _returnEnv, org.apache.axiom.soap.SOAPEnvelope env, Assertion idAssertion, Assertion trcAssertion, String address) {
+                                                  org.apache.axiom.soap.SOAPEnvelope _returnEnv,
+                                                  org.apache.axiom.soap.SOAPEnvelope env, Assertion idAssertion,
+                                                  Assertion trcAssertion, String address) {
+
         EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
         EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
@@ -607,8 +607,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
          * @param obj
          * @param marshaller
          */
-        public JaxbRIDataSource(Class clazz, Object obj,
-                                javax.xml.bind.Marshaller marshaller, String nsuri, String name) {
+        public JaxbRIDataSource(Class clazz, Object obj, javax.xml.bind.Marshaller marshaller, String nsuri, String name) {
             this.outClazz = clazz;
             this.outObject = obj;
             this.marshaller = marshaller;
@@ -616,9 +615,9 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             this.name = name;
         }
 
-        public void serialize(java.io.OutputStream output,
-                              org.apache.axiom.om.OMOutputFormat format)
+        public void serialize(java.io.OutputStream output, org.apache.axiom.om.OMOutputFormat format)
                 throws javax.xml.stream.XMLStreamException {
+
             try {
                 marshaller.marshal(new javax.xml.bind.JAXBElement(
                         new javax.xml.namespace.QName(nsuri, name), outObject
@@ -629,9 +628,9 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             }
         }
 
-        public void serialize(java.io.Writer writer,
-                              org.apache.axiom.om.OMOutputFormat format)
+        public void serialize(java.io.Writer writer, org.apache.axiom.om.OMOutputFormat format)
                 throws javax.xml.stream.XMLStreamException {
+
             try {
                 marshaller.marshal(new javax.xml.bind.JAXBElement(
                         new javax.xml.namespace.QName(nsuri, name), outObject
@@ -642,8 +641,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             }
         }
 
-        public void serialize(javax.xml.stream.XMLStreamWriter xmlWriter)
-                throws javax.xml.stream.XMLStreamException {
+        public void serialize(javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
+
             try {
                 marshaller.marshal(new javax.xml.bind.JAXBElement(
                         new javax.xml.namespace.QName(nsuri, name), outObject
@@ -654,8 +653,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             }
         }
 
-        public javax.xml.stream.XMLStreamReader getReader()
-                throws javax.xml.stream.XMLStreamException {
+        public javax.xml.stream.XMLStreamReader getReader() throws javax.xml.stream.XMLStreamException {
+
             try {
                 javax.xml.bind.JAXBContext context = wsContext;
                 org.apache.axiom.om.impl.builder.SAXOMBuilder builder = new org.apache.axiom.om.impl.builder.SAXOMBuilder();
