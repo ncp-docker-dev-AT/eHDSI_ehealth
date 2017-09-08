@@ -22,6 +22,16 @@ public interface ConfigurationManager {
     String getEndpointUrl(String countryCode, RegisteredService service);
 
     /**
+     * @param countryCode
+     * @param service
+     * @param refresh
+     * @return
+     */
+    String getEndpointUrl(String countryCode, RegisteredService service, boolean refresh);
+
+    void fetchInternationalSearchMask(String countryCode);
+
+    /**
      * @param ISOCountryCode
      * @param ServiceName
      * @param URL
