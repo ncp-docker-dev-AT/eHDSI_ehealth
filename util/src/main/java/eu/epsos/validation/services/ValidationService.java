@@ -8,6 +8,7 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import net.ihe.gazelle.jaxb.schematron.GazelleObjectValidator;
 import net.ihe.gazelle.jaxb.schematron.GazelleObjectValidatorService;
 import net.ihe.gazelle.jaxb.schematron.SOAPException_Exception;
+import net.ihe.gazelle.jaxb.schematron.TransformerException_Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,7 @@ public abstract class ValidationService {
     protected boolean validateSchematron(String object, String schematron, NcpSide ncpSide) {
 
         LOGGER.info("[Validation Service Schematron: '{}' on '{}' side]", schematron, ncpSide.getName());
-        String xmlDetails = "";
+        String xmlDetails;
 
         if (!ValidationService.isValidationOn()) {
             LOGGER.info("Automated validation turned off, not validating.");
@@ -82,7 +83,7 @@ public abstract class ValidationService {
             GazelleObjectValidatorService objectValidatorService = new GazelleObjectValidatorService();
             GazelleObjectValidator gazellePort = objectValidatorService.getGazelleObjectValidatorPort();
             xmlDetails = gazellePort.validateObject(DatatypeConverter.printBase64Binary(object.getBytes()), schematron, schematron);
-        } catch (SOAPException_Exception ex) {
+        } catch (SOAPException_Exception | TransformerException_Exception ex) {
             LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
             return false;
         }
