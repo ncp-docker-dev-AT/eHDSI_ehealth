@@ -21,7 +21,6 @@
             <xsl:when test="string-length(/n1:ClinicalDocument/n1:title)  &gt;= 1">
                 <xsl:value-of select="/n1:ClinicalDocument/n1:title"/>
             </xsl:when>
-
             <xsl:otherwise>
                 <xsl:text>Clinical Document</xsl:text>
             </xsl:otherwise>
