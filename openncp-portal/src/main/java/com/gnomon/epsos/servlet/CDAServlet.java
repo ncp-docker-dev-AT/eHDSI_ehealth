@@ -38,7 +38,7 @@ public class CDAServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
         try {
-            log.info("Rendering CDA Diplay view");
+            log.info("Rendering CDA Display view");
             String exportType = ParamUtil.getString(req, "exportType");
             String cda;
             byte[] output;
@@ -116,7 +116,7 @@ public class CDAServlet extends HttpServlet {
             EpsosDocument1 eps = clientConectorConsumer.retrieveDocument(hcpAssertion, trcAssertion, selectedCountry,
                     documentId, hcid, classCode, lang1);
 
-            if (Validator.isNotNull(eps)) {
+//            if (Validator.isNotNull(eps)) {
 //                try {
 //                    EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
 //                            "NI_DR" + classCode.getValue(),
@@ -127,7 +127,7 @@ public class CDAServlet extends HttpServlet {
 //                } catch (Exception e) {
 //                    log.error(ExceptionUtils.getStackTrace(e));
 //                }
-            } else {
+//            } else {
 //                try {
 //                    EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
 //                            "NI_DR" + classCode.getValue(),
@@ -138,8 +138,7 @@ public class CDAServlet extends HttpServlet {
 //                } catch (Exception e) {
 //                    log.error(ExceptionUtils.getStackTrace(e));
 //                }
-
-            }
+//            }
 
             selectedEpsosDocument.setAuthor(eps.getAuthor() + "");
             try {
@@ -166,20 +165,20 @@ public class CDAServlet extends HttpServlet {
                 log.error(ExceptionUtils.getStackTrace(e));
             }
             String actionURL = "dispenseServlet";
-            String convertedcda = "";
+            String convertedCda;
             if (isCDA) {
                 log.info("The document is EPSOS CDA");
                 log.info("########### Styling the document that is CDA: '{}' using EPSOS XSLT translated in {}", isCDA, lang1);
                 // display it using cda display tool
-                convertedcda = EpsosHelperService.styleDoc(xmlfile, lang1, false, actionURL);
+                convertedCda = EpsosHelperService.styleDoc(xmlfile, lang1, false, actionURL);
             } else {
                 log.info(("The document is CCD"));
                 log.info("########### Styling the document that is CDA: '{}' using standard XSLT translated in {} ", isCDA, lang1);
-                convertedcda = EpsosHelperService.styleDoc(xmlfile, lang1, true, "");
+                convertedCda = EpsosHelperService.styleDoc(xmlfile, lang1, true, "");
             }
 
             session.setAttribute("epBytes", xmlfile.getBytes());
-            cda = convertedcda;
+            cda = convertedCda;
 
             if (StringUtils.equals(exportType, "xml")) {
                 output = xmlfile.getBytes();
@@ -191,7 +190,7 @@ public class CDAServlet extends HttpServlet {
 
             if (StringUtils.equals(exportType, "pdf")) {
                 String fontpath = getServletContext().getRealPath("/") + "/WEB-INF/fonts/";
-                baos = EpsosHelperService.ConvertHTMLtoPDF(convertedcda, serviceUrl, fontpath);
+                baos = EpsosHelperService.ConvertHTMLtoPDF(convertedCda, serviceUrl, fontpath);
                 output = baos.toByteArray();
                 res.setContentType("application/pdf");
                 res.setHeader("Content-Disposition", "attachment; filename=cda.pdf");
@@ -225,52 +224,53 @@ public class CDAServlet extends HttpServlet {
         }
     }
 
-    private void createEvidenceREMNRR(EpsosDocument1 eps, GenericDocumentCode classCode, Assertion trcAssertion) {
-        if (Validator.isNotNull(eps)) {
-            try {
+//    private void createEvidenceREMNRR(EpsosDocument1 eps, GenericDocumentCode classCode, Assertion trcAssertion) {
+//        if (Validator.isNotNull(eps)) {
+//            try {
 //                EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
 //                        "NI_DR" + classCode.getValue(),
 //                        new DateTime(),
 //                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
 //                        "NI_DR_" + classCode.getValue() + "_RES_SUCC",
 //                        trcAssertion.getID());
-            } catch (Exception e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
-        } else {
-            try {
+//            } catch (Exception e) {
+//                log.error(ExceptionUtils.getStackTrace(e));
+//            }
+//        } else {
+//            try {
 //                EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
 //                        "NI_DR" + classCode.getValue(),
 //                        new DateTime(),
 //                        EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
 //                        "NI_DR_" + classCode.getValue() + "_RES_FAIL",
 //                        trcAssertion.getID());
-            } catch (Exception e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
-
-        }
-    }
+//            } catch (Exception e) {
+//                log.error(ExceptionUtils.getStackTrace(e));
+//            }
+//        }
+//    }
 
     private GenericDocumentCode generateDocumentCode(String docType) {
 
         log.debug("generateDocumentCode('{}')", docType);
         GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
 
-        if ("ep".equals(docType)) {
-            classCode.setNodeRepresentation(Constants.EP_CLASSCODE);
-            classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
-            classCode.setValue(Constants.EP_TITLE);
-        }
-        if ("ps".equals(docType)) {
-            classCode.setNodeRepresentation(Constants.PS_CLASSCODE);
-            classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
-            classCode.setValue(Constants.PS_TITLE);
-        }
-        if ("mro".equals(docType)) {
-            classCode.setNodeRepresentation(Constants.MRO_CLASSCODE);
-            classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
-            classCode.setValue(Constants.MRO_TITLE);
+        switch (docType) {
+            case "ep":
+                classCode.setNodeRepresentation(Constants.EP_CLASSCODE);
+                classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
+                classCode.setValue(Constants.EP_TITLE);
+                break;
+            case "ps":
+                classCode.setNodeRepresentation(Constants.PS_CLASSCODE);
+                classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
+                classCode.setValue(Constants.PS_TITLE);
+                break;
+            case "mro":
+                classCode.setNodeRepresentation(Constants.MRO_CLASSCODE);
+                classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
+                classCode.setValue(Constants.MRO_TITLE);
+                break;
         }
         return classCode;
     }

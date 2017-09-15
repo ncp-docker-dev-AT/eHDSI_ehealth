@@ -335,7 +335,7 @@ public class EpsosHelperService {
     public static ByteArrayOutputStream ConvertHTMLtoPDF(String htmlin,
                                                          String uri, String fontpath) {
 
-        String cleanCDA = "";
+        String cleanCDA;
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties props = cleaner.getProperties();
         // props.setTreatUnknownTagsAsContent(true);

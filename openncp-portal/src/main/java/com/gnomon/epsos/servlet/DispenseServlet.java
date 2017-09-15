@@ -8,15 +8,12 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
 import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentResponse;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.DateTime;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +27,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -73,7 +69,6 @@ public class DispenseServlet extends HttpServlet {
             }
 
             if (dispensedIds != null) {
-                List<String> dispensedIdsList = Arrays.asList(dispensedIds);
 
                 ArrayList<ViewResult> dispensedLines = new ArrayList<>();
 
@@ -166,7 +161,7 @@ public class DispenseServlet extends HttpServlet {
 
                     resp = proxy.submitDocument(hcpAssertion, trcAssertion, selectedCountry, document, patient.getPatientDemographics());
 
-                    if (Validator.isNotNull(resp)) {
+//                    if (Validator.isNotNull(resp)) {
 //                        try {
 //                            EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
 //                                    "NI_XDR" + classCode.getValue(),
@@ -177,7 +172,7 @@ public class DispenseServlet extends HttpServlet {
 //                        } catch (Exception e) {
 //                            log.error(ExceptionUtils.getStackTrace(e));
 //                        }
-                    } else {
+//                    } else {
 //                        try {
 //                            EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
 //                                    "NI_XDR" + classCode.getValue(),
@@ -188,8 +183,7 @@ public class DispenseServlet extends HttpServlet {
 //                        } catch (Exception e) {
 //                            log.error(ExceptionUtils.getStackTrace(e));
 //                        }
-
-                    }
+//                    }
                     res.setContentType("text/html");
                     String message = "Dispensation successful";
                     res.setHeader("Cache-Control", "no-cache");
@@ -219,7 +213,7 @@ public class DispenseServlet extends HttpServlet {
 
             log.error("UPLOAD DISP DOC RESPONSE ERROR: " + ex.getMessage());
             res.setContentType("text/html");
-            String message = "";
+            String message;
             if (Validator.isNotNull(resp)) {
                 message = resp.toString();
             } else {

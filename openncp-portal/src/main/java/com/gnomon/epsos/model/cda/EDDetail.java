@@ -5,6 +5,7 @@ public class EDDetail {
     private String relativePrescriptionLineId;
     private String dispensedQuantity;
     private String dispensedQuantityUnit;
+    private String dispensedNumberOfPackages;
     private String medicineBarcode;
     private String medicineTainiaGnisiotitas;
     private String medicineEofCode;
@@ -24,7 +25,6 @@ public class EDDetail {
     private String patientDifference;
     private String medicineExecutionCase;
     private boolean substituted;
-
     public String getRelativePrescriptionLineId() {
         return relativePrescriptionLineId;
     }
@@ -39,6 +39,22 @@ public class EDDetail {
 
     public void setDispensedQuantity(String dispensedQuantity) {
         this.dispensedQuantity = dispensedQuantity;
+    }
+
+    public String getDispensedQuantityUnit() {
+        return dispensedQuantityUnit;
+    }
+
+    public void setDispensedQuantityUnit(String dispensedQuantityUnit) {
+        this.dispensedQuantityUnit = dispensedQuantityUnit;
+    }
+
+    public String getDispensedNumberOfPackages() {
+        return dispensedNumberOfPackages;
+    }
+
+    public void setDispensedNumberOfPackages(String dispensedNumberOfPackages) {
+        this.dispensedNumberOfPackages = dispensedNumberOfPackages;
     }
 
     public String getMedicineBarcode() {
@@ -169,14 +185,6 @@ public class EDDetail {
         this.medicineTainiaGnisiotitas = medicineTainiaGnisiotitas;
     }
 
-    public String getDispensedQuantityUnit() {
-        return dispensedQuantityUnit;
-    }
-
-    public void setDispensedQuantityUnit(String dispensedQuantityUnit) {
-        this.dispensedQuantityUnit = dispensedQuantityUnit;
-    }
-
     public String getMedicinePackageFormCode() {
         return medicinePackageFormCode;
     }
@@ -200,6 +208,7 @@ public class EDDetail {
                 "relativePrescriptionLineId='" + relativePrescriptionLineId + '\'' +
                 ", dispensedQuantity='" + dispensedQuantity + '\'' +
                 ", dispensedQuantityUnit='" + dispensedQuantityUnit + '\'' +
+                ", dispensedNumberOfPackages='" + dispensedNumberOfPackages + '\'' +
                 ", medicineBarcode='" + medicineBarcode + '\'' +
                 ", medicineTainiaGnisiotitas='" + medicineTainiaGnisiotitas + '\'' +
                 ", medicineEofCode='" + medicineEofCode + '\'' +
