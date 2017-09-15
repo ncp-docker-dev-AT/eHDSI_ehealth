@@ -307,8 +307,10 @@ public class EpsosHelperService {
             EDDetail ed = new EDDetail();
             ed.setRelativePrescriptionLineId(dispensedLine.getField1().toString());
             ed.setDispensedQuantity(dispensedLine.getField7().toString());
+            ed.setDispensedNumberOfPackages(dispensedLine.getField8().toString());
             ed.setMedicineFormCode(dispensedLine.getField5().toString());
             ed.setMedicineCommercialName(dispensedLine.getField2().toString());
+
             // Setting the substitution indicator
             ed.setSubstituted((Boolean) dispensedLine.getField3());
             edDetails.add(ed);
@@ -322,9 +324,8 @@ public class EpsosHelperService {
                     .getRelativePrescriptionBarcode(epDoc));
             cda.setDispensationId("D-" + CDAUtils.getRelativePrescriptionBarcode(epDoc));
             edDoc = CDAUtils.createDispensation(epDoc, cda);
-            LOGGER.info("### DISPENSATION START ###");
-            LOGGER.info(edDoc);
-            LOGGER.info("### DISPENSATION END ###");
+            LOGGER.info("### DISPENSATION START ###\n '{}' \n ### DISPENSATION END ###", edDoc);
+
         } catch (Exception e) {
             LOGGER.error("error creating disp doc");
             LOGGER.error(ExceptionUtils.getStackTrace(e));
