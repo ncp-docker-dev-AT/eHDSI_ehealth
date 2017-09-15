@@ -5,6 +5,7 @@ import com.gnomon.epsos.service.Demographics;
 import com.gnomon.epsos.service.EpsosHelperService;
 import com.gnomon.epsos.service.SearchMask;
 import com.liferay.portal.model.User;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,22 +20,23 @@ import java.util.Vector;
 @SessionScoped
 public class NcpBean implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(NcpBean.class);
+    private static final long serialVersionUID = -3598676527887691187L;
+
     private String errorUserAssertion;
     private List<Country> countries;
     private String selectedCountry;
     private boolean showDemographics;
     private List<Identifier> identifiers;
     private List<Demographics> demographics;
-    private static final Logger log = LoggerFactory.getLogger("NcpBean");
 
     public NcpBean() {
-        new MyBean();
 
-        log.info("Initializing NcpBean ...");
+        LOGGER.info("Initializing NcpBean ...");
+        new MyBean();
         selectedCountry = EpsosHelperService.getConfigProperty("ncp.country");
-        identifiers = new ArrayList<Identifier>();
-        demographics = new ArrayList<Demographics>();
+        identifiers = new ArrayList<>();
+        demographics = new ArrayList<>();
         setIdentifiers(selectedCountry);
     }
 
@@ -43,46 +45,42 @@ public class NcpBean implements Serializable {
     }
 
     private void setIdentifiers(String selectedCountry) {
-        log.info("Setting identifiers for:" + selectedCountry);
+
+        LOGGER.info("Setting identifiers for: '{}'", selectedCountry);
         User user = LiferayUtils.getPortalUser();
         LiferayUtils.storeToSession("user", user);
 
-        identifiers = new ArrayList<Identifier>();
-        Vector vec = EpsosHelperService
-                .getCountryIdsFromCS(selectedCountry);
-        for (int i = 0; i < vec.size(); i++) {
+        identifiers = new ArrayList<>();
+        Vector vec = EpsosHelperService.getCountryIdsFromCS(selectedCountry);
+        for (Object aVec1 : vec) {
             Identifier id = new Identifier();
             id.setKey(EpsosHelperService.getPortalTranslation(
-                    ((SearchMask) vec.get(i)).getLabel(),
-                    LiferayUtils.getPortalLanguage())
-                    + "*");
-            id.setDomain(((SearchMask) vec.get(i)).getDomain());
-            if (id.getKey().equals("") || id.getKey().equals("*")) {
-                id.setKey(((SearchMask) vec.get(i)).getLabel() + "*");
+                    ((SearchMask) aVec1).getLabel(), LiferayUtils.getPortalLanguage()) + "*");
+            id.setDomain(((SearchMask) aVec1).getDomain());
+            
+            if (StringUtils.isBlank(id.getKey()) || StringUtils.equals(id.getKey(), "*")) {
+                id.setKey(((SearchMask) aVec1).getLabel() + "*");
             }
             identifiers.add(id);
-            log.info("Identifier: " +id);
+            LOGGER.info("Identifier: '{}'", id);
         }
 
-        demographics = new ArrayList<Demographics>();
-        vec = EpsosHelperService
-                .getCountryDemographicsFromCS(this.selectedCountry);
-        for (int i = 0; i < vec.size(); i++) {
+        demographics = new ArrayList<>();
+        vec = EpsosHelperService.getCountryDemographicsFromCS(this.selectedCountry);
+        for (Object aVec : vec) {
             Demographics id = new Demographics();
-            if (((Demographics) vec.get(i)).getMandatory()) {
+            if (((Demographics) aVec).getMandatory()) {
                 id.setLabel(EpsosHelperService.getPortalTranslation(
-                        ((Demographics) vec.get(i)).getLabel(),
-                        LiferayUtils.getPortalLanguage())
-                        + "*");
+                        ((Demographics) aVec).getLabel(), LiferayUtils.getPortalLanguage()) + "*");
             } else {
                 id.setLabel(EpsosHelperService.getPortalTranslation(
-                        ((Demographics) vec.get(i)).getLabel(),
+                        ((Demographics) aVec).getLabel(),
                         LiferayUtils.getPortalLanguage()));
             }
-            id.setLength(((Demographics) vec.get(i)).getLength());
-            id.setKey(((Demographics) vec.get(i)).getKey());
-            id.setMandatory(((Demographics) vec.get(i)).getMandatory());
-            id.setType(((Demographics) vec.get(i)).getType());
+            id.setLength(((Demographics) aVec).getLength());
+            id.setKey(((Demographics) aVec).getKey());
+            id.setMandatory(((Demographics) aVec).getMandatory());
+            id.setType(((Demographics) aVec).getType());
             demographics.add(id);
         }
         showDemographics = !demographics.isEmpty();

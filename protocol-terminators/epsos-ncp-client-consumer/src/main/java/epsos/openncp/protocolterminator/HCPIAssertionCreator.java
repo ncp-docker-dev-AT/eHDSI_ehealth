@@ -18,6 +18,7 @@ package epsos.openncp.protocolterminator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
 import org.opensaml.saml2.core.impl.AudienceBuilder;
@@ -89,7 +90,7 @@ public class HCPIAssertionCreator {
         assertion.getConditions().getAudienceRestrictions().add(ar);
 
         // Set AuthnStatement
-        DateTime dateTime = new DateTime();
+        DateTime dateTime = new DateTime().toDateTime(DateTimeZone.UTC);
         AuthnStatement authnStatement = saml.create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
         authnStatement.setAuthnInstant(dateTime);
         authnStatement.setSessionNotOnOrAfter(dateTime.plusHours(2));
@@ -258,7 +259,7 @@ public class HCPIAssertionCreator {
                     .getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
-            attVal.setTextContent("Home");
+            attVal.setTextContent("Resident Physician");
 
             attVal.getNamespaceManager().registerNamespace(ns1);
             attVal.getNamespaceManager().registerNamespace(ns2);

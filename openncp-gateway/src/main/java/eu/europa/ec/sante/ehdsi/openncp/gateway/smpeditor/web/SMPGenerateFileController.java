@@ -251,7 +251,7 @@ public class SMPGenerateFileController {
                         HashMap<String, String> propertiesMap = readProperties.readPropertiesFile();
                         String[] nIDs = docID.split(env.getProperty("DocumentIdentifier.Scheme") + "::"); //SPECIFICATION May change if Document Identifier specification change
                         String docuID = nIDs[1];
-                        LOGGER.debug("\n ****** docuID - " + docuID);
+                        LOGGER.debug("\n ****** docuID - '{}'", docuID);
                         Set set2 = propertiesMap.entrySet();
                         Iterator iterator2 = set2.iterator();
                         while (iterator2.hasNext()) {
@@ -264,7 +264,6 @@ public class SMPGenerateFileController {
                                 break;
                             }
                         }
-
                     } else {
                         String message = env.getProperty("error.redirect.href"); //messages.properties
                         redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
@@ -277,8 +276,8 @@ public class SMPGenerateFileController {
                         redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                         return "redirect:/smpeditor/newsmpfile";
                     }
-   
-          /*Builds final file name*/
+
+                    // Builds final file name
                     timeStamp = new SimpleDateFormat("yyyyMMdd'T'HHmmss").format(new java.util.Date());
                     fileName = smpfile.getType().name() + "_" + smpType + "_" + smpfile.getCountry().toUpperCase() + "_" + timeStamp + ".xml";
                     smpfile.setFileName(fileName);

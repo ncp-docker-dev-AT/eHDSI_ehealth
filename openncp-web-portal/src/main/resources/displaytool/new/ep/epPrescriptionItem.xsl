@@ -340,12 +340,12 @@
 			</td>
 			<td>
 				<xsl:call-template name="show-time">
-				<xsl:with-param name="datetime" select="n1:effectiveTime[1][@xsi:type='IVL_TS']/n1:low"/>
+				<xsl:with-param name="datetime" select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:low"/>
 				</xsl:call-template>
 			</td>
 			<td>
 				<xsl:call-template name="show-time">
-					<xsl:with-param name="datetime" select="n1:effectiveTime[1][@xsi:type='IVL_TS']/n1:high"/>
+					<xsl:with-param name="datetime" select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:high"/>
 				</xsl:call-template>
 			</td>
 			<td>

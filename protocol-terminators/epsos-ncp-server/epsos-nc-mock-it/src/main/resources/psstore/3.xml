@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-This file presents a theoretical clinical case that will be used as basis for creating the Critical Test Data needed for testing the eHDSI Patient Summary services.
-
-Critical Test Data comprises a set of well-formed and not-well formed documents in English based upon the eHDSI Schema and the MVC. Deploying countries have to transform these documents into their own CDA document format and language. Critical Test Data is created manually to cover the widest extent of the underlying standard/profile. While a system may create such data, much of the data serves the purpose of ensuring the robustness of the system under test and supporting the development and validation of the test tools (epSOS D3.C.1 Appendix B - Proof of Concept Testing Strategy Details, v1.6, December 28, 2012).
-
-This theoretical case refers to a 34-year-old pregnant woman with a past medical history of allergic asthma and thyroid cancer during adolescence; for the latter she had a surgical procedure done (thyroidectomy) and, as a consequence, suffers hypothyroidism which requires hormone replacement for life (levothyroxine). At the age of 31 she was diagnosed with a hereditary cardiac disorder - Brugada Syndrome- and had a cardioverter defibrillator implanted to control potentially lethal arrhythmias.
-During the pregnancy of her first child (C-section delivery), she suffered gestational diabetes that developed into type 2 diabetes after giving birth and needs now to receive subcutaneous insulin. As chronic treatment she also needs nebulizations three-time per day  for her asthma - this condition is condition is aggravated in her case by being a smoker (half pack per day) as included in the Social History Section.
-At this moment, she presents severe pre-eclampsia (hypertension during pregnancy) in treatment with two oral antihypertensive agents (a combination medication). Additionally, she is following a 14-day-course of antibiotic treatment due to an acute pyelonephritis (kidney infection more likely to be develop in pregnant women due to the physiological changes that may interfere with the flow of urine).
-Other sections of her Summary include allergies to latex and kiwi (which are very often associated) and to aspirin, and intolerance to lactose; immunizations administered during childhood and adolescence are also present.
-
-Although being real choices for the different diseases and conditions, the selection of the patient's current medication tries to present some easily described medication as well as not so easily ones: e.g. insulin degludec, amoxicilin+clavulanic acid, and the combination of ipratropium bromide+salbutamol for nebulization. For the oral treatment of the pre-eclampsia the agents selected would not be used in real practice during pregnancy.
-
-
--->
 <ClinicalDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epsos="urn:epsos-org:ep:medication"
                   xmlns="urn:hl7-org:v3" classCode="DOCCLIN" moodCode="EVN">
     <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>

@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.helpers.NamespaceSupport;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
@@ -605,13 +606,26 @@ public class TransformationService implements ITransformationService, TMConstant
         return (processingOK ? STATUS_SUCCESS : STATUS_FAILURE);
     }
 
+    /**
+     * @param originalElement
+     * @param warnings
+     */
     private void checkType(Element originalElement, List<ITMTSAMEror> warnings) {
-        if (originalElement != null) {
-            if (notEmpty(originalElement.getAttribute(XSI_TYPE))) {
-                if (!(originalElement.getAttribute(XSI_TYPE).equals(CE) || originalElement
-                        .getAttribute(XSI_TYPE).equals(CD))) {
-                    warnings.add(TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE);
-                }
+
+        if (originalElement != null && StringUtils.isNotBlank(originalElement.getAttribute(XSI_TYPE))) {
+
+            String[] parts = new String[3];
+            NamespaceSupport support = new NamespaceSupport();
+            support.pushContext();
+            // TODO: this method has to be optimized and managed carefully the parser to manage the namespaces used.
+            support.declarePrefix("urn", "urn:hl7-org:v3");
+            parts = support.processName(originalElement.getAttributeNode(XSI_TYPE).getValue(), parts, false);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Namespace URI: '{}' - Local Name: '{}' - Raw Name: '{}'", parts[0], parts[1], parts[2]);
+            }
+            if (!StringUtils.equals(parts[1], CE) && !StringUtils.equals(parts[1], CD)) {
+                warnings.add(TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE);
             }
         }
     }

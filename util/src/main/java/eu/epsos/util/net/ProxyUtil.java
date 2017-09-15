@@ -1,6 +1,8 @@
 package eu.epsos.util.net;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.ProxySelector;
 
@@ -24,6 +26,7 @@ import java.net.ProxySelector;
  */
 public class ProxyUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyUtil.class);
     // TODO: Could be good to add/create an Enumeration into the Configuration
     // Manager project containing the List of Parameters available for the
     // application configuration.
@@ -34,12 +37,16 @@ public class ProxyUtil {
      */
     public static void initProxyConfiguration() {
 
+        LOGGER.info("initProxyConfiguration()");
         if (isProxyAnthenticationMandatory()) {
 
             ProxyCredentials proxyCredentials = getProxyCredentials();
             CustomProxySelector ps = new CustomProxySelector(
                     ProxySelector.getDefault(), proxyCredentials);
             ProxySelector.setDefault(ps);
+
+            System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
+            System.setProperty("jdk.http.auth.proxying.disabledSchemes", "");
         }
     }
 

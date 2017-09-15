@@ -43,7 +43,6 @@ import org.htmlcleaner.PrettyXmlSerializer;
 import org.htmlcleaner.TagNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLObjectBuilder;
@@ -304,14 +303,16 @@ public class EpsosHelperService {
 
         List<EDDetail> edDetails = new ArrayList<>();
         for (ViewResult dispensedLine : dispensedLines) {
-            ViewResult d_line = dispensedLine;
+
             EDDetail ed = new EDDetail();
-            ed.setRelativePrescriptionLineId(d_line.getField1().toString());
-            ed.setDispensedQuantity(d_line.getField7().toString());
-            ed.setMedicineFormCode(d_line.getField5().toString());
-            ed.setMedicineCommercialName(d_line.getField2().toString());
+            ed.setRelativePrescriptionLineId(dispensedLine.getField1().toString());
+            ed.setDispensedQuantity(dispensedLine.getField7().toString());
+            ed.setDispensedNumberOfPackages(dispensedLine.getField8().toString());
+            ed.setMedicineFormCode(dispensedLine.getField5().toString());
+            ed.setMedicineCommercialName(dispensedLine.getField2().toString());
+
             // Setting the substitution indicator
-            ed.setSubstituted((Boolean) d_line.getField3());
+            ed.setSubstituted((Boolean) dispensedLine.getField3());
             edDetails.add(ed);
         }
         cda.setEDDetail(edDetails);
@@ -323,9 +324,8 @@ public class EpsosHelperService {
                     .getRelativePrescriptionBarcode(epDoc));
             cda.setDispensationId("D-" + CDAUtils.getRelativePrescriptionBarcode(epDoc));
             edDoc = CDAUtils.createDispensation(epDoc, cda);
-            LOGGER.info("### DISPENSATION START ###");
-            LOGGER.info(edDoc);
-            LOGGER.info("### DISPENSATION END ###");
+            LOGGER.info("### DISPENSATION START ###\n '{}' \n ### DISPENSATION END ###", edDoc);
+
         } catch (Exception e) {
             LOGGER.error("error creating disp doc");
             LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -336,7 +336,7 @@ public class EpsosHelperService {
     public static ByteArrayOutputStream ConvertHTMLtoPDF(String htmlin,
                                                          String uri, String fontpath) {
 
-        String cleanCDA = "";
+        String cleanCDA;
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties props = cleaner.getProperties();
         // props.setTreatUnknownTagsAsContent(true);

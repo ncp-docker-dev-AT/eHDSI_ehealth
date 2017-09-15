@@ -62,13 +62,11 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
 
             try {
                 String mdaResult = GazelleValidatorCore.validateDocument(document, validator);
-                log.info("MDAResult: '{}'", mdaResult);
                 Document mdaResultDoc = XmlUtil.stringToDom(mdaResult);
 
                 // log validation errors
                 List<Node> errors = XmlUtil.getNodeList(mdaResultDoc, ERRORS);
-                log.warn("MDA validation errors");
-                log.info(XmlUtil.nodeListToString(errors));
+                log.warn("MDA validation errors: \n '{}'", XmlUtil.nodeListToString(errors));
 
                 // evaluate XSD validation status
                 Node resultNode;
@@ -76,25 +74,25 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
                 if (resultNode != null && PASSED.equalsIgnoreCase(resultNode.getTextContent())) {
                     result.setSchemaValid(true);
                 }
-                log.info("Schema validation status: " + resultNode.getTextContent());
+                log.info("Schema validation status: '{}'", resultNode.getTextContent());
 
                 // evaluate MDA validation status
                 resultNode = XmlUtil.getNode(mdaResultDoc, MDA_RESULT);
                 if (resultNode != null && PASSED.equalsIgnoreCase(resultNode.getTextContent())) {
                     result.setModelValid(true);
                 }
-                log.info("MDA validation status: " + resultNode.getTextContent());
+                log.info("MDA validation status: '{}'", resultNode.getTextContent());
 
                 // evaluate total validation status
                 resultNode = XmlUtil.getNode(mdaResultDoc, FINAL_RESULT);
                 if (resultNode != null && PASSED.equalsIgnoreCase(resultNode.getTextContent())) {
                     result.setResultValid(true);
                 }
-                log.info("Final validation status: " + resultNode.getTextContent());
+                log.info("Final validation status: '{}'", resultNode.getTextContent());
 
                 result.setValidationError(false);
             } catch (Exception e) {
-                log.error("MDA validation error", e);
+                log.error("MDA validation error: '{}'", e.getMessage(), e);
                 result.setValidationError(true);
             }
         }

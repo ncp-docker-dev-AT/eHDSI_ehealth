@@ -133,7 +133,7 @@ public class CDAUtils {
     }
 
     private static String getRelativeProductLineFromEP(Document epDoc, String id) {
-        Node nl = null;
+        Node nl;
         String nodeString = "";
         try {
             Document doc = epDoc;
@@ -190,7 +190,7 @@ public class CDAUtils {
             //Creating an xpath expression for the displayName attribute of the code element
             String expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code/@displayName";
 
-            //Setting the xpath procesor and the namespaces
+            //Setting the xpath processor and the namespaces
             org.dom4j.XPath xpath = org.dom4j.DocumentHelper.createXPath(expression);
             xpath.setNamespaceURIs(namespaces);
 
@@ -296,7 +296,7 @@ public class CDAUtils {
     }
 
     private static String getRecordTargetFromEP(Document epDoc) {
-        Node nl = null;
+        Node nl;
         String nodeString = "";
         try {
             nl = epDoc.getElementsByTagName("recordTarget").item(0);
@@ -308,7 +308,7 @@ public class CDAUtils {
     }
 
     private static String getCustodianFromEP(Document epDoc) {
-        Node nl = null;
+        Node nl;
         String nodeString = "";
         try {
             nl = epDoc.getElementsByTagName("custodian").item(0);
@@ -320,7 +320,7 @@ public class CDAUtils {
     }
 
     private static String getLegalAuthFromEP(Document epDoc) {
-        Node nl = null;
+        Node nl;
         String nodeString = "";
         try {
             nl = epDoc.getElementsByTagName("legalAuthenticator").item(0);
@@ -332,7 +332,7 @@ public class CDAUtils {
     }
 
     private static String getAuthorFromEP(Document epDoc) {
-        Node nl = null;
+        Node nl;
         String nodeString = "";
         try {
             nl = epDoc.getElementsByTagName("author").item(0);
@@ -344,7 +344,7 @@ public class CDAUtils {
     }
 
     private static String getRelativePrescriptionText(Document epDoc) {
-        Node nl = null;
+        Node nl;
         String nodeString = "";
         try {
             Document doc = epDoc;
@@ -669,14 +669,14 @@ public class CDAUtils {
             // Related prescription line
             sb.append(addIDRoot(entryOid, detail.getRelativePrescriptionLineId()));
             sb.append("\r\n");
-            sb.append("<quantity value=\"").append(detail.getDispensedQuantity()).append("\" unit=\"1\" />");
+            sb.append("<quantity value=\"").append(detail.getDispensedNumberOfPackages()).append("\" unit=\"1\" />");
 
             // Medicine
             sb.append("<product>");
             sb.append("\r\n");
 
             //Creating a clone reference to the ePrescription source
-            org.dom4j.Document clone = null;
+            org.dom4j.Document clone;
             try {
                 //Cloning the ePrescription document
                 String source = Utils.getDocumentAsXml(epDoc, true).replaceAll("xmlns=\"\"", "");

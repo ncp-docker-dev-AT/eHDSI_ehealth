@@ -151,7 +151,7 @@
         
 <xsl:variable
 	name="pregnancyExpectedDate"
-	select="n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.5']/../n1:value[@xsi:type='TS']"/>
+	select="n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.5']/../n1:value[@xsi:type='TS' or substring-after(@xsi:type, ':')='TS']"/>
 
 <xsl:variable
 	name="pregnancyExpectedDateNode"

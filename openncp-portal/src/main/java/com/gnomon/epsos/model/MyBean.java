@@ -167,6 +167,8 @@ public class MyBean implements Serializable {
 
         showDemographics = !demographics.isEmpty();
         LiferayUtils.storeToSession("selectedCountry", selectedCountry);
+        //TODO: Call ConfigurationManager to request ISM fetch
+        //ConfigurationManagerFactory.getConfigurationManager().fetchInternationalSearchMask(selectedCountry);
         patients = new ArrayList<>();
     }
 
@@ -441,13 +443,9 @@ public class MyBean implements Serializable {
         // create user assertion
         errorUserAssertion = "";
         try {
-            FacesContext
-                    .getCurrentInstance()
-                    .getExternalContext()
-                    .redirect(
-                            "/view1.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal");
+            FacesContext.getCurrentInstance().getExternalContext().redirect(
+                    "/view1.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             log.error(ExceptionUtils.getStackTrace(e));
         }
     }

@@ -10,8 +10,8 @@
  **/
 package se.sb.epsos.web.service;
 
-import epsos.ccd.gnomon.configmanager.OLDConfigurationManagerDb;
 import epsosOrgEpMedication.COCTMT230100UVPackagedMedicine;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import hl7OrgV3.*;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
@@ -84,7 +84,7 @@ public class ePtoeDMapper {
 
     protected String getConfigurationProperty(String key) {
         try {
-            return OLDConfigurationManagerDb.getInstance().getProperty(key);
+            return ConfigurationManagerFactory.getConfigurationManager().getProperty(key);
         } catch (Exception e) { // Fix for not been able to run ui with jetty;
             // without configuration db.
             LOGGER.warn("ConfigurationManagerDb.getProperty did throw.", e);
@@ -304,7 +304,7 @@ public class ePtoeDMapper {
 
             // Overall strength, if provided as a text
             String overallStrength = dispRow.getPrescriptionRow().getStrength();
-            if(overallStrength != null && overallStrength.length() > 0) {
+            if (overallStrength != null && overallStrength.length() > 0) {
                 eD_Document_material.addNewDesc();
                 eD_Document_material.getDesc().newCursor().setTextValue(overallStrength);
             }

@@ -28,11 +28,12 @@ import java.nio.file.attribute.BasicFileAttributes;
  * @author karkaletsis
  */
 public class DisplayTest {
+
     private static final Logger logger = LoggerFactory.getLogger(DisplayTest.class);
 
     //	@Test
-    private void fileTest(String input, TRANSFORMATION type)
-            throws UnsupportedEncodingException, FileNotFoundException, IOException {
+    private void fileTest(String input, TRANSFORMATION type) throws UnsupportedEncodingException, FileNotFoundException, IOException {
+
         EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
         logger.info("Transforming file: " + input);
 
@@ -45,14 +46,14 @@ public class DisplayTest {
         String out = "";
         switch (type) {
             case ForPDF:
-                out = xlsClass.transformForPDF(cda, "el_GR", false);
+                out = xlsClass.transformForPDF(cda, "nl-BE", false);
                 break;
             case UsingStandardCDAXsl:
                 out = xlsClass.transformUsingStandardCDAXsl(cda);
             case WithOutputAndDefinedPath:
-                out = xlsClass.transformWithOutputAndDefinedPath(cda, "el_GR", "", Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository"));
+                out = xlsClass.transformWithOutputAndDefinedPath(cda, "nl-BE", "", Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository"));
             case WithOutputAndUserHomePath:
-                out = xlsClass.transformWithOutputAndUserHomePath(cda, "el_GR", "");
+                out = xlsClass.transformWithOutputAndUserHomePath(cda, "nl-BE", "");
 
         }
         String filename = Paths.get(input).getFileName().toString();
@@ -94,14 +95,15 @@ public class DisplayTest {
         // fileTest("samples/es_ps_pivot.xml");
 
         // Frequency
-        fileTest("samples/multiingredient.xml", TRANSFORMATION.WithOutputAndUserHomePath);
+        //fileTest("samples/multiingredient.xml", TRANSFORMATION.WithOutputAndUserHomePath);
+        fileTest("samples/0000141G.xml", TRANSFORMATION.WithOutputAndUserHomePath);
 
     }
 
     @Test
     public void readFile() throws Exception {
         EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
-        String out = xlsClass.readFile("samples/multiingredient.xml");
+        String out = xlsClass.readFile("samples/0000141G.xml");
         String pt = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository", "out", "readfile.txt")
                 .toString();
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), "utf-8"))) {

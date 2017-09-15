@@ -181,12 +181,12 @@
 
 <xsl:variable
 	name="socialHistoryObservationValue"
-	select="n1:observation/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:value[@xsi:type='PQ']/@value"/>
+	select="n1:observation/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:value[@xsi:type='PQ' or substring-after(@xsi:type, ':')='PQ']/@value"/>
 
 
 <xsl:variable
 	name="socialHistoryObservationValueUnit"
-	select="n1:observation/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:value[@xsi:type='PQ']/@unit"/>
+	select="n1:observation/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:value[@xsi:type='PQ' or substring-after(@xsi:type, ':')='PQ']/@unit"/>
 
 
 

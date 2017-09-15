@@ -1,5 +1,6 @@
 package epsos.ccd.posam.tm.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -126,7 +127,7 @@ public class Validator implements TMConstants {
 
             return result;
         }
-        result = SchematronValidator.validate(new File(schemaPath), document);
+        result = SchematronValidator.validate(new File(StringUtils.trim(schemaPath)), document);
         return result;
     }
 

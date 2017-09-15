@@ -56,8 +56,7 @@ public class LiferayUtils {
             log.info("Try to store to session the parameter: '{}' with value: '{}'", param, value);
             FacesContext facesContext = FacesContext.getCurrentInstance();
             ExternalContext externalContext = facesContext.getExternalContext();
-            PortletRequest portletRequest = (PortletRequest) externalContext
-                    .getRequest();
+            PortletRequest portletRequest = (PortletRequest) externalContext.getRequest();
             PortletSession prtSession = portletRequest.getPortletSession();
             prtSession.setAttribute(param, value, PortletSession.APPLICATION_SCOPE);
         } catch (Exception e) {

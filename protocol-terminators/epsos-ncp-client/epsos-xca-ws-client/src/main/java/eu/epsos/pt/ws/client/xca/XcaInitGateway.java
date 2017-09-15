@@ -195,7 +195,7 @@ public class XcaInitGateway {
                 queryResponse.getDocumentResponse().get(0).setDocument(TMServices.transformDocument(queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage)); //Resets the response document to a translated version.
 
                 /* Validate CDA epSOS Friendly-B */
-                cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
+                cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), false), NcpSide.NCP_B);
 
             } catch (DocumentTransformationException ex) {
                 LOGGER.error(ex.getLocalizedMessage(), ex);

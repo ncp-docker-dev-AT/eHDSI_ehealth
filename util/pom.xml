@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>2.5.2.RC1</version>
+        <version>2.5.2.RC2</version>
     </parent>
 
     <artifactId>openncp-util</artifactId>
@@ -72,6 +72,11 @@
             <version>${commons-io.version}</version>
         </dependency>
         <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons-lang.version}</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
@@ -127,15 +132,15 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <wsdlLocation>
-                                https://gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
-                            </wsdlLocation>
+                            <!--<wsdlLocation>-->
+                            <!--https://gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl-->
+                            <!--</wsdlLocation>-->
                             <wsdlFiles>
                                 <wsdlFile>
                                     ${basedir}/src/main/resources/wsdl/assertion-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.assertion</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.assertion</packageName>
                         </configuration>
                     </execution>
                     <execution>
@@ -148,15 +153,15 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <wsdlLocation>
-                                https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS?wsdl
-                            </wsdlLocation>
+                            <!--<wsdlLocation>-->
+                            <!--https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS?wsdl-->
+                            <!--</wsdlLocation>-->
                             <wsdlFiles>
                                 <wsdlFile>
                                     ${basedir}/src/main/resources/wsdl/audit-validator/AuditMessageValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.audit</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.audit</packageName>
                         </configuration>
                     </execution>
                     <execution>
@@ -169,15 +174,15 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <wsdlLocation>
-                                https://gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
-                            </wsdlLocation>
+                            <!--<wsdlLocation>-->
+                            <!--https://gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl-->
+                            <!--</wsdlLocation>-->
                             <wsdlFiles>
                                 <wsdlFile>
                                     ${basedir}/src/main/resources/wsdl/cda-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.cda</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.cda</packageName>
                         </configuration>
                     </execution>
                     <execution>
@@ -190,15 +195,15 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <wsdlLocation>
-                                https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator?wsdl
-                            </wsdlLocation>
+                            <!--<wsdlLocation>-->
+                            <!--https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator?wsdl-->
+                            <!--</wsdlLocation>-->
                             <wsdlFiles>
                                 <wsdlFile>
                                     ${basedir}/src/main/resources/wsdl/certificate-validator/CertificateValidator.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.certificate</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.certificate</packageName>
                         </configuration>
                     </execution>
                     <execution>
@@ -211,15 +216,15 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <wsdlLocation>
-                                https://gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator?wsdl
-                            </wsdlLocation>
+                            <!--<wsdlLocation>-->
+                            <!--https://gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator?wsdl-->
+                            <!--</wsdlLocation>-->
                             <wsdlFiles>
                                 <wsdlFile>
                                     ${basedir}/src/main/resources/wsdl/schematron-validator/GazelleObjectValidator.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.schematron</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.schematron</packageName>
                         </configuration>
                     </execution>
                     <execution>
@@ -232,15 +237,15 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <wsdlLocation>
-                                https://gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl
-                            </wsdlLocation>
+                            <!--<wsdlLocation>-->
+                            <!--https://gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl-->
+                            <!--</wsdlLocation>-->
                             <wsdlFiles>
                                 <wsdlFile>
                                     ${basedir}/src/main/resources/wsdl/xds-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
-                            <packageName>net.ihe.gazelle.xds</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.xds</packageName>
                         </configuration>
                     </execution>
                 </executions>

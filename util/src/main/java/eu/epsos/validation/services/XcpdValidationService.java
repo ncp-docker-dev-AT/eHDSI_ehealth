@@ -5,8 +5,8 @@ import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Model;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.reporting.ReportBuilder;
-import net.ihe.gazelle.xds.ModelBasedValidationWS;
-import net.ihe.gazelle.xds.ModelBasedValidationWSService;
+import net.ihe.gazelle.jaxb.xds.ModelBasedValidationWS;
+import net.ihe.gazelle.jaxb.xds.ModelBasedValidationWSService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

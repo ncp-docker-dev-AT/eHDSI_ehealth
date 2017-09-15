@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://ws.validator.sch.gazelle.ihe.net/"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
                   name="GazelleObjectValidatorService" targetNamespace="http://ws.validator.sch.gazelle.ihe.net/">
@@ -6,6 +6,8 @@
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.validator.sch.gazelle.ihe.net/"
                    attributeFormDefault="unqualified" elementFormDefault="unqualified"
                    targetNamespace="http://ws.validator.sch.gazelle.ihe.net/">
+            <xs:element name="about" type="tns:about"/>
+            <xs:element name="aboutResponse" type="tns:aboutResponse"/>
             <xs:element name="getAllAvailableObjectTypes" type="tns:getAllAvailableObjectTypes"/>
             <xs:element name="getAllAvailableObjectTypesResponse" type="tns:getAllAvailableObjectTypesResponse"/>
             <xs:element name="getAllSchematrons" type="tns:getAllSchematrons"/>
@@ -41,6 +43,14 @@
                     <xs:element minOccurs="0" name="lastModifierId" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="about">
+                <xs:sequence/>
+            </xs:complexType>
+            <xs:complexType name="aboutResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="about" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="validateObject">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="base64ObjectToValidate" type="xs:string"/>
@@ -67,6 +77,8 @@
                         <xs:sequence>
                             <xs:element minOccurs="0" name="author" type="xs:string"/>
                             <xs:element name="available" type="xs:boolean"/>
+                            <xs:element minOccurs="0" name="daffodilOid" type="xs:string"/>
+                            <xs:element minOccurs="0" name="daffodilTransformationNeeded" type="xs:boolean"/>
                             <xs:element minOccurs="0" name="description" type="xs:string"/>
                             <xs:element minOccurs="0" name="id" type="xs:int"/>
                             <xs:element minOccurs="0" name="label" type="xs:string"/>
@@ -103,6 +115,13 @@
                     <xs:element minOccurs="0" name="schematron" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
+            <xs:element name="TransformerException" type="tns:TransformerException"/>
+            <xs:complexType name="TransformerException">
+                <xs:sequence>
+                    <xs:element name="locationAsString" nillable="true" type="xs:string"/>
+                    <xs:element name="messageAndLocation" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
             <xs:element name="SOAPException" type="tns:SOAPException"/>
             <xs:complexType name="SOAPException">
                 <xs:sequence>
@@ -111,40 +130,52 @@
             </xs:complexType>
         </xs:schema>
     </wsdl:types>
-    <wsdl:message name="getAllSchematronsResponse">
-        <wsdl:part element="tns:getAllSchematronsResponse" name="parameters">
-        </wsdl:part>
-    </wsdl:message>
-    <wsdl:message name="getAllSchematrons">
-        <wsdl:part element="tns:getAllSchematrons" name="parameters">
-        </wsdl:part>
-    </wsdl:message>
-    <wsdl:message name="validateObject">
-        <wsdl:part element="tns:validateObject" name="parameters">
-        </wsdl:part>
-    </wsdl:message>
-    <wsdl:message name="getSchematronByNameResponse">
-        <wsdl:part element="tns:getSchematronByNameResponse" name="parameters">
-        </wsdl:part>
-    </wsdl:message>
     <wsdl:message name="getAllAvailableObjectTypesResponse">
         <wsdl:part element="tns:getAllAvailableObjectTypesResponse" name="parameters">
         </wsdl:part>
     </wsdl:message>
-    <wsdl:message name="SOAPException">
-        <wsdl:part element="tns:SOAPException" name="SOAPException">
-        </wsdl:part>
-    </wsdl:message>
-    <wsdl:message name="getAllAvailableObjectTypes">
-        <wsdl:part element="tns:getAllAvailableObjectTypes" name="parameters">
+    <wsdl:message name="about">
+        <wsdl:part element="tns:about" name="parameters">
         </wsdl:part>
     </wsdl:message>
     <wsdl:message name="getSchematronsForAGivenType">
         <wsdl:part element="tns:getSchematronsForAGivenType" name="parameters">
         </wsdl:part>
     </wsdl:message>
+    <wsdl:message name="aboutResponse">
+        <wsdl:part element="tns:aboutResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
     <wsdl:message name="getSchematronByName">
         <wsdl:part element="tns:getSchematronByName" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllSchematronsResponse">
+        <wsdl:part element="tns:getAllSchematronsResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="validateObject">
+        <wsdl:part element="tns:validateObject" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllSchematrons">
+        <wsdl:part element="tns:getAllSchematrons" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getSchematronByNameResponse">
+        <wsdl:part element="tns:getSchematronByNameResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllAvailableObjectTypes">
+        <wsdl:part element="tns:getAllAvailableObjectTypes" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="SOAPException">
+        <wsdl:part element="tns:SOAPException" name="SOAPException">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="TransformerException">
+        <wsdl:part element="tns:TransformerException" name="TransformerException">
         </wsdl:part>
     </wsdl:message>
     <wsdl:message name="getSchematronsForAGivenTypeResponse">
@@ -162,11 +193,19 @@
             <wsdl:output message="tns:getAllAvailableObjectTypesResponse" name="getAllAvailableObjectTypesResponse">
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="about">
+            <wsdl:input message="tns:about" name="about">
+            </wsdl:input>
+            <wsdl:output message="tns:aboutResponse" name="aboutResponse">
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="validateObject">
             <wsdl:input message="tns:validateObject" name="validateObject">
             </wsdl:input>
             <wsdl:output message="tns:validateObjectResponse" name="validateObjectResponse">
             </wsdl:output>
+            <wsdl:fault message="tns:TransformerException" name="TransformerException">
+            </wsdl:fault>
             <wsdl:fault message="tns:SOAPException" name="SOAPException">
             </wsdl:fault>
         </wsdl:operation>
@@ -206,6 +245,15 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="about">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="about">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="aboutResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="validateObject">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="validateObject">
@@ -214,6 +262,9 @@
             <wsdl:output name="validateObjectResponse">
                 <soap:body use="literal"/>
             </wsdl:output>
+            <wsdl:fault name="TransformerException">
+                <soap:fault name="TransformerException" use="literal"/>
+            </wsdl:fault>
             <wsdl:fault name="SOAPException">
                 <soap:fault name="SOAPException" use="literal"/>
             </wsdl:fault>

@@ -55,35 +55,63 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         properties.put(key, value);
     }
 
-    @Override
+    /**
+     * @param countryCode
+     * @param service
+     * @return
+     */
     public String getEndpointUrl(String countryCode, RegisteredService service) {
+
+        return getEndpointUrl(countryCode, service, false);
+    }
+
+    @Override
+    public String getEndpointUrl(String countryCode, RegisteredService service, boolean refresh) {
+
         Assert.notNull(countryCode, "countryCode must not be null!");
         Assert.notNull(service, "service must not be null!");
         LOGGER.info("getEndpointUrl('{}', '{}')", countryCode, service.getServiceName());
         String key = countryCode.toLowerCase() + "." + service.getServiceName() + ".WSE";
-        return findProperty(key).orElseGet(() -> {
+        if (!refresh) {
+            Optional<String> endpoint = findProperty(key);
+            if (endpoint.isPresent()) {
+                return endpoint.get();
+            }
+        }
+
+        SMLSMPClient client = new SMLSMPClient();
+
+        try {
+            client.lookup(countryCode, service.getUrn());
+            URL endpointUrl = client.getEndpointReference();
+            if (endpointUrl == null) {
+                throw new PropertyNotFoundException("Property '" + key + "' not found!");
+            }
+
+            String value = endpointUrl.toExternalForm();
+            setProperty(key, value);
+
+            X509Certificate certificate = client.getCertificate();
+            if (certificate != null) {
+                String endpointId = countryCode.toLowerCase() + "_" + StringUtils.substringAfter(service.getUrn(), "##");
+                storeEndpointCertificate(endpointId, certificate);
+            }
+            return value;
+        } catch (SMLSMPClientException e) {
+            throw new ConfigurationManagerException("An internal error occurred while retrieving the endpoint URL", e);
+        }
+    }
+
+    public void fetchInternationalSearchMask(String countryCode) {
+
+        try {
+            LOGGER.info("fetchInternationalSearchMask({}) - '{}'", countryCode, RegisteredService.EHEALTH_107.getUrn());
             SMLSMPClient client = new SMLSMPClient();
 
-            try {
-                client.lookup(countryCode, service.getUrn());
-                URL endpointUrl = client.getEndpointReference();
-                if (endpointUrl == null) {
-                    throw new PropertyNotFoundException("Property '" + key + "' not found!");
-                }
-
-                String value = endpointUrl.toExternalForm();
-                setProperty(key, value);
-
-                X509Certificate certificate = client.getCertificate();
-                if (certificate != null) {
-                    String endpointId = countryCode.toLowerCase() + "_" + StringUtils.substringAfter(service.getUrn(), "##");
-                    storeEndpointCertificate(endpointId, certificate);
-                }
-                return value;
-            } catch (SMLSMPClientException e) {
-                throw new ConfigurationManagerException("An internal error occurred while retrieving the endpoint URL", e);
-            }
-        });
+            client.fetchSearchMask(StringUtils.lowerCase(countryCode), RegisteredService.EHEALTH_107.getUrn());
+        } catch (SMLSMPClientException e) {
+            throw new ConfigurationManagerException("An internal error occurred while retrieving the International Search Mask", e);
+        }
     }
 
     public void setServiceWSE(String ISOCountryCode, String ServiceName, String URL) {
@@ -108,6 +136,7 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
     }
 
     private void storeEndpointCertificate(String endpointId, X509Certificate certificate) {
+
         // Store the endpoint certificate in the truststore
         String trustStorePath = getProperty(StandardProperties.NCP_TRUSTSTORE);
         char[] trustStorePassword = getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD).toCharArray();

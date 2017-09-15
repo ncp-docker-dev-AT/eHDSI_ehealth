@@ -47,6 +47,10 @@
         <appender-ref ref="DB"/>
     </logger>
 
+    <logger name="ee.affecto.epsos.ws.handler" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="eu.epsos.pt.ws.client.xdr" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
@@ -75,6 +79,10 @@
         <appender-ref ref="DB"/>
     </logger>
 
+    <logger name="eu.epsos.util.net" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="epsos.ccd.posam.tsam.service" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
@@ -86,7 +94,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
+    <logger name="eu.europa.ec.sante.ehdsi.openncp.configmanager" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
