@@ -12,14 +12,16 @@ import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
@@ -30,6 +32,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -169,7 +173,7 @@ public class SMLSMPClient {
 
             LOGGER.info("Querying for service metadata");
 
-            //ServiceMetadata serviceMetadata = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
+            //ServiceMetadata serviceMetadata = EventLogthis.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
             ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
             LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
             ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList();
@@ -289,24 +293,18 @@ public class SMLSMPClient {
      */
     public void fetchSearchMask(String countryCode, String documentType) throws SMLSMPClientException {
 
-        String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH") + "forms";
+        String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH") + "forms" + System.getProperty("file.separator");
         try {
-            //KeyStore ks = this.loadTrustStore();
-            //DynamicDiscovery smpClient = this.createDynamicDiscoveryClient(ks);
-            KeyStore truststore = KeyStore.getInstance("JKS");
 
+            KeyStore trustStore = KeyStore.getInstance("JKS");
             File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH"));
             FileInputStream fileInputStream = new FileInputStream(file);
-            truststore.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+            trustStore.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
 
             DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
                     .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
-                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
+                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(trustStore)))
                     .build();
-
-            // ParticipantIdentifier participantIdentifier = new ParticipantIdentifier("urn:ehealth:ch:ncp-idp", "ehealth-participantid-qns");
-            // DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
-            // DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:ism::internationalsearchmask##ehealth-107", "ehealth-resid-qns");
 
             String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
             ServiceMetadata sm = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
@@ -320,28 +318,45 @@ public class SMLSMPClient {
                     sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getParticipantIdentifier().getValue());
 
             List<ProcessType> processTypes = sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList().getProcess();
+            LOGGER.info("ProcessType: '{}' - '{}'", processTypes.toString(), processTypes.size());
             if (!processTypes.isEmpty()) {
                 List<EndpointType> endpointTypes = processTypes.get(0).getServiceEndpointList().getEndpoint();
+                LOGGER.info("EndpointType: '{}' - '{}'", endpointTypes.toString(), endpointTypes.size());
                 if (!endpointTypes.isEmpty()) {
                     List<ExtensionType> extensionTypes = endpointTypes.get(0).getExtension();
+                    LOGGER.info("ExtensionType: '{}' - '{}'", extensionTypes.toString(), extensionTypes.size());
                     if (!extensionTypes.isEmpty()) {
                         Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
 
-                        DOMSource source = new DOMSource(document.getElementsByTagName("patientSearch").item(0));
+                        DOMSource source = new DOMSource(document.getElementsByTagNameNS("http://ec.europa.eu/sante/ehncp/ism",
+                                "patientSearch").item(0));
                         TransformerFactory transformerFactory = TransformerFactory.newInstance();
                         Transformer transformer = transformerFactory.newTransformer();
                         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
                         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
                         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-                        StreamResult result = new StreamResult(epsosPropsPath + "InternationalSearch_" + countryCode + ".xml");
+                        String outPath = epsosPropsPath + "InternationalSearch_" + StringUtils.upperCase(countryCode) + ".xml";
+                        LOGGER.info("International Search Mask Path: '{}", outPath);
+                        StreamResult result = new StreamResult(outPath);
                         transformer.transform(source, result);
                     }
-
                 }
             }
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new SMLSMPClientException(e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (TransformerConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (TechnicalException e) {
+            e.printStackTrace();
         }
     }
 
