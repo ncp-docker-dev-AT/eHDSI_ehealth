@@ -20,52 +20,44 @@
 package tr.com.srdc.epsos.ws.xdr.client;
 
 import ee.affecto.epsos.util.EventLogClientUtil;
+import eu.epsos.exceptions.DocumentTransformationException;
+import eu.epsos.pt.ws.client.xdr.transformation.TMServices;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.epsos.util.xdr.XDRConstants;
+import eu.epsos.validation.datamodel.cda.CdaModel;
+import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.epsos.validation.services.CdaValidationService;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
-import java.io.UnsupportedEncodingException;
-import java.rmi.RemoteException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.AssociationType1;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ClassificationType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExtrinsicObjectType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.InternationalStringType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.RegistryPackageType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.util.XMLUtils;
+import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml2.core.Attribute;
+import org.opensaml.saml2.core.AttributeStatement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.FileUtil;
-import eu.epsos.util.xdr.XDRConstants;
-import java.util.List;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.Attribute;
-import org.opensaml.saml2.core.AttributeStatement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import eu.epsos.exceptions.DocumentTransformationException;
-import eu.epsos.pt.ws.client.xdr.transformation.TMServices;
-import eu.epsos.validation.datamodel.cda.CdaModel;
-import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.services.CdaValidationService;
 
-import org.apache.axis2.util.XMLUtils;
+import java.io.UnsupportedEncodingException;
+import java.rmi.RemoteException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 /**
  * @author erdem
- *
  */
 public class XDSbRepositoryServiceInvoker {
 
@@ -78,7 +70,7 @@ public class XDSbRepositoryServiceInvoker {
     public RegistryResponseType provideAndRegisterDocumentSet(final XdrRequest request, final String countryCode, String docClassCode)
             throws AxisFault, RemoteException {
         RegistryResponseType response;
-        
+
         String submissionSetUuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
 
         /*
@@ -86,13 +78,14 @@ public class XDSbRepositoryServiceInvoker {
          */
         DocumentRecipient_ServiceStub stub;
         String epr = null;
+        DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
 
         if (docClassCode.equals(Constants.ED_CLASSCODE)) {
-            epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE);
+            epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE);
         } else if (docClassCode.equals(Constants.CONSENT_CLASSCODE)) {
-            epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE);
+            epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE);
         } else if (docClassCode.equals(Constants.HCER_CLASSCODE)) {
-            epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE);
+            epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE);
         }
 
         stub = new DocumentRecipient_ServiceStub(epr);
@@ -399,7 +392,7 @@ public class XDSbRepositoryServiceInvoker {
         RegistryPackageType rpt = ofRim.createRegistryPackageType();
 
         PatientId patientId = request.getPatient().getIdList().get(0);
-        
+
 
         rpt.setId(submissionSetUuid);
         rpt.setObjectType(XDRConstants.REGISTRY_PACKAGE.OBJECT_TYPE_UUID);

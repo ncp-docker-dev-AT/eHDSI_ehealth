@@ -32,6 +32,7 @@ import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XcaValidationService;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
@@ -337,13 +338,14 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
                 String endpoint = null;
                 LOG.debug("ClassCode: " + classCode);
+                DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
                 switch (classCode) {
                     case Constants.PS_CLASSCODE:
-                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                        endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE, true);
                         break;
                     case Constants.EP_CLASSCODE:
-                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                        endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.ORDER_SERVICE, true);
                         break;
                     default:
@@ -683,13 +685,14 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
                 String endpoint = null;
                 LOG.debug("ClassCode: " + classCode);
+                DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
                 switch (classCode) {
                     case Constants.PS_CLASSCODE:
-                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                        endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE, true);
                         break;
                     case Constants.EP_CLASSCODE:
-                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                        endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.ORDER_SERVICE, true);
                         break;
                     default:

@@ -19,7 +19,7 @@ public interface ConfigurationManager {
      * @param service
      * @return
      */
-    String getEndpointUrl(String countryCode, RegisteredService service);
+    //String getEndpointUrl(String countryCode, RegisteredService service);
 
     /**
      * @param countryCode
@@ -27,7 +27,7 @@ public interface ConfigurationManager {
      * @param refresh
      * @return
      */
-    String getEndpointUrl(String countryCode, RegisteredService service, boolean refresh);
+    //String getEndpointUrl(String countryCode, RegisteredService service, boolean refresh);
 
     void fetchInternationalSearchMask(String countryCode);
 

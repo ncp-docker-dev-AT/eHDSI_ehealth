@@ -28,8 +28,8 @@ import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.services.CdaValidationService;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
@@ -92,8 +92,9 @@ public class XcaInitGateway {
 
             /* Stub */
             RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub();
+            DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
             //String epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), service);
-            String epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
+            String epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
             stub.setAddr(epr);
             stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
             EventLogClientUtil.createDummyMustUnderstandHandler(stub);
@@ -143,13 +144,13 @@ public class XcaInitGateway {
             /* Stub */
             RespondingGateway_ServiceStub stub;
             stub = new RespondingGateway_ServiceStub();
-
+            DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
             String epr;
             if (service.equals(Constants.MroService)) {
-                epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE);
+                epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE);
             } else {
                 //epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), service);
-                epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
+                epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
             }
             stub.setAddr(epr);
             stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));

@@ -32,6 +32,7 @@ import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XdrValidationService;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
@@ -289,13 +290,14 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                 String endpoint = null;
 
                 LOG.debug("ClassCode: '{}'", this.classCode);
+                DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
                 switch (classCode) {
                     case tr.com.srdc.epsos.util.Constants.ED_CLASSCODE:
-                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                        endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE, true);
                         break;
                     case tr.com.srdc.epsos.util.Constants.CONSENT_CLASSCODE:
-                        endpoint = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                        endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE, true);
                         break;
                     default:

@@ -60,13 +60,13 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
      * @param service
      * @return
      */
-    public String getEndpointUrl(String countryCode, RegisteredService service) {
+    private String getEndpointUrl(String countryCode, RegisteredService service) {
 
         return getEndpointUrl(countryCode, service, false);
     }
 
-    @Override
-    public String getEndpointUrl(String countryCode, RegisteredService service, boolean refresh) {
+    //@Override
+    private String getEndpointUrl(String countryCode, RegisteredService service, boolean refresh) {
 
         Assert.notNull(countryCode, "countryCode must not be null!");
         Assert.notNull(service, "service must not be null!");

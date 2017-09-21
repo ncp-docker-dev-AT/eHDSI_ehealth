@@ -41,8 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * This class provides methods for constructing the audit message and for
- * sending the syslog message to the repository
+ * This class provides methods for constructing the audit message and for sending the syslog message to the repository
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -54,7 +53,7 @@ import java.util.Date;
 public enum AuditTrailUtils {
 
     INSTANCE;
-    private static final Logger log = LoggerFactory.getLogger(AuditTrailUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuditTrailUtils.class);
 
     public static AuditTrailUtils getInstance() {
         return INSTANCE;
@@ -63,77 +62,77 @@ public enum AuditTrailUtils {
     public synchronized static String constructMessage(AuditMessage auditmessage, boolean sign) {
 
         String auditmsg = "";
-        log.info("Constructing message");
+        LOGGER.info("Constructing message");
         String eventTypeCode = "EventTypeCode(N/A)";
         try {
             eventTypeCode = auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode();
-            log.debug("'{}' try to convert the message to xml using JAXB", eventTypeCode);
+            LOGGER.debug("'{}' try to convert the message to xml using JAXB", eventTypeCode);
         } catch (NullPointerException e) {
-            log.warn("Unable to log AuditMessageEventTypeCode.", e);
+            LOGGER.warn("Unable to log AuditMessageEventTypeCode.", e);
         }
 
         try {
             auditmsg = AuditTrailUtils.convertAuditObjectToXML(auditmessage);
         } catch (JAXBException e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
-        log.info("Message created");
+        LOGGER.info("Message created");
 
         INSTANCE.writeTestAudits(auditmessage, auditmsg);
 
-        log.info("'{}' message constructed", eventTypeCode);
+        LOGGER.info("'{}' message constructed", eventTypeCode);
 
         boolean validated = false;
         URL url = null;
         try {
             url = Utils.class.getClassLoader().getResource("RFC3881.xsd");
         } catch (Exception e) {
-            log.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error getting xsd url", e);
+            LOGGER.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error getting xsd url", e);
         }
         try {
             validated = Utils.validateSchema(auditmsg, url);
-            log.info(auditmessage.getEventIdentification().getEventID().getCode() + " Validating Schema");
+            LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Validating Schema");
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
 
         boolean forcewrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "TRUE", true));
         if (!validated) {
-            log.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message not validated");
+            LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message not validated");
             if (!forcewrite) {
                 auditmsg = "";
             }
         }
         if (validated || forcewrite) {
             if (validated) {
-                log.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message validated");
+                LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message validated");
             } else {
-                log.info(auditmessage.getEventIdentification().getEventID().getCode() + " message not validated");
+                LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " message not validated");
             }
             if (forcewrite && !validated) {
-                log.info(auditmessage.getEventIdentification().getEventID().getCode()
+                LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode()
                         + " AuditManager is force to send the message. So trying ...");
             }
 
             try {
                 // validate xml according to xsd
-                log.debug(auditmessage.getEventIdentification().getEventID().getCode()
+                LOGGER.debug(auditmessage.getEventIdentification().getEventID().getCode()
                         + " XML stuff: Create Dom From String");
                 Document doc = Utils.createDomFromString(auditmsg);
                 if (sign) {
                     // Gnomon SecMan
                     auditmsg = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
 
-                    log.info(auditmessage.getEventIdentification().getEventID().getCode() + " message signed");
+                    LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " message signed");
                 }
             } catch (Exception e) {
                 auditmsg = "";
-                log.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error signing doc"
+                LOGGER.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error signing doc"
                         + e.getMessage(), e);
             }
         }
         // TODO: Audit Message built is not displayed into the logs
-        // log.info("Audit Message: '{}'", auditmsg);
+        // LOGGER.info("Audit Message: '{}'", auditmsg);
         return auditmsg;
     }
 
@@ -146,18 +145,18 @@ public enum AuditTrailUtils {
      * @throws JAXBException
      */
     public synchronized static String convertAuditObjectToXML(AuditMessage am) throws JAXBException {
-        log.info("Converting message");
+        LOGGER.info("Converting message");
         StringWriter sw = new StringWriter();
-        log.debug("JAXB marshalling the Audit Object");
+        LOGGER.debug("JAXB marshalling the Audit Object");
         JAXBContext context = JAXBContext.newInstance(AuditMessage.class);
         Marshaller m = context.createMarshaller();
         try {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         } catch (PropertyException e) {
-            log.warn("Unable to format converted AuditMessage to XML.");
+            LOGGER.warn("Unable to format converted AuditMessage to XML: '{}'", e.getMessage(), e);
         }
         m.marshal(am, sw);
-        log.info("Converting message finished");
+        LOGGER.info("Converting message finished");
         return sw.toString();
     }
 
@@ -169,7 +168,7 @@ public enum AuditTrailUtils {
      */
     public AuditMessage createAuditMessage(EventLog eventLog) {
 
-        log.info("createAuditMessage(EventLog '{}')", eventLog.getEventType());
+        LOGGER.info("createAuditMessage(EventLog '{}')", eventLog.getEventType());
         AuditMessage am = new AuditMessage();
         AuditTrailUtils au = AuditTrailUtils.getInstance();
         if (eventLog.getEventType().equals("epsos-11")) {
@@ -236,11 +235,14 @@ public enum AuditTrailUtils {
             am = au._CreateAuditTrailForEhealthSMPPush(eventLog);
         }
 
-        am = AuditTrailUtils.getInstance().addNonRepudiationSection(am, eventLog.getReqM_ParticipantObjectID(),
-                eventLog.getReqM_PatricipantObjectDetail(), eventLog.getResM_ParticipantObjectID(),
-                eventLog.getResM_PatricipantObjectDetail());
+        if (!StringUtils.equals(eventLog.getEventType(), "ehealth-193")
+                && !StringUtils.equals(eventLog.getEventType(), "ehealth-194")) {
 
-		/* Invoke audit message validation services */
+            am = AuditTrailUtils.getInstance().addNonRepudiationSection(am, eventLog.getReqM_ParticipantObjectID(),
+                    eventLog.getReqM_PatricipantObjectDetail(), eventLog.getResM_ParticipantObjectID(),
+                    eventLog.getResM_PatricipantObjectDetail());
+        }
+        /* Invoke audit message validation services */
         validateAuditMessage(eventLog, am);
 
         return am;
@@ -298,7 +300,8 @@ public enum AuditTrailUtils {
 
         AuditMessage am = createAuditTrailForEhealthSMPQuery(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "SMP", "eHealth Security", "SignedServiceMetadata");
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "SMP",
+                    "eHealth Security", "SignedServiceMetadata");
         }
         return am;
     }
@@ -314,7 +317,8 @@ public enum AuditTrailUtils {
 
         AuditMessage am = createAuditTrailForEhealthSMPPush(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "SMP", "eHealth Security", "SignedServiceMetadata");
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "SMP",
+                    "eHealth Security", "SignedServiceMetadata");
         }
         return am;
     }
@@ -329,7 +333,8 @@ public enum AuditTrailUtils {
     private AuditMessage _CreateAuditTrailForOrderService(EventLog eventLog) {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12",
+                    "", new Short("0"));
         }
         return am;
     }
@@ -345,8 +350,8 @@ public enum AuditTrailUtils {
         AuditMessage am = createAuditTrailForHCPIdentity(eventLog);
         if (am != null) {
             // Event Target
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "IdA", "epSOS Security",
-                    "HCP Identity Assertion");
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "IdA",
+                    "epSOS Security", "HCP Identity Assertion");
         }
         return am;
     }
@@ -377,8 +382,8 @@ public enum AuditTrailUtils {
         AuditMessage am = createAuditTrailForPivotTranslation(eventLog);
         if (am != null) {
             // Event Target
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("4"), new Short("5"), "in", "epSOS Tranlation",
-                    "Input Data");
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("4"), new Short("5"), "in",
+                    "epSOS Tranlation", "Input Data");
             addEventTarget(am, eventLog.getET_ObjectID_additional(), new Short("4"), new Short("5"), "out",
                     "epSOS Tranlation", "Output Data");
         }
@@ -394,7 +399,8 @@ public enum AuditTrailUtils {
     private AuditMessage _CreateAuditTrailTRCA(EventLog eventLog) {
         AuditMessage am = createAuditTrailForTRCA(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "TrcA", "epSOS Security", "TRC Assertion");
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), null, "TrcA",
+                    "epSOS Security", "TRC Assertion");
         }
         return am;
     }
@@ -412,10 +418,11 @@ public enum AuditTrailUtils {
         // Event Target
         if (am != null) {
             if (action.equals("Discard")) {
-                addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "Discard",
-                        new Short("14"));
+                addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12",
+                        "Discard", new Short("14"));
             } else {
-                addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+                addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12",
+                        "", new Short("0"));
             }
         }
         return am;
@@ -432,7 +439,8 @@ public enum AuditTrailUtils {
 
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12",
+                    "", new Short("0"));
         }
         return am;
     }
@@ -455,10 +463,12 @@ public enum AuditTrailUtils {
             }
 
             if (StringUtils.equalsIgnoreCase(action, "Put")) {
-                addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "Put", new Short("0"));
+                addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12",
+                        "Put", new Short("0"));
             }
             if (StringUtils.equalsIgnoreCase(action, "Pin")) {
-                addEventTarget(am, eventLog.getET_ObjectID(), new Short("4"), new Short("12"), "PIN", "esSOS Security",
+                addEventTarget(am, eventLog.getET_ObjectID(), new Short("4"), new Short("12"), "PIN",
+                        "esSOS Security",
                         "Privacy Information Notice");
             }
         }
@@ -475,7 +485,8 @@ public enum AuditTrailUtils {
     private AuditMessage _CreateAuditTrailForPatientService(EventLog eventLog) {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "", new Short("0"));
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("4"), "12", "",
+                    new Short("0"));
         }
         return am;
     }
@@ -507,7 +518,8 @@ public enum AuditTrailUtils {
     private AuditMessage _CreateAuditTrailForPACService(EventLog eventLog) {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("24"), "10", "", new Short("0"));
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("24"), "10", "",
+                    new Short("0"));
         }
         return am;
     }
@@ -521,7 +533,8 @@ public enum AuditTrailUtils {
     private AuditMessage _CreateAuditTrailForRequestOfData(EventLog eventLog) {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("24"), "10", "", new Short("0"));
+            addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("24"), "10", "",
+                    new Short("0"));
         }
         return am;
     }
@@ -534,6 +547,7 @@ public enum AuditTrailUtils {
     }
 
     private String getMappedEventType(String eventType) {
+
         IHEEventType mappedEventType = null;
         if (eventType.equals(
                 epsos.ccd.gnomon.auditmanager.EventType.epsosIdentificationServiceFindIdentityByTraits.getCode())) {
@@ -680,9 +694,9 @@ public enum AuditTrailUtils {
     }
 
     private AuditMessage addEventIdentification(AuditMessage am, String EventType, String transactionName,
-                                                String EventActionCode, XMLGregorianCalendar EventDateTime, BigInteger EventOutcomeIndicator) {
+                                                String EventActionCode, XMLGregorianCalendar EventDateTime,
+                                                BigInteger EventOutcomeIndicator) {
         // Change EventType to new ones
-
         EventIdentificationType eit = new EventIdentificationType();
 
         CodedValueType iheEventID = new CodedValueType();
@@ -774,6 +788,10 @@ public enum AuditTrailUtils {
             eventID_epsos.setCodeSystemName("ehealth-193");
             eventID_epsos.setDisplayName("SMP::Query");
             eit.getEventTypeCode().add(eventID_epsos);
+
+            eit.getEventID().setCode("SMP");
+            eit.getEventID().setCodeSystemName("ehealth-193");
+            eit.getEventID().setDisplayName("SMP::Query");
         }
         if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ehealthSMPPush.getCode())) {
             CodedValueType eventID_epsos = new CodedValueType();
@@ -781,6 +799,10 @@ public enum AuditTrailUtils {
             eventID_epsos.setCodeSystemName("ehealth-194");
             eventID_epsos.setDisplayName("SMP::Push");
             eit.getEventTypeCode().add(eventID_epsos);
+
+            eit.getEventID().setCode("SMP");
+            eit.getEventID().setCodeSystemName("ehealth-194");
+            eit.getEventID().setDisplayName("SMP::Push");
         }
 
         // eit.setEventID(eventID);
@@ -792,14 +814,14 @@ public enum AuditTrailUtils {
         // <EventTypeCode code="60591-5" codeSystemName="epSOS LOINC"
         // displayName="epSOS Patient Summary"
         // originalText="urn:uuid:1.2.3.4.5.6.7.8.9.10"/>
-
         return am;
     }
 
     private AuditMessage addPointOfCare(AuditMessage am, String PC_UserID, String PC_RoleID, boolean UserIsRequestor,
                                         String codeSystem) {
-        if (PC_UserID == null || PC_UserID.equals("")) {
-            log.info("This is service provider and doesn't need Point of Care");
+        //if (PC_UserID == null || PC_UserID.equals("")) {
+        if (StringUtils.isBlank(PC_UserID)) {
+            LOGGER.info("This is service provider and doesn't need Point of Care");
         } else {
             ActiveParticipant a = new ActiveParticipant();
             a.setUserID(PC_UserID);
@@ -828,8 +850,9 @@ public enum AuditTrailUtils {
 
     private AuditMessage addService(AuditMessage am, String SC_UserID, boolean UserIsRequestor, String code,
                                     String codeSystem, String displayName, String ipaddress) {
-        if (SC_UserID == null || SC_UserID.equals("")) {
-            log.warn("No Service, as this is Service Consumer");
+
+        if (StringUtils.isBlank(SC_UserID)) {
+            LOGGER.warn("No Service, as this is Service Consumer");
         } else {
             ActiveParticipant sc = new ActiveParticipant();
             sc.setNetworkAccessPointID(ipaddress);
@@ -865,18 +888,19 @@ public enum AuditTrailUtils {
 
     private AuditMessage addError(AuditMessage am, String EM_PatricipantObjectID, byte[] EM_PatricipantObjectDetail,
                                   Short EM_Code, Short EM_CodeRole, String EM_TypeCode, String EM_qualifier) {
+
         // Error Message
-        boolean noErrorOccured = false;
-        log.info("The EM_PatricipantObjectID is : " + EM_PatricipantObjectID);
+        boolean noErrorOccured;
+        LOGGER.info("The EM_PatricipantObjectID is: '{}'", EM_PatricipantObjectID);
         try {
             noErrorOccured = Utils.isEmpty(EM_PatricipantObjectID);
         } catch (Exception e) {
             noErrorOccured = true;
-            log.error("The participant object id is null. So no error occured" + e.getMessage());
+            LOGGER.error("The participant object id is null. So no error occured" + e.getMessage(), e);
         }
 
         if (noErrorOccured) {
-            log.info("There is no error occured");
+            LOGGER.info("There is no error occured");
         } else {
             ParticipantObjectIdentificationType em = new ParticipantObjectIdentificationType();
             em.setParticipantObjectID(EM_PatricipantObjectID);
@@ -898,6 +922,8 @@ public enum AuditTrailUtils {
 
     private AuditMessage addEventTarget(AuditMessage am, String ET_ObjectID, Short TypeCode, Short TypeCodeRole,
                                         String EM_Code, String action, Short ObjectDataLifeCycle) {
+
+
         ParticipantObjectIdentificationType em = new ParticipantObjectIdentificationType();
         em.setParticipantObjectID(ET_ObjectID);
         em.setParticipantObjectTypeCode(TypeCode);
@@ -912,8 +938,11 @@ public enum AuditTrailUtils {
         return am;
     }
 
-    private AuditMessage addEventTarget(AuditMessage am, String ET_ObjectID, Short ObjectTypeCode,
-                                        Short ObjectDataLifeCycle, String EM_Code, String EM_CodeSystemName, String EM_DisplayName) {
+    private AuditMessage addEventTarget(AuditMessage am, String ET_ObjectID, Short ObjectTypeCode, Short ObjectDataLifeCycle,
+                                        String EM_Code, String EM_CodeSystemName, String EM_DisplayName) {
+
+        LOGGER.info("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", am.toString(), ET_ObjectID,
+                ObjectTypeCode, ObjectDataLifeCycle, EM_Code, EM_CodeSystemName, EM_DisplayName);
         ParticipantObjectIdentificationType em = new ParticipantObjectIdentificationType();
         em.setParticipantObjectID(ET_ObjectID);
         em.setParticipantObjectTypeCode(ObjectTypeCode);
@@ -952,7 +981,7 @@ public enum AuditTrailUtils {
             addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
                     new Short("3"), "9", "errormsg");
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
         }
         return am;
     }
@@ -980,7 +1009,7 @@ public enum AuditTrailUtils {
             addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
                     new Short("3"), "9", "errormsg");
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
         }
         return am;
     }
@@ -1013,7 +1042,7 @@ public enum AuditTrailUtils {
             addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
                     new Short("3"), "9", "errormsg");
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
         }
         return am;
     }
@@ -1044,7 +1073,7 @@ public enum AuditTrailUtils {
             addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
                     new Short("3"), "9", "errormsg");
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
         }
         return am;
     }
@@ -1079,7 +1108,7 @@ public enum AuditTrailUtils {
             addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), new Short("1"), new Short("1"), "Patient",
                     "2", "RFC-3881", "Patient Number");
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
         }
         return am;
     }
@@ -1106,7 +1135,7 @@ public enum AuditTrailUtils {
             addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
                     eventLog.getTargetip());
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
         }
         return am;
     }
@@ -1129,7 +1158,7 @@ public enum AuditTrailUtils {
             addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
                     eventLog.getTargetip());
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
         }
         return am;
     }
@@ -1161,7 +1190,7 @@ public enum AuditTrailUtils {
             addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
                     eventLog.getTargetip());
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
         }
         return am;
     }
@@ -1195,19 +1224,20 @@ public enum AuditTrailUtils {
                     "PatientTarget", "2", "RFC-3881", "Patient Number");
             addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
                     new Short("3"), "9", "errormsg");
-            log.info(am.toString());
+            LOGGER.info(am.toString());
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
 
         }
         return am;
     }
 
     private void writeTestAudits(AuditMessage auditmessage, String auditmsg) {
+
         String wta = Utils.getProperty("WRITE_TEST_AUDITS");
-        log.info("Writing test audits : " + wta);
+        LOGGER.info("Writing test audits: '{}'", wta);
         if (wta.equals("true")) {
-            log.info("Writing test audits");
+            LOGGER.info("Writing test audits");
             String tap = Utils.getProperty("TEST_AUDITS_PATH");
             try {
                 Utils.writeXMLToFile(auditmsg,
@@ -1221,7 +1251,7 @@ public enum AuditTrailUtils {
                     Utils.writeXMLToFile(auditmsg, tap + new SimpleDateFormat("yyyy.MM.dd'at'HH-mm-ss.SSS")
                             .format(new Date(System.currentTimeMillis())) + ".xml");
                 } catch (Exception e2) {
-                    log.warn("Unable to write test audit.");
+                    LOGGER.warn("Unable to write test audit.");
                 }
             }
         }
@@ -1230,7 +1260,7 @@ public enum AuditTrailUtils {
     public synchronized void sendATNASyslogMessage(AuditLogSerializer auditLogSerializer, AuditMessage auditmessage,
                                                    String facility, String severity) {
         MessageSender t = new MessageSender(auditLogSerializer, auditmessage, facility, severity);
-        log.debug("Starting new thread for sending message");
+        LOGGER.debug("Starting new thread for sending message");
         t.start();
     }
 
@@ -1244,9 +1274,9 @@ public enum AuditTrailUtils {
      */
     private boolean validateAuditMessage(EventLog eventLog, AuditMessage am) {
 
-        log.info("validateAuditMessage(EventLog '{}', AudiMessage '{}')", eventLog.getEventType(), am.getEventIdentification().getEventActionCode());
+        LOGGER.info("validateAuditMessage(EventLog '{}', AudiMessage '{}')", eventLog.getEventType(), am.getEventIdentification().getEventActionCode());
         String model = "";
-        NcpSide ncpSide = null;
+        NcpSide ncpSide;
 
         if (eventLog.getPC_UserID() == null || eventLog.getPC_UserID().isEmpty()) {
             ncpSide = NcpSide.NCP_A;
