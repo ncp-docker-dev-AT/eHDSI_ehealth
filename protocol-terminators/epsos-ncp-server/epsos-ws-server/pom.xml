@@ -205,6 +205,7 @@
                         WEB-INF/lib/log4j-1.2.15.jar,
                         WEB-INF/lib/org.apache.xerces-xercesImpl-2.10.0.jar,
                         WEB-INF/lib/xalan-2.7.0.jar,
+                        WEB-INF/lib/xalan-2.7.1.jar,
                         WEB-INF/lib/xmlParserAPIs-2.0.2.jar,
                         WEB-INF/lib/xml-apis-2.10.0.jar
                     </packagingExcludes>

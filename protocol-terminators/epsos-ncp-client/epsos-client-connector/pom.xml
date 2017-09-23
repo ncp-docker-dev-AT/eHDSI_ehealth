@@ -235,6 +235,7 @@
                         WEB-INF/lib/log4j-1.2.15.jar,
                         WEB-INF/lib/saxon9-dom-9.1.0.8.jar,
                         WEB-INF/lib/xalan-2.7.0.jar,
+                        WEB-INF/lib/xalan-2.7.1.jar,
                         WEB-INF/lib/xmlbeans-2.3.0.jar
                     </packagingExcludes>
                 </configuration>
