@@ -18,10 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
@@ -32,8 +32,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -47,7 +45,7 @@ public class SMLSMPClient {
     /**
      * The logger.
      */
-    private final static Logger LOGGER = LoggerFactory.getLogger(SMLSMPClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMLSMPClient.class);
 
     /**
      * Static constants for SMP identifiers
@@ -135,10 +133,9 @@ public class SMLSMPClient {
      */
     public void lookup(String countryCode, String documentType) throws SMLSMPClientException {
 
-        LOGGER.info("SML Client: '{}'-'{}'", countryCode, documentType);
         try {
+            LOGGER.info("SML Client: '{}'-'{}'", countryCode, documentType);
 //            KeyStore ks = this.loadTrustStore();
-//
 //            DynamicDiscovery smpClient = this.createDynamicDiscoveryClient(ks);
 //            LOGGER.info("DynamicDiscovery '{}' instantiated.", smpClient.toString());
             String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
@@ -156,67 +153,68 @@ public class SMLSMPClient {
 
             //File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_KEYSTORE"));
             File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH"));
-            FileInputStream fileInputStream = new FileInputStream(file);
-            ks.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                ks.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
 
-            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
-                    //.locator(new DefaultBDXRLocator("ehealth.testa.eu", new DefaultDNSLookup()))
-                    .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
-                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
-                    .build();
+                DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+                        //.locator(new DefaultBDXRLocator("ehealth.testa.eu", new DefaultDNSLookup()))
+                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
+                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
+                        .build();
 
-            DocumentIdentifier documentIdentifier = new DocumentIdentifier(documentType,
-                    DOCUMENT_IDENTIFIER_SCHEME);
+                DocumentIdentifier documentIdentifier = new DocumentIdentifier(documentType,
+                        DOCUMENT_IDENTIFIER_SCHEME);
 
-            ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue,
-                    PARTICIPANT_IDENTIFIER_SCHEME);
+                ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue,
+                        PARTICIPANT_IDENTIFIER_SCHEME);
 
-            LOGGER.info("Querying for service metadata");
+                LOGGER.info("Querying for service metadata");
 
-            //ServiceMetadata serviceMetadata = EventLogthis.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
-            ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
-            LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
-            ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList();
-            for (ProcessType processType : processListType.getProcess()) {
+                //ServiceMetadata serviceMetadata = EventLogthis.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
+                ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
+                LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
+                ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList();
+                for (ProcessType processType : processListType.getProcess()) {
 
-                LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier().getScheme());
-                ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
-                for (EndpointType endpointType : serviceEndpointList.getEndpoint()) {
-                    LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
+                    LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier().getScheme());
+                    ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
+                    for (EndpointType endpointType : serviceEndpointList.getEndpoint()) {
+                        LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
 
-                }
+                    }
 
-                List<EndpointType> endpoints = serviceEndpointList.getEndpoint();
+                    List<EndpointType> endpoints = serviceEndpointList.getEndpoint();
 
 			/*
              * Constraint: here I think I have just one endpoint
 			 */
-                int size = endpoints.size();
-                if (size != 1) {
-                    throw new Exception(
-                            "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
+                    int size = endpoints.size();
+                    if (size != 1) {
+                        throw new Exception(
+                                "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
+                    }
+
+                    EndpointType e = endpoints.get(0);
+                    String address = e.getEndpointURI();
+                    if (address == null) {
+                        throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
+                    }
+                    URL urlAddress = new URL(address);
+
+
+                    InputStream inStream = new ByteArrayInputStream(e.getCertificate());
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                    X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
+
+                    // X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
+                    if (certificate == null) {
+                        throw new Exception("no certificate found for endpoint: " + e.getEndpointURI());
+                    }
+                    LOGGER.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
+
+                    setAddress(urlAddress);
+                    setCertificate(certificate);
                 }
-
-                EndpointType e = endpoints.get(0);
-                String address = e.getEndpointURI();
-                if (address == null) {
-                    throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
-                }
-                URL urlAddress = new URL(address);
-
-
-                InputStream inStream = new ByteArrayInputStream(e.getCertificate());
-                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
-
-                // X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
-                if (certificate == null) {
-                    throw new Exception("no certificate found for endpoint: " + e.getEndpointURI());
-                }
-                LOGGER.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
-
-                setAddress(urlAddress);
-                setCertificate(certificate);
             }
             // 2.5.2.RC2 DG Sante
 
@@ -260,8 +258,6 @@ public class SMLSMPClient {
 //            LOGGER.debug("Sending audit trail");
 //            //TODO: Request Audit SMP Query
 //            //sendAuditQuery(smp, smpemail, ncp, ncpemail, country, localip, remoteip, new String(encodedObjectID), null, null);
-
-
         } catch (Exception e) {
             throw new SMLSMPClientException(e);
         }
@@ -298,65 +294,56 @@ public class SMLSMPClient {
 
             KeyStore trustStore = KeyStore.getInstance("JKS");
             File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH"));
-            FileInputStream fileInputStream = new FileInputStream(file);
-            trustStore.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                trustStore.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
 
-            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
-                    .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
-                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(trustStore)))
-                    .build();
+                DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
+                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(trustStore)))
+                        .build();
 
-            String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
-            ServiceMetadata sm = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
+                String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
+                ServiceMetadata sm = this.getServiceMetadata(smpClient, participantIdentifierValue, documentType);
 
-            LOGGER.info("DocumentIdentifier: '{}' - '{}'",
-                    sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getDocumentIdentifier().getScheme(),
-                    sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getDocumentIdentifier().getValue());
+                LOGGER.info("DocumentIdentifier: '{}' - '{}'",
+                        sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getDocumentIdentifier().getScheme(),
+                        sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getDocumentIdentifier().getValue());
 
-            LOGGER.info("ParticipantIdentifier: '{}' - '{}'",
-                    sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getParticipantIdentifier().getScheme(),
-                    sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getParticipantIdentifier().getValue());
+                LOGGER.info("ParticipantIdentifier: '{}' - '{}'",
+                        sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getParticipantIdentifier().getScheme(),
+                        sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getParticipantIdentifier().getValue());
 
-            List<ProcessType> processTypes = sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList().getProcess();
-            LOGGER.info("ProcessType: '{}' - '{}'", processTypes.toString(), processTypes.size());
-            if (!processTypes.isEmpty()) {
-                List<EndpointType> endpointTypes = processTypes.get(0).getServiceEndpointList().getEndpoint();
-                LOGGER.info("EndpointType: '{}' - '{}'", endpointTypes.toString(), endpointTypes.size());
-                if (!endpointTypes.isEmpty()) {
-                    List<ExtensionType> extensionTypes = endpointTypes.get(0).getExtension();
-                    LOGGER.info("ExtensionType: '{}' - '{}'", extensionTypes.toString(), extensionTypes.size());
-                    if (!extensionTypes.isEmpty()) {
-                        Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
+                List<ProcessType> processTypes = sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList().getProcess();
+                LOGGER.info("ProcessType: '{}' - '{}'", processTypes.toString(), processTypes.size());
+                if (!processTypes.isEmpty()) {
+                    List<EndpointType> endpointTypes = processTypes.get(0).getServiceEndpointList().getEndpoint();
+                    LOGGER.info("EndpointType: '{}' - '{}'", endpointTypes.toString(), endpointTypes.size());
+                    if (!endpointTypes.isEmpty()) {
+                        List<ExtensionType> extensionTypes = endpointTypes.get(0).getExtension();
+                        LOGGER.info("ExtensionType: '{}' - '{}'", extensionTypes.toString(), extensionTypes.size());
+                        if (!extensionTypes.isEmpty()) {
+                            Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
 
-                        DOMSource source = new DOMSource(document.getElementsByTagNameNS("http://ec.europa.eu/sante/ehncp/ism",
-                                "patientSearch").item(0));
-                        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                        Transformer transformer = transformerFactory.newTransformer();
-                        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-                        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-                        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-                        String outPath = epsosPropsPath + "InternationalSearch_" + StringUtils.upperCase(countryCode) + ".xml";
-                        LOGGER.info("International Search Mask Path: '{}", outPath);
-                        StreamResult result = new StreamResult(outPath);
-                        transformer.transform(source, result);
+                            DOMSource source = new DOMSource(document.getElementsByTagNameNS("http://ec.europa.eu/sante/ehncp/ism",
+                                    "patientSearch").item(0));
+                            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                            Transformer transformer = transformerFactory.newTransformer();
+                            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+                            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                            String outPath = epsosPropsPath + "InternationalSearch_" + StringUtils.upperCase(countryCode) + ".xml";
+                            LOGGER.info("International Search Mask Path: '{}", outPath);
+                            StreamResult result = new StreamResult(outPath);
+                            transformer.transform(source, result);
+                        }
                     }
                 }
             }
         } catch (NoSuchAlgorithmException e) {
             throw new SMLSMPClientException(e);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (TechnicalException e) {
-            e.printStackTrace();
+        } catch (IOException | CertificateException | KeyStoreException | TechnicalException | TransformerException e) {
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 
@@ -429,10 +416,9 @@ public class SMLSMPClient {
      * @throws NoSuchAlgorithmException
      * @throws CertificateException
      */
-    private KeyStore loadTrustStore()
-            throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+    private KeyStore loadTrustStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
 
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH")),
                 ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
         return ks;

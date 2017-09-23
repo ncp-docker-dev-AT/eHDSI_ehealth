@@ -1,19 +1,3 @@
-/*
- *  Copyright 2010 jerouris.
- * 
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
 package epsos.ccd.netsmart.securitymanager.key.impl;
 
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
@@ -30,12 +14,9 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
-/**
- * @author jerouris
- */
 public final class DefaultKeyStoreManager implements KeyStoreManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultKeyStoreManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultKeyStoreManager.class);
 
     private final String KEYSTORE_LOCATION;
     private final String TRUSTSTORE_LOCATION;
@@ -45,12 +26,11 @@ public final class DefaultKeyStoreManager implements KeyStoreManager {
     private final String PRIVATEKEY_PASSWORD;
     private KeyStore keyStore;
     private KeyStore trustStore;
-    private ConfigurationManager cm;
 
     public DefaultKeyStoreManager() throws IOException {
-        cm = ConfigurationManagerFactory.getConfigurationManager();
 
         // Constants Initialization
+        ConfigurationManager cm = ConfigurationManagerFactory.getConfigurationManager();
         KEYSTORE_LOCATION = cm.getProperty("NCP_SIG_KEYSTORE_PATH");
         TRUSTSTORE_LOCATION = cm.getProperty("TRUSTSTORE_PATH");
         KEYSTORE_PASSWORD = cm.getProperty("NCP_SIG_KEYSTORE_PASSWORD");
@@ -80,13 +60,13 @@ public final class DefaultKeyStoreManager implements KeyStoreManager {
                 return new KeyPair(publicKey, (PrivateKey) key);
             }
         } catch (UnrecoverableKeyException e) {
-            logger.error(null, e);
+            LOGGER.error(null, e);
             throw new SMgrException("Key with alias:" + alias + " is unrecoverable", e);
         } catch (NoSuchAlgorithmException e) {
-            logger.error(null, e);
+            LOGGER.error(null, e);
             throw new SMgrException("Key with alias:" + alias + " uses an incompatible algorithm", e);
         } catch (KeyStoreException e) {
-            logger.error(null, e);
+            LOGGER.error(null, e);
             throw new SMgrException("Key with alias:" + alias + " not found", e);
         }
         return null;
@@ -97,13 +77,15 @@ public final class DefaultKeyStoreManager implements KeyStoreManager {
 
         try {
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            InputStream keystoreStream = new FileInputStream(KEYSTORE_LOCATION);
-            keyStore.load(keystoreStream, KEYSTORE_PASSWORD.toCharArray());
 
-            return keyStore;
+            try (InputStream keystoreStream = new FileInputStream(KEYSTORE_LOCATION)) {
+                keyStore.load(keystoreStream, KEYSTORE_PASSWORD.toCharArray());
+
+                return keyStore;
+            }
 
         } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
         return null;
     }
@@ -114,20 +96,22 @@ public final class DefaultKeyStoreManager implements KeyStoreManager {
             return keyStore.getCertificate(alias);
 
         } catch (KeyStoreException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new SMgrException("Certificate with alias: " + alias + " not found in keystore", ex);
         }
     }
 
     @Override
     public KeyStore getTrustStore() {
+
         try {
             trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            InputStream keystoreStream = new FileInputStream(TRUSTSTORE_LOCATION);
-            trustStore.load(keystoreStream, TRUSTSTORE_PASSWORD.toCharArray());
-            return trustStore;
+            try (InputStream keystoreStream = new FileInputStream(TRUSTSTORE_LOCATION)) {
+                trustStore.load(keystoreStream, TRUSTSTORE_PASSWORD.toCharArray());
+                return trustStore;
+            }
         } catch (IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
         return null;
     }
