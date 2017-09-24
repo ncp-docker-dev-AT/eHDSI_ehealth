@@ -141,7 +141,7 @@ public class SAML {
     /**
      * Helper method to read an XML object from a DOM element.
      */
-    public static XMLObject fromElement(Element element) throws IOException, UnmarshallingException, SAXException {
+    public static XMLObject fromElement(Element element) throws IOException, UnmarshallingException {
 
         return Configuration.getUnmarshallerFactory().getUnmarshaller(element).unmarshall(element);
     }
@@ -163,7 +163,7 @@ public class SAML {
     /**
      * Helper method to get an XMLObject as a DOM Document.
      */
-    public Document asDOMDocument(XMLObject object) throws IOException, MarshallingException, TransformerException {
+    public Document asDOMDocument(XMLObject object) throws IOException, MarshallingException {
 
         Document document = builder.newDocument();
         Marshaller out = Configuration.getMarshallerFactory().getMarshaller(object);
@@ -292,7 +292,7 @@ public class SAML {
      * Helper method to generate a shell response with a given status code, status message, and query ID.
      */
     public Response createResponse(String statusCode, String message, String inResponseTo) throws IOException,
-            MarshallingException, TransformerException {
+            MarshallingException {
 
         Response response = create(Response.class, Response.DEFAULT_ELEMENT_NAME);
         response.setID(generator.generateIdentifier());

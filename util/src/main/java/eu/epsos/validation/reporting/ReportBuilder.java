@@ -78,7 +78,10 @@ public class ReportBuilder {
 
             if (!reportFile.exists()) {
                 try {
-                    reportFile.createNewFile();
+                    boolean fileCreated = reportFile.createNewFile();
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("File has been created: '{}'", fileCreated);
+                    }
                 } catch (IOException ex) {
                     LOGGER.error("An I/O error has occurred while creating the report file, please check the stack trace for more information.", ex);
                     return false;

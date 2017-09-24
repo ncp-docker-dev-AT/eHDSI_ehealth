@@ -28,6 +28,8 @@ import org.apache.mina.transport.socket.nio.SocketSessionConfig;
 import org.openhealthtools.openatna.syslog.SyslogException;
 import org.openhealthtools.openatna.syslog.SyslogMessage;
 import org.openhealthtools.openatna.syslog.mina.Notifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
@@ -41,6 +43,7 @@ import java.net.InetSocketAddress;
  */
 public class SyslogProtocolHandler extends IoHandlerAdapter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SyslogProtocolHandler.class);
 
     private Notifier server;
 
@@ -50,6 +53,7 @@ public class SyslogProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionCreated(IoSession session) {
+
         if (session.getTransportType() == TransportType.SOCKET) {
             ((SocketSessionConfig) session.getConfig())
                     .setReceiveBufferSize(2048);
@@ -66,13 +70,14 @@ public class SyslogProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        cause.printStackTrace();
+
+        LOGGER.error("Exception: '{}'", cause.getMessage(), cause);
         session.close();
     }
 
     @Override
-    public void messageReceived(IoSession session, Object message)
-            throws Exception {
+    public void messageReceived(IoSession session, Object message) throws Exception {
+
         if (message instanceof SyslogMessage) {
             SyslogMessage sl = (SyslogMessage) message;
             sl.setSourceIp(((InetSocketAddress) session.getRemoteAddress()).getAddress().getHostAddress());

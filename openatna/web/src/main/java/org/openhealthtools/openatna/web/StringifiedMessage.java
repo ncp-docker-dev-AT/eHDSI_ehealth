@@ -24,11 +24,8 @@ import org.openhealthtools.openatna.audit.persistence.model.MessageParticipantEn
 import org.openhealthtools.openatna.audit.persistence.model.MessageSourceEntity;
 import org.openhealthtools.openatna.audit.persistence.model.codes.EventIdCodeEntity;
 import org.openhealthtools.openatna.audit.persistence.model.codes.EventTypeCodeEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,15 +37,12 @@ import java.util.Set;
  */
 public class StringifiedMessage {
 
-    public static Logger logger = LoggerFactory.getLogger(StringifiedMessage.class);
-
     private Long id;
-
-    private Set<MessageParticipantEntity> messageParticipants = new HashSet<MessageParticipantEntity>();
-    private Set<MessageSourceEntity> messageSources = new HashSet<MessageSourceEntity>();
-    private Set<MessageObjectEntity> messageObjects = new HashSet<MessageObjectEntity>();
+    private Set<MessageParticipantEntity> messageParticipants = new HashSet<>();
+    private Set<MessageSourceEntity> messageSources = new HashSet<>();
+    private Set<MessageObjectEntity> messageObjects = new HashSet<>();
     private EventIdCodeEntity eventId;
-    private Set<EventTypeCodeEntity> eventTypeCodes = new HashSet<EventTypeCodeEntity>();
+    private Set<EventTypeCodeEntity> eventTypeCodes = new HashSet<>();
     private String eventActionCode = "";
     private Date eventDateTime;
     private Integer eventOutcome;
@@ -60,15 +54,8 @@ public class StringifiedMessage {
         this.id = messageEntity.getId();
 
         if (messageEntity.getMessageContent() != null) {
-            try {
-                this.messageContent = new String(messageEntity.getMessageContent(), "UTF-8");
-                this.messageContent = this.messageContent.replaceAll("<", "&lt;");
-            } catch (UnsupportedEncodingException e) {
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            this.messageContent = new String(messageEntity.getMessageContent(), StandardCharsets.UTF_8);
+            this.messageContent = this.messageContent.replaceAll("<", "&lt;");
         }
         this.messageParticipants = messageEntity.getMessageParticipants();
         this.messageSources = messageEntity.getMessageSources();
@@ -102,91 +89,73 @@ public class StringifiedMessage {
         this.messageParticipants = messageParticipants;
     }
 
-
     public Set<MessageSourceEntity> getMessageSources() {
         return messageSources;
     }
-
 
     public void setMessageSources(Set<MessageSourceEntity> messageSources) {
         this.messageSources = messageSources;
     }
 
-
     public Set<MessageObjectEntity> getMessageObjects() {
         return messageObjects;
     }
-
 
     public void setMessageObjects(Set<MessageObjectEntity> messageObjects) {
         this.messageObjects = messageObjects;
     }
 
-
     public EventIdCodeEntity getEventId() {
         return eventId;
     }
-
 
     public void setEventId(EventIdCodeEntity eventId) {
         this.eventId = eventId;
     }
 
-
     public Set<EventTypeCodeEntity> getEventTypeCodes() {
         return eventTypeCodes;
     }
-
 
     public void setEventTypeCodes(Set<EventTypeCodeEntity> eventTypeCodes) {
         this.eventTypeCodes = eventTypeCodes;
     }
 
-
     public String getEventActionCode() {
         return eventActionCode;
     }
-
 
     public void setEventActionCode(String eventActionCode) {
         this.eventActionCode = eventActionCode;
     }
 
-
     public Date getEventDateTime() {
         return eventDateTime;
     }
-
 
     public void setEventDateTime(Date eventDateTime) {
         this.eventDateTime = eventDateTime;
     }
 
-
     public Integer getEventOutcome() {
         return eventOutcome;
     }
-
 
     public void setEventOutcome(Integer eventOutcome) {
         this.eventOutcome = eventOutcome;
     }
 
-
     public String getSourceAddress() {
         return sourceAddress;
     }
-
 
     public void setSourceAddress(String sourceAddress) {
         this.sourceAddress = sourceAddress;
     }
 
-
     public String getMessageContent() {
         return messageContent;
     }
-
 
     public void setMessageContent(String messageContent) {
         this.messageContent = messageContent;

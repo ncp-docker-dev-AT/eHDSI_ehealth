@@ -17,7 +17,6 @@
  * University of Cardiff - initial API and implementation
  * -
  */
-
 package org.openhealthtools.openatna.audit.server;
 
 import org.openhealthtools.openatna.net.ConnectionFactory;
@@ -42,7 +41,7 @@ import java.net.*;
 
 public class UdpServer implements Server {
 
-    private static Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.audit.server.UdpServer");
+    private static final Logger LOGGER = LoggerFactory.getLogger(UdpServer.class);
 
     private AtnaServer atnaServer;
     private IConnectionDescription udpConnection;
@@ -63,9 +62,9 @@ public class UdpServer implements Server {
             thread = new UdpServerThread(socket);
             running = true;
             thread.start();
-            log.info("UDP Server running on port: '{}'", udpConnection.getPort());
+            LOGGER.info("UDP Server running on port: '{}'", udpConnection.getPort());
         } catch (Exception e) {
-            log.error("Failed to start UDP server '{}'", e.getMessage(), e);
+            LOGGER.error("Failed to start UDP server '{}'", e.getMessage(), e);
         }
     }
 
@@ -74,7 +73,7 @@ public class UdpServer implements Server {
         socket.close();
         thread.interrupt();
         udpConn.closeServerConnection();
-        log.info("UDP Server shutting down...");
+        LOGGER.info("UDP Server shutting down...");
     }
 
     private String logPacket(DatagramPacket packet) {
@@ -93,6 +92,7 @@ public class UdpServer implements Server {
             this.socket = socket;
         }
 
+        @Override
         public void run() {
             while (running && !interrupted()) {
                 try {
@@ -101,12 +101,12 @@ public class UdpServer implements Server {
                     socket.receive(packet);
                     atnaServer.execute(new UdpReceiver(packet));
                 } catch (SocketException x) {
-                    log.debug("Socket closed: '{}'", x.getMessage(), x);
+                    LOGGER.debug("Socket closed: '{}'", x.getMessage(), x);
                 } catch (SocketTimeoutException x) {
-                    log.debug("SocketTimeoutException: '{}'", x.getMessage(), x);
+                    LOGGER.debug("SocketTimeoutException: '{}'", x.getMessage(), x);
                     // Timed out, but the socket is still valid, don't shut down
                 } catch (IOException x) {
-                    log.debug("IOException: '{}'", x.getMessage(), x);
+                    LOGGER.debug("IOException: '{}'", x.getMessage(), x);
                     break;
                 }
             }
@@ -126,9 +126,9 @@ public class UdpServer implements Server {
             byte[] data = "no data".getBytes();
             try {
                 data = new byte[packet.getLength()];
-                log.debug(logPacket(packet));
+                LOGGER.debug(logPacket(packet));
                 System.arraycopy(packet.getData(), packet.getOffset(), data, 0, data.length);
-                log.debug("creating message from bytes: '{}'", new String(data));
+                LOGGER.debug("creating message from bytes: '{}'", new String(data));
                 msg = createMessage(data);
             } catch (SyslogException e) {
                 e.setBytes(data);
