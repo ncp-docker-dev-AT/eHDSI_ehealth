@@ -91,7 +91,7 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
     }
 

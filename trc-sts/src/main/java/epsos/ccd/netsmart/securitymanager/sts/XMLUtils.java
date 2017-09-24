@@ -14,7 +14,6 @@
  *  limitations under the License.
  *  under the License.
  */
-
 package epsos.ccd.netsmart.securitymanager.sts;
 
 import org.slf4j.Logger;
@@ -33,24 +32,27 @@ import java.io.StringWriter;
  */
 public class XMLUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(XMLUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtils.class);
+
+    private XMLUtils() {
+    }
 
     public static void sendXMLtoStream(Document doc, OutputStream out) {
+
         try {
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer trans = tf.newTransformer();
-            //trans.setOutputProperty(OutputKeys.INDENT, "yes");
             trans.transform(new DOMSource(doc), new StreamResult(out));
         } catch (TransformerException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     public static String asString(Node node) {
+
         StringWriter writer = new StringWriter();
         try {
             Transformer trans = TransformerFactory.newInstance().newTransformer();
-            // @checkstyle MultipleStringLiterals (1 line)
             trans.setOutputProperty(OutputKeys.INDENT, "yes");
             trans.setOutputProperty(OutputKeys.VERSION, "1.0");
             if (!(node instanceof Document)) {

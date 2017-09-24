@@ -2,6 +2,7 @@ package eu.epsos.protocolterminators.integrationtest.common;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.exceptions.InvalidInput;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
@@ -39,17 +40,16 @@ import java.util.List;
 
 public class HCPIAssertionCreator {
 
-    protected static final Logger LOG = LoggerFactory.getLogger(HCPIAssertionCreator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HCPIAssertionCreator.class);
 
     public static Assertion createHCPIAssertion(XSPARole role) {
-        return createHCPIAssertion(new ArrayList<String>() {
-            {
-                add("4");
-                add("6");
-                add("10");
-                add("46");
-            }
-        }, role);
+        List<String> permissions = new ArrayList<>();
+        permissions.add("4");
+        permissions.add("6");
+        permissions.add("10");
+        permissions.add("46");
+
+        return createHCPIAssertion(permissions, role);
     }
 
     public static Assertion createHCPIAssertion(List<String> permissions, XSPARole role) {
@@ -377,7 +377,7 @@ public class HCPIAssertionCreator {
             DOMSignContext signContext = new DOMSignContext(keyPair.getPrivate(), assertion.getDOM());
             signature.sign(signContext);
         } catch (Exception e) {
-            LOG.error("Signature element not created!", e.getLocalizedMessage());
+            LOG.error("Signature element not created! '{}'", e.getLocalizedMessage(), e);
         }
 
         // Set Signature's place
@@ -394,7 +394,7 @@ public class HCPIAssertionCreator {
                 break;
             }
 
-            if (child.getNodeType() == Node.ELEMENT_NODE && child.getLocalName().equals("Issuer")) {
+            if (child.getNodeType() == Node.ELEMENT_NODE && StringUtils.equals(child.getLocalName(), "Issuer")) {
                 foundIssuer = true;
             }
         }

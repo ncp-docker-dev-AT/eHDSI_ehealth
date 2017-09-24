@@ -18,20 +18,19 @@ package epsos.ccd.netsmart.securitymanager;
 
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.crypto.*;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.*;
 import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 
 /**
  * The Certificate Validator is a component that is responsible for validating
@@ -47,29 +46,28 @@ public final class CertificateValidator extends KeySelector {
     public static final String CRLDP_OID = "2.5.29.31";
     public static final String AIA_OID = "1.3.6.1.5.5.7.1.1";
     public static final String PROP_CHECK_FOR_KEYUSAGE = "secman.cert.validator.checkforkeyusage";
-    private static final Logger logger = LoggerFactory.getLogger(CertificateValidator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CertificateValidator.class);
     private final KeyStore trustStore;
-    /**
-     *
-     */
-    public boolean CHECK_FOR_KEYUSAGE;
+
+    private boolean CHECK_FOR_KEYUSAGE;
     private Certificate cert = null;
     private boolean isRevocationEnabled = false;
 
-    public CertificateValidator(KeyStore _trustStore) throws FileNotFoundException, IOException {
+    public CertificateValidator(KeyStore _trustStore) throws IOException {
+
         CHECK_FOR_KEYUSAGE = false;
         trustStore = _trustStore;
 
-        if (ConfigurationManagerFactory.getConfigurationManager().getProperty(PROP_CHECK_FOR_KEYUSAGE).trim().equalsIgnoreCase("true")) {
+        if (StringUtils.equalsIgnoreCase(ConfigurationManagerFactory.getConfigurationManager()
+                .getProperty(PROP_CHECK_FOR_KEYUSAGE).trim(), "true")) {
             CHECK_FOR_KEYUSAGE = true;
         }
     }
 
-    static boolean algEquals(String algURI, String algName) {
-        if ((algName.equalsIgnoreCase("DSA")
-                && algURI.contains("#dsa"))
-                || (algName.equalsIgnoreCase("RSA")
-                && algURI.contains("#rsa"))) {
+    private static boolean algEquals(String algURI, String algName) {
+
+        if ((algName.equalsIgnoreCase("DSA") && algURI.contains("#dsa"))
+                || (algName.equalsIgnoreCase("RSA") && algURI.contains("#rsa"))) {
             return true;
         } else {
             return false;
@@ -77,23 +75,17 @@ public final class CertificateValidator extends KeySelector {
     }
 
     /**
-     * This method verifies the validity of a certificate by a given keyInfo
-     * structure
+     * This method verifies the validity of a certificate by a given keyInfo structure
      *
-     * @param keyInfo The keyInfo structure that contains the certificate
-     *                (X509).
+     * @param keyInfo The keyInfo structure that contains the certificate (X509).
      * @throws SMgrException when the validation of the certificate fails
      */
-    public void validateCertificate(KeyInfo keyInfo) throws SMgrException {
+    private void validateCertificate(KeyInfo keyInfo) throws SMgrException {
 
-        for (Iterator<?> it = keyInfo.getContent().iterator(); it.hasNext(); ) {
-            Object object = it.next();
-
+        for (Object object : keyInfo.getContent()) {
             if (object instanceof X509Data) {
                 X509Data data = (X509Data) object;
-                Iterator<?> xi = data.getContent().iterator();
-                while (xi.hasNext()) {
-                    Object o = xi.next();
+                for (Object o : data.getContent()) {
                     // check X509Certificate
                     if (o instanceof X509Certificate) {
                         X509Certificate xcert = (X509Certificate) o;
@@ -105,7 +97,6 @@ public final class CertificateValidator extends KeySelector {
                         continue;
                     }
                 }
-
                 throw new SMgrException("The KeyInfo Structure does not contain X509Data element: No Certificate Present");
             }
         }
@@ -113,14 +104,9 @@ public final class CertificateValidator extends KeySelector {
 
     public void validateCertificate(org.opensaml.xml.signature.KeyInfo keyInfo) throws SMgrException {
 
-        for (Iterator<?> it = keyInfo.getX509Datas().iterator(); it.hasNext(); ) {
-            Object object = it.next();
-
-            if (object instanceof org.opensaml.xml.signature.X509Data) {
-                org.opensaml.xml.signature.X509Data data = (org.opensaml.xml.signature.X509Data) object;
-                Iterator<?> xi = data.getX509Certificates().iterator();
-                while (xi.hasNext()) {
-                    Object o = xi.next();
+        for (org.opensaml.xml.signature.X509Data object : keyInfo.getX509Datas()) {
+            if (object != null) {
+                for (Object o : object.getX509Certificates()) {
                     // check X509Certificate
                     if (o instanceof org.opensaml.xml.signature.X509Certificate) {
                         X509Certificate xcert = (X509Certificate) o;
@@ -132,26 +118,25 @@ public final class CertificateValidator extends KeySelector {
                         continue;
                     }
                 }
-
                 throw new SMgrException("The KeyInfo Structure does not contain X509Data element: No Certificate Present");
             }
         }
     }
 
     /**
-     * This method verifies the validity of the given X509 certificate by
-     * checking the truststore.
+     * This method verifies the validity of the given X509 certificate by checking the truststore.
      *
      * @param cert the certificate that will be validated
      * @throws SMgrException when the validation of the certificate fails
      */
     public void validateCertificate(X509Certificate cert) throws SMgrException {
+
         try {
             if (CHECK_FOR_KEYUSAGE) {
-                logger.info("Key usage available in conf manager");
+                LOGGER.info("Key usage available in conf manager");
                 boolean[] keyUsage = cert.getKeyUsage();
 
-                if (keyUsage == null || keyUsage[0] == false) {
+                if (keyUsage == null || !keyUsage[0]) {
                     throw new SMgrException("Certificate Key Usage Extension for Digital Signature Missing");
                 }
             }
@@ -159,10 +144,10 @@ public final class CertificateValidator extends KeySelector {
             try {
                 cert.checkValidity(new Date());
             } catch (CertificateExpiredException ex) {
-                logger.error(null, ex);
+                LOGGER.error(null, ex);
                 throw new SMgrException("Certificate Expired", ex);
             } catch (CertificateNotYetValidException ex) {
-                logger.error(null, ex);
+                LOGGER.error(null, ex);
                 throw new SMgrException("Certificate Not Valid Yet", ex);
             }
 
@@ -170,81 +155,61 @@ public final class CertificateValidator extends KeySelector {
             if (cert.getExtensionValue(AIA_OID) != null) {
                 setRevocationEnabled(true);
                 setOCSPEnabled(true);
-                logger.info("Found AIA Extension. Using OCSP");
+                LOGGER.info("Found AIA Extension. Using OCSP");
             }
 
             if (cert.getExtensionValue(CRLDP_OID) != null) {
                 setRevocationEnabled(true);
                 setCRLDPEnabled(true);
-                logger.info("Found CRLDP Extension. Using CRLDP");
+                LOGGER.info("Found CRLDP Extension. Using CRLDP");
             }
 
-            CertStoreParameters intermediates
-                    = new CollectionCertStoreParameters(Collections.singletonList(cert));
+            CertStoreParameters intermediates = new CollectionCertStoreParameters(Collections.singletonList(cert));
 
             X509CertSelector target = new X509CertSelector();
             target.setCertificate(cert);
 
             PKIXBuilderParameters builderParams = new PKIXBuilderParameters(trustStore, target);
-
             builderParams.addCertStore(CertStore.getInstance("Collection", intermediates));
-
             builderParams.setRevocationEnabled(isRevocationEnabled);
             builderParams.setDate(new Date());
-
-            //CertPathBuilder builder = CertPathBuilder.getInstance("PKIX");
-            //CertPathBuilderResult build = builder.build(builderParams);
-            //CertPath cp = build.getCertPath();
-
-            //CertPathValidator cpv = CertPathValidator.getInstance("PKIX");
 
             PKIXParameters params = new PKIXParameters(trustStore);
             params.setRevocationEnabled(isRevocationEnabled);
 
-            //PKIXCertPathValidatorResult validationResult = (PKIXCertPathValidatorResult) cpv.validate(cp, params);
-
         } catch (NoSuchAlgorithmException ex) {
-
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new SMgrException("Certificate's Public key algorithm is unknown", ex);
-
         } catch (KeyStoreException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new SMgrException("Error when tried to use the TrustStore", ex);
         } catch (InvalidAlgorithmParameterException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new SMgrException("Invalid Algorith parameters for building Certificate Path", ex);
         }
-
     }
 
-    public KeySelectorResult select(KeyInfo keyInfo,
-                                    KeySelector.Purpose purpose,
-                                    AlgorithmMethod method,
-                                    XMLCryptoContext context)
-            throws KeySelectorException {
-        Iterator<?> ki = keyInfo.getContent().iterator();
-        while (ki.hasNext()) {
-            XMLStructure info = (XMLStructure) ki.next();
+    public KeySelectorResult select(KeyInfo keyInfo, KeySelector.Purpose purpose, AlgorithmMethod method,
+                                    XMLCryptoContext context) throws KeySelectorException {
+
+        for (Object o1 : keyInfo.getContent()) {
+            XMLStructure info = (XMLStructure) o1;
             if (!(info instanceof X509Data)) {
                 continue;
             }
             X509Data x509Data = (X509Data) info;
-            Iterator<?> xi = x509Data.getContent().iterator();
-            while (xi.hasNext()) {
-                Object o = xi.next();
+            for (Object o : x509Data.getContent()) {
                 if (!(o instanceof X509Certificate)) {
                     continue;
                 }
                 try {
                     validateCertificate(keyInfo);
                 } catch (SMgrException ex) {
-                    logger.error(null, ex);
+                    LOGGER.error(null, ex);
                     throw new KeySelectorException("Validation Failed: " + ex.getMessage());
                 }
                 final PublicKey key = ((X509Certificate) o).getPublicKey();
-                // Make sure the algorithm is compatible
-                // with the method.
+                // Make sure the algorithm is compatible with the method.
                 if (algEquals(method.getAlgorithm(), key.getAlgorithm())) {
                     return new KeySelectorResult() {
                         public Key getKey() {
@@ -252,28 +217,30 @@ public final class CertificateValidator extends KeySelector {
                         }
                     };
                 }
+                // if (algEquals(method.getAlgorithm(), key.getAlgorithm())) {
+                //return () -> key;
+                //}
             }
         }
         throw new KeySelectorException("No key found!");
     }
 
     /**
-     * @return the X509 Certificate that is validated from the #validate
-     * function
+     * @return the X509 Certificate that is validated from the #validate function
      */
     public Certificate getValidatedCertificate() {
         return cert;
     }
 
-    public void setOCSPEnabled(boolean flag) {
+    private void setOCSPEnabled(boolean flag) {
         java.security.Security.setProperty("ocsp.enable", Boolean.toString(flag));
     }
 
-    public void setCRLDPEnabled(boolean flag) {
+    private void setCRLDPEnabled(boolean flag) {
         System.setProperty("com.sun.security.enableCRLDP", Boolean.toString(flag));
     }
 
-    public void setRevocationEnabled(boolean flag) {
+    private void setRevocationEnabled(boolean flag) {
         this.isRevocationEnabled = flag;
     }
 }

@@ -1,24 +1,3 @@
-/**
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- * <p>
- * XCA and XDR modifications by Kela (The Social Insurance Institution of Finland)
- * GNU General Public License v3
- */
 package tr.com.srdc.epsos.securityman;
 
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
@@ -48,35 +27,37 @@ import java.util.ServiceLoader;
 
 public class SAML2Validator {
 
-    private static final ServiceLoader<PolicyManagerInterface> serviceLoader
-            = ServiceLoader.load(PolicyManagerInterface.class);
-    private static Logger logger = LoggerFactory.getLogger(SAML2Validator.class);
+    private static final ServiceLoader<PolicyManagerInterface> serviceLoader = ServiceLoader.load(PolicyManagerInterface.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Validator.class);
     private static PolicyManagerInterface policyManager;
 
     static {
         try {
-            logger.info("Loading National implementation of PolicyManagerInterface...");
+            LOGGER.info("Loading National implementation of PolicyManagerInterface...");
             policyManager = serviceLoader.iterator().next();
-            logger.info("Successfully loaded PolicyManager");
+            LOGGER.info("Successfully loaded PolicyManager");
         } catch (Exception e) {
-            logger.error("Failed to load implementation of PolicyManagerInterface: " + e.getMessage(), e);
+            LOGGER.error("Failed to load implementation of PolicyManagerInterface: " + e.getMessage(), e);
         }
     }
 
+    private SAML2Validator() {
+    }
 
     public static String validateXCPDHeader(Element sh) throws MissingFieldException, InsufficientRightsException, InvalidFieldException, XSDValidationException, SMgrException {
         String sigCountryCode = null;
 
         NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
-        Element security = null;
+        Element security;
         if (securityList.getLength() > 0) {
             security = (Element) securityList.item(0);
         } else {
             throw (new MissingFieldException("Security element is required."));
         }
 
-        NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "Assertion");
-        Element hcpAss = null;
+        NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion",
+                "Assertion");
+        Element hcpAss;
         Assertion hcpAssertion = null;
         try {
             if (assertionList.getLength() > 0) {
@@ -98,11 +79,10 @@ public class SAML2Validator {
             sigCountryCode = checkHCPAssertion(hcpAssertion, null);
             policyManager.XCPDPermissionValidator(hcpAssertion);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (UnmarshallingException e) {
-            e.printStackTrace();
+        } catch (IOException | UnmarshallingException e) {
+            LOGGER.error("{}: '{}'", e.getMessage(), e);
         } catch (SAXException e) {
+            LOGGER.error("SAXException: '{}'", e.getMessage(), e);
             throw new XSDValidationException(e.getMessage());
         }
 
@@ -110,7 +90,7 @@ public class SAML2Validator {
     }
 
     public static String validateXCAHeader(Element sh, String classCode) throws InsufficientRightsException, MissingFieldException, InvalidFieldException, SMgrException {
-        String sigCountryCode = null;
+        String sigCountryCode;
 
         try {
             // Since the XCA Simulator sends this value wrong, we are trying it as follows for now
@@ -132,13 +112,13 @@ public class SAML2Validator {
                 for (int i = 0; i < assertionList.getLength(); i++) {
                     ass = (Element) assertionList.item(i);
                     if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
-                        logger.debug("ncname found!!!");
+                        LOGGER.debug("ncname found!!!");
                         ass.setAttribute("ID", "_" + ass.getAttribute("ID").substring(9));
                     }
                     if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
-                        logger.debug("ncname still exist!!!");
+                        LOGGER.debug("ncname still exist!!!");
                     } else {
-                        logger.debug("ncname fixed!!!");
+                        LOGGER.debug("ncname fixed!!!");
                     }
 
                     // Validate Assertion according to SAML XSD
@@ -164,7 +144,7 @@ public class SAML2Validator {
 
             checkTRCAdviceIdReferenceAgainstHCPId(trcAssertion, hcpAssertion);
         } catch (IOException | UnmarshallingException | SAXException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
             throw new InsufficientRightsException(4703);
         }
 
@@ -177,7 +157,7 @@ public class SAML2Validator {
      * @author Konstantin.Hypponen@kela.fi
      */
     public static String validateXDRHeader(Element sh, String classCode) throws InsufficientRightsException, MissingFieldException, InvalidFieldException, SMgrException {
-        String sigCountryCode = null;
+        String sigCountryCode;
 
         try {
             NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
@@ -189,7 +169,7 @@ public class SAML2Validator {
             }
 
             NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "Assertion");
-            Element ass = null;
+            Element ass;
             Assertion hcpAssertion = null;
             Assertion trcAssertion = null;
 
@@ -197,13 +177,13 @@ public class SAML2Validator {
                 for (int i = 0; i < assertionList.getLength(); i++) {
                     ass = (Element) assertionList.item(i);
                     if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
-                        logger.debug("ncname found!!!");
+                        LOGGER.debug("ncname found!!!");
                         ass.setAttribute("ID", "_" + ass.getAttribute("ID").substring(9));
                     }
                     if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
-                        logger.debug("ncname still exist!!!");
+                        LOGGER.debug("ncname still exist!!!");
                     } else {
-                        logger.debug("ncname fixed!!!");
+                        LOGGER.debug("ncname fixed!!!");
                     }
 
                     // Validate Assertion according to SAML XSD
@@ -229,7 +209,7 @@ public class SAML2Validator {
 
             checkTRCAdviceIdReferenceAgainstHCPId(trcAssertion, hcpAssertion);
         } catch (IOException | UnmarshallingException | SAXException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
             throw new InsufficientRightsException(4703);
         }
 
@@ -241,14 +221,14 @@ public class SAML2Validator {
             String trcFirstReferenceId = trcAssertion.getAdvice().getAssertionIDReferences().get(0).getAssertionID();
 
             if (trcFirstReferenceId != null && trcFirstReferenceId.equals(hcpAssertion.getID())) {
-                logger.info("Assertion id reference equals to id.");
+                LOGGER.info("Assertion id reference equals to id.");
                 return /* Least one of TRC Advice IdRef equals to HCP Ids */;
             }
         } catch (Exception ex) {
-            logger.error("Unable to resolve first id reference.");
+            LOGGER.error("Unable to resolve first id reference: '{}'", ex.getMessage(), ex);
         }
 
-        logger.info("checkTRCAdviceIdReferenceAgainstHCPId: ReferenceId does not match. Throw InsufficientRightsException.");
+        LOGGER.info("checkTRCAdviceIdReferenceAgainstHCPId: ReferenceId does not match. Throw InsufficientRightsException.");
         throw new InsufficientRightsException(1002);
     }
 
@@ -284,14 +264,16 @@ public class SAML2Validator {
                 result.add((Assertion) SAML.fromElement(ass));
 
             } catch (UnmarshallingException | IOException | SAXException ex) {
-                logger.error(null, ex);
+                LOGGER.error(null, ex);
             }
         }
         return result;
     }
 
 
-    private static String checkHCPAssertion(Assertion assertion, String classCode) throws MissingFieldException, InvalidFieldException, InsufficientRightsException, SMgrException {
+    private static String checkHCPAssertion(Assertion assertion, String classCode) throws MissingFieldException,
+            InvalidFieldException, InsufficientRightsException, SMgrException {
+
         String sigCountryCode = null;
 
         RequiredFieldValidators.validateVersion(assertion);
@@ -334,14 +316,15 @@ public class SAML2Validator {
         try {
             sigCountryCode = new SignatureManager().verifySAMLAssestion(assertion);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }
 
         return sigCountryCode;
     }
 
-    private static void checkTRCAssertion(Assertion assertion, String classCode) throws MissingFieldException, InvalidFieldException {
+    private static void checkTRCAssertion(Assertion assertion, String classCode) throws MissingFieldException,
+            InvalidFieldException {
+
         RequiredFieldValidators.validateVersion(assertion);
         RequiredFieldValidators.validateID(assertion);
         RequiredFieldValidators.validateIssuer(assertion);
@@ -376,7 +359,9 @@ public class SAML2Validator {
     }
 
 
-    public static String getCountryCodeFromHCPAssertion(Element sh) throws MissingFieldException, InvalidFieldException, XSDValidationException, SMgrException {
+    public static String getCountryCodeFromHCPAssertion(Element sh) throws MissingFieldException,
+            InvalidFieldException, XSDValidationException, SMgrException {
+
         String sigCountryCode = null;
 
         NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
@@ -410,11 +395,10 @@ public class SAML2Validator {
             sigCountryCode = new SignatureManager().verifySAMLAssestion(hcpAssertion);
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (UnmarshallingException e) {
-            e.printStackTrace();
+        } catch (IOException | UnmarshallingException e) {
+            LOGGER.error("{}: '{}'", e.getMessage(), e);
         } catch (SAXException e) {
+            LOGGER.error("SAXException: '{}'", e.getMessage(), e);
             throw new XSDValidationException(e.getMessage());
         }
 

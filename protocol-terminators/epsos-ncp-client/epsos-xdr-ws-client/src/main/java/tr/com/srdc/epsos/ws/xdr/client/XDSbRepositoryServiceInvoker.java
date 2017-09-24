@@ -46,9 +46,9 @@ import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
-import tr.com.srdc.epsos.util.FileUtil;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -130,7 +130,7 @@ public class XDSbRepositoryServiceInvoker {
         byte[] cdaBytes = null;
         CdaValidationService cdaValidationService = CdaValidationService.getInstance();
         try {
-            cdaBytes = request.getCda().getBytes(FileUtil.UTF_8);
+            cdaBytes = request.getCda().getBytes(StandardCharsets.UTF_8);
 
             /* Validate CDA epSOS Friendly */
             cdaValidationService.validateModel(
@@ -140,8 +140,6 @@ public class XDSbRepositoryServiceInvoker {
 
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
-        } catch (DocumentTransformationException ex) {
-            LOG.error(null, ex);
         } catch (Exception ex) {
             LOG.error(null, ex);
         }

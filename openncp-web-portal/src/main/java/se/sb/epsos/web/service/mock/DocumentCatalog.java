@@ -14,6 +14,8 @@ import org.apache.xmlbeans.impl.util.HexBin;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.sb.epsos.shelob.ws.client.jaxws.EpsosDocument;
 import se.sb.epsos.shelob.ws.client.jaxws.GenericDocumentCode;
 
@@ -29,8 +31,13 @@ import java.util.*;
 
 public class DocumentCatalog {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentCatalog.class);
+
     private static final Map<String, List<EpsosDocument>> prescriptions = createPrescriptions();
     private static final Map<String, List<EpsosDocument>> patientsummaries = createPatientSummaries();
+
+    private DocumentCatalog() {
+    }
 
     private static Map<String, List<EpsosDocument>> createPrescriptions() {
 
@@ -159,7 +166,7 @@ public class DocumentCatalog {
         } else if (documentId.startsWith("PS")) {
             is = DocumentCatalog.class.getResourceAsStream("ps/" + documentId + ".xml");
         }
-        ;
+
         ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
         byte[] bytes = new byte[512];
         int readBytes;
@@ -168,13 +175,13 @@ public class DocumentCatalog {
                 os.write(bytes, 0, readBytes);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         } finally {
             try {
                 is.close();
                 os.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("IOException: '{}'", e.getMessage(), e);
             }
         }
         return os.toByteArray();
@@ -266,16 +273,18 @@ public class DocumentCatalog {
     }
 
     private static XMLGregorianCalendar getXMLGregorian(GregorianCalendar calendar) {
+
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
         } catch (DatatypeConfigurationException e) {
-            e.printStackTrace();
+            LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
         }
         return date2;
     }
 
     private static XMLGregorianCalendar getDate(String indate) {
+
         DateTimeFormatter df = ISODateTimeFormat.dateTime();
         DateTime dateTime = df.parseDateTime(indate);
         return getXMLGregorian(dateTime.toGregorianCalendar());

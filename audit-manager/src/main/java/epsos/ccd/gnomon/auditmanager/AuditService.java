@@ -22,7 +22,7 @@ import java.io.Serializable;
 public class AuditService implements MessageHandlerListener {
 
     public static final String KEY_TIME_BETWEEN_FAILED_LOGS_HANDLING = "time.between.failed.logs.handling";
-    public static final long DEFAULT_TIME_BETWEEN = 1 * 60 * 60 * 1000; // 1h
+    public static final long DEFAULT_TIME_BETWEEN = 60 * 60 * 1000L; // 1h
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditService.class);
     private FailedLogsHandlerService failedLogsHandlerService;
@@ -33,6 +33,7 @@ public class AuditService implements MessageHandlerListener {
     }
 
     protected void initialize() {
+
         Type type = Type.AUDIT_MANAGER;
         auditLogSerializer = new AuditLogSerializerImpl(type);
         failedLogsHandlerService = new FailedLogsHandlerServiceImpl(this, type);
@@ -48,6 +49,7 @@ public class AuditService implements MessageHandlerListener {
      * @return true if auditLog is attempted to be sent
      */
     public synchronized Boolean write(Object el, String facility, String severity) {
+
         try {
             if (el instanceof EventLog) {
                 EventLog eventLog = (EventLog) el;
@@ -70,6 +72,7 @@ public class AuditService implements MessageHandlerListener {
 
     @Override
     public boolean handleMessage(Serializable message) {
+
         if (message != null && message instanceof SerializableMessage) {
             SerializableMessage sm = (SerializableMessage) message;
             boolean ok = write(sm.getMessage(), sm.getFacility(), sm.getSeverity());

@@ -41,15 +41,16 @@ public class HCPIAssertionCreator {
 
     protected static final Logger LOG = LoggerFactory.getLogger(HCPIAssertionCreator.class);
 
+    private HCPIAssertionCreator() {
+    }
+
     public static Assertion createHCPIAssertion(XSPARole role) {
-        return createHCPIAssertion(new ArrayList<String>() {
-            {
-                add("4");
-                add("6");
-                add("10");
-                add("46");
-            }
-        }, role);
+        List<String> permissions = new ArrayList<>();
+        permissions.add("4");
+        permissions.add("6");
+        permissions.add("10");
+        permissions.add("46");
+        return createHCPIAssertion(permissions, role);
     }
 
     public static Assertion createHCPIAssertion(List<String> permissions, XSPARole role) {

@@ -9,6 +9,7 @@
  */
 package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
@@ -20,6 +21,8 @@ import org.opensaml.xml.XMLObjectBuilder;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.schema.XSAny;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,14 +45,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml.HCPIAssertionCreator.LOG;
-
 /**
  * {Insert Class Description Here}
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
 public class HCPIAssertionBuilder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HCPIAssertionBuilder.class);
 
     private final org.opensaml.saml2.core.Subject subject;
     private final SAML saml;
@@ -449,7 +452,7 @@ public class HCPIAssertionBuilder {
             DOMSignContext signContext = new DOMSignContext(keyPair.getPrivate(), assertion.getDOM());
             signature.sign(signContext);
         } catch (MarshallingException | ClassNotFoundException | InstantiationException | IllegalAccessException | KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException | UnrecoverableEntryException | InvalidAlgorithmParameterException | MarshalException | XMLSignatureException e) {
-            LOG.error("Signature element not created!", e.getLocalizedMessage());
+            LOGGER.error("Signature element not created!", e.getLocalizedMessage(), e);
         }
 
         // Set Signature's place
@@ -466,7 +469,7 @@ public class HCPIAssertionBuilder {
                 break;
             }
 
-            if (child.getNodeType() == Node.ELEMENT_NODE && child.getLocalName().equals("Issuer")) {
+            if (child.getNodeType() == Node.ELEMENT_NODE && StringUtils.equals(child.getLocalName(), "Issuer")) {
                 foundIssuer = true;
             }
         }

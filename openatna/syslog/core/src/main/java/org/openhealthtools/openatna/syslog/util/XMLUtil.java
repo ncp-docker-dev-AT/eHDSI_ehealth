@@ -10,6 +10,8 @@
 
 package org.openhealthtools.openatna.syslog.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -35,23 +37,24 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-
 /**
  * @author tuncay
  */
 public class XMLUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtil.class);
 
     /**
      * Creates a new instance of XMLUtil
      */
-    public XMLUtil() {
+    private XMLUtil() {
     }
 
     /**
      * returns null if Node is null
      */
     public static Node extractFromDOMTree(Node node) throws ParserConfigurationException {
+
         if (node == null) {
             return null;
         }
@@ -59,31 +62,26 @@ public class XMLUtil {
         DocumentBuilder db = dbf.newDocumentBuilder();
         org.w3c.dom.Document theDocument = db.newDocument();
         theDocument.appendChild(theDocument.importNode(node, true));
-        //logger.info(XMLUtil.convertToString(theDocument));
-        return (Node) theDocument.getDocumentElement();
+        return theDocument.getDocumentElement();
     }
 
     public static org.w3c.dom.Document parseContent(byte[] byteContent) throws ParserConfigurationException, SAXException, IOException {
-        org.w3c.dom.Document doc = null;
+
         String content = new String(byteContent);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        //dbf.setIgnoringComments(false);
         dbf.setNamespaceAware(true);
 
-        //dbf.setNamespaceAware(false);        
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
         StringReader lReader = new StringReader(content);
         InputSource inputSource = new InputSource(lReader);
-        doc = docBuilder.parse(inputSource);
-        return doc;
+        return docBuilder.parse(inputSource);
     }
 
     public static org.w3c.dom.Document parseContent(String content) throws ParserConfigurationException, SAXException, IOException {
-        org.w3c.dom.Document doc = null;
+
+        org.w3c.dom.Document doc;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        //dbf.setIgnoringComments(false);
         dbf.setNamespaceAware(true);
-        //dbf.setNamespaceAware(false);
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
         StringReader lReader = new StringReader(content);
         InputSource inputSource = new InputSource(lReader);
@@ -106,6 +104,7 @@ public class XMLUtil {
     }
 
     public static byte[] convertToByteArray(Node node) throws TransformerException {
+
         /** FIXME: We assume that Transfor deals with encoding/charset internally */
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -117,14 +116,15 @@ public class XMLUtil {
     }
 
     public static Map<String, String> parseNamespaceBindings(String namespaceBindings) {
+
         if (namespaceBindings == null)
             return null;
         //remove { and } 
-        namespaceBindings = namespaceBindings.substring(1, namespaceBindings.length() - 1);
-        String[] bindings = namespaceBindings.split(",");
-        Map<String, String> namespaces = new HashMap<String, String>();
-        for (int i = 0; i < bindings.length; i++) {
-            String[] pair = bindings[i].trim().split("=");
+        String namespacesParsed = namespaceBindings.substring(1, namespaceBindings.length() - 1);
+        String[] bindings = namespacesParsed.split(",");
+        Map<String, String> namespaces = new HashMap<>();
+        for (String binding : bindings) {
+            String[] pair = binding.trim().split("=");
             String prefix = pair[0].trim();
             String namespace = pair[1].trim();
             //Remove ' and '
@@ -135,6 +135,7 @@ public class XMLUtil {
     }
 
     public static Document marshall(Object object, String context, String schemaLocation) {
+
         Locale oldLocale = Locale.getDefault();
         Locale.setDefault(new Locale("en"));
         try {
@@ -153,13 +154,14 @@ public class XMLUtil {
             Locale.setDefault(oldLocale);
             return doc;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
         }
         Locale.setDefault(oldLocale);
         return null;
     }
 
     public static Object unmarshall(String context, String schemaLocation, String content) {
+
         Locale oldLocale = Locale.getDefault();
         Locale.setDefault(new Locale("en"));
         try {
@@ -174,18 +176,18 @@ public class XMLUtil {
             Locale.setDefault(oldLocale);
             return obj;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
         }
         Locale.setDefault(oldLocale);
         return null;
     }
 
     public static Object unmarshallWithoutValidation(String context, String schemaLocation, String content) {
+
         Locale oldLocale = Locale.getDefault();
         Locale.setDefault(new Locale("en"));
         try {
-            JAXBContext jc = JAXBContext.newInstance(
-                    context);
+            JAXBContext jc = JAXBContext.newInstance(context);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = schemaFactory.newSchema(new File(schemaLocation));
@@ -193,19 +195,19 @@ public class XMLUtil {
             Locale.setDefault(oldLocale);
             return obj;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
         }
         Locale.setDefault(oldLocale);
         return null;
     }
 
     public static void main(String args[]) {
+
         try {
             String xmlString = "<RegistryResponse xmlns=\"urn:oasis:names:tc:ebxml-regrep:registry:xsd:2.1\" status=\"Success\"><Slot/></RegistryResponse>";
-            org.w3c.dom.Document xmlDoc = XMLUtil.parseContent(xmlString.getBytes());
+            XMLUtil.parseContent(xmlString.getBytes());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
         }
     }
-
 }
