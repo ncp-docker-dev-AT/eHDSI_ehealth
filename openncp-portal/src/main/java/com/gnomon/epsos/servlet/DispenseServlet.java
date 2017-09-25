@@ -8,6 +8,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
+import epsos.ccd.posam.tm.util.XmlUtil;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
@@ -29,6 +30,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import org.w3c.dom.Document;
 
 public class DispenseServlet extends HttpServlet {
 
@@ -125,6 +127,11 @@ public class DispenseServlet extends HttpServlet {
                     formatCode.setSchema(IheConstants.DISPENSATION_FORMATCODE_CODINGSCHEMA);
                     formatCode.setNodeRepresentation(IheConstants.DISPENSATION_FORMATCODE_NODEREPRESENTATION);
                     formatCode.setValue(IheConstants.DISPENSATION_FORMATCODE_DISPLAYNAME);
+                    
+                    Document domDocument = null;
+                    domDocument = XmlUtil.bytesToXml(epBytes, true);
+                    String extension = domDocument.getElementsByTagNameNS("urn:hl7-org:v3", "id").item(0).getAttributes().getNamedItem("extension").getTextContent();
+                    String root =domDocument.getElementsByTagNameNS("urn:hl7-org:v3", "id").item(0).getAttributes().getNamedItem("root").getTextContent();  
 
                     EpsosDocument1 document = EpsosDocument1.Factory.newInstance();
                     document.setAuthor(user.getFullName());
@@ -132,7 +139,8 @@ public class DispenseServlet extends HttpServlet {
                     document.setCreationDate(cal);
                     document.setDescription(Constants.ED_TITLE);
                     document.setTitle(Constants.ED_TITLE);
-                    document.setUuid(EpsosHelperService.getUniqueId());
+                    document.setUuid(root + "^" + extension);
+                    document.setSubmissionSetId(EpsosHelperService.getUniqueId()); 
                     document.setClassCode(classCode);
                     document.setFormatCode(formatCode);
                     document.setBase64Binary(edBytes);
