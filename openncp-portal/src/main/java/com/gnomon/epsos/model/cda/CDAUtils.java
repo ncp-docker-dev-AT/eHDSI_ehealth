@@ -67,9 +67,9 @@ public class CDAUtils {
     private CDAUtils() {
     }
 
-    public static String createDispensation(Document epDoc, CDAHeader cda) throws ParserConfigurationException, SAXException, IOException {
+    public static String createDispensation(Document epDoc, CDAHeader cda, String eDuuid) throws ParserConfigurationException, SAXException, IOException {
 
-        return CDAModelToEDXML(epDoc, cda);
+        return CDAModelToEDXML(epDoc, cda, eDuuid);
     }
 
     private static Document readEpXML(String xml) throws ParserConfigurationException, SAXException, IOException {
@@ -520,7 +520,7 @@ public class CDAUtils {
         return sb.toString();
     }
 
-    private static String CDAModelToEDXML(Document epDoc, CDAHeader cda) {
+    private static String CDAModelToEDXML(Document epDoc, CDAHeader cda, String eDuuid) {
 
         String edCountry = GetterUtil.getString(ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country"), "");
         String pharmacistsOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_OID);
@@ -547,8 +547,8 @@ public class CDAUtils {
         sb.append("\r\n");
         sb.append("<templateId root=\"1.3.6.1.4.1.19376.1.5.3.1.1.1\"/>");
         sb.append("\r\n");
-        String uuid = java.util.UUID.randomUUID().toString().replaceAll("-", "");
-        sb.append("<id extension=\"").append(uuid).append("\" root=\"").append(edOid).append("\"/>");
+        //String uuid = java.util.UUID.randomUUID().toString().replaceAll("-", "");
+        sb.append("<id extension=\"").append(eDuuid).append("\" root=\"").append(edOid).append("\"/>");
         sb.append("\r\n");
         sb.append("<code codeSystemName=\"LOINC\" codeSystem=\"2.16.840.1.113883.6.1\" code=\"60593-1\" displayName=\"eDispensation\"/>");
         sb.append("\r\n");

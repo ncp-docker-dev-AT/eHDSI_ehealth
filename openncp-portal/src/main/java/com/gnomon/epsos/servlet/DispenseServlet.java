@@ -111,8 +111,10 @@ public class DispenseServlet extends HttpServlet {
                     dispensedLines.add(d_line);
                 }
 
+                String eDuuid = java.util.UUID.randomUUID().toString().replaceAll("-", "");
+                String edOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DISPENSATION_OID);
                 if (!dispensedLines.isEmpty()) {
-                    edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user);
+                    edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user, eDuuid);
                 }
 
                 if (Validator.isNotNull(edBytes)) {
@@ -127,11 +129,6 @@ public class DispenseServlet extends HttpServlet {
                     formatCode.setSchema(IheConstants.DISPENSATION_FORMATCODE_CODINGSCHEMA);
                     formatCode.setNodeRepresentation(IheConstants.DISPENSATION_FORMATCODE_NODEREPRESENTATION);
                     formatCode.setValue(IheConstants.DISPENSATION_FORMATCODE_DISPLAYNAME);
-                    
-                    Document domDocument = null;
-                    domDocument = XmlUtil.bytesToXml(epBytes, true);
-                    String extension = domDocument.getElementsByTagNameNS("urn:hl7-org:v3", "id").item(0).getAttributes().getNamedItem("extension").getTextContent();
-                    String root =domDocument.getElementsByTagNameNS("urn:hl7-org:v3", "id").item(0).getAttributes().getNamedItem("root").getTextContent();  
 
                     EpsosDocument1 document = EpsosDocument1.Factory.newInstance();
                     document.setAuthor(user.getFullName());
@@ -139,7 +136,7 @@ public class DispenseServlet extends HttpServlet {
                     document.setCreationDate(cal);
                     document.setDescription(Constants.ED_TITLE);
                     document.setTitle(Constants.ED_TITLE);
-                    document.setUuid(root + "^" + extension);
+                    document.setUuid(edOid + "^" + eDuuid);
                     document.setSubmissionSetId(EpsosHelperService.getUniqueId()); 
                     document.setClassCode(classCode);
                     document.setFormatCode(formatCode);
