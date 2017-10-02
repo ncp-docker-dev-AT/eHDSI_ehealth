@@ -31,6 +31,156 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
  */
 /**
  * XCPD_ServiceMessageReceiverInOut.java
@@ -70,12 +220,12 @@ import java.util.UUID;
  */
 public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.AbstractInOutMessageReceiver {
 
-    private static final Logger logger = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
 
     private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
-        logger.debug("Loading the WS-Security init libraries in XCPD_ServiceMessageReceiverInOut xcpd 2009");
+        LOGGER.debug("Loading the WS-Security init libraries in XCPD_ServiceMessageReceiverInOut xcpd 2009");
 
         org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
     }
@@ -88,21 +238,20 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
                     org.hl7.v3.PRPAIN201305UV02.class,
                     org.hl7.v3.PRPAIN201306UV02.class);
         } catch (javax.xml.bind.JAXBException ex) {
-            logger.error("Unable to create JAXBContext: '{}'", ex.getMessage(), ex);
+            LOGGER.error("Unable to create JAXBContext: '{}'", ex.getMessage(), ex);
             // Runtime.getRuntime().exit(-1);
         } finally {
             wsContext = jc;
         }
     }
 
-    private String getIPofSender(
-            org.apache.axis2.context.MessageContext msgContext) {
-        String remoteAddress_IPConsumer = (String) msgContext
-                .getProperty("REMOTE_ADDR");
-        return remoteAddress_IPConsumer;
+    private String getIPofSender(org.apache.axis2.context.MessageContext msgContext) {
+
+        return (String) msgContext.getProperty("REMOTE_ADDR");
     }
 
     private String getMessageID(org.apache.axiom.soap.SOAPEnvelope envelope) {
+
         Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(
                 new QName("http://www.w3.org/2005/08/addressing", "MessageID"));
         if (it.hasNext()) {
@@ -114,9 +263,8 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
         }
     }
 
-    public void invokeBusinessLogic(
-            org.apache.axis2.context.MessageContext msgContext,
-            org.apache.axis2.context.MessageContext newMsgContext)
+    public void invokeBusinessLogic(org.apache.axis2.context.MessageContext msgContext,
+                                    org.apache.axis2.context.MessageContext newMsgContext)
             throws org.apache.axis2.AxisFault {
 
         try {
@@ -141,30 +289,12 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
             eventLog.setSC_UserID(clientDN);
             eventLog.setTargetip(req.getServerName());
 
-            logger.debug("Incoming XCPD Request Message:\n"
-                    + XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext
-                    .getEnvelope())));
-
-            // Send NRR
-//            try {
-//                EvidenceUtils.createEvidenceREMNRR(envCanonicalized,
-//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                        EventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
-//                        new DateTime(),
-//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                        "NCPA_XCPD_REQ");
-//
-//            } catch (Exception e) {
-//                log.error(ExceptionUtils.getStackTrace(e));
-//            }
+            LOGGER.debug("Incoming XCPD Request Message:\n '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
 
             /* Validate incoming request message */
-            XcpdValidationService.getInstance().validateSchematron(
-                    XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement())),
-                    Hl7v3Schematron.EPSOS_ID_SERVICE_REQUEST.toString(),
-                    NcpSide.NCP_A);
+            XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(
+                    XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement())),
+                    Hl7v3Schematron.EPSOS_ID_SERVICE_REQUEST.toString(), NcpSide.NCP_A);
 
             XCPD_ServiceSkeleton skel = (XCPD_ServiceSkeleton) obj;
             // Out Envelop
@@ -173,36 +303,27 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
             org.apache.axis2.description.AxisOperation op = msgContext
                     .getOperationContext().getAxisOperation();
             if (op == null) {
-                throw new org.apache.axis2.AxisFault(
-                        "Operation is not located, if this is doclit style the SOAP-ACTION should specified via the SOAP Action to use the RawXMLProvider");
+                throw new org.apache.axis2.AxisFault("Operation is not located, if this is doclit style the SOAP-ACTION " +
+                        "should specified via the SOAP Action to use the RawXMLProvider");
             }
 
             String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID().toString();
             java.lang.String methodName;
-            if ((op.getName() != null)
-                    && ((methodName = org.apache.axis2.util.JavaUtils
-                    .xmlNameToJavaIdentifier(op.getName()
-                            .getLocalPart())) != null)) {
+
+            if ((op.getName() != null) && ((methodName = org.apache.axis2.util.JavaUtils.xmlNameToJavaIdentifier(
+                    op.getName().getLocalPart())) != null)) {
 
                 if ("respondingGateway_PRPA_IN201305UV02".equals(methodName)) {
 
-                    org.hl7.v3.PRPAIN201306UV02 pRPA_IN201306UV021 = null;
+                    org.hl7.v3.PRPAIN201306UV02 pRPA_IN201306UV021;
                     org.hl7.v3.PRPAIN201305UV02 wrappedParam = (org.hl7.v3.PRPAIN201305UV02) fromOM(
-                            msgContext.getEnvelope().getBody()
-                                    .getFirstElement(),
-                            org.hl7.v3.PRPAIN201305UV02.class,
+                            msgContext.getEnvelope().getBody().getFirstElement(), org.hl7.v3.PRPAIN201305UV02.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    pRPA_IN201306UV021 = skel
-                            .respondingGateway_PRPA_IN201305UV02(wrappedParam,
-                                    sh, eventLog);
+                    pRPA_IN201306UV021 = skel.respondingGateway_PRPA_IN201305UV02(wrappedParam, sh, eventLog);
 
-                    envelope = toEnvelope(getSOAPFactory(msgContext),
-                            pRPA_IN201306UV021, false);
+                    envelope = toEnvelope(getSOAPFactory(msgContext), pRPA_IN201306UV021, false);
 
-                    // SOAPHeaderBlock shb = (SOAPHeaderBlock)
-                    // envelope.getHeader().getHeaderBlocksWithNSURI("http://www.w3.org/2005/08/addressing");
-                    // shb.setMustUnderstand(true);
                     /* Validate reponse message */
                     XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(XMLUtils.toDOM(
                             envelope.getBody().getFirstElement())),
@@ -217,21 +338,7 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
 
                     XMLGregorianCalendar cal = eventLog.getEI_EventDateTime();
 
-                    logger.debug("Outgoing XCPD Response Message:\n"
-                            + XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
-//
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                EventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
-//                                new DateTime(),
-//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                "NCPA_XCPD_RES");
-//                    } catch (Exception e) {
-//                        log.error(ExceptionUtils.getStackTrace(e));
-//                    }
+                    LOGGER.debug("Outgoing XCPD Response Message:\n '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
 
                 } else {
                     throw new java.lang.RuntimeException("method not found");
@@ -242,89 +349,71 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
                 try {
-                    EadcUtilWrapper.invokeEadc(msgContext,
-                            newMsgContext,
-                            null,
-                            null,
-                            startTime,
-                            endTime,
-                            "",
-                            EadcEntry.DsTypes.XCA,
-                            EadcUtil.Direction.OUTBOUND);
+                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
+                            endTime, "", EadcEntry.DsTypes.XCA, EadcUtil.Direction.OUTBOUND);
                 } catch (Exception ex) {
-                    logger.error("EADC INVOCATION FAILED!", ex);
+                    LOGGER.error("EADC INVOCATION FAILED!", ex);
                 }
             }
         } catch (java.lang.Exception e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
             throw org.apache.axis2.AxisFault.makeFault(e);
         }
     }
 
-    private org.apache.axiom.om.OMElement toOM(
-            org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent)
+    private org.apache.axiom.om.OMElement toOM(org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
+
         try {
             javax.xml.bind.JAXBContext context = wsContext;
             javax.xml.bind.Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT,
-                    Boolean.TRUE);
+            marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
-            org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory
-                    .getOMFactory();
+            org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
 
-            JaxbRIDataSource source = new JaxbRIDataSource(
-                    org.hl7.v3.PRPAIN201305UV02.class, param, marshaller,
+            JaxbRIDataSource source = new JaxbRIDataSource(org.hl7.v3.PRPAIN201305UV02.class, param, marshaller,
                     "urn:hl7-org:v3", "PRPA_IN201305UV02");
-            org.apache.axiom.om.OMNamespace namespace = factory
-                    .createOMNamespace("urn:hl7-org:v3", null);
-            return factory.createOMElement(source, "PRPA_IN201305UV02",
-                    namespace);
+            org.apache.axiom.om.OMNamespace namespace = factory.createOMNamespace("urn:hl7-org:v3", null);
+            return factory.createOMElement(source, "PRPA_IN201305UV02", namespace);
         } catch (javax.xml.bind.JAXBException bex) {
             throw org.apache.axis2.AxisFault.makeFault(bex);
         }
     }
 
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-            org.apache.axiom.soap.SOAPFactory factory,
-            org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent)
+    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory,
+                                                          org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
-        org.apache.axiom.soap.SOAPEnvelope envelope = factory
-                .getDefaultEnvelope();
+
+        org.apache.axiom.soap.SOAPEnvelope envelope = factory.getDefaultEnvelope();
         envelope.getBody().addChild(toOM(param, optimizeContent));
         return envelope;
     }
 
-    private org.apache.axiom.om.OMElement toOM(
-            org.hl7.v3.PRPAIN201306UV02 param, boolean optimizeContent)
+    private org.apache.axiom.om.OMElement toOM(org.hl7.v3.PRPAIN201306UV02 param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
+
         try {
             javax.xml.bind.JAXBContext context = wsContext;
             javax.xml.bind.Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT,
                     Boolean.TRUE);
 
-            org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory
-                    .getOMFactory();
+            org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
 
-            JaxbRIDataSource source = new JaxbRIDataSource(
-                    org.hl7.v3.PRPAIN201306UV02.class, param, marshaller,
+            JaxbRIDataSource source = new JaxbRIDataSource(org.hl7.v3.PRPAIN201306UV02.class, param, marshaller,
                     "urn:hl7-org:v3", "PRPA_IN201306UV02");
-            org.apache.axiom.om.OMNamespace namespace = factory
-                    .createOMNamespace("urn:hl7-org:v3", null);
-            return factory.createOMElement(source, "PRPA_IN201306UV02",
-                    namespace);
+            org.apache.axiom.om.OMNamespace namespace = factory.createOMNamespace("urn:hl7-org:v3", null);
+            return factory.createOMElement(source, "PRPA_IN201306UV02", namespace);
         } catch (javax.xml.bind.JAXBException bex) {
             throw org.apache.axis2.AxisFault.makeFault(bex);
         }
     }
 
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-            org.apache.axiom.soap.SOAPFactory factory,
-            org.hl7.v3.PRPAIN201306UV02 param, boolean optimizeContent)
+    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory,
+                                                          org.hl7.v3.PRPAIN201306UV02 param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
-        org.apache.axiom.soap.SOAPEnvelope envelope = factory
-                .getDefaultEnvelope();
+
+        org.apache.axiom.soap.SOAPEnvelope envelope = factory.getDefaultEnvelope();
         envelope.getBody().addChild(toOM(param, optimizeContent));
         return envelope;
     }
@@ -332,21 +421,18 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
     /**
      * get the default envelope
      */
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-            org.apache.axiom.soap.SOAPFactory factory) {
+    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory) {
+
         return factory.getDefaultEnvelope();
     }
 
-    private java.lang.Object fromOM(org.apache.axiom.om.OMElement param,
-                                    java.lang.Class type, java.util.Map extraNamespaces)
+    private java.lang.Object fromOM(org.apache.axiom.om.OMElement param, java.lang.Class type, java.util.Map extraNamespaces)
             throws org.apache.axis2.AxisFault {
         try {
             javax.xml.bind.JAXBContext context = wsContext;
-            javax.xml.bind.Unmarshaller unmarshaller = context
-                    .createUnmarshaller();
+            javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
 
-            return unmarshaller.unmarshal(
-                    param.getXMLStreamReaderWithoutCaching(), type).getValue();
+            return unmarshaller.unmarshal(param.getXMLStreamReaderWithoutCaching(), type).getValue();
         } catch (javax.xml.bind.JAXBException bex) {
             throw org.apache.axis2.AxisFault.makeFault(bex);
         }
@@ -355,19 +441,19 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
     /**
      * A utility method that copies the namepaces from the SOAPEnvelope
      */
-    private java.util.Map getEnvelopeNamespaces(
-            org.apache.axiom.soap.SOAPEnvelope env) {
+    private java.util.Map getEnvelopeNamespaces(org.apache.axiom.soap.SOAPEnvelope env) {
+
         java.util.Map returnMap = new java.util.HashMap();
         java.util.Iterator namespaceIterator = env.getAllDeclaredNamespaces();
         while (namespaceIterator.hasNext()) {
-            org.apache.axiom.om.OMNamespace ns = (org.apache.axiom.om.OMNamespace) namespaceIterator
-                    .next();
+            org.apache.axiom.om.OMNamespace ns = (org.apache.axiom.om.OMNamespace) namespaceIterator.next();
             returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
         }
         return returnMap;
     }
 
     private org.apache.axis2.AxisFault createAxisFault(java.lang.Exception e) {
+
         org.apache.axis2.AxisFault f;
         Throwable cause = e.getCause();
         if (cause != null) {
@@ -408,8 +494,7 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
          * @param obj
          * @param marshaller
          */
-        public JaxbRIDataSource(Class clazz, Object obj,
-                                javax.xml.bind.Marshaller marshaller, String nsuri, String name) {
+        public JaxbRIDataSource(Class clazz, Object obj, javax.xml.bind.Marshaller marshaller, String nsuri, String name) {
             this.outClazz = clazz;
             this.outObject = obj;
             this.marshaller = marshaller;
@@ -417,23 +502,19 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
             this.name = name;
         }
 
-        public void serialize(java.io.OutputStream output,
-                              org.apache.axiom.om.OMOutputFormat format)
+        public void serialize(java.io.OutputStream output, org.apache.axiom.om.OMOutputFormat format)
                 throws javax.xml.stream.XMLStreamException {
+
             try {
-                marshaller.marshal(
-                        new javax.xml.bind.JAXBElement(
-                                new javax.xml.namespace.QName(nsuri, name),
-                                outObject.getClass(), outObject), output);
+                marshaller.marshal(new javax.xml.bind.JAXBElement(new javax.xml.namespace.QName(nsuri, name),
+                        outObject.getClass(), outObject), output);
             } catch (javax.xml.bind.JAXBException e) {
-                throw new javax.xml.stream.XMLStreamException(
-                        "Error in JAXB marshalling", e);
+                throw new javax.xml.stream.XMLStreamException("Error in JAXB marshalling", e);
             }
         }
 
-        public void serialize(java.io.Writer writer,
-                              org.apache.axiom.om.OMOutputFormat format)
-                throws javax.xml.stream.XMLStreamException {
+        public void serialize(java.io.Writer writer, org.apache.axiom.om.OMOutputFormat format) throws javax.xml.stream.XMLStreamException {
+
             try {
                 marshaller.marshal(
                         new javax.xml.bind.JAXBElement(
