@@ -6,25 +6,38 @@
 package fi.kela.se.epsos.data.model;
 
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
-import java.io.StringWriter;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.io.StringWriter;
 
 /**
- *
  * @author jgoncalves
  */
 public class SearchCriteriaImplTest {
-    
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchCriteriaImplTest.class);
+
     public SearchCriteriaImplTest() {
+    }
+
+    private static String convertElementToString(Element elem) throws TransformerException {
+
+        TransformerFactory transFactory = TransformerFactory.newInstance();
+        Transformer transformer = transFactory.newTransformer();
+        StringWriter buffer = new StringWriter();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.transform(new DOMSource(elem), new StreamResult(buffer));
+        return buffer.toString();
     }
 
     /**
@@ -32,6 +45,7 @@ public class SearchCriteriaImplTest {
      */
     @Test
     public void testAsXml() throws TransformerException {
+
         String patientId = "23q2e";
         String docId = "29846534324.123453";
         SearchCriteria sc = new SearchCriteriaImpl();
@@ -40,18 +54,6 @@ public class SearchCriteriaImplTest {
         Document doc = sc.asXml();
         Element e = doc.getDocumentElement();
         String str = convertElementToString(e);
-        System.out.println(str);
+        LOGGER.info("testAsXml(): '{}'", str);
     }
-    
-    public static String convertElementToString(Element elem) throws TransformerConfigurationException, TransformerException {
-        TransformerFactory transFactory = TransformerFactory.newInstance();
-        Transformer transformer = transFactory.newTransformer();
-        StringWriter buffer = new StringWriter();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        transformer.transform(new DOMSource(elem),
-              new StreamResult(buffer));
-        String str = buffer.toString();
-        return str;
-    }
-    
 }
