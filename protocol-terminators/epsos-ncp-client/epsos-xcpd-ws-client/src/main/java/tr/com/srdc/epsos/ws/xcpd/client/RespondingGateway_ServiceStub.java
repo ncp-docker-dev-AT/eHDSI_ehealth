@@ -31,6 +31,7 @@ import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.services.XcpdValidationService;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -305,8 +306,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             } catch (AxisFault e) {
                 LOG.error("Axis Fault: Code-'{}' Message-'{}'", e.getFaultCode(), e.getMessage());
                 LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
-
-                String value = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(
+                DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
+                String value = dynamicDiscoveryService.getEndpointUrl(
                         this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_IDENTIFICATION_SERVICE, true);
 
                 if (StringUtils.isNotEmpty(value)) {

@@ -50,7 +50,7 @@ public class EpsosRestService {
 
     public static final long companyId = 10157;
     private static final int bypassRefererChecking = 1;
-    private static final Logger log = LoggerFactory.getLogger("EpsosRestService");
+    private static final Logger LOGGER = LoggerFactory.getLogger(EpsosRestService.class);
     private static final Utils utils = new Utils();
     @Context
     private static HttpServletRequest servletRequest;
@@ -62,6 +62,7 @@ public class EpsosRestService {
     @GET
     @Path("/dictionary/conditions")
     public Response getListOfConditions() throws PortalException, SystemException {
+
         Map<String, List<DictionaryTerm>> problemsDictionary = DictionaryServices.getProblemsDictionaryTerms();
         String output = new Gson().toJson(problemsDictionary);
         return Response.ok().entity(output).build();
@@ -75,6 +76,7 @@ public class EpsosRestService {
     @GET
     @Path("/dictionary/familyroles")
     public Response getListOfFamilyRoles() throws PortalException, SystemException {
+
         Map<String, List<DictionaryTerm>> rolesDictionary = DictionaryServices.getFamilyRolesDictionaryTerms();
         String output = new Gson().toJson(rolesDictionary);
         return Response.ok().entity(output).build();
@@ -88,6 +90,7 @@ public class EpsosRestService {
     @GET
     @Path("/dictionary/procedures")
     public Response getListOfProcedures() throws PortalException, SystemException {
+
         Map<String, List<DictionaryTerm>> snomedDictionary = DictionaryServices.getProceduresDictionaryTerms();
         String output = new Gson().toJson(snomedDictionary);
         return Response.ok().entity(output).build();
@@ -101,6 +104,7 @@ public class EpsosRestService {
     @GET
     @Path("/dictionary/allergies")
     public Response getListOfAllergies() throws PortalException, SystemException {
+
         Map<String, List<DictionaryTerm>> snomedDictionary = DictionaryServices.getAllergiesDictionaryTerms();
         String output = new Gson().toJson(snomedDictionary);
         return Response.ok().entity(output).build();
@@ -109,40 +113,41 @@ public class EpsosRestService {
     @GET
     @Path("/{param}")
     public Response test(@Context HttpServletRequest request, @PathParam("param") String msg) {
+
         String ip = request.getRemoteAddr();
-        log.info("IP ADDRESS IS : " + ip);
+        LOGGER.info("IP ADDRESS IS: '{}'", ip);
         String output = "OpenNCP says : " + msg;
         return Response.status(200).entity(output).build();
     }
 
     @POST
     @Path("/users/login")
-    public Response userLogin(
-            @FormParam("username") String username,
-            @FormParam("password") String password,
-            @HeaderParam("referer") String referer) throws PortalException, SystemException, UnsupportedEncodingException {
+    public Response userLogin(@FormParam("username") String username, @FormParam("password") String password,
+                              @HeaderParam("referer") String referer)
+            throws PortalException, SystemException, UnsupportedEncodingException {
+
         if (!validReferer(referer)) {
             return Response.status(404).entity("Invalid Request").build();
         }
-        log.info("user: " + username);
-        log.info("password: " + password);
+        LOGGER.info("user: '{}'", username);
+        LOGGER.info("password: '{}'", password);
         username = URLDecoder.decode(username, "UTF-8");
-        log.info("companyId: " + companyId);
+        LOGGER.info("companyId: '{}'", companyId);
         int usertype = 100;
         User user = null;
         String ret = "";
         try {
-            log.info("Try to find user with screenname :" + username);
+            LOGGER.info("Try to find user with screenname: '{}'", username);
             user = UserLocalServiceUtil.getUserByScreenName(companyId, username);
         } catch (Exception e) {
-            log.error("Error find user by screenname " + username);
+            LOGGER.error("Error find user by screenname: '{}' - '{}'", username, e.getMessage(), e);
         }
         if (Validator.isNull(user)) {
             try {
-                log.info("Try to find user with email :" + username);
+                LOGGER.info("Try to find user with email: '{}'", username);
                 user = UserLocalServiceUtil.getUserByEmailAddress(companyId, username);
             } catch (Exception e) {
-                log.error("Error find user by emailaddress " + username);
+                LOGGER.error("Error find user by emailaddress: '{}' - '{}'", username, e.getMessage(), e);
             }
         }
 
@@ -150,7 +155,7 @@ public class EpsosRestService {
         if (Validator.isNotNull(user)) {
 
             if (!user.isActive()) {
-                log.info("USER ACTIVE: " + user.isActive());
+                LOGGER.info("USER ACTIVE: " + user.isActive());
                 ret = "401";
             } else {
 
@@ -162,13 +167,13 @@ public class EpsosRestService {
                             CompanyConstants.AUTH_TYPE_SN,
                             username, password);
                 }
-                log.info("auth: " + auth);
+                LOGGER.info("auth: '{}'", auth);
                 if (auth == 0) {
                     ret = "400";
                 }
             }
         }
-        log.info("# AUTH " + auth);
+        LOGGER.info("# AUTH '{}'", auth);
         UserData ud = new UserData();
         if (auth > 0) {
             ud.setStatus("1");
@@ -181,8 +186,8 @@ public class EpsosRestService {
         }
         ud.setRet(ret);
         try {
-            String encauth = Utils.encrypt(auth + "");
-            log.info("### : " + encauth);
+            String encauth = Utils.encrypt(Long.toString(auth));
+            LOGGER.info("###: '{}'", encauth);
             if (auth > 0) {
                 ud.setRet("200");
                 ud.setUserId(encauth);
@@ -191,10 +196,10 @@ public class EpsosRestService {
                 ud.setUsertype(usertype);
             }
         } catch (Exception ex) {
-            log.error("Error encrypring");
+            LOGGER.error("Error encrypring: '{}'", ex.getMessage(), ex);
         }
         servletRequest.getSession(true).setAttribute("test", "kostas");
-        log.info("SESSION SET: " + "kostas");
+        LOGGER.info("SESSION SET: " + "kostas");
         Gson gson = new Gson();
         ret = gson.toJson(ud);
         return Response.ok().entity(ret).build();
@@ -212,13 +217,13 @@ public class EpsosRestService {
      */
     @POST
     @Path("/get/countries/names/{language}")
-    public Response getCountries(
-            @PathParam("language") String language,
-            @HeaderParam("referer") String referer) throws PortalException, SystemException, Exception {
-        log.info("Get Countries for language: " + language);
+    public Response getCountries(@PathParam("language") String language, @HeaderParam("referer") String referer)
+            throws Exception {
+
+        LOGGER.info("Get Countries for language: '{}'", language);
         String ret = "";
         String path = servletRequest.getSession().getServletContext().getRealPath("/");
-        log.info("Application Path is: " + path);
+        LOGGER.info("Application Path is: '{}'", path);
         List<Country> countries = EpsosHelperService.getCountriesFromCS(language, path);
         Gson gson = new Gson();
         ret = gson.toJson(countries);
@@ -227,8 +232,7 @@ public class EpsosRestService {
 
     @GET
     @Path("/languages/get")
-    public Response getAvailableLanguages(
-            @HeaderParam("referer") String referer) throws PortalException, SystemException, Exception {
+    public Response getAvailableLanguages(@HeaderParam("referer") String referer) throws Exception {
 
         List ltrlanguages = EpsosHelperService.getEHPLTRLanguages();
         Gson gson = new Gson();
@@ -242,15 +246,14 @@ public class EpsosRestService {
 
     @POST
     @Path("/get/countries/attributes/{country}/{language}")
-    public Response getCountryAttributes(
-            @Context HttpServletRequest request,
-            @PathParam("country") String country,
-            @PathParam("language") String language,
-            @HeaderParam("referer") String referer) throws PortalException, SystemException, Exception {
-        log.info("Get attributes for language: " + country);
+    public Response getCountryAttributes(@Context HttpServletRequest request, @PathParam("country") String country,
+                                         @PathParam("language") String language, @HeaderParam("referer") String referer)
+            throws PortalException, SystemException, Exception {
+
+        LOGGER.info("Get attributes for language: '{}'", country);
         String ret = "";
         String path = request.getSession().getServletContext().getRealPath("/") + "/WEB-INF/";
-        log.info("#################: " + path);
+        LOGGER.info("#################: '{}'", path);
         Vector countryIdentifiers = EpsosHelperService.getCountryIdsFromCS(country, path);
         List<Identifier> identifiers = EpsosHelperService.getCountryIdentifiers(country, language, path, null);
 
@@ -290,30 +293,30 @@ public class EpsosRestService {
      */
     @POST
     @Path("/search/patients")
-    public Response searchPatients(
-            StreamSource streamSource) throws Exception {
-        log.info("$$$$$$ Try to search patients");
-        //log.info("Get into search patients: " + getUsernameFromHeaders());
+    public Response searchPatients(StreamSource streamSource) throws Exception {
+
+        LOGGER.info("$$$$$$ Try to search patients");
         populatePatient(streamSource);
-        log.info("Searching patients: " + ru.getEmailaddress() + " " + ru.getFullname() + " " + ru.getOrgid() + " " + ru.getOrgname() + " " + ru.getOrgtype() + " " + ru.getRolename() + " " + ru.getScreenname() + " " + pdq.getDemographics().getBirthDate());
+        LOGGER.info("Searching patients: " + ru.getEmailaddress() + " " + ru.getFullname() + " " + ru.getOrgid() + " "
+                + ru.getOrgname() + " " + ru.getOrgtype() + " " + ru.getRolename() + " " + ru.getScreenname() + " "
+                + pdq.getDemographics().getBirthDate());
         String ret = "";
         Object ass = EpsosHelperService.getUserAssertion(ru.getScreenname(), ru.getFullname(), ru.getEmailaddress(), ru.getRolename());
-        log.info("The assertion for user has been created: " + ((Assertion) ass).getID());
+        LOGGER.info("The assertion for user has been created: '{}'", ((Assertion) ass).getID());
 
         List<Patient> patients = EpsosHelperService.searchPatients((Assertion) ass, pd, pdq.getDemographics().getCountry());
-        log.info("Patients found: " + patients.size());
+        LOGGER.info("Patients found: '{}'", patients.size());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.registerTypeAdapter(Patient.class,
-                new PatientAdapter()).create();
+        Gson gson = gsonBuilder.registerTypeAdapter(Patient.class, new PatientAdapter()).create();
         ret = gson.toJson(patients);
         return Response.ok().entity(ret).build();
     }
 
     @POST
     @Path("/documents/transform")
-    public Response transformDocument(StreamSource streamSource
-    ) {
+    public Response transformDocument(StreamSource streamSource) {
+
         String soapMessage = "";
         String convertedcda = "";
         try {
@@ -322,8 +325,8 @@ public class EpsosRestService {
             EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
             convertedcda = xlsClass.transformUsingStandardCDAXsl(soapMessage);
         } catch (Exception e) {
-            log.error("Error processing request");
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error processing request");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
             return Response.status(404).entity("Invalid Request").build();
         }
 
@@ -333,31 +336,29 @@ public class EpsosRestService {
 
     @POST
     @Path("/search/documents/ps/{username}")
-    public Response getPatientPSDocuments(
-            @FormParam("country") String country,
-            @FormParam("root") String root,
-            @FormParam("extension") String extension) throws Exception {
+    public Response getPatientPSDocuments(@FormParam("country") String country, @FormParam("root") String root,
+                                          @FormParam("extension") String extension) throws Exception {
 
-        log.info("Get into search patients");
+        LOGGER.info("Get into search patients");
         String ret = "";
         String username = getUsernameFromHeaders();
         User user = utils.getLiferayUserUnEncrypted(username);
         Object ass = EpsosHelperService.getUserAssertion(user);
-        log.info("The assertion for user has been created: " + ((Assertion) ass).getID());
+        LOGGER.info("The assertion for user has been created: '{}'", ((Assertion) ass).getID());
         PatientId patientId = PatientId.Factory.newInstance();
         patientId.setExtension(extension);
         patientId.setRoot(root);
         String purposeOfUse = "TREATMENT";
-        log.info("TRCA: Creating trca for hcpAssertion : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
+        LOGGER.info("TRCA: Creating trca for hcpAssertion: " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
         Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, (Assertion) ass, patientId);
-        log.info("TRCA: Created " + ((Assertion) trcAssertion).getID() + " for : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
+        LOGGER.info("TRCA: Created " + ((Assertion) trcAssertion).getID() + " for : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
         List<PatientDocument> patientDocuments = EpsosHelperService.getPSDocs(
                 (Assertion) ass,
                 (Assertion) trcAssertion,
                 root,
                 extension,
                 country);
-        log.info("PS Docs found: " + patientDocuments.size());
+        LOGGER.info("PS Docs found: '{}'", patientDocuments.size());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.registerTypeAdapter(PatientDocument.class,
@@ -368,72 +369,58 @@ public class EpsosRestService {
 
     @POST
     @Path("/search/documents/ep/{country}/{patientid}")
-    public Response getPatientEPDocuments(
-            @PathParam("country") String country,
-            @PathParam("root") String root,
-            @PathParam("extension") String extension) throws Exception {
+    public Response getPatientEPDocuments(@PathParam("country") String country, @PathParam("root") String root,
+                                          @PathParam("extension") String extension) throws Exception {
 
-        log.info("Get into search patients");
+        LOGGER.info("Get into search patients");
         String ret = "";
         String username = getUsernameFromHeaders();
         User user = utils.getLiferayUserUnEncrypted(username);
 
         Object ass = EpsosHelperService.getUserAssertion(user);
-        log.info("The assertion for user has been created: " + ((Assertion) ass).getID());
+        LOGGER.info("The assertion for user has been created: '{}'", ((Assertion) ass).getID());
         PatientId patientId = PatientId.Factory.newInstance();
         patientId.setExtension(extension);
         patientId.setRoot(root);
         String purposeOfUse = "TREATMENT";
-        log.info("TRCA: Creating trca for hcpAssertion : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
+        LOGGER.info("TRCA: Creating trca for hcpAssertion : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
         Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, (Assertion) ass, patientId);
-        log.info("TRCA: Created " + ((Assertion) trcAssertion).getID() + " for : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
-        List<PatientDocument> patientDocuments = EpsosHelperService.getPSDocs(
-                (Assertion) ass,
-                (Assertion) trcAssertion,
-                root,
-                extension,
-                country);
-        log.info("PS Docs found: " + patientDocuments.size());
+        LOGGER.info("TRCA: Created " + ((Assertion) trcAssertion).getID() + " for : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
+        List<PatientDocument> patientDocuments = EpsosHelperService.getPSDocs((Assertion) ass, (Assertion) trcAssertion,
+                root, extension, country);
+        LOGGER.info("PS Docs found: '{}'", patientDocuments.size());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.registerTypeAdapter(PatientDocument.class,
-                new PatientDocumentAdapter()).create();
+        Gson gson = gsonBuilder.registerTypeAdapter(PatientDocument.class, new PatientDocumentAdapter()).create();
         ret = gson.toJson(patientDocuments);
         return Response.ok().entity(ret).build();
     }
 
     @POST
     @Path("/search/mydocuments/{doctype}")
-    public Response getMyPatientDocuments(
-            StreamSource streamSource,
-            @PathParam("doctype") String doctype) throws Exception {
+    public Response getMyPatientDocuments(StreamSource streamSource, @PathParam("doctype") String doctype) throws Exception {
+
         String ret = "";
         String purposeOfUse = "TREATMENT";
 
         populatePatient(streamSource);
         Object ass = EpsosHelperService.getUserAssertion(ru.getScreenname(), ru.getFullname(), ru.getEmailaddress(), ru.getRolename());
-        log.info("The assertion for user has been created: " + ((Assertion) ass).getID());
-//        List<Patient> patients = EpsosHelperService.searchPatients((Assertion) ass, pd, pdq.getDemographics().getCountry());
+        LOGGER.info("The assertion for user has been created: '{}'", ((Assertion) ass).getID());
         String root = pdq.getIdentifiers().getIdentifier().get(0).getRoot();
         String extension = pdq.getIdentifiers().getIdentifier().get(0).getExtension();
         String country = pdq.getDemographics().getCountry();
-//        if (country.equalsIgnoreCase("KP")) {
-//            country = "USA";
-//        }
-//        if (patients.size() > 0) {
+
         if (Validator.isNotNull(extension)) {
-            log.info("PATIENT FOUND: " + extension);
+            LOGGER.info("PATIENT FOUND: '{}'", extension);
             PatientId patientId = PatientId.Factory.newInstance();
-//            patientId.setExtension(patients.get(0).getExtension());
-//            patientId.setRoot(patients.get(0).getRoot());
             patientId.setExtension(extension);
             patientId.setRoot(root);
             Patient pat = new Patient();
             pat.setRoot(patientId.getRoot());
             pat.setExtension(patientId.getExtension());
             Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, (Assertion) ass, patientId);
-            List<PatientDocument> patientDocuments = new ArrayList();
-            log.info("$$$$$$$$$ 1:" + ((Assertion) ass).getID() + "-2:" + ((Assertion) trcAssertion).getID() + "-3: " + root + " -4: " + extension + "-5: " + country);
+            List<PatientDocument> patientDocuments = new ArrayList<>();
+            LOGGER.info("$$$$$$$$$ 1:" + ((Assertion) ass).getID() + "-2:" + ((Assertion) trcAssertion).getID() + "-3: " + root + " -4: " + extension + "-5: " + country);
             if (doctype.equalsIgnoreCase("ps")) {
                 patientDocuments = EpsosHelperService.getPSDocs(
                         (Assertion) ass,
@@ -458,7 +445,7 @@ public class EpsosRestService {
             Gson gson = gsonBuilder.registerTypeAdapter(PatientDocument.class,
                     new PatientDocumentAdapter()).create();
             ret = gson.toJson(dext);
-            log.info(ret);
+            LOGGER.info(ret);
         } else {
             return Response.status(404).entity("Invalid Request").build();
         }
@@ -495,25 +482,23 @@ public class EpsosRestService {
 
     @POST
     @Path("/get/document/cda/{doctype}/{language}")
-    public Response retrieveDocument(
-            StreamSource streamSource,
-            @PathParam("doctype") String doctype,
-            @PathParam("language") String language
-    ) throws Exception {
-        log.info("#######################: " + servletRequest.getSession(true).getAttribute("test"));
+    public Response retrieveDocument(StreamSource streamSource, @PathParam("doctype") String doctype,
+                                     @PathParam("language") String language) throws Exception {
+
+        LOGGER.info("#######################: '{}'", servletRequest.getSession(true).getAttribute("test"));
 
         String ret = "";
         populatePatient(streamSource);
-        log.info("COUNTRY: " + pd.getCountry());
+        LOGGER.info("COUNTRY: '{}'", pd.getCountry());
         Object ass = EpsosHelperService.getUserAssertion(ru.getScreenname(), ru.getFullname(), ru.getEmailaddress(), ru.getRolename());
-        log.info("The assertion for user has been created: " + ((Assertion) ass).getID());
+        LOGGER.info("The assertion for user has been created: " + ((Assertion) ass).getID());
         PatientId patientId = PatientId.Factory.newInstance();
         patientId.setExtension(document.getExtension());
         patientId.setRoot(document.getRoot());
         String purposeOfUse = "TREATMENT";
-        log.info("TRCA: Creating trca for hcpAssertion : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
+        LOGGER.info("TRCA: Creating trca for hcpAssertion : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
         Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, (Assertion) ass, patientId);
-        log.info("TRCA: Created " + ((Assertion) trcAssertion).getID() + " for : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
+        LOGGER.info("TRCA: Created " + ((Assertion) trcAssertion).getID() + " for : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
         String cda = EpsosHelperService.getDocument((Assertion) ass, (Assertion) trcAssertion, pd.getCountry(), document.getRepositoryid(), document.getHcid(), document.getUuid(), doctype, language);
         if (Validator.isNotNull(cda)) {
             String pdf = EpsosHelperService.extractPdfPartOfDocument(cda);
@@ -521,18 +506,13 @@ public class EpsosRestService {
                 cda = new String(pdf);
             }
         }
-//        if (transform) {
-//            cda = EpsosHelperService.styleDoc(cda, language, true, "");
-//        }
         return Response.ok().entity(cda).build();
     }
 
     @POST
     @Path("/translate/document/{language}")
-    public Response translateDocument(
-            @FormParam("cda") String cda,
-            @PathParam("language") String language
-    ) throws Exception {
+    public Response translateDocument(@FormParam("cda") String cda, @PathParam("language") String language) throws Exception {
+
         String ret = "";
         String translatedcda = EpsosHelperService.styleDoc(cda, language, false, "", true);
         return Response.ok().entity(translatedcda).build();
@@ -540,25 +520,23 @@ public class EpsosRestService {
 
     @POST
     @Path("/get/document/{doctype}/{language}/{transform}")
-    public Response retrieveDocument(
-            StreamSource streamSource,
-            @PathParam("doctype") String doctype,
-            @PathParam("language") String language,
-            @PathParam("transform") boolean transform
-    ) throws Exception {
-        log.info("Get into retrieve document with transform : " + transform);
+    public Response retrieveDocument(StreamSource streamSource, @PathParam("doctype") String doctype,
+                                     @PathParam("language") String language, @PathParam("transform") boolean transform)
+            throws Exception {
+
+        LOGGER.info("Get into retrieve document with transform: '{}'", transform);
         String ret = "";
         populatePatient(streamSource);
-        log.info("COUNTRY: " + pd.getCountry());
+        LOGGER.info("COUNTRY: " + pd.getCountry());
         Object ass = EpsosHelperService.getUserAssertion(ru.getScreenname(), ru.getFullname(), ru.getEmailaddress(), ru.getRolename());
-        log.info("The assertion for user has been created: " + ((Assertion) ass).getID());
+        LOGGER.info("The assertion for user has been created: " + ((Assertion) ass).getID());
         PatientId patientId = PatientId.Factory.newInstance();
         patientId.setExtension(document.getExtension());
         patientId.setRoot(document.getRoot());
         String purposeOfUse = "TREATMENT";
-        log.info("TRCA: Creating trca for hcpAssertion : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
+        LOGGER.info("TRCA: Creating trca for hcpAssertion: " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
         Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, (Assertion) ass, patientId);
-        log.info("TRCA: Created " + ((Assertion) trcAssertion).getID() + " for : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
+        LOGGER.info("TRCA: Created " + ((Assertion) trcAssertion).getID() + " for : " + ((Assertion) ass).getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
         String cda = EpsosHelperService.getDocument((Assertion) ass, (Assertion) trcAssertion, pd.getCountry(), document.getRepositoryid(), document.getHcid(), document.getUuid(), doctype, language);
         if (transform) {
             cda = EpsosHelperService.styleDoc(cda, language, false, "", false);
@@ -568,25 +546,22 @@ public class EpsosRestService {
 
     @POST
     @Path("/transform/document/{language}")
-    public Response transformDocument(
-            @FormParam("cda") String cda,
-            @PathParam("language") String language
-    ) {
-        String ret = "";
-        String convertedcda = "";
+    public Response transformDocument(@FormParam("cda") String cda, @PathParam("language") String language) {
+
+        String convertedCDA;
         try {
-            convertedcda = com.gnomon.epsos.model.cda.Utils.getDocumentAsXml(EpsosHelperService.translateDoc(
+            convertedCDA = com.gnomon.epsos.model.cda.Utils.getDocumentAsXml(EpsosHelperService.translateDoc(
                     com.gnomon.epsos.model.cda.Utils.createDomFromString(cda), language)
             );
-            log.info("Converted cda is " + convertedcda.substring(0, 100));
-            convertedcda = EpsosHelperService.styleDoc(convertedcda, language, false, "", false);
-            log.info("Styled cda is " + convertedcda.substring(0, 100));
+            LOGGER.info("Converted cda is '{}'", convertedCDA.substring(0, 100));
+            convertedCDA = EpsosHelperService.styleDoc(convertedCDA, language, false, "", false);
+            LOGGER.info("Styled cda is '{}'", convertedCDA.substring(0, 100));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             return Response.status(403).entity("Error transforming document").build();
         }
-        return Response.ok().entity(convertedcda).build();
+        return Response.ok().entity(convertedCDA).build();
     }
 
     @POST
@@ -602,7 +577,8 @@ public class EpsosRestService {
     }
 
     private boolean validReferer(String referer) {
-        log.info("##### bypassRefererChecking " + bypassRefererChecking);
+
+        LOGGER.info("##### bypassRefererChecking: '{}'", bypassRefererChecking);
         if (bypassRefererChecking == 1) {
             return true;
         }
@@ -613,15 +589,16 @@ public class EpsosRestService {
     }
 
     private void populatePatient(StreamSource streamSource) {
-        log.info("Populating patient...");
+
+        LOGGER.info("Populating patient...");
         String soapMessage = "";
         try {
             Document doc = Utils.readXml(streamSource);
             soapMessage = Utils.transformDomToString(doc);
-            log.info(soapMessage);
+            LOGGER.info(soapMessage);
         } catch (Exception e) {
-            log.error("Error processing request");
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error processing request");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
         JAXBContext jaxbContext;
@@ -630,8 +607,8 @@ public class EpsosRestService {
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             StringReader reader = new StringReader(soapMessage);
             pdq = (PatientDiscovery) jaxbUnmarshaller.unmarshal(reader);
-            log.info("getDemographics(): " + pdq.getDemographics().getAddress());
-            log.info("getIdentifier: " + pdq.getIdentifiers().getIdentifier().get(0).getExtension());
+            LOGGER.info("getDemographics(): " + pdq.getDemographics().getAddress());
+            LOGGER.info("getIdentifier: " + pdq.getIdentifiers().getIdentifier().get(0).getExtension());
             pd = PatientDemographics.Factory.newInstance();
             ru = new Info();
             document = new com.gnomon.epsos.model.queries.Document();
@@ -669,60 +646,56 @@ public class EpsosRestService {
                 pd.setCity(pdq.getDemographics().getCity());
                 pd.setPostalCode(pdq.getDemographics().getPostalCode());
                 pd.setAdministrativeGender(pdq.getDemographics().getGender());
-                log.info("PRE DATE: " + pdq.getDemographics().getBirthDate());
+                LOGGER.info("PRE DATE: '{}'", pdq.getDemographics().getBirthDate());
                 if (Validator.isNotNull(pdq.getDemographics().getBirthDate())) {
                     try {
                         Calendar cal = Calendar.getInstance();
                         cal.setTime(pdq.getDemographics().getBirthDate());
                         pd.setBirthDate(cal);
                     } catch (Exception ex) {
-                        ex.printStackTrace();
-                        log.error(ex.getMessage());
+                        LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
                     }
                 }
             }
-            log.info("firstname: " + pd.getFamilyName());
-            log.info("getBirthDate:  " + pd.getBirthDate());
-            log.info("PatientDemographic" + pd);
+            LOGGER.info("firstname: '{}'", pd.getFamilyName());
+            LOGGER.info("getBirthDate: '{}'", pd.getBirthDate());
+            LOGGER.info("PatientDemographic: '{}'", pd);
             pd.setPatientIdArray(idArray);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Problem during patient population");
+            LOGGER.error("Problem during patient population: '{}'", e.getMessage(), e);
         }
     }
 
     private String getUsernameFromHeaders() {
+
         String username = "";
         String authCredentials = servletRequest.getHeader(AUTHENTICATION_HEADER);
-        log.info("try to authencticate with: " + authCredentials);
-        final String encodedUserPassword = authCredentials.replaceFirst("Basic"
-                + " ", "");
+        LOGGER.info("try to authencticate with: '{}'", authCredentials);
+        final String encodedUserPassword = authCredentials.replaceFirst("Basic" + " ", "");
         String usernameAndPassword = null;
         try {
             byte[] decodedBytes = Base64.decodeBase64(encodedUserPassword);
             usernameAndPassword = new String(decodedBytes, "UTF-8");
-            log.info("Decoded password: " + usernameAndPassword);
+            LOGGER.info("Decoded password: '{}'", usernameAndPassword);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }
-        final StringTokenizer tokenizer = new StringTokenizer(
-                usernameAndPassword, ":");
+        final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
         boolean authenticationStatus = false;
         try {
             username = tokenizer.nextToken();
             final String password = tokenizer.nextToken();
-            log.info("username: " + username + " password: " + password);
+            LOGGER.info("username: '{}' - password: '{}'", username, password);
             // we have fixed the userid and password as admin
             // call some UserService/LDAP here
             long auth = UserLocalServiceUtil.authenticateForBasic(EpsosRestService.companyId,
                     CompanyConstants.AUTH_TYPE_SN,
                     username, password);
-            log.info("Authentication status for username: " + username + " is " + auth);
+            LOGGER.info("Authentication status for username: '{}' is '{}'", username, auth);
             authenticationStatus = auth > 0;
-//            authenticationStatus = "admin".equals(username)
-//                    && "admin".equals(password);
+
         } catch (Exception e) {
-            log.error("Error decoding username password");
+            LOGGER.error("Error decoding username password: '{}'", e.getMessage(), e);
         }
         return username;
     }

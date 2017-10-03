@@ -21,41 +21,34 @@ package eu.epsos.pt.cc.dts.axis2;
 
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
-import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
-
 import org.opensaml.saml2.core.Assertion;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 import tr.com.srdc.epsos.util.Constants;
-import tr.com.srdc.epsos.util.FileUtil;
+
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 
 /**
- *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class XdrRequestDts {
 
-    public static XdrRequest newInstance(final EpsosDocument1 document,
-                                         final PatientDemographics patient,
+    private XdrRequestDts() {
+    }
+
+    public static XdrRequest newInstance(final EpsosDocument1 document, final PatientDemographics patient,
                                          final Assertion idAssertion, final Assertion trcAssertion) throws ParseException {
+
         if (document == null) {
             return null;
         }
 
         XdrRequest result = new XdrRequest();
-        try {
-            result.setCda(new String(document.getBase64Binary(), FileUtil.UTF_8));
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-        }
+        result.setCda(new String(document.getBase64Binary(), StandardCharsets.UTF_8));
         result.setCdaId(document.getUuid());
-
-
         result.setPatient(eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(patient));
-
         result.setcountryCode(Constants.COUNTRY_CODE);
         result.setCountryName(Constants.COUNTRY_NAME);
-
         result.setIdAssertion(idAssertion);
         result.setTrcAssertion(trcAssertion);
 

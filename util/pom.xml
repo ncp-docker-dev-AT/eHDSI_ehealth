@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>2.5.2.RC2</version>
+        <version>2.5.2.RC3</version>
     </parent>
 
     <artifactId>openncp-util</artifactId>
@@ -132,12 +132,10 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <!--<wsdlLocation>-->
-                            <!--https://gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl-->
-                            <!--</wsdlLocation>-->
+                            <wsdlLocation>/META-INF/wsdl/assertion-validator/ModelBasedValidationWS.wsdl</wsdlLocation>
                             <wsdlFiles>
                                 <wsdlFile>
-                                    ${basedir}/src/main/resources/wsdl/assertion-validator/ModelBasedValidationWS.wsdl
+                                    ${basedir}/src/main/resources/META-INF/wsdl/assertion-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
                             <packageName>net.ihe.gazelle.jaxb.assertion</packageName>
@@ -153,12 +151,10 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <!--<wsdlLocation>-->
-                            <!--https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS?wsdl-->
-                            <!--</wsdlLocation>-->
+                            <wsdlLocation>/META-INF/wsdl/audit-validator/AuditMessageValidationWS.wsdl</wsdlLocation>
                             <wsdlFiles>
                                 <wsdlFile>
-                                    ${basedir}/src/main/resources/wsdl/audit-validator/AuditMessageValidationWS.wsdl
+                                    ${basedir}/src/main/resources/META-INF/wsdl/audit-validator/AuditMessageValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
                             <packageName>net.ihe.gazelle.jaxb.audit</packageName>
@@ -174,12 +170,10 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <!--<wsdlLocation>-->
-                            <!--https://gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl-->
-                            <!--</wsdlLocation>-->
+                            <wsdlLocation>/META-INF/wsdl/cda-validator/ModelBasedValidationWS.wsdl</wsdlLocation>
                             <wsdlFiles>
                                 <wsdlFile>
-                                    ${basedir}/src/main/resources/wsdl/cda-validator/ModelBasedValidationWS.wsdl
+                                    ${basedir}/src/main/resources/META-INF/wsdl/cda-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
                             <packageName>net.ihe.gazelle.jaxb.cda</packageName>
@@ -195,12 +189,10 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <!--<wsdlLocation>-->
-                            <!--https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator?wsdl-->
-                            <!--</wsdlLocation>-->
+                            <wsdlLocation>/META-INF/wsdl/certificate-validator/CertificateValidator.wsdl</wsdlLocation>
                             <wsdlFiles>
                                 <wsdlFile>
-                                    ${basedir}/src/main/resources/wsdl/certificate-validator/CertificateValidator.wsdl
+                                    ${basedir}/src/main/resources/META-INF/wsdl/certificate-validator/CertificateValidator.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
                             <packageName>net.ihe.gazelle.jaxb.certificate</packageName>
@@ -216,12 +208,10 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <!--<wsdlLocation>-->
-                            <!--https://gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator?wsdl-->
-                            <!--</wsdlLocation>-->
+                            <wsdlLocation>/META-INF/wsdl/schematron-validator/GazelleObjectValidator.wsdl</wsdlLocation>
                             <wsdlFiles>
                                 <wsdlFile>
-                                    ${basedir}/src/main/resources/wsdl/schematron-validator/GazelleObjectValidator.wsdl
+                                    ${basedir}/src/main/resources/META-INF/wsdl/schematron-validator/GazelleObjectValidator.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
                             <packageName>net.ihe.gazelle.jaxb.schematron</packageName>
@@ -237,12 +227,10 @@
                             <vmArgs>
                                 <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
                             </vmArgs>
-                            <!--<wsdlLocation>-->
-                            <!--https://gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS?wsdl-->
-                            <!--</wsdlLocation>-->
+                            <wsdlLocation>/META-INF/wsdl/xds-validator/ModelBasedValidationWS.wsdl</wsdlLocation>
                             <wsdlFiles>
                                 <wsdlFile>
-                                    ${basedir}/src/main/resources/wsdl/xds-validator/ModelBasedValidationWS.wsdl
+                                    ${basedir}/src/main/resources/META-INF/wsdl/xds-validator/ModelBasedValidationWS.wsdl
                                 </wsdlFile>
                             </wsdlFiles>
                             <packageName>net.ihe.gazelle.jaxb.xds</packageName>
@@ -295,7 +283,6 @@
             <!--<id>wsimport-generate-GazelleObjectValidatorWS</id>-->
             <!--<phase>generate-sources</phase>-->
             <!--</execution>-->
-
             <!--<execution>-->
             <!--<goals>-->
             <!--<goal>wsimport</goal>-->

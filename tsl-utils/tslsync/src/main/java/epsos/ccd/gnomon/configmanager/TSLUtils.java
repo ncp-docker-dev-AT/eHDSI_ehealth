@@ -70,6 +70,9 @@ public class TSLUtils {
     private static String TRUST_STORE_PASS = "spirit";
     private static String TSLNS = "http://uri.etsi.org/02231/v2#";
 
+    private TSLUtils() {
+    }
+
     public static void init_variables() {
 
 		/*
@@ -104,7 +107,7 @@ public class TSLUtils {
             Element tdElement = (Element) td;
             tagValue = tdElement.getTextContent();
         } catch (Exception e) {
-            logger.error(countrycode + "_" + tagValue.trim() + " NOT processed successfully");
+            logger.error("{}_{} NOT processed successfully: '{}'", countrycode, tagValue.trim(), e.getMessage(), e);
         }
         return tagValue;
     }
@@ -231,7 +234,7 @@ public class TSLUtils {
             }
             export = true;
         } catch (Exception e) {
-            logger.error(countrycode + "_" + tagValue.trim() + " NOT processed successfully");
+            logger.error("{}_{} NOT processed successfully: '{}'", countrycode, tagValue.trim(), e.getMessage(), e);
         }
         return sb.toString();
     }
@@ -281,7 +284,7 @@ public class TSLUtils {
             ncptsl = true;
 
         } catch (Exception e) {
-            logger.error(countrycode + "_" + "NCP Signature NOT processed successfully");
+            logger.error("{}_NCP Signature NOT processed successfully: '{}'", countrycode, e.getMessage(), e);
         }
         return sb.toString();
 
@@ -335,7 +338,7 @@ public class TSLUtils {
                                 try {
                                     tdValue = tdElement.getTextContent();
                                 } catch (Exception e) {
-                                    logger.error(e.getMessage());
+                                    logger.error("Exception: '{}'", e.getMessage(), e);
                                 }
                             }
                             if (!tdValue.startsWith("NCP-B")) {
@@ -373,9 +376,7 @@ public class TSLUtils {
 
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            e.printStackTrace();
-
+            logger.error("Exception: '{}'", e.getMessage(), e);
         }
         return serviceNames;
     }
@@ -406,24 +407,23 @@ public class TSLUtils {
                     (Provider) Class.forName(providerName).newInstance());
             KeyInfoKeySelector keyInfoKeySelector = new KeyInfoKeySelector();
             DOMValidateContext valContext = new DOMValidateContext(keyInfoKeySelector, nl.item(0));
-            // cert = new KeyInfoKeySelector().getCertificate();
 
             XMLSignature signature = null;
             try {
                 signature = fac.unmarshalXMLSignature(valContext);
             } catch (MarshalException e) {
-                logger.debug("XML signature parse error: " + e.getMessage());
+                logger.debug("XML signature parse error: " + e.getMessage(), e);
             }
 
             boolean coreValidity = signature.validate(valContext);
-            if (coreValidity == false) {
+            if (!coreValidity) {
                 logger.debug("Signature failed");
             } else {
                 logger.debug("Signature passed");
             }
             cert = keyInfoKeySelector.getCertificate();
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.error("Exception: '{}'", e.getMessage(), e);
         }
         return cert;
     }
@@ -453,7 +453,7 @@ public class TSLUtils {
             }
             cert = getCertificateFromNodeList(xmlSigs);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Exception: '{}'", e.getMessage());
         }
         return cert;
     }
@@ -461,8 +461,7 @@ public class TSLUtils {
     private static String getServiceNameFromURL(String url) {
         String[] parts = url.split("/");
         int partsLength = parts.length;
-        String serviceName = parts[partsLength - 1];
-        return serviceName;
+        return parts[partsLength - 1];
     }
 
     /**
@@ -492,7 +491,7 @@ public class TSLUtils {
             in.close();
             t = (X509Certificate) c;
         } catch (Exception e) {
-            logger.info(e.getMessage());
+            logger.error("Exception: '{}'", e.getMessage());
         }
         return t;
     }
@@ -561,11 +560,10 @@ public class TSLUtils {
                 exp = true;
             } catch (Exception e) {
                 exp = false;
-                e.printStackTrace();
-                logger.error(e.getMessage());
+                logger.error("Exception: '{}'", e.getMessage());
             }
         } catch (CertificateEncodingException e) {
-            e.printStackTrace();
+            logger.error("CertificateEncodingException: '{}'", e.getMessage());
         }
         return exp;
     }
@@ -580,7 +578,7 @@ public class TSLUtils {
             sm.verifyEnvelopedSignature(doc);
             verified = true;
         } catch (Exception e) {
-            logger.error("Error validating the signature");
+            logger.error("Error validating the signature: '{}'", e.getMessage(), e);
         }
         return verified;
     }
@@ -612,7 +610,7 @@ public class TSLUtils {
             dbFactory.setNamespaceAware(true);
             doc = dbFactory.newDocumentBuilder().parse(iStream);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Exception: '{}'", e.getMessage());
         }
         return doc;
 
@@ -658,33 +656,9 @@ public class TSLUtils {
             dbFactory.setNamespaceAware(true);
             doc = dbFactory.newDocumentBuilder().parse(iStream);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Exception: '{}'", e.getMessage());
         }
         return doc;
 
     }
-
-    /**
-     * Given the pem string of the signature this method returns the X509
-     * Certificate of the signature
-     *
-     * @param pem
-     *            String fortmat of the signature
-     * @return the X509 certificate
-     */
-    // public static X509Certificate getCertificateFromString(String pem)
-    // {
-    // X509Certificate t = null;
-    // try
-    // {
-    // CertificateFactory cf = CertificateFactory.getInstance("X.509");
-    // InputStream in = StringToStream(pem);
-    // java.security.cert.Certificate c = cf. generateCertificate(in);
-    // in.close();
-    // t = (X509Certificate) c;
-    // }
-    // catch (Exception e)
-    // {logger.info(e.getMessage());}
-    // return t;
-    // }
 }

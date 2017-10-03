@@ -32,13 +32,14 @@ import java.util.List;
 
 public class DispenseServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-    private static Logger log = LoggerFactory.getLogger("dispenseServlet");
+    private static final long serialVersionUID = -4879064073530149994L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DispenseServlet.class);
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+
         SubmitDocumentResponse resp = null;
-        log.info("dispensing ...");
+        LOGGER.info("dispensing ...");
 
         HttpSession session = req.getSession();
         String selectedCountry = (String) session.getAttribute("selectedCountry");
@@ -65,7 +66,7 @@ public class DispenseServlet extends HttpServlet {
             try {
                 fullname = user.getFullName();
             } catch (Exception e1) {
-                log.error(ExceptionUtils.getStackTrace(e1));
+                LOGGER.error(ExceptionUtils.getStackTrace(e1));
             }
 
             if (dispensedIds != null) {
@@ -101,20 +102,9 @@ public class DispenseServlet extends HttpServlet {
                     String materialid = line.getField19() + ""; // field10
                     String activeIngredient = line.getField2().toString();
 
-                    ViewResult d_line = new ViewResult(
-                            id,
-                            dispensed_id,
-                            dispensed_name,
-                            substitute,
-                            dispensed_strength,
-                            dispensed_form,
-                            dispensed_package,
-                            dispensed_quantity,
-                            dispensed_nrOfPacks,
-                            prescriptionid,
-                            materialid,
-                            activeIngredient,
-                            measures_id);
+                    ViewResult d_line = new ViewResult(id, dispensed_id, dispensed_name, substitute, dispensed_strength,
+                            dispensed_form, dispensed_package, dispensed_quantity, dispensed_nrOfPacks, prescriptionid,
+                            materialid, activeIngredient, measures_id);
 
                     dispensedLines.add(d_line);
                 }
@@ -124,7 +114,6 @@ public class DispenseServlet extends HttpServlet {
                 }
 
                 if (Validator.isNotNull(edBytes)) {
-                    String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
 
                     ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
                     GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
@@ -148,42 +137,8 @@ public class DispenseServlet extends HttpServlet {
                     document.setFormatCode(formatCode);
                     document.setBase64Binary(edBytes);
 
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRO(classCode.toString(),
-//                                "NI_XDR_" + classCode.getValue(),
-//                                new DateTime(),
-//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                "NI_XDR_" + classCode.getValue() + "_REQ",
-//                                trcAssertion.getID());
-//                    } catch (Exception e) {
-//                        log.error(ExceptionUtils.getStackTrace(e));
-//                    }
-
                     resp = proxy.submitDocument(hcpAssertion, trcAssertion, selectedCountry, document, patient.getPatientDemographics());
 
-//                    if (Validator.isNotNull(resp)) {
-//                        try {
-//                            EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
-//                                    "NI_XDR" + classCode.getValue(),
-//                                    new DateTime(),
-//                                    EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                    "NI_XDR_" + classCode.getValue() + "_RES_SUCC",
-//                                    trcAssertion.getID());
-//                        } catch (Exception e) {
-//                            log.error(ExceptionUtils.getStackTrace(e));
-//                        }
-//                    } else {
-//                        try {
-//                            EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
-//                                    "NI_XDR" + classCode.getValue(),
-//                                    new DateTime(),
-//                                    EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
-//                                    "NI_XDR_" + classCode.getValue() + "_RES_FAIL",
-//                                    trcAssertion.getID());
-//                        } catch (Exception e) {
-//                            log.error(ExceptionUtils.getStackTrace(e));
-//                        }
-//                    }
                     res.setContentType("text/html");
                     String message = "Dispensation successful";
                     res.setHeader("Cache-Control", "no-cache");
@@ -195,7 +150,7 @@ public class DispenseServlet extends HttpServlet {
                     OutStream.flush();
                     OutStream.close();
                 } else {
-                    log.error("UPLOAD DISP DOC RESPONSE ERROR");
+                    LOGGER.error("UPLOAD DISP DOC RESPONSE ERROR");
                     res.setContentType("text/html");
                     String message = resp.toString();
                     res.setHeader("Cache-Control", "no-cache");
@@ -211,7 +166,7 @@ public class DispenseServlet extends HttpServlet {
             }
         } catch (Exception ex) {
 
-            log.error("UPLOAD DISP DOC RESPONSE ERROR: " + ex.getMessage());
+            LOGGER.error("UPLOAD DISP DOC RESPONSE ERROR: '{}'", ex.getMessage(), ex);
             res.setContentType("text/html");
             String message;
             if (Validator.isNotNull(resp)) {
@@ -223,11 +178,13 @@ public class DispenseServlet extends HttpServlet {
             res.setDateHeader("Expires", 0);
             res.setHeader("Pragma", "No-cache");
 
-            OutputStream OutStream = res.getOutputStream();
-            OutStream.write(message.getBytes());
-            OutStream.flush();
-            OutStream.close();
-            log.error(ExceptionUtils.getStackTrace(ex));
+            try (OutputStream outputStream = res.getOutputStream()) {
+                outputStream.write(message.getBytes());
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                LOGGER.error("IOException: '{}'", e.getMessage(), e);
+            }
         }
     }
 }

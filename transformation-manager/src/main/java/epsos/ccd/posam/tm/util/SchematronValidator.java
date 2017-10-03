@@ -37,24 +37,18 @@ public class SchematronValidator implements InitializingBean, TMConstants {
     private static final String SVRL_FAILED_ASSERT_XPATH = "//svrl:failed-assert";
     private static final String SCH_TEMP_DIR = System.getenv("EPSOS_PROPS_PATH") + "validation" +
             File.separatorChar + "schematron";
+
     private static SchematronValidator instance = null;
-    /**
-     * path to XSL directory
-     */
     private String xslDirectoryPath;
-    private File phase1OutFile;
-    private File phase2OutFile;
-    private File phase3OutFile;
     private HashMap<String, String> friendlyType;
-
     private HashMap<String, String> pivotType;
-
     private TMConfiguration config;
 
     private SchematronValidator() {
     }
 
     public static SchematronValidator getInstance() {
+
         if (instance == null) {
             instance = new SchematronValidator();
         }
@@ -62,10 +56,12 @@ public class SchematronValidator implements InitializingBean, TMConstants {
     }
 
     public static SchematronResult validate(File inputSchemeFile, Document inputXmlDocument) {
+
         return getInstance().doValidate(inputSchemeFile, inputXmlDocument);
     }
 
     private SchematronResult doValidate(File inputSchemeFile, Document inputXmlDocument) {
+
         SchematronResult result = new SchematronResult();
         try {
             log.info("...Schematron validation BEGIN");
@@ -84,17 +80,21 @@ public class SchematronValidator implements InitializingBean, TMConstants {
             String phase2Out = inputSchemeName + "." + time + ".phase2.xml";
             String phase3Out = inputSchemeName + "." + time + ".phase3.xml";
 
-            phase1OutFile = getSchema(phase1Out);
-            phase2OutFile = getSchema(phase2Out);
-            phase3OutFile = getSchema(phase3Out);
+            File phase1OutFile = getSchema(phase1Out);
+            File phase2OutFile = getSchema(phase2Out);
+            File phase3OutFile = getSchema(phase3Out);
 
             if (!phase3OutFile.exists()) {
-                // if final Schematron xsl does not exists
-                // delete all old files
+                // if final Schematron xsl does not exists delete all old files
                 File[] files = new File(SCH_TEMP_DIR).listFiles();
-                for (File file : files) {
-                    if (file.getName().startsWith(inputSchemeName)) {
-                        file.delete();
+                if (files != null) {
+                    for (File file : files) {
+                        if (file.getName().startsWith(inputSchemeName)) {
+                            boolean deleted = file.delete();
+                            if (log.isDebugEnabled()) {
+                                log.debug("File: '{}' has been deleted: '{}'", file.getName(), deleted);
+                            }
+                        }
                     }
                 }
             }
@@ -144,13 +144,18 @@ public class SchematronValidator implements InitializingBean, TMConstants {
     }
 
     private void ensureTempExist() {
+
         File schemaTemp = new File(SCH_TEMP_DIR);
         if (!schemaTemp.exists()) {
-            schemaTemp.mkdirs();
+            boolean created = schemaTemp.mkdirs();
+            if (log.isDebugEnabled()) {
+                log.debug("Directory: '{}' has been created: '{}'", SCH_TEMP_DIR, created);
+            }
         }
     }
 
     private NodeList evaluateResult(final DOMResult domOut) throws XPathExpressionException {
+
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(new NamespaceContext() {
             public Iterator getPrefixes(String namespaceURI) {
@@ -198,6 +203,7 @@ public class SchematronValidator implements InitializingBean, TMConstants {
     }
 
     public void afterPropertiesSet() throws Exception {
+
         friendlyType = new HashMap<>();
         friendlyType.put(PATIENT_SUMMARY3, config.getPatientSummarySchematronFriendlyPath());
         friendlyType.put(EPRESCRIPTION3, config.getePrescriptionSchematronFriendlyPath());

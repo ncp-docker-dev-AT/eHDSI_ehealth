@@ -21,6 +21,8 @@
 package org.openhealthtools.openatna.audit.persistence.util;
 
 import org.openhealthtools.openatna.audit.persistence.PersistencePolicies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -45,7 +47,6 @@ import java.io.OutputStream;
  * @created Oct 7, 2009: 7:40:47 PM
  * @date $Date:$ modified by $Author:$
  */
-
 public class PersistencePoliciesIO {
 
     public static final String POLICIES = "PersistencePolicies";
@@ -57,6 +58,7 @@ public class PersistencePoliciesIO {
     public static final String ALLOW_UNKNOWN_DETAIL_TYPES = "allowUnknownDetailTypes";
     public static final String ALLOW_MODIFY_MESSAGES = "allowModifyMessages";
     public static final String ERROR_ON_DUPLICATE_INSERT = "errorOnDuplicateInsert";
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersistencePoliciesIO.class);
 
     private PersistencePoliciesIO() {
     }
@@ -78,28 +80,22 @@ public class PersistencePoliciesIO {
 
 
     public static Element write(Document doc, PersistencePolicies policies) {
+
         Element el = doc.createElement(POLICIES);
-        el.appendChild(element(ALLOW_NEW_CODES,
-                policies.isAllowNewCodes(), doc));
-        el.appendChild(element(ALLOW_MODIFY_MESSAGES,
-                policies.isAllowModifyMessages(), doc));
-        el.appendChild(element(ALLOW_NEW_NETWORK_POINTS,
-                policies.isAllowNewNetworkAccessPoints(), doc));
-        el.appendChild(element(ALLOW_NEW_OBJECTS,
-                policies.isAllowNewObjects(), doc));
-        el.appendChild(element(ALLOW_NEW_PARTICIPANTS,
-                policies.isAllowNewParticipants(), doc));
-        el.appendChild(element(ALLOW_NEW_SOURCES,
-                policies.isAllowNewSources(), doc));
-        el.appendChild(element(ALLOW_UNKNOWN_DETAIL_TYPES,
-                policies.isAllowUnknownDetailTypes(), doc));
+        el.appendChild(element(ALLOW_NEW_CODES, policies.isAllowNewCodes(), doc));
+        el.appendChild(element(ALLOW_MODIFY_MESSAGES, policies.isAllowModifyMessages(), doc));
+        el.appendChild(element(ALLOW_NEW_NETWORK_POINTS, policies.isAllowNewNetworkAccessPoints(), doc));
+        el.appendChild(element(ALLOW_NEW_OBJECTS, policies.isAllowNewObjects(), doc));
+        el.appendChild(element(ALLOW_NEW_PARTICIPANTS, policies.isAllowNewParticipants(), doc));
+        el.appendChild(element(ALLOW_NEW_SOURCES, policies.isAllowNewSources(), doc));
+        el.appendChild(element(ALLOW_UNKNOWN_DETAIL_TYPES, policies.isAllowUnknownDetailTypes(), doc));
         return el;
     }
 
     public static PersistencePolicies read(Element parent) throws IOException {
+
         if (!parent.getTagName().equals(POLICIES)) {
-            throw new IOException("unknown element. Got " + parent.getTagName()
-                    + " but expected " + POLICIES);
+            throw new IOException("unknown element. Got " + parent.getTagName() + " but expected " + POLICIES);
         }
         PersistencePolicies pp = new PersistencePolicies();
         NodeList ch = parent.getChildNodes();
@@ -125,8 +121,8 @@ public class PersistencePoliciesIO {
                     }
                 }
             }
-
         } catch (Exception e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             throw new IOException(e.getMessage());
         }
         return pp;
@@ -135,12 +131,13 @@ public class PersistencePoliciesIO {
 
     private static Element element(String name, boolean b, Document doc) {
         Element el = doc.createElement(name);
-        el.setTextContent(Boolean.valueOf(b).toString());
+        el.setTextContent(Boolean.toString(b));
         return el;
 
     }
 
     private static Document newDocument(InputStream stream) throws IOException {
+
         Document doc = null;
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -148,15 +145,16 @@ public class PersistencePoliciesIO {
             DocumentBuilder db = dbf.newDocumentBuilder();
             doc = db.parse(stream);
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            LOGGER.error("ParserConfigurationException: '{}'", e.getMessage(), e);
         } catch (SAXException e) {
-            e.printStackTrace();
+            LOGGER.error("SAXException: '{}'", e.getMessage(), e);
         }
         return doc;
     }
 
 
     private static Document newDocument() throws IOException {
+
         Document doc = null;
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -165,12 +163,13 @@ public class PersistencePoliciesIO {
             DocumentBuilder db = dbf.newDocumentBuilder();
             doc = db.newDocument();
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            LOGGER.error("ParserConfigurationException: '{}'", e.getMessage(), e);
         }
         return doc;
     }
 
     private static StreamResult transform(Document doc, OutputStream out, boolean indent) throws IOException {
+
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer t = null;
         try {
@@ -183,14 +182,16 @@ public class PersistencePoliciesIO {
             t.setOutputProperty(OutputKeys.METHOD, "xml");
             t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         } catch (TransformerConfigurationException tce) {
+            LOGGER.error("TransformerConfigurationException: '{}'", tce.getMessage(), tce);
             assert (false);
         }
         DOMSource doms = new DOMSource(doc);
         StreamResult sr = new StreamResult(out);
         try {
             t.transform(doms, sr);
-        } catch (TransformerException te) {
-            throw new IOException(te.getMessage());
+        } catch (TransformerException e) {
+            LOGGER.error("TransformerException: '{}'", e.getMessage(), e);
+            throw new IOException(e.getMessage());
         }
         return sr;
     }
@@ -199,8 +200,7 @@ public class PersistencePoliciesIO {
         try {
             PersistencePoliciesIO.write(System.out, new PersistencePolicies());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }
     }
-
 }

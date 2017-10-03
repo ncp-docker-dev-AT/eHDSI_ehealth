@@ -243,7 +243,8 @@ public class EventLog {
         return el;
     }
 
-    public static EventLog createEventLogPatientPrivacy(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
+    public static EventLog createEventLogPatientPrivacy(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode,
+                                                        XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                                         String HR_UserID, String HR_AlternativeUserID, String HR_RoleID,
                                                         String SC_UserID, String SP_UserID, String AS_AuditSourceId,
                                                         String PT_PatricipantObjectID,

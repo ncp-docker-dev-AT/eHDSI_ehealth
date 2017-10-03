@@ -23,6 +23,7 @@ import ee.affecto.epsos.util.EventLogClientUtil;
 import eu.epsos.dts.xcpd.PRPAIN201305UV022DTS;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml2.core.Assertion;
@@ -61,7 +62,8 @@ public final class RespondingGateway_RequestSender {
                                                                        final Assertion idAssertion,
                                                                        final String countryCode) {
 
-        String epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH),
+        DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
+        String epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH),
                 RegisteredService.PATIENT_IDENTIFICATION_SERVICE);
 
         PRPAIN201305UV02 hl7Request;

@@ -22,7 +22,7 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
     private static final String ERRORS = "//Error";
     private static final String PASSED = "PASSED";
 
-    public static ModelBasedValidator INSTANCE;
+    private static ModelBasedValidator instance;
 
     private TMConfiguration config;
 
@@ -30,15 +30,15 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
     private HashMap<String, String> pivotTypes;
 
     public static ModelBasedValidator getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ModelBasedValidator();
+        if (instance == null) {
+            instance = new ModelBasedValidator();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public ModelValidatorResult validate(String document, String docType, boolean friendly) {
-        log.info("MDA validator start");
 
+        log.info("MDA validator start");
         String validator;
         ModelValidatorResult result = new ModelValidatorResult();
 
@@ -66,29 +66,36 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
 
                 // log validation errors
                 List<Node> errors = XmlUtil.getNodeList(mdaResultDoc, ERRORS);
-                log.warn("MDA validation errors: \n '{}'", XmlUtil.nodeListToString(errors));
+                if (log.isWarnEnabled()) {
+                    log.warn("MDA validation errors: \n '{}'", XmlUtil.nodeListToString(errors));
+                }
 
                 // evaluate XSD validation status
-                Node resultNode;
-                resultNode = XmlUtil.getNode(mdaResultDoc, SCHEMA_RESULT);
+                Node resultNode = XmlUtil.getNode(mdaResultDoc, SCHEMA_RESULT);
                 if (resultNode != null && PASSED.equalsIgnoreCase(resultNode.getTextContent())) {
                     result.setSchemaValid(true);
                 }
-                log.info("Schema validation status: '{}'", resultNode.getTextContent());
+                if (resultNode != null) {
+                    log.info("Schema validation status: '{}'", resultNode.getTextContent());
+                }
 
                 // evaluate MDA validation status
                 resultNode = XmlUtil.getNode(mdaResultDoc, MDA_RESULT);
                 if (resultNode != null && PASSED.equalsIgnoreCase(resultNode.getTextContent())) {
                     result.setModelValid(true);
                 }
-                log.info("MDA validation status: '{}'", resultNode.getTextContent());
+                if (resultNode != null) {
+                    log.info("MDA validation status: '{}'", resultNode.getTextContent());
+                }
 
                 // evaluate total validation status
                 resultNode = XmlUtil.getNode(mdaResultDoc, FINAL_RESULT);
                 if (resultNode != null && PASSED.equalsIgnoreCase(resultNode.getTextContent())) {
                     result.setResultValid(true);
                 }
-                log.info("Final validation status: '{}'", resultNode.getTextContent());
+                if (resultNode != null) {
+                    log.info("Final validation status: '{}'", resultNode.getTextContent());
+                }
 
                 result.setValidationError(false);
             } catch (Exception e) {

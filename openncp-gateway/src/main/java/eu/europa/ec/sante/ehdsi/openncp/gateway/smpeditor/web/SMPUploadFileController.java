@@ -319,7 +319,6 @@ public class SMPUploadFileController {
                             .setProxy(new HttpHost(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort())))
                             .build();
                 }
-
             } else {
                 httpclient = HttpClients.custom()
                         .setSSLSocketFactory(sslsf)
@@ -365,7 +364,8 @@ public class SMPUploadFileController {
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 //Audit Error
                 byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
-                Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
                         new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
 
                 return "redirect:/smpeditor/uploadsmpfile";
@@ -374,7 +374,8 @@ public class SMPUploadFileController {
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 //Audit Error
                 byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
-                Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
                         new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
 
                 return "redirect:/smpeditor/uploadsmpfile";
@@ -446,13 +447,15 @@ public class SMPUploadFileController {
                 String errorResult = sw.toString();
                 LOGGER.debug("Error Result: '{}", errorResult);
                 //Audit error
-                Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
+                        //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
                         new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), errorResult.getBytes());
             }
 
             if (itemUpload.getStatusCode() == 200 || itemUpload.getStatusCode() == 201) {
                 //Audit Success
-                Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
+                        //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
                         new String(encodedObjectID), null, null);
             }
 
@@ -470,7 +473,8 @@ public class SMPUploadFileController {
                 try {
                     smpClient = DynamicDiscoveryBuilder.newInstance()
                             .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
-                                    .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
+                                    .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
+                            .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
                             .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(),
                                     Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(),
                                     proxyCredentials.getProxyPassword())))
@@ -481,10 +485,6 @@ public class SMPUploadFileController {
                     LOGGER.error("ConnectionException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
             } else {
-//                smpClient = DynamicDiscoveryBuilder.newInstance()
-//                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
-//                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
-//                        .build();
 
                 smpClient = DynamicDiscoveryBuilder.newInstance()
                         .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()

@@ -1,31 +1,12 @@
-/**
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- */
 package tr.com.srdc.epsos.securityman.validators;
 
 import org.opensaml.saml2.core.Assertion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
 
 public class RequiredFieldValidators {
 
-    public static Logger logger = LoggerFactory.getLogger(RequiredFieldValidators.class);
+    private RequiredFieldValidators() {
+    }
 
     public static void validateVersion(Assertion assertion) throws MissingFieldException {
         if (assertion.getVersion() == null) {
@@ -70,7 +51,7 @@ public class RequiredFieldValidators {
     }
 
     public static void validateSubjectConfirmation(Assertion assertion) throws MissingFieldException {
-        if (assertion.getSubject().getSubjectConfirmations().size() == 0) {
+        if (assertion.getSubject().getSubjectConfirmations().isEmpty()) {
             throw (new MissingFieldException("SubjectConfirmation element is required."));
         }
     }
@@ -100,7 +81,7 @@ public class RequiredFieldValidators {
     }
 
     public static void validateAuthnStatement(Assertion assertion) throws MissingFieldException {
-        if (assertion.getAuthnStatements().size() == 0) {
+        if (assertion.getAuthnStatements().isEmpty()) {
             throw (new MissingFieldException("AuthnStatement element is required."));
         }
     }
@@ -124,7 +105,7 @@ public class RequiredFieldValidators {
     }
 
     public static void validateAttributeStatement(Assertion assertion) throws MissingFieldException {
-        if (assertion.getAttributeStatements().size() == 0) {
+        if (assertion.getAttributeStatements().isEmpty()) {
             throw (new MissingFieldException("AttributeStatement element is required."));
         }
     }
@@ -142,7 +123,7 @@ public class RequiredFieldValidators {
     }
 
     public static void validateAssertionIdRef(Assertion assertion) throws MissingFieldException {
-        if (assertion.getAdvice().getAssertionIDReferences().size() == 0) {
+        if (assertion.getAdvice().getAssertionIDReferences().isEmpty()) {
             throw (new MissingFieldException("AssertionIdRef element is required."));
         }
     }

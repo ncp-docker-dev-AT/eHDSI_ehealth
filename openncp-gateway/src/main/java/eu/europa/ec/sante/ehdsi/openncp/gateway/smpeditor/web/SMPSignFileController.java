@@ -634,5 +634,4 @@ public class SMPSignFileController {
         }
         return "redirect:/smpeditor/checksignsmpfile";
     }
-
 }

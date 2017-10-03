@@ -3,6 +3,7 @@ package com.gnomon.epsos.servlet;
 import com.gnomon.epsos.model.Patient;
 import com.gnomon.epsos.service.EpsosHelperService;
 import com.liferay.portal.model.User;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,24 +18,23 @@ import java.io.OutputStream;
 
 public class ConsentServlet extends HttpServlet {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private static Logger log = LoggerFactory.getLogger("consentServlet");
+    private static final long serialVersionUID = 5646088170034248115L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsentServlet.class);
 
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-        byte[] pdf;
-        log.info("consentdocument");
+        LOGGER.info("Servlet Consent Document");
+
         try {
+            byte[] pdf;
             HttpSession session = req.getSession();
 
             Assertion hcpAssertion = (Assertion) session.getAttribute("hcpAssertion");
-            log.info(hcpAssertion.getID());
+            LOGGER.info("HCP Assertions: '{}'", hcpAssertion.getID());
 
             User user = (User) session.getAttribute("user");
-            log.info(user.getEmailAddress());
+            LOGGER.info("User: '{}'", user.getEmailAddress());
 
             Patient patient = (Patient) session.getAttribute("patient");
             pdf = EpsosHelperService.getConsentReport(user.getLanguageId(), user.getFullName(), patient);
@@ -46,23 +46,26 @@ public class ConsentServlet extends HttpServlet {
             res.setDateHeader("Expires", 0);
             res.setHeader("Pragma", "No-cache");
 
-            OutputStream OutStream = res.getOutputStream();
-            OutStream.write(pdf);
-            OutStream.flush();
-            OutStream.close();
+            OutputStream outputStream = res.getOutputStream();
+            outputStream.write(pdf);
+            outputStream.flush();
+            outputStream.close();
 
         } catch (Exception ex) {
+            LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
             res.setContentType("text/html");
 
             res.setHeader("Cache-Control", "no-cache");
             res.setDateHeader("Expires", 0);
             res.setHeader("Pragma", "No-cache");
 
-            OutputStream OutStream = res.getOutputStream();
-            OutStream.write(ex.getMessage().getBytes());
-            OutStream.flush();
-            OutStream.close();
-            log.error(ex.getMessage());
+            try (OutputStream outputStream = res.getOutputStream()) {
+                outputStream.write(ex.getMessage().getBytes());
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                LOGGER.error(ExceptionUtils.getStackTrace(e));
+            }
         }
     }
 }

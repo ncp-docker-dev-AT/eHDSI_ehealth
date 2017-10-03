@@ -1,4 +1,4 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
+/*    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
  *
  *    This file is part of epSOS-WEB.
  *
@@ -28,6 +28,9 @@ public class PatientCatalog {
 
     private static final Map<String, PatientDemographics> patients = createPatientMap();
 
+    private PatientCatalog() {
+    }
+
     private static Map<String, PatientDemographics> createPatientMap() {
         Map<String, PatientDemographics> map = new HashMap<>();
         // SE patients
@@ -56,7 +59,7 @@ public class PatientCatalog {
     }
 
     public static PatientDemographics query(String epsosID) {
-        LOGGER.info("Looking for patient: " + epsosID);
+        LOGGER.info("Looking for patient: '{}'", epsosID);
         PatientDemographics pat = patients.get(epsosID);
         LOGGER.info("Patient: " + epsosID + " was " + (pat != null ? "found" : "not found") + " in catalog");
         return pat;
@@ -77,7 +80,7 @@ public class PatientCatalog {
         try {
             cal = DatatypeFactory.newInstance().newXMLGregorianCalendar();
         } catch (DatatypeConfigurationException e) {
-            e.printStackTrace();
+            LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
         }
         cal.setYear(Integer.parseInt(birthDate.substring(0, 4)));
         cal.setMonth(Integer.parseInt(birthDate.substring(4, 6)));

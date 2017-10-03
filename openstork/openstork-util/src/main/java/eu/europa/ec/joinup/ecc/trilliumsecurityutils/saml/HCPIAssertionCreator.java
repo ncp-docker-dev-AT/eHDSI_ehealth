@@ -72,14 +72,14 @@ public class HCPIAssertionCreator {
      * @return
      */
     public static Assertion createHCPIAssertion(final XSPARole role, final String patientId, final String homeCommunityId) {
-        return createHCPIAssertion(new ArrayList<String>() {
-            {
-                add("4");
-                add("6");
-                add("10");
-                add("46");
-            }
-        }, role, patientId, homeCommunityId);
+
+        List<String> permissions = new ArrayList<>();
+        permissions.add("4");
+        permissions.add("6");
+        permissions.add("10");
+        permissions.add("46");
+
+        return createHCPIAssertion(permissions, role, patientId, homeCommunityId);
     }
 
     /**

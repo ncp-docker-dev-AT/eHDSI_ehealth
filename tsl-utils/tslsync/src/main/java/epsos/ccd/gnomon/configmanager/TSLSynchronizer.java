@@ -1,19 +1,3 @@
-/**
- * *Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements. See the NOTICE file distributed with this
- * work for additional information regarding copyright ownership. The ASF
- * licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
 package epsos.ccd.gnomon.configmanager;
 
 import epsos.ccd.gnomon.auditmanager.*;
@@ -36,13 +20,12 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 
 /**
- * Synchronizes the countries tsl content to the configuration parameters Read
- * the list of countries from the configuration manager parameter name =
- * ncp.countries For each country reads again the configuration manager to find
- * the property tsl.location.[country_code] It verifies the tsl file It parses
- * the tsl file and extracts the endpoint wse and writes them to the
- * configuration manager Finally it exports all the certificates and add them to
- * the truststore
+ * Synchronizes the countries tsl content to the configuration parameters Read the list of countries from
+ * the configuration manager parameter name = ncp.countries.
+ * For each country reads again the configuration manager to find  the property tsl.location.[country_code].
+ * It verifies the tsl file It parses the tsl file and extracts the endpoint wse and writes them to the
+ * configuration manager.
+ * Finally it exports all the certificates and add them to the truststore.
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -51,7 +34,7 @@ import java.util.Hashtable;
  */
 public class TSLSynchronizer {
 
-    private static Logger logger = LoggerFactory.getLogger(TSLSynchronizer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TSLSynchronizer.class);
 
     public TSLSynchronizer() {
     }
@@ -78,7 +61,7 @@ public class TSLSynchronizer {
 
         // Loop through countries list
         for (String country : countries) {
-            logger.info("Exporting configuration for: '{}'", country);
+            LOGGER.info("Exporting configuration for: '{}'", country);
             sb = exportCountryConfig(sb1, country);
         }
         return sb;
@@ -92,19 +75,20 @@ public class TSLSynchronizer {
                 throw new Exception("Argument must be a 2-letter country-code!");
             } else {
                 syncCountry(arg.toLowerCase());
-                logger.info("TSL SYNC FINISHED");
+                LOGGER.info("TSL SYNC FINISHED");
                 System.exit(0);
             }
         } else {
             String sb = sync().toString();
-            logger.info("TSL SYNC FINISHED");
+            LOGGER.info("TSL SYNC FINISHED");
             System.exit(0);
         }
     }
 
     /* Sync info for a specified country */
     public static String syncCountry(String country) {
-        logger.info("Synchronizing a specific country...");
+
+        LOGGER.info("Synchronizing a specific country...");
         StringBuilder sb1 = new StringBuilder();
         String sb = "";
         ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
@@ -120,7 +104,7 @@ public class TSLSynchronizer {
             cms.setProperty("ncp.email", ncpemail);
         }
 
-        logger.info("Exporting configuration for: '{}'", country);
+        LOGGER.info("Exporting configuration for: '{}'", country);
         sb = exportCountryConfig(sb1, country);
 
         return sb;
@@ -185,21 +169,22 @@ public class TSLSynchronizer {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException ex) {
-                logger.error(null, ex);
+                LOGGER.error(null, ex);
             }
         } catch (Exception e) {
-            logger.error("Error sending audit for tslsync");
+            LOGGER.error("Error sending audit for tslsync");
         }
     }
 
     private static String exportCountryConfig(StringBuilder sb, String country) {
+
         ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
         String ncp = cms.getProperty("ncp.country");
         String ncpemail = cms.getProperty("ncp.email");
-        Hashtable serviceNames = null;
-        logger.info(country + ": Reading tsl file");
+
+        LOGGER.info(country + ": Reading tsl file");
         String url = cms.getProperty("tsl.location." + country);
-        logger.info("URL: " + url);
+        LOGGER.info("URL: " + url);
         sb.append("Country is :" + country + " and location is :" + url);
         sb.append("<br/>");
         // verify the authenticity and integrity of tsl
@@ -207,10 +192,10 @@ public class TSLSynchronizer {
 //        boolean verifyTSL = TSLUtils.VerifyTSL(doc);
         boolean verifyTSL = true;
         if (verifyTSL) {
-            logger.info(country + ": The tsl file has verified");
+            LOGGER.info(country + ": The tsl file has verified");
             // Extract the service WSEs from the TSL and write them to the NCP configuration
-            logger.info(country + ": Extracting service Endpoints");
-            serviceNames = TSLUtils.getServicesFromTSL(url);
+            LOGGER.info(country + ": Extracting service Endpoints");
+            Hashtable serviceNames = serviceNames = TSLUtils.getServicesFromTSL(url);
             if (serviceNames.size() > 0) {
                 Enumeration names;
                 names = serviceNames.keys();
@@ -227,23 +212,21 @@ public class TSLSynchronizer {
                     if (!serviceNames.get(str).toString().equals("")) {
                         cms.setServiceWSE(country, str_corrected.trim(), serviceNames.get(str).toString().trim());
                     }
-                    logger.debug(country + ": Extracting " + str.trim() + " - " + serviceNames.get(str).toString().trim());
+                    LOGGER.debug(country + ": Extracting " + str.trim() + " - " + serviceNames.get(str).toString().trim());
                 }
                 // Extract the certificates from services, ipsec and ssl
                 // Services
-                logger.info(country + ": Extracting certificates");
+                LOGGER.info("Extracting certificates for: '{}'", country);
                 sb.append(TSLUtils.exportSSLFromTSL(url, country));
                 sb.append(TSLUtils.exportNCPSignFromTSL(url, country));
                 String localip = cms.getProperty("SERVER_IP");
-                String remoteip = url;
-                sendAudit(ncp, ncpemail, "Central Cervices", "centralservices@epsos.eu", localip, remoteip, country);
+                sendAudit(ncp, ncpemail, "Central Cervices", "centralservices@epsos.eu", localip, url, country);
             } else {
-                logger.info(country + ": Problem extracting service names");
+                LOGGER.info("Problem extracting service names for: '{}'", country);
             }
         } else {
-            logger.error("ERROR Validating TSL");
+            LOGGER.error("ERROR Validating TSL");
         }
         return sb.toString();
     }
-
 }

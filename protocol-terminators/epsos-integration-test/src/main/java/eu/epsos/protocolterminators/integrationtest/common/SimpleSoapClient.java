@@ -9,13 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import tr.com.srdc.epsos.util.FileUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.soap.*;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -55,16 +55,16 @@ public class SimpleSoapClient {
         LOG.error(bodyStr);
         Document doc = null;
         try {
-            doc = XMLUtil.parseContent(bodyStr.getBytes(FileUtil.UTF_8));
+
+            doc = XMLUtil.parseContent(bodyStr.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            e.printStackTrace();
+            LOG.error("Exception: '{}'", e.getMessage(), e);
         }
 
         // build list of SAML2 assertions
         Assertion idAssertion = new HCPIAssertionCreator().createHCPIAssertion(XSPARole.PHYSICIAN);
         Assertion trcAssertion = new TRCAssertionCreator().createTRCAssertion("", "");
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        Collection<Assertion> assertions = new ArrayList<>();
         assertions.add(idAssertion);
         assertions.add(trcAssertion);
 
@@ -77,7 +77,7 @@ public class SimpleSoapClient {
             LOG.info(response.getValue());
 
         } catch (SOAPFaultException ex) {
-            LOG.error(ex.getLocalizedMessage());
+            LOG.error("SOAPFaultException: '{}'", ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -133,7 +133,7 @@ public class SimpleSoapClient {
             SOAPBody responseBody = response.getSOAPBody();
             LOG.debug("Response: " + LINE_SEPARATOR + getXmlFromSOAPMessage(response));
             SOAPBodyElement responseElement = (SOAPBodyElement) responseBody.getChildElements().next();
-            returnElement = (SOAPElement) responseElement;
+            returnElement = responseElement;
 
             /* If error present */
             if (responseBody.getFault() != null) {
@@ -141,11 +141,7 @@ public class SimpleSoapClient {
                 throw new SOAPFaultException(responseBody.getFault());
             }
 
-        } catch (SOAPException e) {
-            LOG.info(e.getLocalizedMessage(), e);
-        } catch (IOException e) {
-            LOG.info(e.getLocalizedMessage(), e);
-        } catch (MarshallingException e) {
+        } catch (SOAPException | MarshallingException | IOException e) {
             LOG.info(e.getLocalizedMessage(), e);
         }
 

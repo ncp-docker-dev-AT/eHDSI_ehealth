@@ -1,21 +1,21 @@
 /**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
+ * Copyright (c) 2009-2011 University of Cardiff and others
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * <p>
+ * Contributors:
+ * University of Cardiff - initial API and implementation
+ * -
  */
 
 package org.openhealthtools.openatna.anom;
@@ -41,18 +41,17 @@ import java.util.TimeZone;
 
 public class Timestamp {
 
-    private static DateFormat df = new SimpleDateFormat("yyy-MM-dd HH:mm:ss.SSS");
-
-    private Timestamp() {
-		super();
-	}
-
-	/**
+    /**
      * misc. numeric formats used in formatting
      */
     private static final DecimalFormat XX_FORMAT = new DecimalFormat("00");
     private static final DecimalFormat XXX_FORMAT = new DecimalFormat("000");
     private static final DecimalFormat XXXX_FORMAT = new DecimalFormat("0000");
+    private static DateFormat df = new SimpleDateFormat("yyy-MM-dd HH:mm:ss.SSS");
+
+    private Timestamp() {
+        super();
+    }
 
     public static Date parseToDate(String text) {
         Calendar c = parse(text);
@@ -62,7 +61,7 @@ public class Timestamp {
         try {
             return df.parse(text);
         } catch (ParseException e) {
-        	//TODO: Manage the exception: either throw or log?
+            //TODO: Manage the exception: either throw or log?
         }
         return null;
     }
@@ -72,7 +71,7 @@ public class Timestamp {
      *
      * @param text the date/time string to be parsed
      * @return a <code>Calendar</code>, or <code>null</code> if the input could
-     *         not be parsed
+     * not be parsed
      * @throws IllegalArgumentException if a <code>null</code> argument is passed
      */
     public static Calendar parse(String text) {
@@ -174,10 +173,10 @@ public class Timestamp {
                 return null;
             }
         } catch (IndexOutOfBoundsException e) {
-        	//TODO: Manage Exception: either log or re-throw.
+            //TODO: Manage Exception: either log or re-throw.
             return null;
         } catch (NumberFormatException e) {
-        	//TODO: Manage Exception: either log or re-throw.
+            //TODO: Manage Exception: either log or re-throw.
             return null;
         }
 
@@ -224,7 +223,7 @@ public class Timestamp {
              */
             getYear(cal);
         } catch (IllegalArgumentException e) {
-        	//TODO: Manage Exception: either log or re-throw.
+            //TODO: Manage Exception: either log or re-throw.
             return null;
         }
 
@@ -252,20 +251,19 @@ public class Timestamp {
             throw new IllegalArgumentException("argument can not be null");
         }
 
-        /**
+        /*
          * the format of the date/time string is:
          * YYYY-MM-DDThh:mm:ss.SSSTZD
          *
          * note that we cannot use java.text.SimpleDateFormat for
          * formatting because it can't handle years <= 0 and TZD's
          */
-        //StringBuffer buf = new StringBuffer();
         StringBuilder buf = new StringBuilder();
         // year ([-]YYYY)
         buf.append(XXXX_FORMAT.format(getYear(cal)));
         buf.append('-');
         // month (MM)
-        buf.append(XX_FORMAT.format(cal.get(Calendar.MONTH) + 1));
+        buf.append(XX_FORMAT.format(cal.get(Calendar.MONTH) + 1L));
         buf.append('-');
         // day (DD)
         buf.append(XX_FORMAT.format(cal.get(Calendar.DAY_OF_MONTH)));
@@ -312,7 +310,7 @@ public class Timestamp {
         int year = cal.get(Calendar.YEAR);
         if (cal.isSet(Calendar.ERA)
                 && cal.get(Calendar.ERA) == GregorianCalendar.BC) {
-            /**
+            /*
              * calculate year using astronomical system:
              * year n BCE => astronomical year -n + 1
              */

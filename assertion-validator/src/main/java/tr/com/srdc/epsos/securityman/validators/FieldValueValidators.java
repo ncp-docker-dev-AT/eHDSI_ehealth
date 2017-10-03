@@ -1,21 +1,3 @@
-/**
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- */
 package tr.com.srdc.epsos.securityman.validators;
 
 import org.joda.time.DateTime;
@@ -27,12 +9,14 @@ import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
 
 public class FieldValueValidators {
 
-    public static Logger logger = LoggerFactory.getLogger(FieldValueValidators.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(FieldValueValidators.class);
 
-    public static int CONDITIONS_SECOND_RANGE = 60; // a tolerance on the clock (second)
-    public static int HCP_MAXIMUM_TIME_SPAN = 4; // maximum timespan for hcp identity assertion (hours)
-    public static int TRC_MAXIMUM_TIME_SPAN = 2; // maximum timespan for trc assertion (hours)
+    private static final int CONDITIONS_SECOND_RANGE = 60; // a tolerance on the clock (second)
+    private static final int HCP_MAXIMUM_TIME_SPAN = 4; // maximum timespan for hcp identity assertion (hours)
+    private static final int TRC_MAXIMUM_TIME_SPAN = 2; // maximum timespan for trc assertion (hours)
 
+    private FieldValueValidators() {
+    }
 
     public static void validateVersionValue(Assertion assertion) throws InvalidFieldException {
         if (assertion.getVersion().getMajorVersion() != 2 || assertion.getVersion().getMinorVersion() != 0) {
@@ -44,7 +28,7 @@ public class FieldValueValidators {
         if (assertion.getIssuer().getValue() == null) {
             throw (new InvalidFieldException("Issuer should be filled."));
         } else {
-            logger.info("Issuer	: " + assertion.getIssuer().getValue());
+            LOGGER.info("Issuer	: " + assertion.getIssuer().getValue());
         }
     }
 
@@ -52,7 +36,7 @@ public class FieldValueValidators {
         if (assertion.getSubject().getNameID().getValue() == null) {
             throw (new InvalidFieldException("NameID should be filled."));
         } else {
-            logger.info("Subject Name ID	: " + assertion.getSubject().getNameID().getValue());
+            LOGGER.info("Subject Name ID	: " + assertion.getSubject().getNameID().getValue());
         }
     }
 
@@ -108,5 +92,4 @@ public class FieldValueValidators {
             throw (new InvalidFieldException("AssertionIdRef should be filled."));
         }
     }
-
 }

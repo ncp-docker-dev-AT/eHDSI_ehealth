@@ -145,14 +145,21 @@ public class SMPDeleteFileController {
         }
         if (proxyCredentials != null) {
             try {
+
                 smpClient = DynamicDiscoveryBuilder.newInstance()
-                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_DNS_DOMAIN)))
-                        .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(), proxyCredentials.getProxyPassword())))
+                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
+                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
+                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
+                        .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(),
+                                Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(),
+                                proxyCredentials.getProxyPassword())))
                         .build();
             } catch (ConnectionException ex) {
                 success = false;
                 errorType = "ConnectionException";
                 logger.error("\n ConnectionException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            } catch (TechnicalException e) {
+                logger.error("TechnicalException: '{}'" + e.getMessage(), e);
             }
         } else {
             try {
@@ -483,7 +490,8 @@ public class SMPDeleteFileController {
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 //Audit error
                 byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
-                Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
                         new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
 
                 return "redirect:/smpeditor/deletesmpfile";
@@ -492,7 +500,8 @@ public class SMPDeleteFileController {
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 //Audit error
                 byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
-                Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
+                        //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
                         new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
 
                 return "redirect:/smpeditor/deletesmpfile";
@@ -564,13 +573,15 @@ public class SMPDeleteFileController {
                 String errorresult = sw.toString();
                 logger.debug("\n ***************** ERROR RESULT - '{}'", errorresult);
                 //Audit error
-                Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
                         new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), errorresult.getBytes());
             }
 
             if (itemDelete.getStatusCode() == 200 || itemDelete.getStatusCode() == 201) {
                 //Audit Success
-                Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
+                        //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
                         new String(encodedObjectID), null, null);
             }
             itemDelete.setId(i);

@@ -25,6 +25,8 @@
  * TslView.java
  * <p>
  * TslView.java
+ * <p>
+ * TslView.java
  */
 /**
  * TslView.java
@@ -2189,7 +2191,7 @@ public class TslView extends FrameView implements TreeSelectionListener, ItemLis
                 try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(crtFile))) {
                     byte[] x509CertificateData = new byte[(int) crtFile.length()];
 
-                    in.read(x509CertificateData);
+                    int byteRead = in.read(x509CertificateData);
 
                     try {
                         X509Certificate certificate = (X509Certificate) certificateFactory

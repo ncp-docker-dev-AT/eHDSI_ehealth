@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
  * Tic. Ltd. Sti. <epsos@srdc.com.tr>
  * <p>
@@ -60,10 +60,10 @@ import java.util.*;
 
 public class XCPDServiceImpl implements XCPDServiceInterface {
 
-    public static final String ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED = "DemographicsQueryNotAllowed";
-    public static final String ERROR_ANSWER_NOT_AVAILABLE = "AnswerNotAvailable";
-    public static final String ERROR_INSUFFICIENT_RIGHTS = "InsufficientRights";
-    public static Logger logger = LoggerFactory.getLogger(XCPDServiceImpl.class);
+    private static final String ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED = "DemographicsQueryNotAllowed";
+    private static final String ERROR_ANSWER_NOT_AVAILABLE = "AnswerNotAvailable";
+    private static final String ERROR_INSUFFICIENT_RIGHTS = "InsufficientRights";
+    private static final Logger LOGGER = LoggerFactory.getLogger(XCPDServiceImpl.class);
     private ObjectFactory of;
     private ServiceLoader<PatientSearchInterface> serviceLoader;
     private PatientSearchInterface patientSearchService;
@@ -72,11 +72,11 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         of = new ObjectFactory();
         serviceLoader = ServiceLoader.load(PatientSearchInterface.class);
         try {
-            logger.info("Loading National implementation of PatientSearchInterface...");
+            LOGGER.info("Loading National implementation of PatientSearchInterface...");
             patientSearchService = serviceLoader.iterator().next();
-            logger.info("Successfully loaded PatientSearchService");
+            LOGGER.info("Successfully loaded PatientSearchService");
         } catch (Exception e) {
-            logger.error("Failed to load implementation of PatientSearchService: " + e.getMessage(), e);
+            LOGGER.error("Failed to load implementation of PatientSearchService: " + e.getMessage(), e);
             throw e;
         }
     }
@@ -92,7 +92,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
-            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
+            LOGGER.error("DatatypeConfigurationException: {}", e.getMessage(), e);
         }
         eventLog.setHR_UserID(Constants.HR_ID_PREFIX + "<" + Helper.getUserID(sh) + "@" + Helper.getOrganization(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
@@ -356,14 +356,14 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         outputMessage.getControlActProcess().getQueryAck().setQueryResponseCode(of.createCS());
         outputMessage.getControlActProcess().getQueryAck().getQueryResponseCode().setCode(errorCode);
         if (detail != null) {
-            logger.error(detail);
+            LOGGER.error(detail);
             // Set acknowledgement/acknowledgementDetail
             outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().add(of.createMCCIMT000300UV01AcknowledgementDetail());
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).setText(of.createED());
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().setContent(detail);
         } else {
-            logger.info("XCPD Request is valid.");
+            LOGGER.info("XCPD Request is valid.");
         }
     }
 
@@ -384,7 +384,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         pd.setAdministrativeGender(PatientDemographics.Gender.parseGender(gender.getValue().get(0).getCode()));
                     }
                 } catch (Exception e) {
-                    logger.warn("Unable to parse administrative gender", e);
+                    LOGGER.warn("Unable to parse administrative gender", e);
                 }
 
                 // BirthDate
@@ -396,7 +396,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         pd.setBirthDate(DateUtil.parseDateFromString(sbd, "yyyyMMdd"));
                     }
                 } catch (Exception e) {
-                    logger.warn("Unable to parse birthDate", e);
+                    LOGGER.warn("Unable to parse birthDate", e);
                 }
 
                 // City, street name, country, postal code
@@ -426,7 +426,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         }
                     }
                 } catch (Exception e) {
-                    logger.warn("Unable to parse city, street name, country or postal code", e);
+                    LOGGER.warn("Unable to parse city, street name, country or postal code", e);
                 }
 
                 // Given name, family name
@@ -450,7 +450,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         }
                     }
                 } catch (Exception e) {
-                    logger.warn("Unable to parse given name or family name", e);
+                    LOGGER.warn("Unable to parse given name or family name", e);
                 }
 
                 // Id
@@ -461,7 +461,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         pd.setId(id.getValue().get(0).getExtension());
                     }
                 } catch (Exception e) {
-                    logger.warn("Unable to parse patient id", e);
+                    LOGGER.warn("Unable to parse patient id", e);
                 }
 
                 //TODO Email
@@ -558,7 +558,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         try {
             shElement = XMLUtils.toDOM(sh);
         } catch (Exception e) {
-            logger.error("SOAP header jaxb to dom failed.", e);
+            LOGGER.error("SOAP header jaxb to dom failed.", e);
             throw e;
         }
         patientSearchService.setSOAPHeader(shElement);
@@ -568,9 +568,9 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
             String senderHomeCommID = inputMessage.getSender().getDevice().getId().get(0).getRoot();
             String receiverHomeCommID = inputMessage.getReceiver().get(0).getDevice().getId().get(0).getRoot();
-            logger.info("Sender Home Community ID.... " + senderHomeCommID);
-            logger.info("Receiver Home Community ID.. " + receiverHomeCommID);
-            logger.info("Constants.HOME_COMM_ID...... " + Constants.HOME_COMM_ID);
+            LOGGER.info("Sender Home Community ID.... '{}'", senderHomeCommID);
+            LOGGER.info("Receiver Home Community ID.. '{}'", receiverHomeCommID);
+            LOGGER.info("Constants.HOME_COMM_ID...... '{}'", Constants.HOME_COMM_ID);
 
             List<PRPAMT201306UV02LivingSubjectId> idList = inputQBP.getParameterList().getLivingSubjectId();
             // TODO: enable demographic searches
@@ -578,7 +578,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 fillOutputMessage(outputMessage, "Receiver has wrong Home Community ID.", ERROR_ANSWER_NOT_AVAILABLE);
             } else if (idList.size() > 0) {
                 StringBuilder sb = new StringBuilder();
-                List<PatientId> patientIdList = new ArrayList<PatientId>();
+                List<PatientId> patientIdList = new ArrayList<>();
                 sb.append("<patient>");
                 for (int idIndex = 0; idIndex < idList.size(); idIndex++) {
                     PatientId patientId = new PatientId();
@@ -588,12 +588,12 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     sb.append("<id>").append(patientId.getRoot()).append("</id>");
                     sb.append("<extension>").append(patientId.getExtension()).append("</extension>");
                     sb.append("</identifier>");
-                    logger.info("Using ID Namespace (root)...... " + idIndex + " : " + patientId.getRoot());
-                    logger.info("Using Patient ID (extension)... " + idIndex + " : " + patientId.getExtension());
+                    LOGGER.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
+                    LOGGER.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
                     patientIdList.add(patientId);
                 }
                 sb.append("</patient>");
-                logger.debug("patientIdList.size: " + patientIdList.size());
+                LOGGER.debug("patientIdList.size: '{}'", patientIdList.size());
 
                 // call to NI
                 // Joao: we have an adhoc XML document, so we can generate this evidence correctly
@@ -618,7 +618,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                             "NI_XCPD_REQ",
                             Helper.getHCPAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
                 } catch (Exception e) {
-                    logger.error(ExceptionUtils.getStackTrace(e));
+                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                 }
                 List<PatientDemographics> pdList = patientSearchService.getPatientDemographics(patientIdList);
                 // Joao: the NRR is being generated based on the request data, not on the response. This NRR is optional as per the CP, so it's left commented
@@ -637,7 +637,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 //                            "NI_XCPD_RES",
 //                            Helper.getHCPAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
 //                } catch (Exception e) {
-//                    logger.error(ExceptionUtils.getStackTrace(e));
+//                    LOGGER.error(ExceptionUtils.getStackTrace(e));
 //                }
                 if (pdList.size() == 0) {
                     // Preparing answer not available error
@@ -655,13 +655,13 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     // ships within the HCP assertion
                     // TODO: Might be necessary to remove later, although it does no harm in reality!
                     else {
-                        logger.info("Could not get client country code from the service consumer certificate. The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
+                        LOGGER.info("Could not get client country code from the service consumer certificate. The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
                         if (sigCountryCode != null) {
-                            logger.info("Found the client country code via the signature certificate.");
+                            LOGGER.info("Found the client country code via the signature certificate.");
                             countryCode = sigCountryCode;
                         }
                     }
-                    logger.info("The client country code to be used by the PDP: " + countryCode);
+                    LOGGER.info("The client country code to be used by the PDP: " + countryCode);
 
                     // Then, it is the Policy Decision Point (PDP) that decides according to the consents of the patients
                     /**
@@ -702,7 +702,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);
         } catch (Exception e) {
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_ANSWER_NOT_AVAILABLE);
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         // Set queryByParameter
         PRPAMT201306UV02QueryByParameter qbpValue = of.createPRPAMT201306UV02QueryByParameter();
@@ -746,7 +746,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         try {
             prepareEventLog(eventLog, inputMessage, outputMessage, shElement);
         } catch (Exception ex) {
-            logger.error("Prepare Audit log failed.", ex);
+            LOGGER.error("Prepare Audit log failed.", ex);
             // Is it fatal, if Audit log cannot be created?
         }
     }

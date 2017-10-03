@@ -22,14 +22,13 @@ package eu.epsos.pt.ws.client.xca;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import eu.epsos.dts.xds.AdhocQueryRequestCreator;
 import eu.epsos.dts.xds.AdhocQueryResponseConverter;
-import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.services.CdaValidationService;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
@@ -39,7 +38,6 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.util.XMLUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -92,8 +90,9 @@ public class XcaInitGateway {
 
             /* Stub */
             RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub();
+            DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
             //String epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), service);
-            String epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
+            String epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
             stub.setAddr(epr);
             stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
             EventLogClientUtil.createDummyMustUnderstandHandler(stub);
@@ -101,23 +100,15 @@ public class XcaInitGateway {
 
             /* queryRespose */
             AdhocQueryResponse queryResponse = stub.respondingGateway_CrossGatewayQuery(queryRequest, idAssertion, trcAssertion, documentCode.getValue());   // Request
-            // Check result //TODO: Review generic exception throwed and remove last catch from try, catch sequence.
             processRegistryErrors(queryResponse.getRegistryErrorList());
 
             if (queryResponse.getRegistryObjectList() != null) {
                 result = AdhocQueryResponseConverter.convertAdhocQueryResponse(queryResponse);
             }
 
-        } catch (PhaseException ex) {
+        } catch (RemoteException | RuntimeException ex) {
             throw new RuntimeException(ex);
-        } catch (AxisFault ex) {
-            throw new RuntimeException(ex);
-        } catch (RemoteException ex) {
-            throw new RuntimeException(ex);
-        } catch (RuntimeException ex) {
-            throw ex;
         }
-
 
         return result;
     }
@@ -143,13 +134,13 @@ public class XcaInitGateway {
             /* Stub */
             RespondingGateway_ServiceStub stub;
             stub = new RespondingGateway_ServiceStub();
-
+            DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
             String epr;
             if (service.equals(Constants.MroService)) {
-                epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE);
+                epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE);
             } else {
                 //epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), service);
-                epr = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
+                epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
             }
             stub.setAddr(epr);
             stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
@@ -172,9 +163,6 @@ public class XcaInitGateway {
                 processRegistryErrors(registryErrorList);
             }
 
-        } catch (PhaseException ex) {
-            LOGGER.error(ex.getLocalizedMessage(), ex);
-            throw new RuntimeException(ex);
         } catch (AxisFault ex) {
             LOGGER.error(ex.getLocalizedMessage(), ex);
             throw new RuntimeException(ex);
@@ -184,21 +172,25 @@ public class XcaInitGateway {
 
         if (!queryResponse.getDocumentResponse().isEmpty()) {
             if (queryResponse.getDocumentResponse().size() > 1) {
-                LOGGER.error("More than one documents where retrieved for the current request with parameters document ID: '{}' - homeCommunityId: '{}' - registry: ", document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
+                LOGGER.error("More than one documents where retrieved for the current request with parameters document ID: '{}' " +
+                        "- homeCommunityId: '{}' - registry: ", document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
             }
             try {
                 CdaValidationService cdaValidationService = CdaValidationService.getInstance();
 
                 /* Validate CDA epSOS Pivot */
-                cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
+                cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(
+                        queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
+                        CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
 
-                queryResponse.getDocumentResponse().get(0).setDocument(TMServices.transformDocument(queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage)); //Resets the response document to a translated version.
+                queryResponse.getDocumentResponse().get(0).setDocument(TMServices.transformDocument(
+                        queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage)); //Resets the response document to a translated version.
 
                 /* Validate CDA epSOS Friendly-B */
-                cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), false), NcpSide.NCP_B);
+                cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(
+                        queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
+                        CdaModel.obtainCdaModel(document.getClassCode().getValue(), false), NcpSide.NCP_B);
 
-            } catch (DocumentTransformationException ex) {
-                LOGGER.error(ex.getLocalizedMessage(), ex);
             } catch (Exception ex) {
                 LOGGER.error(ex.getLocalizedMessage(), ex);
             } finally {
@@ -250,52 +242,47 @@ public class XcaInitGateway {
                         continue;
                     }
 
-
                     //Throw all the remaining errors
                     if (hasError) {
                         LOGGER.error(msg);
                         throw new XCAException(errorCode);
                     }
-
                 }
             }
         }
     }
 
     /**
-     * This method will check if a given code is related to the document
-     * transformation errors
+     * This method will check if a given code is related to the document transformation errors
      *
      * @param errorCode
      * @return
      */
     private static boolean checkTransformationErrors(String errorCode) {
-        List<String> errorCodes = new ArrayList<String>() {
-            {
-                add("4500");
-                add("4501");
-                add("4502");
-                add("4503");
-                add("4504");
-                add("4505");
-                add("4506");
-                add("4507");
-                add("4508");
-                add("4509");
-                add("4510");
-                add("4511");
-                add("4512");
-                add("2500");
-                add("2501");
-                add("2502");
-                add("2503");
-                add("2504");
-                add("2505");
-                add("2506");
-                add("2507");
-                add("2508");
-            }
-        };
+
+        List<String> errorCodes = new ArrayList<>();
+        errorCodes.add("4500");
+        errorCodes.add("4501");
+        errorCodes.add("4502");
+        errorCodes.add("4503");
+        errorCodes.add("4504");
+        errorCodes.add("4505");
+        errorCodes.add("4506");
+        errorCodes.add("4507");
+        errorCodes.add("4508");
+        errorCodes.add("4509");
+        errorCodes.add("4510");
+        errorCodes.add("4511");
+        errorCodes.add("4512");
+        errorCodes.add("2500");
+        errorCodes.add("2501");
+        errorCodes.add("2502");
+        errorCodes.add("2503");
+        errorCodes.add("2504");
+        errorCodes.add("2505");
+        errorCodes.add("2506");
+        errorCodes.add("2507");
+        errorCodes.add("2508");
 
         return errorCodes.contains(errorCode);
     }

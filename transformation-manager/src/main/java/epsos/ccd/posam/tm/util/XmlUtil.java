@@ -46,9 +46,10 @@ public class XmlUtil implements TMConstants {
             Result result = new StreamResult(stringWriter);
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer transformer = factory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(
-                    "{http://xml.apache.org/xslt}indent-amount", "2");
+            // FIX: https://ec.europa.eu/cefdigital/tracker/browse/EHNCP-1342
+            transformer.setOutputProperty(OutputKeys.INDENT, "no");
+//            transformer.setOutputProperty(
+//                    "{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.transform(source, result);
             return stringWriter.getBuffer().toString();
         } catch (TransformerConfigurationException e) {

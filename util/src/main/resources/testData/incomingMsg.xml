@@ -10,7 +10,8 @@
             <addressing:Address>http://www.w3.org/2005/08/addressing/anonymous</addressing:Address>
         </addressing:ReplyTo>
         <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
-            <saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            <saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
+                             xmlns:xs="http://www.w3.org/2001/XMLSchema"
                              ID="_70e21708-5d2a-4c68-91a1-da667980f338" IssueInstant="2014-11-10T21:18:13.506Z"
                              Version="2.0">
                 <saml2:Issuer Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">urn:tiani-spirit:sts
