@@ -885,9 +885,8 @@
 								<xsl:value-of select="position()" />
 							<xsl:text disable-output-escaping="yes">&apos;)</xsl:text>
 						</xsl:attribute>
-						<xsl:text>+/-</xsl:text>
+						<xsl:text>Show/Hide</xsl:text>
 					</a>
-
 				</th>
 			</tr>
 			<table>
@@ -914,5 +913,4 @@
 			<xsl:text disable-output-escaping="yes">};</xsl:text>
 		</script>
 	</xsl:template>
-
 </xsl:stylesheet>

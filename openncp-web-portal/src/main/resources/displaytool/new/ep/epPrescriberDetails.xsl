@@ -92,9 +92,8 @@
 		<xsl:attribute name="onclick">
 			<xsl:text disable-output-escaping="yes">showhide(&apos;prescriberTable&apos;)</xsl:text>
 		</xsl:attribute>
-		<xsl:text>+/-</xsl:text>
+		<xsl:text>Show/Hide</xsl:text>
 	</a>
-
 	<table>
 		<xsl:attribute name="id">
 		<xsl:text>prescriberTable</xsl:text>
@@ -238,6 +237,4 @@
 		<xsl:text disable-output-escaping="yes">showhide(&apos;prescriberTable&apos;)</xsl:text>
 	</script>
 </xsl:template>
-	
 </xsl:stylesheet>
-
