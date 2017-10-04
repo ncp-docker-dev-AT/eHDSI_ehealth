@@ -48,7 +48,6 @@
         <module>transformation-manager</module>
         <module>eadc</module>
         <module>consent-manager</module>
-        <module>tsl-utils</module>
         <module>protocol-terminators</module>
         <module>openatna</module>
         <module>openncp-portal</module>
