@@ -81,7 +81,7 @@ public class TsamSyncManager {
             stopWatch.stop();
             logger.trace("Task: {} / Elapsed time: {} ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
             if (!success) {
-                throw new TsamSyncManagerException("Database backup failure");
+                throw new TsamSyncException("Database backup failure");
             }
 
             logger.info("Clear database content");
