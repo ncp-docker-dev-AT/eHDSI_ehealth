@@ -1,22 +1,3 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others.
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * <p>
- * Contributors:
- * Cardiff University - intial API and implementation
- */
-
 package org.openhealthtools.openatna.audit.persistence.util;
 
 import org.openhealthtools.openatna.audit.persistence.model.*;
@@ -24,6 +5,8 @@ import org.openhealthtools.openatna.audit.persistence.model.codes.CodeEntity;
 import org.openhealthtools.openatna.audit.persistence.model.codes.ObjectIdTypeCodeEntity;
 import org.openhealthtools.openatna.audit.persistence.model.codes.ParticipantCodeEntity;
 import org.openhealthtools.openatna.audit.persistence.model.codes.SourceCodeEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -49,10 +32,13 @@ import java.util.Set;
 
 public class DataWriter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataReader.class);
+
     private Document doc;
     private Element root;
 
     public DataWriter() {
+
         try {
             this.doc = newDocument();
             if (this.doc != null) {
@@ -60,11 +46,12 @@ public class DataWriter {
                 doc.appendChild(root);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }
     }
 
     private static StreamResult transform(Document doc, OutputStream out, boolean indent) throws IOException {
+
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer t = null;
         try {
@@ -77,6 +64,7 @@ public class DataWriter {
             t.setOutputProperty(OutputKeys.METHOD, "xml");
             t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         } catch (TransformerConfigurationException tce) {
+            LOGGER.error("TransformerConfigurationException: '{}'", tce.getMessage(), tce);
             assert (false);
         }
         DOMSource doms = new DOMSource(doc);
@@ -84,12 +72,14 @@ public class DataWriter {
         try {
             t.transform(doms, sr);
         } catch (TransformerException te) {
+            LOGGER.error("TransformerException: '{}'", te.getMessage(), te);
             throw new IOException(te.getMessage());
         }
         return sr;
     }
 
     private static Document newDocument() throws IOException {
+
         Document doc = null;
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -97,12 +87,13 @@ public class DataWriter {
             DocumentBuilder db = dbf.newDocumentBuilder();
             doc = db.newDocument();
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            LOGGER.error("ParserConfigurationException: '{}'", e.getMessage(), e);
         }
         return doc;
     }
 
     public void write(File f) throws IOException {
+
         FileOutputStream fout = new FileOutputStream(f);
         transform(doc, fout, false);
         fout.flush();
@@ -110,6 +101,7 @@ public class DataWriter {
     }
 
     public void writeSources(List<SourceEntity> sources) {
+
         if (!sources.isEmpty()) {
             Element els = doc.createElement(DataConstants.SOURCES);
             for (SourceEntity source : sources) {
@@ -141,7 +133,6 @@ public class DataWriter {
 
     public void writeParticipants(List<ParticipantEntity> entities) {
 
-        //if (entities.size() > 0) {
         if (!entities.isEmpty()) {
             Element els = doc.createElement(DataConstants.PARTICIPANTS);
             for (ParticipantEntity entity : entities) {
@@ -175,7 +166,7 @@ public class DataWriter {
     }
 
     public void writeObjects(List<ObjectEntity> entities) {
-        //if (entities.size() > 0) {
+
         if (!entities.isEmpty()) {
             Element els = doc.createElement(DataConstants.OBJECTS);
             for (ObjectEntity entity : entities) {
@@ -246,6 +237,7 @@ public class DataWriter {
     }
 
     public void writeNaps(List<NetworkAccessPointEntity> naps) {
+
         if (!naps.isEmpty()) {
             Element els = doc.createElement(DataConstants.NETWORK_ACCESS_POINTS);
             for (NetworkAccessPointEntity nap : naps) {
@@ -259,6 +251,7 @@ public class DataWriter {
     }
 
     public void writeCodes(List<CodeEntity> ents) {
+
         if (!ents.isEmpty()) {
             Element els = doc.createElement(DataConstants.CODES);
             List<List<CodeEntity>> lists = sort(ents);
