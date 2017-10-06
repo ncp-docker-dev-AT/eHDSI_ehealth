@@ -737,19 +737,19 @@
 
     <!-- display Labels -->
     <xsl:template name="show-displayLabels">
-        <xsl:param name="data"/>
+        <xsl:param name="code"/>
         <xsl:variable name="dirFile"
-                      select="concat($epsosLangDir,'/epSOSDisplayLabels.xml')"/>
+                      select="concat($epsosLangDir,'/1.3.6.1.4.1.12559.11.10.1.3.1.42.46.xml')"/>
         <xsl:variable name="foundKey"
-                      select="document(concat('file://', $dirFile))/epSOSDisplayLabelsInformation/epSOSDisplayLabelsEntry[@code=$data]"/>
+                      select="document(concat('file://', $dirFile))/ValueSet/concept[@code=$code and @codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.4']"/>
         <xsl:variable name="foundKeyLang"
-                      select="$foundKey/displayName[@lang=$userLang]"/>
+                      select="$foundKey/designation[@lang=$userLang]"/>
         <xsl:variable name="defFoundKeyLang"
-                      select="$foundKey/displayName[@lang=$defaultUserLang]"/>
+                      select="$foundKey/designation[@lang=$defaultUserLang]"/>
         <xsl:choose>
             <xsl:when test="not ($foundKey)">
                 <!-- if the key is not found then display the key itself -->
-                <xsl:value-of select="$data"/>
+                <xsl:value-of select="$code"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:choose>

@@ -6,15 +6,15 @@ public class Concept {
 
     private String code;
 
-    private String valueSetOid;
+    private String codeSystemOid;
 
-    private String valueSetName;
+    private String codeSystemName;
 
-    public Concept(Long id, String code, String valueSetOid, String valueSetName) {
+    public Concept(Long id, String code, String codeSystemOid, String codeSystemName) {
         this.id = id;
         this.code = code;
-        this.valueSetOid = valueSetOid;
-        this.valueSetName = valueSetName;
+        this.codeSystemOid = codeSystemOid;
+        this.codeSystemName = codeSystemName;
     }
 
     public Long getId() {
@@ -33,19 +33,19 @@ public class Concept {
         this.code = code;
     }
 
-    public String getValueSetOid() {
-        return valueSetOid;
+    public String getCodeSystemOid() {
+        return codeSystemOid;
     }
 
-    public void setValueSetOid(String valueSetOid) {
-        this.valueSetOid = valueSetOid;
+    public void setCodeSystemOid(String codeSystemOid) {
+        this.codeSystemOid = codeSystemOid;
     }
 
-    public String getValueSetName() {
-        return valueSetName;
+    public String getCodeSystemName() {
+        return codeSystemName;
     }
 
-    public void setValueSetName(String valueSetName) {
-        this.valueSetName = valueSetName;
+    public void setCodeSystemName(String codeSystemName) {
+        this.codeSystemName = codeSystemName;
     }
 }

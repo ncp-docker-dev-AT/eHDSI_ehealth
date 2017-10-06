@@ -1,8 +1,8 @@
 package eu.europa.ec.sante.ehdsi.openncp.tsam.exporter;
 
-import eu.europa.ec.sante.ehdsi.openncp.tsam.exporter.domain.CodeSystem;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.exporter.domain.Concept;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.exporter.domain.Designation;
+import eu.europa.ec.sante.ehdsi.openncp.tsam.exporter.domain.ValueSet;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,65 +34,65 @@ public class TsamExporterManager {
             throw new TsamExporterException("Environment variable 'EPSOS_PROPS_PATH' is not defined!");
         }
 
-        logger.debug("Retrieving code systems ...");
+        logger.debug("Retrieving value sets ...");
 
-        List<CodeSystem> codeSystems = jdbcTemplate.query(
-                "SELECT id, name FROM code_system",
-                (resultSet, i) -> new CodeSystem(
+        List<ValueSet> valueSets = jdbcTemplate.query(
+                "SELECT id, oid, epsos_name FROM value_set",
+                (resultSet, i) -> new ValueSet(
                         resultSet.getLong(1),
-                        resultSet.getString(2)));
+                        resultSet.getString(2),
+                        resultSet.getString(3)));
 
-        logger.info("{} code systems retrieved from the database", codeSystems.size());
+        logger.info("{} value sets retrieved from the database", valueSets.size());
 
-        codeSystems.forEach(codeSystem -> {
-            String codeSystemName = StringUtils.removeAll(codeSystem.getName(), " ");
-
+        valueSets.forEach(valueSet -> {
             File epsosRepository = Paths.get(epsosPropsPath, "EpsosRepository").toFile();
             if (!epsosRepository.exists()) {
                 epsosRepository.mkdir();
             }
 
-            try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(epsosPropsPath, codeSystemName + ".xml"))))) {
-                out.println("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-                out.println("<" + codeSystemName + "Information>");
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(epsosRepository, valueSet.getOid() + ".xml"))))) {
+                out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+                out.println("");
+                out.println("<ValueSet oid=\"" + valueSet.getOid() + "\" name=\"" + valueSet.getName() + "\">");
 
-                logger.debug("Retrieving concepts for code system '{}' ...", codeSystem.getName());
+                logger.debug("Retrieving concepts for value set '{}' ...", valueSet.getName());
 
                 List<Concept> concepts = jdbcTemplate.query(
                         // @formatter:off
-                    "SELECT c.id, c.code, vs.oid, vs.epsos_name " +
-                    "FROM code_system_concept c " +
-                        "INNER JOIN code_system_version csv ON c.code_system_version_id = csv.id " +
-                        "INNER JOIN x_concept_value_set cvsm ON cvsm.code_system_concept_id = c.id " +
-                        "INNER JOIN value_set_version vsv ON vsv.id = cvsm.value_set_version_id " +
-                        "INNER JOIN value_set vs ON vs.id = vsv.value_set_id " +
-                    "WHERE csv.code_system_id = ?", new Object[]{codeSystem.getId()},
-                    // @formatter:on
+                        "SELECT c.id, c.code, cs.oid, cs.name " +
+                        "FROM code_system_concept c " +
+                            "INNER JOIN code_system_version csv ON c.code_system_version_id = csv.id " +
+                            "INNER JOIN code_system cs ON csv.code_system_id = cs.id " +
+                            "INNER JOIN x_concept_value_set cvsm ON cvsm.code_system_concept_id = c.id " +
+                            "INNER JOIN value_set_version vsv ON vsv.id = cvsm.value_set_version_id " +
+                        "WHERE vsv.value_set_id = ?", new Object[]{valueSet.getId()},
+                        // @formatter:on
                         (resultSet, i) -> new Concept(
                                 resultSet.getLong(1),
                                 resultSet.getString(2),
                                 resultSet.getString(3),
                                 resultSet.getString(4)));
 
-                logger.info("[{}]: {} concepts retrieved from the database", codeSystem.getName(), concepts.size());
+                logger.info("[{}, {}]: {} concepts retrieved from the database", valueSet.getName(), valueSet.getOid(), concepts.size());
 
                 concepts.forEach(concept -> {
-                    out.println("<" + codeSystemName + "Entry oid=\"" + concept.getValueSetOid() + "\" epsosName=\"" + concept.getValueSetName() +
+                    out.println("    <concept codeSystem=\"" + concept.getCodeSystemOid() +
+                            "\" codeSystemName=\"" + concept.getCodeSystemName() +
                             "\" code=\"" + StringEscapeUtils.escapeXml10(concept.getCode()) + "\">");
 
                     List<Designation> designations = jdbcTemplate.query(
                             "SELECT language_code, designation FROM designation WHERE code_system_concept_id = ?",
                             new Object[]{concept.getId()},
-                            (resultSet, i) -> new Designation(
-                                    resultSet.getString(1),
-                                    resultSet.getString(2)));
+                            (resultSet, i) -> new Designation(resultSet.getString(1), resultSet.getString(2)));
 
-                    designations.forEach(designation -> out.println("<displayName lang=\"" + designation.getLanguage() + "\">" +
-                            StringEscapeUtils.escapeXml10(designation.getValue()) + "</displayName>"));
+                    designations.forEach(designation -> out.println("        <designation lang=\"" + designation.getLanguage() + "\">" +
+                            StringEscapeUtils.escapeXml10(designation.getValue()) + "</designation>"));
 
-                    out.println("</" + codeSystemName + "Entry>");
+                    out.println("    </concept>");
                 });
 
+                out.println("</ValueSet>");
             } catch (IOException e) {
                 throw new TsamExporterException("An IOException has occurred!", e);
             }
