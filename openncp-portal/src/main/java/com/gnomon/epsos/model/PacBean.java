@@ -43,7 +43,7 @@ import java.util.*;
 @SessionScoped
 public class PacBean implements Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger("PacBean");
+    private static final Logger LOGGER = LoggerFactory.getLogger(PacBean.class);
 
     private static final long serialVersionUID = 1L;
     private String selectedCountry;
@@ -75,9 +75,10 @@ public class PacBean implements Serializable {
     private Map<String, String> onbehalfdemographicsattrs;
 
     public PacBean() {
-        STORKSAMLEngine engine = null;
-        String host = "";
-        String USER_samlResponseXML = "";
+
+        STORKSAMLEngine engine;
+        String host;
+        String USER_samlResponseXML;
         try {
             engine = STORKSAMLEngine.getInstance("SP");
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -86,36 +87,29 @@ public class PacBean implements Serializable {
             HttpServletRequest httpServletRequest = PortalUtil.getHttpServletRequest(portletRequest);
 
             host = httpServletRequest.getRemoteHost();
-            log.info("HOST IS : " + host);
+            LOGGER.info("HOST IS: '{}'", host);
 
             USER_samlResponseXML = (String) LiferayUtils.getFromSession("USER_samlResponseXML");
 
-        } catch (Exception e) {
-            log.error("Error starting Stork engine");
-            log.error(ExceptionUtils.getStackTrace(e));
-        }
 
-        try {
             STORKAuthnResponse authnResponse = engine.validateSTORKAuthnResponse(USER_samlResponseXML.getBytes(), host);
             onbehalfdemographicsattrs = StorkUtils.getRepresentedDemographics(authnResponse);
             String givenName = onbehalfdemographicsattrs.get("patient.data.surname");
-            log.info("REP GIVEN NAME IS: " + givenName);
+            LOGGER.info("REP GIVEN NAME IS: '{}'", givenName);
             hasPacToOther = Validator.isNotNull(givenName);
-            log.info("PATIENT HAS ACCESS TO OTHER : " + hasPacToOther);
-        } catch (Exception e) {
-            log.error("REPRESENTATIVE ACCESS CONFIGURATION ERROR " + e.getMessage());
-        }
+            LOGGER.info("PATIENT HAS ACCESS TO OTHER: '{}'", hasPacToOther);
 
-        selectedCountry = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
-        log.info("Selected Country: " + selectedCountry);
-        identifiers = new ArrayList<Identifier>();
-        demographics = new ArrayList<Demographics>();
-        ltrlanguages = EpsosHelperService.getLTRLanguages();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Country", selectedCountry));
-        try {
+
+            selectedCountry = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
+            LOGGER.info("Selected Country: '{}'", selectedCountry);
+            identifiers = new ArrayList<>();
+            demographics = new ArrayList<>();
+            ltrlanguages = EpsosHelperService.getLTRLanguages();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Country", selectedCountry));
             getPACDocuments();
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error starting Stork engine");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -133,16 +127,16 @@ public class PacBean implements Serializable {
     }
 
     public void getPACDocuments() throws Exception {
-        log.info("HCP Assertion is going to be created");
+        LOGGER.info("HCP Assertion is going to be created");
         errorUserAssertion = "";
         Object obj = EpsosHelperService.getUserAssertion();
-        log.info("User Assertion: " + obj);
+        LOGGER.info("User Assertion: '{}'", obj);
         if (obj instanceof Assertion) {
             hcpAssertion = (Assertion) obj;
         } else if (obj instanceof String) {
             errorUserAssertion = (String) obj;
         }
-        log.info("HCP Assertion has been created");
+        LOGGER.info("HCP Assertion has been created");
         User user = LiferayUtils.getPortalUser();
         LiferayUtils.storeToSession("user", user);
 
@@ -156,23 +150,23 @@ public class PacBean implements Serializable {
                 null,
                 user);
 
-        log.info("Selected Country: " + selectedCountry);
+        LOGGER.info("Selected Country: " + selectedCountry);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Country", selectedCountry));
         LiferayUtils.storeToSession("selectedCountry", selectedCountry);
-        log.info("Get my patient info (Start)");
+        LOGGER.info("Get my patient info (Start)");
         getMyPatientInfo();
-        log.info("Get my patient info (End)");
+        LOGGER.info("Get my patient info (End)");
         if (Validator.isNotNull(selectedPatient)) {
-            log.info("Create TRCA (Start)");
+            LOGGER.info("Create TRCA (Start)");
             createTRCA("ps", "TREATMENT");
-            log.info("Create TRCA (End)");
+            LOGGER.info("Create TRCA (End)");
             try {
-                log.info("Get PS Docs (Start)");
+                LOGGER.info("Get PS Docs (Start)");
                 getPSDocs();
-                log.info("Get PS Docs (End)");
+                LOGGER.info("Get PS Docs (End)");
             } catch (ConsentException e) {
                 queryDocumentsException = LiferayUtils.getPortalTranslation(e.getMessage());
-                log.error(ExceptionUtils.getStackTrace(e));
+                LOGGER.error(ExceptionUtils.getStackTrace(e));
             }
         }
     }
@@ -198,51 +192,51 @@ public class PacBean implements Serializable {
             trcAssertion = null;
             trcassertionnotexists = true;
             trcassertionexists = false;
-            patients = new ArrayList<Patient>();
+            patients = new ArrayList<>();
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
 
             PatientDemographics pd = EpsosHelperService.createPatientDemographicsForQuery(identifiers, demographics);
 
-            log.info("Running client connector : " + serviceUrl);
+            LOGGER.info("Running client connector : " + serviceUrl);
             ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
-            log.info("Test Assertions: "
+            LOGGER.info("Test Assertions: "
                     + EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS));
             boolean testAssertion = GetterUtil.getBoolean(
                     EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS), true);
-            Assertion ass = null;
+            Assertion ass;
             if (testAssertion) {
                 ass = new HCPIAssertionCreator().createHCPIAssertion();
             } else {
                 ass = hcpAssertion;
             }
-            log.info("Searching for patients in " + selectedCountry);
-            log.info("Assertion id: " + ass.getID());
+            LOGGER.info("Searching for patients in " + selectedCountry);
+            LOGGER.info("Assertion id: " + ass.getID());
             try {
-                log.info("PD : " + pd.getPatientIdArray(0));
+                LOGGER.info("PD : " + pd.getPatientIdArray(0));
             } catch (Exception e) {
-                log.error("No patient identifier declared " + e.getMessage());
+                LOGGER.error("No patient identifier declared " + e.getMessage());
             }
 
             List<PatientDemographics> queryPatient = proxy.queryPatient(ass, selectedCountry, pd);
             int i = 0;
             for (PatientDemographics aux : queryPatient) {
                 Patient patient = EpsosHelperService.populatePatient(aux);
-                log.info("PATIENT FOUND: " + patient.getExtension());
+                LOGGER.info("PATIENT FOUND: " + patient.getExtension());
                 selectedPatient = patient;
                 i++;
                 if (i > 1) {
                     selectedPatient = null;
                     patient = null;
-                    log.error("More than one patients exist with these criteria. Exiting ...");
+                    LOGGER.error("More than one patients exist with these criteria. Exiting ...");
                     return;
                 }
             }
             queryPatientsException = LiferayUtils.getPortalTranslation("patient.list.no.patient");
-            log.info("Found " + i + " patients");
+            LOGGER.info("Found " + i + " patients");
             showPatientList = true;
         } catch (Exception ex) {
-            log.error(ExceptionUtils.getStackTrace(ex));
-            patients = new ArrayList<Patient>();
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
+            patients = new ArrayList<>();
             showPatientList = true;
             queryPatientsException = LiferayUtils.getPortalTranslation(ex.getMessage());
         }
@@ -382,9 +376,9 @@ public class PacBean implements Serializable {
     }
 
     public boolean getShowConfirmation() {
-        log.debug("### GET SHOW CONFIRMATION ###");
-        log.debug("trcassertionexists: " + trcassertionexists);
-        log.debug("consentExists: " + consentExists);
+        LOGGER.debug("### GET SHOW CONFIRMATION ###");
+        LOGGER.debug("trcassertionexists: " + trcassertionexists);
+        LOGGER.debug("consentExists: " + consentExists);
         return !trcassertionexists;
     }
 
@@ -397,9 +391,9 @@ public class PacBean implements Serializable {
         trcassertionexists = true;
         PatientId patientId = null;
         try {
-            patientDocuments = new ArrayList<PatientDocument>();
+            patientDocuments = new ArrayList<>();
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-            log.info("CLIENTCONNECTOR: " + serviceUrl);
+            LOGGER.info("CLIENTCONNECTOR: " + serviceUrl);
             ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
 
             patientId = PatientId.Factory.newInstance();
@@ -413,11 +407,11 @@ public class PacBean implements Serializable {
             // Summary
             // ClassCode.
 
-            log.info("PS QUERY: Getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry);
+            LOGGER.info("PS QUERY: Getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry);
             List<EpsosDocument1> queryDocuments = clientConectorConsumer
                     .queryDocuments(hcpAssertion, trcAssertion,
                             selectedCountry, patientId, classCode);
-            log.info("PS QUERY: Found " + queryDocuments.size() + " for : " + patientId.getExtension() + " from " + selectedCountry);
+            LOGGER.info("PS QUERY: Found " + queryDocuments.size() + " for : " + patientId.getExtension() + " from " + selectedCountry);
             showPS = true;
             consentExists = true;
             for (EpsosDocument1 aux : queryDocuments) {
@@ -428,8 +422,8 @@ public class PacBean implements Serializable {
                 try {
                     document.setCreationDate(sdf.format(cal.getTime()));
                 } catch (Exception e) {
-                    log.error("Problem converting date" + aux.getCreationDate());
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    LOGGER.error("Problem converting date" + aux.getCreationDate());
+                    LOGGER.error(ExceptionUtils.getStackTrace(e));
                 }
                 document.setDescription(aux.getDescription());
                 document.setHealthcareFacility("");
@@ -446,15 +440,14 @@ public class PacBean implements Serializable {
         } catch (Exception ex) {
             hasPac = false;
             consentExists = true;
-            log.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "DOCUMENT QUERY", ex.getMessage()));
-            log.error("PS QUERY: Error getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry + " - " + ex.getMessage());
+            LOGGER.error("PS QUERY: Error getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry + " - " + ex.getMessage());
             queryDocumentsException = LiferayUtils.getPortalTranslation(ex.getMessage());
             if (ex.getMessage().contains("4701")) {
                 consentExists = false;
                 throw new ConsentException();
             }
-
         }
     }
 
@@ -462,24 +455,26 @@ public class PacBean implements Serializable {
         if (docType.equals("ps")) {
             showPS = false;
         }
-        log.info("TRCA: Starting setting the purpose of use: " + purposeOfUse);
+        LOGGER.info("TRCA: Starting setting the purpose of use: " + purposeOfUse);
         PatientId patientId = null;
         try {
             patientId = PatientId.Factory.newInstance();
             patientId.setExtension(selectedPatient.getExtension());
             patientId.setRoot(selectedPatient.getRoot());
             this.purposeOfUse = purposeOfUse;
-            log.info("TRCA: Creating trca for hcpAssertion : " + hcpAssertion.getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
+            LOGGER.info("TRCA: Creating trca for hcpAssertion : " + hcpAssertion.getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
             trcAssertion = EpsosHelperService.createPatientConfirmationPlain(
                     purposeOfUse, hcpAssertion, patientId);
-            log.info("TRCA: Created " + trcAssertion.getID() + " for : " + hcpAssertion.getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
+            LOGGER.info("TRCA: Created " + trcAssertion.getID() + " for : " + hcpAssertion.getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
             trcassertionexists = true;
             trcassertionnotexists = false;
             // get patient documents
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "TRCA ERROR", e.getMessage()));
-            log.error("TRCA: Error creating trca for patient : " + patientId.getExtension() + " with hcpAssetion : " + hcpAssertion.getID() + ". Purpose of use is : " + purposeOfUse + " - " + e.getMessage());
-            log.error(ExceptionUtils.getStackTrace(e));
+            if (patientId != null) {
+                LOGGER.error("TRCA: Error creating trca for patient : " + patientId.getExtension() + " with hcpAssetion : " + hcpAssertion.getID() + ". Purpose of use is : " + purposeOfUse + " - " + e.getMessage());
+            }
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
             trcassertionexists = false;
             trcassertionnotexists = true;
             queryDocumentsException = LiferayUtils.getPortalTranslation(e.getMessage());

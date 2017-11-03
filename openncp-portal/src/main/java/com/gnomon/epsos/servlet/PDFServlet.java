@@ -5,15 +5,12 @@ import com.gnomon.epsos.service.EpsosHelperService;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
-import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.DocumentId;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
-import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.DateTime;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,23 +26,23 @@ import java.io.OutputStream;
 
 public class PDFServlet extends HttpServlet {
 
-    private static Logger log = LoggerFactory.getLogger(PDFServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PDFServlet.class);
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-        log.info("Getting PDF document");
-        byte[] pdf = null;
+        LOGGER.info("Getting PDF document");
+        byte[] pdf;
 
         try {
             String uuid = req.getParameter("uuid");
             String repositoryId = req.getParameter("repositoryid");
             String hcid = req.getParameter("hcid");
 
-            log.debug("Retrieving PDF document");
-            log.debug("uuid: '{}'", uuid);
-            log.debug("repositoryId: '{}'", repositoryId);
-            log.debug("hcid: '{}'", hcid);
+            LOGGER.debug("Retrieving PDF document");
+            LOGGER.debug("uuid: '{}'", uuid);
+            LOGGER.debug("repositoryId: '{}'", repositoryId);
+            LOGGER.debug("hcid: '{}'", hcid);
 
             EpsosDocument selectedEpsosDocument = new EpsosDocument();
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
@@ -96,56 +93,16 @@ public class PDFServlet extends HttpServlet {
                 lang = ltrlang;
             }
 
-//            String lang1 = lang.replace("_", "-");
-//            lang1 = lang1.replace("en-US", "en");
-
-            log.info("User Language: '{}' - Parameter Request Language: '{}' - Translated Language: {}", userLanguage, ltrlang, lang);
+            LOGGER.info("User Language: '{}' - Parameter Request Language: '{}' - Translated Language: {}", userLanguage, ltrlang, lang);
 
             String lang1 = lang.replace("_", "-");
             lang1 = lang1.replace("en-US", "en-GB");
             lang1 = lang1.replace("en_US", "en-GB");
 
-            log.info("Portal language is : '{} - {}'", lang, lang1);
+            LOGGER.info("Portal language is : '{} - {}'", lang, lang1);
 
-//            try {
-//                EvidenceUtils.createEvidenceREMNRO(classCode.toString(),
-//                        "NI_DR_" + classCode.getValue(),
-//                        new DateTime(),
-//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                        "NI_DR_" + classCode.getValue() + "_REQ",
-//                        trcAssertion.getID());
-//            } catch (Exception e) {
-//                log.error(ExceptionUtils.getStackTrace(e));
-//            }
-
-            EpsosDocument1 eps = clientConectorConsumer.retrieveDocument(
-                    hcpAssertion, trcAssertion, selectedCountry, documentId,
-                    hcid, classCode, lang1);
-
-            if (Validator.isNotNull(eps)) {
-//                try {
-//                    EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
-//                            "NI_DR" + classCode.getValue(),
-//                            new DateTime(),
-//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                            "NI_DR_" + classCode.getValue() + "_RES_SUCC",
-//                            trcAssertion.getID());
-//                } catch (Exception e) {
-//                    log.error(ExceptionUtils.getStackTrace(e));
-//                }
-            } else {
-//                try {
-//                    EvidenceUtils.createEvidenceREMNRR(classCode.toString(),
-//                            "NI_DR" + classCode.getValue(),
-//                            new DateTime(),
-//                            EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
-//                            "NI_DR_" + classCode.getValue() + "_RES_FAIL",
-//                            trcAssertion.getID());
-//                } catch (Exception e) {
-//                    log.error(ExceptionUtils.getStackTrace(e));
-//                }
-
-            }
+            EpsosDocument1 eps = clientConectorConsumer.retrieveDocument(hcpAssertion, trcAssertion, selectedCountry,
+                    documentId, hcid, classCode, lang1);
 
             selectedEpsosDocument.setAuthor(eps.getAuthor() + "");
             selectedEpsosDocument.setCreationDate(eps.getCreationDate());
@@ -153,39 +110,16 @@ public class PDFServlet extends HttpServlet {
             selectedEpsosDocument.setTitle(eps.getTitle());
 
             String xmlfile = new String(eps.getBase64Binary(), "UTF-8");
-            log.debug(xmlfile);
-
-            log.debug("The requested XML-PDF file for " + uuid + "\n" + xmlfile);
+            LOGGER.debug("The requested XML-PDF file for '{}':\n'{}", uuid, xmlfile);
 
             pdf = EpsosHelperService.extractPdfPartOfDocument(eps.getBase64Binary());
-            writeOutpustream(res, pdf);
-//            res.setContentType("application/pdf");
-//            res.setHeader("Content-Disposition", "inline; filename=cdapdf.pdf");
-//            res.setHeader("Cache-Control", "no-cache");
-//            res.setDateHeader("Expires", 0);
-//            res.setHeader("Pragma", "No-cache");
-//            log.info("##########3 Serve pdf file");
-//            OutputStream OutStream = res.getOutputStream();
-//            OutStream.write(pdf);
-//            OutStream.flush();
-//            OutStream.close();
+            writeOutputstream(res, pdf);
         } catch (Exception ex) {
-            log.error(ExceptionUtils.getStackTrace(ex));
-//            res.setContentType("text/html");
-//
-//            res.setHeader("Cache-Control", "no-cache");
-//            res.setDateHeader("Expires", 0);
-//            res.setHeader("Pragma", "No-cache");
-//
-//            OutputStream OutStream = res.getOutputStream();
-//            OutStream.write(ex.getMessage().getBytes());
-//            OutStream.flush();
-//            OutStream.close();
-//            log.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
     }
 
-    private void writeOutpustream(HttpServletResponse response, byte[] bytes) {
+    private void writeOutputstream(HttpServletResponse response, byte[] bytes) {
 
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "inline; filename=cdapdf.pdf");
@@ -195,12 +129,12 @@ public class PDFServlet extends HttpServlet {
 
         try (OutputStream stream = response.getOutputStream()) {
 
-            log.info("##########3 Serve pdf file");
+            LOGGER.info("##########3 Serve pdf file");
             stream.write(bytes);
             stream.flush();
             stream.close();
         } catch (IOException e) {
-            log.error("IOException: '{}'", e.getMessage(), e);
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
             response.setContentType("text/html");
             response.setHeader("Cache-Control", "no-cache");
             response.setDateHeader("Expires", 0);
@@ -209,7 +143,7 @@ public class PDFServlet extends HttpServlet {
 
                 stream.write(e.getMessage().getBytes());
             } catch (IOException ex) {
-                log.error("IOException: '{}'", ex.getMessage(), ex);
+                LOGGER.error("IOException: '{}'", ex.getMessage(), ex);
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.gnomon.epsos.filter;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,18 +8,18 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 
 public class RestAuthenticationFilter implements javax.servlet.Filter {
 
     public static final String AUTHENTICATION_HEADER = "Authorization";
-    private static final Logger log = LoggerFactory.getLogger("RestAuthenticationFilter");
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestAuthenticationFilter.class);
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain filter) throws IOException, ServletException, UnsupportedEncodingException {
-        log.info("Rest Authentication Filter ...");
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filter)
+            throws IOException, ServletException {
+
+        LOGGER.info("Rest Authentication Filter ...");
         String url = "";
         HttpServletRequest httpServletRequest = null;
         if (request instanceof HttpServletRequest) {
@@ -26,8 +27,8 @@ public class RestAuthenticationFilter implements javax.servlet.Filter {
             httpServletRequest = (HttpServletRequest) request;
         }
 
-        if (httpServletRequest.getMethod().equalsIgnoreCase("OPTIONS")) {
-            log.info("OPTIONS METHOD ACCEPTED");
+        if (StringUtils.equalsIgnoreCase(httpServletRequest.getMethod(), "OPTIONS")) {
+            LOGGER.info("OPTIONS METHOD ACCEPTED");
             if (response instanceof HttpServletResponse) {
                 HttpServletResponse httpServletResponse = (HttpServletResponse) response;
                 httpServletResponse
@@ -36,39 +37,35 @@ public class RestAuthenticationFilter implements javax.servlet.Filter {
             return;
         }
 
-        log.info("go into authentication filter: " + url);
+        LOGGER.info("go into authentication filter: '{}'", url);
         if (request instanceof HttpServletRequest) {
             httpServletRequest = (HttpServletRequest) request;
 
-            String authCredentials = httpServletRequest
-                    .getHeader(AUTHENTICATION_HEADER);
+            String authCredentials = httpServletRequest.getHeader(AUTHENTICATION_HEADER);
 
-            log.info(AUTHENTICATION_HEADER + ": " + authCredentials);
-            // better injected
+            LOGGER.info("{}: {}", AUTHENTICATION_HEADER, authCredentials);
             AuthenticationService authenticationService = new AuthenticationService();
 
             boolean authenticationStatus = false;
             try {
                 authenticationStatus = authenticationService
                         .authenticate(authCredentials);
-                log.info("Authentication status; " + authenticationStatus);
+                LOGGER.info("Authentication status: '{}'", authenticationStatus);
             } catch (ParseException ex) {
-                log.error(null, ex);
+                LOGGER.error(null, ex);
             }
             if (authenticationStatus) {
                 filter.doFilter(request, response);
             } else {
-                if (httpServletRequest.getMethod().equalsIgnoreCase("OPTIONS")) {
+                if (StringUtils.equalsIgnoreCase(httpServletRequest.getMethod(), "OPTIONS")) {
                     if (response instanceof HttpServletResponse) {
                         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-                        httpServletResponse
-                                .setStatus(HttpServletResponse.SC_ACCEPTED);
+                        httpServletResponse.setStatus(HttpServletResponse.SC_ACCEPTED);
                     }
                 } else {
                     if (response instanceof HttpServletResponse) {
                         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-                        httpServletResponse
-                                .setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     }
                 }
             }
@@ -77,9 +74,11 @@ public class RestAuthenticationFilter implements javax.servlet.Filter {
 
     @Override
     public void destroy() {
+        // Implementation not required.
     }
 
     @Override
     public void init(FilterConfig arg0) throws ServletException {
+        // Implementation not required.
     }
 }
