@@ -147,12 +147,16 @@ public class XcaInitGateway {
             stub.setCountryCode(countryCode);
             EventLogClientUtil.createDummyMustUnderstandHandler(stub);
             // This is a rather dirty hack, but document.getClassCode() returns null for some reason.
-            if (service.equals(Constants.OrderService)) {
-                classCode = Constants.EP_CLASSCODE;
-            } else if (service.equals(Constants.PatientService)) {
-                classCode = Constants.PS_CLASSCODE;
-            } else if (service.equals(Constants.MroService)) {
-                classCode = Constants.MRO_CLASSCODE;
+            switch (service) {
+                case Constants.OrderService:
+                    classCode = Constants.EP_CLASSCODE;
+                    break;
+                case Constants.PatientService:
+                    classCode = Constants.PS_CLASSCODE;
+                    break;
+                case Constants.MroService:
+                    classCode = Constants.MRO_CLASSCODE;
+                    break;
             }
 
             /* Request */

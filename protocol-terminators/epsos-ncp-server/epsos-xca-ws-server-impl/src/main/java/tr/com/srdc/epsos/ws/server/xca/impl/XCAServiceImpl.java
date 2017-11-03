@@ -130,7 +130,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
-            LOGGER.error("DatatypeConfigurationException: {}", e.getMessage());
+            LOGGER.error("DatatypeConfigurationException: {}", e.getMessage(), e);
         }
         eventLog.setPS_PatricipantObjectID(getDocumentEntryPatientId(request));
 
@@ -216,9 +216,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         eventLog.setET_ObjectID(Constants.UUID_PREFIX + request.getDocumentRequest().get(0).getDocumentUniqueId());
 
-        if (documentReturned == false) {
+        if (!documentReturned) {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
-        } else if (errorsDiscovered == false) {
+        } else if (!errorsDiscovered) {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         } else {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.TEMPORAL_FAILURE);
@@ -242,7 +242,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 try {
                     LOGGER.debug("Error to be included in audit: '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(error)));
                 } catch (Exception e) {
-                    LOGGER.debug(e.getMessage());
+                    LOGGER.debug("Exception: '{}'", e.getMessage(), e);
                 }
                 eventLog.setEM_PatricipantObjectID(error.getAttributeValue(new QName("", "errorCode")));
                 eventLog.setEM_PatricipantObjectDetail(error.getAttributeValue(new QName("", "codeContext")).getBytes());
@@ -281,9 +281,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
      * Extracts the patient ID used in epSOS transactions from the XCA query
      */
     private String getEpSOSPatientId(AdhocQueryRequest request) {
+
         String docPatientId = getDocumentEntryPatientId(request);
-        String patientId = trimDocumentEntryPatientId(docPatientId);
-        return patientId;
+        return trimDocumentEntryPatientId(docPatientId);
     }
 
     /**
@@ -770,9 +770,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
         if (!rel.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(rel);
             response.setStatus(IheConstants.REGREP_RESPONSE_FAILURE);
+
         } else {
-            if (classCodeValue.equals(Constants.EP_CLASSCODE) || classCodeValue.equals(Constants.PS_CLASSCODE) || classCodeValue.equals(Constants.MRO_CLASSCODE)) {
-                LOGGER.info("XCA Query Request for " + getDocumentName(classCodeValue) + " is valid.");
+            if (StringUtils.equals(classCodeValue, Constants.EP_CLASSCODE) || StringUtils.equals(classCodeValue,
+                    Constants.PS_CLASSCODE) || StringUtils.equals(classCodeValue, Constants.MRO_CLASSCODE)) {
+
+                LOGGER.info("XCA Query Request for '{}' is valid.", getDocumentName(classCodeValue));
                 if (classCodeValue.contains(Constants.EP_CLASSCODE)) { // Document search for ePrescription service.
                     List<DocumentAssociation<EPDocumentMetaData>> prescriptions
                             = documentSearchService.getEPDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
@@ -780,7 +783,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         rel.getRegistryError().add(createErrorMessage("4103", "ePrescription registry could not be accessed.", "", true));
                         response.setRegistryErrorList(rel);
                         response.setStatus(IheConstants.REGREP_RESPONSE_FAILURE);
-                    } else if (prescriptions.size() == 0) {
+                    } else if (prescriptions.isEmpty()) {
                         rel.getRegistryError().add(createErrorMessage("1102", "No ePrescriptions are registered for the given patient.", "", true));
                         response.setRegistryErrorList(rel);
                         response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
@@ -1338,7 +1341,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     /**
-     * This auxiliar service returns the service name, based on a provided class code.
+     * This auxiliary service returns the service name, based on a provided class code.
      *
      * @param classCodeValue
      * @return

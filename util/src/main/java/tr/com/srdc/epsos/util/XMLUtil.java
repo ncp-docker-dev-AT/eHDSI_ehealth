@@ -49,18 +49,19 @@ import java.util.Map;
 
 public class XMLUtil {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(XMLUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtil.class);
 
     /**
      * Creates a new instance of XMLUtil
      */
-    public XMLUtil() {
+    private XMLUtil() {
     }
 
     /**
      * returns null if Node is null
      */
     public static Node extractFromDOMTree(Node node) throws ParserConfigurationException {
+
         if (node == null) {
             return null;
         }
@@ -68,8 +69,7 @@ public class XMLUtil {
         DocumentBuilder db = dbf.newDocumentBuilder();
         org.w3c.dom.Document theDocument = db.newDocument();
         theDocument.appendChild(theDocument.importNode(node, true));
-        //logger.info(XMLUtil.convertToString(theDocument));
-        return (Node) theDocument.getDocumentElement();
+        return theDocument.getDocumentElement();
     }
 
     /**
@@ -82,13 +82,13 @@ public class XMLUtil {
      * @throws Exception either the document is null, there is no available DOM factory, or a generic c14n error
      */
     public static Document canonicalize(Document doc) throws Exception {
+
         Canonicalizer canon = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
         byte[] back = canon.canonicalizeSubtree(doc);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
 
-        Document docCanon = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(back));
-        return docCanon;
+        return dbf.newDocumentBuilder().parse(new ByteArrayInputStream(back));
     }
 
     public static org.w3c.dom.Document parseContent(byte[] byteContent) throws ParserConfigurationException, SAXException, IOException {
@@ -135,8 +135,7 @@ public class XMLUtil {
         //transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(doc), new StreamResult(writer));
-        String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
-        return output;
+        return writer.getBuffer().toString().replaceAll("\n|\r", "");
     }
 
     /**
@@ -170,8 +169,7 @@ public class XMLUtil {
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        transformer.transform(new DOMSource(doc),
-                new StreamResult(new OutputStreamWriter(out, "UTF-8")));
+        transformer.transform(new DOMSource(doc), new StreamResult(new OutputStreamWriter(out, "UTF-8")));
     }
 
     /**
@@ -186,8 +184,8 @@ public class XMLUtil {
         namespaceBindings = namespaceBindings.substring(1, namespaceBindings.length() - 1);
         String[] bindings = namespaceBindings.split(",");
         Map<String, String> namespaces = new HashMap<>();
-        for (int i = 0; i < bindings.length; i++) {
-            String[] pair = bindings[i].trim().split("=");
+        for (String binding : bindings) {
+            String[] pair = binding.trim().split("=");
             String prefix = pair[0].trim();
             String namespace = pair[1].trim();
             //Remove ' and '
@@ -262,11 +260,11 @@ public class XMLUtil {
      * @return
      */
     public static Object unmarshallWithoutValidation(String context, String schemaLocation, String content) {
+
         Locale oldLocale = Locale.getDefault();
         Locale.setDefault(new Locale("en"));
         try {
-            JAXBContext jc = JAXBContext.newInstance(
-                    context);
+            JAXBContext jc = JAXBContext.newInstance(context);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = schemaFactory.newSchema(new File(schemaLocation));
@@ -285,23 +283,19 @@ public class XMLUtil {
      * @return
      */
     public static Document newDocumentFromInputStream(InputStream in) {
-        DocumentBuilderFactory factory = null;
-        DocumentBuilder builder = null;
+
+        DocumentBuilderFactory factory;
+        DocumentBuilder builder;
         Document ret = null;
 
         try {
             factory = DocumentBuilderFactory.newInstance();
             builder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            LOGGER.error(e.getMessage());
-        }
-
-        try {
             ret = builder.parse(new InputSource(in));
-        } catch (SAXException e) {
-            LOGGER.error(e.getMessage());
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+        } catch (ParserConfigurationException e) {
+            LOGGER.error("ParserConfigurationException: '{}'", e.getMessage(), e);
+        } catch (SAXException | IOException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return ret;
     }

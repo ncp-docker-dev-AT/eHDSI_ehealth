@@ -76,8 +76,6 @@ public class XmlUtil implements TMConstants {
             }
 
             return stringWriter.getBuffer().toString();
-        } catch (TransformerConfigurationException e) {
-            log.error("xmlToString error: ", e);
         } catch (TransformerException e) {
             log.error("xmlToString error: ", e);
         }
@@ -188,7 +186,7 @@ public class XmlUtil implements TMConstants {
     /**
      * Using XPath expression evaluates input node
      *
-     * @param document        input Document
+     * @param node        input Document
      * @param xpathexpression XPath expression to be evaluated
      * @return NodeList
      * @throws XPathExpressionException
