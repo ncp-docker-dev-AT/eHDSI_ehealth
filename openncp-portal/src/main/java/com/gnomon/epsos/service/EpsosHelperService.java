@@ -1136,7 +1136,7 @@ public class EpsosHelperService {
 
             // send Audit message
             // GUI-27
-            if (Validator.isNotNull(assertion)) {
+            if (assertion != null) {
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
                 LOGGER.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
                 EpsosHelperService.sendAuditEpsos91(user.getFullName(), user.getEmailAddress(), orgName, orgType, rolename,
@@ -1150,17 +1150,16 @@ public class EpsosHelperService {
 
                 signSAMLAssertion(assertion, KEY_ALIAS);
                 AssertionMarshaller marshaller = new AssertionMarshaller();
-                Element element = null;
-
-                element = marshaller.marshall(assertion);
+                Element element = marshaller.marshall(assertion);
 
                 Document document = element.getOwnerDocument();
 
                 String hcpa = Utils.getDocumentAsXml(document, false);
                 LOGGER.info("#### HCPA Start\n '{}' \n#### HCPA End", hcpa);
             }
-
-            LOGGER.info("Assertion: '{}'", assertion.getID());
+            if (assertion != null) {
+                LOGGER.info("Assertion: '{}'", assertion.getID());
+            }
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
             return e.getMessage();
@@ -1202,7 +1201,7 @@ public class EpsosHelperService {
                 rolename = "medical doctor";
 
                 String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
-                String p[] = doctor_perms.split(",");
+                String[] p = doctor_perms.split(",");
                 for (String aP : p) {
                     perms.add(prefix + aP);
                 }
@@ -1210,7 +1209,7 @@ public class EpsosHelperService {
             if (isPharmacist) {
                 rolename = "pharmacist";
                 String pharm_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_PERMISSIONS);
-                String p1[] = pharm_perms.split(",");
+                String[] p1 = pharm_perms.split(",");
                 for (String aP1 : p1) {
                     perms.add(prefix + aP1);
                 }
@@ -1219,7 +1218,7 @@ public class EpsosHelperService {
             if (isNurse) {
                 rolename = "nurse";
                 String nurse_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_NURSE_PERMISSIONS);
-                String p1[] = nurse_perms.split(",");
+                String[] p1 = nurse_perms.split(",");
                 for (String aP1 : p1) {
                     perms.add(prefix + aP1);
                 }
@@ -1228,7 +1227,7 @@ public class EpsosHelperService {
             if (isPatient) {
                 rolename = "patient";
                 String patient_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
-                String p1[] = patient_perms.split(",");
+                String[] p1 = patient_perms.split(",");
                 for (String aP1 : p1) {
                     perms.add(prefix + aP1);
                 }
@@ -1237,7 +1236,7 @@ public class EpsosHelperService {
             if (isAdministrator) {
                 rolename = "administrator";
                 String admin_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
-                String p1[] = admin_perms.split(",");
+                String[] p1 = admin_perms.split(",");
                 for (String aP1 : p1) {
                     perms.add(prefix + aP1);
                 }
@@ -1258,7 +1257,7 @@ public class EpsosHelperService {
 
             // send Audit message
             // GUI-27
-            if (Validator.isNotNull(assertion)) {
+            if (assertion != null) {
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
                 LOGGER.debug("Sending epsos-91 audit message for '{}'", fullname);
                 EpsosHelperService.sendAuditEpsos91(fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
@@ -1275,11 +1274,11 @@ public class EpsosHelperService {
                 Document document = element.getOwnerDocument();
 
                 String hcpa = Utils.getDocumentAsXml(document, false);
-                LOGGER.debug("#### HCPA Start");
-                LOGGER.debug(hcpa);
-                LOGGER.debug("#### HCPA End");
+                LOGGER.debug("#### HCPA Start\n{}\n#### HCPA End", hcpa);
             }
-            LOGGER.info("Assertion: " + assertion.getID());
+            if (assertion != null) {
+                LOGGER.info("Assertion: " + assertion.getID());
+            }
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
             return e.getMessage();
@@ -1345,7 +1344,7 @@ public class EpsosHelperService {
 
             // Get certificate
             cert = keystore.getCertificate(KEY_ALIAS);
-            if (cert != null) {
+            if (LOGGER.isInfoEnabled() && cert != null) {
                 LOGGER.info("Certificate loaded ... '{}'", cert.getPublicKey().toString());
             }
 
@@ -1418,11 +1417,9 @@ public class EpsosHelperService {
         asd.write(eventLog1, "13", "2");
     }
 
-    private static Attribute createAttribute(
-            XMLObjectBuilderFactory builderFactory, String FriendlyName,
-            String oasisName) {
-        Attribute attrPID = create(Attribute.class,
-                Attribute.DEFAULT_ELEMENT_NAME);
+    private static Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String FriendlyName, String oasisName) {
+
+        Attribute attrPID = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
         attrPID.setFriendlyName(FriendlyName);
         attrPID.setName(oasisName);
         attrPID.setNameFormat(Attribute.URI_REFERENCE);
@@ -1473,7 +1470,7 @@ public class EpsosHelperService {
     }
 
     private static <T> T create(Class<T> cls, QName qname) {
-        return (T) ((XMLObjectBuilder) Configuration.getBuilderFactory()
+        return (T) (Configuration.getBuilderFactory()
                 .getBuilder(qname)).buildObject(qname);
     }
 
@@ -1803,17 +1800,17 @@ public class EpsosHelperService {
         List<Identifier> identifiers = new ArrayList<>();
 
         Vector vec = EpsosHelperService.getCountryIdsFromCS(country, path);
-        for (int i = 0; i < vec.size(); i++) {
+        for (Object aVec : vec) {
             Identifier id = new Identifier();
             id.setKey(EpsosHelperService.getPortalTranslation(
-                    ((SearchMask) vec.get(i)).getLabel(), language)
+                    ((SearchMask) aVec).getLabel(), language)
                     + "*");
-            id.setDomain(((SearchMask) vec.get(i)).getDomain());
+            id.setDomain(((SearchMask) aVec).getDomain());
             if (id.getKey().equals("") || id.getKey().equals("*")) {
-                id.setKey(((SearchMask) vec.get(i)).getLabel() + "*");
+                id.setKey(((SearchMask) aVec).getLabel() + "*");
             }
 
-            id.setFriendlyName(((SearchMask) vec.get(i)).getFriendlyName());
+            id.setFriendlyName(((SearchMask) aVec).getFriendlyName());
 
             if (Validator.isNotNull(user)) {
                 String idvalue = (String) user.getExpandoBridge().getAttribute(
@@ -1832,20 +1829,20 @@ public class EpsosHelperService {
         List<Demographics> demographics = new ArrayList<Demographics>();
         Vector vec = EpsosHelperService.getCountryDemographicsFromCS(country,
                 path);
-        for (int i = 0; i < vec.size(); i++) {
+        for (Object aVec : vec) {
             Demographics id = new Demographics();
-            if (((Demographics) vec.get(i)).getMandatory()) {
+            if (((Demographics) aVec).getMandatory()) {
                 id.setLabel(EpsosHelperService.getPortalTranslation(
-                        ((Demographics) vec.get(i)).getLabel(), language) + "*");
+                        ((Demographics) aVec).getLabel(), language) + "*");
             } else {
                 id.setLabel(EpsosHelperService.getPortalTranslation(
-                        ((Demographics) vec.get(i)).getLabel(), language));
+                        ((Demographics) aVec).getLabel(), language));
             }
-            id.setLength(((Demographics) vec.get(i)).getLength());
-            id.setKey(((Demographics) vec.get(i)).getKey());
-            id.setMandatory(((Demographics) vec.get(i)).getMandatory());
-            id.setType(((Demographics) vec.get(i)).getType());
-            id.setFriendlyName(((Demographics) vec.get(i)).getFriendlyName());
+            id.setLength(((Demographics) aVec).getLength());
+            id.setKey(((Demographics) aVec).getKey());
+            id.setMandatory(((Demographics) aVec).getMandatory());
+            id.setType(((Demographics) aVec).getType());
+            id.setFriendlyName(((Demographics) aVec).getFriendlyName());
 
             if (Validator.isNotNull(user)) {
                 String idvalue = (String) user.getExpandoBridge().getAttribute(
@@ -2399,12 +2396,12 @@ public class EpsosHelperService {
     }
 
     public static List<PatientDocument> getMockPSDocuments() {
-        List<PatientDocument> mockdocs = new ArrayList();
+        List<PatientDocument> mockdocs = new ArrayList<>();
 
         String repositoryId = "repID";
         String hcID = "hcID";
 
-        GenericDocumentCode formatCode = null;
+        GenericDocumentCode formatCode = GenericDocumentCode.Factory.newInstance();
         formatCode.setNodeRepresentation("");
         formatCode.setSchema("");
         formatCode.setValue("urn:epSOS:ps:ps:2010");
@@ -2413,7 +2410,6 @@ public class EpsosHelperService {
         document.setDescription("Patient Summary");
         document.setHealthcareFacility("");
         document.setTitle("ps title");
-        // document.setFile(aux.getBase64Binary());
         document.setUuid(UUID.randomUUID().toString());
         document.setFormatCode(formatCode);
         document.setRepositoryId(repositoryId);
@@ -2424,9 +2420,9 @@ public class EpsosHelperService {
     }
 
     public static List<PatientDocument> getMockEPDocuments() {
-        List<PatientDocument> mockdocs = new ArrayList();
+        List<PatientDocument> mockdocs = new ArrayList<>();
 
-        GenericDocumentCode formatCode = null;
+        GenericDocumentCode formatCode = GenericDocumentCode.Factory.newInstance();
         formatCode.setNodeRepresentation("");
         formatCode.setSchema("");
         formatCode.setValue("urn:epSOS:ep:pre:2010");
@@ -2438,7 +2434,6 @@ public class EpsosHelperService {
         document.setDescription("Patient Summary");
         document.setHealthcareFacility("");
         document.setTitle("ps title");
-        // document.setFile(aux.getBase64Binary());
         document.setUuid(UUID.randomUUID().toString());
         document.setFormatCode(formatCode);
         document.setRepositoryId(repositoryId);
@@ -2472,7 +2467,6 @@ public class EpsosHelperService {
             convertedcda = xlsClass.transformUsingStandardCDAXsl(input);
         } else {
             LOGGER.info("Transform the document using cdadisplay tool as this is epsos cda");
-            //LOGGER.info("CDA: '{}'", input);
             convertedcda = xlsClass.transform(input, lang, actionUrl);
         }
 
@@ -2651,32 +2645,28 @@ public class EpsosHelperService {
     public static List<PatientDocument> getEPDocs(Assertion assertion,
                                                   Assertion trca, String root, String extension, String country) {
         List<PatientDocument> patientDocuments = null;
-        PatientId patientId = null;
+        PatientId patientId;
         try {
             patientDocuments = new ArrayList<>();
             String serviceUrl = EpsosHelperService
                     .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL); // serviceUrl
             // =
             // LiferayUtils.getFromPrefs("client_connector_url");
-            LOGGER.info("CLIENTCONNECTOR: " + serviceUrl);
-            ClientConnectorConsumer clientConectorConsumer = MyServletContextListener
-                    .getClientConnectorConsumer();
+            LOGGER.info("CLIENTCONNECTOR: '{}'", serviceUrl);
+            ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
             patientId = PatientId.Factory.newInstance();
             patientId.setRoot(root);
             patientId.setExtension(extension);
-            GenericDocumentCode classCode = GenericDocumentCode.Factory
-                    .newInstance();
+            GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
             classCode.setNodeRepresentation(Constants.EP_CLASSCODE);
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.EP_TITLE); // Patient
 
-            LOGGER.info("EP QUERY: Getting ep documents for : "
-                    + patientId.getExtension() + " from " + country);
+            LOGGER.info("EP QUERY: Getting ep documents for : " + patientId.getExtension() + " from " + country);
             List<EpsosDocument1> queryDocuments = clientConectorConsumer
                     .queryDocuments(assertion, trca, country, patientId,
                             classCode);
-            LOGGER.info("EP QUERY: Found " + queryDocuments.size() + " for : "
-                    + patientId.getExtension() + " from " + country);
+            LOGGER.info("EP QUERY: Found " + queryDocuments.size() + " for : " + patientId.getExtension() + " from " + country);
             for (EpsosDocument1 aux : queryDocuments) {
                 PatientDocument document = new PatientDocument();
                 document.setAuthor(aux.getAuthor());
@@ -2755,15 +2745,13 @@ public class EpsosHelperService {
         lang1 = lang1.replace("en-US", "en");
 
         LOGGER.info("Selected language is: '{}'-'{}'", lang, lang1);
-        EpsosDocument1 eps = null;
+        EpsosDocument1 eps;
+        String xmlfile = "";
+
         try {
             eps = clientConectorConsumer.retrieveDocument(hcpAssertion, trcAssertion, selectedCountry, documentId,
                     homecommunityid, classCode, lang1);
-        } catch (Exception e) {
-            LOGGER.error("Error getting document '{}': '{}'", documentid, e.getMessage(), e);
-        }
-        String xmlfile = "";
-        if (Validator.isNotNull(eps)) {
+
             selectedEpsosDocument.setAuthor(eps.getAuthor() + "");
             try {
                 selectedEpsosDocument.setCreationDate(eps.getCreationDate());
@@ -2778,7 +2766,10 @@ public class EpsosHelperService {
             LOGGER.debug("#### CDA XML Start");
             LOGGER.info(xmlfile);
             LOGGER.debug("#### CDA XML End");
+        } catch (Exception e) {
+            LOGGER.error("Error getting document '{}': '{}'", documentid, e.getMessage(), e);
         }
+
         return xmlfile;
     }
 

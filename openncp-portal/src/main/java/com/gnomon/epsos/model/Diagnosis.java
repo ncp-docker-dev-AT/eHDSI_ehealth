@@ -3,6 +3,7 @@ package com.gnomon.epsos.model;
 import com.gnomon.LiferayUtils;
 import com.gnomon.epsos.FacesService;
 import com.liferay.portal.model.User;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +47,7 @@ public class Diagnosis implements Serializable {
     private static final Map<String, Map<String, String>> problemsDictionary;
     //Observation list of a diagnosis
     private static final Map<String, Map<String, String>> observationsDictionary;
-    //Simple date format
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
+
     private static final long serialVersionUID = -6996983017835718177L;
 
     static {
@@ -56,12 +56,12 @@ public class Diagnosis implements Serializable {
         EPSOS_REPOSITORY_PATH = HOME_PATH + "EpsosRepository";
 
         //Building the list of statuses of a diagnosis
-        availableStatuses = new ArrayList<String>();
+        availableStatuses = new ArrayList<>();
         availableStatuses.add("Active");
         availableStatuses.add("Completed");
 
         //Building a map of diagnosis problem display names and codes for each language
-        problemsDictionary = new HashMap<String, Map<String, String>>();
+        problemsDictionary = new HashMap<>();
 
         try {
             //Logging a short info message
@@ -130,7 +130,7 @@ public class Diagnosis implements Serializable {
         }
 
         //Building a map of diagnosis observation display names nad codes
-        observationsDictionary = new HashMap<String, Map<String, String>>();
+        observationsDictionary = new HashMap<>();
 
         try {
             //Logging a short info message
@@ -308,6 +308,7 @@ public class Diagnosis implements Serializable {
      * @return the formatted onset date of the diagnosis.
      */
     public String getFormattedOnset() {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
         return formatter.format(onset);
     }
 
@@ -336,6 +337,7 @@ public class Diagnosis implements Serializable {
      */
     public String getFormattedResolution() {
         if (resolution != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
             return formatter.format(resolution);
         } else {
             return "";
@@ -371,18 +373,16 @@ public class Diagnosis implements Serializable {
 
         //Iterating throught the list of stored observations
         for (String observation : observations) {
-            //Getting the display name
-            String display = observation;
 
             //Getting the codde
-            String code = observationsDictionary.get(language).get(display);
+            String code = observationsDictionary.get(language).get(observation);
 
             //Adding entry into the map
-            entries.put(display, code);
+            entries.put(observation, code);
         }
 
         //Creating an empty list of map entries
-        List<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(entries.entrySet());
+        List<Map.Entry<String, String>> list = new ArrayList<>(entries.entrySet());
 
         return list;
     }
@@ -448,7 +448,7 @@ public class Diagnosis implements Serializable {
      */
     public List<String> getAvailableProblems() {
         //Creating an empty list
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
 
         //Checking if the dictionary provide such a language, otherwise return empty
         if (problemsDictionary.get(language) != null) {
@@ -469,7 +469,7 @@ public class Diagnosis implements Serializable {
      * @return the list of matching display observation names.
      */
     public List<String> complete(String query) {
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
 
         //Checking if the dictionary provide such a language, otherwise return empty
         if (observationsDictionary.get(language) != null) {
@@ -498,7 +498,7 @@ public class Diagnosis implements Serializable {
         String value = event.getNewValue().toString();
 
         //Checking the status of the diagnosis selected by the user
-        resolved = value != null && value.equalsIgnoreCase("completed");
+        resolved = value != null && StringUtils.equalsIgnoreCase(value, "completed");
     }
 
     /**
@@ -537,7 +537,7 @@ public class Diagnosis implements Serializable {
         }
 
         //Checking if the diagnosis is completed
-        if (status.equalsIgnoreCase("completed")) {
+        if (StringUtils.equalsIgnoreCase(status, "completed")) {
             //Validating the resolution field
             if (resolution == null) {
                 //Setting the diagnosis as not passed

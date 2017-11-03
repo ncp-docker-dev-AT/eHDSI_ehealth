@@ -1,11 +1,6 @@
 package eu.epsos.policymanager;
 
 import eu.epsos.assertionvalidator.*;
-
-import static eu.epsos.assertionvalidator.AssertionHelper.getAttributeFromAssertion;
-
-import java.util.List;
-
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.xml.XMLObject;
 import org.slf4j.Logger;
@@ -15,44 +10,54 @@ import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
 import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
 import tr.com.srdc.epsos.util.Constants;
 
+import java.util.List;
+
+import static eu.epsos.assertionvalidator.AssertionHelper.getAttributeFromAssertion;
+
 /**
  * Created: Date: 2012-11-26 Time: 13:14 By: fredrik.dahlman@cag.se
  */
 public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultPolicyManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPolicyManagerImpl.class);
 
     @Override
-    public void HealthcareFacilityValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
-        String healthcareFacilityType = getAttributeFromAssertion(assertion, URN_EPSOS_NAMES_WP3_4_SUBJECT_HEALTHCARE_FACILITY_TYPE);
+    public void HealthcareFacilityValidator(Assertion assertion, String documentClass) throws MissingFieldException,
+            InvalidFieldException {
+
+        String healthcareFacilityType = getAttributeFromAssertion(assertion,
+                URN_EPSOS_NAMES_WP3_4_SUBJECT_HEALTHCARE_FACILITY_TYPE);
         if (healthcareFacilityType.equals(HealthcareFacilityType.HOSPITAL.toString())
                 || healthcareFacilityType.equals(HealthcareFacilityType.RESIDENT_PHYSICIAN.toString())
                 || healthcareFacilityType.equals(HealthcareFacilityType.PHARMACY.toString())
                 || healthcareFacilityType.equals(HealthcareFacilityType.OTHER.toString())) {
-            logger.info("HCP Identity Assertion Healthcare Facility Type	: " + healthcareFacilityType);
+            LOGGER.info("HCP Identity Assertion Healthcare Facility Type: '{}'", healthcareFacilityType);
         } else {
-            logger.warn("InvalidFieldException: epSOS Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
+            LOGGER.warn("InvalidFieldException: epSOS Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
             throw new InvalidFieldException("epSOS Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
         }
     }
 
     @Override
-    public void OnBehalfOfValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
+    public void OnBehalfOfValidator(Assertion assertion, String documentClass) throws MissingFieldException,
+            InvalidFieldException {
+
         String onBehalfOfRole = getAttributeFromAssertion(assertion, URN_EPSOS_NAMES_WP3_4_SUBJECT_ON_BEHALF_OF);
         if (onBehalfOfRole.equals(OnBehalfOf.DENTIST.toString())
                 || onBehalfOfRole.equals(OnBehalfOf.NURSE.toString())
                 || onBehalfOfRole.equals(OnBehalfOf.PHARMACIST.toString())
                 || onBehalfOfRole.equals(OnBehalfOf.PHYSICIAN.toString())
                 || onBehalfOfRole.equals(OnBehalfOf.NURSE_MIDWIFE.toString())) {
-            logger.info("HCP Identity Assertion OnBehalfOf	: " + onBehalfOfRole);
+            LOGGER.info("HCP Identity Assertion OnBehalfOf: '{}'", onBehalfOfRole);
         } else {
             throw new InvalidFieldException("OnBehalfOf 'urn:epsos:names:wp3.4:subject:on-behalf-of' attribute in assertion should be one of followings {'dentist', 'nurse', 'pharmacist', 'physician', 'nurse midwife'}.");
         }
-
     }
 
     @Override
-    public void XSPARoleValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
+    public void XSPARoleValidator(Assertion assertion, String documentClass) throws MissingFieldException,
+            InvalidFieldException {
+
         String xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
         if (xspaRole.equals(XSPARole.NURSE.toString())
                 || xspaRole.equals(XSPARole.PHARMACIST.toString())
@@ -60,14 +65,14 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
                 || xspaRole.equals("medical doctor") // TODO: this role is not valid..
                 || xspaRole.equals(XSPARole.NURSE_MIDWIFE.toString())
                 || xspaRole.equals(XSPARole.PATIENT.toString())) {
-            logger.info("HCP Identity Assertion XSPA Role	: " + xspaRole);
+            LOGGER.info("HCP Identity Assertion XSPA Role: '{}'", xspaRole);
         } else if (xspaRole.equals(XSPARole.ANCILLARY_SERVICES.toString())
                 || xspaRole.equals(XSPARole.CLINICAL_SERVICES.toString())) {
-            logger.info("HCP Identity Assertion XSPA Role	: " + xspaRole);
+            LOGGER.info("HCP Identity Assertion XSPA Role: '{}'", xspaRole);
             OnBehalfOfValidator(assertion, documentClass);
         } else {
-            logger.error("Found XSPA Role: " + xspaRole);
-            logger.error("XSPA Role 'urn:oasis:names:tc:xacml:2.0:subject:role' attribute in assertion should be one of followings {'nurse', 'pharmacist', 'physician', 'medical doctor', 'nurse midwife', 'ancillary services' , 'clinical services', 'patient'}.");
+            LOGGER.error("Found XSPA Role: '{}'", xspaRole);
+            LOGGER.error("XSPA Role 'urn:oasis:names:tc:xacml:2.0:subject:role' attribute in assertion should be one of followings {'nurse', 'pharmacist', 'physician', 'medical doctor', 'nurse midwife', 'ancillary services' , 'clinical services', 'patient'}.");
             throw new InvalidFieldException("The user role is invalid. It should be one of followings {'nurse', 'pharmacist', 'physician', 'medical doctor', 'nurse midwife', 'ancillary services' , 'clinical services', 'patient'}");
         }
     }
@@ -78,7 +83,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         if (subjectId.equals("")) {
             throw new InvalidFieldException("XSPA Subject 'urn:oasis:names:tc:xacml:1.0:subject:subject-id' attribute in assertion should be filled.");
         }
-        logger.info("HCP Identity Assertion XSPA Subject: " + subjectId);
+        LOGGER.info("HCP Identity Assertion XSPA Subject: '{}", subjectId);
     }
 
     @Override
@@ -87,16 +92,16 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         if (resourceId.equals("")) {
             throw new InvalidFieldException("XSPA subject 'uurn:oasis:names:tc:xacml:1.0:resource:resource-id' attribute in assertion should be filled.");
         }
-        logger.info("TRC Assertion XSPA subject	: " + resourceId);
+        LOGGER.info("TRC Assertion XSPA subject: '{}'", resourceId);
     }
 
     @Override
     public void PurposeOfUseValidator(Assertion assertion, String documentClass) throws MissingFieldException, InsufficientRightsException {
         String resourceId = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_PURPOSEOFUSE);
         if (resourceId.equals("TREATMENT") || resourceId.equals("EMERGENCY")) {
-            logger.info("HCP Identity Assertion XSPA Purpose of Use	: " + resourceId);
+            LOGGER.info("HCP Identity Assertion XSPA Purpose of Use: '{}'", resourceId);
         } else {
-            logger.error("InsufficientRightsException");
+            LOGGER.error("InsufficientRightsException");
             throw new InsufficientRightsException();
         }
     }
@@ -107,20 +112,20 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         if (environmentLocality.equals("")) {
             throw new InvalidFieldException("XSPA Locality 'urn:oasis:names:tc:xspa:1.0:environment:locality' attribute in assertion should be filled.");
         }
-        logger.info("HCP Identity Assertion XSPA Locality	: " + environmentLocality);
+        LOGGER.info("HCP Identity Assertion XSPA Locality: '{}", environmentLocality);
     }
 
     @Override
     public void XCPDPermissionValidator(Assertion assertion) throws InsufficientRightsException {
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         for (XMLObject permission : permissions) {
-            logger.info("HCP Identity Assertion XSPD Permission	: " + permission.getDOM().getTextContent());
+            LOGGER.info("HCP Identity Assertion XSPD Permission: " + permission.getDOM().getTextContent());
             if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_006)) {
-                logger.info("Found permission for PRD-006 (Patient Identification and Lookup)");
+                LOGGER.info("Found permission for PRD-006 (Patient Identification and Lookup)");
                 return;
             }
         }
-        logger.error("InsufficientRightsException");
+        LOGGER.error("InsufficientRightsException");
         throw new InsufficientRightsException();
     }
 
@@ -134,7 +139,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
             XCAPermissionValidatorMro(assertion);
         } else {
             String errorMsg = "Invalid document class code: " + documentClass;
-            logger.error(errorMsg);
+            LOGGER.error(errorMsg);
             throw new MissingFieldException(errorMsg);  // TODO: What to do when wrong class code
         }
 
@@ -155,37 +160,38 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         try {
             xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caugth. The assertion role could not be obtained.");
+            LOGGER.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!xspaRole.equals(XSPARole.PHYSICIAN.toString()) && !xspaRole.equals("medical doctor") && !xspaRole.equals(XSPARole.PATIENT.toString())) {
-            logger.error("InsufficientRightsException - Unsupported role (named: " + xspaRole + ") tried to access Patient Summary documents.");
+        if (!xspaRole.equals(XSPARole.PHYSICIAN.toString()) && !xspaRole.equals("medical doctor")
+                && !xspaRole.equals(XSPARole.PATIENT.toString())) {
+            LOGGER.error("InsufficientRightsException - Unsupported role (named: '{}') tried to access Patient Summary documents.", xspaRole);
             throw new InsufficientRightsException();
         }
 
         //Check required permissions
         for (XMLObject permission : permissions) {
             permissionValue = permission.getDOM().getTextContent();
-            logger.info("HCP Identity Assertion XSPA Permission	: " + permissionValue);
+            LOGGER.info("HCP Identity Assertion XSPA Permission: '{}'", permissionValue);
             if (permissionValue.equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_003)) {
                 medicalHistory = true;
-                logger.info("Found permission for PRD-003 (Review Medical History)");
+                LOGGER.info("Found permission for PRD-003 (Review Medical History)");
             } else if (permissionValue.equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_005)) {
                 vitalSign = true;
-                logger.info("Found permission for PRD-005 (Review Vital Signs/Patient Measurements)");
+                LOGGER.info("Found permission for PRD-005 (Review Vital Signs/Patient Measurements)");
             } else if (permissionValue.equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_010)) {
                 patientMedications = true;
-                logger.info("Found permission for PRD-010 (Review Patient Medications)");
+                LOGGER.info("Found permission for PRD-010 (Review Patient Medications)");
             } else if (permissionValue.equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_016)) {
                 reviewProblem = true;
-                logger.info("Found permission for PRD-016 (Review Problems)");
+                LOGGER.info("Found permission for PRD-016 (Review Problems)");
             }
         }
 
         if (medicalHistory && vitalSign && patientMedications && reviewProblem) {
             return;
         }
-        logger.error("InsufficientRightsException");
+        LOGGER.error("InsufficientRightsException");
         throw new InsufficientRightsException();
     }
 
@@ -206,30 +212,30 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         try {
             xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caugth. The assertion role could not be obtained.");
+            LOGGER.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
         if (!xspaRole.equals(XSPARole.PHARMACIST.toString())) {
-            logger.error("InsufficientRightsException - Unsupported (named: " + xspaRole + ") role tried to access ePrescriptions documents.");
+            LOGGER.error("InsufficientRightsException - Unsupported (named: '{}) role tried to access ePrescriptions documents.", xspaRole);
             throw new InsufficientRightsException();
         }
 
         //Check required permissions
         for (XMLObject permission : permissions) {
-            logger.info("HCP Identity Assertion XSPA Permission	: " + permission.getDOM().getTextContent());
+            LOGGER.info("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
             if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_004)) {
                 reviewExistingOrders = true;
-                logger.info("Found permission for PRD-004 (Review Existing Orders)");
+                LOGGER.info("Found permission for PRD-004 (Review Existing Orders)");
             } else if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_010)) {
                 patientMedications = true;
-                logger.info("Found permission for PRD-010 (Review Patient Medications)");
+                LOGGER.info("Found permission for PRD-010 (Review Patient Medications)");
             }
         }
 
         if (reviewExistingOrders && patientMedications) {
             return;
         }
-        logger.error("InsufficientRightsException");
+        LOGGER.error("InsufficientRightsException");
         throw new InsufficientRightsException();
     }
 
@@ -251,7 +257,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
             XDRPermissionValidatorConsent(assertion);
         } else {
             String errorMsg = "Invalid document class code: " + documentClass;
-            logger.error(errorMsg);
+            LOGGER.error(errorMsg);
             throw new MissingFieldException(errorMsg);  // TODO: What to do when wrong class code?
         }
     }
@@ -273,26 +279,27 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         try {
             xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caugth. The assertion role could not be obtained.");
+            LOGGER.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!xspaRole.equals(XSPARole.PHARMACIST.toString()) && !xspaRole.equals(XSPARole.PHYSICIAN.toString()) && !xspaRole.equals("medical doctor")) {
-            logger.error("InsufficientRightsException - Unsupported role (named: " + xspaRole + ") tried to submit eDispensations or HCER documents.");
+        if (!xspaRole.equals(XSPARole.PHARMACIST.toString()) && !xspaRole.equals(XSPARole.PHYSICIAN.toString())
+                && !xspaRole.equals("medical doctor")) {
+            LOGGER.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit eDispensations or HCER documents.", xspaRole);
             throw new InsufficientRightsException();
         }
 
 
         //Check required permissions
         for (XMLObject permission : permissions) {
-            logger.info("HCP Identity Assertion XSPA Permission	: " + permission.getDOM().getTextContent());
+            LOGGER.info("HCP Identity Assertion XSPA Permission	: " + permission.getDOM().getTextContent());
             if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_046)) {
                 recordMedicationAdministrationRecord = true;
-                logger.info("Found permission for PPD-046 (Record Medication Administration Record)");
+                LOGGER.info("Found permission for PPD-046 (Record Medication Administration Record)");
             }
         }
 
         if (!recordMedicationAdministrationRecord) {
-            logger.error("InsufficientRightsException");
+            LOGGER.error("InsufficientRightsException");
             throw new InsufficientRightsException();
         }
     }
@@ -313,36 +320,35 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         try {
             xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caugth. The assertion role could not be obtained.");
+            LOGGER.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
         if (!xspaRole.equals(XSPARole.PHARMACIST.toString()) && !xspaRole.equals(XSPARole.PHYSICIAN.toString()) && !xspaRole.equals("medical doctor")) {
-            logger.error("InsufficientRightsException - Unsupported role (named: " + xspaRole + ") tried to submit consent documents.");
+            LOGGER.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit consent documents.", xspaRole);
             throw new InsufficientRightsException();
         }
 
 
         //Check required permissions
         for (XMLObject permission : permissions) {
-            logger.info("HCP Identity Assertion XSPA Permission	: " + permission.getDOM().getTextContent());
+            LOGGER.info("HCP Identity Assertion XSPA Permission	: " + permission.getDOM().getTextContent());
             if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_032)) {
                 recordMedicationAdministrationRecord = true;
-                logger.info("Found permission for PPD-032 (New Consents and Authorizations)");
+                LOGGER.info("Found permission for PPD-032 (New Consents and Authorizations)");
             }
         }
 
         if (!recordMedicationAdministrationRecord) {
-            logger.error("InsufficientRightsException");
+            LOGGER.error("InsufficientRightsException");
             throw new InsufficientRightsException();
         }
     }
 
     @Override
     public boolean isConsentGiven(String patientId, String countryId) {
-        boolean consentGiven = true;
-        logger.info("Checking consent of patient " + patientId + " for country " + countryId);
-        // TODO: actual check
-        logger.info("Consent of patient " + patientId + " valid for country " + countryId + ": " + consentGiven);
-        return consentGiven;
+
+        LOGGER.info("Checking consent of patient '{}' for country '{}'", patientId, countryId);
+        LOGGER.info("Consent is Valid by default of patient '{}' from country '{}'", patientId, countryId);
+        return true;
     }
 }
