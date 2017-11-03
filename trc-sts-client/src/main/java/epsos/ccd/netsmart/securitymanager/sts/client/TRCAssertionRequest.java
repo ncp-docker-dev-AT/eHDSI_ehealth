@@ -1,19 +1,3 @@
-/*
- *  Copyright 2010 Jerry Dimitriou <jerouris at netsmart.gr>.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
 package epsos.ccd.netsmart.securitymanager.sts.client;
 
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
@@ -47,9 +31,8 @@ import java.security.UnrecoverableKeyException;
 import java.util.UUID;
 
 /**
- * The TRC STS client. It can be used as a reference implementation for
- * requesting a TRC Assertion from the TRC-STS Service. It uses the Builder
- * Design Pattern to create the request, in order to create a immutable final
+ * The TRC STS client. It can be used as a reference implementation for requesting a TRC Assertion from
+ * the TRC-STS Service. It uses the Builder Design Pattern to create the request, in order to create a immutable final
  * object.
  *
  * @author Jerry Dimitriou <jerouris at netsmart.gr>
@@ -91,8 +74,7 @@ public class TRCAssertionRequest {
 
     private TRCAssertionRequest(Builder b) throws Exception {
 
-        // The builder is the only class that can call the constructor
-        // and for that, the following will be surely initialized.
+        // The builder is the only class that can call the constructor and for that, the following will be surely initialized.
         this.idAssert = b.idAssert;
         this.patientId = b.patientId;
         this.purposeOfUse = b.puproseOfUse;
@@ -119,6 +101,7 @@ public class TRCAssertionRequest {
     }
 
     private Element convertAssertionToElement(Assertion as) {
+
         try {
             Document doc = builder.newDocument();
             Configuration.getMarshallerFactory().getMarshaller(as).marshall(as, doc);
@@ -131,6 +114,7 @@ public class TRCAssertionRequest {
     }
 
     private Assertion convertElementToAssertion(Element e) {
+
         try {
             UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(e);
@@ -144,6 +128,7 @@ public class TRCAssertionRequest {
     }
 
     private void createRSTHeader(SOAPHeader header) {
+
         try {
 
             SOAPHeaderElement messageIdElem = header.addHeaderElement(new QName(ADDRESSING_NS, "MessageID", "wsa"));
@@ -161,6 +146,7 @@ public class TRCAssertionRequest {
     }
 
     private void createRSTBody(SOAPBody body) {
+
         try {
             SOAPFactory fac = SOAPFactory.newInstance();
 
@@ -195,10 +181,11 @@ public class TRCAssertionRequest {
      * Sends the request to the TRC STS Service.
      *
      * @return the TRC Assertion that was received from the STS, if the request
-     * was successfull.
+     * was successful.
      * @throws Exception if the request failed.
      */
     public Assertion request() throws Exception {
+
         try {
             LOGGER.info("TRC-STS client request Assertion");
             HttpURLConnection httpConnection = (HttpURLConnection) STSLocation.openConnection();
@@ -214,13 +201,7 @@ public class TRCAssertionRequest {
                 ((HttpsURLConnection) httpConnection).setSSLSocketFactory(getEpsosSSLSocketFactory());
                 if (StringUtils.equals(CHECK_FOR_HOSTNAME, "false"))
                     ((HttpsURLConnection) httpConnection).setHostnameVerifier(
-                            new javax.net.ssl.HostnameVerifier() {
-
-                                public boolean verify(String hostname,
-                                                      javax.net.ssl.SSLSession sslSession) {
-                                    return true;
-                                }
-                            });
+                            (hostname, sslSession) -> true);
             }
 
             //Write and send the SOAP message
@@ -238,7 +219,6 @@ public class TRCAssertionRequest {
                 throw new SOAPException("Code:" + code + ", Error String:" + string);
 
             }
-
             return extractTRCAssertionFromRSTC(response);
 
         } catch (SOAPException ex) {
@@ -251,6 +231,7 @@ public class TRCAssertionRequest {
     }
 
     private Assertion extractTRCAssertionFromRSTC(SOAPMessage response) throws Exception {
+
         try {
             SOAPBody body = response.getSOAPBody();
             if (body.getElementsByTagNameNS(SAML20_TOKEN_URN, "Assertion").getLength() != 1) {
@@ -276,6 +257,7 @@ public class TRCAssertionRequest {
     }
 
     public SSLSocketFactory getEpsosSSLSocketFactory() {
+
         SSLContext ctx = null;
         try {
             KeyStoreManager ksm = new DefaultKeyStoreManager();
@@ -324,6 +306,7 @@ public class TRCAssertionRequest {
          * @param patientId the relevant patient id.
          */
         public Builder(Assertion idAssert, String patientId) {
+
             this.idAssert = idAssert;
             this.patientId = patientId;
             try {
@@ -335,26 +318,26 @@ public class TRCAssertionRequest {
         }
 
         /**
-         * method to incrementaly add the Pupropse Of Use parameter of the TRC
-         * Request
+         * method to incrementaly add the Pupropse Of Use parameter of the TRC Request
          *
          * @param pou Purpose Of use. Either TREATMENT or EMERGENCY
          * @return the Builder object for further initialization
          */
         public Builder PurposeOfUse(String pou) {
+
             this.puproseOfUse = pou;
             return this;
         }
 
         /**
-         * method to incrementally add the STS URL the request. If not added, the
-         * builder will use the one that exists in the secman.sts.url parameter
-         * of the epsos.properties file (see ConfigurationManagerService)
+         * method to incrementally add the STS URL the request. If not added, the builder will use the one that exists
+         * in the secman.sts.url parameter of the epsos.properties file (see ConfigurationManagerService)
          *
          * @param url the URL of the STS that the client will make the request
          * @return the Builder object for further initialization
          */
         public Builder STSLocation(String url) {
+
             try {
                 this.STSLocation = new URL(url);
             } catch (MalformedURLException ex) {
@@ -365,6 +348,7 @@ public class TRCAssertionRequest {
         }
 
         public TRCAssertionRequest build() throws Exception {
+
             return new TRCAssertionRequest(this);
         }
     }

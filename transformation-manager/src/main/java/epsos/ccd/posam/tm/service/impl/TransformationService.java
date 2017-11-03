@@ -110,12 +110,11 @@ public class TransformationService implements ITransformationService, TMConstant
         }
 
         // Document level (1 - unstructured or 3 - structured)
-        boolean level3Doc = false;
+        boolean level3Doc;
         // check if structuredDocument
         //		XPathExpression expr2 = xpath.compile(XPATH_STRUCTUREDBODY);
         //		Node nodeStructuredBody = (Node) expr2.evaluate(document, XPathConstants.NODE);
         Node nodeStructuredBody = XmlUtil.getNode(document, XPATH_STRUCTUREDBODY);
-        ;
         if (nodeStructuredBody != null) {
             LOGGER.debug("Found - '{}'", XPATH_STRUCTUREDBODY);
             // LEVEL 3 document
@@ -137,7 +136,7 @@ public class TransformationService implements ITransformationService, TMConstant
             }
         }
 
-        String docTypeConstant = null;
+        String docTypeConstant;
 
         // find constant for Document type
         if (level3Doc) {
@@ -184,7 +183,7 @@ public class TransformationService implements ITransformationService, TMConstant
 
                 // mda validation
                 if (config.isModelValidationEnabled()) {
-                    boolean validateFriendly = isTranscode ? true : false;
+                    boolean validateFriendly = isTranscode;
                     ModelValidatorResult validateMDA = Validator.validateMDA(
                             new String(inputDocbytes), cdaDocumentType,
                             validateFriendly);
@@ -211,7 +210,7 @@ public class TransformationService implements ITransformationService, TMConstant
                         .isSchematronValidationEnabled()) {
                     // if transcoding, validate against friendly scheme,
                     // else against pivot scheme
-                    boolean validateFriendly = isTranscode ? true : false;
+                    boolean validateFriendly = isTranscode;
                     SchematronResult result = Validator.validateSchematron(
                             inputDocument, cdaDocumentType, validateFriendly);
                     if (result == null || !result.isValid()) {
@@ -245,17 +244,17 @@ public class TransformationService implements ITransformationService, TMConstant
 
                 }
                 // validate RESULT (schematron)
-                if (config
-                        .isSchematronValidationEnabled()) {
-                    SchematronResult result = Validator.validateSchematron(
-                            finalDoc, cdaDocumentType, !isTranscode);
+                if (config.isSchematronValidationEnabled()) {
+
+                    SchematronResult result = Validator.validateSchematron(finalDoc, cdaDocumentType, !isTranscode);
                     if (result == null || !result.isValid()) {
                         status = STATUS_FAILURE;
                         warnings.add(TMError.WARNING_OUTPUT_SCHEMATRON_VALIDATION_FAILED);
-                        responseStructure = new TMResponseStructure(finalDoc,
-                                status, errors, warnings);
+                        responseStructure = new TMResponseStructure(finalDoc, status, errors, warnings);
                         LOGGER.error("Schematron validation error, result document is invalid!");
-                        LOGGER.error(result.toString());
+                        if (LOGGER.isErrorEnabled() && result != null) {
+                            LOGGER.error(result.toString());
+                        }
                         return responseStructure;
                     }
                 } else {
@@ -524,8 +523,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     // if targetLanguageCode is specified in CodedElementList,
                     // this
                     // is used for translation
-                    if (celTargetLanguageCode != null
-                            && celTargetLanguageCode.length() > 1) {
+                    if (celTargetLanguageCode != null && celTargetLanguageCode.length() > 1) {
                         useCELTargetLanguageCode = true;
                     } else {
                         useCELTargetLanguageCode = false;
@@ -533,40 +531,42 @@ public class TransformationService implements ITransformationService, TMConstant
                 }
 
                 nodeList = XmlUtil.getNodeList(document, xPathExpression);
-                LOGGER.debug("Found: "
-                        + (nodeList == null ? "NULL" : nodeList.size())
-                        + " elements");
-                if (isRequired
-                        && (nodeList == null || nodeList.isEmpty())) {
-                    LOGGER.error("Required element is missing: '{}'", codedElementListItem.toString());
+                LOGGER.debug("Found: '{}' elements", (nodeList == null ? "NULL" : nodeList.size()));
+
+                if (isRequired && (nodeList == null || nodeList.isEmpty())) {
+                    if (LOGGER.isErrorEnabled()) {
+                        LOGGER.error("Required element is missing: '{}'", codedElementListItem.toString());
+                    }
                     processingOK = false;
                     errors.add(new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_MISSING, codedElementListItem.toString()));
                 } else {
                     Element originalElement;
-                    for (int i = 0; i < nodeList.size(); i++) {
-                        // iterate elements for processing
-                        originalElement = (Element) nodeList.get(i);
+                    if (nodeList != null) {
 
-                        // check if xsi:type is "CE" or "CD"
-                        checkType(originalElement, warnings);
+                        for (Node aNodeList : nodeList) {
+                            // iterate elements for processing
+                            originalElement = (Element) aNodeList;
 
-                        // call tsam transcode/translate method for each coded
-                        // element
-                        isProcessingSuccesful = (isTranscode ? transcodeElement(
-                                originalElement, document, hmReffId_DisplayName, null,
-                                null, errors, warnings) : translateElement(
-                                originalElement, document, targetLanguageCode,
-                                hmReffId_DisplayName, null, null, errors, warnings));
+                            // check if xsi:type is "CE" or "CD"
+                            checkType(originalElement, warnings);
 
-                        // if is required & processing is unsuccesful,
-                        // report ERROR
-                        if (isRequired && !isProcessingSuccesful) {
-                            processingOK = false;
-                            String ctx = XmlUtil.getElementPath(originalElement);
-                            errors
-                                    .add(isTranscode ? new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED, ctx)
-                                            : new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSLATED, ctx));
-                            LOGGER.error("Required coded element was not translated");
+                            // call tsam transcode/translate method for each coded
+                            // element
+                            isProcessingSuccesful = (isTranscode ? transcodeElement(
+                                    originalElement, document, hmReffId_DisplayName, null,
+                                    null, errors, warnings) : translateElement(
+                                    originalElement, document, targetLanguageCode,
+                                    hmReffId_DisplayName, null, null, errors, warnings));
+
+                            // if is required & processing is unsuccesful,
+                            // report ERROR
+                            if (isRequired && !isProcessingSuccesful) {
+                                processingOK = false;
+                                String ctx = XmlUtil.getElementPath(originalElement);
+                                errors.add(isTranscode ? new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED, ctx)
+                                        : new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSLATED, ctx));
+                                LOGGER.error("Required coded element was not translated");
+                            }
                         }
                     }
                 }

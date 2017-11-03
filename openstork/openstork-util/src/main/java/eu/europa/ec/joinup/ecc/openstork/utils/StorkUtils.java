@@ -65,11 +65,8 @@ public class StorkUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(StorkUtils.class);
 
-    /*
-
-     CONVERSION METHODS
-
-     */
+    private StorkUtils() {
+    }
 
     /**
      * Converts a given STORK Authentication Response into an epSOS Assertion.
@@ -144,19 +141,15 @@ public class StorkUtils {
         } else {
             hcpId = NOT_AVAILABLE;
         }
-        assertionBuilder
-                .hcpIdentifier(hcpId)
-                .hcpRole(hcpRole);
+        assertionBuilder.hcpIdentifier(hcpId).hcpRole(hcpRole);
 
         // MANDATORY: HealthCare Facility Type
         healthCareFacilityType = OTHER_FACILITY_TYPE;
-        assertionBuilder
-                .healthCareFacilityType(healthCareFacilityType);
+        assertionBuilder.healthCareFacilityType(healthCareFacilityType);
 
         // MANDATORY: Purpose of Use
         purposeOfUse = TREATMENT_PURPOSE_OF_USE;
-        assertionBuilder
-                .purposeOfUse(purposeOfUse);
+        assertionBuilder.purposeOfUse(purposeOfUse);
 
         // MANDATORY: Point Of Care
         pointOfCare = DUMMY_POINT_OF_CARE;
@@ -615,7 +608,7 @@ public class StorkUtils {
             String domainAttrValue = elem.getAttribute(DOMAIN_ATTR_NAME);
             String storkAttrValue = elem.getAttribute(STORK_ATTR_NAME);
 
-            if (!searchMaskAttrId.isEmpty() & !storkAttrValue.isEmpty()) {
+            if (!searchMaskAttrId.isEmpty() && !storkAttrValue.isEmpty()) {
                 if (!domainAttrValue.isEmpty()) { // FILL DOMAIN VALUES FOR eIdentifiers (e.g. eIdentifier=2.16.470.1.100.1.1.1000.990.1)
                     result.put(storkAttrValue, domainAttrValue);
                 } else { // FILL NORMAL MAPPING (e.g. surname=patient.data.surname)

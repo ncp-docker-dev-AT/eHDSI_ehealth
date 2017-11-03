@@ -1,22 +1,4 @@
-/***Licensed to the Apache Software Foundation (ASF) under one
- *or more contributor license agreements.  See the NOTICE file
- *distributed with this work for additional information
- *regarding copyright ownership.  The ASF licenses this file
- *to you under the Apache License, Version 2.0 (the
- *"License"); you may not use this file except in compliance
- *with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- *Unless required by applicable law or agreed to in writing,
- *software distributed under the License is distributed on an
- *"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *KIND, either express or implied.  See the License for the
- *specific language governing permissions and limitations
- *under the License.
- **/
 package epsos.ccd.netsmart.securitymanager.sts;
-
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
@@ -24,40 +6,30 @@ import com.sun.xml.ws.api.security.trust.WSTrustException;
 import epsos.ccd.netsmart.securitymanager.EvidenceEmitter;
 import epsos.ccd.netsmart.securitymanager.NoXACMLEvidenceEmitter;
 import epsos.ccd.netsmart.securitymanager.SamlTRCIssuer;
-import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
+import epsos.ccd.netsmart.securitymanager.sts.util.STSUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.io.MarshallingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.*;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.*;
 import javax.xml.ws.Service.Mode;
 import javax.xml.ws.handler.MessageContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
@@ -67,24 +39,21 @@ import java.util.Base64;
 import java.util.UUID;
 
 /**
- * This class is the implementation of the unsigned TRC STS manager for the eID
- * level 2. This class is changed because we need to return an unsigned TRC STS
- * (to be signed by the patient). The layout is changed as well, to avoid to
- * pass back and forth the IdA (to avoid to have the IdA crossing several
+ * This class is the implementation of the unsigned TRC STS manager for the eID level 2.
+ * This class is changed because we need to return an unsigned TRC STS (to be signed by the patient).
+ * The layout is changed as well, to avoid to pass back and forth the IdA (to avoid to have the IdA crossing several
  * security zones).
  *
- * @author Jerry Dimitriou <jerouris at netsmart.gr>, Massimiliano Masi
- *         <massimiliano.masi@tiani-spirit.com>
+ * @author Jerry Dimitriou <jerouris at netsmart.gr>, Massimiliano Masi <massimiliano.masi@tiani-spirit.com>
  */
 @ServiceMode(value = Mode.MESSAGE)
 @WebServiceProvider(targetNamespace = "http://epsos.eu/", serviceName = "SecurityTokenServiceEID", portName = "ISecurityTokenServiceEID_Port")
 @BindingType(value = "http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 public class STSServiceEID implements Provider<SOAPMessage> {
 
-    private static final Logger logger = LoggerFactory.getLogger(STSServiceEID.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(STSServiceEID.class);
 
-    private static final QName Messaging_To = new QName(
-            "http://www.w3.org/2005/08/addressing", "To");
+    private static final QName Messaging_To = new QName("http://www.w3.org/2005/08/addressing", "To");
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion"; // What
     // can
     // be
@@ -108,13 +77,14 @@ public class STSServiceEID implements Provider<SOAPMessage> {
     private static final String WS_SEC_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 
     @Resource
-    WebServiceContext context;
+    private WebServiceContext context;
     private String messageIdResponse;
 
     @Override
     public SOAPMessage invoke(SOAPMessage source) {
-        SOAPBody body = null;
-        SOAPHeader header = null;
+
+        SOAPBody body;
+        SOAPHeader header;
         try {
             body = source.getSOAPBody();
             header = source.getSOAPHeader();
@@ -125,7 +95,7 @@ public class STSServiceEID implements Provider<SOAPMessage> {
         try {
             DefaultBootstrap.bootstrap();
         } catch (ConfigurationException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
         try {
             if (!SUPPORTED_ACTION_URI.equals(getRSTAction(body))) {
@@ -145,7 +115,7 @@ public class STSServiceEID implements Provider<SOAPMessage> {
         try {
             // these calls are both getters and checkers of message.
             // So we call them first
-            String purposeOfUse = getPurposeOfUse(body);
+            String purposeOfUse = STSUtils.getPurposeOfUse(body);
             String patientID = getPatientID(body);
             String doctorId = getDoctorID(body);
             DateTime notBefore = getNotBefore(body);
@@ -160,49 +130,29 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             dbf.setNamespaceAware(true);
             DocumentBuilder builder = dbf.newDocumentBuilder();
 
-            // The repsonse TRC Assertion Issuer.
+            // The response TRC Assertion Issuer.
             SamlTRCIssuer samlTRCIssuer = new SamlTRCIssuer();
 
-            Assertion trc = samlTRCIssuer.issueTrcTokenUnsigned(purposeOfUse, patientID, doctorId, notBefore, notOnOrAfter, authnInstant, sessionNotOnOrAfter, idaReference);
+            Assertion trc = samlTRCIssuer.issueTrcTokenUnsigned(purposeOfUse, patientID, doctorId, notBefore, notOnOrAfter,
+                    authnInstant, sessionNotOnOrAfter, idaReference);
 
             Document signedDoc = builder.newDocument();
-            Configuration.getMarshallerFactory().getMarshaller(trc)
-                    .marshall(trc, signedDoc);
+            Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
 
-            SOAPMessage resp = MessageFactory.newInstance(
-                    SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
-            resp.getSOAPBody().addDocument(createRSTRC(signedDoc));
+            SOAPMessage resp = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
+            resp.getSOAPBody().addDocument(STSUtils.createRSTRC(signedDoc));
             createResponseHeader(resp.getSOAPHeader(), mid);
 
-            String strRespHeader = domElementToString(resp.getSOAPHeader());
-            String strReqHeader = domElementToString(header);
+            String strRespHeader = STSUtils.domElementToString(resp.getSOAPHeader());
+            String strReqHeader = STSUtils.domElementToString(header);
 
 
-            String tls_cn = getSSLCertPeer();
-            logger.info("tls_cn: '{}'", tls_cn);
+            String tls_cn = STSUtils.getSSLCertPeer(context.getMessageContext());
+            LOGGER.info("tls_cn: '{}'", tls_cn);
 
             if (context.getUserPrincipal() != null) {
                 tls_cn = context.getUserPrincipal().getName();
             }
-
-            // audit(samlTRCIssuer.getPointofCare(),
-            // samlTRCIssuer.getHumanRequestorNameId(),
-            // samlTRCIssuer.getHumanRequestorSubjectId(),
-            // samlTRCIssuer.getHRRole(),
-            // patientID,
-            // samlTRCIssuer.getFacilityType(),
-            // trc.getID(),
-            // tls_cn,
-            // mid,
-            // Base64.encodeBase64(strReqHeader.getBytes()),
-            // getMessageIdFromHeader(resp.getSOAPHeader()),
-            // Base64.encodeBase64(strRespHeader.getBytes()));
-
-            // Logger.getLogger(STSService.class.getName()).log(Level.INFO,
-            // "header1:{0}", new String(strReqHeader.getBytes()));
-            // Logger.getLogger(STSService.class.getName()).log(Level.INFO,
-            // "header2:{0}", new String(strRespHeader.getBytes()));
-
 
             DefaultKeyStoreManager lamkm = new DefaultKeyStoreManager();
 
@@ -240,33 +190,8 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             serializer.serialize(el.getOwnerDocument());
             return resp;
 
-        } catch (SOAPException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-
-        } catch (MarshallingException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (ParserConfigurationException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (SMgrException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (CertificateEncodingException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (SAXException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (IOException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException(ex);
         } catch (Exception ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new WebServiceException(ex);
         }
     }
@@ -287,11 +212,9 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             return null;
         }
 
-        String idAReference = trcDetails
+        return trcDetails
                 .getElementsByTagNameNS(TRC_NS, "IdAReference").item(0)
                 .getTextContent();
-
-        return idAReference;
     }
 
     private DateTime getSessionNotOnOrAfter(SOAPBody body) {
@@ -367,48 +290,22 @@ public class STSServiceEID implements Provider<SOAPMessage> {
     }
 
     private String getDoctorID(SOAPBody body) {
+
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
             throw new WebServiceException("No TRC Parameters in RST");
         }
 
-        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(
-                TRC_NS, "TRCParameters").item(0);
+        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "DoctorId").item(0) == null) {
             return null;
         }
 
-        String doctorId = trcDetails
-                .getElementsByTagNameNS(TRC_NS, "DoctorId").item(0)
-                .getTextContent();
-
-        return doctorId;
+        return trcDetails.getElementsByTagNameNS(TRC_NS, "DoctorId").item(0).getTextContent();
     }
 
-    private String getPurposeOfUse(SOAPElement body) {
-
-        if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
-            throw new WebServiceException("No TRC Parameters in RST");
-        }
-
-        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(
-                TRC_NS, "TRCParameters").item(0);
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "PurposeOfUse").item(0) == null) {
-            return null;
-        }
-
-        String purposeOfUse = trcDetails
-                .getElementsByTagNameNS(TRC_NS, "PurposeOfUse").item(0)
-                .getTextContent();
-        if (purposeOfUse != null
-                && (!"TREATMENT".equals(purposeOfUse) && !"EMERGENCY"
-                .equals(purposeOfUse))) {
-            throw new WebServiceException(
-                    "Purpose of Use MUST be either TREATMENT of EMERGENCY");
-        }
-        return purposeOfUse;
-    }
 
     private String getPatientID(SOAPElement body) {
+
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
             throw new WebServiceException("No TRC Parameters in RST");
         }
@@ -420,14 +317,13 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             // be
             // null!
         }
-        String patientId = trcDetails
+        return trcDetails
                 .getElementsByTagNameNS(TRC_NS, "PatientId").item(0)
                 .getTextContent();
-        return patientId;
     }
 
-
     private String getMessageIdFromHeader(SOAPHeader header) {
+
         if (header.getElementsByTagNameNS(ADDRESSING_NS, "MessageID")
                 .getLength() < 1) {
             throw new WebServiceException("Message ID not found in Header");
@@ -447,98 +343,30 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             DateTime now = new DateTime();
 
             SOAPFactory fac = SOAPFactory.newInstance();
-            SOAPElement messageIdElem = header.addHeaderElement(new QName(
-                    ADDRESSING_NS, "MessageID", "wsa"));
+            SOAPElement messageIdElem = header.addHeaderElement(new QName(ADDRESSING_NS, "MessageID", "wsa"));
             messageIdResponse = "uuid:" + UUID.randomUUID().toString();
-            messageIdElem
-                    .setTextContent(messageIdResponse);
-            SOAPElement securityHeaderElem = header.addHeaderElement(new QName(
-                    WS_SEC_NS, "Security", "wsse"));
+            messageIdElem.setTextContent(messageIdResponse);
 
-            SOAPElement timeStampElem = fac.createElement("Timestamp", "wsu",
-                    WS_SEC_UTIL_NS);
-            SOAPElement ltCreated = fac.createElement("Created", "wsu",
-                    WS_SEC_UTIL_NS);
-            ltCreated.setTextContent(now.toDateTime(DateTimeZone.UTC)
-                    .toString());
-
-            SOAPElement ltExpires = fac.createElement("Expires", "wsu",
-                    WS_SEC_UTIL_NS);
-            ltExpires.setTextContent(now.plusHours(2)
-                    .toDateTime(DateTimeZone.UTC).toString());
-
+            SOAPElement securityHeaderElem = header.addHeaderElement(new QName(WS_SEC_NS, "Security", "wsse"));
+            SOAPElement timeStampElem = fac.createElement("Timestamp", "wsu", WS_SEC_UTIL_NS);
+            SOAPElement ltCreated = fac.createElement("Created", "wsu", WS_SEC_UTIL_NS);
+            ltCreated.setTextContent(now.toDateTime(DateTimeZone.UTC).toString());
+            SOAPElement ltExpires = fac.createElement("Expires", "wsu", WS_SEC_UTIL_NS);
+            ltExpires.setTextContent(now.plusHours(2).toDateTime(DateTimeZone.UTC).toString());
             timeStampElem.addChildElement(ltCreated);
             timeStampElem.addChildElement(ltExpires);
 
             securityHeaderElem.addChildElement(timeStampElem);
 
-            SOAPElement actionElem = header.addHeaderElement(new QName(
-                    ADDRESSING_NS, "Action", "wsa"));
+            SOAPElement actionElem = header.addHeaderElement(new QName(ADDRESSING_NS, "Action", "wsa"));
             actionElem.setTextContent("urn:IssueTokenResponse");
 
-            SOAPElement relatesToElem = header.addHeaderElement(new QName(
-                    ADDRESSING_NS, "RelatesTo", "wsa"));
+            SOAPElement relatesToElem = header.addHeaderElement(new QName(ADDRESSING_NS, "RelatesTo", "wsa"));
             relatesToElem.setTextContent(messageId);
 
         } catch (SOAPException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new WebServiceException("Could not create Response Header");
-        }
-    }
-
-    private Document createRSTRC(Document assertion) {
-        try {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                    .newDocumentBuilder();
-            Document respBody = builder.newDocument();
-
-            Element rstrcElem = respBody.createElementNS(WS_TRUST_NS,
-                    "wst:RequestSecurityTokenResponseCollection");
-            respBody.appendChild(rstrcElem);
-
-            Element rstrElem = respBody.createElementNS(WS_TRUST_NS,
-                    "wst:RequestSecurityTokenResponse");
-            rstrcElem.appendChild(rstrElem);
-
-            Element rstElem = respBody.createElementNS(WS_TRUST_NS,
-                    "wst:RequestedSecurityToken");
-            rstrElem.appendChild(rstElem);
-
-            // add the Assertion
-            rstElem.appendChild(respBody.importNode(
-                    assertion.getDocumentElement(), true));
-
-            Element tokenTypeElem = respBody.createElementNS(WS_TRUST_NS,
-                    "wst:TokenType");
-            tokenTypeElem.setTextContent(SAML20_TOKEN_URN);
-
-            rstrElem.appendChild(tokenTypeElem);
-
-            Element lifeTimeElem = respBody.createElementNS(WS_TRUST_NS,
-                    "wst:LifeTime");
-            rstrElem.appendChild(lifeTimeElem);
-
-            DateTime now = new DateTime();
-
-            Element ltCreated = respBody.createElementNS(WS_SEC_UTIL_NS,
-                    "wsu:Created");
-            ltCreated.setTextContent(now.toDateTime(DateTimeZone.UTC)
-                    .toString());
-
-            lifeTimeElem.appendChild(ltCreated);
-
-            Element ltExpires = respBody.createElementNS(WS_SEC_UTIL_NS,
-                    "wsu:Expires");
-            ltExpires.setTextContent(now.plusHours(2)
-                    .toDateTime(DateTimeZone.UTC).toString());
-
-            lifeTimeElem.appendChild(ltExpires);
-
-            return respBody;
-
-        } catch (Exception ex) {
-            logger.error(null, ex);
-            throw new WebServiceException("Cannot create RSTSC Message");
         }
     }
 
@@ -563,125 +391,28 @@ public class STSServiceEID implements Provider<SOAPMessage> {
 
     }
 
-    private String domElementToString(Element elem) {
-        try {
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer trans = tf.newTransformer();
-            StringWriter sw = new StringWriter();
-            trans.transform(new DOMSource(elem), new StreamResult(sw));
-            return sw.toString();
-        } catch (TransformerException ex) {
-            logger.error(null, ex);
-            throw new WebServiceException("Error Creating audit message");
-        }
-    }
-
-    // private void audit(String pointOfCareID,
-    // String humanRequestorNameID,
-    // String humanRequestorSubjectID,
-    // String humanRequestorRole,
-    // String patientID,
-    // String facilityType,
-    // String assertionId,
-    // String tls_cn,
-    // String reqMid,
-    // byte[] reqSecHeader,
-    // String resMid,
-    // byte[] resSecHeader)
-    // {
-    // AuditService asd = new AuditService();
-    // GregorianCalendar c = new GregorianCalendar();
-    // c.setTime(new Date());
-    // XMLGregorianCalendar date2 = null;
-    // try {
-    // date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-    // } catch (DatatypeConfigurationException ex) {
-    //
-    // }
-    //
-    // ConfigurationManagerService cms =
-    // ConfigurationManagerService.getInstance();
-    //
-    // EventLog evLogTRC = EventLog.createEventLogTRCA(
-    // TransactionName.epsosTRCAssertion,
-    // EventActionCode.EXECUTE,
-    // date2,
-    // EventOutcomeIndicator.FULL_SUCCESS,
-    // pointOfCareID,
-    // facilityType,
-    // cms.getProperty("ncp.country")+"<" + humanRequestorNameID + "@" +
-    // cms.getProperty("ncp.country")+ ">" ,
-    // humanRequestorRole,
-    // humanRequestorSubjectID,
-    // tls_cn,
-    // getServerIP(),
-    // cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
-    // patientID,
-    // "urn:uuid:" + assertionId,
-    // reqMid,
-    // reqSecHeader,
-    // resMid,
-    // resSecHeader,
-    // getServerIP(),
-    // getClientIP());
-    //
-    // evLogTRC.setEventType(EventType.epsosTRCAssertion);
-    // asd.write(evLogTRC, "13", "2");
-    //
-    // }
-
-    private String getServerIP() {
-        try {
-            InetAddress thisIp = InetAddress.getLocalHost();
-            return thisIp.getHostAddress();
-        } catch (Exception e) {
-            return "Unknown IP";
-        }
-
-    }
-
     private String getClientIP() {
+
         MessageContext mc = context.getMessageContext();
-        HttpServletRequest req = (HttpServletRequest) mc
-                .get(MessageContext.SERVLET_REQUEST);
+        HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
         return req.getRemoteAddr();
     }
 
     private X509Certificate getSSLCert() {
+
         MessageContext msgCtx = context.getMessageContext();
 
-        javax.servlet.ServletRequest sreq = (javax.servlet.ServletRequest) msgCtx
-                .get(MessageContext.SERVLET_REQUEST);
+        javax.servlet.ServletRequest sreq = (javax.servlet.ServletRequest) msgCtx.get(MessageContext.SERVLET_REQUEST);
 
         if (sreq instanceof HttpServletRequest && sreq.isSecure()) {
-            logger.info("Secure and http");
+            LOGGER.info("Secure and http");
             HttpServletRequest hreq = (HttpServletRequest) sreq;
-            X509Certificate peerCert[] = (X509Certificate[]) hreq
-                    .getAttribute("javax.servlet.request.X509Certificate");
+            X509Certificate[] peerCert = (X509Certificate[]) hreq.getAttribute("javax.servlet.request.X509Certificate");
             if (peerCert != null) {
                 return peerCert[0];
             }
         }
         return null;
-    }
-
-    private String getSSLCertPeer() {
-        String user = "Unknown(No Client Certificate)";
-        MessageContext msgCtx = context.getMessageContext();
-
-        javax.servlet.ServletRequest sreq = (javax.servlet.ServletRequest) msgCtx
-                .get(MessageContext.SERVLET_REQUEST);
-
-        if (sreq instanceof HttpServletRequest && sreq.isSecure()) {
-            logger.info("Secure and http");
-            HttpServletRequest hreq = (HttpServletRequest) sreq;
-            X509Certificate peerCert[] = (X509Certificate[]) hreq
-                    .getAttribute("javax.servlet.request.X509Certificate");
-            if (peerCert != null) {
-                return peerCert[0].getSubjectDN().getName();
-            }
-        }
-        return user;
     }
 
     /**
@@ -696,7 +427,7 @@ public class STSServiceEID implements Provider<SOAPMessage> {
 
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         md.reset();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         OutputFormat format = new OutputFormat();
 
@@ -709,9 +440,9 @@ public class STSServiceEID implements Provider<SOAPMessage> {
         format.setStandalone(true);
 
 
-        XMLSerializer serializer = new XMLSerializer(baos, format);
+        XMLSerializer serializer = new XMLSerializer(outputStream, format);
         serializer.serialize(envelope.getSOAPBody().getOwnerDocument());
-        md.update(baos.toByteArray());
+        md.update(outputStream.toByteArray());
         return Base64.getEncoder().encodeToString(md.digest());
     }
 }

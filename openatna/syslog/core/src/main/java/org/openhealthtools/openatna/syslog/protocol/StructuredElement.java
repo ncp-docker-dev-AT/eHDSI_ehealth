@@ -1,25 +1,7 @@
-/**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
- */
-
 package org.openhealthtools.openatna.syslog.protocol;
 
+import org.openhealthtools.openatna.syslog.Constants;
+import org.openhealthtools.openatna.syslog.SyslogException;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -28,9 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.openhealthtools.openatna.syslog.Constants;
-import org.openhealthtools.openatna.syslog.SyslogException;
 
 /**
  * A structured element as defined by RFC 5424
@@ -44,25 +23,12 @@ import org.openhealthtools.openatna.syslog.SyslogException;
 public class StructuredElement implements Serializable {
 
     public static final int docEnterpriseNumber = 32473;
-
-    public static char[] escaped = {'"', '\\', ']'};
-    public static char[] disallowed = {' ', '=', '\\', ']'};
-
-
-    public static String[] ianaIds =
-            {
-                    "timeQuality",
-                    "origin",
-                    "meta",
-            };
-
     /**
      * timeQuality parameters
      */
     public static final String TZ_KNOWN = "tzKnown";
     public static final String IS_SYNCED = "isSynced";
     public static final String SYNC_ACCURACY = "syncAccuracy";
-
     /**
      * origin parameters
      */
@@ -70,47 +36,26 @@ public class StructuredElement implements Serializable {
     public static final String ENTERPRISE_ID = "enterpriseId";
     public static final String SOFTWARE = "software";
     public static final String SW_VERSION = "swVersion";
-
     /**
      * meta parameters
      */
     public static final String SEQUENCE_ID = "sequenceId";
     public static final String SYS_UPTIME = "sysUpTime";
     public static final String LANGUAGE = "language";
-
-
+    public static char[] escaped = {'"', '\\', ']'};
+    public static char[] disallowed = {' ', '=', '\\', ']'};
+    public static String[] ianaIds =
+            {
+                    "timeQuality",
+                    "origin",
+                    "meta",
+            };
     private String id;
     private Set<SdParam> params = new HashSet<SdParam>();
 
     public StructuredElement(String id, List<SdParam> params) {
         this.id = id;
-        for (SdParam param : params) {
-            this.params.add(param);
-        }
-    }
-
-    /**
-     * returns a copy
-     *
-     * @return
-     */
-    public List<SdParam> getParams() {
-        return new ArrayList<SdParam>(params);
-    }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder("[");
-        sb.append(id);
-        for (SdParam s : params) {
-            sb.append(" ")
-                    .append(s.getName())
-                    .append("=\"")
-                    .append(escape(s.getValue()))
-                    .append("\"");
-        }
-        sb.append("]");
-        return sb.toString();
-
+        this.params.addAll(params);
     }
 
     public static String unescape(String param) {
@@ -175,8 +120,9 @@ public class StructuredElement implements Serializable {
      * @throws SyslogException
      */
     public static List<StructuredElement> parse(InputStream in) throws SyslogException {
-        List<StructuredElement> ret = new ArrayList<StructuredElement>();
-        List<SdParam> params = new ArrayList<SdParam>();
+
+        List<StructuredElement> ret = new ArrayList<>();
+        List<SdParam> params = new ArrayList<>();
         String currName = null;
         String id = null;
         int state = 0;
@@ -344,6 +290,29 @@ public class StructuredElement implements Serializable {
         if (name.equals(docEnterpriseNumber)) {
             throw new SyslogException("documentation enterprise number not allowed");
         }
+    }
+
+    /**
+     * returns a copy
+     *
+     * @return
+     */
+    public List<SdParam> getParams() {
+        return new ArrayList<>(params);
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        sb.append(id);
+        for (SdParam s : params) {
+            sb.append(" ")
+                    .append(s.getName())
+                    .append("=\"")
+                    .append(escape(s.getValue()))
+                    .append("\"");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     @Override
