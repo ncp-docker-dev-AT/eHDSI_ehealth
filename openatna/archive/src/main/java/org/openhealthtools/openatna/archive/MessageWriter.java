@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2009-2011 University of Cardiff and others.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * <p>
  * Contributors:
  * Cardiff University - intial API and implementation
  */
@@ -23,6 +23,8 @@ import org.openhealthtools.openatna.audit.persistence.model.*;
 import org.openhealthtools.openatna.audit.persistence.model.codes.CodeEntity;
 import org.openhealthtools.openatna.audit.persistence.util.Base64;
 import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -38,14 +40,18 @@ import java.util.Set;
 
 public class MessageWriter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorWriter.class);
+
     private EntityWriter entityWriter = new EntityWriter();
 
     public void begin(XMLStreamWriter writer) throws XMLStreamException {
+
         writer.writeStartDocument();
         writer.writeStartElement(DataConstants.MESSAGES);
     }
 
     public void writeMessages(List<? extends MessageEntity> msgs, XMLStreamWriter writer) throws XMLStreamException {
+
         for (MessageEntity msg : msgs) {
             writer.writeStartElement(DataConstants.MESSAGE);
             if (msg.getSourceAddress() != null) {
@@ -58,13 +64,13 @@ public class MessageWriter {
                 writer.writeAttribute(DataConstants.EVT_OUTCOME, Integer.toString(msg.getEventOutcome()));
             }
             if (msg.getEventDateTime() != null) {
-                writer.writeAttribute(DataConstants.EVT_TIME, Archiver.archiveFormat.format(msg.getEventDateTime()));
+                writer.writeAttribute(DataConstants.EVT_TIME, Archiver.formatDate(msg.getEventDateTime()));
             }
             if (msg.getEventId() != null) {
                 entityWriter.writeCode(msg.getEventId(), writer, DataConstants.EVT_ID);
             }
-            if (msg.getEventTypeCodes().size() > 0) {
-                List<? extends CodeEntity> l = new ArrayList<CodeEntity>(msg.getEventTypeCodes());
+            if (!msg.getEventTypeCodes().isEmpty()) {
+                List<? extends CodeEntity> l = new ArrayList<>(msg.getEventTypeCodes());
                 for (CodeEntity codeEntity : l) {
                     entityWriter.writeCode(codeEntity, writer, DataConstants.EVT_TYPE);
                 }
@@ -130,12 +136,14 @@ public class MessageWriter {
 
 
     public void finish(XMLStreamWriter writer) throws IOException {
+
         try {
             writer.writeEndElement();
             writer.writeEndDocument();
             writer.flush();
             writer.close();
         } catch (XMLStreamException e) {
+            LOGGER.error("XMLStreamException: '{}'", e.getMessage(), e);
             throw new IOException(e.getMessage());
         }
     }

@@ -1,22 +1,3 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others.
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * <p>
- * Contributors:
- * Cardiff University - intial API and implementation
- */
-
 package org.openhealthtools.openatna.archive;
 
 import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
@@ -36,21 +17,18 @@ import java.util.List;
 /**
  * @author Andrew Harrison
  * @version 1.0.0
- * @date Jan 27, 2010: 5:56:09 PM
  */
-
 public class ErrorReader {
 
     public void begin(XMLEventReader reader) throws XMLStreamException {
         ReadUtils.dig(reader, DataConstants.ERRORS);
     }
 
-
     public List<ErrorEntity> readErrors(int max, XMLEventReader reader) throws XMLStreamException {
         if (max <= 0) {
             max = Integer.MAX_VALUE;
         }
-        List<ErrorEntity> ret = new ArrayList<ErrorEntity>();
+        List<ErrorEntity> ret = new ArrayList<>();
 
         boolean is = ReadUtils.peek(reader, DataConstants.ERROR);
         while (is && ret.size() < max) {
@@ -63,6 +41,7 @@ public class ErrorReader {
 
 
     public ErrorEntity readError(XMLEventReader reader) throws XMLStreamException {
+
         XMLEvent evt = ReadUtils.dig(reader, DataConstants.ERROR);
         List<Attribute> attrs = ReadUtils.getAttributes(evt);
         ErrorEntity se = new ErrorEntity();
@@ -72,13 +51,14 @@ public class ErrorReader {
                 se.setSourceIp(a.getValue());
             } else if (attr.equalsIgnoreCase(DataConstants.ERROR_TIMESTAMP)) {
                 try {
-                    se.setErrorTimestamp(Archiver.archiveFormat.parse(a.getValue()));
+                    se.setErrorTimestamp(Archiver.parseDate(a.getValue()));
                 } catch (ParseException e) {
                     throw new XMLStreamException(e);
                 }
             }
         }
         while (true) {
+
             XMLEvent code = reader.peek();
             if (code.isStartElement()) {
                 StartElement el = code.asStartElement();
@@ -102,7 +82,6 @@ public class ErrorReader {
             } else {
                 // move on - it's a comment or space or something
                 reader.nextEvent();
-
             }
         }
         return se;

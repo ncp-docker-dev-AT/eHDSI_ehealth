@@ -8,12 +8,12 @@ import java.util.Date;
  * A class encapsulating a date of birth.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Birthdate {
 
     // Date formatter
-    private static SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
+    private SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
+
     // Date and time of birth
     private Date date;
 

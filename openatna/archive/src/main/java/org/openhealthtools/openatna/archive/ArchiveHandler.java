@@ -1,21 +1,3 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others.
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * <p>
- * Contributors:
- * Cardiff University - intial API and implementation
- */
 package org.openhealthtools.openatna.archive;
 
 import java.io.*;
@@ -31,12 +13,11 @@ import java.util.zip.ZipEntry;
 /**
  * @author Andrew Harrison
  * @version 1.0.0
- * @date Jan 26, 2010: 2:35:04 PM
  */
 
 public class ArchiveHandler {
 
-    public static final String JAR_SEP = "/";
+    private static final String JAR_SEP = "/";
 
     private static ArrayList<String> ignores = new ArrayList<String>();
 
@@ -51,10 +32,12 @@ public class ArchiveHandler {
     }
 
     public static File archive(String jarName, List<File> files, File destDir) throws IOException {
+
         return archive(jarName, files, destDir, true);
     }
 
     public static File archive(String jarName, List<File> files, File destDir, boolean recursive) throws IOException {
+
         if (!destDir.exists()) {
             destDir.mkdirs();
         }
@@ -80,6 +63,7 @@ public class ArchiveHandler {
 
 
     private static void writeEntry(File f, JarOutputStream jos, File build, List<String> entries, boolean recursive) throws IOException {
+
         if (f == null || shouldBeIgnored(f.getName())) {
             return;
         }
@@ -114,14 +98,16 @@ public class ArchiveHandler {
     }
 
     private static void writeManifest(JarOutputStream out) throws IOException {
+
         out.putNextEntry(new ZipEntry("META-INF/"));
         out.putNextEntry(new ZipEntry("META-INF/MANIFEST.MF"));
         out.write("Manifest-Version: 1.0\n".getBytes("UTF-8"));
-        out.write(("Built-Date: " + Archiver.archiveFormat.format(new Date()) + "\n").getBytes("UTF-8"));
+        out.write(("Built-Date: " + Archiver.formatDate(new Date()) + "\n").getBytes("UTF-8"));
         out.closeEntry();
     }
 
     private static String createPath(File build, File file) throws IOException {
+
         String root = build.getCanonicalPath();
         String entry = file.getCanonicalPath();
         String jarPath = entry.substring(root.length(), entry.length()).replace(File.separator, JAR_SEP);
@@ -136,6 +122,7 @@ public class ArchiveHandler {
     }
 
     private static boolean shouldBeIgnored(String name) {
+
         for (String ignore : ignores) {
             if (name.equals(ignore)) {
                 return true;
@@ -169,8 +156,6 @@ public class ArchiveHandler {
 
                 BufferedInputStream in = new BufferedInputStream(source);
                 BufferedOutputStream out = new BufferedOutputStream(destination);
-//                BufferedInputStream in = new BufferedInputStream(new FileInputStream(src));
-//                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest));
 
                 byte[] bytes = new byte[8192];
                 int c;
@@ -195,6 +180,7 @@ public class ArchiveHandler {
      * @throws FileNotFoundException
      */
     public static void deleteFiles(File parent, boolean incParent) throws FileNotFoundException {
+
         if (!parent.exists()) {
             throw new FileNotFoundException("File does not exist.");
         }
@@ -210,31 +196,37 @@ public class ArchiveHandler {
     }
 
     public static InputStream readMessages(File file) throws IOException {
+
         return readEntry(file, Archiver.MESSAGES);
     }
 
     public static InputStream readEntities(File file) throws IOException {
+
         return readEntry(file, Archiver.ENTITIES);
     }
 
     public static InputStream readErrors(File file) throws IOException {
+
         return readEntry(file, Archiver.ERRORS);
     }
 
     public static File extractMessages(File file, File destDir) throws IOException {
+
         return extractEntry(file, Archiver.MESSAGES, destDir);
     }
 
     public static File extractEntities(File file, File destDir) throws IOException {
+
         return extractEntry(file, Archiver.ENTITIES, destDir);
     }
 
     public static File extractErrors(File file, File destDir) throws IOException {
+
         return extractEntry(file, Archiver.ERRORS, destDir);
     }
 
-
     public static File extractEntry(JarFile jarFile, String path, File destDir) throws IOException {
+
         JarEntry entry = jarFile.getJarEntry(path);
         if (entry == null) {
             return null;
@@ -258,6 +250,7 @@ public class ArchiveHandler {
     }
 
     public static InputStream readEntry(JarFile jarFile, String path) throws IOException {
+
         JarEntry entry = jarFile.getJarEntry(path);
         if (entry == null) {
             return null;
@@ -267,17 +260,19 @@ public class ArchiveHandler {
     }
 
     public static File extractEntry(File file, String path, File destDir) throws IOException {
+
         JarFile jarFile = new JarFile(file);
         return extractEntry(jarFile, path, destDir);
     }
 
     public static InputStream readEntry(File file, String path) throws IOException {
+
         JarFile jarFile = new JarFile(file);
         return readEntry(jarFile, path);
     }
 
-
     private static File createOutputFile(File destDir, String jarEntry) {
+
         int sep = jarEntry.indexOf(JAR_SEP);
         if (sep == -1) {
             return new File(destDir, jarEntry);
@@ -293,11 +288,13 @@ public class ArchiveHandler {
     }
 
     public static void extract(File file, File destDir) throws IOException {
+
         JarFile jarFile = new JarFile(file);
         extract(jarFile, destDir);
     }
 
     public static void extract(JarFile jarFile, File destDir) throws IOException {
+
         Enumeration<JarEntry> en = jarFile.entries();
         while (en.hasMoreElements()) {
             JarEntry je = en.nextElement();

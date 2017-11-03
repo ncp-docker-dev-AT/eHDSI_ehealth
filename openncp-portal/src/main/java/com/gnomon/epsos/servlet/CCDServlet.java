@@ -25,13 +25,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.io.OutputStream;
 
 public class CCDServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1974995783413475611L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(CCDServlet.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CCDServlet.class);
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -40,7 +41,7 @@ public class CCDServlet extends HttpServlet {
 
         String cda;
         LOGGER.info("getting html document");
-        try {
+        try (OutputStream outputStream = res.getOutputStream()) {
             String uuid = req.getParameter("uuid");
             String repositoryId = req.getParameter("repositoryid");
             String hcid = req.getParameter("hcid");
@@ -77,7 +78,7 @@ public class CCDServlet extends HttpServlet {
             LOGGER.debug("selectedCountry: '{}'", selectedCountry);
             LOGGER.debug("classCode: '{}'", classCode);
 
-            String lang = user.getLanguageId();
+            String lang;
             String ltrlang = ParamUtil.getString(req, "lang");
             if (Validator.isNull(ltrlang)) {
                 lang = user.getLanguageId();
@@ -101,31 +102,27 @@ public class CCDServlet extends HttpServlet {
             String xmlFile = new String(eps.getBase64Binary(), "UTF-8");
             LOGGER.info("#### CDA XML Start: \n '{}' \n #### CDA XML End", xmlFile);
 
-            boolean isCDA = false;
-            try {
-                Document doc1 = Utils.createDomFromString(xmlFile);
-                isCDA = EpsosHelperService.isCDA(doc1);
-                LOGGER.info("### Document created is CDA: '{}'", isCDA);
-            } catch (Exception e) {
-                LOGGER.error(ExceptionUtils.getStackTrace(e));
-            }
+            boolean isCDA;
+            Document doc1 = Utils.createDomFromString(xmlFile);
+            isCDA = EpsosHelperService.isCDA(doc1);
+            LOGGER.info("### Document created is CDA: '{}'", isCDA);
 
             // Transform to CCD
             String mayoTransformed = "";
             EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
 
             if (isCDA) {
-                LOGGER.info("########### Styling the document that is CDA: '{}' using standard xsl", isCDA);
+                LOGGER.info("########### Styling the document that is CDA: '{}' using standard xsl", true);
                 cda = xlsClass.transformUsingStandardCDAXsl(mayoTransformed);
             } else {
-                LOGGER.info("########### Styling the document that is CDA: '{}' using EPSOS xsl", isCDA);
+                LOGGER.info("########### Styling the document that is CDA: '{}' using EPSOS xsl", false);
                 mayoTransformed = xmlFile;
                 cda = xlsClass.transform(mayoTransformed, lang1, "");
             }
 
             // Visualize as HTML using standard stylesheet
             LOGGER.info("EXPORT TYPE: '{}'", exportType);
-            byte[] output = null;
+            byte[] output;
             if (StringUtils.equals(exportType, "xml")) {
                 output = mayoTransformed.getBytes();
             } else {
@@ -143,23 +140,26 @@ public class CCDServlet extends HttpServlet {
             res.setDateHeader("Expires", 0);
             res.setHeader("Pragma", "No-cache");
 
-            OutputStream outputStream = res.getOutputStream();
             outputStream.write(output);
             outputStream.flush();
             outputStream.close();
 
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
             res.setContentType("text/html");
             res.setHeader("Cache-Control", "no-cache");
             res.setDateHeader("Expires", 0);
             res.setHeader("Pragma", "No-cache");
 
-            OutputStream outputStream = res.getOutputStream();
-            outputStream.write(ex.getMessage().getBytes());
-            outputStream.flush();
-            outputStream.close();
-            LOGGER.error(ExceptionUtils.getStackTrace(ex));
+            try (OutputStream outputStream = res.getOutputStream()) {
+                outputStream.write(ex.getMessage().getBytes());
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                LOGGER.error(ExceptionUtils.getStackTrace(e));
+            }
+        } catch (XPathExpressionException e) {
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
     }
 }

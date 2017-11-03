@@ -1,36 +1,28 @@
 /**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
+ * Copyright (c) 2009-2011 University of Cardiff and others
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * <p>
+ * Contributors:
+ * University of Cardiff - initial API and implementation
+ * -
  */
 
 package org.openhealthtools.openatna.audit.persistence.model.codes;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
-import javax.persistence.Version;
 import org.openhealthtools.openatna.audit.persistence.model.PersistentEntity;
+
+import javax.persistence.*;
 
 
 /**
@@ -51,19 +43,9 @@ import org.openhealthtools.openatna.audit.persistence.model.PersistentEntity;
 )
 public abstract class CodeEntity extends PersistentEntity {
 
-    public static enum CodeType {
-        ACTIVE_PARTICIPANT,
-        AUDIT_SOURCE,
-        EVENT_ID,
-        EVENT_TYPE,
-        PARTICIPANT_OBJECT_ID_TYPE
-    }
-
     private Long id;
     private Integer version;
-
     private CodeType type;
-
     private String code;
     private String codeSystem;
     private String codeSystemName;
@@ -137,7 +119,7 @@ public abstract class CodeEntity extends PersistentEntity {
      * Gets the value of the code property.
      *
      * @return possible object is
-     *         {@link String }
+     * {@link String }
      */
     public String getCode() {
         return code;
@@ -157,7 +139,7 @@ public abstract class CodeEntity extends PersistentEntity {
      * Gets the value of the displayName property.
      *
      * @return possible object is
-     *         {@link String }
+     * {@link String }
      */
     public String getDisplayName() {
         return displayName;
@@ -177,7 +159,7 @@ public abstract class CodeEntity extends PersistentEntity {
      * Gets the value of the originalText property.
      *
      * @return possible object is
-     *         {@link String }
+     * {@link String }
      */
     public String getOriginalText() {
         return originalText;
@@ -197,7 +179,7 @@ public abstract class CodeEntity extends PersistentEntity {
      * Gets the value of the codeSystem property.
      *
      * @return possible object is
-     *         {@link String }
+     * {@link String }
      */
     public String getCodeSystem() {
         return codeSystem;
@@ -217,7 +199,7 @@ public abstract class CodeEntity extends PersistentEntity {
      * Gets the value of the codeSystemName property.
      *
      * @return possible object is
-     *         {@link String }
+     * {@link String }
      */
     public String getCodeSystemName() {
         return codeSystemName;
@@ -260,16 +242,7 @@ public abstract class CodeEntity extends PersistentEntity {
         if (getCodeSystemName() != null ? !getCodeSystemName().equals(that.getCodeSystemName()) : that.getCodeSystemName() != null) {
             return false;
         }
-        /*if (getDisplayName() != null ? !getDisplayName().equals(that.getDisplayName()) : that.getDisplayName() != null) {
-            return false;
-        }
-        if (getOriginalText() != null ? !getOriginalText().equals(that.getOriginalText()) : that.getOriginalText() != null) {
-            return false;
-        }*/
-        if (getType() != that.getType()) {
-            return false;
-        }
-        return true;
+        return getType() == that.getType();
     }
 
     @Override
@@ -278,34 +251,36 @@ public abstract class CodeEntity extends PersistentEntity {
         result = 31 * result + (getCode() != null ? getCode().hashCode() : 0);
         result = 31 * result + (getCodeSystem() != null ? getCodeSystem().hashCode() : 0);
         result = 31 * result + (getCodeSystemName() != null ? getCodeSystemName().hashCode() : 0);
-        /*result = 31 * result + (getDisplayName() != null ? getDisplayName().hashCode() : 0);
-        result = 31 * result + (getOriginalText() != null ? getOriginalText().hashCode() : 0);*/
         result = 31 * result + (getType() != null ? getType().hashCode() : 0);
         return result;
     }
 
-
     public String toString() {
-        return new StringBuilder("[").append(getClass().getName())
-                .append(" id=")
-                .append(getId())
-                .append(", version=")
-                .append(getVersion())
-                .append(", type=")
-                .append(getType())
-                .append(", code=")
-                .append(getCode())
-                .append(", code system=")
-                .append(getCodeSystem())
-                .append(", code system name=")
-                .append(getCodeSystemName())
-                .append(", original text=")
-                .append(getOriginalText())
-                .append(", display name=")
-                .append(getDisplayName())
-                .append("]")
-                .toString();
+        return "[" + getClass().getName() +
+                " id=" +
+                getId() +
+                ", version=" +
+                getVersion() +
+                ", type=" +
+                getType() +
+                ", code=" +
+                getCode() +
+                ", code system=" +
+                getCodeSystem() +
+                ", code system name=" +
+                getCodeSystemName() +
+                ", original text=" +
+                getOriginalText() +
+                ", display name=" +
+                getDisplayName() +
+                "]";
     }
 
-
+    public enum CodeType {
+        ACTIVE_PARTICIPANT,
+        AUDIT_SOURCE,
+        EVENT_ID,
+        EVENT_TYPE,
+        PARTICIPANT_OBJECT_ID_TYPE
+    }
 }

@@ -1,28 +1,10 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Contributors:
- * Cardiff University - intial API and implementation
- */
-
 package org.openhealthtools.openatna.archive;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.openhealthtools.openatna.audit.persistence.model.*;
+import org.openhealthtools.openatna.audit.persistence.model.codes.EventIdCodeEntity;
+import org.openhealthtools.openatna.audit.persistence.model.codes.EventTypeCodeEntity;
+import org.openhealthtools.openatna.audit.persistence.util.Base64;
+import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -30,16 +12,10 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import org.openhealthtools.openatna.audit.persistence.model.MessageEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageObjectEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageParticipantEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageSourceEntity;
-import org.openhealthtools.openatna.audit.persistence.model.NetworkAccessPointEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ObjectDetailEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.EventIdCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.EventTypeCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.util.Base64;
-import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Andrew Harrison
@@ -51,13 +27,14 @@ public class MessageReader {
 
     private EntityReader entityReader = new EntityReader();
 
-
     public void begin(XMLEventReader reader) throws XMLStreamException {
+
         ReadUtils.dig(reader, DataConstants.MESSAGES);
     }
 
 
     public List<MessageEntity> readMessages(int max, XMLEventReader reader) throws XMLStreamException {
+
         if (max <= 0) {
             max = Integer.MAX_VALUE;
         }
@@ -73,6 +50,7 @@ public class MessageReader {
 
 
     public MessageEntity readMessage(XMLEventReader reader) throws XMLStreamException {
+
         XMLEvent evt = ReadUtils.dig(reader, DataConstants.MESSAGE);
         List<Attribute> attrs = ReadUtils.getAttributes(evt);
         MessageEntity se = new MessageEntity();
@@ -86,13 +64,14 @@ public class MessageReader {
                 se.setEventOutcome(Integer.parseInt(a.getValue()));
             } else if (attr.equalsIgnoreCase(DataConstants.EVT_TIME)) {
                 try {
-                    se.setEventDateTime(Archiver.archiveFormat.parse(a.getValue()));
+                    se.setEventDateTime(Archiver.parseDate(a.getValue()));
                 } catch (ParseException e) {
                     throw new XMLStreamException(e);
                 }
             }
         }
         while (true) {
+
             XMLEvent code = reader.peek();
             if (code.isStartElement()) {
                 StartElement el = code.asStartElement();
@@ -140,6 +119,7 @@ public class MessageReader {
     }
 
     public List<MessageSourceEntity> readSources(int max, XMLEventReader reader) throws XMLStreamException {
+
         if (max <= 0) {
             max = Integer.MAX_VALUE;
         }
@@ -156,6 +136,7 @@ public class MessageReader {
     }
 
     public List<MessageParticipantEntity> readParticipants(int max, XMLEventReader reader) throws XMLStreamException {
+
         if (max <= 0) {
             max = Integer.MAX_VALUE;
         }
@@ -197,11 +178,12 @@ public class MessageReader {
     }
 
     public List<MessageObjectEntity> readObjects(int max, XMLEventReader reader) throws XMLStreamException {
+
         if (max <= 0) {
             max = Integer.MAX_VALUE;
         }
         ReadUtils.dig(reader, DataConstants.MESSAGE_OBJECTS);
-        List<MessageObjectEntity> ret = new ArrayList<MessageObjectEntity>();
+        List<MessageObjectEntity> ret = new ArrayList<>();
         XMLEvent evt = ReadUtils.dig(reader, DataConstants.MESSAGE_OBJECT);
         while (evt != null && ret.size() < max) {
             MessageObjectEntity moe = new MessageObjectEntity();
@@ -259,6 +241,4 @@ public class MessageReader {
         }
         return ret;
     }
-
-
 }
