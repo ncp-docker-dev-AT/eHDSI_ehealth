@@ -21,6 +21,7 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -364,7 +365,7 @@ public class SMPUploadFileController {
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 //Audit Error
                 byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
-                //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+
                 Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
                         new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
 
@@ -374,7 +375,7 @@ public class SMPUploadFileController {
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 //Audit Error
                 byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
-                //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+
                 Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
                         new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
 
@@ -447,16 +448,14 @@ public class SMPUploadFileController {
                 String errorResult = sw.toString();
                 LOGGER.debug("Error Result: '{}", errorResult);
                 //Audit error
-                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
-                        //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
-                        new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), errorResult.getBytes());
+                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip, new String(encodedObjectID),
+                        Integer.toString(response.getStatusLine().getStatusCode()), errorResult.getBytes());
             }
 
             if (itemUpload.getStatusCode() == 200 || itemUpload.getStatusCode() == 201) {
                 //Audit Success
-                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
-                        //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
-                        new String(encodedObjectID), null, null);
+                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip, new String(encodedObjectID),
+                        null, null);
             }
 
             //GET
@@ -512,22 +511,23 @@ public class SMPUploadFileController {
             itemUpload.setServiceGroupUrl(serviceGroup.toString());
             itemUpload.setSignedServiceMetadataUrl(serviceMetadataUri.toString());
 
-            if (success) {
-                localip = smpURI.toString();//Source Gateway
-                objectID = serviceMetadataUri.toString(); //ParticipantObjectID
-                encodedObjectID = Base64.encodeBase64(objectID.getBytes());
-                //Audit Success
-                Audit.sendAuditQuery(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
-                        new String(encodedObjectID), null, null);
-            } else {
-                localip = smpURI.toString();//Source Gateway
-                objectID = serviceMetadataUri.toString(); //ParticipantObjectID
-                encodedObjectID = Base64.encodeBase64(objectID.getBytes());
-                //Audit Error
-                Audit.sendAuditQuery(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
-                        new String(encodedObjectID), "500", errorType.getBytes());//TODO
-            }
-
+//            LOGGER.info("[START] Producing not required SMP Audit: '{}'", serviceMetadataUri.toString());
+//            if (success) {
+//                localip = smpURI.toString();//Source Gateway
+//                objectID = serviceMetadataUri.toString(); //ParticipantObjectID
+//                encodedObjectID = Base64.encodeBase64(objectID.getBytes());
+//                //Audit Success
+//                Audit.sendAuditQuery(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+//                        new String(encodedObjectID), null, null);
+//            } else {
+//                localip = smpURI.toString();//Source Gateway
+//                objectID = serviceMetadataUri.toString(); //ParticipantObjectID
+//                encodedObjectID = Base64.encodeBase64(objectID.getBytes());
+//                //Audit Error
+//                Audit.sendAuditQuery(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
+//                        new String(encodedObjectID), "500", errorType.getBytes());//TODO
+//            }
+//            LOGGER.info("[STOP] Producing not required SMP Audit: '{}'", serviceMetadataUri.toString());
             itemUpload.setId(i);
             allItems.add(i, itemUpload);
         }
@@ -569,31 +569,31 @@ public class SMPUploadFileController {
                 Alert status = new Alert(messag, Alert.fontColor.red, "#f2dede");
                 smpupload.getAllItems().get(i).setStatus(status);
 
-                if (smpupload.getAllItems().get(i).getBusinessCode().equals("XSD_INVALID")) {
+                if (StringUtils.equals(smpupload.getAllItems().get(i).getBusinessCode(), "XSD_INVALID")) {
                     String message = "400 (XSD_INVALID): " + env.getProperty("http.400.XSD_INVALID");//messages.properties
                     Alert alert = new Alert(message, Alert.alertType.danger);
                     smpupload.getAllItems().get(i).setAlert(alert);
-                } else if (smpupload.getAllItems().get(i).getBusinessCode().equals("MISSING_FIELD")) {
+                } else if (StringUtils.equals(smpupload.getAllItems().get(i).getBusinessCode(), "MISSING_FIELD")) {
                     String message = "400 (MISSING_FIELD): " + env.getProperty("http.400.MISSING_FIELD");//messages.properties
                     Alert alert = new Alert(message, Alert.alertType.danger);
                     smpupload.getAllItems().get(i).setAlert(alert);
-                } else if (smpupload.getAllItems().get(i).getBusinessCode().equals("WRONG_FIELD")) {
+                } else if (StringUtils.equals(smpupload.getAllItems().get(i).getBusinessCode(), "WRONG_FIELD")) {
                     String message = "400 (WRONG_FIELD): " + env.getProperty("http.400.WRONG_FIELD");//messages.properties
                     Alert alert = new Alert(message, Alert.alertType.danger);
                     smpupload.getAllItems().get(i).setAlert(alert);
-                } else if (smpupload.getAllItems().get(i).getBusinessCode().equals("OUT_OF_RANGE")) {
+                } else if (StringUtils.equals(smpupload.getAllItems().get(i).getBusinessCode(), "OUT_OF_RANGE")) {
                     String message = "400 (OUT_OF_RANGE): " + env.getProperty("http.400.OUT_OF_RANGE");//messages.properties
                     Alert alert = new Alert(message, Alert.alertType.danger);
                     smpupload.getAllItems().get(i).setAlert(alert);
-                } else if (smpupload.getAllItems().get(i).getBusinessCode().equals("UNAUTHOR_FIELD")) {
+                } else if (StringUtils.equals(smpupload.getAllItems().get(i).getBusinessCode(), "UNAUTHOR_FIELD")) {
                     String message = "400 (UNAUTHOR_FIELD): " + env.getProperty("http.400.UNAUTHOR_FIELD");//messages.properties
                     Alert alert = new Alert(message, Alert.alertType.danger);
                     smpupload.getAllItems().get(i).setAlert(alert);
-                } else if (smpupload.getAllItems().get(i).getBusinessCode().equals("FORMAT_ERROR")) {
+                } else if (StringUtils.equals(smpupload.getAllItems().get(i).getBusinessCode(), "FORMAT_ERROR")) {
                     String message = "400 (FORMAT_ERROR): " + env.getProperty("http.400.FORMAT_ERROR");//messages.properties
                     Alert alert = new Alert(message, Alert.alertType.danger);
                     smpupload.getAllItems().get(i).setAlert(alert);
-                } else if (smpupload.getAllItems().get(i).getBusinessCode().equals("OTHER_ERROR")) {
+                } else if (StringUtils.equals(smpupload.getAllItems().get(i).getBusinessCode(), "OTHER_ERROR")) {
                     String message = "400 (OTHER_ERROR): " + env.getProperty("http.400.OTHER_ERROR");//messages.properties
                     Alert alert = new Alert(message, Alert.alertType.danger);
                     smpupload.getAllItems().get(i).setAlert(alert);
