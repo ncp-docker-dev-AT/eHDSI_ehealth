@@ -189,15 +189,14 @@ public class AuthSSLSocketFactory {
         if (keystore == null) {
             throw new IllegalArgumentException("Keystore may not be null");
         }
-        TrustManagerFactory tmfactory =
-                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());//TrustManagerFactory.getInstance(algorithm);
+        TrustManagerFactory tmfactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmfactory.init(keystore);
         TrustManager[] trustmanagers = tmfactory.getTrustManagers();
-        for (int i = 0; i < trustmanagers.length; i++) {
+        for (TrustManager trustmanager : trustmanagers) {
 
-            if (trustmanagers[i] instanceof X509TrustManager) {
+            if (trustmanager instanceof X509TrustManager) {
                 return new TrustManager[]{
-                        new AuthSSLX509TrustManager((X509TrustManager) trustmanagers[i], defaultTrustManager, truststore.getAuthorizedDNs())};
+                        new AuthSSLX509TrustManager((X509TrustManager) trustmanager, defaultTrustManager, truststore.getAuthorizedDNs())};
             }
         }
         return trustmanagers;
@@ -261,16 +260,16 @@ public class AuthSSLSocketFactory {
             sslcontext.init(keymanagers, trustmanagers, null);
             return sslcontext;
         } catch (NoSuchAlgorithmException e) {
-            LOGGER.warn(e.getMessage());
+            LOGGER.warn(e.getMessage(), e);
             throw new IOException("Unsupported algorithm exception: " + e.getMessage());
         } catch (KeyStoreException e) {
-            LOGGER.warn(e.getMessage());
+            LOGGER.warn(e.getMessage(), e);
             throw new IOException("Keystore exception: " + e.getMessage());
         } catch (GeneralSecurityException e) {
-            LOGGER.warn(e.getMessage());
+            LOGGER.warn(e.getMessage(), e);
             throw new IOException("Key management exception: " + e.getMessage());
         } catch (IOException e) {
-            LOGGER.warn(e.getMessage());
+            LOGGER.warn(e.getMessage(), e);
             throw new IOException("I/O error reading keystore/truststore file: " + e.getMessage());
         }
     }

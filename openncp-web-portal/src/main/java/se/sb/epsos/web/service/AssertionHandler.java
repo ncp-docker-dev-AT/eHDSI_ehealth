@@ -261,11 +261,14 @@ public class AssertionHandler implements Serializable {
         String reqm_participantObjectID = "urn:uuid:" + assertion.getID();
         String resm_participantObjectID = "urn:uuid:" + assertion.getID();
 
-        InetAddress sourceIP = null;
+        InetAddress sourceIP;
+        String sourceHost;
         try {
             sourceIP = InetAddress.getLocalHost();
+            sourceHost = sourceIP.getHostAddress();
         } catch (UnknownHostException ex) {
             LOGGER.error("UnknownHostException: '{}'", ex.getMessage(), ex);
+            sourceHost = "UnknownHost";
         }
 
         String email = userDetails.getUserId() + "@" + configurationManager.getProperty("ncp.country");
@@ -300,7 +303,7 @@ public class AssertionHandler implements Serializable {
                 SP_UserID, AS_AuditSourceId, ET_ObjectID,
                 reqm_participantObjectID, basedSecHead.getBytes(),
                 resm_participantObjectID, ResM_PatricipantObjectDetail,
-                sourceIP.getHostAddress(), "N/A");
+                sourceHost, "N/A");
         eventLog.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog, "13", "2");
         LOGGER.debug("################################################");
@@ -397,7 +400,7 @@ public class AssertionHandler implements Serializable {
     }
 
     private String getAttributeValue(String key) {
-        String returnValue = null;
+        
         List<AttributeStatement> attrStatements = assertion.getAttributeStatements();
         for (AttributeStatement stat : attrStatements) {
             List<Attribute> attributes = stat.getAttributes();
@@ -407,6 +410,6 @@ public class AssertionHandler implements Serializable {
                 }
             }
         }
-        return returnValue;
+        return null;
     }
 }

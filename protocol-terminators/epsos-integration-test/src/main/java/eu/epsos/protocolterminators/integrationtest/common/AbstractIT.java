@@ -1,27 +1,9 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.protocolterminators.integrationtest.common;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
+import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -52,27 +34,37 @@ import java.util.NoSuchElementException;
  */
 public abstract class AbstractIT {
 
-    protected static final Logger LOG = LoggerFactory.getLogger(AbstractIT.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractIT.class);
+    private static final String ROOT_ID = "2.16.17.710.804.1000.990.1";
+    private static final String EXTENSION = "6212122451";
     protected static String epr;
     protected Collection<Assertion> assertions;
 
     @AfterClass
     public static void tearDownClass() {
-        LOG.info("");
+        LOGGER.info("");
     }
 
     public static Document readDoc(String name) {
+
         Document doc = null;
-        String bodyStr = new ResourceLoader().getResource(name); // load SOAP body
-        Assert.assertTrue("Empty request body", bodyStr != null && !bodyStr.isEmpty());
 
         try {
-            doc = XMLUtil.parseContent(bodyStr.getBytes(StandardCharsets.UTF_8));
+            String bodyStr = new ResourceLoader().getResource(name); // load SOAP body
+            Assert.assertTrue("Empty request body", bodyStr != null && !bodyStr.isEmpty());
+            if (StringUtils.isNotBlank(bodyStr)) {
+                doc = XMLUtil.parseContent(bodyStr.getBytes(StandardCharsets.UTF_8));
+            } else {
+                Assert.fail("SOAP Body is empty");
+            }
         } catch (ParserConfigurationException ex) {
+            LOGGER.error("ParserConfigurationException: '{}'", ex.getMessage(), ex);
             Assert.fail(ex.getLocalizedMessage());
         } catch (SAXException ex) {
+            LOGGER.error("SAXException: '{}'", ex.getMessage(), ex);
             Assert.fail(ex.getLocalizedMessage());
         } catch (IOException ex) {
+            LOGGER.error("IOException: '{}'", ex.getMessage(), ex);
             Assert.fail(ex.getLocalizedMessage());
         }
 
@@ -80,6 +72,7 @@ public abstract class AbstractIT {
     }
 
     protected static String extractErrorElem(SOAPElement response) {
+
         SOAPElement ack = (SOAPElement) response.getChildElements(new QName(response.getNamespaceURI(), "acknowledgement")).next();
 
         try {
@@ -89,6 +82,7 @@ public abstract class AbstractIT {
             return txt.getTextContent();
 
         } catch (NoSuchElementException ex) {
+            LOGGER.error("NoSuchElementException: '{}'", ex.getMessage(), ex);
             return null;
         }
     }
@@ -102,6 +96,7 @@ public abstract class AbstractIT {
     }
 
     protected static SOAPElement extractElem(SOAPElement response, String[] path) {
+
         try {
             QName nextElem = new QName(response.getNamespaceURI(), path[0]);
             SOAPElement auxElem = (SOAPElement) response.getChildElements(nextElem).next();
@@ -114,22 +109,25 @@ public abstract class AbstractIT {
             return auxElem;
 
         } catch (NoSuchElementException ex) {
+            LOGGER.error("NoSuchElementException: '{}'", ex.getMessage(), ex);
             return null;
         }
     }
 
     protected static Collection<Assertion> hcpAssertionCreate(XSPARole role) {
-        Collection<Assertion> assertions = new ArrayList<Assertion>(1);
+
+        Collection<Assertion> assertions = new ArrayList<>(1);
         assertions.add(HCPIAssertionCreator.createHCPIAssertion(role));
 
         return assertions;
     }
 
     protected static Collection<Assertion> hcpAndTrcAssertionCreate(XSPARole role) {
-        Collection<Assertion> assertions = new ArrayList<Assertion>(2);
+
+        Collection<Assertion> assertions = new ArrayList<>(2);
 
         Assertion hcpAssertion = HCPIAssertionCreator.createHCPIAssertion(role);
-        Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion("2.16.17.710.804.1000.990.1", "6212122451", hcpAssertion.getID());
+        Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion(ROOT_ID, EXTENSION, hcpAssertion.getID());
 
         assertions.add(hcpAssertion);
         assertions.add(trcAssertion);
@@ -138,20 +136,22 @@ public abstract class AbstractIT {
     }
 
     protected static Collection<Assertion> hcpAssertionCreate(List<String> permissions, XSPARole role) {
-        Collection<Assertion> assertions = new ArrayList<Assertion>(1);
+
+        Collection<Assertion> assertions = new ArrayList<>(1);
         assertions.add(HCPIAssertionCreator.createHCPIAssertion(permissions, role));
 
         return assertions;
     }
 
     protected static Collection<Assertion> hcpAndTrcAssertionCreate(String patientIdIso, XSPARole role) {
-        Collection<Assertion> assertions = new ArrayList<Assertion>(2);
+
+        Collection<Assertion> assertions = new ArrayList<>(2);
 
         Assertion hcpAssertion = HCPIAssertionCreator.createHCPIAssertion(role);
         Assertion trcAssertion;
 
-        if (patientIdIso == null && patientIdIso.isEmpty()) {
-            trcAssertion = TRCAssertionCreator.createTRCAssertion("2.16.17.710.804.1000.990.1", "6212122451", hcpAssertion.getID());
+        if (patientIdIso == null || patientIdIso.isEmpty()) {
+            trcAssertion = TRCAssertionCreator.createTRCAssertion(ROOT_ID, EXTENSION, hcpAssertion.getID());
         } else {
             trcAssertion = TRCAssertionCreator.createTRCAssertion(patientIdIso, hcpAssertion.getID());
         }
@@ -163,7 +163,8 @@ public abstract class AbstractIT {
     }
 
     protected static Collection<Assertion> hcpAndTrcAssertionCreate(String patientIdIso, List<String> permissions, XSPARole role) {
-        Collection<Assertion> assertions = new ArrayList<Assertion>(2);
+
+        Collection<Assertion> assertions = new ArrayList<>(2);
 
         Assertion hcpAssertion = HCPIAssertionCreator.createHCPIAssertion(permissions, role);
         Assertion trcAssertion;
@@ -190,19 +191,14 @@ public abstract class AbstractIT {
     }
 
     protected static void validateCDA(SOAPElement soapBody, CdaExtraction.MessageType msgType, CdaModel model) {
+
         String base64Doc = null;
         SOAPBodyElement body = (SOAPBodyElement) soapBody;
         try {
             base64Doc = CdaExtraction.extract(msgType, XMLUtil.parseContent(XMLUtil.prettyPrint(body.getFirstChild())
                     .getBytes(StandardCharsets.UTF_8)));
-        } catch (ParserConfigurationException ex) {
-            LOG.error("An error has occurred during CDA Validation.", ex);
-        } catch (SAXException ex) {
-            LOG.error("An error has occurred during CDA Validation.", ex);
-        } catch (IOException ex) {
-            LOG.error("An error has occurred during CDA Validation.", ex);
-        } catch (TransformerException ex) {
-            LOG.error("An error has occurred during CDA Validation.", ex);
+        } catch (ParserConfigurationException | TransformerException | IOException | SAXException ex) {
+            LOGGER.error("An error has occurred during CDA Validation.", ex);
         }
         invokeIheCdaService(base64Doc, msgType, model);
 
@@ -217,14 +213,14 @@ public abstract class AbstractIT {
 //
 //            // Validate document against IHE services
 //            DetailedResult detailedResult = CdaExtraction.unmarshalDetails(port.validateBase64Document(base64Doc, model.getName()));
-//            LOG.info("\u21b3Document validation result");
-//            LOG.info(" \u251c\u2500Service Name: " + detailedResult.getValResultsOverview().getValidationServiceName().split(" : ")[1]);
-//            LOG.info(" \u251c\u2500XSD: " + detailedResult.getDocumentValidXsd().getResult());
-//            LOG.info(" \u251c\u2500Document Well Formed: " + detailedResult.getDocumentWellFormed().getResult());
-//            LOG.info(" \u251c\u2500Number of Errors: " + detailedResult.getMdaValidation().getNotes().size());
-//            LOG.info(" \u2514\u2500Overall Result: " + detailedResult.getValResultsOverview().getValidationTestResult());
+//            LOGGER.info("\u21b3Document validation result");
+//            LOGGER.info(" \u251c\u2500Service Name: " + detailedResult.getValResultsOverview().getValidationServiceName().split(" : ")[1]);
+//            LOGGER.info(" \u251c\u2500XSD: " + detailedResult.getDocumentValidXsd().getResult());
+//            LOGGER.info(" \u251c\u2500Document Well Formed: " + detailedResult.getDocumentWellFormed().getResult());
+//            LOGGER.info(" \u251c\u2500Number of Errors: " + detailedResult.getMdaValidation().getNotes().size());
+//            LOGGER.info(" \u2514\u2500Overall Result: " + detailedResult.getValResultsOverview().getValidationTestResult());
 //        } catch (SOAPException_Exception ex) {
-//            LOG.error("An error has occurred during CDA Validation.", ex);
+//            LOGGER.error("An error has occurred during CDA Validation.", ex);
 //        }
     }
 
@@ -234,41 +230,47 @@ public abstract class AbstractIT {
 
     @After
     public void tearDown() {
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
     }
 
     protected String soapElementToString(SOAPElement element) {
+
         String str = null;
         try {
             str = XMLUtil.prettyPrint(element);
         } catch (Exception ex) {
+            LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
             Assert.fail(ex.getLocalizedMessage());
         }
         return str;
     }
+
     /*
      * Instance methods
      */
-
     protected abstract Collection<Assertion> getAssertions(String requestPath, XSPARole role);
 
     protected SOAPElement testGood(String testName, String request) {
+
         SOAPElement result = null;
 
         try {
             result = callService(request);  // call
 
         } catch (RuntimeException ex) {
-            LOG.info(fail(testName));// preaty status print to tests list
-            LOG.info(ex.getMessage(), ex);//must have stack trace for troubleshooting failed integration tests
+            LOGGER.info(fail(testName));// preaty status print to tests list
+            LOGGER.info(ex.getMessage(), ex);//must have stack trace for troubleshooting failed integration tests
             Assert.fail(testName + ": " + ex.getMessage());             // fail the test
         }
 
-        LOG.info(success(testName)); // pretty status print to tests list
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info(success(testName)); // pretty status print to tests list
+        }
         return result;
     }
 
     protected SOAPElement callService(String request) throws SOAPFaultException {
+
         Document doc = readDoc(request);                            // read soap request
         SimpleSoapClient client = new SimpleSoapClient(epr);        // SOAP client
         return client.call(doc, assertions);                    // Call service

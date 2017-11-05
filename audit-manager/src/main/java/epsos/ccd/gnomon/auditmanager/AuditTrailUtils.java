@@ -539,17 +539,16 @@ public enum AuditTrailUtils {
         return am;
     }
 
-    private AuditMessage addAuditSource(AuditMessage am, String auditsource) {
+    private AuditMessage addAuditSource(AuditMessage am, String auditSource) {
 
-        AuditSourceIdentificationType asit = new AuditSourceIdentificationType();
-        asit.setAuditSourceID(auditsource);
-        am.getAuditSourceIdentification().add(asit);
+        AuditSourceIdentificationType auditSourceIdentification = new AuditSourceIdentificationType();
+        auditSourceIdentification.setAuditSourceID(auditSource);
+        am.getAuditSourceIdentification().add(auditSourceIdentification);
         return am;
     }
 
     private String getMappedEventType(String eventType) {
 
-        IHEEventType mappedEventType = null;
         if (eventType.equals(
                 epsos.ccd.gnomon.auditmanager.EventType.epsosIdentificationServiceFindIdentityByTraits.getCode())) {
             return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode();
@@ -615,16 +614,11 @@ public enum AuditTrailUtils {
             return epsos.ccd.gnomon.auditmanager.IHEEventType.ehealthSMPPush.getCode();
         }
         // TODO: Fix this issue, does the mappedEventType should be initialized?
-        if (mappedEventType == null) {
-            return null;
-        } else {
-            return mappedEventType.getCode();
-        }
+        return "Event Type Not Mapped";
     }
 
     private String getMappedTransactionName(String name) {
-
-        IHETransactionName mappedEventType = null;
+        
         if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosIdentificationServiceFindIdentityByTraits
                 .getCode())) {
             return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosIdentificationServiceFindIdentityByTraits
@@ -688,11 +682,7 @@ public enum AuditTrailUtils {
             return epsos.ccd.gnomon.auditmanager.IHETransactionName.ehealthSMPPush.getCode();
         }
         // TODO: Fix this issue, does the mappedEventType should be initialized?
-        if (mappedEventType == null) {
-            return null;
-        } else {
-            return mappedEventType.getCode();
-        }
+        return "Transaction not Mapped";
     }
 
     private AuditMessage addEventIdentification(AuditMessage am, String EventType, String transactionName,
