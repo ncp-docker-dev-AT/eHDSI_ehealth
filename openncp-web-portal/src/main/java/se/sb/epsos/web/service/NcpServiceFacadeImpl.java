@@ -20,7 +20,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.impl.AssertionMarshaller;
-import org.opensaml.xml.io.MarshallingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -38,8 +37,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.HandlerResolver;
-import javax.xml.ws.handler.PortInfo;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -105,14 +102,10 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         /*
          * Creating web service call header with assertion.
 		 */
-        service.setHandlerResolver(new HandlerResolver() {
-
-            @Override
-            public List<Handler> getHandlerChain(PortInfo portInfo) {
-                List<Handler> handlerList = new ArrayList<Handler>();
-                handlerList.add(new RGBSOAPHandler(userDetails));
-                return handlerList;
-            }
+        service.setHandlerResolver(portInfo -> {
+            List<Handler> handlerList = new ArrayList<>();
+            handlerList.add(new RGBSOAPHandler(userDetails));
+            return handlerList;
         });
 
 		/*
@@ -127,8 +120,11 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
     @Override
     public List<Person> queryForPatient(AuthenticatedUser userDetails, List<PatientIdVO> patientList, CountryVO country) throws NcpServiceException {
-        LOGGER.info("queryForPatient called for country: " + country.getId());
-        LOGGER.info("Patient ids: '{}", Arrays.toString(patientList.toArray()));
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("queryForPatient called for country: " + country.getId());
+            LOGGER.info("Patient ids: '{}", Arrays.toString(patientList.toArray()));
+        }
 
         QueryPatientRequest queryPatientRequest = createQueryPatientRequest(patientList, country);
         List<Person> personList = new ArrayList<>();
@@ -138,10 +134,12 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
                 for (PatientDemographics dem : queryPatient) {
                     Person person = new Person(this.sessionId, dem, country.getId());
                     personList.add(person);
-                    LOGGER.debug("Patient ID: '{}'", person.getId());
-                    LOGGER.debug("Patient Country: '{}", person.getCountry());
-                    LOGGER.debug("Patient Gender: '{}", person.getGender());
-                    LOGGER.debug("Patient Birthdate: '{}", dem.getBirthDate().toString());
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Patient ID: '{}'", person.getId());
+                        LOGGER.debug("Patient Country: '{}", person.getCountry());
+                        LOGGER.debug("Patient Gender: '{}", person.getGender());
+                        LOGGER.debug("Patient Birthdate: '{}", dem.getBirthDate().toString());
+                    }
                 }
             } catch (Exception e) {
                 throw new NcpServiceException(e.getMessage(), e);
@@ -153,6 +151,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
     }
 
     private QueryPatientRequest createQueryPatientRequest(List<PatientIdVO> list, CountryVO country) {
+
         QueryPatientRequest createQueryPatientRequest = new QueryPatientRequest();
         PatientDemographics dem = new PatientDemographics();
         createQueryPatientRequest.setCountryCode(country.getId());
@@ -182,7 +181,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
                 dem.setFamilyName(id.getValue());
             } else if (id.getLabel().contains("birth.date") && id.getValue() != null) {
                 XMLGregorianCalendar g = getDate(id.getValue(), ISODateTimeFormat.basicDate());
-                LOGGER.debug("birthdate: " + id.getValue() + " birthdate as xml: " + g);
+                LOGGER.debug("birthdate: '{}' birthdate as xml: '{}'", id.getValue(), g);
                 dem.setBirthDate(g);
             } else if (id.getLabel().contains("sex") && id.getValue() != null) {
                 LOGGER.debug("sex: " + id.getValue());
@@ -199,6 +198,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
      */
     @Override
     public void setTRCAssertion(TRC trc, AuthenticatedUser userDetails) throws NcpServiceException {
+
         LOGGER.info("start::setTRCAssertion()");
         try {
             LOGGER.info("Building TRC request");
@@ -213,7 +213,9 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
             AssertionMarshaller marshaller2 = new AssertionMarshaller();
             Element element2 = marshaller2.marshall(userDetails.getAssertion());
             Document document2 = element2.getOwnerDocument();
-            LOGGER.info("Assertion1:\n" + new XmlUtil().prettyPrint(document2));
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Assertion1:\n" + new XmlUtil().prettyPrint(document2));
+            }
             TRCAssertionRequest trcAssertionRequest = trcServiceHandler.buildTrcRequest(userDetails.getAssertion(), trc.getPerson().getEpsosId(),
                     trc.getPurpose());
             LOGGER.info("Building TRC request done");
@@ -224,19 +226,15 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
                 AssertionMarshaller marshaller = new AssertionMarshaller();
                 Element element = marshaller.marshall(trcAssertion);
                 Document document = element.getOwnerDocument();
-                LOGGER.info("Assertion2:\n" + new XmlUtil().prettyPrint(document));
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Assertion2:\n" + new XmlUtil().prettyPrint(document));
+                }
                 userDetails.setTrc(trc);
                 userDetails.setTrcAssertion(trcAssertion);
             } else {
                 LOGGER.error("TrcAssertionRequest was null");
                 throw new NcpServiceException("Failed to build TRC Request, TRCAssertionRequest was null", new Exception());
             }
-        } catch (MarshallingException e) {
-            LOGGER.error("TRC webservice call failed", e);
-            throw new NcpServiceException("TRC Webservice call failed", e);
-        } catch (IOException e) {
-            LOGGER.error("TRC webservice call failed", e);
-            throw new NcpServiceException("TRC Webservice call failed", e);
         } catch (Exception e) {
             LOGGER.error("TRC webservice call failed", e);
             throw new NcpServiceException("TRC Webservice call failed", e);
@@ -264,17 +262,21 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         request.setPatientId(person.getPatientId());
 
         try {
-            LOGGER.debug("\n" + XmlUtil.marshallJaxbObject(new XmlTypeWrapper<QueryDocumentRequest>(request)));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("\n" + XmlUtil.marshallJaxbObject(new XmlTypeWrapper<>(request)));
+            }
         } catch (JAXBException e) {
-            LOGGER.warn("Faild to marshall Jaxb object for debug logging.");
+            LOGGER.warn("Faild to marshall Jaxb object for debug logging.", e);
         }
 
-        List<MetaDocument> docList = new ArrayList<MetaDocument>();
+        List<MetaDocument> docList = new ArrayList<>();
         try {
             List<EpsosDocument> list = shelobConnector.queryDocuments(request);
             for (EpsosDocument doc : list) {
                 MetaDocument metaDocument = new MetaDocument(this.sessionId, person.getEpsosId(), doc);
-                LOGGER.debug("Created MetaDocument with key: " + metaDocument.getDtoCacheKey().toString());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Created MetaDocument with key: '{}'", metaDocument.getDtoCacheKey().toString());
+                }
                 docList.add(metaDocument);
             }
         } catch (Exception e) {
@@ -305,7 +307,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
         try {
             EpsosDocument epsosDocument = shelobConnector.retrieveDocument(retrieveDocumentRequest);
-            LOGGER.debug("Doc: " + epsosDocument);
+            LOGGER.debug("Doc: '{}'", epsosDocument);
             byte[] bytes = epsosDocument.getBase64Binary();
             if (doc.getType().equals(DocType.EP)) {
                 document = new Prescription(doc, bytes, epsosDocument);
@@ -314,34 +316,28 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
             } else if (doc.getType().equals(DocType.PDF)) {
                 document = new PdfDocument(doc, bytes, epsosDocument);
             }
-        } catch (ParserConfigurationException e) {
+        } catch (ParserConfigurationException | SAXException | XmlException | IOException e) {
             GRAPHITELOGGER.logMetric("epsos-web.service.retrieveDocument.failed." + countryCode + "." + doc.getType(), 1L);
             throw new NcpServiceException("Failed to parse retrieved document", e);
-        } catch (SAXException e) {
-            GRAPHITELOGGER.logMetric("epsos-web.service.retrieveDocument.failed." + countryCode + "." + doc.getType(), 1L);
-            throw new NcpServiceException("Failed to parse retrieved document", e);
-        } catch (IOException e) {
-            GRAPHITELOGGER.logMetric("epsos-web.service.retrieveDocument.failed." + countryCode + "." + doc.getType(), 1L);
-            throw new NcpServiceException("Failed to parse retrieved document", e);
-        } catch (XmlException e) {
-            GRAPHITELOGGER.logMetric("epsos-web.service.retrieveDocument.failed." + countryCode + "." + doc.getType(), 1L);
-            throw new NcpServiceException("Faild to create PDF document from CDA", e);
         } catch (SOAPFaultException sfe) {
             GRAPHITELOGGER.logMetric("epsos-web.service.retrieveDocument.failed. " + sfe.getMessage(), 1L);
             throw new NcpServiceException(sfe.getMessage(), sfe);
         }
 
         GRAPHITELOGGER.logMetric("epsos-web.service.retrieveDocument.success." + countryCode + "." + doc.getType(), 1L);
-        LOGGER.debug("Retreived Document:\n" + new String(document.getBytes()));
+        if (LOGGER.isDebugEnabled() && document != null) {
+            LOGGER.debug("Retreived Document:\n{}", new String(document.getBytes()));
+        }
         return document;
     }
 
     @Override
     public byte[] submitDocument(Dispensation dispensation, AuthenticatedUser user, Person person, String eD_PageAsString) throws NcpServiceException {
-        byte[] bytes = null;
+
+        byte[] bytes;
         String oidRoot = MasterConfigManager.get("ApplicationConfigManager.xmlDispensationRoot");
-        String cdaIdExtension = "" + System.currentTimeMillis();
-        String pdfIdExtension = "" + System.currentTimeMillis();
+        String cdaIdExtension = Long.toString(System.currentTimeMillis());
+        String pdfIdExtension = Long.toString(System.currentTimeMillis());
         String dispensationDocumentCacheKey = dispensation.getDoc().getUuid();
         dispensation.getDoc().setUuid(oidRoot + "." + cdaIdExtension);
         try {
@@ -351,8 +347,8 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
             throw new NcpServiceException("Failed to create CDA", e);
         }
 
-        byte[] pdfInBytes = null;
-        byte[] pdfCdaInBytes = null;
+        byte[] pdfInBytes;
+        byte[] pdfCdaInBytes;
         try {
             pdfInBytes = PdfHandler.convertStringToPdf(eD_PageAsString);
             pdfCdaInBytes = getDispensationAsByteArray(getDispensationDocumentPDF(pdfInBytes, dispensation, user, cdaIdExtension, pdfIdExtension));
@@ -404,13 +400,14 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
             throw new NcpServiceException("Failed to submit document.", sfe);
         } finally {
             StringBuilder buf = new StringBuilder();
-//			 buf.append(doc.getDescription()).append(" ").append(doc.getFormatCode().getValue()).append("\n");
             buf.append(new String(doc.getBase64Binary())).append("\n");
             for (EpsosDocument epsDoc : doc.getAssociatedDocuments()) {
-                buf.append("Child document: ");//.append(epsDoc.getDescription()).append(" ").append(epsDoc.getFormatCode().getValue()).append("\n");
+                buf.append("Child document: ");
                 buf.append(new String(epsDoc.getBase64Binary())).append("\n");
             }
-            LOGGER.debug("Submitted Documents:\n" + buf.toString());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Submitted Documents:\n{}", buf.toString());
+            }
         }
         return pdfInBytes;
     }
@@ -432,7 +429,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
     private String addOIDPrefix(String oid) {
         if (oid == null) {
-            return oid;
+            return null;
         }
         if (oid.startsWith("urn:oid:")) {
             return oid;

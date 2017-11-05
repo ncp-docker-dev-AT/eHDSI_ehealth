@@ -29,6 +29,7 @@ public class MessageQueue {
     }
 
     public void start() {
+
         if (running) {
             return;
         }
@@ -37,6 +38,7 @@ public class MessageQueue {
     }
 
     public void stop() {
+
         LOGGER.debug("Message Queue shutting down...");
         running = false;
         exec.shutdown();
@@ -69,29 +71,32 @@ public class MessageQueue {
         }
 
         public void run() {
+
             while (!Thread.interrupted() && running) {
                 Object o = messageQueue.poll();
                 if (o == null) {
                     try {
                         Thread.sleep(25);
                     } catch (InterruptedException e) {
-                        // Ignored
+                        LOGGER.error("InterruptedException: '{}'", e.getMessage(), e);
+                        Thread.currentThread().interrupt();
                     }
                 } else {
                     handleMessage(o);
                 }
             }
-
             logAndClearMessageQueue();
         }
 
         private void logAndClearMessageQueue() {
+
             while (!messageQueue.isEmpty()) {
                 handleMessage(messageQueue.poll());
             }
         }
 
         private void handleMessage(Object o) {
+
             if (o instanceof SyslogMessage) {
                 handleSysLogMessage((SyslogMessage) o);
             } else if (o instanceof SyslogException) {
@@ -100,11 +105,14 @@ public class MessageQueue {
         }
 
         private void handleSysLogMessage(SyslogMessage message) {
+
             if (running) {
                 listener.messageArrived(message);
             } else {
                 try {
-                    LOGGER.error("MessageQueue was unable to persist message: '{}'", new String(message.toByteArray()));
+                    if (LOGGER.isErrorEnabled()) {
+                        LOGGER.error("MessageQueue was unable to persist message: '{}'", new String(message.toByteArray()));
+                    }
                 } catch (SyslogException e) {
                     handleSysLogException(e);
                 }
@@ -112,6 +120,7 @@ public class MessageQueue {
         }
 
         private void handleSysLogException(SyslogException exception) {
+
             if (running) {
                 listener.exceptionThrown(exception);
             } else {

@@ -29,14 +29,14 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class TerminologyService implements ITerminologyService {
 
-    private static final Logger log = LoggerFactory.getLogger(TerminologyService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TerminologyService.class);
     private static final String CURRENT = "current";
     private ITsamDao dao;
     private TsamConfiguration config;
 
-    public TSAMResponseStructure getDesignationByEpSOSConcept(
-            CodedElement epSOSRefConcept, String targetLanguageCode) {
-        log.debug("getDesignationByEpSOSConcept BEGIN (" + epSOSRefConcept + ",lang: " + targetLanguageCode + ")");
+    public TSAMResponseStructure getDesignationByEpSOSConcept(CodedElement epSOSRefConcept, String targetLanguageCode) {
+
+        LOGGER.debug("getDesignationByEpSOSConcept BEGIN ('{}', lang: '{}')", epSOSRefConcept, targetLanguageCode);
         DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
         TSAMResponseStructure response = new TSAMResponseStructure(epSOSRefConcept);
         try {
@@ -57,7 +57,7 @@ public class TerminologyService implements ITerminologyService {
             CodeSystemConcept concept = dao.getConcept(code, codeSystemVersion);
 
             // obtain Designation
-            if (targetLanguageCode == null || targetLanguageCode.equals("")) {
+            if (targetLanguageCode == null || "".equals(targetLanguageCode)) {
                 targetLanguageCode = config.getTranslationLang();
             }
             List<Designation> designations = dao.getDesignation(concept, targetLanguageCode);
@@ -70,17 +70,18 @@ public class TerminologyService implements ITerminologyService {
 
         } catch (TSAMException e) {
             response.addError(e.getReason(), epSOSRefConcept.toString());
-            log.warn(epSOSRefConcept + ", " + e.toString());
+            LOGGER.warn(epSOSRefConcept + ", " + e.toString(), e);
         } catch (Exception e) {
             response.addError(TSAMError.ERROR_PROCESSING_ERROR, epSOSRefConcept.toString());
-            log.error(epSOSRefConcept.toString(), e);
+            LOGGER.error(epSOSRefConcept.toString(), e);
         }
-        log.debug("getEpSOSConceptByCode END");
+        LOGGER.debug("getEpSOSConceptByCode END");
         return response;
     }
 
     public TSAMResponseStructure getEpSOSConceptByCode(CodedElement localConcept) {
-        log.debug("getEpSOSConceptByCode BEGIN (" + localConcept + ")");
+
+        LOGGER.debug("getEpSOSConceptByCode BEGIN ('{}')", localConcept);
         DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
         TSAMResponseStructure response = new TSAMResponseStructure(localConcept);
 
@@ -96,8 +97,7 @@ public class TerminologyService implements ITerminologyService {
             checkCodeSystemName(system, csName, response);
 
             // optain CodeSystemVersion
-            CodeSystemVersion codeSystemVersion = dao.getVersion(csVersion,
-                    system);
+            CodeSystemVersion codeSystemVersion = dao.getVersion(csVersion, system);
 
             // obtain Concept
             CodeSystemConcept concept = dao.getConcept(code, codeSystemVersion);
@@ -134,32 +134,35 @@ public class TerminologyService implements ITerminologyService {
             checkManyDesignations(response, designations);
         } catch (TSAMException e) {
             response.addError(e.getReason(), localConcept.toString());
-            log.warn(localConcept + ", " + e.toString());
+            LOGGER.warn(localConcept + ", " + e.toString(), e);
         } catch (Exception e) {
             response.addError(TSAMError.ERROR_PROCESSING_ERROR, localConcept.toString());
-            log.error(localConcept.toString(), e);
+            LOGGER.error(localConcept.toString(), e);
         }
 
-        log.debug("getDesignationByEpSOSConcept END");
+        LOGGER.debug("getDesignationByEpSOSConcept END");
         return response;
     }
 
     public List<RetrievedConcept> getValueSetConcepts(String valueSetOid, String valueSetVersionName, String language) {
-        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
+
+        DebugUtils.showTransactionStatus("getValueSetConcepts()");
         return dao.getConcepts(valueSetOid, valueSetVersionName, language);
     }
 
     public List<String> getLtrLanguages() {
-        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
+
+        DebugUtils.showTransactionStatus("getLtrLanguages()");
         return dao.getLtrLanguages();
     }
 
     private void checkCodeSystemName(CodeSystem codeSystem, String name, TSAMResponseStructure response) {
-        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
+
+        DebugUtils.showTransactionStatus("checkCodeSystemName()");
         if (name == null || codeSystem == null || !name.equals(codeSystem.getName())) {
             String ctx = codeSystem.getName() + " != " + name;
             response.addWarning(TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
-            log.warn(response.getInputCodedElement() + ": " + TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH + ": " + ctx);
+            LOGGER.warn("[{}] '{}': '{}'", response.getInputCodedElement(), TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
         }
     }
 
@@ -170,7 +173,8 @@ public class TerminologyService implements ITerminologyService {
      * @throws TSAMException
      */
     private void checkTargedVersion(CodeSystemVersion version) throws TSAMException {
-        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
+
+        DebugUtils.showTransactionStatus("checkTargedVersion()");
         if (version == null) {
             throw new TSAMException(TSAMError.ERROR_EPSOS_VERSION_NOTFOUND);
         }
@@ -183,11 +187,12 @@ public class TerminologyService implements ITerminologyService {
      * @throws TSAMException
      */
     private void checkTargetCodeSystem(CodeSystem codeSystem) throws TSAMException {
-        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
+
+        DebugUtils.showTransactionStatus("checkTargetCodeSystem()");
         if (codeSystem == null) {
             throw new TSAMException(TSAMError.ERROR_EPSOS_CODE_SYSTEM_NOTFOUND);
         }
-        if (codeSystem.getOid() == null || codeSystem.getOid().equals("")) {
+        if (codeSystem.getOid() == null || "".equals(codeSystem.getOid())) {
             throw new TSAMException(TSAMError.ERROR_EPSOS_CS_OID_NOTFOUND);
         }
     }
@@ -200,19 +205,22 @@ public class TerminologyService implements ITerminologyService {
      * @param designations
      */
     private void checkManyDesignations(TSAMResponseStructure response, List<Designation> designations) {
-        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
-        
+
+        DebugUtils.showTransactionStatus("checkManyDesignations()");
+
         if (designations.size() > 1) {
-            int preffered = 0;
+            int preferred = 0;
             for (Designation designation : designations) {
                 if (Boolean.TRUE.equals(designation.isPreffered())) {
-                    preffered++;
+                    preferred++;
                 }
             }
-            if (preffered == 0) {
+            if (preferred == 0) {
                 TSAMError warning = TSAMError.WARNING_MANY_DESIGNATIONS;
                 response.addWarning(warning, response.getCode());
-                log.warn(response.getInputCodedElement() + ": " + warning.toString());
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("'{}': '{}'", response.getInputCodedElement(), warning.toString());
+                }
             }
         }
     }
@@ -226,6 +234,7 @@ public class TerminologyService implements ITerminologyService {
      * @param response
      */
     private void checkValueSet(CodeSystemConcept concept, String vsOid, String vsVersion, TSAMResponseStructure response) {
+
         if (vsOid != null) {
             boolean valueSetMatches = dao.valueSetMatches(concept, vsOid, vsVersion);
             if (!valueSetMatches) {
@@ -233,7 +242,9 @@ public class TerminologyService implements ITerminologyService {
                 String warnMsg = "CodeSystemConcept: " + code + ", ValueSetOid: " + vsOid;
                 TSAMError warning = TSAMError.WARNING_VS_DOESNT_MATCH;
                 response.addWarning(warning, warnMsg);
-                log.warn("[" + warnMsg + "]- " + warning.toString());
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("[{}]- '{}'", warning, warning.toString());
+                }
             }
         }
     }
@@ -243,10 +254,11 @@ public class TerminologyService implements ITerminologyService {
      * @param response
      */
     private void checkConceptStatus(CodeSystemConcept concept, TSAMResponseStructure response) {
+
         if (concept != null && !CURRENT.equalsIgnoreCase(concept.getStatus())) {
             TSAMError warning = TSAMError.WARNING_CONCEPT_STATUS_NOT_CURRENT;
             response.addWarning(warning, concept.getCode());
-            log.warn(response.getInputCodedElement() + ": " + warning);
+            LOGGER.warn("'{}': '{}'", response.getInputCodedElement(), warning);
         }
     }
 
