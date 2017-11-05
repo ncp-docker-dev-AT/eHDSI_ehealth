@@ -128,9 +128,11 @@ public class STSService implements Provider<SOAPMessage> {
                 }
             }
             Assertion trc = samlTRCIssuer.issueTrcToken(hcpIdAssertion, patientID, purposeOfUse, null);
-            LOGGER.info("HCP Assertion Date: '{}' TRC Assertion Date: '{}' -- '{}'",
-                    hcpIdAssertion.getIssueInstant().withZone(DateTimeZone.UTC),
-                    trc.getIssueInstant().withZone(DateTimeZone.UTC), trc.getAuthnStatements().isEmpty());
+            if (hcpIdAssertion != null) {
+                LOGGER.info("HCP Assertion Date: '{}' TRC Assertion Date: '{}' -- '{}'",
+                        hcpIdAssertion.getIssueInstant().withZone(DateTimeZone.UTC),
+                        trc.getIssueInstant().withZone(DateTimeZone.UTC), trc.getAuthnStatements().isEmpty());
+            }
 
             Document signedDoc = builder.newDocument();
             Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
