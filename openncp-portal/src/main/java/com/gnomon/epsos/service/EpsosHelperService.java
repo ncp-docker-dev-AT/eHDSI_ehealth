@@ -66,6 +66,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import sun.security.x509.X500Name;
 import tr.com.srdc.epsos.util.Constants;
 
 import javax.faces.context.ExternalContext;
@@ -86,8 +87,10 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
-import java.security.Principal;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -1333,8 +1336,8 @@ public class EpsosHelperService {
             LOGGER.error("Problem reading configuration parameters");
             return;
         }
-        java.security.cert.Certificate cert = null;
-        String name = "";
+        java.security.cert.Certificate cert;
+        String name = "N/A";
         try (FileInputStream is = new FileInputStream(KEYSTORE_LOCATION)) {
 
             // Load the keystore in the user's home directory
@@ -1346,26 +1349,31 @@ public class EpsosHelperService {
             cert = keystore.getCertificate(KEY_ALIAS);
             if (LOGGER.isInfoEnabled() && cert != null) {
                 LOGGER.info("Certificate loaded ... '{}'", cert.getPublicKey().toString());
+                java.security.cert.Certificate[] chain = keystore.getCertificateChain(KEY_ALIAS);
+                X509Certificate x509Certificate = ((X509Certificate) chain[0]);
+                name = ((X500Name) x509Certificate.getSubjectDN()).getCommonName();
+                LOGGER.info("Certificate Common Name: '{}'", name);
+
             }
 
             // List the aliases
-            Enumeration enum1 = keystore.aliases();
-            while (enum1.hasMoreElements()) {
-                String alias = (String) enum1.nextElement();
-                LOGGER.info("ALIAS IS '{}'", alias);
-                if (cert instanceof X509Certificate) {
-                    X509Certificate x509cert = (X509Certificate) cert;
-
-                    // Get subject
-                    Principal principal = x509cert.getSubjectDN();
-                    String subjectDn = principal.getName();
-                    name = subjectDn;
-                    // Get issuer
-                    principal = x509cert.getIssuerDN();
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
+//            Enumeration enum1 = keystore.aliases();
+//            while (enum1.hasMoreElements()) {
+//                String alias = (String) enum1.nextElement();
+//                LOGGER.info("ALIAS IS '{}'", alias);
+//                if (cert instanceof X509Certificate) {
+//                    X509Certificate x509cert = (X509Certificate) cert;
+//
+//                    // Get subject
+//                    Principal principal = x509cert.getSubjectDN();
+//                    String subjectDn = principal.getName();
+//                    name = subjectDn;
+//                    // Get issuer
+//                    principal = x509cert.getIssuerDN();
+//                }
+//            }
+        } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
         LOGGER.info("##########");
@@ -1403,15 +1411,11 @@ public class EpsosHelperService {
         } catch (DatatypeConfigurationException ex) {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
-        EventLog eventLog1 = EventLog.createEventLogHCPIdentity(
-                TransactionName.epsosHcpAuthentication,
-                EventActionCode.EXECUTE, date2,
-                EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID,
-                HR_UserID, HR_RoleID, HR_AlternativeUserID, SC_UserID,
-                SP_UserID, AS_AuditSourceId, ET_ObjectID,
-                reqm_participantObjectID, basedSecHead.getBytes(),
-                resm_participantObjectID, ResM_PatricipantObjectDetail,
-                sourceIP.getHostAddress(), "N/A");
+        EventLog eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
+                date2, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
+                SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID, basedSecHead.getBytes(),
+                resm_participantObjectID, ResM_PatricipantObjectDetail, sourceIP.getHostAddress(), "N/A");
+
         LOGGER.info("The audit has been prepared");
         eventLog1.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog1, "13", "2");
@@ -1426,42 +1430,37 @@ public class EpsosHelperService {
         return attrPID;
     }
 
-    private static Attribute AddAttributeValue(
-            XMLObjectBuilderFactory builderFactory, Attribute attribute,
-            String value, String namespace, String xmlschema) {
-        XMLObjectBuilder stringBuilder = builderFactory
-                .getBuilder(XSString.TYPE_NAME);
-        XSString attrValPID = (XSString) stringBuilder.buildObject(
-                AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
+    private static Attribute AddAttributeValue(XMLObjectBuilderFactory builderFactory, Attribute attribute, String value,
+                                               String namespace, String xmlschema) {
+
+        XMLObjectBuilder stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
+        XSString attrValPID = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
         attrValPID.setValue(value);
         attribute.getAttributeValues().add(attrValPID);
         return attribute;
     }
 
-    private static Attribute createAttribute(
-            XMLObjectBuilderFactory builderFactory, String FriendlyName,
-            String oasisName, String value, String namespace, String xmlschema) {
-        Attribute attrPID = create(Attribute.class,
-                Attribute.DEFAULT_ELEMENT_NAME);
+    private static Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String FriendlyName, String oasisName,
+                                             String value, String namespace, String xmlschema) {
+
+        Attribute attrPID = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
         attrPID.setFriendlyName(FriendlyName);
         attrPID.setName(oasisName);
         attrPID.setNameFormat(Attribute.URI_REFERENCE);
         // Create and add the Attribute Value
 
-        XMLObjectBuilder stringBuilder = null;
+        XMLObjectBuilder stringBuilder;
 
-        if (namespace.equals("")) {
-            XSString attrValPID = null;
+        if (StringUtils.isBlank(namespace)) {
+            XSString attrValPID;
             stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
-            attrValPID = (XSString) stringBuilder.buildObject(
-                    AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
+            attrValPID = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
             attrValPID.setValue(value);
             attrPID.getAttributeValues().add(attrValPID);
         } else {
-            XSURI attrValPID = null;
+            XSURI attrValPID;
             stringBuilder = builderFactory.getBuilder(XSURI.TYPE_NAME);
-            attrValPID = (XSURI) stringBuilder.buildObject(
-                    AttributeValue.DEFAULT_ELEMENT_NAME, XSURI.TYPE_NAME);
+            attrValPID = (XSURI) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSURI.TYPE_NAME);
             attrValPID.setValue(value);
             attrPID.getAttributeValues().add(attrValPID);
         }
@@ -1474,20 +1473,16 @@ public class EpsosHelperService {
                 .getBuilder(qname)).buildObject(qname);
     }
 
-    private static Assertion createAssertion(String username, String role,
-                                             String organization, String organizationId, String facilityType,
-                                             String purposeOfUse, String xspaLocality,
-                                             java.util.Vector permissions) {
+    private static Assertion createAssertion(String username, String role, String organization, String organizationId,
+                                             String facilityType, String purposeOfUse, String xspaLocality, Vector permissions) {
 
-        return createStorkAssertion(username, role, organization,
-                organizationId, facilityType, purposeOfUse, xspaLocality,
-                permissions, null);
+        return createStorkAssertion(username, role, organization, organizationId, facilityType, purposeOfUse, xspaLocality, permissions, null);
     }
 
     private static Assertion createStorkAssertion(String username, String role,
                                                   String organization, String organizationId, String facilityType,
                                                   String purposeOfUse, String xspaLocality,
-                                                  java.util.Vector permissions, String onBehalfId) {
+                                                  Vector permissions, String onBehalfId) {
         // assertion
         LOGGER.info("username: '{}'", username);
         LOGGER.info("role: '{}'", role);
@@ -1703,22 +1698,19 @@ public class EpsosHelperService {
     }
 
     public static String getCountryName(String countryCode, String lang) {
-        String translation = countryCode;
-        translation = LiferayUtils.getPortalTranslation(countryCode, lang);
-        return translation;
+
+        return LiferayUtils.getPortalTranslation(countryCode, lang);
     }
 
     public static void getCountryListNameFromCS(String lang,
                                                 List<Country> countriesList) {
 
         try {
-            for (int i = 0; i < countriesList.size(); i++) {
-                Country country = countriesList.get(i);
-                String translation = country.getCode();
-                translation = LiferayUtils.getPortalTranslation(
-                        country.getCode(), lang);
+            for (Country country : countriesList) {
+
+                String translation = LiferayUtils.getPortalTranslation(country.getCode(), lang);
                 country.setName(translation);
-                LOGGER.info("Country is : " + country.getName());
+                LOGGER.info("Country is: '{}'", country.getName());
             }
         } catch (Exception ex) {
             LOGGER.error("getCountriesNamesFromCS: " + ex.getMessage());
@@ -1815,7 +1807,7 @@ public class EpsosHelperService {
             if (Validator.isNotNull(user)) {
                 String idvalue = (String) user.getExpandoBridge().getAttribute(
                         id.getDomain());
-                LOGGER.info("Identifiers: " + id.getKey() + "_" + idvalue);
+                LOGGER.info("Identifiers: '{}_{}'", id.getKey(), idvalue);
                 id.setUserValue(idvalue);
             }
 
@@ -1826,17 +1818,16 @@ public class EpsosHelperService {
 
     public static List<Demographics> getCountryDemographics(String country,
                                                             String language, String path, User user) {
-        List<Demographics> demographics = new ArrayList<Demographics>();
-        Vector vec = EpsosHelperService.getCountryDemographicsFromCS(country,
-                path);
+
+        List<Demographics> demographics = new ArrayList<>();
+        Vector vec = EpsosHelperService.getCountryDemographicsFromCS(country, path);
         for (Object aVec : vec) {
             Demographics id = new Demographics();
             if (((Demographics) aVec).getMandatory()) {
                 id.setLabel(EpsosHelperService.getPortalTranslation(
                         ((Demographics) aVec).getLabel(), language) + "*");
             } else {
-                id.setLabel(EpsosHelperService.getPortalTranslation(
-                        ((Demographics) aVec).getLabel(), language));
+                id.setLabel(EpsosHelperService.getPortalTranslation(((Demographics) aVec).getLabel(), language));
             }
             id.setLength(((Demographics) aVec).getLength());
             id.setKey(((Demographics) aVec).getKey());
@@ -1845,17 +1836,16 @@ public class EpsosHelperService {
             id.setFriendlyName(((Demographics) aVec).getFriendlyName());
 
             if (Validator.isNotNull(user)) {
-                String idvalue = (String) user.getExpandoBridge().getAttribute(
-                        id.getKey());
+                String idvalue = (String) user.getExpandoBridge().getAttribute(id.getKey());
                 id.setUserValue(idvalue);
             }
-
             demographics.add(id);
         }
         return demographics;
     }
 
     public static Vector getCountryIdsFromCS(String country) {
+
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
         return getCountryIdsFromCS(country, externalContext.getRealPath("/"));
@@ -1865,15 +1855,14 @@ public class EpsosHelperService {
         return Constants.EPSOS_PROPS_PATH;
     }
 
-    public static Vector getCountryDemographicsFromCS(String country,
-                                                      String portalPath) {
+    public static Vector getCountryDemographicsFromCS(String country, String portalPath) {
+
         Vector v = new Vector();
         String filename = "InternationalSearch_" + country + ".xml";
 
         String path = getSearchMaskPath() + "forms" + File.separator + filename;
         try {
             File file = new File(path);
-            // File file = new File(internationalSearchPath+filename);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(file);
@@ -1923,31 +1912,31 @@ public class EpsosHelperService {
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
-        LOGGER.info("Demographics size :" + v.size());
+        LOGGER.info("Demographics size: '{}'", v.size());
         return v;
     }
 
     public static Vector getCountryDemographicsFromCS(String country) {
-        Vector v = new Vector();
+
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
-        return getCountryDemographicsFromCS(country,
-                externalContext.getRealPath("/"));
+        return getCountryDemographicsFromCS(country, externalContext.getRealPath("/"));
     }
 
     public static String getPortalTranslation(String key, String language) {
+
         return LiferayUtils.getPortalTranslation(key, language);
     }
 
-    public static String getPortalTranslationFromServlet(
-            HttpServletRequest req, String key, String language) {
+    public static String getPortalTranslationFromServlet(HttpServletRequest req, String key, String language) {
+
         return LiferayUtils.getPortalTranslation(key, language);
     }
 
-    public static void printAssertion(Assertion ass)
-            throws MarshallingException {
+    public static void printAssertion(Assertion ass) throws MarshallingException {
+
         AssertionMarshaller marshaller = new AssertionMarshaller();
-        Element element = null;
+        Element element;
         element = marshaller.marshall(ass);
         Document document = element.getOwnerDocument();
 
@@ -1959,6 +1948,7 @@ public class EpsosHelperService {
     }
 
     public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
+
         Assertion trc;
         LOGGER.debug("Try to create TRCA for patient : " + patient.getExtension());
         String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
@@ -2314,8 +2304,7 @@ public class EpsosHelperService {
                     .getResource("com/gnomon/epsos/reports/epsosConsent.jasper");
             String path = url.getPath();
             LOGGER.debug("PATH IS " + path);
-            bytes = generatePdfReport(LiferayUtils.getCurrentConnection(),
-                    path, parameters);
+            bytes = generatePdfReport(LiferayUtils.getCurrentConnection(), path, parameters);
         } catch (Exception e) {
             LOGGER.error("Error creating pin document. " + e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -2351,30 +2340,26 @@ public class EpsosHelperService {
         return translation;
     }
 
-    public static byte[] generatePdfReport(Connection conn,
-                                           String jasperFilePath, Map parameters) throws JRException,
-            SQLException {
-        ByteArrayOutputStream baos = null;
-        try {
+    public static byte[] generatePdfReport(Connection conn, String jasperFilePath, Map parameters) throws JRException, SQLException {
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             File reportFile = new File(jasperFilePath);
-            JasperFillManager
-                    .fillReport(reportFile.getPath(), parameters, conn);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(
-                    reportFile.getPath(), parameters, conn);
+            JasperFillManager.fillReport(reportFile.getPath(), parameters, conn);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(reportFile.getPath(), parameters, conn);
             JRPdfExporter exporter = new JRPdfExporter();
-            baos = new ByteArrayOutputStream();
             exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-            exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+            exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
             exporter.exportReport();
-        } finally {
-            conn.close();
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
+            return new byte[0];
         }
-        return baos.toByteArray();
     }
 
     public static List<Patient> getMockPatients() {
-        List<Patient> mockpatients = new ArrayList();
 
+        List<Patient> mockpatients = new ArrayList<>();
         Patient patient = new Patient();
         patient.setName("Patient name");
         patient.setFamilyName("Patient family name");
@@ -2494,7 +2479,7 @@ public class EpsosHelperService {
         TrilliumBridgeTransformer transformer = new XsltTrilliumBridgeTransformer();
         cdaInputStream = new ByteArrayInputStream(input.getBytes());
         cdaOutputStream = new ByteArrayOutputStream();
-        String mayoTransformed = "";
+        String mayoTransformed;
         if (isCDA) {
             transformer.epsosToCcda(cdaInputStream, cdaOutputStream,
                     TrilliumBridgeTransformer.Format.XML, null);
@@ -2648,10 +2633,7 @@ public class EpsosHelperService {
         PatientId patientId;
         try {
             patientDocuments = new ArrayList<>();
-            String serviceUrl = EpsosHelperService
-                    .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL); // serviceUrl
-            // =
-            // LiferayUtils.getFromPrefs("client_connector_url");
+            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
             LOGGER.info("CLIENTCONNECTOR: '{}'", serviceUrl);
             ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
             patientId = PatientId.Factory.newInstance();
@@ -2672,13 +2654,6 @@ public class EpsosHelperService {
                 document.setAuthor(aux.getAuthor());
                 Calendar cal = aux.getCreationDate();
                 LOGGER.info("DATE IS " + aux.getCreationDate());
-                // DateFormat sdf = LiferayUtils.getPortalUserDateFormat();
-                // try {
-                // document.setCreationDate(sdf.format(cal.getTime()));
-                // } catch (Exception e) {
-                // document.setCreationDate(aux.getCreationDate() + "");
-                // LOGGER.error("Problem converting date" + aux.getCreationDate());
-                // };
                 document.setDescription(aux.getDescription());
                 document.setHealthcareFacility("");
                 document.setTitle(aux.getTitle());
@@ -2693,9 +2668,6 @@ public class EpsosHelperService {
             LOGGER.debug("Selected Country: '{}'", country);
         } catch (Exception ex) {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
-            // if (ex.getMessage().contains("4701")) {
-            // //throw new ConsentException();
-            // }
         }
         return patientDocuments;
     }
@@ -2818,8 +2790,8 @@ public class EpsosHelperService {
         return patient;
     }
 
-    public static PatientDemographics createPatientDemographicsForQuery(
-            List<Identifier> identifiers, List<Demographics> demographics) {
+    public static PatientDemographics createPatientDemographicsForQuery(List<Identifier> identifiers, List<Demographics> demographics) {
+
         PatientDemographics pd = PatientDemographics.Factory.newInstance();
         PatientId[] idArray = new PatientId[identifiers.size()];
         for (int i = 0; i < identifiers.size(); i++) {
