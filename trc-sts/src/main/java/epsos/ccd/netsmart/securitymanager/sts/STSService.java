@@ -73,10 +73,10 @@ public class STSService implements Provider<SOAPMessage> {
     @Override
     public SOAPMessage invoke(SOAPMessage source) {
 
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Incoming SOAP Message request: '{}'", source.toString());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Incoming SOAP Message request: '{}'", source.toString());
+            log(source);
         }
-        log(source);
 
         SOAPBody body;
         SOAPHeader header;
@@ -137,11 +137,11 @@ public class STSService implements Provider<SOAPMessage> {
             Document signedDoc = builder.newDocument();
             Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
 
-            SOAPMessage resp = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
-            resp.getSOAPBody().addDocument(STSUtils.createRSTRC(signedDoc));
-            createResponseHeader(resp.getSOAPHeader(), mid);
+            SOAPMessage response = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
+            response.getSOAPBody().addDocument(STSUtils.createRSTRC(signedDoc));
+            createResponseHeader(response.getSOAPHeader(), mid);
 
-            String strRespHeader = STSUtils.domElementToString(resp.getSOAPHeader());
+            String strRespHeader = STSUtils.domElementToString(response.getSOAPHeader());
             String strReqHeader = STSUtils.domElementToString(header);
 
             String tls_cn = STSUtils.getSSLCertPeer(context.getMessageContext());
@@ -154,13 +154,14 @@ public class STSService implements Provider<SOAPMessage> {
             audit(samlTRCIssuer.getPointofCare(), samlTRCIssuer.getHumanRequestorNameId(),
                     samlTRCIssuer.getHumanRequestorSubjectId(), samlTRCIssuer.getHRRole(), patientID,
                     samlTRCIssuer.getFacilityType(), trc.getID(), tls_cn, mid,
-                    Base64.encodeBase64(strReqHeader.getBytes()), getMessageIdFromHeader(resp.getSOAPHeader()),
+                    Base64.encodeBase64(strReqHeader.getBytes()), getMessageIdFromHeader(response.getSOAPHeader()),
                     Base64.encodeBase64(strRespHeader.getBytes()));
 
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Outgoing SOAP Message response: '{}'", resp.toString());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Outgoing SOAP Message response: '{}'", response.toString());
+                log(response);
             }
-            return resp;
+            return response;
 
         } catch (SOAPException | WSTrustException | MarshallingException | SMgrException | ParserConfigurationException
                 | IOException ex) {
@@ -262,7 +263,6 @@ public class STSService implements Provider<SOAPMessage> {
         }
     }
 
-
     private String getRSTAction(SOAPBody body) throws WSTrustException {
 
         if (body.getElementsByTagNameNS(WS_TRUST_NS, "RequestType").getLength() < 1) {
@@ -299,16 +299,14 @@ public class STSService implements Provider<SOAPMessage> {
         ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
 
         EventLog evLogTRC = EventLog.createEventLogTRCA(TransactionName.epsosTRCAssertion, EventActionCode.EXECUTE,
-                date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType,
-                cms.getProperty("ncp.country") + "<" + humanRequestorNameID + "@" + cms.getProperty("ncp.country")
-                        + ">",
-                humanRequestorRole, humanRequestorSubjectID, tls_cn, STSUtils.getServerIP(),
-                cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"), patientID, "urn:uuid:" + assertionId, reqMid,
-                reqSecHeader, resMid, resSecHeader, STSUtils.getServerIP(), getClientIP());
+                date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, cms.getProperty("ncp.country")
+                        + "<" + humanRequestorNameID + "@" + cms.getProperty("ncp.country") + ">", humanRequestorRole,
+                humanRequestorSubjectID, tls_cn, STSUtils.getServerIP(), cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
+                patientID, "urn:uuid:" + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
+                STSUtils.getServerIP(), getClientIP());
 
         evLogTRC.setEventType(EventType.epsosTRCAssertion);
         asd.write(evLogTRC, "13", "2");
-
     }
 
     private String getClientIP() {
