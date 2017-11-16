@@ -326,8 +326,7 @@ public class EpsosHelperService {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document epDoc = db.parse(new ByteArrayInputStream(bytes));
-            cda.setPrescriptionBarcode(CDAUtils
-                    .getRelativePrescriptionBarcode(epDoc));
+            cda.setPrescriptionBarcode(CDAUtils.getRelativePrescriptionBarcode(epDoc));
             cda.setDispensationId("D-" + CDAUtils.getRelativePrescriptionBarcode(epDoc));
             edDoc = CDAUtils.createDispensation(epDoc, cda);
             LOGGER.info("### DISPENSATION START ###\n '{}' \n ### DISPENSATION END ###", edDoc);
@@ -2114,7 +2113,7 @@ public class EpsosHelperService {
     }
 
     public static String formatDateHL7(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssZ");
         return formatter.format(date);
     }
 
