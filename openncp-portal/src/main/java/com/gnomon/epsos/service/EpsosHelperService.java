@@ -1079,44 +1079,44 @@ public class EpsosHelperService {
                 rolename = "medical doctor";
 
                 String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
-                String p[] = doctor_perms.split(",");
-                for (int k = 0; k < p.length; k++) {
-                    perms.add(prefix + p[k]);
+                String[] p = doctor_perms.split(",");
+                for (String aP : p) {
+                    perms.add(prefix + aP);
                 }
             }
             if (isPharmacist) {
                 rolename = "pharmacist";
                 String pharm_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_PERMISSIONS);
-                String p1[] = pharm_perms.split(",");
-                for (int k = 0; k < p1.length; k++) {
-                    perms.add(prefix + p1[k]);
+                String[] p1 = pharm_perms.split(",");
+                for (String aP1 : p1) {
+                    perms.add(prefix + aP1);
                 }
             }
 
             if (isNurse) {
                 rolename = "nurse";
                 String nurse_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_NURSE_PERMISSIONS);
-                String p1[] = nurse_perms.split(",");
-                for (int k = 0; k < p1.length; k++) {
-                    perms.add(prefix + p1[k]);
+                String[] p1 = nurse_perms.split(",");
+                for (String aP1 : p1) {
+                    perms.add(prefix + aP1);
                 }
             }
 
             if (isPatient) {
                 rolename = "patient";
                 String patient_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
-                String p1[] = patient_perms.split(",");
-                for (int k = 0; k < p1.length; k++) {
-                    perms.add(prefix + p1[k]);
+                String[] p1 = patient_perms.split(",");
+                for (String aP1 : p1) {
+                    perms.add(prefix + aP1);
                 }
             }
 
             if (isAdministrator) {
                 rolename = "administrator";
                 String admin_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
-                String p1[] = admin_perms.split(",");
-                for (int k = 0; k < p1.length; k++) {
-                    perms.add(prefix + p1[k]);
+                String[] p1 = admin_perms.split(",");
+                for (String aP1 : p1) {
+                    perms.add(prefix + aP1);
                 }
             }
             Company company = CompanyLocalServiceUtil.getCompany(user.getCompanyId());
@@ -1125,7 +1125,7 @@ public class EpsosHelperService {
             // fixed for consent creation AuthorInstitution Validation problem
             String orgId = company.getCompanyId() + ".1";
             List depts = user.getOrganizations();
-            String orgType = "Other";
+            String orgType;
             if (isPharmacist) {
                 orgType = "Pharmacy";
             } else {
@@ -1135,7 +1135,8 @@ public class EpsosHelperService {
                     orgType = "Hospital";
                 }
             }
-            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType, "TREATMENT", poc, perms);
+            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType, "TREATMENT",
+                    poc, perms);
 
             // send Audit message
             // GUI-27
@@ -1476,15 +1477,20 @@ public class EpsosHelperService {
     private static Assertion createAssertion(String username, String role, String organization, String organizationId,
                                              String facilityType, String purposeOfUse, String xspaLocality, Vector permissions) {
 
-        return createStorkAssertion(username, role, organization, organizationId, facilityType, purposeOfUse, xspaLocality, permissions, null);
+        String fullName = LiferayUtils.getPortalUser().getFullName();
+        String email = LiferayUtils.getPortalUser().getEmailAddress();
+        return createStorkAssertion(username, fullName, email, role, organization, organizationId, facilityType, purposeOfUse,
+                xspaLocality, permissions, null);
     }
 
-    private static Assertion createStorkAssertion(String username, String role,
+    private static Assertion createStorkAssertion(String username, String fullName, String email, String role,
                                                   String organization, String organizationId, String facilityType,
                                                   String purposeOfUse, String xspaLocality,
                                                   Vector permissions, String onBehalfId) {
         // assertion
         LOGGER.info("username: '{}'", username);
+        LOGGER.info("FullName: '{}'", fullName);
+        LOGGER.info("Email: '{}'", email);
         LOGGER.info("role: '{}'", role);
         LOGGER.info("organization: '{}'", organization);
         LOGGER.info("organizationId: '{}'", organizationId);
@@ -1500,8 +1506,8 @@ public class EpsosHelperService {
             // Create the NameIdentifier
             SAMLObjectBuilder nameIdBuilder = (SAMLObjectBuilder) builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME);
             NameID nameId = (NameID) nameIdBuilder.buildObject();
-            nameId.setValue(username);
-            nameId.setFormat(NameID.UNSPECIFIED);
+            nameId.setValue(email);
+            nameId.setFormat(NameID.EMAIL);
 
             assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
 
@@ -1531,7 +1537,8 @@ public class EpsosHelperService {
             assertion.setConditions(conditions);
 
             Issuer issuer = new IssuerBuilder().buildObject();
-            issuer.setValue("urn:idp:countryB");
+            String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
+            issuer.setValue("urn:idp:" + countryCode + ":countryB");
             issuer.setNameQualifier("urn:epsos:wp34:assertions");
             assertion.setIssuer(issuer);
 
@@ -1552,7 +1559,7 @@ public class EpsosHelperService {
             // XSPA Subject
             Attribute attrPID = createAttribute(builderFactory, "XSPA subject",
                     "urn:oasis:names:tc:xacml:1.0:subject:subject-id",
-                    username, "", "");
+                    fullName, "", "");
             attrStmt.getAttributes().add(attrPID);
 
             // XSPA Role
@@ -1561,24 +1568,21 @@ public class EpsosHelperService {
             attrStmt.getAttributes().add(attrPID_1);
 
             // XSPA Organization
-            Attribute attrPID_3 = createAttribute(builderFactory,
-                    "XSPA Organization",
+            Attribute attrPID_3 = createAttribute(builderFactory, "XSPA Organization",
                     "urn:oasis:names:tc:xspa:1.0:subject:organization",
                     organization, "", "");
             attrStmt.getAttributes().add(attrPID_3);
+
             // XSPA Organization ID
             Attribute attrPID_4 = createAttribute(builderFactory,
-                    "XSPA Organization ID",
-                    "urn:oasis:names:tc:xspa:1.0:subject:organization-id",
+                    "XSPA Organization ID", "urn:oasis:names:tc:xspa:1.0:subject:organization-id",
                     organizationId, "AA", "");
             attrStmt.getAttributes().add(attrPID_4);
 
             // // On behalf of
             if (Validator.isNotNull(onBehalfId)) {
-                Attribute attrPID_41 = createAttribute(builderFactory,
-                        "OnBehalfOf",
-                        "urn:epsos:names:wp3.4:subject:on-behalf-of",
-                        onBehalfId, role, "");
+                Attribute attrPID_41 = createAttribute(builderFactory, "OnBehalfOf",
+                        "urn:epsos:names:wp3.4:subject:on-behalf-of", onBehalfId, role, "");
                 attrStmt.getAttributes().add(attrPID_41);
                 attrStmt.getAttributes().add(attrPID_41);
             }
@@ -1589,18 +1593,21 @@ public class EpsosHelperService {
                     "urn:epsos:names:wp3.4:subject:healthcare-facility-type",
                     facilityType, "", "");
             attrStmt.getAttributes().add(attrPID_5);
+
             // XSPA Purpose of Use
             Attribute attrPID_6 = createAttribute(builderFactory,
                     "XSPA Purpose Of Use",
                     "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse",
                     purposeOfUse, "", "");
             attrStmt.getAttributes().add(attrPID_6);
+
             // XSPA Locality
             Attribute attrPID_7 = createAttribute(builderFactory,
                     "XSPA Locality",
                     "urn:oasis:names:tc:xspa:1.0:environment:locality",
                     xspaLocality, "", "");
             attrStmt.getAttributes().add(attrPID_7);
+
             // HL7 Permissions
             Attribute attrPID_8 = createAttribute(builderFactory,
                     "Hl7 Permissions",
