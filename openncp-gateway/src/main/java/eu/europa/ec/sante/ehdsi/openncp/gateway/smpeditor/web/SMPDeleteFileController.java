@@ -39,7 +39,6 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.PrivateKeyDetails;
 import org.apache.http.ssl.PrivateKeyStrategy;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
@@ -69,7 +68,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.*;
@@ -341,7 +339,7 @@ public class SMPDeleteFileController {
 
         List<String> referencesSelected = smpdelete.getReferenceSelected();
 
-        List<SMPHttp> allItems = new ArrayList<SMPHttp>();
+        List<SMPHttp> allItems = new ArrayList<>();
 
     /*
       Iterate through all references selected to delete
@@ -382,12 +380,7 @@ public class SMPDeleteFileController {
 
             logger.debug("\n ************** URI - {}", uri);
 
-            PrivateKeyStrategy privatek = new PrivateKeyStrategy() {
-                @Override
-                public String chooseAlias(Map<String, PrivateKeyDetails> map, Socket socket) {
-                    return configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_ALIAS);
-                }
-            };
+            PrivateKeyStrategy privatek = (map, socket) -> configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_ALIAS);
 
             // Trust own CA and all self-signed certs
             SSLContext sslcontext = null;
