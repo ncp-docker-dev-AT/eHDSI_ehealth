@@ -49,8 +49,8 @@ public class Utils {
 
     public synchronized static void writeXMLToFile(String am, String path) {
 
-        try (FileWriter fstream = new FileWriter(path); BufferedWriter out = new BufferedWriter(fstream);) {
-
+        LOGGER.debug("method writeXMLToFile({})", path);
+        try (FileWriter writer = new FileWriter(path); BufferedWriter out = new BufferedWriter(writer)) {
             out.write(am);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
