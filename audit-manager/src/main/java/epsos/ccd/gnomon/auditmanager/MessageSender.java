@@ -1,24 +1,3 @@
-/***Licensed to the Apache Software Foundation (ASF) under one
- *or more contributor license agreements.  See the NOTICE file
- *distributed with this work for additional information
- *regarding copyright ownership.  The ASF licenses this file
- *to you under the Apache License, Version 2.0 (the
- *"License"); you may not use this file except in compliance
- *with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- *Unless required by applicable law or agreed to in writing,
- *software distributed under the License is distributed on an
- *"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *KIND, either express or implied.  See the License for the
- *specific language governing permissions and limitations
- *under the License.
- **/
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package epsos.ccd.gnomon.auditmanager;
 
 import epsos.ccd.gnomon.auditmanager.ssl.AuthSSLSocketFactory;
@@ -47,9 +26,8 @@ import java.util.Enumeration;
 import java.util.TimeZone;
 
 /**
- * Thread for sending the messages to the syslog repository. Each message is
- * being sent using a different thread. If a message can;t be send immediately,
- * it tries for a time interval
+ * Thread for sending the messages to the syslog repository. Each message is being sent using a different thread.
+ * If a message can;t be send immediately, it tries for a time interval.
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -58,15 +36,14 @@ import java.util.TimeZone;
  */
 public class MessageSender extends java.lang.Thread {
 
-    private static final Logger log = LoggerFactory.getLogger(MessageSender.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageSender.class);
     private static String[] enabledProtocols = {"TLSv1"};
     private static String AUDIT_REPOSITORY_URL = "audit.repository.url";
     private static String AUDIT_REPOSITORY_PORT = "audit.repository.port";
     private static String KEYSTORE_FILE = "NCP_SIG_KEYSTORE_PATH";
-    //private static String KEYSTORE_PWD = "NCP_SIG_KEYSTORE_PASSWORD";
     private static String TRUSTSTORE = "TRUSTSTORE_PATH";
-    //private static String TRUSTSTORE_PWD = "TRUSTSTORE_PASSWORD";
     private static String KEY_ALIAS = "NCP_SIG_PRIVATEKEY_ALIAS";
+
     private AuditLogSerializer auditLogSerializer;
     private AuditMessage auditmessage;
     private String facility;
@@ -81,24 +58,25 @@ public class MessageSender extends java.lang.Thread {
     }
 
     public void run() {
+
         boolean sent = false;
-        log.info("Try to construct the message");
+        LOGGER.info("Try to construct the message");
         try {
-            log.info(auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() + " Try to construct the message");
+            LOGGER.info(auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() + " Try to construct the message");
             String auditmsg = AuditTrailUtils.constructMessage(auditmessage, true);
-            log.debug(auditmsg);
+            LOGGER.debug(auditmsg);
 
             if (!Utils.isEmpty(auditmsg)) {
                 long timeout = Long.parseLong(Utils.getProperty("audit.time.to.try", "60000", true));
-                boolean timeouted = false;
-                log.info("Try to send the message for '{}' msec", timeout);
+                boolean timeouted;
+                LOGGER.info("Try to send the message for '{}' msec", timeout);
                 timeout += System.currentTimeMillis();
 
                 do {
                     try {
                         sent = sendMessage(auditmsg, facility, severity);
                     } catch (Exception e) {
-                        log.error(e.getMessage(), e);
+                        LOGGER.error(e.getMessage(), e);
                     }
                     timeouted = System.currentTimeMillis() > timeout;
                     if (!sent && !timeouted) {
@@ -107,17 +85,17 @@ public class MessageSender extends java.lang.Thread {
                 } while (!sent && !timeouted);
 
                 if (timeouted) {
-                    log.info("The time set to epsos.properties in order to retry sending the audit has passed");
+                    LOGGER.info("The time set to epsos.properties in order to retry sending the audit has passed");
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         } finally {
             if (!sent) {
                 if (auditLogSerializer != null) {
                     auditLogSerializer.writeObjectToFile(new SerializableMessage(auditmessage, facility, severity));
                 } else {
-                    log.info("Failed to send backuped audit message to OpenATNA. Retry later.");
+                    LOGGER.info("Failed to send backuped audit message to OpenATNA. Retry later.");
                 }
             }
         }
@@ -140,24 +118,23 @@ public class MessageSender extends java.lang.Thread {
 
         String host = configurationManager.getProperty(AUDIT_REPOSITORY_URL);
         int port = Integer.parseInt(configurationManager.getProperty(AUDIT_REPOSITORY_PORT));
-        if (log.isDebugEnabled()) {
-            log.debug("Set the security properties");
-            log.debug(configurationManager.getProperty(KEYSTORE_FILE));
-            log.debug(configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()));
-            log.debug(configurationManager.getProperty(TRUSTSTORE));
-            log.debug(configurationManager.getProperty(Configuration.TRUSTSTORE_PWD.getValue()));
-            log.debug(configurationManager.getProperty(KEY_ALIAS));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Set the security properties");
+            LOGGER.debug(configurationManager.getProperty(KEYSTORE_FILE));
+            LOGGER.debug(configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()));
+            LOGGER.debug(configurationManager.getProperty(TRUSTSTORE));
+            LOGGER.debug(configurationManager.getProperty(Configuration.TRUSTSTORE_PWD.getValue()));
+            LOGGER.debug(configurationManager.getProperty(KEY_ALIAS));
         }
 
-        if (log.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled()) {
 
             InputStream stream = null;
             try {
                 KeyStore ks = KeyStore.getInstance("JKS");
                 ks.load(Utils.fullStream(configurationManager.getProperty(KEYSTORE_FILE)), configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()).toCharArray());
                 X509Certificate cert = (X509Certificate) ks.getCertificate(configurationManager.getProperty(KEY_ALIAS));
-                log.debug("KEYSTORE");
-                log.debug(cert.toString());
+                LOGGER.debug("KEYSTORE: {}", cert.toString());
                 KeyStore ks1 = KeyStore.getInstance("JKS");
                 stream = Utils.fullStream(configurationManager.getProperty(TRUSTSTORE));
                 ks1.load(stream, configurationManager.getProperty(Configuration.TRUSTSTORE_PWD.getValue()).toCharArray());
@@ -166,11 +143,11 @@ public class MessageSender extends java.lang.Thread {
                 while (enu.hasMoreElements()) {
                     i++;
                     String alias = enu.nextElement();
-                    log.debug("ALIAS " + i + " " + alias);
-                    log.debug(ks1.getCertificate(alias).toString());
+                    LOGGER.debug("ALIAS " + i + " " + alias);
+                    LOGGER.debug(ks1.getCertificate(alias).toString());
                 }
             } catch (Exception e) {
-                log.error("Error logging keystore file", e);
+                LOGGER.error("Error logging keystore file", e);
             } finally {
                 IOUtils.closeQuietly(stream);
             }
@@ -179,7 +156,7 @@ public class MessageSender extends java.lang.Thread {
         BufferedOutputStream bos = null;
         SSLSocket sslsocket = null;
         try {
-            log.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Initialize the SSL socket");
+            LOGGER.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Initialize the SSL socket");
             File u = new File(configurationManager.getProperty(TRUSTSTORE));
             KeystoreDetails trust = new KeystoreDetails(u.toString(), configurationManager.getProperty(Configuration.TRUSTSTORE_PWD.getValue()),
                     configurationManager.getProperty(KEY_ALIAS));
@@ -187,10 +164,10 @@ public class MessageSender extends java.lang.Thread {
             KeystoreDetails key = new KeystoreDetails(uu.toString(), configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()),
                     configurationManager.getProperty(KEY_ALIAS), configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()));
             AuthSSLSocketFactory f = new AuthSSLSocketFactory(key, trust);
-            log.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Create socket");
+            LOGGER.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Create socket");
 
             sslsocket = (SSLSocket) f.createSecureSocket(host, port);
-            log.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Enabling protocols");
+            LOGGER.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Enabling protocols");
             sslsocket.setEnabledProtocols(enabledProtocols);
 
             String[] suites = sslsocket.getSupportedCipherSuites();
@@ -216,13 +193,13 @@ public class MessageSender extends java.lang.Thread {
             // Sets the bom for utf-8
             bos.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
             bos.flush();
-            log.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Write the object to bos");
+            LOGGER.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Write the object to bos");
             // Write the syslog message to repository
             bos.write(auditmsg.getBytes());
-            log.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message sent");
+            LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message sent");
             sent = true;
         } catch (Exception e) {
-            log.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error sending message" + e.getMessage(), e);
+            LOGGER.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error sending message" + e.getMessage(), e);
         } finally {
             // closes the boom and the socket
             Utils.close(bos);
@@ -230,10 +207,9 @@ public class MessageSender extends java.lang.Thread {
                 if (sslsocket != null)
                     sslsocket.close();
             } catch (IOException e) {
-                log.warn("Unable to close SSLSocket", e);
+                LOGGER.warn("Unable to close SSLSocket", e);
             }
         }
-
         return sent;
     }
 }
