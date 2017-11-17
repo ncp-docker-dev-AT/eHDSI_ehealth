@@ -35,6 +35,8 @@ public enum CdaModel {
     MRO("epSOS - MRO Medication Related Overview"),
     PS_FRIENDLY("epSOS - Patient Summary Friendly"),
     PS_PIVOT("epSOS - Patient Summary Pivot"),
+    PS_ART_DECOR_CDA("epSOS - ART-DECOR based CDA validation [EXPERIMENTAL]"),
+    PS_ART_DECOR_SCANNED("epSOS - ART-DECOR based Scanned Document"),
     SCANNED_DOCUMENT("epSOS - Scanned Document"),
     CONSENT("epSOS - eConsent"),
     ED_FRIENDLY("epSOS - eDispensation Friendly"),
@@ -60,9 +62,9 @@ public enum CdaModel {
      * This helper method will return a specific CDA model based on a document
      * class code (also choosing between friendly or pivot documents).
      *
-     * @param classCode  The document class code.
-     * @param isFriendly The boolean flag stating if the document is pivot or
-     *                   not.
+     * @param classCode The document class code.
+     * @param isPivot   The boolean flag stating if the document is pivot or
+     *                  not.
      * @return the correspondent CDA model.
      */
     public static String obtainCdaModel(String classCode, boolean isPivot) {
@@ -79,6 +81,7 @@ public enum CdaModel {
             }
             if (classCode.equals(Constants.PS_CLASSCODE)) {
                 return CdaModel.PS_PIVOT.toString();
+                //return CdaModel.PS_ART_DECOR_CDA.toString();
             }
             if (classCode.equals(Constants.ED_CLASSCODE)) {
                 return CdaModel.ED_PIVOT.toString();
@@ -98,6 +101,7 @@ public enum CdaModel {
             }
             if (classCode.equals(Constants.PS_CLASSCODE)) {
                 return CdaModel.PS_FRIENDLY.toString();
+                //return CdaModel.PS_ART_DECOR_CDA.toString();
             }
             if (classCode.equals(Constants.ED_CLASSCODE)) {
                 return CdaModel.ED_FRIENDLY.toString();
