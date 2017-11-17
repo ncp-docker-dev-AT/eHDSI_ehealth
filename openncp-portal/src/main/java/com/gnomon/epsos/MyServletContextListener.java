@@ -19,7 +19,7 @@ import javax.servlet.annotation.WebListener;
 @WebListener
 public class MyServletContextListener implements ServletContextListener {
 
-    private static final Logger log = LoggerFactory.getLogger("MyServletContextListener");
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyServletContextListener.class);
     private static String runningMode;
     private static String encryptionKey;
     private static ITransformationService tService;
@@ -59,17 +59,17 @@ public class MyServletContextListener implements ServletContextListener {
     // ServletContextListener implementation
     // -------------------------------------------------------
     public void contextInitialized(ServletContextEvent sce) {
-        log.info("Context Listener > Initialized");
+        LOGGER.info("Context Listener > Initialized");
         try {
             runningMode = GetterUtil.get(PropsUtil.get("running.mode"), "live");
             encryptionKey = PropsUtil.get("ehealthpass.encryption.key");
 
         } catch (Exception e) {
             runningMode = "live";
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
-        log.info("Initiating OpenNCP Portal");
+        LOGGER.info("Initiating OpenNCP Portal");
         try {
             System.setProperty("javax.net.ssl.keyStore", Constants.NCP_SIG_KEYSTORE_PATH);
             System.setProperty("javax.net.ssl.keyStorePassword", Constants.NCP_SIG_KEYSTORE_PASSWORD);
@@ -84,25 +84,25 @@ public class MyServletContextListener implements ServletContextListener {
             System.setProperty("javax.net.ssl.trustStore", Constants.TRUSTSTORE_PATH);
             System.setProperty("javax.net.ssl.trustStorePassword", Constants.TRUSTSTORE_PASSWORD);
         } catch (Exception e) {
-            log.error("#### ERROR INITIALIZING KEYSTORE/TRUSTSTORE #### - '{}'", e.getMessage(), e);
+            LOGGER.error("#### ERROR INITIALIZING KEYSTORE/TRUSTSTORE #### - '{}'", e.getMessage(), e);
         }
 
-        log.info("Initializing TM component");
+        LOGGER.info("Initializing TM component");
         try {
             ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("ctx_tm.xml");
             tService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
         } catch (Exception e) {
-            log.error("#### ERROR INITIALIZING TM ####", e);
+            LOGGER.error("#### ERROR INITIALIZING TM ####", e);
         }
         try {
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);            //serviceUrl = LiferayUtils.getFromPrefs("client_connector_url");
-            log.info("SERVICE URL IS '{}'", serviceUrl);
+            LOGGER.info("SERVICE URL IS '{}'", serviceUrl);
             clientConnectorConsumer = new ClientConnectorConsumer(serviceUrl);
         } catch (Exception e) {
-            log.error("ERROR INITIALIZING CLIENT CONNECTOR PROXY - '{}'", e.getMessage(), e);
+            LOGGER.error("ERROR INITIALIZING CLIENT CONNECTOR PROXY - '{}'", e.getMessage(), e);
         }
 
-        log.info("Running Mode: '{}'", runningMode);
+        LOGGER.info("Running Mode: '{}'", runningMode);
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
