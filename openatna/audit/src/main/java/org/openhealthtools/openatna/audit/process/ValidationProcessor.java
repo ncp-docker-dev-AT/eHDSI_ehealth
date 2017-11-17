@@ -1,40 +1,11 @@
-/**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
- */
-
 package org.openhealthtools.openatna.audit.process;
 
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openhealthtools.openatna.anom.AtnaCode;
-import org.openhealthtools.openatna.anom.AtnaException;
-import org.openhealthtools.openatna.anom.AtnaMessage;
-import org.openhealthtools.openatna.anom.AtnaMessageObject;
-import org.openhealthtools.openatna.anom.AtnaMessageParticipant;
-import org.openhealthtools.openatna.anom.AtnaObject;
-import org.openhealthtools.openatna.anom.AtnaObjectDetail;
-import org.openhealthtools.openatna.anom.AtnaSource;
-import org.openhealthtools.openatna.anom.ObjectType;
-import org.openhealthtools.openatna.anom.ObjectTypeCodeRole;
+import org.openhealthtools.openatna.anom.*;
 import org.openhealthtools.openatna.audit.persistence.PersistencePolicies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 
 /**
@@ -43,13 +14,10 @@ import org.openhealthtools.openatna.audit.persistence.PersistencePolicies;
  *
  * @author Andrew Harrison
  * @version $Revision:$
- * @created Sep 30, 2009: 8:38:08 PM
- * @date $Date:$ modified by $Author:$
  */
-
 public class ValidationProcessor implements AtnaProcessor {
-	
-	private static Log log = LogFactory.getLog("org.openhealthtools.openatna.audit.process.ValidationProcessor");
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidationProcessor.class);
 
     private static ObjectTypeCodeRole[] persons = {
             ObjectTypeCodeRole.CUSTOMER,
@@ -135,14 +103,14 @@ public class ValidationProcessor implements AtnaProcessor {
             }
         }
         List<AtnaSource> sources = message.getSources();
-        if (sources.size() == 0) {
+        if (sources.isEmpty()) {
             throw new AtnaException("no audit source defined", AtnaException.AtnaError.NO_AUDIT_SOURCE);
         }
         for (AtnaSource source : sources) {
             validateSource(source, context.getPolicies());
         }
         List<AtnaMessageParticipant> participants = message.getParticipants();
-        if (participants.size() == 0) {
+        if (participants.isEmpty()) {
             throw new AtnaException("no participants defined", AtnaException.AtnaError.NO_ACTIVE_PARTICIPANT);
         }
         for (AtnaMessageParticipant participant : participants) {
@@ -203,7 +171,7 @@ public class ValidationProcessor implements AtnaProcessor {
         AtnaObject obj = object.getObject();
         if (obj.getObjectId() == null) {
             //throw new AtnaException("no participant object id defined",
-              //      AtnaException.AtnaError.NO_PARTICIPANT_OBJECT_ID);
+            //      AtnaException.AtnaError.NO_PARTICIPANT_OBJECT_ID);
         }
         if (obj.getObjectIdTypeCode() == null || obj.getObjectIdTypeCode().getCode() == null) {
             throw new AtnaException("no object id type code",
@@ -218,6 +186,9 @@ public class ValidationProcessor implements AtnaProcessor {
 
         List<AtnaObjectDetail> details = object.getObjectDetails();
         for (AtnaObjectDetail detail : details) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("AtnaObjectDetail: '{}'", detail.toString());
+            }
             if (detail.getType() == null || detail.getValue() == null || detail.getValue().length == 0) {
                 throw new AtnaException("invalid object detail",
                         AtnaException.AtnaError.INVALID_OBJECT_DETAIL);
@@ -258,8 +229,8 @@ public class ValidationProcessor implements AtnaProcessor {
                 break;
             case SYSTEM_OBJECT:
                 if (!isInArray(role, systemObjects)) {
-                	// [Mustafa: May 15, 2012]: We had to remove this control, since epSOS specs need role: resource and type: system object together
-                	log.warn("Invalid combination of role and type. Role:" + role + " type:" + type + ". But we had to skip to be compliant with the epSOS specs.");
+                    // [Mustafa: May 15, 2012]: We had to remove this control, since epSOS specs need role: resource and type: system object together
+                    LOGGER.warn("Invalid combination of role and type. Role:" + role + " type:" + type + ". But we had to skip to be compliant with the epSOS specs.");
                     //throw new AtnaException("Invalid combination of role and type. Role:" + role + " type:" + type);
                 }
                 break;

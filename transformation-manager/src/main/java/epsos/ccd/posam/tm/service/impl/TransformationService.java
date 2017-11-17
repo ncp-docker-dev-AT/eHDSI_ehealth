@@ -296,6 +296,7 @@ public class TransformationService implements ITransformationService, TMConstant
     }
 
     private void writeAuditTrail(TMResponseStructure responseStructure) {
+
         if (config.isAuditTrailEnabled()) {
             LOGGER.debug("Audit trail BEGIN");
             try {
@@ -318,13 +319,10 @@ public class TransformationService implements ITransformationService, TMConstant
                         ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP") // The IP Address of the target Gateway
                 );
                 logg.setEventType(EventType.epsosPivotTranslation);
-
-                new AuditService().write(
-                        logg,
-                        config.getAuditTrailFacility(), // the facility number according to log4j
-                        config.getAuditTrailSeverity());// the severity of the message
+                LOGGER.info("Write AuditTrail: '{}'", logg.getEventType());
+                new AuditService().write(logg, config.getAuditTrailFacility(), config.getAuditTrailSeverity());
             } catch (Exception e) {
-                LOGGER.error("Audit trial ERROR! ", e);
+                LOGGER.error("Audit trail ERROR! ", e);
             }
             LOGGER.debug("Audit trail END");
         } else {
@@ -558,7 +556,7 @@ public class TransformationService implements ITransformationService, TMConstant
                                     originalElement, document, targetLanguageCode,
                                     hmReffId_DisplayName, null, null, errors, warnings));
 
-                            // if is required & processing is unsuccesful,
+                            // if is required & processing is unsuccessful,
                             // report ERROR
                             if (isRequired && !isProcessingSuccesful) {
                                 processingOK = false;
