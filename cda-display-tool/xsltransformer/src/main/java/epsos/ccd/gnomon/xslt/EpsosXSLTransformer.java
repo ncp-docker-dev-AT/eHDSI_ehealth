@@ -185,16 +185,15 @@ public class EpsosXSLTransformer {
                 "1.3.6.1.4.1.12559.11.10.1.3.1.42.46.xml", "1.3.6.1.4.1.12559.11.10.1.3.1.42.16.xml"};
         // get User Path
         try {
-            if (new File(path.toUri()).exists())
-                for (String aFilesNeeded : filesNeeded) {
-                    if (!new File(Paths.get(path.toString(), aFilesNeeded).toUri()).exists())
-                        throw new Exception("File " + aFilesNeeded + " doesn't exists");
+            if (new File(path.toUri()).exists()) {
+
                 for (String aFilesNeeded : filesNeeded) {
                     if (!new File(Paths.get(path.toString(), aFilesNeeded).toUri()).exists())
                         throw new TerminologyFileNotFoundException("File " + aFilesNeeded + " doesn't exists");
                 }
-            else
+            } else {
                 throw new TerminologyFileNotFoundException("Folder " + path.toString() + " doesn't exists");
+            }
         } catch (Exception e) {
             logger.error("FATAL ERROR: " + e.getMessage(), e);
         }
