@@ -96,14 +96,14 @@ public class DisplayTest {
 
         // Frequency
         //fileTest("samples/multiingredient.xml", TRANSFORMATION.WithOutputAndUserHomePath);
-        fileTest("samples/0000141G.xml", TRANSFORMATION.WithOutputAndUserHomePath);
+        fileTest("samples/2-4567.xml", TRANSFORMATION.WithOutputAndUserHomePath);
 
     }
 
     @Test
     public void readFile() throws Exception {
         EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
-        String out = xlsClass.readFile("samples/0000141G.xml");
+        String out = xlsClass.readFile("samples/2-4567.xml");
         String pt = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository", "out", "readfile.txt")
                 .toString();
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), "utf-8"))) {

@@ -45,11 +45,6 @@
 	<!-- if sectionTitle is not missing for alerts  (Exception alerts section is missing)-->
  	 	<xsl:when test=" ($diagSectionTitleCode='30954-2')">
 				<span class="sectionTitle">
-				<!-- xsl:text>Relevantné diagnostické testy / laboratórne údaje</xsl:text-->
-				<!-- xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'RelevantnéDiagnostickéTesty'"/>
-							</xsl:call-template-->
-							
 				<xsl:value-of select="$diagSsectionTitle"/>&#160;&#160;
 				</span><br/>
                                 

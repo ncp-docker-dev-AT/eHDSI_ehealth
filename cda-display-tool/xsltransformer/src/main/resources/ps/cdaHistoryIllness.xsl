@@ -94,20 +94,20 @@
             				<th>
             					<!-- xsl:text>Closed Inactive Problem</xsl:text-->
             					<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'11'"/>
+								<xsl:with-param name="code" select="'11'"/>
 							</xsl:call-template>
             				</th>
             				<th>
             					<!-- xsl:text>Onset Date</xsl:text-->
             					<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'45'"/>
+								<xsl:with-param name="code" select="'45'"/>
 							</xsl:call-template>
             				</th>
             			
             			<th>
             					<!-- xsl:text>End Date</xsl:text-->
             					<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'26'"/>
+								<xsl:with-param name="code" select="'26'"/>
 							</xsl:call-template>
             				</th>
             			
@@ -223,7 +223,7 @@
     				
     				
     				  				<xsl:call-template name="show-unknownInfo">
-							<xsl:with-param name="data" select="$historyIllnessClosedProblemID"/>
+							<xsl:with-param name="code" select="$historyIllnessClosedProblemID"/>
 					</xsl:call-template>
     				
     						   					

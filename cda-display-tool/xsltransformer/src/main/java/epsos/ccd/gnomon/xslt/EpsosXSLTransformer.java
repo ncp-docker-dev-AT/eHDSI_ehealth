@@ -70,7 +70,8 @@ public class EpsosXSLTransformer {
 
         String output = "";
         checkLanguageFiles();
-        logger.info("Trying to transform XML using action path for dispensation '{}' and repository path '{}' to language {}", actionpath, path, lang);
+        logger.info("Trying to transform XML using action path for dispensation '{}' and repository path '{}' " +
+                "to language {}", actionpath, path, lang);
 
         try {
             URL xslUrl = this.getClass().getResource(xsl);
@@ -200,14 +201,16 @@ public class EpsosXSLTransformer {
 
     private void checkLanguageFiles() {
 
-        final String filesNeeded[] = {"epSOSDisplayLabels.xml", "NullFlavor.xml", "SNOMEDCT.xml",
-                "UCUMUnifiedCodeforUnitsofMeasure.xml"};
+//        final String filesNeeded[] = {"epSOSDisplayLabels.xml", "NullFlavor.xml", "SNOMEDCT.xml",
+//                "UCUMUnifiedCodeforUnitsofMeasure.xml"};
+        final String filesNeeded[] = {"1.3.6.1.4.1.12559.11.10.1.3.1.42.17.xml", "1.3.6.1.4.1.12559.11.10.1.3.1.42.37.xml",
+                "1.3.6.1.4.1.12559.11.10.1.3.1.42.46.xml", "1.3.6.1.4.1.12559.11.10.1.3.1.42.16.xml"};
         // get User Path
         try {
             if (new File(path.toUri()).exists())
-                for (int i = 0; i < filesNeeded.length; i++) {
-                    if (!new File(Paths.get(path.toString(), filesNeeded[i]).toUri()).exists())
-                        throw new Exception("File " + filesNeeded[i] + " doesn't exists");
+                for (String aFilesNeeded : filesNeeded) {
+                    if (!new File(Paths.get(path.toString(), aFilesNeeded).toUri()).exists())
+                        throw new Exception("File " + aFilesNeeded + " doesn't exists");
                 }
             else
                 throw new Exception("Folder " + path.toString() + " doesn't exists");

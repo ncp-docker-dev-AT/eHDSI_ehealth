@@ -105,7 +105,7 @@
 			<span class="tdtext">
 				<!--  Prescriber: -->
 	                <xsl:call-template  name="show-displayLabels">
-						<xsl:with-param name="data" select="'56'"/>
+						<xsl:with-param name="code" select="'56'"/>
 					</xsl:call-template>   
 			</span>
 			&#160;
@@ -117,7 +117,7 @@
 			<span class="tdtext">
 				<!--  Profession: -->
 	                <xsl:call-template  name="show-displayLabels">
-						<xsl:with-param name="data" select="'64'"/>
+						<xsl:with-param name="code" select="'64'"/>
 					</xsl:call-template>   			
 			</span> 
 			&#160;
@@ -129,7 +129,7 @@
 			<span class="tdtext">
 			<!--  Specialty: -->
 			  <xsl:call-template  name="show-displayLabels">
-				<xsl:with-param name="data" select="'69'"/>
+				<xsl:with-param name="code" select="'69'"/>
 		      </xsl:call-template>   			
 			</span> 
 			&#160;
@@ -141,7 +141,7 @@
 			<span class="tdtext">
 				<!--  Contact Information: -->
 				    <xsl:call-template  name="show-displayLabels">
-						<xsl:with-param name="data" select="'12'"/>
+						<xsl:with-param name="code" select="'12'"/>
 					</xsl:call-template>   							
 			</span>
 			&#160;
@@ -155,7 +155,7 @@
 			<span class="tdtext">
 				<!-- Facility Name:-->
 			    <xsl:call-template  name="show-displayLabels">
-					<xsl:with-param name="data" select="'29'"/>
+					<xsl:with-param name="code" select="'29'"/>
 				</xsl:call-template>   					
 			</span>
 			&#160;
@@ -167,7 +167,7 @@
 			<span class="tdtext">
 				<!--  Facility ID: -->
 			    <xsl:call-template  name="show-displayLabels">
-					<xsl:with-param name="data" select="'28'"/>
+					<xsl:with-param name="code" select="'28'"/>
 				</xsl:call-template>   					
 			</span>
 			&#160;
@@ -179,7 +179,7 @@
 			<span class="tdtext">
 				<!-- Country: -->
 			    <xsl:call-template  name="show-displayLabels">
-					<xsl:with-param name="data" select="'13'"/>
+					<xsl:with-param name="code" select="'13'"/>
 				</xsl:call-template>  				
 			</span>
 			&#160;
@@ -193,7 +193,7 @@
 			<span class="tdtext">
 				<!--  Address: -->
 			    <xsl:call-template  name="show-displayLabels">
-					<xsl:with-param name="data" select="'3'"/>
+					<xsl:with-param name="code" select="'3'"/>
 				</xsl:call-template>  					
 			</span>
 			&#160;
@@ -207,7 +207,7 @@
 		<span class="tdtext">
 			<!--  Organisation Name: -->
 			<xsl:call-template  name="show-displayLabels">
-				<xsl:with-param name="data" select="'47'"/>
+				<xsl:with-param name="code" select="'47'"/>
 			</xsl:call-template>  
 		</span>
 		&#160;
@@ -219,7 +219,7 @@
 		<span class="tdtext">
 			<!--  Organisation Identifier: -->
 			<xsl:call-template  name="show-displayLabels">
-				<xsl:with-param name="data" select="'46'"/>
+				<xsl:with-param name="code" select="'46'"/>
 			</xsl:call-template>  
 		</span>
 		&#160;
