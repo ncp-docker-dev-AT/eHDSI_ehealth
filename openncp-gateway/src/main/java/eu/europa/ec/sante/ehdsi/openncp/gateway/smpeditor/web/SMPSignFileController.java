@@ -23,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -434,7 +435,7 @@ public class SMPSignFileController {
                 smpfile.setTechnicalInformationUrl(endpoint.getTechnicalInformationUrl());
 
                 if (smpfields.getExtension().isEnable()) {
-                    try (Scanner scanner = new Scanner(smpfile.getSignFile().getInputStream())) {
+                    try (Scanner scanner = new Scanner(smpfile.getSignFile().getInputStream(), StandardCharsets.UTF_8.name())) {
                         //String content = new Scanner(smpfile.getSignFile().getInputStream()).useDelimiter("\\Z").next();
                         String content = scanner.useDelimiter("\\Z").next();
                         String capturedString = content.substring(content.indexOf("<Extension>"), content.indexOf("</Extension>"));

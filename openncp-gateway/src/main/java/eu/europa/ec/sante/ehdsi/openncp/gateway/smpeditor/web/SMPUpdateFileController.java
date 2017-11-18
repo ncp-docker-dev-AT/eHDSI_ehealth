@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -317,7 +318,7 @@ public class SMPUpdateFileController {
             smpfileupdate.setTechnicalInformationUrl(endpoint.getTechnicalInformationUrl());
 
             if (smpfields.getExtension().isEnable()) {
-                try (Scanner scanner = new Scanner(smpfileupdate.getUpdateFile().getInputStream())) {
+                try (Scanner scanner = new Scanner(smpfileupdate.getUpdateFile().getInputStream(), StandardCharsets.UTF_8.name())) {
                     String content = scanner.useDelimiter("\\Z").next();
                     String capturedString = content.substring(content.indexOf("<Extension>"), content.indexOf("</Extension>"));
                     String[] endA = capturedString.split("<Extension>");

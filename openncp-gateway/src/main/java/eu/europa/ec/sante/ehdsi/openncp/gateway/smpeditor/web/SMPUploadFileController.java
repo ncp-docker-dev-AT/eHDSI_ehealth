@@ -21,6 +21,7 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -69,6 +70,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
@@ -123,7 +125,7 @@ public class SMPUploadFileController {
         LOGGER.debug("\n==== in postUpload ====");
         model.addAttribute("smpupload", smpupload);
     
-    /*Iterate through all chosen files*/
+        /*Iterate through all chosen files*/
         List<SMPHttp> allItems = new ArrayList<>();
         for (int i = 0; i < smpupload.getUploadFiles().size(); i++) {
             SMPHttp itemUpload = new SMPHttp();
@@ -249,14 +251,14 @@ public class SMPUploadFileController {
             LOGGER.info("SMP Uri endpoint: '{}'", uri);
 
             String content = "";
-            try (Scanner scanner = new Scanner(smpupload.getUploadFiles().get(i).getInputStream())) {
+            try (Scanner scanner = new Scanner(smpupload.getUploadFiles().get(i).getInputStream(), StandardCharsets.UTF_8.name())) {
                 content = scanner.useDelimiter("\\Z").next();
             } catch (IOException ex) {
                 LOGGER.error("IOException: '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
 
             StringEntity entityPut = new StringEntity(content, ContentType.create("application/xml", "UTF-8"));
-
+            LOGGER.debug("Entity that will be put on the SMP server : " + IOUtils.toString(entityPut.getContent(), StandardCharsets.UTF_8));
 
             ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
 
@@ -383,7 +385,7 @@ public class SMPUploadFileController {
             }
 
             if (!(itemUpload.getStatusCode() == 200 || itemUpload.getStatusCode() == 201)) {
-        /* Get BusinessCode and ErrorDescription from response */
+            /* Get BusinessCode and ErrorDescription from response */
 
                 //Save InputStream of response in ByteArrayOutputStream in order to read it more than once.
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
