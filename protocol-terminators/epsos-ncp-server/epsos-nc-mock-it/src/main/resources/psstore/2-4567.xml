@@ -396,6 +396,27 @@
                     </entry>
                 </section>
             </component>
+            <component>
+                <section moodCode="EVN">
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.8"/>
+                    <code code="11348-0" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
+                    <title>History of Past Illness</title>
+                    <text>NNNN</text>
+                    <entry>
+                        <act moodCode="EVN" classCode="ACT">
+                            <id nullFlavor="NP"/>
+                            <code nullFlavor="NP"/>
+                            <text>No Info</text>
+                            <statusCode nullFlavor="NP"/>
+                            <effectiveTime nullFlavor="NP"/>
+                            <entryRelationship typeCode="CAUS">
+                                <
+                            </entryRelationship>
+                        </act>
+                    </entry>
+                </section>
+            </component>
         </structuredBody>
     </component>
 </ClinicalDocument>
