@@ -21,13 +21,14 @@ package eu.epsos.pt.cc.is;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.pt.cc.ClientGenericIT;
-import java.util.ArrayList;
-import java.util.Collection;
-import javax.naming.NamingException;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
+
+import javax.naming.NamingException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * XCPD Integration Testing class.
@@ -45,9 +46,9 @@ public class XcpdIT extends ClientGenericIT {
     @BeforeClass
     public static void setUpClass() throws NamingException {
         ClientGenericIT.setUpClass();
-        LOG.info("----------------------------");
-        LOG.info(" Query Patient");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Query Patient");
+        LOGGER.info("----------------------------");
     }
 
     /*
@@ -64,14 +65,15 @@ public class XcpdIT extends ClientGenericIT {
      * Invalid scenarios
      * see D3.4.2 | 3.2.1.9
      */
+
     /**
      * (WARNING)
-     *
+     * <p>
      * The service requestor tried an identification based on an ID only or did
      * not provide enough data to univocally identify the patient. (WARNING) The
      * HCP SHOULD ask the patient for further demographics and re-issue the
      * request.
-     *
+     * <p>
      * AA (application accept) is returned in Acknowledgement.typeCode
      * (transmission wrapper). OK (data found, no errors) is returned in
      * QueryAck.queryResponseCode (control act wrapper)
@@ -84,12 +86,12 @@ public class XcpdIT extends ClientGenericIT {
 
     /**
      * (WARNING)
-     *
+     * <p>
      * The service provider only allows for patient identification by
      * national/shared ID (WARNING) The HCP SHOULD ask the patient for a
      * national (health care) identification card and reissue the request using
      * Shared/national Patient Identifier Query and Feed mode.
-     *
+     * <p>
      * AA (application accept) is returned in Acknowledgement.typeCode
      * (transmission wrapper). AE (application error) is returned in
      * QueryAck.queryResponseCode (control act wrapper)
@@ -102,12 +104,12 @@ public class XcpdIT extends ClientGenericIT {
 
     /**
      * (WARNING)
-     *
+     * <p>
      * The service provider only allows for patient identification by national
      * health card or EHIC. Queries based on demographics only are not supported
      * (WARNING) The HCP SHOULD ask the patient for a health care identification
      * card and re-issue the request.
-     *
+     * <p>
      * AA (application accept) is returned in Acknowledgement.typeCode
      * (transmissionwrapper). AE (application error) is returned in
      * QueryAck.queryResponseCode (control act wrapper)
@@ -120,11 +122,11 @@ public class XcpdIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The service provider does not accept the query because responding MAY
      * lead to a disclosure of private patient data (ERROR). The HCP SHOULD
      * limit the provided traits and re-issue the request.
-     *
+     * <p>
      * AA (application accept) is returned in Acknowledgement.typeCode
      * (transmission wrapper). AE (application error) is returned in
      * QueryAck.queryResponseCode (control act wrapper)
@@ -137,30 +139,30 @@ public class XcpdIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The requestor has insufficient rights to query for patient’s identity
      * data (ERROR). If access to the patient’s medical data is required at the
      * PoC this MUST be performed by a person with additional permissions.
-     *
+     * <p>
      * AA (application accept) is returned in Acknowledgement.typeCode
      * (transmission wrapper). AE (application error) is returned in
      * QueryAck.queryResponseCode (control act wrapper)
      */
     @Test
     public void testQueryInsRights() {
-        this.assertions = super.hcpAssertionCreate(new ArrayList<String>(0), XSPARole.PHYSICIAN);
+        this.assertions = hcpAssertionCreate(new ArrayList<>(0), XSPARole.PHYSICIAN);
 
         testFailScenario("PT_CLIENT_XCPD_#5", "InsufficientRights", REQ_FOLDER + "PT_CLIENT_XCPD_#0.xml");
     }
 
     /**
      * (ERROR)
-     *
+     * <p>
      * Patient authentication MUST be piggybacked with patient identification. A
      * respective identifier (e.g. GSS TAN) was not provided (ERROR) The HCP at
      * the PoC SHOULD ask the patient for a respective identifier and SHOULD
      * re-issue the request.
-     *
+     * <p>
      * AA (application accept) is returned in Acknowledgement.typeCode
      * (transmission wrapper). AE (application error) is returned in
      * QueryAck.queryResponseCode (control act wrapper)
@@ -173,11 +175,11 @@ public class XcpdIT extends ClientGenericIT {
 
     /**
      * (INFO)
-     *
+     * <p>
      * The service provider did not find a match with the given minimum
      * accuracy. (INFO) The service consumer SHOULD re-issue the request with a
      * lower minimum confidence level.
-     *
+     * <p>
      * AA (application accept) is returned in Acknowledgement.typeCode
      * (transmission wrapper). OK (data found) is returned in
      * QueryAck.queryResponseCode (control act wrapper)
@@ -190,11 +192,11 @@ public class XcpdIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The identity traits provided by the service consumer are not supported by
      * the service provider. (ERROR) The service consumer SHOULD re-issue the
      * request with a different set of identity traits.
-     *
+     * <p>
      * AA (application accept) is returned in Acknowledgement.typeCode
      * (transmission wrapper). AE (application error) is returned in
      * QueryAck.queryResponseCode (control act wrapper)
@@ -207,12 +209,12 @@ public class XcpdIT extends ClientGenericIT {
 
     /**
      * (INFO)
-     *
+     * <p>
      * The service consumer defined a confidence level that conflicts with the
      * security policy of the service provider. (INFO) The service provider
      * SHOULD respond only with the candidate matches that it is allowed to
      * provide wrt. its security policy.
-     *
+     * <p>
      * AA (application accept) is returned in Acknowledgement.typeCode
      * (transmission wrapper). AE (application error) is returned in
      * QueryAck.queryResponseCode (control act wrapper)
@@ -227,11 +229,12 @@ public class XcpdIT extends ClientGenericIT {
      * Usage restrictions
      * see D3.4.2 | 3.2.1.2
      */
+
     /**
      * <p>
      * Asserts that a NOT well formulated &lt;LivingSubjectID&gt; results in a
      * NOT valid response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: SHOULD contain zero or more living subject Id.
      * When present, it shall contain both an assigning authority identifier
@@ -249,7 +252,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a well formulated &lt;LivingSubjectID&gt; results in a valid
      * response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: SHOULD contain zero or more living subject Id.
      * When present, it shall contain both an assigning authority identifier
@@ -267,7 +270,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a NOT well formulated &lt;LivingSubjectName&gt; results in a
      * NOT valid response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: Family name and given name MUST both be
      * given.</p>
@@ -282,7 +285,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a well formulated &lt;LivingSubjectName&gt; results in a
      * valid response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: Family name and given name MUST both be given</p>
      */
@@ -296,7 +299,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a NOT well formulated &lt;LivingSubjectBirthTime&gt; results
      * in a NOT valid response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: NOTE: MUST be encoded
      * “YYYY[MM[DD[HHMM[SS[.S[S[S[S]]]]]]]][+/-ZZZZ]”</p>
@@ -311,7 +314,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a well formulated &lt;LivingSubjectBirthTime&gt; results in
      * a valid response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: NOTE: MUST be encoded
      * “YYYY[MM[DD[HHMM[SS[.S[S[S[S]]]]]]]][+/-ZZZZ]”</p>
@@ -326,7 +329,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a NOT well formulated &lt;LivingSubjectGender&gt; results in
      * a NOT valid response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: MUST be “M” or “F”</p>
      */
@@ -340,7 +343,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a well formulated &lt;LivingSubjectGender&gt; results in a
      * valid response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: MUST be “M” or “F”</p>
      */
@@ -354,7 +357,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a NOT well formulated &lt;LivingSubjectBirthPlaceAddress&gt;
      * results in a NOT valid response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: SHOULD contain country and city.</p>
      */
@@ -368,7 +371,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a well formulated &lt;LivingSubjectBirthPlaceAddress&gt;
      * results in a valid response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: SHOULD contain country and city.</p>
      */
@@ -382,7 +385,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a NOT well formulated &lt;PatientAddress&gt; results in a
      * NOT valid response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: SHOULD contain country and city.</p>
      */
@@ -396,7 +399,7 @@ public class XcpdIT extends ClientGenericIT {
      * <p>
      * Asserts that a well formulated &lt;PatientAddress&gt; results in a valid
      * response.</p>
-     *
+     * <p>
      * <p>
      * Normal usage condition: SHOULD contain country and city.</p>
      */
@@ -410,6 +413,7 @@ public class XcpdIT extends ClientGenericIT {
     /*
      * Test invalid fields
      */
+
     /**
      * <p>
      * Asserts that a well and full formulated request results in a valid

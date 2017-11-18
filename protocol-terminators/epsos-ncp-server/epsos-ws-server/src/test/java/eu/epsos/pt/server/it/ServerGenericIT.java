@@ -24,6 +24,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.reporting.ValidationReport;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import org.junit.Assert;
 import org.w3c.dom.Document;
 
@@ -42,6 +43,7 @@ public abstract class ServerGenericIT extends AbstractIT {
      * Aux instance of ConfigurationManagerService.
      */
     protected static final ConfigurationManager CONFIG_SERVICE = ConfigurationManagerFactory.getConfigurationManager();
+    protected static final DynamicDiscoveryService DISCOVERY_SERVICE = new DynamicDiscoveryService();
     /**
      * Integration test fictional Country.
      */
@@ -55,7 +57,7 @@ public abstract class ServerGenericIT extends AbstractIT {
      * @return the ISO format Patient ID
      */
     protected static String getPatientIdIso(String queryRequestPath) {
-        String pid = "";
+        String pid;
         Document requestDoc = readDoc(queryRequestPath);
         XPath xPath = XPathFactory.newInstance().newXPath();
 
@@ -81,7 +83,7 @@ public abstract class ServerGenericIT extends AbstractIT {
             Assert.assertNotNull(testName + ": response is not null", response);
 
         } catch (RuntimeException ex) {
-            LOG.info(fail(testName));                                   // pretty status print to tests list
+            LOGGER.info(fail(testName));                                   // pretty status print to tests list
             Assert.fail(testName + ": " + ex.getLocalizedMessage());    // fail the test
 
             return;
@@ -89,9 +91,9 @@ public abstract class ServerGenericIT extends AbstractIT {
 
         String xml = soapElementToString(response);
         if (xml.contains(expected)) {
-            LOG.info(success(testName));
+            LOGGER.info(success(testName));
         } else {
-            LOG.info(fail(testName));
+            LOGGER.info(fail(testName));
         }
 
         Assert.assertTrue(fail(testName), xml.contains(expected));

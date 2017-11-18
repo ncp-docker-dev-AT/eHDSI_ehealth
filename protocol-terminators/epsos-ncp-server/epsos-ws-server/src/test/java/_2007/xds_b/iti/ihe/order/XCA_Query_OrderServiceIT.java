@@ -21,13 +21,14 @@ package _2007.xds_b.iti.ihe.order;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.pt.server.it.ServerGenericIT;
-import java.util.Collection;
-import org.junit.*;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
-import tr.com.srdc.epsos.util.Constants;
+
+import java.util.Collection;
 
 /**
- *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class XCA_Query_OrderServiceIT extends ServerGenericIT {
@@ -38,11 +39,11 @@ public class XCA_Query_OrderServiceIT extends ServerGenericIT {
 
     @BeforeClass
     public static void setUpClass() {
-        LOG.info("----------------------------");
-        LOG.info(" Query Documents");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Query Documents");
+        LOGGER.info("----------------------------");
 
-        epr = CONFIG_SERVICE.getServiceWSE(COUNTRY_CODE, Constants.OrderService);
+        epr = DISCOVERY_SERVICE.getEndpointUrl(COUNTRY_CODE, RegisteredService.ORDER_SERVICE, false);
     }
 
     /**

@@ -21,25 +21,27 @@ package _2009.xcpd.iti.ihe;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.pt.server.it.ServerGenericIT;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.opensaml.saml2.core.Assertion;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import org.junit.*;
-import org.opensaml.saml2.core.Assertion;
-import tr.com.srdc.epsos.util.Constants;
 
 /**
- *
  * PLEASE BE NOTICE
- *
+ * <p>
  * The tests implemented in this class are incomplete. This testes were copied from client side, which have to test
  * less.
- *
- *
+ * <p>
+ * <p>
  * NCP-A Tests, need to also validate:
- *
+ * <p>
  * Acknowledgement.typeCode QueryAck.queryResponseCode
- *
  */
+
 /**
  *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
@@ -53,11 +55,11 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
 
     @BeforeClass
     public static void setUpClass() {
-        LOG.info("----------------------------");
-        LOG.info(" Query Patient");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Query Patient");
+        LOGGER.info("----------------------------");
 
-        epr = CONFIG_SERVICE.getServiceWSE(COUNTRY_CODE, Constants.PatientIdentificationService);
+        epr = DISCOVERY_SERVICE.getEndpointUrl(COUNTRY_CODE, RegisteredService.PATIENT_IDENTIFICATION_SERVICE, false);
     }
 
     /*
@@ -74,6 +76,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
      * Test error coded responses;
      * see D3.4.2 section 3.2.1.9 Response Message (No Patient ID Discovered).
      */
+
     /**
      * (WARNING)
      *
@@ -168,7 +171,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testQueryPatientAuthId() {
-        this.assertions = this.getAssertions( REQ_FOLDER + "PT_CLIENT_XCPD_#6.xml", XSPARole.PHYSICIAN);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#6.xml", XSPARole.PHYSICIAN);
         testFail("PT_CLIENT_XCPD_#6", "PatientAuthenticationRequired", REQ_FOLDER + "PT_CLIENT_XCPD_#6.xml");
     }
 
@@ -223,6 +226,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
      * Test bad formulated requests;
      * see D3.4.2 section 3.2.1.2 Restrictions on the Use of Traits.
      */
+
     /**
      * <p>Asserts that a NOT well formulated &lt;LivingSubjectID&gt; results in a NOT valid response.</p>
      *
@@ -293,7 +297,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testGoodLivingSubjectBirthTime() {
-        this.assertions = this.getAssertions( REQ_FOLDER + "PT_CLIENT_XCPD_#12.1.xml", XSPARole.PHYSICIAN);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#12.1.xml", XSPARole.PHYSICIAN);
         testGood("PT_CLIENT_XCPD_#12.1", REQ_FOLDER + "PT_CLIENT_XCPD_#12.1.xml");
     }
 
@@ -305,7 +309,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testBadLivingSubjectGender() {
-        this.assertions = this.getAssertions( REQ_FOLDER + "PT_CLIENT_XCPD_#13.xml", XSPARole.PHYSICIAN);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#13.xml", XSPARole.PHYSICIAN);
         testFail("PT_CLIENT_XCPD_#13", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#13.xml");
     }
 
@@ -317,7 +321,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testGoodLivingSubjectGender() {
-        this.assertions = this.getAssertions( REQ_FOLDER + "PT_CLIENT_XCPD_#13.1.xml", XSPARole.PHYSICIAN);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#13.1.xml", XSPARole.PHYSICIAN);
         testFail("PT_CLIENT_XCPD_#13.1", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#13.1.xml");
     }
 
@@ -329,7 +333,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testBadLivingSubjectBirthPlaceAddress() {
-        this.assertions = this.getAssertions( REQ_FOLDER + "PT_CLIENT_XCPD_#14.xml", XSPARole.PHYSICIAN);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#14.xml", XSPARole.PHYSICIAN);
         testFail("PT_CLIENT_XCPD_#14", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#14.xml");
     }
 
@@ -365,7 +369,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testGoodpatientAddress() {
-        this.assertions = this.getAssertions( REQ_FOLDER + "PT_CLIENT_XCPD_#15.1.xml", XSPARole.PHYSICIAN);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#15.1.xml", XSPARole.PHYSICIAN);
         testFail("PT_CLIENT_XCPD_#15.1", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#15.1.xml");
     }
 
@@ -373,6 +377,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     /*
      * Test invalid fields
      */
+
     /**
      * <p>Asserts that a well and full formulated request results in a valid response.</p>
      */

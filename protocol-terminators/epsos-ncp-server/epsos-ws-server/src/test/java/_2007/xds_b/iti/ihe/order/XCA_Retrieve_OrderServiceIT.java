@@ -21,18 +21,20 @@ package _2007.xds_b.iti.ihe.order;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.pt.server.it.ServerGenericIT;
-import java.util.Collection;
-import org.junit.*;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
-import tr.com.srdc.epsos.util.Constants;
+
+import java.util.Collection;
 
 /**
- *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class XCA_Retrieve_OrderServiceIT extends ServerGenericIT {
 
-//    private static final String URL = CONFIG_SERVICE.getServiceWSE(COUNTRY_CODE, Constants.OrderService);
+    //    private static final String URL = CONFIG_SERVICE.getServiceWSE(COUNTRY_CODE, Constants.OrderService);
     private static final String QUERY_FILE = "xca/retrieve/order/xca-retrieve.xml";
     private static final String QUERY_FILE_INVALD_ID = "xca/retrieve/order/xca-retrieve-invalid-id.xml";
     private static final String QUERY_FILE_EMPTY_ID = "xca/retrieve/order/xca-retrieve-empty-id.xml";
@@ -41,18 +43,18 @@ public class XCA_Retrieve_OrderServiceIT extends ServerGenericIT {
     public XCA_Retrieve_OrderServiceIT() {
     }
 
+    @BeforeClass
+    public static void setUpClass() {
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Retrieve Document");
+        LOGGER.info("----------------------------");
+
+        epr = DISCOVERY_SERVICE.getEndpointUrl(COUNTRY_CODE, RegisteredService.ORDER_SERVICE, false);
+    }
+
     @Override
     protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
         return hcpAndTrcAssertionCreate(PATIENT_ID_ISO, XSPARole.PHARMACIST);
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-        LOG.info("----------------------------");
-        LOG.info(" Retrieve Document");
-        LOG.info("----------------------------");
-
-        epr = CONFIG_SERVICE.getServiceWSE(COUNTRY_CODE, Constants.OrderService);
     }
 
     /**
@@ -61,14 +63,14 @@ public class XCA_Retrieve_OrderServiceIT extends ServerGenericIT {
      */
     @Test
     public void testRetrieveDocument() {
-        this.assertions = this.assertions = this.getAssertions(QUERY_FILE, XSPARole.PHARMACIST);
+        this.assertions = this.getAssertions(QUERY_FILE, XSPARole.PHARMACIST);
         testGood("testRetrieveDocument", QUERY_FILE);
     }
 
     @Ignore
     @Test
     public void testRetrieveInvalidDocument() {
-        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_INVALD_ID, XSPARole.PHARMACIST);
+        this.assertions = this.getAssertions(QUERY_FILE_INVALD_ID, XSPARole.PHARMACIST);
         testFail("testRetrieveInvalidDocument", "Failure", QUERY_FILE_INVALD_ID);
     }
 

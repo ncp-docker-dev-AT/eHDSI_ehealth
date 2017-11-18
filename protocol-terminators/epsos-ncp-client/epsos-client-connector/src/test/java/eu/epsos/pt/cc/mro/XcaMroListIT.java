@@ -21,13 +21,14 @@ package eu.epsos.pt.cc.mro;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.pt.cc.ClientGenericIT;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.naming.NamingException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
+
+import javax.naming.NamingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements all the Integration Test for the XCA Retrieve operation for MRO
@@ -45,14 +46,15 @@ public class XcaMroListIT extends ClientGenericIT {
     @BeforeClass
     public static void setUpClass() throws NamingException {
         ClientGenericIT.setUpClass();
-        LOG.info("----------------------------");
-        LOG.info(" Query MRO Documents");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Query MRO Documents");
+        LOGGER.info("----------------------------");
     }
 
     /*
      * Normal usage
      */
+
     /**
      * This test performs an XCA Query for MRO, using valid Patient Identifiers.
      * It is a simple test designed uniquely for testing the normal work-flow of
@@ -60,7 +62,7 @@ public class XcaMroListIT extends ClientGenericIT {
      */
     @Test
     public void testQueryMro() {
-        List<String> permissions = new ArrayList<String>(2);
+        List<String> permissions = new ArrayList<>(2);
         permissions.add("4");
         permissions.add("10");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#0.xml", XSPARole.PHARMACIST);
