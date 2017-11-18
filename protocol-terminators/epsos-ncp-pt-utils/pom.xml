@@ -52,10 +52,6 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-audit-manager</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-configuration-manager</artifactId>
         </dependency>
         <dependency>
