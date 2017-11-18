@@ -4,33 +4,24 @@
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
 
     <!--- BASIC HEADER ELEMENT -->
-    <xsl:variable
-            name="familyName"
-            select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:family"/>
-    <xsl:variable
-            name="givenName"
-            select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:given"/>
-    <xsl:variable
-            name="prefix"
-            select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:prefix"/>
-    <xsl:variable
-            name="primaryPatientId"
-            select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:id[1]"/>
-    <xsl:variable
-            name="secondaryPatientId"
-            select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:id[2]"/>
-    <xsl:variable
-            name="birthdate"
-            select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:birthTime"/>
-    <xsl:variable
-            name="gender"
-            select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@displayName"/>
-    <xsl:variable
-            name="creationDate"
-            select="/n1:ClinicalDocument/n1:effectiveTime"/>
-    <xsl:variable
-            name="lastUpdate"
-            select="/n1:ClinicalDocument/n1:documentationOf/n1:serviceEvent/n1:effectiveTime/n1:high"/>
+    <xsl:variable name="familyName"
+                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:family"/>
+    <xsl:variable name="givenName"
+                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:given"/>
+    <xsl:variable name="prefix"
+                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:prefix"/>
+    <xsl:variable name="primaryPatientId"
+                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:id[1]"/>
+    <xsl:variable name="secondaryPatientId"
+                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:id[2]"/>
+    <xsl:variable name="birthdate"
+                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:birthTime"/>
+    <xsl:variable name="gender"
+                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@displayName"/>
+    <xsl:variable name="creationDate"
+                  select="/n1:ClinicalDocument/n1:effectiveTime"/>
+    <xsl:variable name="lastUpdate"
+                  select="/n1:ClinicalDocument/n1:documentationOf/n1:serviceEvent/n1:effectiveTime/n1:high"/>
 
     <xsl:template name="basicCdaHeader">
         <table class="header_table">
@@ -39,7 +30,7 @@
                     <th class="td_creation_date">
                         <!-- Creation Date: -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'15'"/>
+                            <xsl:with-param name="code" select="'15'"/>
                         </xsl:call-template>
                         :
                         <span class="tdtext">
@@ -51,7 +42,7 @@
                     <th class="td_creation_date">
                         <!-- Last Update:-->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'39'"/>
+                            <xsl:with-param name="code" select="'39'"/>
                         </xsl:call-template>
                         :
                         <span class="tdtext">
@@ -65,7 +56,7 @@
                     <th colspan="3">
                         <!-- Patient-->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'51'"/>
+                            <xsl:with-param name="code" select="'51'"/>
                         </xsl:call-template>
                     </th>
                 </tr>
@@ -76,19 +67,19 @@
                                 <th>
                                     <!-- Prefix-->
                                     <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="data" select="'55'"/>
+                                        <xsl:with-param name="code" select="'55'"/>
                                     </xsl:call-template>
                                 </th>
                                 <th>
                                     <!-- Family Name-->
                                     <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="data" select="'30'"/>
+                                        <xsl:with-param name="code" select="'30'"/>
                                     </xsl:call-template>
                                 </th>
                                 <th>
                                     <!-- Given Name-->
                                     <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="data" select="'34'"/>
+                                        <xsl:with-param name="code" select="'34'"/>
                                     </xsl:call-template>
                                 </th>
                             </tr>
@@ -113,7 +104,7 @@
                                 <th style="width:100px;">
                                     <!-- Patient Ids-->
                                     <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="data" select="'52'"/>
+                                        <xsl:with-param name="code" select="'52'"/>
                                     </xsl:call-template>
                                 </th>
                                 <td>
@@ -137,7 +128,7 @@
                                 <th style="width:100px;">
                                     <!-- Gender-->
                                     <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="data" select="'33'"/>
+                                        <xsl:with-param name="code" select="'33'"/>
                                     </xsl:call-template>
                                 </th>
                                 <td>
@@ -157,7 +148,7 @@
                                 <th style="width:100px;">
                                     <!-- Date Of Birth-->
                                     <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="data" select="'19'"/>
+                                        <xsl:with-param name="code" select="'19'"/>
                                     </xsl:call-template>
                                 </th>
                                 <td>

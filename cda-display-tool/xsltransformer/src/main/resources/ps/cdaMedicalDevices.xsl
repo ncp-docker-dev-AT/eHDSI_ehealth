@@ -36,7 +36,7 @@
                                     <xsl:when test=" ($documentCode='60591-5')">
 
   							<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'74'"/>
+								<xsl:with-param name="code" select="'74'"/>
 							</xsl:call-template>
                                     </xsl:when>
                                     </xsl:choose>
@@ -97,13 +97,13 @@
             				<th>
             					<!-- xsl:text>Device Implant </xsl:text-->
             					<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'21'"/>
+								<xsl:with-param name="code" select="'21'"/>
 							</xsl:call-template>
             				</th>
             				<th>
             					<!--xsl:text>Implant Date</xsl:text-->
             					<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'36'"/>
+								<xsl:with-param name="code" select="'36'"/>
 							</xsl:call-template>
             				</th>
             			

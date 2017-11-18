@@ -71,7 +71,11 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             tr.com.srdc.epsos.data.model.PatientDemographics request;
             QueryPatientRequest arg0 = queryPatient.getQueryPatient().getArg0();
             PatientDemographics pDemographic = arg0.getPatientDemographics();
+            LOG.info("Patient Demographics: '{}', '{}', '{}'", pDemographic.getPatientIdArray()[0],
+                    pDemographic.getBirthDate(), pDemographic.getGivenName());
             request = eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(pDemographic);
+
+            LOG.info("Patient Demographics Request: '{}', '{}', '{}'", request.getId(), request.getGivenName(), request.getBirthDate());
 
             String countryCode = arg0.getCountryCode();
 

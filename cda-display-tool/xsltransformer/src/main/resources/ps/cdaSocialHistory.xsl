@@ -96,13 +96,13 @@
             				<th>
             				<!--  Observation Type -->
             				<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'44'"/>
+								<xsl:with-param name="code" select="'44'"/>
 							</xsl:call-template>
             				</th>
             				<th>
             					<!--   Date From  -->
             				<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'85'"/>
+								<xsl:with-param name="code" select="'85'"/>
 							</xsl:call-template>            					
             				</th>
             			
@@ -110,7 +110,7 @@
             			<th>
             					<!--  Date To -->
             				<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'18'"/>
+								<xsl:with-param name="code" select="'18'"/>
 							</xsl:call-template>            					
             					
             				</th>
@@ -119,7 +119,7 @@
             			<th>
             					<!--  Observation Value -->
             				<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'84'"/>
+								<xsl:with-param name="code" select="'84'"/>
 							</xsl:call-template>              				
             				</th>
             			
