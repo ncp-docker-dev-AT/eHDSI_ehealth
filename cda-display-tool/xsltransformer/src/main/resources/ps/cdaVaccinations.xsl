@@ -1,11 +1,8 @@
 <?xml version="1.0"  ?>
-
-
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3" version="1.0">
     <xsl:output method="html" indent="yes" version="4.01"
                 doctype-system="http://www.w3.org/TR/html4/strict.dtd" doctype-public="-//W3C//DTD HTML 4.01//EN"/>
-
 
     <!-- variable to check that at least one alert section exist -->
     <xsl:variable name="vaccinationsExist"

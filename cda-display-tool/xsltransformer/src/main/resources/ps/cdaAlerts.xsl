@@ -59,7 +59,6 @@
         <!-- in case of no info scenarion the following displayName will be displayed -->
         <xsl:variable name="obsDisplay"
                       select="n1:entry/n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:value/@displayName"/>
-
         <!-- End definition of variables-->
 
         <!--- table Display -->
@@ -75,7 +74,9 @@
                     <xsl:when test="not($act/@nullFlavor)">
                         <xsl:choose>
                             <xsl:when test="$shownarrative='true'">
-                                <a href="javascript: showhide('reactionsTr'); self.focus(); void(0);"><h2>Show/Hide</h2></a>
+                                <a href="javascript: showhide('reactionsTr'); self.focus(); void(0);">
+                                    <h2>Show/Hide</h2>
+                                </a>
                                 <div id="reactionsTr" style="display:block">
                                     <xsl:apply-templates
                                             select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='48765-2']/../n1:text/*"/>
@@ -167,10 +168,8 @@
         <xsl:variable name="clinicalManifestationNode"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:entryRelationship[@typeCode='MFST']/n1:observation/n1:templateId[@root='2.16.840.1.113883.10.20.1.54']/../n1:value"/>
 
-
         <xsl:variable name="agentID"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:participant[@typeCode='CSM']/n1:participantRole[@classCode='MANU']/n1:playingEntity[@classCode='MMAT']/n1:code/@code"/>
-
 
         <xsl:variable name="agentDescription"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:participant[@typeCode='CSM']/n1:participantRole[@classCode='MANU']/n1:playingEntity[@classCode='MMAT']/n1:code"/>
@@ -191,14 +190,10 @@
         <xsl:variable name="obsDisplay"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:value/@displayName"/>
 
-        <xsl:variable name="act"
-                      select="n1:act"/>
-
+        <xsl:variable name="act" select="n1:act"/>
         <!-- End definition of variables-->
 
-
         <!--- table Display -->
-
         <!-- nullflavored act -->
         <xsl:choose>
             <xsl:when test="not($act/@nullFlavor)">

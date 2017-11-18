@@ -92,7 +92,7 @@ public class EpsosXSLTransformer {
             transformer.transform(xmlSource, result);
             output = readFile(resultFile.getAbsolutePath());
             if (!export) {
-                Files.delete(Paths.get(output));
+                Files.delete(Paths.get(resultFile.getCanonicalPath()));
                 logger.debug("Deleting temp file '{}' successfully", resultFile.getAbsolutePath());
             }
         } catch (Exception e) {
