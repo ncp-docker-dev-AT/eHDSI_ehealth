@@ -1,0 +1,149 @@
+/* 
+-----------------------------------
+	MAIN NAV
+-----------------------------------
+*/
+
+#main-nav {
+	margin:0;
+	border:0;
+	border-radius:0 0 3px 3px;
+	background: #7E8E93;
+	min-height:52px;
+	color:#fff;
+	/*border-bottom: 1px solid rgba(0,0,0,.06);*/
+	border-top:1px solid rgba(255,255,255,.4);
+	margin-bottom:20px;
+}
+
+@media (min-width: 768px) {
+	#main-nav .navbar-collapse {
+		padding-left:0;
+	}
+}
+
+#main-nav .nav > li > a {
+	background: transparent;
+	border-radius:0;
+	border:0;
+	color:#fff;
+	font-size:110%;
+	padding-bottom:18px;
+	padding-top:18px;
+	box-shadow: -2px 0 0 0 rgba(0, 0, 0, 0.1) inset, -1px 0 0 0 rgba(255,255,255,.15) inset;
+}
+
+@media (max-width: 800px) {
+	#main-nav .nav > li > a {
+		padding-left:12px;
+		padding-right:12px;
+	}
+}
+
+#main-nav .nav > li > a .navbar-nav-item-icon {
+	border-radius:50px;
+	box-shadow: 0 0 0 1.2px rgba(255,255,255,1);
+	padding:7px;
+	min-width:1.8em;
+	text-align:center;
+	margin:-4px 10px -4px 2px;
+	top: 0;
+}
+
+#main-nav .nav > li > a .navbar-nav-item-icon.fa-stack {
+	width: 1.8em;
+	height: 1.8em;
+	line-height: 1.8em;
+}
+
+#main-nav .nav > li > a .navbar-nav-item-icon [class*=fa-stack] {
+	top: 0;
+}
+
+#main-nav .nav > li > a .navbar-nav-item-icon .fa-bell  {
+	top:4px;
+	left:2px;
+	font-size:60%;
+	color:#75919F;
+	text-shadow:0 1px #fff;
+}
+
+#main-nav .nav > li > a .navbar-nav-item-icon .fa-file-o  {
+	font-size:110%;
+}
+
+#main-nav .nav > li > a:hover {
+	background:rgba(0, 0, 0, 0.15);
+}
+
+#main-nav .nav > li:not(.active):hover + li:not(.active) a {
+	box-shadow:none;
+}
+
+@media (min-width: 768px) {
+
+	#main-nav .nav > li.active > a {
+		background: #5bc0de;
+		color:#fff;
+		box-shadow: -3px 0 0 0 rgba(0, 0, 0, 0.05) ,2px 0 0 0 rgba(0, 0, 0, 0.15),0 1px 0 0 rgba(255,255,255,0.4) inset,0 -1px 0 0 rgba(255,255,255,1) inset;
+		margin-top: -2px;
+		padding-bottom: 21px;
+	}
+
+}
+
+@media (max-width: 767px) {
+
+	#main-nav .nav > li.active > a {
+		background:#5bc0de;
+		box-shadow:  0 -1px 0 0 rgba(0, 0, 0, 0.15) ,0 2px 0 0 rgba(0, 0, 0, 0.15),0 1px 0 0 rgba(255,255,255,0.4) inset;
+	}
+	
+	#main-nav .dropdown-has-icon .dropdown-menu {
+		padding-left:35px;
+	}
+	
+	#main-nav .dropdown-menu > li > a {
+		background:transparent;
+		color:#fff;
+	}
+
+}
+
+	/* 
+	-----------------------------------
+		NAVBAR BTN
+	-----------------------------------
+	*/
+	
+	#main-nav .navbar-btn {
+		border-color:transparent;
+	}
+
+	/* 
+	-----------------------------------
+		NAVBAR HEADER
+	-----------------------------------
+	*/
+
+	#main-nav .navbar-header:hover {
+		background:rgba(46, 75, 90, 0.3);
+		cursor:pointer;
+	}
+	
+	#main-nav .navbar-header .navbar-brand {
+		color: #fff;
+	}
+	
+	#main-nav .navbar-header .navbar-toggle {
+		color: #fff;
+		background:none;
+		border:0;
+		border-radius:2px;
+		box-shadow:none;
+		
+	}
+	
+	#main-nav .navbar-header .navbar-toggle > .icon-bar {
+		background: #fff;
+	}

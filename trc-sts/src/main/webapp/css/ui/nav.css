@@ -1,0 +1,63 @@
+/* 
+-----------------------------------
+	NAV
+-----------------------------------
+*/
+.nav-item-icon {
+	margin-right:5px;
+}
+
+/* 
+-----------------------------------
+	TABS
+-----------------------------------
+*/
+
+.nav-tabs>li.active>a,
+.nav-tabs>li.active>a:focus,
+.nav-tabs>li.active>a:hover {
+    border: 1px solid #d7dfe4;
+	border-bottom-color: transparent;
+}
+
+.nav-tabs + .tab-content {
+	margin-top:10px;
+}
+
+.nav-tabs-panel {
+	border-bottom:0;
+}
+
+.nav-tabs-panel + .tab-content {
+	border:1px solid #d7dfe4;
+	border-radius:0 4px 4px 4px;
+	margin-top:0;
+}
+
+.nav-tabs-panel + .tab-content .tab-content-section,
+.tab-content .tab-pane-body  {
+	padding:15px;
+}
+
+.nav-tabs-panel + .tab-content .tab-content-section + .tab-content-section,
+.tab-content .tab-pane-body + .tab-pane-body {
+	border-top:1px dashed #d7dfe4;
+}
+
+.nav-tabs-panel.nav-justified + .tab-content {
+	border-radius:0 0 4px 4px;
+	margin-top:-1px;
+}
+
+.nav-tabs-all > li > a {
+	background-color:#FAFAFA;
+	border-color: #EEEEEE #EEEEEE #DDDDDD;
+}
+
+.nav-tabs.nav-justified > li {
+	padding-right:2px;
+}
+.nav-tabs.nav-justified > li:last-child {
+	padding-right:0;
+}
+	

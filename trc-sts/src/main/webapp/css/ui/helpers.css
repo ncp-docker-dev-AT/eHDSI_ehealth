@@ -1,0 +1,38 @@
+/* 
+-----------------------------------
+	HELPERS
+-----------------------------------
+*/
+
+.is_important {
+	color:red !important;
+}
+
+.is_mandatory {
+	color:red !important;
+}
+
+.is_empty {
+	color:#aaa !important;
+	white-space:nowrap !important;
+}
+
+.is_validated {
+	color:#76C055 !important;
+	cursor:help;
+}
+
+
+/* 
+-----------------------------------
+	TEXT
+-----------------------------------
+*/
+
+.text-nowrap {
+	white-space:nowrap;
+}
+
+.text-break-all {
+	word-break:break-all;
+}

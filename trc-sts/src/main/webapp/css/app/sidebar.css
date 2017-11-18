@@ -1,0 +1,238 @@
+/* 
+-----------------------------------
+	SIDE BAR
+-----------------------------------
+*/
+
+.sidebar-left {
+	color: #fff;
+	width:350px;
+	padding-bottom:20px;
+	box-shadow: -4px 0 0px rgba(0,0,0,.15) inset;
+	background-color:#2E4B5A;
+}
+
+@media (max-width: 991px) {
+	.sidebar-left {
+		width:275px;
+	}
+}
+
+.is_sidebar-left-closed .sidebar-left {
+	width:50px;
+}
+
+.is_sidebar-left-closed .sidebar-left-overflow {
+	overflow:hidden;
+	max-width:50px;
+}
+
+.is_sidebar-left-closed .sidebar-left-overflow-inner {
+	width:350px;
+}
+
+
+.is_sidebar-left-closed .sidebar-left-overflow {
+	overflow:hidden;
+	max-width:50px;
+}
+
+#main-content .sidebar-left .sidebar-steps {
+	background-color: #1E4E6B;
+	box-shadow:-4px 0 1px rgba(0,0,0,.08) inset;
+}
+
+#main-content .sidebar-left .sidebar-actions {
+	background-color: #B7AB33;
+	box-shadow:-4px 0 1px rgba(0,0,0,.08) inset;
+}
+
+	
+#main-content .sidebar-left + .main-content-body-inner {
+	display:table-cell;
+}
+
+/* 
+-----------------------------------
+	SIDE BAR HEADER
+-----------------------------------
+*/
+
+.sidebar-header {
+	background-color:#27404D;
+	display:table;
+	width:100%;
+}
+
+.sidebar-header > * {
+	display:table-cell;
+	vertical-align:middle;
+}
+
+.sidebar-title {
+	text-transform: uppercase;
+	font-size: 120%;
+	padding:17px 15px;
+}
+
+.sidebar-toggle {
+	width:51px;
+	cursor:pointer;
+	padding:16px 17px 16px 17px;
+	font-size:120%;
+	color:#fff;
+	text-align:center;
+}
+
+
+.is_sidebar-left-closed .sidebar-toggle i:before {
+    content: "\f065";
+}
+
+
+.sidebar-toggle:hover {
+	background-color:rgba(0,0,0,.3);
+	color:#fff;
+}
+
+/* 
+-----------------------------------
+	SIDE BAR BODY
+-----------------------------------
+*/
+
+.sidebar-body {
+	overflow:hidden;
+}
+
+.sidebar-nav li a {
+	padding:15px;
+	color:rgba(255,255,255,.75);
+}
+.sidebar-nav li a:hover,
+.sidebar-nav li a:focus,
+.sidebar-nav li a:active,
+.sidebar-nav li.active a {
+	background-color:rgba(91, 192, 222, 0.9);
+	color:#fff;
+}
+
+.sidebar-nav li a .sidebar-nav-icon {
+	font-size:20px;
+	margin-right:15px;
+	vertical-align:middle;
+	width:20px;
+}
+
+.sidebar-nav li a  span {
+	vertical-align:middle;
+}
+
+.sidebar-nav li a .sidebar-nav-notification {
+	position:absolute;
+	right:15px;
+	border-radius:50px;
+	padding:5px 7px;
+	font-size:70%;
+	box-shadow:1px 2px 0 rgba(0,0,0,.2) inset;
+}
+
+.sidebar-left-collapsed .sidebar-nav li a .sidebar-nav-notification {
+	right:auto;
+	left:25px;
+	top:5px;
+	opacity:.90;
+	padding:3px 5px;
+	box-shadow:none
+}
+
+.sidebar-nav li.active > a:before {
+	content: "";
+	display: block;
+	width: 0; 
+	height: 0; 
+	z-index:500;
+	border-right: 20px solid rgba(0,0,0,0.15);
+	border-bottom: 20px solid transparent;
+	border-top:  20px solid transparent; 
+	position: absolute;
+	top: 50%;
+	left: 100%;
+	margin-left:-17px;
+	margin-top:-17px;
+	-moz-transform: scale(.9999);
+}
+
+.sidebar-nav li.active > a:after  {
+	content: "";
+	display: block;
+	width: 0; 
+	height: 0; 
+	z-index:501;
+	border-right: 12px solid #fff;
+	border-bottom: 12px solid transparent;
+	border-top: 12px solid transparent;
+	position: absolute;
+	top: 50%;
+	left: 100%;
+	margin-left:-12px;
+	margin-top:-12px;
+	-moz-transform: scale(.9999);
+}
+
+/* 
+-----------------------------------
+	SIDE BAR / DISPLAY TABLE
+-----------------------------------
+*/
+
+.sidebar-nav .nav-badge li a {
+	padding:0;
+}
+
+.sidebar-nav .nav-badge li a .display-table-cell {
+	padding:15px;
+	vertical-align:top;
+}
+
+.sidebar-nav .nav-badge li a .display-table-cell:first-child {
+	text-align:center;
+	background-color: rgba(0,0,0,.05);
+	width:50px;
+}
+
+.sidebar-nav .nav-badge li ul {
+	display: none;
+	padding: 0;
+}
+
+.sidebar-nav .nav-badge li.expanded ul {
+	display: block;
+}
+
+.sidebar-nav .nav-badge li {
+	display:block;
+	margin-left: 0;
+}
+
+.sidebar-nav .nav-badge li a {
+	display:block;
+	width:100%;
+	position:relative;
+}
+
+.sidebar-nav .nav-badge li a:hover {
+	text-decoration:none;
+}
+
+.sidebar-nav .nav-badge li a .badge {
+	vertical-align: top;
+	background-color: rgba(0,0,0,.1);
+	padding:4px 7px;
+}
+
+.sidebar-nav .nav-badge .fa-level-up {
+	margin-right: 5px;
+	margin-left: 7px;
+}
+	
