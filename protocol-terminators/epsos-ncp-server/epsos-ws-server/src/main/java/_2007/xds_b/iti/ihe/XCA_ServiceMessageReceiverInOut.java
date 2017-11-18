@@ -56,6 +56,21 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCA_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCA_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCA_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
  */
 /**
  * XCA_ServiceMessageReceiverInOut.java
@@ -204,14 +219,13 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
 //                    }
 
                     /* Validate incoming query request */
-                    String requestMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
+                    //String requestMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
+                    String requestMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
                     XcaValidationService.getInstance().validateModel(requestMessage, XdModel.obtainModelXca(requestMessage).toString(), NcpSide.NCP_A);
 
-                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse adhocQueryResponse1 = null;
+                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse adhocQueryResponse1;
                     oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest wrappedParam = (oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest) fromOM(
-                            msgContext.getEnvelope().getBody()
-                                    .getFirstElement(),
-                            oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
+                            msgContext.getEnvelope().getBody().getFirstElement(), oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
                     adhocQueryResponse1 = skel.respondingGateway_CrossGatewayQuery(wrappedParam, sh, eventLog);
@@ -224,7 +238,7 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
                     auditService.write(eventLog, "", "1");
 
                     /* Validate outgoing query response */
-                    String responseMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
+                    String responseMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
                     XcaValidationService.getInstance().validateModel(responseMessage, XdModel.obtainModelXca(responseMessage).toString(), NcpSide.NCP_A);
 
                     logger.debug("Response Header:\n" + envelope.getHeader().toString());

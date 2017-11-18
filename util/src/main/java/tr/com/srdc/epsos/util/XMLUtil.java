@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -42,6 +43,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Locale;
@@ -92,13 +97,11 @@ public class XMLUtil {
     }
 
     public static org.w3c.dom.Document parseContent(byte[] byteContent) throws ParserConfigurationException, SAXException, IOException {
-        org.w3c.dom.Document doc = null;
+
+        org.w3c.dom.Document doc;
         String content = new String(byteContent);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        //dbf.setIgnoringComments(false);
         dbf.setNamespaceAware(true);
-
-        //dbf.setNamespaceAware(false);
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
         StringReader lReader = new StringReader(content);
         InputSource inputSource = new InputSource(lReader);
@@ -116,11 +119,9 @@ public class XMLUtil {
     public static org.w3c.dom.Document parseContent(String content) throws ParserConfigurationException, SAXException, IOException {
 
         LOGGER.debug("parseContent(): \n'{}'", content);
-        org.w3c.dom.Document doc = null;
+        org.w3c.dom.Document doc;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        //dbf.setIgnoringComments(false);
         dbf.setNamespaceAware(true);
-        //dbf.setNamespaceAware(false);
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
         StringReader lReader = new StringReader(content);
         InputSource inputSource = new InputSource(lReader);
@@ -136,6 +137,28 @@ public class XMLUtil {
         StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(doc), new StreamResult(writer));
         return writer.getBuffer().toString().replaceAll("\n|\r", "");
+    }
+
+    public static String prettyPrintForValidation(Node node) throws TransformerException, XPathExpressionException {
+
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList nodeList = (NodeList) xPath.evaluate("//text()[normalize-space()='']", node, XPathConstants.NODESET);
+
+        for (int i = 0; i < nodeList.getLength(); ++i) {
+            Node item = nodeList.item(i);
+            item.getParentNode().removeChild(item);
+        }
+
+        StringWriter stringWriter = new StringWriter();
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+        transformer.transform(new DOMSource(node), new StreamResult(stringWriter));
+        return stringWriter.toString();
     }
 
     /**
