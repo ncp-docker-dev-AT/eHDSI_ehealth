@@ -121,48 +121,48 @@
         <xsl:choose>
             <xsl:when test="$code='No'">
                 <xsl:call-template name="show-displayLabels">
-                    <xsl:with-param name="data" select="'42'"/>
+                    <xsl:with-param name="code" select="'42'"/>
                 </xsl:call-template>
                 <!-- <xsl:value-of select="'No'"/>  -->
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="show-displayLabels">
-                    <xsl:with-param name="data" select="'81'"/>
+                    <xsl:with-param name="code" select="'81'"/>
                 </xsl:call-template>
                 <!--  <xsl:value-of select="'Yes'"/> -->
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
-    <!--  xsl:variable name="scValue">
-            <xsl:call-template name="pure-substitution-code" />
-    </xsl:variable -->
+<xsl:variable name="strengthValue">
+		<xsl:call-template name="strength"/>
+</xsl:variable>
 
-    <xsl:variable name="strengthValue">
-        <xsl:call-template name="strength"/>
-    </xsl:variable>
 
-    <xsl:variable name="numberOfPacks">
-        <xsl:call-template name="number-of-packages">
-            <xsl:with-param name="supply" select="n1:entryRelationship[@typeCode='COMP']"/>
-        </xsl:call-template>
-    </xsl:variable>
+<xsl:variable name="numberOfPacks">
+	<xsl:call-template name="number-of-packages">
+		<xsl:with-param name="supply" select="n1:entryRelationship[@typeCode='COMP']"/>
+	</xsl:call-template>
+</xsl:variable>
 
-    <xsl:template name="inputform">
-        <xsl:param name="txt"/>
-        <xsl:param name="val"/>
-        <xsl:attribute name="id">
-            <xsl:value-of select="$txt"/>
-            <xsl:value-of select="position()-1"/>
-        </xsl:attribute>
-        <xsl:attribute name="name">
-            <xsl:value-of select="$txt"/>
-            <xsl:value-of select="position()-1"/>
-        </xsl:attribute>
-        <xsl:attribute name="value">
-            <xsl:value-of select="$val"/>
-        </xsl:attribute>
-    </xsl:template>
+
+<xsl:template name="inputform">
+	<xsl:param name="txt"/>
+	<xsl:param name="val"/>
+	
+	<xsl:attribute name="id">
+		<xsl:value-of select="$txt"/>
+		<xsl:value-of select="position()-1" />
+	</xsl:attribute>
+	<xsl:attribute name="name">
+		<xsl:value-of select="$txt"/>
+		<xsl:value-of select="position()-1" />
+	</xsl:attribute>
+	<xsl:attribute name="value">
+		<xsl:value-of select="$val"/>
+	</xsl:attribute>
+	
+</xsl:template>
 
     <xsl:template name="add-newUnitMeasure">
         <xsl:param name="unit"/>
@@ -183,14 +183,15 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template name="check-EffectiveTime">
-        <xsl:value-of select="''"/>
-        <xsl:choose>
-            <xsl:when test="n1:effectiveTime[2]/n1:period/@nullFlavor">
-                <xsl:value-of select="'false'"/>
-            </xsl:when>
-        </xsl:choose>
-    </xsl:template>
+
+<xsl:template name="check-EffectiveTime">
+	<xsl:value-of select="''"/>	
+	<xsl:choose>
+		<xsl:when test="n1:effectiveTime[2]/n1:period/@nullFlavor">
+			<xsl:value-of select="'false'"/>
+		</xsl:when>
+	</xsl:choose>
+</xsl:template>
 
     <xsl:template name="check-FrequencyOfIntakes">
         <xsl:value-of select="''"/>

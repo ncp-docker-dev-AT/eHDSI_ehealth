@@ -31,7 +31,7 @@
   					<!-- xsl:text>TThe Active Problem section is missing !</xsl:text-->
   					
   					<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'72'"/>
+								<xsl:with-param name="code" select="'72'"/>
 							</xsl:call-template>
   					
   				</span><br/><br/>
@@ -105,7 +105,7 @@
             					<!-- xsl:text>Active Problem </xsl:text-->
             					
             				<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'2'"/>
+								<xsl:with-param name="code" select="'2'"/>
 							</xsl:call-template>
             				</th>
             				
@@ -113,7 +113,7 @@
             					<!-- xsl:text>OnSet Date </xsl:text-->
             					
             				<xsl:call-template  name="show-displayLabels">
-								<xsl:with-param name="data" select="'45'"/>
+								<xsl:with-param name="code" select="'45'"/>
 							</xsl:call-template>
             				</th>
             			</tr>
@@ -232,7 +232,7 @@
     			<tr>
             		<td colspan="3">	
                                         <xsl:call-template name="show-unknownInfo">
-							<xsl:with-param name="data" select="$probObsCode"/>
+							<xsl:with-param name="code" select="$probObsCode"/>
 					</xsl:call-template>
     				
     			</td></tr>			   					

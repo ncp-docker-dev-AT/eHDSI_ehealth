@@ -2800,6 +2800,7 @@ public class EpsosHelperService {
 
         PatientDemographics pd = PatientDemographics.Factory.newInstance();
         PatientId[] idArray = new PatientId[identifiers.size()];
+
         for (int i = 0; i < identifiers.size(); i++) {
             PatientId id = PatientId.Factory.newInstance();
             id.setRoot(identifiers.get(i).getDomain());
@@ -2817,12 +2818,14 @@ public class EpsosHelperService {
                     pd.setGivenName(dem.getUserValue());
                     break;
                 case "patient.data.birth.date":
-                    try {
-                        Calendar cal = Calendar.getInstance();
-                        cal.setTime(dem.getUserDateValue());
-                        pd.setBirthDate(cal);
-                    } catch (Exception ex) {
-                        LOGGER.error("Invalid Date Format for date '{}'", dem.getUserValue(), ex);
+                    if (dem.getUserDateValue() != null) {
+                        try {
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTime(dem.getUserDateValue());
+                            pd.setBirthDate(cal);
+                        } catch (Exception ex) {
+                            LOGGER.error("Invalid Date Format for date '{}'", dem.getUserValue(), ex);
+                        }
                     }
                     break;
                 case "patient.data.street.address":

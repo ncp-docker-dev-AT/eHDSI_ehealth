@@ -36,7 +36,7 @@
                         <p:inputText id="#{not empty identifier.friendlyName ? identifier.friendlyName : ''.concat('uservalue-').concat(idLoop.index)}" value="#{identifier.userValue}" required="true"/>
                     </c:forEach>
                     <c:forEach items="#{myBean.demographics}" var="demographic" varStatus="demographicsLoop">
-                        <h:outputLabel value="#{demographic.label}:" rendered="#{myBean.showDemographics}"/>
+                        <h:outputLabel value="#{demographic.label}" rendered="#{myBean.showDemographics}"/>
                         <c:choose>
                             <c:when test="#{demographic.type=='text'}">
                                     <p:inputText id="#{not empty demographic.friendlyName ? demographic.friendlyName : ''.concat('userValue2-').concat(demographicsLoop.index)}" 
@@ -44,8 +44,8 @@
                             </c:when>
                             <c:when test="#{demographic.type=='calendar'}">
                                     <p:calendar id="#{not empty demographic.friendlyName ? demographic.friendlyName : ''.concat('userDateValue2-').concat(demographicsLoop.index)}" 
-                                                value="#{demographic.userDateValue}" yearRange="c-100:c+0" pattern="yyyyMMdd" navigator="true" >
-                                            <f:convertDateTime pattern="yyyyMMdd"/>
+                                                value="#{demographic.userDateValue}" yearRange="c-100:c+0" pattern="yyyy/MM/dd" navigator="true" >
+                                            <f:convertDateTime pattern="yyyy/MM/dd"/>
                                     </p:calendar>
                             </c:when>
                         </c:choose>
@@ -53,10 +53,8 @@
                 </h:panelGrid>
                 <a id="sc_link" target="_blank" href="/jnlp/openecard.jnlp">#{msg['patient.search.downloadeid']}</a>             
 
-            <p:commandButton 
-                id="submitPatient" value="#{msg['ui.search.info']}"
-                ajax="true" actionListener="#{myBean.searchPatients}"
-                update="resultPanel" oncomplete="panelwv.show();">
+            <p:commandButton id="submitPatient" value="#{msg['ui.search.info']}" ajax="true"
+                             actionListener="#{myBean.searchPatients}" update="resultPanel" oncomplete="panelwv.show();">
             </p:commandButton>
             <p/>
 
@@ -141,7 +139,7 @@
                                                      target="#{myBean.selectedPatient}" />
                         #{msg['ui.consent.info']}<br/>
                     </p:commandLink>
-                    <p:commandLink 
+                    <!--p:commandLink
                         action="/viewPatientConfirmationForHCER.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal"
                         ajax="false"
                         id="p8"
@@ -162,7 +160,7 @@
                         <f:setPropertyActionListener value="#{patient}"
                                                      target="#{myBean.selectedPatient}" />
                         #{msg['ui.mro.info']}<br/>
-                    </p:commandLink>                              
+                    </p:commandLink-->
                 </ui:repeat>  
             </p:panel>
 
