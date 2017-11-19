@@ -43,17 +43,25 @@ public class SMPGenerateFileController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SMPGenerateFileController.class);
 
-    @Autowired
-    private final SMPConverter smpconverter = new SMPConverter();
+    private final SMPFields smpfields = new SMPFields();
+
+    private SMPConverter smpconverter = new SMPConverter();
+
+    private XMLValidator xmlValidator = new XMLValidator();
+
+    private Environment env;
+
+    private ReadSMPProperties readProperties = new ReadSMPProperties();
+
+    private String type;
 
     @Autowired
-    private final XMLValidator xmlValidator = new XMLValidator();
-    private final SMPFields smpfields = new SMPFields();
-    @Autowired
-    private Environment env;
-    @Autowired
-    private ReadSMPProperties readProperties = new ReadSMPProperties();
-    private String type;
+    public SMPGenerateFileController(SMPConverter smpconverter, XMLValidator xmlValidator, Environment env, ReadSMPProperties readProperties) {
+        this.smpconverter = smpconverter;
+        this.xmlValidator = xmlValidator;
+        this.env = env;
+        this.readProperties = readProperties;
+    }
 
     /**
      * Generate GenerateSMPFile page
