@@ -1,14 +1,6 @@
 package epsos.ccd.gnomon.cda.parser.docs;
 
-import epsos.ccd.gnomon.cda.parser.beans.Author;
-import epsos.ccd.gnomon.cda.parser.beans.Code;
-import epsos.ccd.gnomon.cda.parser.beans.Custodian;
-import epsos.ccd.gnomon.cda.parser.beans.Identifier;
-import epsos.ccd.gnomon.cda.parser.beans.LegalAuthenticator;
-import epsos.ccd.gnomon.cda.parser.beans.MedicalComponent;
-import epsos.ccd.gnomon.cda.parser.beans.Participant;
-import epsos.ccd.gnomon.cda.parser.beans.Patient;
-import epsos.ccd.gnomon.cda.parser.beans.RelatedDocument;
+import epsos.ccd.gnomon.cda.parser.beans.*;
 import epsos.ccd.gnomon.cda.parser.enums.Country;
 
 import java.text.SimpleDateFormat;
@@ -20,12 +12,11 @@ import java.util.Set;
  * A class encapsulating a generic clinical document.
  *
  * @author Akis Papadopoulos
- *
  */
 public class ClinicalDocument {
 
     // Date formatter
-    protected static SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
+    protected SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
     // Document class code
     protected Code code;
     // Document identification number
@@ -79,7 +70,7 @@ public class ClinicalDocument {
         this.patient = null;
 
         // Creating an empty set of the participants
-        this.participants = new HashSet<Participant>();
+        this.participants = new HashSet<>();
 
         // Setting a null author of the document
         this.author = null;
@@ -91,19 +82,19 @@ public class ClinicalDocument {
         this.custodian = null;
 
         // Creating an empty set of related document
-        this.relatedDocuments = new HashSet<RelatedDocument>();
+        this.relatedDocuments = new HashSet<>();
 
         // Creating an empty set of medical components
-        this.components = new HashSet<MedicalComponent>();
+        this.components = new HashSet<>();
     }
 
     /**
      * A constructor initializing the clinical document header data.
      *
-     * @param code the class code of the document.
-     * @param id the document identifier.
-     * @param created the creation date of the document.
-     * @param updated the last updated date of the document.
+     * @param code     the class code of the document.
+     * @param id       the document identifier.
+     * @param created  the creation date of the document.
+     * @param updated  the last updated date of the document.
      * @param language the language of the document.
      */
     public ClinicalDocument(Code code, Identifier id, Date created, Date updated, Country language) {
@@ -129,7 +120,7 @@ public class ClinicalDocument {
         this.patient = null;
 
         // Creating an empty set of the participants
-        this.participants = new HashSet<Participant>();
+        this.participants = new HashSet<>();
 
         // Setting a null author of the document
         this.author = null;
@@ -141,10 +132,10 @@ public class ClinicalDocument {
         this.custodian = null;
 
         // Creating an empty set of related document
-        this.relatedDocuments = new HashSet<RelatedDocument>();
+        this.relatedDocuments = new HashSet<>();
 
         // Creating an empty set of medical components
-        this.components = new HashSet<MedicalComponent>();
+        this.components = new HashSet<>();
     }
 
     /**

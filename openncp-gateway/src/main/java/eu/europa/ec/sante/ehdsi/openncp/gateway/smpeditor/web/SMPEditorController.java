@@ -17,7 +17,6 @@ import java.util.Set;
 /**
  * @author Inês Garganta
  */
-
 @Controller
 public class SMPEditorController {
 

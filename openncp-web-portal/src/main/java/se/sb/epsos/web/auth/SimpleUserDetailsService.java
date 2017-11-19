@@ -1,13 +1,13 @@
 /**
- *    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
- *
- *    This file is part of epSOS-WEB.
- *
- *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
+ * Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
+ * <p>
+ * This file is part of epSOS-WEB.
+ * <p>
+ * epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * <p>
+ * epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
  **/
 package se.sb.epsos.web.auth;
 
@@ -43,10 +43,12 @@ public class SimpleUserDetailsService implements UserDetailsService {
             try {
                 init();
             } catch (ConfigurationException e) {
+                LOGGER.error("ConfigurationException: '{}'", e.getMessage(), e);
                 throw new DataAccessException("Failed to load users from XML") {
                     private static final long serialVersionUID = -3848074168433511697L;
                 };
             } catch (IOException e) {
+                LOGGER.error("IOException: '{}'", e.getMessage(), e);
                 throw new DataAccessException("Failed to read XML file") {
                     private static final long serialVersionUID = 2763171318518245251L;
                 };
@@ -77,7 +79,9 @@ public class SimpleUserDetailsService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority(role));
         }
         userDetails.setAuthorities(authorities);
-        LOGGER.info("Loaded AuthenticatedUser: '{}'", userDetails.toString());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Loaded AuthenticatedUser: '{}'", userDetails.toString());
+        }
         return userDetails;
     }
 

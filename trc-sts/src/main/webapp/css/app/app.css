@@ -1,0 +1,203 @@
+/* 
+-----------------------------------
+	BODY
+-----------------------------------
+*/
+
+body, html {
+	padding:0;
+	background-color:#D7DFE4;
+	color: #666;
+	padding-top:10px;
+	padding-bottom:10px;
+}
+
+@media (max-width: 1500px) {
+	.container-strech-smaller-1500 body,
+	html.container-strech-smaller-1500 {
+		padding:0;
+	}
+}
+
+a {
+	color: #5BC0DE;
+}
+
+a:hover {
+	color: #2695B5;
+}
+
+.flag-icon {
+	line-height:1.42em;
+}
+
+
+/* 
+-----------------------------------
+	MAIN WRAPPER
+-----------------------------------
+*/
+
+#main-wrapper {
+	background:#fff;
+	box-shadow: 0 1px 1px 0 rgba(24, 67, 70, 0.10);
+	box-shadow:none\9;
+	padding:15px 20px;
+	border-radius:3px;
+}
+
+@media (max-width: 767px) {
+
+	#main-wrapper {
+		padding:10px 15px;
+	}
+
+}
+
+
+/* 
+-----------------------------------
+	MAIN CONTENT
+-----------------------------------
+*/
+
+#main-content {
+	background-color:#fff;
+	margin:0;
+	/*box-shadow:0 0 5px 1px rgba(0,0,0,.25);*/
+}
+
+#main-content .main-content-inner {
+	width:100%;
+	display:table;
+}
+
+#main-content .main-content-inner > * {
+	display:table-cell;
+	vertical-align: top;
+}
+
+#main-content .main-content-inner > .main-content-center {
+	box-shadow:0 3px rgba(0,0,0,0.05);
+}
+
+/* 
+-----------------------------------
+	APPLICATION
+-----------------------------------
+*/
+
+.page-header-title .label-application-status {
+	font-size:50%;
+	font-weight:normal;
+	display:inline-block;
+	vertical-align:middle;
+}
+/* 
+-----------------------------------
+	DATE PICKER
+-----------------------------------
+*/
+
+.datepicker table tr td.active.active,
+.datepicker table tr td.active.active:hover,
+.datepicker table tr td.active.active:active,
+.bootstrap-datetimepicker-widget table td span.active {
+	background:#31b0d5;
+	border-color:transparent;
+}
+
+.bootstrap-datetimepicker-widget table th.disabled,
+.bootstrap-datetimepicker-widget table th.disabled:hover,
+.bootstrap-datetimepicker-widget table td.disabled,
+.bootstrap-datetimepicker-widget table td.disabled:hover,
+.bootstrap-datetimepicker-widget table td span.disabled,
+.bootstrap-datetimepicker-widget table td span.disabled:hover {
+  color: #bbbbbb;
+}
+
+.bootstrap-datetimepicker-widget table td.today:before {
+    border-bottom-color: #31b0d5;
+}
+
+/* 
+-----------------------------------
+	NOTIFICATION DETAILS
+-----------------------------------
+*/
+	
+.notification-details .notification-details-footer {
+	background-color:#F1F3F4;
+	margin-top:15px;
+	padding:8px;
+}
+
+/* 
+-------------------------------------------
+	TABLE CATEGORY SELECT
+-------------------------------------------
+*/
+
+.table-select-category-radio {
+	width:1px;
+}
+
+.table-select-category-name .btn-toggle-collapse{
+	margin:0 0 0 7px;
+}
+
+/* 
+-------------------------------------------
+	FOOD ITEM TABLE
+-------------------------------------------
+*/
+
+.level-td .category-description {
+	font-size:90%;
+	color:#777;
+}
+
+
+.level-td .category-description p {
+	margin-top:6px;
+	margin-bottom:0;
+}
+
+.level-td .category-description ul {
+	margin-top:6px;
+	margin-bottom:0;
+	padding-left:20px;
+}
+
+
+/* 
+-------------------------------------------
+	AJAX LOADING
+-------------------------------------------
+*/
+
+.ajax-loading-shadow {
+	position:fixed;
+	top:0;
+	right:0;
+	left:0;
+	bottom:0;
+	background:#0065a2;
+	opacity:0.9;
+	z-index:10000000;
+}
+
+.ajax-loading-animation {
+	position:fixed;
+	top:50%;
+	left:50%;
+	transform: translate(-50%, -50%);
+	text-align:center;
+	color:#fff;
+	z-index:10000001;
+}
+
+.ajax-loading-animation-text {
+	margin-top:10px;
+}
+

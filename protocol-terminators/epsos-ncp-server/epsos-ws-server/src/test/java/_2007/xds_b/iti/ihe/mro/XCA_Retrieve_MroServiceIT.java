@@ -21,18 +21,20 @@ package _2007.xds_b.iti.ihe.mro;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.pt.server.it.ServerGenericIT;
-import java.util.Collection;
-import org.junit.*;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
-import tr.com.srdc.epsos.util.Constants;
+
+import java.util.Collection;
 
 /**
- *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class XCA_Retrieve_MroServiceIT extends ServerGenericIT {
 
-//    private static final String URL = CONFIG_SERVICE.getServiceWSE(COUNTRY_CODE, Constants.OrderService);
+    //    private static final String URL = CONFIG_SERVICE.getServiceWSE(COUNTRY_CODE, Constants.OrderService);
     private static final String QUERY_FILE_L3 = "xca/retrieve/mro/xca-retrieve.xml";
     private static final String QUERY_FILE_L1 = "xca/retrieve/mro/xca-retrieve-pdf.xml";
     private static final String QUERY_FILE_INVALD_ID = "xca/retrieve/mro/xca-retrieve-invalid-id.xml";
@@ -42,18 +44,18 @@ public class XCA_Retrieve_MroServiceIT extends ServerGenericIT {
     public XCA_Retrieve_MroServiceIT() {
     }
 
+    @BeforeClass
+    public static void setUpClass() {
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Retrieve Document (MRO)");
+        LOGGER.info("----------------------------");
+
+        epr = DISCOVERY_SERVICE.getEndpointUrl(COUNTRY_CODE, RegisteredService.ORDER_SERVICE, false);
+    }
+
     @Override
     protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
         return hcpAndTrcAssertionCreate(PATIENT_ISO, XSPARole.PHARMACIST);
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-        LOG.info("----------------------------");
-        LOG.info(" Retrieve Document (MRO)");
-        LOG.info("----------------------------");
-
-        epr = CONFIG_SERVICE.getServiceWSE(COUNTRY_CODE, Constants.OrderService);
     }
 
     /**
@@ -65,7 +67,7 @@ public class XCA_Retrieve_MroServiceIT extends ServerGenericIT {
         this.assertions = this.assertions = this.getAssertions(QUERY_FILE_L3, XSPARole.PHARMACIST);
         testGood("testRetrieveDocument", QUERY_FILE_L3);
     }
-    
+
     /**
      * Test of respondingGateway_CrossGatewayRetrieve method, of class
      * XCA_ServiceSkeleton.

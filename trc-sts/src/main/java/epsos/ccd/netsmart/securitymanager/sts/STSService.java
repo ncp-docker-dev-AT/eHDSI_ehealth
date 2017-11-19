@@ -5,6 +5,7 @@ import epsos.ccd.gnomon.auditmanager.*;
 import epsos.ccd.netsmart.securitymanager.SamlTRCIssuer;
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
+import epsos.ccd.netsmart.securitymanager.sts.util.STSUtils;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
@@ -21,7 +22,6 @@ import org.opensaml.xml.io.UnmarshallingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.annotation.Resource;
@@ -34,19 +34,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.*;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.*;
 import javax.xml.ws.Service.Mode;
 import javax.xml.ws.handler.MessageContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.net.InetAddress;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
@@ -76,15 +68,15 @@ public class STSService implements Provider<SOAPMessage> {
     private static final String WS_SEC_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 
     @Resource
-    WebServiceContext context;
+    private WebServiceContext context;
 
     @Override
     public SOAPMessage invoke(SOAPMessage source) {
 
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Incoming SOAP Message request: '{}'", source.toString());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Incoming SOAP Message request: '{}'", source.toString());
+            log(source);
         }
-        log(source);
 
         SOAPBody body;
         SOAPHeader header;
@@ -118,7 +110,7 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             // these calls are both getters and checkers of message.
             // So we call them first
-            String purposeOfUse = getPurposeOfUse(body);
+            String purposeOfUse = STSUtils.getPurposeOfUse(body);
             String patientID = getPatientID(body);
             String mid = getMessageIdFromHeader(header);
 
@@ -136,21 +128,23 @@ public class STSService implements Provider<SOAPMessage> {
                 }
             }
             Assertion trc = samlTRCIssuer.issueTrcToken(hcpIdAssertion, patientID, purposeOfUse, null);
-            LOGGER.info("HCP Assertion Date: '{}' TRC Assertion Date: '{}' -- '{}'",
-                    hcpIdAssertion.getIssueInstant().withZone(DateTimeZone.UTC),
-                    trc.getIssueInstant().withZone(DateTimeZone.UTC), trc.getAuthnStatements().isEmpty());
+            if (hcpIdAssertion != null) {
+                LOGGER.info("HCP Assertion Date: '{}' TRC Assertion Date: '{}' -- '{}'",
+                        hcpIdAssertion.getIssueInstant().withZone(DateTimeZone.UTC),
+                        trc.getIssueInstant().withZone(DateTimeZone.UTC), trc.getAuthnStatements().isEmpty());
+            }
 
             Document signedDoc = builder.newDocument();
             Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
 
-            SOAPMessage resp = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
-            resp.getSOAPBody().addDocument(createRSTRC(signedDoc));
-            createResponseHeader(resp.getSOAPHeader(), mid);
+            SOAPMessage response = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
+            response.getSOAPBody().addDocument(STSUtils.createRSTRC(signedDoc));
+            createResponseHeader(response.getSOAPHeader(), mid);
 
-            String strRespHeader = domElementToString(resp.getSOAPHeader());
-            String strReqHeader = domElementToString(header);
+            String strRespHeader = STSUtils.domElementToString(response.getSOAPHeader());
+            String strReqHeader = STSUtils.domElementToString(header);
 
-            String tls_cn = getSSLCertPeer();
+            String tls_cn = STSUtils.getSSLCertPeer(context.getMessageContext());
             LOGGER.info("tls_cn: '{}'", tls_cn);
 
             if (context.getUserPrincipal() != null) {
@@ -160,13 +154,14 @@ public class STSService implements Provider<SOAPMessage> {
             audit(samlTRCIssuer.getPointofCare(), samlTRCIssuer.getHumanRequestorNameId(),
                     samlTRCIssuer.getHumanRequestorSubjectId(), samlTRCIssuer.getHRRole(), patientID,
                     samlTRCIssuer.getFacilityType(), trc.getID(), tls_cn, mid,
-                    Base64.encodeBase64(strReqHeader.getBytes()), getMessageIdFromHeader(resp.getSOAPHeader()),
+                    Base64.encodeBase64(strReqHeader.getBytes()), getMessageIdFromHeader(response.getSOAPHeader()),
                     Base64.encodeBase64(strRespHeader.getBytes()));
 
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Outgoing SOAP Message response: '{}'", resp.toString());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Outgoing SOAP Message response: '{}'", response.toString());
+                log(response);
             }
-            return resp;
+            return response;
 
         } catch (SOAPException | WSTrustException | MarshallingException | SMgrException | ParserConfigurationException
                 | IOException ex) {
@@ -175,23 +170,6 @@ public class STSService implements Provider<SOAPMessage> {
         }
     }
 
-    private String getPurposeOfUse(SOAPElement body) {
-
-        if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
-            throw new WebServiceException("No TRC Parameters in RST");
-        }
-
-        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "PurposeOfUse").item(0) == null) {
-            return null;
-        }
-
-        String purposeOfUse = trcDetails.getElementsByTagNameNS(TRC_NS, "PurposeOfUse").item(0).getTextContent();
-        if (purposeOfUse != null && (!"TREATMENT".equals(purposeOfUse) && !"EMERGENCY".equals(purposeOfUse))) {
-            throw new WebServiceException("Purpose of Use MUST be either TREATMENT of EMERGENCY");
-        }
-        return purposeOfUse;
-    }
 
     private String getPatientID(SOAPElement body) {
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
@@ -234,13 +212,7 @@ public class STSService implements Provider<SOAPMessage> {
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
             return (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
 
-        } catch (ParserConfigurationException ex) {
-            LOGGER.error(null, ex);
-            throw new WSTrustException("Error Parsing SAML Assertion in Message Header", ex);
-        } catch (UnmarshallingException ex) {
-            LOGGER.error(null, ex);
-            throw new WSTrustException("Error Parsing SAML Assertion in Message Header", ex);
-        } catch (IOException ex) {
+        } catch (ParserConfigurationException | UnmarshallingException | IOException ex) {
             LOGGER.error(null, ex);
             throw new WSTrustException("Error Parsing SAML Assertion in Message Header", ex);
         }
@@ -291,52 +263,6 @@ public class STSService implements Provider<SOAPMessage> {
         }
     }
 
-    private Document createRSTRC(Document assertion) {
-
-        try {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document respBody = builder.newDocument();
-
-            Element rstrcElem = respBody.createElementNS(WS_TRUST_NS, "wst:RequestSecurityTokenResponseCollection");
-            respBody.appendChild(rstrcElem);
-
-            Element rstrElem = respBody.createElementNS(WS_TRUST_NS, "wst:RequestSecurityTokenResponse");
-            rstrcElem.appendChild(rstrElem);
-
-            Element rstElem = respBody.createElementNS(WS_TRUST_NS, "wst:RequestedSecurityToken");
-            rstrElem.appendChild(rstElem);
-
-            // add the Assertion
-            rstElem.appendChild(respBody.importNode(assertion.getDocumentElement(), true));
-
-            Element tokenTypeElem = respBody.createElementNS(WS_TRUST_NS, "wst:TokenType");
-            tokenTypeElem.setTextContent(SAML20_TOKEN_URN);
-
-            rstrElem.appendChild(tokenTypeElem);
-
-            Element lifeTimeElem = respBody.createElementNS(WS_TRUST_NS, "wst:LifeTime");
-            rstrElem.appendChild(lifeTimeElem);
-
-            DateTime now = new DateTime();
-
-            Element ltCreated = respBody.createElementNS(WS_SEC_UTIL_NS, "wsu:Created");
-            ltCreated.setTextContent(now.toDateTime(DateTimeZone.UTC).toString());
-
-            lifeTimeElem.appendChild(ltCreated);
-
-            Element ltExpires = respBody.createElementNS(WS_SEC_UTIL_NS, "wsu:Expires");
-            ltExpires.setTextContent(now.plusHours(2).toDateTime(DateTimeZone.UTC).toString());
-
-            lifeTimeElem.appendChild(ltExpires);
-
-            return respBody;
-
-        } catch (Exception ex) {
-            LOGGER.error(null, ex);
-            throw new WebServiceException("Cannot create RSTSC Message");
-        }
-    }
-
     private String getRSTAction(SOAPBody body) throws WSTrustException {
 
         if (body.getElementsByTagNameNS(WS_TRUST_NS, "RequestType").getLength() < 1) {
@@ -356,19 +282,6 @@ public class STSService implements Provider<SOAPMessage> {
 
     }
 
-    private String domElementToString(Element elem) {
-        try {
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer trans = tf.newTransformer();
-            StringWriter sw = new StringWriter();
-            trans.transform(new DOMSource(elem), new StreamResult(sw));
-            return sw.toString();
-        } catch (TransformerException ex) {
-            LOGGER.error(null, ex);
-            throw new WebServiceException("Error Creating audit message");
-        }
-    }
-
     private void audit(String pointOfCareID, String humanRequestorNameID, String humanRequestorSubjectID,
                        String humanRequestorRole, String patientID, String facilityType, String assertionId,
                        String tls_cn, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
@@ -386,27 +299,14 @@ public class STSService implements Provider<SOAPMessage> {
         ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
 
         EventLog evLogTRC = EventLog.createEventLogTRCA(TransactionName.epsosTRCAssertion, EventActionCode.EXECUTE,
-                date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType,
-                cms.getProperty("ncp.country") + "<" + humanRequestorNameID + "@" + cms.getProperty("ncp.country")
-                        + ">",
-                humanRequestorRole, humanRequestorSubjectID, tls_cn, getServerIP(),
-                cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"), patientID, "urn:uuid:" + assertionId, reqMid,
-                reqSecHeader, resMid, resSecHeader, getServerIP(), getClientIP());
+                date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, cms.getProperty("ncp.country")
+                        + "<" + humanRequestorNameID + "@" + cms.getProperty("ncp.country") + ">", humanRequestorRole,
+                humanRequestorSubjectID, tls_cn, STSUtils.getServerIP(), cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
+                patientID, "urn:uuid:" + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
+                STSUtils.getServerIP(), getClientIP());
 
         evLogTRC.setEventType(EventType.epsosTRCAssertion);
         asd.write(evLogTRC, "13", "2");
-
-    }
-
-    private String getServerIP() {
-
-        try {
-            InetAddress thisIp = InetAddress.getLocalHost();
-            return thisIp.getHostAddress();
-        } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
-            return "Unknown IP";
-        }
     }
 
     private String getClientIP() {
@@ -416,25 +316,7 @@ public class STSService implements Provider<SOAPMessage> {
         return req.getRemoteAddr();
     }
 
-    private String getSSLCertPeer() {
-
-        String user = "Unknown(No Client Certificate)";
-        MessageContext msgCtx = context.getMessageContext();
-
-        javax.servlet.ServletRequest sreq = (javax.servlet.ServletRequest) msgCtx.get(MessageContext.SERVLET_REQUEST);
-
-        if (sreq instanceof HttpServletRequest && sreq.isSecure()) {
-            LOGGER.info("Secure and http");
-            HttpServletRequest hreq = (HttpServletRequest) sreq;
-            X509Certificate peerCert[] = (X509Certificate[]) hreq.getAttribute("javax.servlet.request.X509Certificate");
-            if (peerCert != null) {
-                return peerCert[0].getSubjectDN().getName();
-            }
-        }
-        return user;
-    }
-
-    private String log(SOAPMessage message) {
+    private void log(SOAPMessage message) {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
@@ -443,10 +325,7 @@ public class STSService implements Provider<SOAPMessage> {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("************************************************************");
-            LOGGER.info(out.toString());
-            LOGGER.info("************************************************************");
+            LOGGER.info("SOAPMessage:\n{}", out.toString());
         }
-        return out.toString();
     }
 }

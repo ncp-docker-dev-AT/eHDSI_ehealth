@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:AcceptanceRejectionByRecipient version="1" xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://uri.etsi.org/02640/v1#" xmlns:ns3="http://uri.etsi.org/02231/v2#" xmlns:ns4="http://uri.etsi.org/01903/v1.3.2#">
+<ns2:AcceptanceRejectionByRecipient xmlns:ns2="http://uri.etsi.org/02640/v1#" version="1"
+                                    xmlns="http://www.w3.org/2000/09/xmldsig#">
     <ns2:EventCode>Rejection</ns2:EventCode>
     <ns2:EvidenceIdentifier>$evidenceIdentifier</ns2:EvidenceIdentifier>
     <ns2:EvidenceIssuerPolicyID>
@@ -35,5 +36,4 @@
         <DigestMethod Algorithm="SHA1"/>
         <DigestValue>$digestValue</DigestValue>
     </ns2:SenderMessageDetails>
-
 </ns2:AcceptanceRejectionByRecipient>

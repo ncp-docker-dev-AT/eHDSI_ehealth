@@ -1,6 +1,5 @@
-
-<wsdl:definitions targetNamespace="http://epsos.eu/"
-                  xmlns:tns="http://epsos.eu/"
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:tns="http://epsos.eu/"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
                   xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
@@ -9,8 +8,12 @@
                   xmlns:q1="http://schemas.message.com/Message"
                   xmlns:q2="http://schemas.message.com/Message"
                   xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsp1="http://www.w3.org/ns/ws-policy" xmlns:fi="http://java.sun.com/xml/ns/wsit/2006/09/policy/fastinfoset/service" xmlns:tcp="http://java.sun.com/xml/ns/wsit/2006/09/policy/soaptcp/service" xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
-
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  xmlns:wsp1="http://www.w3.org/ns/ws-policy"
+                  xmlns:fi="http://java.sun.com/xml/ns/wsit/2006/09/policy/fastinfoset/service"
+                  xmlns:tcp="http://java.sun.com/xml/ns/wsit/2006/09/policy/soaptcp/service"
+                  xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+                  targetNamespace="http://epsos.eu/">
 
     <wsdl:types>
         <xsd:schema targetNamespace="http://epsos.eu/Imports">
@@ -21,19 +24,19 @@
     <wsdl:message name="ISecurityTokenService_IssueToken_InputMessage">
         <wsdl:part name="rstMessage" type="q1:MessageBody"/>
     </wsdl:message>
+
     <wsdl:message name="ISecurityTokenService_IssueToken_OutputMessage">
         <wsdl:part name="IssueTokenResult" type="q2:MessageBody"/>
     </wsdl:message>
 
-
-
     <wsdl:portType name="ISecurityTokenService">
         <wsdl:operation name="IssueToken">
-            <wsdl:input wsap:Action="http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue" message="tns:ISecurityTokenService_IssueToken_InputMessage"/>
-            <wsdl:output wsap:Action="http://schemas.xmlsoap.org/ws/2005/02/trust/RSTR/Issue" message="tns:ISecurityTokenService_IssueToken_OutputMessage"/>
+            <wsdl:input wsap:Action="http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue"
+                        message="tns:ISecurityTokenService_IssueToken_InputMessage"/>
+            <wsdl:output wsap:Action="http://schemas.xmlsoap.org/ws/2005/02/trust/RSTR/Issue"
+                         message="tns:ISecurityTokenService_IssueToken_OutputMessage"/>
         </wsdl:operation>
     </wsdl:portType>
-
 
     <wsdl:binding name="ISecurityTokenService_Binding" type="tns:ISecurityTokenService">
         <wsp1:PolicyReference URI="#ISecurityTokenService_BindingPolicy"/>

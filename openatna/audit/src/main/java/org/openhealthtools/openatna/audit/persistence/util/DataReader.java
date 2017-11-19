@@ -1,25 +1,6 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
-
 package org.openhealthtools.openatna.audit.persistence.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.openhealthtools.openatna.anom.Timestamp;
 import org.openhealthtools.openatna.audit.AtnaFactory;
 import org.openhealthtools.openatna.audit.persistence.AtnaPersistenceException;
@@ -53,7 +34,7 @@ import java.util.*;
  */
 public class DataReader {
 
-    private Logger logger = LoggerFactory.getLogger(DataReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataReader.class);
 
     private Document doc;
 
@@ -71,15 +52,18 @@ public class DataReader {
     private Set<MessageEntity> messages = new HashSet<>();
 
     public DataReader(InputStream in) {
+
         try {
             doc = newDocument(in);
             in.close();
         } catch (IOException e) {
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
             throw new RuntimeException("Could not load data file");
         }
     }
 
     private static Document newDocument(InputStream stream) throws IOException {
+
         Document doc = null;
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -87,19 +71,21 @@ public class DataReader {
             DocumentBuilder db = dbf.newDocumentBuilder();
             doc = db.parse(stream);
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            LOGGER.error("ParserConfigurationException: '{}'", e.getMessage(), e);
         } catch (SAXException e) {
-            e.printStackTrace();
+            LOGGER.error("SAXException: '{}'", e.getMessage(), e);
         }
         return doc;
     }
 
     public void parse() throws AtnaPersistenceException {
+
         readDoc();
         load();
     }
 
     private void load() throws AtnaPersistenceException {
+
         PersistencePolicies pp = new PersistencePolicies();
         pp.setErrorOnDuplicateInsert(false);
         pp.setAllowNewCodes(true);
@@ -162,17 +148,16 @@ public class DataReader {
                 dao.save(e, pp);
             }
         }
-        if (messages.size() > 0) {
+        if (!messages.isEmpty()) {
             MessageDao dao = AtnaFactory.messageDao();
             for (MessageEntity e : messages) {
                 dao.save(e, pp);
             }
         }
-
-
     }
 
     private void readDoc() {
+
         Element el = doc.getDocumentElement();
         if (el.getLocalName().equals(DataConstants.ENTITIES)) {
             NodeList children = el.getChildNodes();
@@ -218,6 +203,7 @@ public class DataReader {
     }
 
     private void readCodes(Element codes) {
+
         NodeList children = codes.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node n = children.item(i);
@@ -234,6 +220,7 @@ public class DataReader {
     }
 
     private void readCodeTypes(Element code, String type) {
+
         NodeList children = code.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node n = children.item(i);
@@ -243,7 +230,6 @@ public class DataReader {
                 }
             }
         }
-
     }
 
     private void readCode(Element el, String type) {
@@ -265,7 +251,7 @@ public class DataReader {
         }
         String code = el.getAttribute(DataConstants.CODE);
         if (nill(code)) {
-            logger.info("no code defined in coded value. Not loading...");
+            LOGGER.info("no code defined in coded value. Not loading...");
             return;
         }
         entity.setCode(code);
@@ -277,20 +263,28 @@ public class DataReader {
         entity.setCodeSystemName(nill(name) ? null : name);
         entity.setDisplayName(nill(dis) ? null : dis);
         entity.setOriginalText(nill(orig) ? null : orig);
-        if (type.equals(DataConstants.CODE_EVENT_ID)) {
-            evtIds.put(code, entity);
-        } else if (type.equals(DataConstants.CODE_EVENT_TYPE)) {
-            evtTypes.put(code, entity);
-        } else if (type.equals(DataConstants.CODE_OBJ_ID_TYPE)) {
-            objTypes.put(code, entity);
-        } else if (type.equals(DataConstants.CODE_PARTICIPANT_TYPE)) {
-            partTypes.put(code, entity);
-        } else if (type.equals(DataConstants.CODE_SOURCE)) {
-            sourceTypes.put(code, entity);
+
+        switch (type) {
+            case DataConstants.CODE_EVENT_ID:
+                evtIds.put(code, entity);
+                break;
+            case DataConstants.CODE_EVENT_TYPE:
+                evtTypes.put(code, entity);
+                break;
+            case DataConstants.CODE_OBJ_ID_TYPE:
+                objTypes.put(code, entity);
+                break;
+            case DataConstants.CODE_PARTICIPANT_TYPE:
+                partTypes.put(code, entity);
+                break;
+            case DataConstants.CODE_SOURCE:
+                sourceTypes.put(code, entity);
+                break;
         }
     }
 
     private void readNaps(Element codes) {
+
         NodeList children = codes.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node n = children.item(i);
@@ -301,10 +295,11 @@ public class DataReader {
     }
 
     private void readNap(Element el) {
+
         String netId = el.getAttribute(DataConstants.NETWORK_ACCESS_POINT_ID);
         String type = el.getAttribute(DataConstants.TYPE);
         if (nill(netId) || nill(type)) {
-            logger.info("no identifier or type defined in network access point. Not loading...");
+            LOGGER.info("no identifier or type defined in network access point. Not loading...");
             return;
         }
         NetworkAccessPointEntity e = new NetworkAccessPointEntity();
@@ -314,6 +309,7 @@ public class DataReader {
     }
 
     private void readSources(Element codes) {
+
         NodeList children = codes.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node n = children.item(i);
@@ -324,9 +320,10 @@ public class DataReader {
     }
 
     private void readSource(Element el) {
+
         String sourceId = el.getAttribute(DataConstants.SOURCE_ID);
         if (nill(sourceId)) {
-            logger.info("No Source id set. Not loading...");
+            LOGGER.info("No Source id set. Not loading...");
             return;
         }
         String ent = el.getAttribute(DataConstants.ENT_SITE_ID);
@@ -352,6 +349,7 @@ public class DataReader {
     }
 
     private void readParts(Element codes) {
+
         NodeList children = codes.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node n = children.item(i);
@@ -362,9 +360,10 @@ public class DataReader {
     }
 
     private void readPart(Element el) {
+
         String partId = el.getAttribute(DataConstants.USER_ID);
         if (nill(partId)) {
-            logger.info("no active participant id defined. Not loading...");
+            LOGGER.info("no active participant id defined. Not loading...");
         }
         String name = el.getAttribute(DataConstants.USER_NAME);
         String alt = el.getAttribute(DataConstants.ALT_USER_ID);
@@ -391,6 +390,7 @@ public class DataReader {
     }
 
     private void readObjects(Element codes) {
+
         NodeList children = codes.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node n = children.item(i);
@@ -401,9 +401,10 @@ public class DataReader {
     }
 
     private void readObject(Element el) {
+
         String obId = el.getAttribute(DataConstants.OBJECT_ID);
         if (nill(obId)) {
-            logger.info("no participating object id defined. Not loading...");
+            LOGGER.info("no participating object id defined. Not loading...");
         }
         String name = el.getAttribute(DataConstants.OBJECT_NAME);
         String type = el.getAttribute(DataConstants.OBJECT_TYPE_CODE);
@@ -424,14 +425,14 @@ public class DataReader {
                 if (ele.getLocalName().equals(DataConstants.OBJECT_ID_TYPE)) {
                     String ref = ele.getAttribute(DataConstants.CODE);
                     if (nill(ref)) {
-                        logger.info("no object id type defined. Not loading...");
+                        LOGGER.info("no object id type defined. Not loading...");
                         return;
                     }
                     CodeEntity code = objTypes.get(ref);
                     if (code != null && code instanceof ObjectIdTypeCodeEntity) {
                         e.setObjectIdTypeCode((ObjectIdTypeCodeEntity) code);
                     } else {
-                        logger.info("no object id type defined. Not loading...");
+                        LOGGER.info("no object id type defined. Not loading...");
                         return;
                     }
                 } else if (ele.getLocalName().equals(DataConstants.OBJECT_DETAIL_KEY)) {
@@ -443,13 +444,14 @@ public class DataReader {
             }
         }
         if (e.getObjectIdTypeCode() == null) {
-            logger.info("no object id type defined. Not loading...");
+            LOGGER.info("no object id type defined. Not loading...");
             return;
         }
         objects.put(obId, e);
     }
 
     public void readMessage(Element el) {
+
         String action = el.getAttribute(DataConstants.EVT_ACTION);
         String outcome = el.getAttribute(DataConstants.EVT_OUTCOME);
         String time = el.getAttribute(DataConstants.EVT_TIME);
@@ -461,7 +463,7 @@ public class DataReader {
             ts = new Date();
         }
         if (nill(action) || nill(outcome)) {
-            logger.info("action or outcome of message is null. Not loading...");
+            LOGGER.info("action or outcome of message is null. Not loading...");
         }
         MessageEntity ent = new MessageEntity();
         ent.setEventActionCode(action);
@@ -475,14 +477,14 @@ public class DataReader {
                 if (ele.getLocalName().equals(DataConstants.EVT_ID)) {
                     String ref = ele.getAttribute(DataConstants.CODE);
                     if (nill(ref)) {
-                        logger.info("no event id type defined. Not loading...");
+                        LOGGER.info("no event id type defined. Not loading...");
                         return;
                     }
                     CodeEntity code = evtIds.get(ref);
                     if (code != null && code instanceof EventIdCodeEntity) {
                         ent.setEventId((EventIdCodeEntity) code);
                     } else {
-                        logger.info("no event id type defined. Not loading...");
+                        LOGGER.info("no event id type defined. Not loading...");
                         return;
                     }
                 } else if (ele.getLocalName().equals(DataConstants.EVT_TYPE)) {
@@ -534,7 +536,7 @@ public class DataReader {
                                 if (node instanceof Element) {
                                     Element child = (Element) node;
                                     boolean enc = child.getAttribute("encoded") != null
-                                            && child.getAttribute("encoded").equalsIgnoreCase("true");
+                                            && StringUtils.equalsIgnoreCase(child.getAttribute("encoded"), "true");
                                     if (child.getLocalName().equals(DataConstants.QUERY)) {
                                         String q = child.getTextContent();
                                         if (q != null) {
@@ -545,8 +547,8 @@ public class DataReader {
                                             try {
                                                 p.setObjectQuery(q.getBytes("UTF-8"));
                                             } catch (UnsupportedEncodingException e) {
-                                                e.printStackTrace();
                                                 // shouldn't happen
+                                                LOGGER.error("UnsupportedEncodingException: '{}'", e.getMessage(), e);
                                             }
                                         }
                                     } else if (child.getLocalName().equals(DataConstants.DETAIL)) {
@@ -563,8 +565,8 @@ public class DataReader {
                                                             = new ObjectDetailEntity(type, val.getBytes("UTF-8"));
                                                     p.addObjectDetail(ode);
                                                 } catch (UnsupportedEncodingException e) {
-                                                    e.printStackTrace();
                                                     // shouldn't happen
+                                                    LOGGER.error("UnsupportedEncodingException: '{}'", e.getMessage(), e);
                                                 }
                                             }
                                         }
@@ -577,12 +579,12 @@ public class DataReader {
                 }
             }
         }
-        if (ent.getMessageParticipants().size() == 0) {
-            logger.info("message has no participants. Not loading...");
+        if (ent.getMessageParticipants().isEmpty()) {
+            LOGGER.info("message has no participants. Not loading...");
             return;
         }
-        if (ent.getMessageSources().size() == 0) {
-            logger.info("message has no sources. Not loading...");
+        if (ent.getMessageSources().isEmpty()) {
+            LOGGER.info("message has no sources. Not loading...");
             return;
         }
         messages.add(ent);
@@ -597,9 +599,6 @@ public class DataReader {
     }
 
     private boolean nill(String val) {
-        if (val == null || val.trim().length() == 0) {
-            return true;
-        }
-        return false;
+        return val == null || val.trim().length() == 0;
     }
 }

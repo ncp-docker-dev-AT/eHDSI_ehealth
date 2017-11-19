@@ -50,7 +50,7 @@ import java.util.List;
 @SessionScoped
 public class MyBean implements Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger("MyBean");
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyBean.class);
     private static final long serialVersionUID = 1L;
     private List<Country> countries;
     private String selectedCountry;
@@ -99,10 +99,11 @@ public class MyBean implements Serializable {
     private String signedTRC;
 
     public MyBean() {
-        log.info("Initializing MyBean ...");
+
+        LOGGER.info("Initializing MyBean ...");
         checkButtonPermissions();
         String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH");
-        log.info("EPSOS PROPS PATH IS: '{}'", epsosPropsPath);
+        LOGGER.info("EPSOS PROPS PATH IS: '{}'", epsosPropsPath);
         if (!Validator.isNull(epsosPropsPath)) {
             try {
                 cdaStylesheet = EpsosHelperService
@@ -112,32 +113,26 @@ public class MyBean implements Serializable {
                 countries = new ArrayList<>();
                 identifiers = new ArrayList<>();
                 demographics = new ArrayList<>();
-                countries = EpsosHelperService.getCountriesFromCS(LiferayUtils
-                        .getPortalLanguage());
-                log.info("Countries found: '{}'", countries.size());
+                countries = EpsosHelperService.getCountriesFromCS(LiferayUtils.getPortalLanguage());
+                LOGGER.info("Countries found: '{}'", countries.size());
             } catch (Exception e) {
-                FacesContext.getCurrentInstance().addMessage(
-                        null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Error getting user", ""));
-                log.error("Error getting user");
-                log.error(ExceptionUtils.getStackTrace(e));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Error getting user", ""));
+                LOGGER.error("Error getting user");
+                LOGGER.error(ExceptionUtils.getStackTrace(e));
             }
         } else {
-            FacesContext.getCurrentInstance().addMessage(
-                    null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "EPSOS_PROPS_PATH not found", ""));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "EPSOS_PROPS_PATH not found", ""));
         }
     }
 
-    public void showPrescription(ActionEvent actionEvent)
-            throws SystemException {
-        RenderRequest renderRequest = (RenderRequest) (FacesContext
-                .getCurrentInstance().getExternalContext().getRequestMap()
-                .get("javax.portlet.request"));
+    public void showPrescription(ActionEvent actionEvent) throws SystemException {
+
+        RenderRequest renderRequest = (RenderRequest) (FacesContext.getCurrentInstance().getExternalContext()
+                .getRequestMap().get("javax.portlet.request"));
         String parameter = renderRequest.getParameter("productId");
-        log.info("PRODUCT ID: '{}'", parameter);
+        LOGGER.info("PRODUCT ID: '{}'", parameter);
     }
 
     public List<Country> getCountries() {
@@ -158,58 +153,43 @@ public class MyBean implements Serializable {
         LiferayUtils.storeToSession("user", user);
 
         this.selectedCountry = selectedCountry;
-        identifiers = EpsosHelperService.getCountryIdentifiers(
-                this.selectedCountry, LiferayUtils.getPortalLanguage(), null,
-                null);
-        demographics = EpsosHelperService.getCountryDemographics(
-                this.selectedCountry, LiferayUtils.getPortalLanguage(), null,
-                null);
-
+        identifiers = EpsosHelperService.getCountryIdentifiers(this.selectedCountry, LiferayUtils.getPortalLanguage(),
+                null, null);
+        demographics = EpsosHelperService.getCountryDemographics(this.selectedCountry, LiferayUtils.getPortalLanguage(),
+                null, null);
         showDemographics = !demographics.isEmpty();
         LiferayUtils.storeToSession("selectedCountry", selectedCountry);
-        //TODO: Call ConfigurationManager to request ISM fetch
-        //ConfigurationManagerFactory.getConfigurationManager().fetchInternationalSearchMask(selectedCountry);
         patients = new ArrayList<>();
     }
 
     public boolean getAssertionExists() {
-        if (trcassertionexists) {
-            return (true);
-        } else {
-            return (false);
-        }
+        return trcassertionexists;
     }
 
     public boolean getAssertionNotExists() {
-        if (!trcassertionexists) {
-            return (true);
-        } else {
-            return (false);
-        }
+        return !trcassertionexists;
     }
 
     public void searchPatientsRequest(ActionEvent event) {
         checkButtonPermissions();
-        log.info("searchPatientORequest ::: Selected country is : '{}'", selectedCountry);
+        LOGGER.info("searchPatientORequest ::: Selected country is : '{}'", selectedCountry);
         String country = (String) event.getComponent().getAttributes()
                 .get("selectedCountry");
-        identifiers = (List<Identifier>) event.getComponent().getAttributes()
-                .get("identifiers");
-        demographics = (List<Demographics>) event.getComponent()
-                .getAttributes().get("demographics");
+        identifiers = (List<Identifier>) event.getComponent().getAttributes().get("identifiers");
+        demographics = (List<Demographics>) event.getComponent().getAttributes().get("demographics");
         if (Validator.isNotNull(country)) {
             selectedCountry = country;
         }
-        log.info("searchPatientsRequest ::: Selected country is : '{}'", selectedCountry);
+        LOGGER.info("searchPatientsRequest ::: Selected country is : '{}'", selectedCountry);
         searchPatients();
     }
 
-    private void searchPatients(Assertion assertion, List<Identifier> id_,
-                                List<Demographics> dem_, String country) {
-        log.info("Search Patients selected country is: '{}'", country);
+    private void searchPatients(Assertion assertion, List<Identifier> id_, List<Demographics> dem_, String country) {
+
+        LOGGER.info("Search Patients selected country is: '{}'", country);
         String runningMode = MyServletContextListener.getRunningMode();
         String strMsg = "";
-        Assertion ass = null;
+        Assertion ass;
         if (StringUtils.equals(runningMode, "demo")) {
             patients = EpsosHelperService.getMockPatients();
             trcAssertion = null;
@@ -222,54 +202,20 @@ public class MyBean implements Serializable {
                 trcassertionnotexists = true;
                 trcassertionexists = false;
                 patients = new ArrayList<>();
-                String serviceUrl = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-                log.info("CONNECTOR URL IS: '{}'", serviceUrl);
+                String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
+                LOGGER.info("CONNECTOR URL IS: '{}'", serviceUrl);
 
-                PatientDemographics pd = EpsosHelperService
-                        .createPatientDemographicsForQuery(id_, dem_);
-
-                ClientConnectorConsumer proxy = MyServletContextListener
-                        .getClientConnectorConsumer();// new
-                // ClientConnectorConsumer(serviceUrl);
-                log.info("Test Assertions: "
-                        + EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS));
+                PatientDemographics pd = EpsosHelperService.createPatientDemographicsForQuery(id_, dem_);
+                ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
+                LOGGER.info("Test Assertions: " + EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS));
                 ass = assertion;
 
-                log.info("Searching for patients in '{}'", country);
-                log.info("Assertion id: '{}'", ass.getID());
-                log.info("PD: '{}'", pd.toString());
+                LOGGER.info("Searching for patients in '{}'", country);
+                LOGGER.info("Assertion id: '{}'", ass.getID());
+                LOGGER.info("PD: '{}'", pd.toString());
                 strMsg = pd.toString();
 
-//				try {
-//                                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//                                    factory.setNamespaceAware(true);
-//                                    DocumentBuilder builder = factory.newDocumentBuilder();
-//                                    Document doc = builder.parse(new InputSource(new StringReader(strMsg)));
-//                                    EvidenceUtils.createEvidenceREMNRO(doc, "NI_PD",
-//							new DateTime(), EventOutcomeIndicator.FULL_SUCCESS
-//									.getCode().toString(), "NI_PD_REQ", ass
-//									.getID());
-//				} catch (Exception e) {
-//					log.error(ExceptionUtils.getStackTrace(e));
-//				}
-
-                List<PatientDemographics> queryPatient = proxy.queryPatient(
-                        ass, country, pd);
-
-//				try {
-//                                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//                                    factory.setNamespaceAware(true);
-//                                    DocumentBuilder builder = factory.newDocumentBuilder();
-//                                    Document doc = builder.parse(new InputSource(new StringReader(queryPatient.toString())));
-//                                    EvidenceUtils.createEvidenceREMNRR(doc, "NI_PD",
-//							new DateTime(), EventOutcomeIndicator.FULL_SUCCESS
-//									.getCode().toString(), "NI_PD_RES_SUCC",
-//							ass.getID());
-//				} catch (Exception e) {
-//					log.error(ExceptionUtils.getStackTrace(e));
-//				}
+                List<PatientDemographics> queryPatient = proxy.queryPatient(ass, country, pd);
 
                 for (PatientDemographics aux : queryPatient) {
                     Patient patient = EpsosHelperService.populatePatient(aux);
@@ -280,30 +226,20 @@ public class MyBean implements Serializable {
                     queryPatientsException = LiferayUtils
                             .getPortalTranslation("patient.list.no.patient");
                 }
-                log.info("Found " + patients.size() + " patients");
+                LOGGER.info("Found '{}' patients", patients.size());
                 showPatientList = true;
             } catch (Exception ex) {
 
-//				try {
-//					EvidenceUtils.createEvidenceREMNRR(strMsg, "NI_PD",
-//							new DateTime(),
-//							EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
-//									.toString(), "NI_PD_RES_FAIL", ass.getID());
-//				} catch (Exception e) {
-//					log.error(ExceptionUtils.getStackTrace(e));
-//				}
-
-                log.error(ExceptionUtils.getStackTrace(ex));
+                LOGGER.error(ExceptionUtils.getStackTrace(ex));
                 patients = new ArrayList<>();
                 showPatientList = true;
-                queryPatientsException = LiferayUtils.getPortalTranslation(ex
-                        .getMessage());
+                queryPatientsException = LiferayUtils.getPortalTranslation(ex.getMessage());
             }
         }
     }
 
     public void searchPatients() {
-        log.info("Searching for patients (creating assertions)...");
+        LOGGER.info("Searching for patients (creating assertions)...");
         Object obj = EpsosHelperService.getUserAssertion();
         if (obj instanceof Assertion) {
             hcpAssertion = (Assertion) obj;
@@ -314,8 +250,7 @@ public class MyBean implements Serializable {
                             obj.toString()));
             errorUserAssertion = (String) obj;
         }
-        log.info("Searching for patients (deomgraphics) " + demographics.size()
-                + " (Identifiers) + " + identifiers.size());
+        LOGGER.info("Searching for patients (deomgraphics) '{}' (Identifiers) '{}'", demographics.size(), identifiers.size());
         searchPatients(hcpAssertion, identifiers, demographics, selectedCountry);
     }
 
@@ -446,14 +381,14 @@ public class MyBean implements Serializable {
             FacesContext.getCurrentInstance().getExternalContext().redirect(
                     "/view1.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal");
         } catch (IOException e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
     public boolean getShowConsent() {
-        log.debug("### GET SHOW CONSENT ###");
-        log.debug("trcassertionexists: " + trcassertionexists);
-        log.debug("consentExists: " + consentExists);
+        LOGGER.debug("### GET SHOW CONSENT ###");
+        LOGGER.debug("trcassertionexists: '{}'", trcassertionexists);
+        LOGGER.debug("consentExists: '{}'", consentExists);
         if (!trcassertionexists) {
             return false;
         }
@@ -466,9 +401,9 @@ public class MyBean implements Serializable {
     }
 
     public boolean getShowConfirmation() {
-        log.debug("### GET SHOW CONFIRMATION ###");
-        log.debug("trcassertionexists: " + trcassertionexists);
-        log.debug("consentExists: " + consentExists);
+        LOGGER.debug("### GET SHOW CONFIRMATION ###");
+        LOGGER.debug("trcassertionexists: '{}'", trcassertionexists);
+        LOGGER.debug("consentExists: '{}'", consentExists);
         return !trcassertionexists;
     }
 
@@ -481,93 +416,52 @@ public class MyBean implements Serializable {
     }
 
     public void getMRODocs() throws ConsentException {
+
         consentExists = true;
         trcassertionexists = true;
         PatientId patientId = null;
         try {
-            patientDocuments = new ArrayList<PatientDocument>();
-            String serviceUrl = EpsosHelperService
-                    .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL); // serviceUrl
-            // =
-            // LiferayUtils.getFromPrefs("client_connector_url");
-            log.info("CLIENTCONNECTOR: " + serviceUrl);
-            ClientConnectorConsumer clientConectorConsumer = MyServletContextListener
-                    .getClientConnectorConsumer();
+            patientDocuments = new ArrayList<>();
+            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
+
+            LOGGER.info("CLIENTCONNECTOR: '{}'", serviceUrl);
+            ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
 
             patientId = PatientId.Factory.newInstance();
             patientId.setExtension(selectedPatient.getExtension());
             patientId.setRoot(selectedPatient.getRoot());
-            GenericDocumentCode classCode = GenericDocumentCode.Factory
-                    .newInstance();
+            GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
             classCode.setNodeRepresentation(Constants.MRO_CLASSCODE);
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.MRO_TITLE); // Patient
             // Summary
             // ClassCode.
 
-//			try {
-//				EvidenceUtils
-//						.createEvidenceREMNRO(patientId.toString(),
-//								"NI_DQ_MRO", new DateTime(),
-//								EventOutcomeIndicator.FULL_SUCCESS.getCode()
-//										.toString(), "NI_DQ_MRO_REQ",
-//								trcAssertion.getID());
-//			} catch (Exception e) {
-//				log.error(ExceptionUtils.getStackTrace(e));
-//			}
-
-            log.info("MRO QUERY: Getting mro documents for : "
-                    + patientId.getExtension() + " from " + selectedCountry);
-            List<EpsosDocument1> queryDocuments = clientConectorConsumer
-                    .queryDocuments(hcpAssertion, trcAssertion,
-                            selectedCountry, patientId, classCode);
-            log.info("MRO QUERY: Found " + queryDocuments.size() + " for : "
-                    + patientId.getExtension() + " from " + selectedCountry);
-
-//			try {
-//				EvidenceUtils
-//						.createEvidenceREMNRR(patientId.toString(),
-//								"NI_DQ_MRO", new DateTime(),
-//								EventOutcomeIndicator.FULL_SUCCESS.getCode()
-//										.toString(), "NI_DQ_MRO_RES_SUCC",
-//								trcAssertion.getID());
-//			} catch (Exception e) {
-//				log.error(ExceptionUtils.getStackTrace(e));
-//			}
+            LOGGER.info("MRO QUERY: Getting mro documents for : " + patientId.getExtension() + " from " + selectedCountry);
+            List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion, selectedCountry, patientId, classCode);
+            LOGGER.info("MRO QUERY: Found " + queryDocuments.size() + " for : " + patientId.getExtension() + " from " + selectedCountry);
 
             showMRO = true;
             consentExists = true;
             for (EpsosDocument1 aux : queryDocuments) {
-                PatientDocument document = EpsosHelperService.populateDocument(
-                        aux, "mro");
+                PatientDocument document = EpsosHelperService.populateDocument(aux, "mro");
                 patientDocuments.add(document);
             }
-            queryDocumentsException = LiferayUtils
-                    .getPortalTranslation("report.list.no.document");
-            log.debug("Selected Country: "
-                    + LiferayUtils.getFromSession("selectedCountry"));
+            queryDocumentsException = LiferayUtils.getPortalTranslation("report.list.no.document");
+            LOGGER.debug("Selected Country: " + LiferayUtils.getFromSession("selectedCountry"));
         } catch (Exception ex) {
-//			try {
-//				EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
-//						"NI_DQ_MRO", new DateTime(),
-//						EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
-//								.toString(), "NI_DQ_MRO_RES_FAIL", trcAssertion
-//								.getID());
-//			} catch (Exception e) {
-//				log.error(ExceptionUtils.getStackTrace(e));
-//			}
+
             consentExists = true;
-            log.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
             FacesContext.getCurrentInstance().addMessage(
                     null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "DOCUMENT QUERY", LiferayUtils
                             .getPortalTranslation(ex.getMessage())));
-            log.error("MRO QUERY: Error getting ps documents for : "
-                    + patientId.getExtension() + " from " + selectedCountry
-                    + " - " + ex.getMessage());
-            queryDocumentsException = LiferayUtils.getPortalTranslation(ex
-                    .getMessage());
+            if (patientId != null) {
+                LOGGER.error("MRO QUERY: Error getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry + " - " + ex.getMessage());
+            }
+            queryDocumentsException = LiferayUtils.getPortalTranslation(ex.getMessage());
 
             if (ex.getMessage().contains("4701")) {
                 consentExists = false;
@@ -600,40 +494,19 @@ public class MyBean implements Serializable {
                 classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
                 classCode.setValue(Constants.PS_TITLE);
 
-                log.info("PS QUERY: Getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry);
-                log.info("HCP ASSERTION IS : " + hcpAssertion.getID());
-                log.info("TRCA ASSERTION IS : " + trcAssertion.getID());
-                log.info("selectedCountry : " + selectedCountry);
-                log.info("patientId: " + patientId);
-                log.info("classCode: " + classCode);
-
-                // NRO
-//				try {
-//					EvidenceUtils.createEvidenceREMNRO(patientId.toString(),
-//							"NI_DQ_PS", new DateTime(),
-//							EventOutcomeIndicator.FULL_SUCCESS.getCode()
-//									.toString(), "NI_DQ_PS_REQ", trcAssertion
-//									.getID());
-//				} catch (Exception e) {
-//					log.error(ExceptionUtils.getStackTrace(e));
-//				}
+                LOGGER.info("PS QUERY: Getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry);
+                LOGGER.info("HCP ASSERTION IS : " + hcpAssertion.getID());
+                LOGGER.info("TRCA ASSERTION IS : " + trcAssertion.getID());
+                LOGGER.info("selectedCountry : " + selectedCountry);
+                LOGGER.info("patientId: " + patientId);
+                LOGGER.info("classCode: " + classCode);
 
                 List<EpsosDocument1> queryDocuments = clientConectorConsumer
                         .queryDocuments(hcpAssertion, trcAssertion,
                                 selectedCountry, patientId, classCode);
 
-                log.info("PS QUERY: Found " + queryDocuments.size() + " for : "
+                LOGGER.info("PS QUERY: Found " + queryDocuments.size() + " for : "
                         + patientId.getExtension() + " from " + selectedCountry);
-
-//				try {
-//					EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
-//							"NI_DQ_PS", new DateTime(),
-//							EventOutcomeIndicator.FULL_SUCCESS.getCode()
-//									.toString(), "NI_DQ_PS_RES_SUCC",
-//							trcAssertion.getID());
-//				} catch (Exception e) {
-//					log.error(ExceptionUtils.getStackTrace(e));
-//				}
 
                 showPS = true;
                 consentExists = true;
@@ -644,21 +517,12 @@ public class MyBean implements Serializable {
                 }
                 queryDocumentsException = LiferayUtils
                         .getPortalTranslation("report.list.no.document");
-                log.debug("Selected Country: "
+                LOGGER.debug("Selected Country: "
                         + LiferayUtils.getFromSession("selectedCountry"));
             } catch (Exception ex) {
-//				try {
-//					EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
-//							"NI_DQ_PS", new DateTime(),
-//							EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
-//									.toString(), "NI_DQ_PS_RES_FAIL",
-//							trcAssertion.getID());
-//				} catch (Exception e) {
-//					log.error(ExceptionUtils.getStackTrace(e));
-//				}
 
                 consentExists = true;
-                log.error(ExceptionUtils.getStackTrace(ex));
+                LOGGER.error(ExceptionUtils.getStackTrace(ex));
                 FacesContext.getCurrentInstance()
                         .addMessage(
                                 null,
@@ -666,9 +530,11 @@ public class MyBean implements Serializable {
                                         "DOCUMENT QUERY", LiferayUtils
                                         .getPortalTranslation(ex
                                                 .getMessage())));
-                log.error("PS QUERY: Error getting ps documents for : "
-                        + patientId.getExtension() + " from " + selectedCountry
-                        + " - " + ex.getMessage());
+                if (patientId != null) {
+                    LOGGER.error("PS QUERY: Error getting ps documents for : "
+                            + patientId.getExtension() + " from " + selectedCountry
+                            + " - " + ex.getMessage());
+                }
                 queryDocumentsException = LiferayUtils.getPortalTranslation(ex
                         .getMessage());
                 if (ex.getMessage().contains("4701")) {
@@ -681,7 +547,7 @@ public class MyBean implements Serializable {
 
     private void createTRCA(String docType, String purposeOfUse) {
 
-        log.info("Creating TRCAssertion for '{}' request and Purpose of Use: '{}'", docType, purposeOfUse);
+        LOGGER.info("Creating TRCAssertion for '{}' request and Purpose of Use: '{}'", docType, purposeOfUse);
         String runningMode = MyServletContextListener.getRunningMode();
 
         if (StringUtils.equals(docType, "ps")) {
@@ -690,7 +556,7 @@ public class MyBean implements Serializable {
         if (StringUtils.equals(docType, "ep")) {
             showEP = false;
         }
-        log.info("signedTRC: '{}'", getSignedTRC());
+        LOGGER.info("signedTRC: '{}'", getSignedTRC());
 
         PatientId patientId = null;
         try {
@@ -698,15 +564,15 @@ public class MyBean implements Serializable {
             patientId.setExtension(selectedPatient.getExtension());
             patientId.setRoot(selectedPatient.getRoot());
             this.purposeOfUse = purposeOfUse;
-            log.info("TRCA: Creating trca for hcpAssertion : "
+            LOGGER.info("TRCA: Creating trca for hcpAssertion : "
                     + hcpAssertion.getID() + " for patient "
                     + patientId.getRoot() + ". Purpose of use is : "
                     + purposeOfUse);
             if (runningMode.equals("demo")) {
-                log.info("demo running so trca not created");
+                LOGGER.info("demo running so trca not created");
             } else if (getSignedTRC() == null) {
                 trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, hcpAssertion, patientId);
-                log.info("TRCA: Created " + trcAssertion.getID() + " for : "
+                LOGGER.info("TRCA: Created " + trcAssertion.getID() + " for : "
                         + hcpAssertion.getID() + " for patient "
                         + patientId.getRoot() + "_" + patientId.getExtension()
                         + ". Purpose of use is : " + purposeOfUse);
@@ -742,10 +608,12 @@ public class MyBean implements Serializable {
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "TRCA ERROR", LiferayUtils.getPortalTranslation(e.getMessage())));
-            log.error("TRCA: Error creating trca for patient: '{}' with hcpAssetion: '{}'. " +
-                            "Purpose of use is: '{} - '{}", patientId.getExtension(), hcpAssertion.getID(), purposeOfUse,
-                    e.getMessage(), e);
-            log.error(ExceptionUtils.getStackTrace(e));
+            if (patientId != null) {
+                LOGGER.error("TRCA: Error creating trca for patient: '{}' with hcpAssetion: '{}'. " +
+                                "Purpose of use is: '{} - '{}", patientId.getExtension(), hcpAssertion.getID(), purposeOfUse,
+                        e.getMessage(), e);
+            }
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
             trcassertionexists = false;
             trcassertionnotexists = true;
             queryDocumentsException = LiferayUtils.getPortalTranslation(e.getMessage());
@@ -764,9 +632,9 @@ public class MyBean implements Serializable {
         String consentCode = "";
         String consentDisplayName = "";
 
-        log.info("Consent Start Date: " + consentStartDate);
-        log.info("Consent End Date: " + consentEndDate);
-        log.info("Consent Opt: " + consentOpt);
+        LOGGER.info("Consent Start Date: " + consentStartDate);
+        LOGGER.info("Consent End Date: " + consentEndDate);
+        LOGGER.info("Consent Opt: " + consentOpt);
 
         String consentStartDateStr = new SimpleDateFormat("yyyyMMdd")
                 .format(consentStartDate);
@@ -797,11 +665,11 @@ public class MyBean implements Serializable {
             // showPS=true;
             // showEP=true;
         } catch (Exception e) {
-            log.error("CONSENT: Error submitting consent for patient : "
+            LOGGER.error("CONSENT: Error submitting consent for patient : "
                     + patient.getRoot() + " with hcpAssetion : "
                     + hcpAssertion.getID() + " - " + e.getMessage());
-            log.error(ExceptionUtils.getStackTrace(e));
-            log.error(null, resp);
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(null, resp);
             FacesContext.getCurrentInstance().addMessage(
                     null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
@@ -845,27 +713,20 @@ public class MyBean implements Serializable {
     }
 
     private SubmitDocumentResponse submitConsent(String xml) {
-        String serviceUrl = EpsosHelperService
-                .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-        serviceUrl = EpsosHelperService
-                .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
 
-        // serviceUrl = LiferayUtils.getFromPrefs("client_connector_url");
-        ClientConnectorConsumer proxy = MyServletContextListener
-                .getClientConnectorConsumer();
+        String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
+        serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
 
-        GenericDocumentCode classCode = GenericDocumentCode.Factory
-                .newInstance();
+        ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
+
+        GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
         classCode.setNodeRepresentation(Constants.CONSENT_CLASSCODE);
         classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
         classCode.setValue(Constants.CONSENT_TITLE);
 
-        GenericDocumentCode formatCode = GenericDocumentCode.Factory
-                .newInstance();
-
+        GenericDocumentCode formatCode = GenericDocumentCode.Factory.newInstance();
         formatCode.setSchema(IheConstants.CONSENT_FORMATCODE_CODINGSCHEMA);
-        formatCode
-                .setNodeRepresentation(IheConstants.CONSENT_FORMATCODE_NODEREPRESENTATION);
+        formatCode.setNodeRepresentation(IheConstants.CONSENT_FORMATCODE_NODEREPRESENTATION);
         formatCode.setValue(IheConstants.CONSENT_FORMATCODE_DISPLAYNAME);
 
         EpsosDocument1 document = EpsosDocument1.Factory.newInstance();
@@ -901,10 +762,8 @@ public class MyBean implements Serializable {
         PatientId patientId = null;
         try {
             patientPrescriptions = new ArrayList<>();
-            String serviceUrl = EpsosHelperService
-                    .getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-            ClientConnectorConsumer clientConectorConsumer = MyServletContextListener
-                    .getClientConnectorConsumer();
+            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
+            ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
 
             patientId = PatientId.Factory.newInstance();
             patientId.setExtension(selectedPatient.getExtension());
@@ -916,34 +775,12 @@ public class MyBean implements Serializable {
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.EP_TITLE); // EP
 
-//			try {
-//				EvidenceUtils
-//						.createEvidenceREMNRO(patientId.toString(), "NI_DQ_EP",
-//								new DateTime(),
-//								EventOutcomeIndicator.FULL_SUCCESS.getCode()
-//										.toString(), "NI_DQ_EP_REQ",
-//								trcAssertion.getID());
-//			} catch (Exception e) {
-//				log.error(ExceptionUtils.getStackTrace(e));
-//			}
-
-            log.info("EP QUERY: Getting ePrescription documents for: {} from {}.", patientId.getExtension(), selectedCountry);
+            LOGGER.info("EP QUERY: Getting ePrescription documents for: {} from {}.", patientId.getExtension(), selectedCountry);
             List<EpsosDocument1> queryDocuments = clientConectorConsumer
                     .queryDocuments(hcpAssertion, trcAssertion,
                             selectedCountry, patientId, classCode);
 
-//			try {
-//				EvidenceUtils
-//						.createEvidenceREMNRR(patientId.toString(), "NI_DQ_EP",
-//								new DateTime(),
-//								EventOutcomeIndicator.FULL_SUCCESS.getCode()
-//										.toString(), "NI_DQ_EP_RES_SUCC",
-//								trcAssertion.getID());
-//			} catch (Exception e) {
-//				log.error(ExceptionUtils.getStackTrace(e));
-//			}
-
-            log.info("EP QUERY: Found " + queryDocuments.size() + " for : "
+            LOGGER.info("EP QUERY: Found " + queryDocuments.size() + " for : "
                     + patientId.getExtension() + " from " + selectedCountry);
             showEP = true;
             for (EpsosDocument1 aux : queryDocuments) {
@@ -953,17 +790,8 @@ public class MyBean implements Serializable {
             }
             queryPrescriptionsException = LiferayUtils.getPortalTranslation(
                     "document.empty.list", FacesService.getPortalLanguage());
-            log.info("Documents are " + queryDocuments.size());
+            LOGGER.info("Documents are " + queryDocuments.size());
         } catch (Exception ex) {
-//			try {
-//				EvidenceUtils.createEvidenceREMNRR(patientId.toString(),
-//						"NI_DQ_EP", new DateTime(),
-//						EventOutcomeIndicator.TEMPORAL_FAILURE.getCode()
-//								.toString(), "NI_DQ_EP_RES_FAIL", trcAssertion
-//								.getID());
-//			} catch (Exception e) {
-//				log.error(ExceptionUtils.getStackTrace(e));
-//			}
 
             FacesContext.getCurrentInstance().addMessage(
                     null,
@@ -971,10 +799,12 @@ public class MyBean implements Serializable {
                             "QUERY DOCUMENTS", LiferayUtils
                             .getPortalTranslation(ex.getMessage(),
                                     FacesService.getPortalLanguage())));
-            log.error("EP QUERY: Error getting ep documents for : "
-                    + patientId.getExtension() + " from " + selectedCountry
-                    + " - " + ex.getMessage());
-            log.error(ExceptionUtils.getStackTrace(ex));
+            if (patientId != null) {
+                LOGGER.error("EP QUERY: Error getting ep documents for : "
+                        + patientId.getExtension() + " from " + selectedCountry
+                        + " - " + ex.getMessage());
+            }
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
             queryPrescriptionsException = LiferayUtils.getPortalTranslation(
                     ex.getMessage(), FacesService.getPortalLanguage());
             if (ex.getMessage().contains("4701")) {
@@ -1151,7 +981,7 @@ public class MyBean implements Serializable {
 
     public String submitConfirmation() {
         createTRCA("generic", purposeOfUse);
-        log.info("### Selected patient: " + selectedPatient.getFamilyName());
+        LOGGER.info("### Selected patient: " + selectedPatient.getFamilyName());
         ExternalContext ec = FacesContext.getCurrentInstance()
                 .getExternalContext();
         ec.getRequestMap().put("trcAssertion", trcAssertion);
@@ -1300,8 +1130,8 @@ public class MyBean implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                log.error("Error getting property for can convert to ccd");
-                log.error(ExceptionUtils.getStackTrace(e));
+                LOGGER.error("Error getting property for can convert to ccd");
+                LOGGER.error(ExceptionUtils.getStackTrace(e));
             }
         }
     }
@@ -1344,7 +1174,7 @@ public class MyBean implements Serializable {
 
     public void setSignedTRC(String signedTRC) throws Exception {
 
-        log.info("signedTRC: '{}'", signedTRC);
+        LOGGER.info("signedTRC: '{}'", signedTRC);
         if (signedTRC != null && !signedTRC.isEmpty()) {
             // Initialize the library
             DefaultBootstrap.bootstrap();
@@ -1365,7 +1195,7 @@ public class MyBean implements Serializable {
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
             trcAssertion = (Assertion) unmarshaller.unmarshall(metadataRoot);
 
-            log.info("TRCA '{}' with ID: '{}'", trcAssertion, trcAssertion.getID());
+            LOGGER.info("TRCA '{}' with ID: '{}'", trcAssertion, trcAssertion.getID());
             LiferayUtils.storeToSession("trcAssertion", trcAssertion);
             this.signedTRC = signedTRC;
         }

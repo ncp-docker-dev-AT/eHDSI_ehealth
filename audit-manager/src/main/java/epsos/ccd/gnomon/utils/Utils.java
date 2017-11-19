@@ -31,6 +31,7 @@ public class Utils {
     }
 
     public synchronized static String getProperty(String key, String defaultValue, boolean persistIfNotFound) {
+
         try {
             String value = ConfigurationManagerFactory.getConfigurationManager().getProperty(key);
             if (isEmpty(value)) {
@@ -39,7 +40,6 @@ public class Utils {
                     ConfigurationManagerFactory.getConfigurationManager().setProperty(key, value);
                 }
             }
-
             return value;
         } catch (Exception e) {
             LOGGER.error("Error occurred while fetching property: '{}'", e.getMessage(), e);
@@ -48,17 +48,12 @@ public class Utils {
     }
 
     public synchronized static void writeXMLToFile(String am, String path) {
-        BufferedWriter out = null;
-        FileWriter fstream = null;
-        try {
-            fstream = new FileWriter(path);
-            out = new BufferedWriter(fstream);
+
+        LOGGER.debug("method writeXMLToFile({})", path);
+        try (FileWriter writer = new FileWriter(path); BufferedWriter out = new BufferedWriter(writer)) {
             out.write(am);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
-        } finally {
-            Utils.close(out);
-            Utils.close(fstream);
         }
     }
 
@@ -70,6 +65,7 @@ public class Utils {
      * @return org.w3c.dom.Document
      */
     public static Document createDomFromString(String inputFile) {
+
         Document doc = null;
         // Instantiate the document to be signed
         try {
@@ -118,6 +114,7 @@ public class Utils {
      * @return
      */
     public static String convertStreamToString(InputStream is) {
+
         StringBuilder sb = new StringBuilder();
         try {
             String line;
@@ -146,6 +143,7 @@ public class Utils {
      * @return the input stream
      */
     public static InputStream StringToStream(String text) {
+
         InputStream is = null;
         try {
             is = new ByteArrayInputStream(text.getBytes());
@@ -167,25 +165,22 @@ public class Utils {
      * @throws IOException , if the Streams couldn't be created.
      **/
     public static InputStream fullStream(String fname) throws IOException {
-        DataInputStream dis = null;
-        FileInputStream fis = null;
+
         ByteArrayInputStream bais = null;
 
-        try {
-            fis = new FileInputStream(fname);
-            dis = new DataInputStream(fis);
+        try (FileInputStream fis = new FileInputStream(fname); DataInputStream dis = new DataInputStream(fis)) {
+
             byte[] bytes = new byte[dis.available()];
             dis.readFully(bytes);
             bais = new ByteArrayInputStream(bytes);
             return bais;
         } finally {
             close(bais);
-            close(dis);
-            close(fis);
         }
     }
 
     public static void close(Closeable closeable) {
+
         try {
             if (closeable != null)
                 closeable.close();
@@ -203,6 +198,7 @@ public class Utils {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
             LOGGER.error("Sleep interrupted: '{}'", e.getMessage(), e);
+            Thread.currentThread().interrupt();
         }
     }
 }

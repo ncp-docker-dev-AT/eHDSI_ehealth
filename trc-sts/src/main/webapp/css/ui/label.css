@@ -1,0 +1,27 @@
+/* 
+-----------------------------------
+	LABEL
+-----------------------------------
+*/
+
+.label:empty {
+	width:10px;
+	height:10px;
+	display:inline-block;
+	padding:0;
+}
+
+.label.label-circle {
+	border-radius:50px;
+}
+
+.label.label-block {
+	display:block;
+	line-height:34px;
+	min-width:34px;
+	padding:0;
+}
+
+.label.label-orange {
+	background-color:#E86A2E;
+}

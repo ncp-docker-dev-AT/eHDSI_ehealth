@@ -44,169 +44,154 @@ public class FacesService {
     public static final int URL_MODE_ACTION = 1;
     public static final int URL_MODE_RESOURCE = 2;
     public static final String BUNDLE_LOCATION = "content.Language";
-    private static final Logger log = LoggerFactory.getLogger("FacesService");
+    private static final Logger LOGGER = LoggerFactory.getLogger(FacesService.class);
 
     public static PortletRequest getPortletRequest() {
+
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
-        PortletRequest portletRequest = (PortletRequest) externalContext
-                .getRequest();
-        return portletRequest;
+        return (PortletRequest) externalContext.getRequest();
     }
 
     /**
      * @return
      */
     public static PortletResponse getPortletResponse() {
-        log.info("getPortletResponse");
+
+        LOGGER.info("getPortletResponse");
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
 
-        log.info("externalContext ?  " + (externalContext != null));
+        if (externalContext != null) {
+            LOGGER.info("externalContext ?  '{}'", externalContext.getContextName());
 
-        Object xyz = externalContext.getResponse();
-        log.info("xyz ?  " + (xyz != null));
-
-        log.info("**!@!! " + xyz + ", " + xyz.getClass().getName());
-
-        PortletResponse response = (PortletResponse) externalContext.getResponse();
-
-        return response;
+            Object xyz = externalContext.getResponse();
+            if (xyz != null) {
+                LOGGER.info("**!@!! '{}', '{}'", xyz, xyz.getClass().getName());
+            }
+            return (PortletResponse) externalContext.getResponse();
+        }
+        return null;
     }
 
     public static HttpServletRequest getHttpServletRequest() {
+
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
-        PortletRequest portletRequest = (PortletRequest) externalContext
-                .getRequest();
+        PortletRequest portletRequest = (PortletRequest) externalContext.getRequest();
         return PortalUtil.getHttpServletRequest(portletRequest);
     }
 
     public static void storeToSession(String param, Object value) {
+
         try {
-            log.info("Try to store to session the parameter : " + param + " with value : " + value);
+            LOGGER.info("Try to store to session the parameter: '{}' with value: '{}'", param, value);
             FacesContext facesContext = FacesContext.getCurrentInstance();
             ExternalContext externalContext = facesContext.getExternalContext();
-            PortletRequest portletRequest = (PortletRequest) externalContext
-                    .getRequest();
+            PortletRequest portletRequest = (PortletRequest) externalContext.getRequest();
             HttpServletRequest req = PortalUtil.getHttpServletRequest(portletRequest);
             HttpSession session = req.getSession();
             session.setAttribute(param, value);
         } catch (Exception e) {
-            log.error("ERROR: While trying to store to session the parameter : " + param + " with value : " + value + ": " + e.getMessage());
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("ERROR: While trying to store to session the parameter : " + param + " with value : " + value + ": " + e.getMessage());
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
     public static Object getFromSession(String param) {
+
         Object ret = null;
         try {
-            log.info("Try to get from session the parameter : " + param);
+            LOGGER.info("Try to get from session the parameter: '{}'", param);
             FacesContext facesContext = FacesContext.getCurrentInstance();
             ExternalContext externalContext = facesContext.getExternalContext();
-            PortletRequest portletRequest = (PortletRequest) externalContext
-                    .getRequest();
+            PortletRequest portletRequest = (PortletRequest) externalContext.getRequest();
             HttpServletRequest req = PortalUtil.getHttpServletRequest(portletRequest);
             HttpSession session = req.getSession();
             ret = session.getAttribute(param);
         } catch (Exception e) {
-            log.error("ERROR: While trying to get from session the parameter : " + param + ": " + e.getMessage());
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("ERROR: While trying to get from session the parameter : " + param + ": " + e.getMessage());
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return ret;
     }
 
     public static boolean userHasRole(long userId, long companyId, String rolename) {
+
         boolean hasRole = false;
         try {
             hasRole = RoleLocalServiceUtil.hasUserRole(userId, companyId, rolename, false);
-            if (hasRole)
-                log.info("User has role: " + rolename);
-        } catch (PortalException e) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e));
-        } catch (SystemException e) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e));
+            if (hasRole) {
+                LOGGER.info("User has role: '{}'", rolename);
+            }
+        } catch (PortalException | SystemException e) {
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return hasRole;
     }
 
     public static DateFormat getPortalUserDateFormat() {
-        User user = null;
+
+        User user;
         DateFormat df = null;
         PortletRequest portletRequest = getPortletRequest();
         try {
             user = PortalUtil.getUser(portletRequest);
             df = DateFormat.getDateInstance(SimpleDateFormat.LONG, user.getLocale());
-        } catch (PortalException e1) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e1));
-        } catch (SystemException e1) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e1));
+        } catch (PortalException | SystemException e1) {
+            LOGGER.error(ExceptionUtils.getStackTrace(e1));
         }
         return df;
     }
 
     public static ExternalContext getContext() {
+
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        ExternalContext externalContext = facesContext.getExternalContext();
-        return externalContext;
+        return facesContext.getExternalContext();
     }
 
     public static User getPortalUser() {
+
         User user = null;
         PortletRequest portletRequest = getPortletRequest();
         try {
             user = PortalUtil.getUser(portletRequest);
-        } catch (PortalException e1) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e1));
-        } catch (SystemException e1) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e1));
+        } catch (PortalException | SystemException e1) {
+            LOGGER.error(ExceptionUtils.getStackTrace(e1));
         }
         return user;
     }
 
     public static Company getPortalCompany() {
+
         Company company = null;
         PortletRequest portletRequest = getPortletRequest();
         try {
             company = PortalUtil.getCompany(portletRequest);
-        } catch (PortalException e1) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e1));
-        } catch (SystemException e1) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e1));
+        } catch (PortalException | SystemException e1) {
+            LOGGER.error(ExceptionUtils.getStackTrace(e1));
         }
         return company;
     }
 
     public static String getPortalLanguage() {
+
         PortletRequest portletRequest = getPortletRequest();
-        String lang = portletRequest.getLocale().getLanguage() + "-"
-                + portletRequest.getLocale().getCountry();
-        return lang;
+        return portletRequest.getLocale().getLanguage() + "-" + portletRequest.getLocale().getCountry();
     }
 
     public static String generateURL(String page) {
+
         PortletRequest req = getPortletRequest();
         ThemeDisplay themeDisplay = (ThemeDisplay) req.getAttribute(WebKeys.THEME_DISPLAY);
 
-        PortletURL url = PortletURLFactoryUtil.create(req,
-                PortalUtil.getPortletId(req),
-                themeDisplay.getLayout().getPlid(),
-                PortletRequest.ACTION_PHASE);
+        PortletURL url = PortletURLFactoryUtil.create(req, PortalUtil.getPortletId(req), themeDisplay.getLayout().getPlid(), PortletRequest.ACTION_PHASE);
         url.setParameter("_facesViewIdRender", "/" + page + ".xhtml");
         try {
             url.setWindowState(WindowState.NORMAL);
             url.setPortletMode(PortletMode.VIEW);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return url.toString();
     }
@@ -224,10 +209,9 @@ public class FacesService {
                 }
             }
         } catch (SystemException e) {
-            log.error("Could not scan for layout " + e.toString());
+            LOGGER.error("Could not scan for layout: '{}'", e.getMessage(), e);
         }
-
-        return null;// target;
+        return null;
     }
 
     /**
@@ -243,19 +227,18 @@ public class FacesService {
      */
     public static LiferayPortletURL getUrltoPortletInOtherPage(String portletId, int urlPhase, boolean isPrivatePage, String pageFrUrl, long groupId, boolean isInstanceablePortlet) {
 
-        Layout targetLayout = null;
+        Layout targetLayout;
         targetLayout = scanLayout(groupId, isPrivatePage, pageFrUrl);
 
         PortletResponse res = getPortletResponse();
         LiferayPortletResponse rr = PortalUtil.getLiferayPortletResponse(res);
-        LiferayPortletURL ddUrl = null;// rr.createActionURL(portletId) ;
-        switch (urlPhase) {
-            case URL_MODE_ACTION:
-                ddUrl = rr.createActionURL(portletId);
-                break;
-            default:
-                ddUrl = rr.createRenderURL(portletId);
-                break;
+        LiferayPortletURL ddUrl;
+        if (urlPhase == URL_MODE_ACTION) {
+            ddUrl = rr.createActionURL(portletId);
+
+        } else {
+            ddUrl = rr.createRenderURL(portletId);
+
         }
         if (isInstanceablePortlet) {
             try {
@@ -265,46 +248,39 @@ public class FacesService {
                 String secName = "/" + pageFrUrl;
                 LayoutTypePortlet layoutTypePortlet = LayoutTypePortletFactoryUtil.create(LayoutLocalServiceUtil.getFriendlyURLLayout(themeDisplay.getLayout().getGroupId(), false, secName));
                 List<String> portletIdList = layoutTypePortlet.getPortletIds();
-                if (portletIdList != null && portletIdList.size() > 0) {
+                if (portletIdList != null && !portletIdList.isEmpty()) {
                     for (String prtId : portletIdList) {
                         if (prtId.contains(portletId)) {
                             ddUrl.setPortletId(prtId);
-
-                            //log.info("instanceable instance resolved");
                         }
                     }
                 }
             } catch (Exception e) {
-                log.error("Could not resolve portlet id for instanceable portlet " + e.toString());
+                LOGGER.error("Could not resolve portlet id for instantiable portlet '{}'", e.getMessage(), e);
             }
         }
 
         if (targetLayout == null) {
-            log.error("Page with given name and groupid could not be found. null Layout");
+            LOGGER.error("Page with given name and groupid could not be found. null Layout");
 
         } else {
             ddUrl.setPlid(targetLayout.getPlid());
         }
-
-        //log.info("url is ready [" + ddUrl.toString() + "]");
-
         return ddUrl;
     }
 
     public static String translate(String key, String lang) {
 
-        FacesContext ctx = FacesContext.getCurrentInstance();
-        lang = lang.replace("-", "_");
-        Locale locale = LocaleUtils.toLocale(lang);
+        String language = lang.replace("-", "_");
+        Locale locale = LocaleUtils.toLocale(language);
         ResourceBundle rb = ResourceBundle.getBundle(BUNDLE_LOCATION, locale);
         String str = key;
         try {
             str = rb.getString(key);
             str = StringUtils.toEncodedString(str.getBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            log.error("Key: " + key + " not found in message bundle. Using key as value");
+            LOGGER.error("Key: '{}' not found in message bundle. Using key as value", key, e);
         }
-
         return str;
     }
 
@@ -325,16 +301,15 @@ public class FacesService {
             str = rb.getString(key);
             str = StringUtils.toEncodedString(str.getBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            log.error("Key: " + key + " not found in message bundle. Using key as value");
+            LOGGER.error("Key: '{}' not found in message bundle. Using key as value", key, e);
         }
-
         return str;
     }
 
     public static Locale getLocale() {
+
         FacesContext ctx = FacesContext.getCurrentInstance();
-        Locale locale = ctx.getViewRoot().getLocale();
-        return locale;
+        return ctx.getViewRoot().getLocale();
     }
 
     /**
@@ -354,9 +329,7 @@ public class FacesService {
 
         PortletRequest request = FacesService.getPortletRequest();
         ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-        PermissionChecker permissionChecker = themeDisplay.getPermissionChecker();
-
-        return permissionChecker;
+        return themeDisplay.getPermissionChecker();
     }
 
     /**
@@ -366,6 +339,7 @@ public class FacesService {
      * @return
      */
     public static boolean hasUserPermission(String actionKey) {
+
         try {
             PortletRequest request = ((PortletRequest) (FacesContext.getCurrentInstance().getExternalContext().getRequest()));
             ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
@@ -376,9 +350,9 @@ public class FacesService {
             long groupId = themeDisplay.getScopeGroupId();
             return permissionChecker.hasPermission(groupId, name, primKey, actionKey);
         } catch (Exception e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             return false;
         }
-
     }
 
     public static String getParameter(String key) {
@@ -392,8 +366,8 @@ public class FacesService {
             String[] vals = params.get(fullKey);
             return vals[0];
         } catch (Exception e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
-
         return null;
     }
 
@@ -404,6 +378,7 @@ public class FacesService {
      * @return boolean
      */
     public static boolean checkPermission(String actionKey) {
+
         PortletRequest request = ((PortletRequest) (FacesContext.getCurrentInstance().getExternalContext().getRequest()));
 
         ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
@@ -417,8 +392,8 @@ public class FacesService {
     }
 
     public static boolean isAdministrator() {
+
         PortletRequest request = ((PortletRequest) (FacesContext.getCurrentInstance().getExternalContext().getRequest()));
         return request.isUserInRole("administrator");
     }
-
 }

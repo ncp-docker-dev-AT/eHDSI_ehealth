@@ -26,6 +26,7 @@ import eu.epsos.protocolterminators.ws.server.xcpd.XCPDServiceInterface;
 import eu.epsos.util.EvidenceUtils;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hl7.v3.*;
 import org.joda.time.DateTime;
@@ -86,6 +87,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     }
 
     public void prepareEventLog(EventLog eventLog, PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, Element sh) {
+
         eventLog.setEventType(EventType.epsosIdentificationServiceFindIdentityByTraits);
         eventLog.setEI_TransactionName(TransactionName.epsosIdentificationServiceFindIdentityByTraits);
         eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
@@ -101,9 +103,9 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         eventLog.setPC_UserID(Helper.getPC_UserID(sh));
         eventLog.setPC_RoleID(Helper.getPC_RoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-        II source_ii = null;
-        II target_ii = null;
-        if (inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().size() > 0) {
+        II source_ii;
+        II target_ii;
+        if (!inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().isEmpty()) {
             source_ii = inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
             target_ii = outputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
         } else {
@@ -116,12 +118,12 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             eventLog.setPS_PatricipantObjectID(getParticipantObjectID(source_ii));
         }
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
-        if (outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().size() > 0) {
+        if (!outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()) {
             String detail = outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent();
             if (detail.startsWith("(")) {
                 String code = detail.substring(1, 5);
                 eventLog.setEM_PatricipantObjectID(code);
-                if (code.equals("1102")) {
+                if (StringUtils.equals(code, "1102")) {
                     eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.TEMPORAL_FAILURE);
                 } else {
                     eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
@@ -473,7 +475,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     }
 
     private void pRPAIN201306UV02Builder(PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, SOAPHeader sh, EventLog eventLog) throws Exception {
-        String sigCountryCode = null;
+
+        String sigCountryCode;
 
         if (patientSearchService instanceof PatientSearchInterfaceWithDemographics) {
             PatientSearchInterfaceWithDemographics psiwd = (PatientSearchInterfaceWithDemographics) patientSearchService;
@@ -554,7 +557,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         outputMessage.getControlActProcess().getQueryAck().getQueryId().setRoot(inputQBP.getQueryId().getRoot());
         outputMessage.getControlActProcess().getQueryAck().getQueryId().setExtension(inputQBP.getQueryId().getExtension());
 
-        Element shElement = null;
+        Element shElement;
         try {
             shElement = XMLUtils.toDOM(sh);
         } catch (Exception e) {
@@ -661,10 +664,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                             countryCode = sigCountryCode;
                         }
                     }
-                    LOGGER.info("The client country code to be used by the PDP: " + countryCode);
+                    LOGGER.info("The client country code to be used by the PDP: '{}'", countryCode);
 
                     // Then, it is the Policy Decision Point (PDP) that decides according to the consents of the patients
-                    /**
+                    /*
                      * TODO: Uncomment when PDP works. You may also need to pass
                      * the whole PatientID (both the root and extension) to PDP,
                      * if required by PDP procedures.
@@ -679,7 +682,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                             outputMessage.getControlActProcess().getSubject().add(getSubjectByPatientDemographic(pdList.get(i)));
                         }
                     }
-                    if (pdList.size() > 0) {
+                    if (!pdList.isEmpty()) {
                         // There are patient data to be sent, OK
                         fillOutputMessage(outputMessage, null, null, "OK");
                     } else {
@@ -692,11 +695,9 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 // Preparing demographic query not allowed error
                 fillOutputMessage(outputMessage, "Queries are only available with patient identifiers", ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED);
             }
-        } catch (MissingFieldException e) {
+        } catch (MissingFieldException | InvalidFieldException e) {
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);
         } catch (InsufficientRightsException e) {
-            fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);
-        } catch (InvalidFieldException e) {
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);
         } catch (XSDValidationException e) {
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);

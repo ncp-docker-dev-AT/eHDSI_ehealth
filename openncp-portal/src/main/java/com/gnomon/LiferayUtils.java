@@ -116,9 +116,7 @@ public class LiferayUtils {
             if (hasRole) {
                 log.info("User has role: '{}'", rolename);
             }
-        } catch (PortalException e) {
-            log.error(ExceptionUtils.getStackTrace(e), e);
-        } catch (SystemException e) {
+        } catch (PortalException | SystemException e) {
             log.error(ExceptionUtils.getStackTrace(e), e);
         }
         return hasRole;
@@ -195,9 +193,7 @@ public class LiferayUtils {
         PortletRequest portletRequest = getPortletRequest();
         try {
             company = PortalUtil.getCompany(portletRequest);
-        } catch (PortalException e1) {
-            log.error(ExceptionUtils.getStackTrace(e1));
-        } catch (SystemException e1) {
+        } catch (PortalException | SystemException e1) {
             log.error(ExceptionUtils.getStackTrace(e1));
         }
         return company;

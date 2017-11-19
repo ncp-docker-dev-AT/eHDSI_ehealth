@@ -368,9 +368,8 @@ public class EventLog {
                                                        String sourceip,
                                                        String targetip) {
 
-        EventLog el = EventLog.createEventLogHCPAssurance(EI_TransactionName, EI_EventActionCode, EI_EventDateTime, EI_EventOutcomeIndicator, PC_UserID, PC_RoleID, HR_UserID, HR_AlternativeUserID, HR_RoleID, SC_UserID, SP_UserID, AS_AuditSourceId, PT_PatricipantObjectID, null, null,
+        return EventLog.createEventLogHCPAssurance(EI_TransactionName, EI_EventActionCode, EI_EventDateTime, EI_EventOutcomeIndicator, PC_UserID, PC_RoleID, HR_UserID, HR_AlternativeUserID, HR_RoleID, SC_UserID, SP_UserID, AS_AuditSourceId, PT_PatricipantObjectID, null, null,
                 "PINdny", ReqM_ParticipantObjectID, ReqM_PatricipantObjectDetail, ResM_ParticipantObjectID, ResM_PatricipantObjectDetail, sourceip, targetip);
-        return el;
     }
 
     /**
@@ -943,81 +942,6 @@ public class EventLog {
         return SC_UserID;
     }
 
-    /**
-     * This method creates an EventLog object for use in Patient Privacy Audit
-     * Schema
-     *
-     * @param EI_TransactionNumber         The number of transaction including the
-     *                                     epsos- prefix
-     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime             The datetime the event occured
-     * @param EI_EventOutcomeIndicator     <br>
-     *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
-     * @param HR_UserID                    Identifier of the HCP initiated the event
-     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
-     *                                     the Subject-ID
-     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
-     *                                     triggered the epsos operation
-     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
-     *                                     processed the epsos operation
-     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
-     *                                     the audit source
-     * @param PT_PatricipantObjectID       Patient Identifier in HL7 II format
-     * @param EM_PatricipantObjectID       The error code included with the response
-     *                                     message
-     * @param EM_PatricipantObjectDetail   Contains the base64 encoded error
-     *                                     message
-     * @param ET_ObjectID                  The string encoded UUID of the returned document
-     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
-     *                                     message
-     * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     *                                     encoded security header.
-     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
-     *                                     message
-     * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     *                                     encoded security header.
-     * @param sourceip                     The IP Address of the source Gateway
-     * @param targetip                     The IP Address of the target Gateway
-     * @return the EventLog object
-     */
-//    public static EventLog createEventLogPrivacy(String EI_TransactionNumber,  TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
-//            String HR_UserID, String HR_AlternativeUserID,
-//            String SC_UserID, String SP_UserID, String AS_AuditSourceId,
-//            String PT_PatricipantObjectID, String EM_PatricipantObjectID, byte[]
-//            EM_PatricipantObjectDetail,String ET_ObjectID,
-//            String ReqM_ParticipantObjectID,
-//            byte[] ReqM_PatricipantObjectDetail,
-//            String ResM_ParticipantObjectID,
-//            byte[] ResM_PatricipantObjectDetail,
-//            String sourceip,
-//            String targetip)
-//    {
-//        EventLog el = new EventLog();
-//        el.setEI_TransactionNumber(NullToEmptyString(EI_TransactionNumber));
-//        el.setEI_TransactionName(EI_TransactionName);
-//        el.setEI_EventActionCode(EI_EventActionCode);
-//        el.setEI_EventDateTime(EI_EventDateTime);
-//        el.setEI_EventOutcomeIndicator(EI_EventOutcomeIndicator);
-//        el.setHR_UserID(NullToEmptyString(HR_UserID));
-//        el.setHR_AlternativeUserID(NullToEmptyString(HR_AlternativeUserID));
-//        el.setSC_UserID(NullToEmptyString(SC_UserID));
-//        el.setSP_UserID(NullToEmptyString(SP_UserID));
-//        el.setAS_AuditSourceId(NullToEmptyString(AS_AuditSourceId));
-//        el.setPT_PatricipantObjectID(NullToEmptyString(PT_PatricipantObjectID));
-//        el.setEM_PatricipantObjectID(NullToEmptyString(EM_PatricipantObjectID));
-//        el.setEM_PatricipantObjectDetail(EM_PatricipantObjectDetail);
-//        el.setET_ObjectID(NullToEmptyString(ET_ObjectID));
-//        el.setReqM_ParticipantObjectID(NullToEmptyString(ReqM_ParticipantObjectID));
-//        el.setReqM_PatricipantObjectDetail(ReqM_PatricipantObjectDetail);
-//        el.setResM_ParticipantObjectID(NullToEmptyString(ResM_ParticipantObjectID));
-//        el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
-//        el.setSourceip(NullToEmptyString(sourceip));
-//        el.setTargetip(NullToEmptyString(targetip));
-//        return el;
-//    }
     public void setSC_UserID(String SC_UserID) {
         this.SC_UserID = SC_UserID;
     }

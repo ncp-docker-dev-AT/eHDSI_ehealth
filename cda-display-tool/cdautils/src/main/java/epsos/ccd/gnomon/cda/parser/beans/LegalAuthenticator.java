@@ -11,12 +11,11 @@ import java.util.Set;
  * A class encapsulating a legal authenticator of a medical document.
  *
  * @author Akis Papadopoulos
- *
  */
 public class LegalAuthenticator {
 
     // Date formatter
-    private static SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
+    private SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
     // Authenticating time
     private Date time;
     // Authenticator identification number
@@ -49,10 +48,10 @@ public class LegalAuthenticator {
         this.address = null;
 
         // Creating an empty set of phone contacts
-        this.phones = new HashSet<Contact>();
+        this.phones = new HashSet<>();
 
         // Creating an empty set of email contacts
-        this.emails = new HashSet<Contact>();
+        this.emails = new HashSet<>();
 
         // Setting a null represented organization
         this.organization = null;
@@ -61,8 +60,8 @@ public class LegalAuthenticator {
     /**
      * A constructor initializing a legal authenticator entity.
      *
-     * @param id the identification number of the authenticator.
-     * @param name the full name of the authenticator.
+     * @param id           the identification number of the authenticator.
+     * @param name         the full name of the authenticator.
      * @param organization the organization represented by the authenticator.
      */
     public LegalAuthenticator(Identifier id, Name name, Organization organization) {
@@ -79,10 +78,10 @@ public class LegalAuthenticator {
         this.address = null;
 
         // Creating an empty set of phone contacts
-        this.phones = new HashSet<Contact>();
+        this.phones = new HashSet<>();
 
         // Creating an empty set of email contacts
-        this.emails = new HashSet<Contact>();
+        this.emails = new HashSet<>();
 
         // Setting the represented organization
         this.organization = organization;
@@ -260,7 +259,7 @@ public class LegalAuthenticator {
         }
 
         // Checking if phone contacts are provided
-        if (phones.size() > 0) {
+        if (!phones.isEmpty()) {
             // Iterating through the set of phones
             for (Contact phone : phones) {
                 // Checking for a valid contact element
@@ -272,7 +271,7 @@ public class LegalAuthenticator {
         }
 
         // Checking if email contacts are provided
-        if (emails.size() > 0) {
+        if (!emails.isEmpty()) {
             // Iterating through the email set
             for (Contact email : emails) {
                 // Checking for a valid contact element

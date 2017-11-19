@@ -51,7 +51,7 @@ public class DispenseServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
 
         byte[] edBytes = null;
-        try {
+        try (OutputStream outputStream = res.getOutputStream()) {
             byte[] epBytes = (byte[]) session.getAttribute("epBytes");
 
             List<ViewResult> lines = EpsosHelperService.parsePrescriptionDocumentForPrescriptionLines(epBytes);
@@ -137,7 +137,7 @@ public class DispenseServlet extends HttpServlet {
                     document.setDescription(Constants.ED_TITLE);
                     document.setTitle(Constants.ED_TITLE);
                     document.setUuid(edOid + "^" + eDuuid);
-                    document.setSubmissionSetId(EpsosHelperService.getUniqueId()); 
+                    document.setSubmissionSetId(EpsosHelperService.getUniqueId());
                     document.setClassCode(classCode);
                     document.setFormatCode(formatCode);
                     document.setBase64Binary(edBytes);
@@ -150,31 +150,31 @@ public class DispenseServlet extends HttpServlet {
                     res.setDateHeader("Expires", 0);
                     res.setHeader("Pragma", "No-cache");
 
-                    OutputStream OutStream = res.getOutputStream();
-                    OutStream.write(message.getBytes());
-                    OutStream.flush();
-                    OutStream.close();
+
+                    outputStream.write(message.getBytes());
+                    outputStream.flush();
+                    outputStream.close();
                 } else {
                     LOGGER.error("UPLOAD DISP DOC RESPONSE ERROR");
                     res.setContentType("text/html");
-                    String message = resp.toString();
+                    //String message = resp.toString();
+                    String message = "Cannot upload Dispense message";
                     res.setHeader("Cache-Control", "no-cache");
                     res.setDateHeader("Expires", 0);
                     res.setHeader("Pragma", "No-cache");
 
-                    OutputStream OutStream = res.getOutputStream();
-                    OutStream.write(message.getBytes());
-                    OutStream.flush();
-                    OutStream.close();
+                    outputStream.write(message.getBytes());
+                    outputStream.flush();
+                    outputStream.close();
                     req.setAttribute("exception", "UPLOAD DISP DOC RESPONSE ERROR");
                 }
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
 
             LOGGER.error("UPLOAD DISP DOC RESPONSE ERROR: '{}'", ex.getMessage(), ex);
             res.setContentType("text/html");
             String message;
-            if (Validator.isNotNull(resp)) {
+            if (resp != null) {
                 message = resp.toString();
             } else {
                 message = ex.getLocalizedMessage();

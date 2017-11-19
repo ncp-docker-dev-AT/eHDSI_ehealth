@@ -42,6 +42,7 @@ public class EadcDbConnectImpl implements EadcDbConnect {
      * @return the current connection
      */
     public Connection getConnection() {
+
         return connection;
     }
 
@@ -49,13 +50,14 @@ public class EadcDbConnectImpl implements EadcDbConnect {
      * This method will close the connection
      */
     public void closeConnection() {
+
         try {
             if (connection != null) {
                 connection.close();
             }
-            LOGGER.debug("Closing DB connection: (id:" + hashCode() + ")");
+            LOGGER.debug("Closing DB connection: (id:'{}')", hashCode());
         } catch (Exception ex) {
-            LOGGER.warn("Unable to close DB connection (id:" + hashCode() + ")", ex);
+            LOGGER.warn("Unable to close DB connection (id:'{}')", hashCode(), ex);
         }
     }
 }

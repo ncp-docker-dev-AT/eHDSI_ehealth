@@ -32,7 +32,7 @@ import java.util.Map;
 
 public class CDAUtils {
 
-    private static final Logger _log = LoggerFactory.getLogger("CDAUtils");
+    private static final Logger LOGGER = LoggerFactory.getLogger(CDAUtils.class);
 
     private final static String XML_LOINC_SYSTEM = "LOINC",
             XML_LOINC_CODESYSTEM = "2.16.840.1.113883.6.1",
@@ -81,6 +81,7 @@ public class CDAUtils {
     }
 
     private static XPath getXPathFactory() {
+
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
         xpath.setNamespaceContext(new CDANameSpaceContext());
@@ -100,25 +101,26 @@ public class CDAUtils {
                 refBarcode = nl.item(0).getNodeValue();
             }
         } catch (Exception e) {
-            _log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return refBarcode;
     }
 
     public static String getRelativePrescriptionBarcode(String xml) {
-        Node nl = null;
+
         String nodeString = "";
         try {
             Document doc = readEpXML(xml);
             nodeString = getRelativePrescriptionBarcode(doc);
         } catch (Exception e) {
-            _log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return nodeString;
     }
 
     private static String getRelativePrescriptionLineFromEP(Document epDoc, String id) {
-        Node nl = null;
+
+        Node nl;
         String nodeString = "";
         try {
             Document doc = epDoc;
@@ -127,12 +129,13 @@ public class CDAUtils {
             nl = (Node) epExpr.evaluate(doc, XPathConstants.NODE);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
-            _log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return nodeString;
     }
 
     private static String getRelativeProductLineFromEP(Document epDoc, String id) {
+
         Node nl;
         String nodeString = "";
         try {
@@ -159,7 +162,7 @@ public class CDAUtils {
 
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
-            _log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return nodeString;
     }
@@ -289,61 +292,66 @@ public class CDAUtils {
             //Getting the string representation of the node
             context = manufacturedProduct.asXML().replaceAll("xmlns=\"\"", "");
         } catch (Exception e) {
-            _log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
         return context;
     }
 
     private static String getRecordTargetFromEP(Document epDoc) {
+
         Node nl;
         String nodeString = "";
         try {
             nl = epDoc.getElementsByTagName("recordTarget").item(0);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
-            _log.error(e.getMessage());
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return nodeString;
     }
 
     private static String getCustodianFromEP(Document epDoc) {
+
         Node nl;
         String nodeString = "";
         try {
             nl = epDoc.getElementsByTagName("custodian").item(0);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
-            _log.error(e.getMessage());
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return nodeString;
     }
 
     private static String getLegalAuthFromEP(Document epDoc) {
+
         Node nl;
         String nodeString = "";
         try {
             nl = epDoc.getElementsByTagName("legalAuthenticator").item(0);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
-            _log.error(e.getMessage());
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return nodeString;
     }
 
     private static String getAuthorFromEP(Document epDoc) {
+
         Node nl;
         String nodeString = "";
         try {
             nl = epDoc.getElementsByTagName("author").item(0);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
-            _log.error(e.getMessage());
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return nodeString;
     }
 
     private static String getRelativePrescriptionText(Document epDoc) {
+
         Node nl;
         String nodeString = "";
         try {
@@ -353,12 +361,13 @@ public class CDAUtils {
             nl = (Node) epExpr.evaluate(doc, XPathConstants.NODE);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
-            _log.error(e.getMessage());
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return nodeString;
     }
 
     public static String getRelativePrescriptionRoot(Document doc) {
+
         NodeList nl;
         String refBarcode = "";
         try {
@@ -369,7 +378,7 @@ public class CDAUtils {
                 refBarcode = nl.item(0).getNodeValue();
             }
         } catch (Exception e) {
-            _log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         return refBarcode;
     }
@@ -687,25 +696,15 @@ public class CDAUtils {
                 String product = detail.getMedicineCommercialName();
                 String unit = detail.getDispensedQuantityUnit(); //Even in a substitution we getting null
                 String quantity = detail.getDispensedQuantity();
-                _log.info("************************* EDDetails: {}", detail.toString());
+                LOGGER.info("************************* EDDetails: {}", detail.toString());
                 //Adding the relative product line updated with the substituted data, if any
                 sb.append(getSubstitutedRelativeProductLineFromEP(clone, id, product, unit, quantity));
 
                 sb.append("\r\n");
             } catch (Exception exc) {
-                _log.error("Error cloning ePrescription document " + exc.getMessage());
-                _log.error(ExceptionUtils.getStackTrace(exc));
+                LOGGER.error("Error cloning ePrescription document " + exc.getMessage());
+                LOGGER.error(ExceptionUtils.getStackTrace(exc));
             }
-
-            // TODO fix containerPackageMedicine code
-                            /*
-             *
-             *                       <epsos:containerPackagedMedicine classCode="CONT" determinerCode="INSTANCE">
-             <epsos:name>DIGOXIN</epsos:name>
-             <epsos:formCode codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.1" codeSystemName="EDQM" code="N/A"/>
-             <epsos:capacityQuantity unit="1" value="100"/>
-             </epsos:containerPackagedMedicine>
-             */
             sb.append("</product>");
             sb.append("\r\n");
 
@@ -824,6 +823,7 @@ public class CDAUtils {
     }
 
     private static String addDoctorAuthor(CDAHeader cda) {
+
         StringBuilder sb = new StringBuilder();
         sb.append("<author typeCode=\"AUT\">");
         sb.append("\r\n");
@@ -866,6 +866,7 @@ public class CDAUtils {
     }
 
     private static String addPharmacistAuthor(CDAHeader cda) {
+
         StringBuilder sb = new StringBuilder();
         // dispenser information
         sb.append("<author typeCode=\"AUT\">");
@@ -896,6 +897,7 @@ public class CDAUtils {
     }
 
     private static String addEntryRelationship(String code1, String value1) {
+
         StringBuilder sb = new StringBuilder();
         sb.append("<entryRelationship inversionInd=\"true\" typeCode=\"RSON\">");
         sb.append("\r\n");
@@ -926,6 +928,7 @@ public class CDAUtils {
     }
 
     private static String addQuantity(String lowValue, String lowUnit, String highValue, String highUnit) {
+
         StringBuilder et = new StringBuilder();
         et.append("<epsos:quantity>");
         et.append("\r\n");
@@ -939,6 +942,7 @@ public class CDAUtils {
     }
 
     private static String addDoseQuantity(String lowValue, String lowUnit, String highValue, String highUnit) {
+
         StringBuilder et = new StringBuilder();
         et.append("<doseQuantity>");
         et.append("\r\n");
@@ -955,6 +959,7 @@ public class CDAUtils {
      * <effectiveTime xsi:type='PIVL_TS' institutionSpecified='false' operator='A'> <period value='8' unit='h' /></effectiveTime>
      */
     private static String addDoseFrequency(String freq) {
+
         String eff = "";
         if (freq.equals("5")) // Μια φορά την εβδομάδα
         {
@@ -1017,18 +1022,18 @@ public class CDAUtils {
     }
 
     private static String addEffectiveTime(String low, String high) {
-        StringBuilder et = new StringBuilder();
-        et.append("<effectiveTime xsi:type=\"IVL_TS\">");
-        et.append("\r\n");
-        et.append("<low value=\"").append(low).append("\" />");
-        et.append("\r\n");
-        et.append("<high value=\"").append(high).append("\" />");
-        et.append("\r\n");
-        et.append("</effectiveTime>");
-        return et.toString();
+
+        return "<effectiveTime xsi:type=\"IVL_TS\">" +
+                "\r\n" +
+                "<low value=\"" + low + "\" />" +
+                "\r\n" +
+                "<high value=\"" + high + "\" />" +
+                "\r\n" +
+                "</effectiveTime>";
     }
 
     private static String addTextTag(String tagName, String value) {
+
         if (Validator.isNull(value)) {
             value = "";
         }
@@ -1046,12 +1051,13 @@ public class CDAUtils {
     }
 
     private static String addTag(String tagName, String value) {
+
         if (Validator.isNull(value)) {
             value = "";
         }
         StringBuilder sb = new StringBuilder();
         sb.append("<").append(tagName);
-        String ext = "";
+        String ext;
         if (value.equals("")) {
             ext = " nullFlavor=\"NI\"";
         } else {
@@ -1063,18 +1069,19 @@ public class CDAUtils {
     }
 
     private static String addName(String family, String prefix, String given) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<name>");
-        sb.append("\r\n");
-        sb.append(addTextTag("family", family));
-        sb.append("\r\n");
-        sb.append(addTextTag("given", given));
-        sb.append("\r\n");
-        sb.append("</name>");
-        return sb.toString();
+
+        return "<name>" +
+                "\r\n" +
+                addTextTag("family", family) +
+                "\r\n" +
+                addTextTag("given", given) +
+                "\r\n" +
+                "</name>";
     }
 
-    private static String addAddress(String streetAddress, String city, String postalCode, String country, String tel, String email, boolean addressPointInStart) {
+    private static String addAddress(String streetAddress, String city, String postalCode, String country, String tel,
+                                     String email, boolean addressPointInStart) {
+
         StringBuilder sb = new StringBuilder();
         if (addressPointInStart) {
             if (Validator.isNull(email) && Validator.isNull(tel)) {
@@ -1114,13 +1121,13 @@ public class CDAUtils {
                 sb.append("<telecom use=\"WP\" value=\"mailto:").append(email).append("\"/>");
             }
         }
-
         return sb.toString();
     }
 
     private static String addIDRoot(String id, String extension) {
-        String ext = "";
-        String ret = "";
+
+        String ext;
+        String ret;
         if (Validator.isNull(extension)) {
             ext = "nullFlavor=\"NI\"";
             ret = "<id " + ext + " />";
@@ -1132,8 +1139,9 @@ public class CDAUtils {
     }
 
     private static String addTemplateIDRoot(String id, String extension) {
-        String ext = "";
-        String ret = "";
+
+        String ext;
+        String ret;
         if (Validator.isNull(extension)) {
             ext = "nullFlavor=\"NI\"";
             ret = "<id " + ext + " />";
@@ -1145,19 +1153,21 @@ public class CDAUtils {
     }
 
     private static String getTagValue(String sTag, Element eElement) {
+
         String ret = "";
         try {
             NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
-            Node nValue = (Node) nlList.item(0);
+            Node nValue = nlList.item(0);
             ret = nValue.getNodeValue();
         } catch (Exception e) {
-            _log.error("Error getting value " + e.getMessage());
-            _log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error getting value '{}'", e.getMessage());
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return ret;
     }
 
     public static boolean checkPrescriptionBarcode(String dispensexml, String barcode) {
+
         boolean sameBarcode = false;
         try {
             Document doc = CDAUtils.readEpXML(dispensexml);
@@ -1173,22 +1183,23 @@ public class CDAUtils {
                 refBarcode = nl.item(0).getNodeValue();
             }
             sameBarcode = barcode.equals(refBarcode);
-            _log.debug("The reference prescription barcode is : " + refBarcode + " and the requested is : " + barcode + ".Comparison: " + sameBarcode);
+            LOGGER.debug("The reference prescription barcode is: '{}' and the requested is: '{}'. Comparison: '{}'", refBarcode, barcode, sameBarcode);
         } catch (Exception e) {
-            _log.error(e.getMessage());
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return sameBarcode;
     }
 
     private static String getBirthTime(String cdaBirthDate) {
+
         final DateFormat portalUserDateFormat = LiferayUtils.getPortalUserDateFormat();
         Date patientBirthDate = null;
         try {
             patientBirthDate = portalUserDateFormat.parse(cdaBirthDate);
         } catch (ParseException e) {
-            _log.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
-        SimpleDateFormat format = new SimpleDateFormat("YYYYMMdd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         return format.format(patientBirthDate);
     }
 }

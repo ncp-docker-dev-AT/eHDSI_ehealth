@@ -9,7 +9,7 @@ import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
-import epsos.ccd.gnomon.xslt.EpsosXSLTransformer;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.UploadedFile;
@@ -28,6 +28,7 @@ import javax.portlet.PortletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -48,9 +49,10 @@ public class TrilliumBean implements Serializable {
     private String ltrlang;
 
     public TrilliumBean() {
+
         log.info("Initializing TrilliumBean ...");
         String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH");
-        log.info("EPSOS PROPS PATH IS : " + epsosPropsPath);
+        log.info("EPSOS PROPS PATH IS: '{}'", epsosPropsPath);
         if (!Validator.isNull(epsosPropsPath)) {
             ltrlanguages = EpsosHelperService.getLTRLanguages();
             String lang = "en-US";
@@ -61,7 +63,7 @@ public class TrilliumBean implements Serializable {
                 log.info("#### " + EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS));
             } catch (Exception e) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error getting user", ""));
-                log.error("Error getting user");
+                log.error("Error getting user: '{}'", e.getMessage(), e);
             }
 
         } else {
@@ -94,6 +96,7 @@ public class TrilliumBean implements Serializable {
     }
 
     public void export(String type) throws IOException, PortalException, SystemException {
+
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
         String fontpath = externalContext.getRealPath("/") + "WEB-INF/fonts/";
@@ -104,7 +107,7 @@ public class TrilliumBean implements Serializable {
         HttpServletRequest request = com.liferay.portal.util.PortalUtil.getHttpServletRequest(portletRequest);
         String contentType = "";
         InputStream stream = null;
-        log.info("Export file to " + type + " for language " + ltrlang);
+        log.info("Export file to '{}' for language '{}'", type, ltrlang);
         byte[] temp = cdafile.getContents();
         if (Validator.isNotNull(temp)) {
             cdafilecontents = temp;
@@ -117,29 +120,29 @@ public class TrilliumBean implements Serializable {
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Problem uploading " + cdafile.getFileName() + e.getMessage(), cdafile.getFileName() + " is not uploaded.");
             log.error(ExceptionUtils.getStackTrace(e));
         }
-        String decoded = new String(cdafilecontents, "UTF-8");
+        String decoded = new String(cdafilecontents, StandardCharsets.UTF_8);
         log.info("#### CDA XML Start");
         log.debug(decoded.substring(0, 1000));
         log.info("#### CDA XML End");
-        log.debug("Transform document to " + ltrlang);
+        log.debug("Transform document to '{}'", ltrlang);
         String lang1 = ltrlang.replace("_", "-");
         lang1 = lang1.replace("en-US", "en");
-        log.info("Transform document to " + lang1);
+        log.info("Transform document to '{}'", lang1);
         Document doc = Utils.createDomFromString(decoded);
         boolean isCDA = false;
-        Document doc1 = null;
+        Document doc1;
         try {
             doc1 = Utils.createDomFromString(decoded);
             isCDA = EpsosHelperService.isCDA(doc1);
             log.info("### Document created");
-            log.info("########## IS CDA: " + isCDA);
+            log.info("########## IS CDA: '{}'", isCDA);
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
         }
 
         transformed = decoded;
-        EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
-        if (type.equals("html")) {
+
+        if (StringUtils.equals(type, "html")) {
 
             if (isCDA) {
                 log.info(("The document is EPSOS CDA"));
@@ -157,11 +160,6 @@ public class TrilliumBean implements Serializable {
             } else {
                 log.info(("The document is CCD"));
                 convertedcda = EpsosHelperService.styleDoc(transformed, lang1, true, "");
-                //contentType="text/html";
-//                    stream = new ByteArrayInputStream(convertedcda.getBytes("UTF-8"));
-//                    response.setHeader("Content-disposition", "inline; filename=\"cda.html\"");
-//                    response.setContentType(contentType);
-//                    ServletResponseUtil.sendFile(request, response, filename, stream,contentType);
                 showhideComponentID("form1:p1", true);
                 showhideComponentID("form1:button1", true);
                 showhideComponentID("form1:button2", true);
@@ -171,36 +169,12 @@ public class TrilliumBean implements Serializable {
 
         }
 
-        //log.info("File = " + convertedcda);
-        ByteArrayOutputStream baos = null;
-        byte[] output = convertedcda.getBytes();
+        byte[] output;
 
-        log.info("Fontpath: " + fontpath);
-//        InputStream stream = new ByteArrayInputStream(convertedcda.getBytes("UTF-8"));
+        log.info("Fontpath: '{}'", fontpath);
         String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-//        log.info("Service URL is : " + serviceUrl);
-//        HtmlCleaner cleaner = new HtmlCleaner();
-//        CleanerProperties props = cleaner.getProperties();
-//        //props.setTreatUnknownTagsAsContent(true);
-//        props.setOmitUnknownTags(true);
-//        log.info("Cleaner init");
-//        TagNode node = cleaner.clean(convertedcda);
-//        convertedcda = new PrettyXmlSerializer(props).getAsString(node);
-//
-//        Tidy tidy = new Tidy();
-//        tidy.setQuiet(false);
-//        tidy.setShowWarnings(true);
-//        tidy.setShowErrors(0);
-//        tidy.setMakeClean(true);
-//
-//        ByteArrayInputStream inputStream = new ByteArrayInputStream(convertedcda.getBytes("UTF-8"));
-//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//        tidy.parseDOM(inputStream, outputStream);
-//        convertedcda =  outputStream.toString("UTF-8");
-//
-//        convertedcda=cleaner.getInnerHtml(node);
 
-        if (type.equals("pdf")) {
+        if (StringUtils.equals(type, "pdf")) {
 
             if (isCDA) {
                 log.info(("The document is EPSOS CDA"));
@@ -216,31 +190,26 @@ public class TrilliumBean implements Serializable {
             }
 
             Utils.WriteXMLToFile(convertedcda, "/home/karkaletsis/dev/css/a1.xml");
-            //convertedcda=xlsClass.transformForPDF(convertedcda, lang1,false);
             stream = new ByteArrayInputStream(convertedcda.getBytes("UTF-8"));
             filename = filename + ".pdf";
-            try {
+            try (ByteArrayOutputStream baos = EpsosHelperService.ConvertHTMLtoPDF(convertedcda, serviceUrl, fontpath)) {
+
                 log.info("Running pdf");
-                //convertedcda="<html><head><title>Your title</title></head><body>html body</body></html>";
-                baos = EpsosHelperService.ConvertHTMLtoPDF(convertedcda, serviceUrl, fontpath);
-                //baos = EpsosHelperService.ConvertHTMLtoPDFWS(convertedcda);
+                output = baos.toByteArray();
+                contentType = "application/pdf";
+                response.setContentType(contentType);
+                response.setHeader("Content-disposition", "attachment; filename=\"cda.pdf\"");
+                OutputStream OutStream = response.getOutputStream();
+                OutStream.write(output);
+                OutStream.flush();
+                OutStream.close();
+
             } catch (Exception ex) {
                 log.error(ExceptionUtils.getStackTrace(ex));
                 log.error(null, ex);
             }
-            output = baos.toByteArray();
-            contentType = "application/pdf";
-            response.setContentType(contentType);
-            response.setHeader("Content-disposition", "attachment; filename=\"cda.pdf\"");
-//            ServletResponseUtil.sendFile(request, response, filename, output, contentType);
-            OutputStream OutStream = response.getOutputStream();
-            OutStream.write(output);
-            OutStream.flush();
-            OutStream.close();
-            baos.flush();
-            baos.close();
         } else {
-            if (type.equals("ccd")) {
+            if (StringUtils.equals(type, "ccd")) {
                 log.info("Exporting as ccd");
 
                 if (isCDA) {
@@ -252,77 +221,33 @@ public class TrilliumBean implements Serializable {
                     // convert it
                     convertedcda = EpsosHelperService.transformDoc(transformed);
                     // translate it
-                    convertedcda = Utils.getDocumentAsXml(
-                            EpsosHelperService.translateDoc(
-                                    Utils.createDomFromString(convertedcda), lang1));
+                    convertedcda = Utils.getDocumentAsXml(EpsosHelperService.translateDoc(Utils.createDomFromString(convertedcda), lang1));
 
                     convertedcda = EpsosHelperService.styleDoc(convertedcda, lang1, false, "");
                 }
-
                 contentType = "text/html";
                 stream = new ByteArrayInputStream(convertedcda.getBytes("UTF-8"));
-                //output = transformed.getBytes("UTF-8");
-
                 response.setHeader("Content-disposition", "inline; filename=\"cda.html\"");
                 response.setContentType(contentType);
                 ServletResponseUtil.sendFile(request, response, filename, stream, contentType);
                 return;
             }
-            if (type.equals("xml")) {
+            if (StringUtils.equals(type, "xml")) {
                 stream = new ByteArrayInputStream(transformed.getBytes("UTF-8"));
                 output = transformed.getBytes("UTF-8");
                 filename = filename + ".xml";
                 contentType = "text/xml";
                 response.setHeader("Content-disposition", "attachment; filename=\"cda.xml\"");
                 response.setContentType(contentType);
-                ServletResponseUtil.sendFile(
-                        request, response, filename, stream, contentType);
+                ServletResponseUtil.sendFile(request, response, filename, stream, contentType);
             }
         }
         response.flushBuffer();
         facesContext.responseComplete();
     }
 
-    //    public void uploadFile() throws UnsupportedEncodingException {
-//
-//        FacesContext facesContext = FacesContext.getCurrentInstance();
-//        String title = cdafile.getFileName();
-//        String description = "";
-//        FacesMessage msg = new FacesMessage("Successful", "");
-//        try {
-//                msg = new FacesMessage(FacesMessage.SEVERITY_INFO,"Succesful uploading " + cdafile.getFileName(), cdafile.getFileName() + " is uploaded.");
-//                }
-//        catch (Exception e) {
-//                msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,"Problem uploading " + cdafile.getFileName() + e.getMessage(), cdafile.getFileName() + " is not uploaded.");
-//                logger.error(ExceptionUtils.getStackTrace(e));
-//        }
-//       // FacesContext.getCurrentInstance().addMessage(null, msg);
-//
-//        String decoded = new String(cdafile.getContents(), "UTF-8");
-//        log.info("#### CDA XML Start");
-//        log.debug(decoded);
-//        log.info("#### CDA XML End");
-//        log.info("Transform document to " + ltrlang);
-//        String lang1 = ltrlang.replace("_", "-");
-//        lang1 = lang1.replace("en-US", "en");
-//        log.info("Transform document to " + lang1);
-//        Document doc = Utils.createDomFromString(decoded);
-//        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("ctx_tm.xml");
-//        ITransformationService tService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
-//        TMResponseStructure tmResponse = tService.translate(doc, ltrlang);
-//        Document translatedDoc = tmResponse.getResponseCDA();
-//        EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
-//        transformed = Utils.getDocumentAsXml(translatedDoc);
-//
-//        String actionURL = "";
-//        convertedcda = xlsClass.transform(transformed, ltrlang, actionURL);
-//        showhideComponentID("form1:p1",true);
-//        showhideComponentID("form1:button1",true);
-//        showhideComponentID("form1:button2",true);
-//
-//    }
-//
     private void showhideComponentID(String componentid, boolean show) {
+
         UIComponent component = FacesContext.getCurrentInstance().getViewRoot().findComponent(componentid);
         if (component != null) {
             component.setRendered(show);

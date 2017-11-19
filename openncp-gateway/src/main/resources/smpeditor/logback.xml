@@ -6,14 +6,6 @@
         </layout>
     </appender>
 
-    <!--<timestamp key="byDay" datePattern="yyyy-MM-dd"/>-->
-    <!--<appender name="FILE" class="ch.qos.logback.core.FileAppender">-->
-    <!--<file>${catalina.base}/logs/smpeditor-${byDay}.log</file>-->
-    <!--<append>true</append>-->
-    <!--<encoder>-->
-    <!--<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>-->
-    <!--</encoder>-->
-    <!--</appender>-->
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>${catalina.base}/logs/openncp-gateway.log</file>
         <append>true</append>

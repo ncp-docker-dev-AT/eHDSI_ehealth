@@ -63,7 +63,6 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         return templateResolver;
     }
 
-
     @Bean(name = "messageSource")
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
@@ -80,7 +79,6 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         return viewResolver;
     }
 
-
     @Bean(name = "filterMultipartResolver")
     public CommonsMultipartResolver filterMultipartResolver() {
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
@@ -89,3 +87,4 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         return resolver;
     }
 }
+

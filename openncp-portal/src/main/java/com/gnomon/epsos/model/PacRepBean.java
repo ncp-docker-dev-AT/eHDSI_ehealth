@@ -67,8 +67,8 @@ public class PacRepBean implements Serializable {
     private String queryDocumentsException;
     private boolean showPS;
     private boolean consentExists;
-    private Map<String, String> ltrlanguages = new HashMap<String, String>();
-    private Map<String, String> repuser = new HashMap<String, String>();
+    private Map<String, String> ltrlanguages = new HashMap<>();
+    private Map<String, String> repuser = new HashMap<>();
     private String repUserString;
     private boolean enablePacRep;
     private String ltrlang;
@@ -131,8 +131,8 @@ public class PacRepBean implements Serializable {
         log.debug("Response is :" + USER_samlResponseXML);
 
         log.info("Selected Country: " + selectedCountry);
-        identifiers = new ArrayList<Identifier>();
-        demographics = new ArrayList<Demographics>();
+        identifiers = new ArrayList<>();
+        demographics = new ArrayList<>();
         ltrlanguages = EpsosHelperService.getLTRLanguages();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Country", selectedCountry));
         try {
@@ -292,7 +292,7 @@ public class PacRepBean implements Serializable {
             showPatientList = true;
         } catch (Exception ex) {
             log.error(ExceptionUtils.getStackTrace(ex));
-            patients = new ArrayList<Patient>();
+            patients = new ArrayList<>();
             showPatientList = true;
             queryPatientsException = LiferayUtils.getPortalTranslation(ex.getMessage());
         }
@@ -447,7 +447,7 @@ public class PacRepBean implements Serializable {
         trcassertionexists = true;
         PatientId patientId = null;
         try {
-            patientDocuments = new ArrayList<PatientDocument>();
+            patientDocuments = new ArrayList<>();
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
             log.info("CLIENTCONNECTOR: " + serviceUrl);
             ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
@@ -497,7 +497,9 @@ public class PacRepBean implements Serializable {
             consentExists = true;
             log.error(ex.getMessage());
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "DOCUMENT QUERY", ex.getMessage()));
-            log.error("PS QUERY: Error getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry + " - " + ex.getMessage());
+            if (patientId != null) {
+                log.error("PS QUERY: Error getting ps documents for : " + patientId.getExtension() + " from " + selectedCountry + " - " + ex.getMessage());
+            }
             queryDocumentsException = LiferayUtils.getPortalTranslation(ex.getMessage());
             if (ex.getMessage().contains("4701")) {
                 consentExists = false;
@@ -527,7 +529,9 @@ public class PacRepBean implements Serializable {
             // get patient documents
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "TRCA ERROR", e.getMessage()));
-            log.error("TRCA: Error creating trca for patient : " + patientId.getExtension() + " with hcpAssetion : " + hcpAssertion.getID() + ". Purpose of use is : " + purposeOfUse + " - " + e.getMessage());
+            if (patientId != null) {
+                log.error("TRCA: Error creating trca for patient : " + patientId.getExtension() + " with hcpAssetion : " + hcpAssertion.getID() + ". Purpose of use is : " + purposeOfUse + " - " + e.getMessage());
+            }
             trcassertionexists = false;
             trcassertionnotexists = true;
             queryDocumentsException = LiferayUtils.getPortalTranslation(e.getMessage());
@@ -761,5 +765,4 @@ public class PacRepBean implements Serializable {
     public void setPatientcountry(String patientcountry) {
         this.patientcountry = patientcountry;
     }
-
 }

@@ -75,6 +75,9 @@ public class HTTPUtil {
                 URL url;
                 url = new URL(endpoint);
                 con = (HttpsURLConnection) url.openConnection();
+                //TODO: not sustainable solution: EHNCP-1363
+                con.setHostnameVerifier((hostname, session) -> true);
+                // End EHNCP-1363
                 con.setSSLSocketFactory(sslsocketfactory);
                 con.connect();
                 Certificate[] certs = con.getServerCertificates();

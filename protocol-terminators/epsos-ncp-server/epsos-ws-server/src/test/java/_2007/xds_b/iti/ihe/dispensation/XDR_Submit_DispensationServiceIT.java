@@ -21,24 +21,27 @@ package _2007.xds_b.iti.ihe.dispensation;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.pt.server.it.ServerGenericIT;
-import java.util.Collection;
-import org.junit.*;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
-import tr.com.srdc.epsos.util.Constants;
+
+import java.util.Collection;
 
 /**
  * Integration test class for the XDR Submit Document service.
+ *
  * @author gareth
  */
 public class XDR_Submit_DispensationServiceIT extends ServerGenericIT {
 
     @BeforeClass
     public static void setUpClass() {
-        LOG.info("----------------------------");
-        LOG.info(" Submit Document eD");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Submit Document eD");
+        LOGGER.info("----------------------------");
 
-        epr = CONFIG_SERVICE.getServiceWSE(COUNTRY_CODE, Constants.DispensationService);
+        epr = DISCOVERY_SERVICE.getEndpointUrl(COUNTRY_CODE, RegisteredService.DISPENSATION_SERVICE, false);
     }
 
     /**
@@ -60,7 +63,7 @@ public class XDR_Submit_DispensationServiceIT extends ServerGenericIT {
         this.assertions = this.getAssertions("xdr/edispensation/testSubmitNoEP.xml", XSPARole.PHARMACIST);
         testFail("testSubmitNoEP", "4105", "xdr/edispensation/testSubmitNoEP.xml");
     }
-    
+
     /**
      * Test of respondingGateway_ProvideAndRegisterDocumentSet method, of class XDR_ServiceSkeleton.
      * Expected result is a response with fail status.
@@ -68,7 +71,7 @@ public class XDR_Submit_DispensationServiceIT extends ServerGenericIT {
     @Test
     public void testSubmitDispEP() {
         this.assertions = this.getAssertions("xdr/edispensation/testSubmitDispEP.xml", XSPARole.PHARMACIST);
-        testFail("testSubmitDispEP","4106", "xdr/edispensation/testSubmitDispEP.xml");
+        testFail("testSubmitDispEP", "4106", "xdr/edispensation/testSubmitDispEP.xml");
     }
 
     @Override

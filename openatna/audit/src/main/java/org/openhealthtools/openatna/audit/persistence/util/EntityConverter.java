@@ -1,64 +1,30 @@
 /**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
+ * Copyright (c) 2009-2011 University of Cardiff and others
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * <p>
+ * Contributors:
+ * University of Cardiff - initial API and implementation
+ * -
  */
-
 package org.openhealthtools.openatna.audit.persistence.util;
+
+import org.openhealthtools.openatna.anom.*;
+import org.openhealthtools.openatna.audit.persistence.model.*;
+import org.openhealthtools.openatna.audit.persistence.model.codes.*;
 
 import java.util.List;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.openhealthtools.openatna.anom.AtnaCode;
-import org.openhealthtools.openatna.anom.AtnaMessage;
-import org.openhealthtools.openatna.anom.AtnaMessageObject;
-import org.openhealthtools.openatna.anom.AtnaMessageParticipant;
-import org.openhealthtools.openatna.anom.AtnaObject;
-import org.openhealthtools.openatna.anom.AtnaObjectDetail;
-import org.openhealthtools.openatna.anom.AtnaParticipant;
-import org.openhealthtools.openatna.anom.AtnaSource;
-import org.openhealthtools.openatna.anom.EventAction;
-import org.openhealthtools.openatna.anom.EventOutcome;
-import org.openhealthtools.openatna.anom.NetworkAccessPoint;
-import org.openhealthtools.openatna.anom.ObjectDataLifecycle;
-import org.openhealthtools.openatna.anom.ObjectDescription;
-import org.openhealthtools.openatna.anom.ObjectType;
-import org.openhealthtools.openatna.anom.ObjectTypeCodeRole;
-import org.openhealthtools.openatna.anom.SopClass;
-import org.openhealthtools.openatna.audit.persistence.model.DetailTypeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageObjectEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageParticipantEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageSourceEntity;
-import org.openhealthtools.openatna.audit.persistence.model.NetworkAccessPointEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ObjectDescriptionEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ObjectDetailEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ObjectEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ParticipantEntity;
-import org.openhealthtools.openatna.audit.persistence.model.SopClassEntity;
-import org.openhealthtools.openatna.audit.persistence.model.SourceEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.CodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.EventIdCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.EventTypeCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.ObjectIdTypeCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.ParticipantCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.SourceCodeEntity;
-import org.slf4j.LoggerFactory;
 
 /**
  * Converts between ANOM objects and persistable objects.
@@ -71,16 +37,13 @@ import org.slf4j.LoggerFactory;
 
 public class EntityConverter {
 
-	public static Logger logger = LoggerFactory.getLogger(EntityConverter.class);
-	
     private EntityConverter() {
     }
 
     public static MessageEntity createMessage(AtnaMessage message) {
-    	
+
         CodeEntity code = createCode(message.getEventCode(), CodeEntity.CodeType.EVENT_ID);
-        MessageEntity ent = new MessageEntity((EventIdCodeEntity) code,
-                new Integer(message.getEventOutcome().value()));
+        MessageEntity ent = new MessageEntity((EventIdCodeEntity) code, new Integer(message.getEventOutcome().value()));
         ent.setEventDateTime(message.getEventDateTime());
         if (message.getSourceAddress() != null) {
             ent.setSourceAddress(message.getSourceAddress());
@@ -108,11 +71,12 @@ public class EntityConverter {
         }
         if (message.getMessageContent() != null) {
             ent.setMessageContent(message.getMessageContent());
-        }        
+        }
         return ent;
     }
 
     public static AtnaMessage createMessage(MessageEntity entity) {
+
         AtnaCode evtid = createCode(entity.getEventId());
         AtnaMessage msg = new AtnaMessage(evtid, EventOutcome.getOutcome(entity.getEventOutcome()));
         msg.setMessageId(entity.getId());
@@ -144,6 +108,7 @@ public class EntityConverter {
     }
 
     public static MessageParticipantEntity createMessageParticipant(AtnaMessageParticipant participant) {
+
         MessageParticipantEntity e = new MessageParticipantEntity();
         e.setParticipant(createParticipant(participant.getParticipant()));
         e.setUserIsRequestor(participant.isUserIsRequestor());
@@ -158,6 +123,7 @@ public class EntityConverter {
     }
 
     public static AtnaMessageParticipant createMessageParticipant(MessageParticipantEntity entity) {
+
         AtnaParticipant ap = createParticipant(entity.getParticipant());
         AtnaMessageParticipant p = new AtnaMessageParticipant(ap);
         if (entity.isUserIsRequestor() != null) {
@@ -172,6 +138,7 @@ public class EntityConverter {
     }
 
     public static MessageObjectEntity createMessageObject(AtnaMessageObject object) {
+
         MessageObjectEntity e = new MessageObjectEntity();
         e.setObject(createObject(object.getObject()));
         if (object.getObjectQuery() != null && object.getObjectQuery().length > 0) {
@@ -189,6 +156,7 @@ public class EntityConverter {
     }
 
     public static AtnaMessageObject createMessageObject(MessageObjectEntity entity) {
+
         AtnaObject obj = createObject(entity.getObject());
         AtnaMessageObject o = new AtnaMessageObject(obj);
         if (entity.getObjectDataLifeCycle() != null) {
@@ -208,17 +176,20 @@ public class EntityConverter {
     }
 
     public static MessageSourceEntity createMessageSource(AtnaSource source) {
+
         MessageSourceEntity e = new MessageSourceEntity();
         e.setSource(createSource(source));
         return e;
     }
 
     public static AtnaSource createMessageSource(MessageSourceEntity entity) {
+
         return createSource(entity.getSource());
     }
 
 
     public static ObjectEntity createObject(AtnaObject object) {
+
         ObjectEntity e = new ObjectEntity();
         e.setObjectId(object.getObjectId());
         e.setObjectName(object.getObjectName());
@@ -264,6 +235,7 @@ public class EntityConverter {
     }
 
     public static AtnaObject createObject(ObjectEntity entity) {
+
         AtnaCode code = createCode(entity.getObjectIdTypeCode());
         AtnaObject ao = new AtnaObject(entity.getObjectId(), code);
         ao.setObjectName(entity.getObjectName());
@@ -304,33 +276,6 @@ public class EntityConverter {
         }
         return ao;
     }
-/*
-
-    public static List<String> mppsUidsAsList(ObjectDescriptionEntity entity) {
-        String uids = entity.getMppsUids();
-        String[] vals = uids.split(" ");
-        List<String> ret = new ArrayList<String>();
-        for (String val : vals) {
-            if (val.length() > 0) {
-                ret.add(val);
-            }
-        }
-        return ret;
-    }
-
-
-    public static List<String> getInstanceUidsAsList(SopClassEntity entity) {
-        String uids = entity.getInstanceUids();
-        String[] vals = uids.split(" ");
-        List<String> ret = new ArrayList<String>();
-        for (String val : vals) {
-            if (val.length() > 0) {
-                ret.add(val);
-            }
-        }
-        return ret;
-    }*/
-
 
     public static SourceEntity createSource(AtnaSource source) {
         SourceEntity e = new SourceEntity();

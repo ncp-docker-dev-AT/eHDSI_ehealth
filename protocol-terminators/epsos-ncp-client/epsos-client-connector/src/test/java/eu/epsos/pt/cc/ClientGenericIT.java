@@ -24,23 +24,23 @@ import eu.epsos.protocolterminators.integrationtest.common.AbstractIT;
 import eu.epsos.validation.datamodel.common.EpsosService;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.reporting.ValidationReport;
-import java.beans.PropertyVetoException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.springframework.mock.jndi.SimpleNamingContextBuilder;
+import org.w3c.dom.Document;
+
 import javax.naming.NamingException;
 import javax.xml.soap.SOAPElement;
 import javax.xml.ws.soap.SOAPFaultException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.springframework.mock.jndi.SimpleNamingContextBuilder;
-import org.w3c.dom.Document;
+import java.beans.PropertyVetoException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
- *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public abstract class ClientGenericIT extends AbstractIT {
@@ -64,7 +64,7 @@ public abstract class ClientGenericIT extends AbstractIT {
             try {
                 ds.setDriverClass(portalProps.getProperty("db.driverclass"));
             } catch (PropertyVetoException ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             }
             ds.setJdbcUrl(portalProps.getProperty("db.jdbcurl"));
             ds.setUser(portalProps.getProperty("db.user"));
@@ -78,42 +78,11 @@ public abstract class ClientGenericIT extends AbstractIT {
             try {
                 builder.activate();
             } catch (IllegalStateException ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             }
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    /**
-     *
-     * @param testName Test name for logging purposes
-     * @param expected expected error code
-     * @param request file with PRPA_IN201305UV02
-     */
-    protected void testFailScenario(String testName, String expected, String request) {
-        ValidationReport.cleanValidationDir(NcpSide.NCP_B);
-        try {
-            callService(request);  // call
-
-            LOG.info(fail(testName));                                   // preaty status print to tests list
-            Assert.fail(testName + "Unexpected success result; missing error exception"); // fail the test
-
-        } catch (SOAPFaultException ex) {
-            if (expected.equals((ex.getMessage()))) {        // is expected exception error?
-                LOG.info(success(testName));
-
-            } else {
-                LOG.info(fail(testName));
-            }
-
-            Assert.assertEquals(testName, expected, ex.getMessage());
-
-        } catch (RuntimeException ex) {
-            LOG.info(fail(testName));                                   // preaty status print to tests list
-            Assert.fail(testName + ": " + ex.getMessage()); // fail the test
-        }
-        ValidationReport.write(NcpSide.NCP_B, true);
     }
 
     /**
@@ -135,6 +104,36 @@ public abstract class ClientGenericIT extends AbstractIT {
             throw new RuntimeException(ex.getMessage(), ex.getCause());
         }
         return extension + "^^^&;" + root + "&;ISO";
+    }
+
+    /**
+     * @param testName Test name for logging purposes
+     * @param expected expected error code
+     * @param request  file with PRPA_IN201305UV02
+     */
+    protected void testFailScenario(String testName, String expected, String request) {
+        ValidationReport.cleanValidationDir(NcpSide.NCP_B);
+        try {
+            callService(request);  // call
+
+            LOGGER.info(fail(testName));                                   // preaty status print to tests list
+            Assert.fail(testName + "Unexpected success result; missing error exception"); // fail the test
+
+        } catch (SOAPFaultException ex) {
+            if (expected.equals((ex.getMessage()))) {        // is expected exception error?
+                LOGGER.info(success(testName));
+
+            } else {
+                LOGGER.info(fail(testName));
+            }
+
+            Assert.assertEquals(testName, expected, ex.getMessage());
+
+        } catch (RuntimeException ex) {
+            LOGGER.info(fail(testName));                                   // pretty status print to tests list
+            Assert.fail(testName + ": " + ex.getMessage()); // fail the test
+        }
+        ValidationReport.write(NcpSide.NCP_B, true);
     }
 
     @Override

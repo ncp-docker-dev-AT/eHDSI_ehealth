@@ -34,6 +34,9 @@ public class PatientDBConnector {
     private static Statement statement = null;
     private static PreparedStatement preparedStatement = null;
 
+    private PatientDBConnector() {
+    }
+
     private static void getConnection() {
 //		try {
 //			if(connection == null || connection.isClosed())
@@ -53,7 +56,7 @@ public class PatientDBConnector {
                 statement = connection.createStatement();
             }
         } catch (SQLException e) {
-            logger.error("", e);
+            logger.error("SQLException: '{}'", e.getMessage(), e);
         }
 
         return statement;
@@ -68,7 +71,7 @@ public class PatientDBConnector {
                 preparedStatement = connection.prepareStatement(sql);
             }
         } catch (SQLException e) {
-            logger.error("", e);
+            logger.error("SQLException: '{}'", e.getMessage(), e);
         }
         return preparedStatement;
     }
@@ -82,7 +85,7 @@ public class PatientDBConnector {
                 preparedStatement = connection.prepareStatement(sql, param);
             }
         } catch (SQLException e) {
-            logger.error("", e);
+            logger.error("SQLException: '{}'", e.getMessage(), e);
         }
         return preparedStatement;
     }

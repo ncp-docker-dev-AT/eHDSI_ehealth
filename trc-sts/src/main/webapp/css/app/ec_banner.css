@@ -1,0 +1,191 @@
+/* 
+-----------------------------------
+	EC BANNER
+-----------------------------------
+*/
+
+#ec-banner {
+	position:relative;
+	background-color:#fff;
+}
+
+@media (min-width: 768px) {
+	#ec-banner #ec-logo {
+		position:absolute;
+		top:15px;
+		left:15px;
+	}
+}
+
+@media (max-width: 767px) {
+	#ec-banner #ec-logo {
+		float:left;
+		width:120px;
+		height:auto;
+		margin:10px 0 0 10px;
+	}
+}
+	
+#ec-banner-inner {
+	position:relative;
+}
+	
+#ec-banner #ec-title {
+	margin:0;
+	font-size:180%;
+	font-family:Verdana, Geneva, sans-serif;
+}
+	
+#ec-banner #ec-title strong {
+	color:#0065a2;
+	background-color:white;
+	height:100px;
+	display:block;
+	font-weight:normal;
+	padding:70px 0 0 220px;
+}
+
+@media (max-width: 767px) {
+	#ec-banner #ec-title strong  {
+		padding:41px 0 5px 160px;
+		height:auto;
+		font-size:90%;
+	}
+}
+
+#ec-banner #ec-title span {
+	color:white;
+	background-color:#0065a2;
+	display:block;
+	font-size:80%;
+	padding:5px 0 15px 220px;
+}
+
+@media (max-width: 767px) {
+	#ec-banner #ec-title span  {
+		padding:5px 0 10px 160px;
+		font-size:60%;
+	}
+}
+
+	/* 
+	-----------------------------------
+		USER NAV
+	-----------------------------------
+	*/
+	
+	#ec-banner #ec-user-nav {
+		float:right;
+		margin:5px 10px;
+		position:relative;
+		z-index:10;
+	}
+	
+	@media (max-width: 767px) {
+		#ec-banner #ec-user-nav {
+			background:rgb(251, 251, 251);
+			margin:0;
+			padding:5px;
+			float:none;
+			font-size:90%;
+		}
+	}
+	
+	@media (max-width: 500px) {
+		#ec-banner #ec-user-nav {
+			font-size:85%;
+		}
+	}
+	
+	#ec-banner #ec-user-nav > ul {
+		display:inline-block;
+		vertical-align:middle;
+	}
+
+	#ec-banner #ec-user-nav > ul > li a {
+		color:#0065a2;
+		padding:9px;
+	}
+	
+	@media (max-width: 500px) {
+		#ec-banner #ec-user-nav > ul > li a  {
+			padding:7px 5px;
+		}
+	}
+	
+	/* 
+	-----------------------------------
+		LANGUAGE SELECTOR
+	-----------------------------------
+	*/
+	
+	
+	
+	#ec-banner .ec-language-form,
+	#ec-banner .ec-language-selector {
+		display:inline-block;
+		width:auto;
+		vertical-align:middle;
+		margin-left:5px;
+		height:auto;
+		margin-bottom:0;
+	}
+	
+	#ec-banner select.ec-language-selector {
+		padding:5px 10px;
+	}
+	
+	@media (max-width: 767px) {
+		#ec-banner .ec-language-selector {
+			font-size:90%;
+			min-width:auto;
+			float:right;
+			margin-top:2px;
+		}
+	}
+	
+/* 
+-----------------------------------
+	MAIN PATH
+-----------------------------------
+*/
+
+#ec-banner-path {
+	border:0;
+	background-color:#074A8B;
+	margin:0;
+}
+
+#ec-banner-path ul {
+	border:0;
+	background-color:#074A8B;
+	margin:0;
+	padding:4px 15px;
+	display:block;
+}
+
+#ec-banner-path ul li {
+	display:inline-block;
+}
+
+#ec-banner-path ul li + li:before {
+	content:"/";
+	display:inline-block;
+	margin:0 1px;
+	color:#fff;
+}
+
+#ec-banner-path a,
+#ec-banner-path a:visited{
+	color:#fff;
+	text-decoration:none;
+	border:0;
+}
+
+#ec-banner-path a:hover,
+#ec-banner-path a:focus,
+#ec-banner-path a:active{
+	text-decoration:underline;
+	color:#fff;
+	border:0;
+}

@@ -1,0 +1,76 @@
+/* 
+-----------------------------------
+	PANEL
+-----------------------------------
+*/
+
+.panel {
+	border-radius:2px;
+}
+
+.panel-title {
+	font-size:14px;
+}
+
+.panel-title a {
+	color:#5BC0DE;
+}
+
+/* 
+-----------------------------------
+	PANEL GROUP
+-----------------------------------
+*/
+
+.panel-group .panel {
+	border-radius:2px;
+}
+
+/* 
+-----------------------------------
+	PANEL HEADING
+-----------------------------------
+*/
+
+.panel-heading[aria-expanded] {
+	cursor:pointer;
+	display:block;
+}
+
+.panel-heading[aria-expanded] .panel-title {
+	color:#5BC0DE;
+	
+}
+
+.panel-heading[aria-expanded]:hover,
+.panel-heading[aria-expanded]:active,
+.panel-heading[aria-expanded]:focus {
+	background-color:rgba(0,0,0,0.03);
+	text-decoration:none;
+}
+
+.panel-heading[aria-expanded] .panel-title::before {
+	content: "\f055";
+	margin-right:10px;
+	display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+	color:#666;
+}
+
+.panel-heading[aria-expanded="true"] .panel-title::before {
+	content: "\f056";
+}
+
+.panel-default {
+	border-color: #DEE3E6;
+}
+
+.panel-default .panel-heading {
+	border-color: #DEE3E6;
+	background-color:transparent;
+	color:#666;
+}

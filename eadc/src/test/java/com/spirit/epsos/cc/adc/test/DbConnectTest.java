@@ -3,6 +3,8 @@ package com.spirit.epsos.cc.adc.test;
 import com.spirit.epsos.cc.adc.db.EadcDbConnect;
 import eu.epsos.pt.eadc.util.EadcFactory;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +18,7 @@ import java.sql.Statement;
 /**
  * This test will test the database connection
  */
+@RunWith(JUnit4.class)
 public class DbConnectTest extends BaseEadcTest {
 
     private static Logger log = LoggerFactory.getLogger(DbConnectTest.class);

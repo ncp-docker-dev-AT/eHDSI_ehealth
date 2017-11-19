@@ -21,11 +21,12 @@ package _2007.xds_b.iti.ihe.hcer;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.pt.server.it.ServerGenericIT;
-import java.util.Collection;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
-import tr.com.srdc.epsos.util.Constants;
+
+import java.util.Collection;
 
 /**
  * Integration test class for the XDR Submit Document service.
@@ -36,11 +37,11 @@ public class XDR_Submit_HcerServiceIT extends ServerGenericIT {
 
     @BeforeClass
     public static void setUpClass() {
-        LOG.info("----------------------------");
-        LOG.info(" Submit HCER Documents");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Submit HCER Documents");
+        LOGGER.info("----------------------------");
 
-        epr = CONFIG_SERVICE.getServiceWSE(COUNTRY_CODE, Constants.DispensationService);
+        epr = DISCOVERY_SERVICE.getEndpointUrl(COUNTRY_CODE, RegisteredService.DISPENSATION_SERVICE, false);
     }
 
     @Override

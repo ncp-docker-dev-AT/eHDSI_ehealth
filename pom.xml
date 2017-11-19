@@ -5,7 +5,7 @@
 
     <groupId>eu.europa.ec.sante.ehdsi</groupId>
     <artifactId>openncp</artifactId>
-    <version>2.5.2.RC3-SNAPSHOT</version>
+    <version>2.5.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenNCP Reference Implementation</name>
@@ -24,6 +24,7 @@
     </licenses>
 
     <developers/>
+
     <contributors/>
 
     <mailingLists/>
@@ -47,7 +48,6 @@
         <module>transformation-manager</module>
         <module>eadc</module>
         <module>consent-manager</module>
-        <module>tsl-utils</module>
         <module>protocol-terminators</module>
         <module>openatna</module>
         <module>openncp-portal</module>

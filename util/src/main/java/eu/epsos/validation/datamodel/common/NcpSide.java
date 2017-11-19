@@ -30,7 +30,7 @@ public enum NcpSide {
     NCP_B("NCP-B");
     private String name;
 
-    private NcpSide(String s) {
+    NcpSide(String s) {
         name = s;
     }
 

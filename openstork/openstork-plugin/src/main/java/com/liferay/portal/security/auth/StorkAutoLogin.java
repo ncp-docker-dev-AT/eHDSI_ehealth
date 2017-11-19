@@ -12,7 +12,6 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.stork.util.PatientSearchAttributes;
 import com.liferay.portal.stork.util.Util;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.expando.model.ExpandoTable;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
@@ -25,6 +24,7 @@ import eu.stork.peps.auth.commons.PEPSUtil;
 import eu.stork.peps.auth.commons.PersonalAttribute;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
+import org.apache.commons.lang.StringUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ import java.util.*;
  */
 public class StorkAutoLogin implements AutoLogin {
 
-    private static final Logger _log = LoggerFactory.getLogger(StorkHelper.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(StorkHelper.class);
     private static Properties configs;
     private static String providerName;
     private static String homepage = "/SP/";
@@ -66,83 +66,78 @@ public class StorkAutoLogin implements AutoLogin {
 
     private void getSAMLAttributes(HttpServletRequest request) throws UnsupportedEncodingException {
 
-        _log.info("Getting saml attributes");
+        LOGGER.info("Getting saml attributes");
         providerName = PropsUtil.get("provider.name");
         SAMLResponse = request.getParameter("SAMLResponse");
-        //SAMLResponse = URLDecoder.decode(SAMLResponse);
 
-        _log.info("SAML RESPONSE IS : " + SAMLResponse);
+        LOGGER.info("SAML RESPONSE IS: '{}'", SAMLResponse);
         byte[] decSamlToken = PEPSUtil.decodeSAMLToken(SAMLResponse);
         samlResponseXML = new String(decSamlToken);
-        _log.info("SAML RESPONSE XML IS : " + samlResponseXML);
+        LOGGER.info("SAML RESPONSE XML IS: '{}'", samlResponseXML);
         request.setAttribute("USER_samlResponseXML", samlResponseXML);
 
         STORKAuthnResponse authnResponse = null;
         attrs = null;
         STORKSAMLEngine engine = STORKSAMLEngine.getInstance(Constants.SP_CONF);
-        String host = (String) request.getRemoteHost();
-        _log.info("HOST IS : '{}'", host);
+        String host = request.getRemoteHost();
+        LOGGER.info("HOST IS : '{}'", host);
         request.setAttribute("USER_test", "kostas");
         try {
             authnResponse = engine.validateSTORKAuthnResponseWithQuery(decSamlToken, host);
             Assertion onBehalf = StorkUtils.convertOnBehalfStorktoHcpAssertion(authnResponse);
             Map<String, String> onbehalfattrs = StorkUtils.getRepresentedPersonInformation(authnResponse);
-            try {
-                _log.info("###############: " + onbehalfattrs.size() + " " + onbehalfattrs.get("givenName"));
-            } catch (Exception e) {
+            if (onbehalfattrs != null) {
+                LOGGER.info("###############: '{}' - '{}'", onbehalfattrs.size(), onbehalfattrs.get("givenName"));
             }
+
             request.setAttribute("USER_onbehalfassertion", onBehalf);
             request.setAttribute("USER_onbehalfattributes", onbehalfattrs);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            _log.info(e.getMessage());
+            LOGGER.info("Exception: '{}'", e.getMessage(), e);
         }
         if (authnResponse.isFail()) {
-            _log.info("Problem with response");
+            LOGGER.info("Problem with response");
         } else {
             attrs = authnResponse.getTotalPersonalAttributeList();
             if (attrs.isEmpty()) {
                 attrs = authnResponse.getPersonalAttributeList();
             }
-//          hcpRole = com.liferay.portal.stork.util.StorkConversionUtils.obtainRole(attrs);
-//          _log.info("HCP ROLE : " + hcpRole);
-
         }
     }
 
     public String[] login(HttpServletRequest req, HttpServletResponse res) throws AutoLoginException {
-        _log.info("############### STORK AUTO LOGIN ###############");
+
+        LOGGER.info("############### STORK AUTO LOGIN ###############");
         try {
             getSAMLAttributes(req);
         } catch (UnsupportedEncodingException ex) {
-            //java.util.logging.LoggerFactory.getLogger(StorkAutoLogin.class.getName()).log(Level.SEVERE, null, ex);
-            _log.error(null, ex);
+
+            LOGGER.error(null, ex);
         }
-        _log.info("#### USER IS " + getSurname() + " " + getEmailAddress());
-        User user = null;
-        String[] credentials = null;
+        LOGGER.info("#### USER IS " + getSurname() + " " + getEmailAddress());
+        User user;
+        String[] credentials;
 
         long companyId = PortalUtil.getCompanyId(req);
-        String login = null;
 
         try {
             String hcpInfo = getHCPInfo();
             String hcpRole = getHCPRoleString(hcpInfo);
             String epsosRole = getEpsosRole(hcpRole);
-            _log.info("HCP INFO: " + hcpInfo);
-            _log.info("STORK ROLE: " + hcpRole);
-            _log.info("EPSOS ROLE IS: " + epsosRole);
+            LOGGER.info("HCP INFO: '{}'", hcpInfo);
+            LOGGER.info("STORK ROLE: '{}'", hcpRole);
+            LOGGER.info("EPSOS ROLE IS: '{}'", epsosRole);
 
-            _log.info("Stork Autologin [modified 1]");
+            LOGGER.info("Stork Autologin [modified 1]");
 
             if (!Util.isEnabled(companyId)) {
-                return credentials;
+                return null;
             }
 
             user = loginFromSession(companyId, req);
             if (Validator.isNull(user)) {
-                return credentials;
+                return null;
             }
 
             credentials = new String[3];
@@ -157,51 +152,51 @@ public class StorkAutoLogin implements AutoLogin {
             logError(e);
             throw new AutoLoginException(e);
         }
-        return credentials;
+        return null;
     }
 
     private User loginFromSession(long companyId, HttpServletRequest request) throws Exception {
-        String login = null;
-        String emailAddress = null;
-        User user = null;
-        _log.info("IN login from STORK Saml Assertion");
+
+        String login;
+        String emailAddress;
+        User user;
+        LOGGER.info("IN login from STORK Saml Assertion");
 
         login = (getSurname() + getGivenName()).toLowerCase();
         emailAddress = getEmailAddress();
         if (Validator.isNull(login)) {
             return null;
         }
-        if (login.indexOf("@") >= 0) {
+        if (login.contains("@")) {
             login = login.substring(0, login.indexOf("@"));
         }
 
-        String authType = Util.getAuthType(companyId);
+        Util.getAuthType(companyId);
 
         try {
             user = UserLocalServiceUtil.getUserByEmailAddress(companyId, emailAddress);
-            _log.info("User found: " + user.getScreenName() + " (" + user.getEmailAddress() + ")");
+            LOGGER.info("User found: " + user.getScreenName() + " (" + user.getEmailAddress() + ")");
             if (Util.autoUpdateUser(companyId)) {
-                _log.error("Auto-updating user...");
-                //updateUserFromSession(companyId, user, request);
+                LOGGER.error("Auto-updating user...");
             }
         } catch (NoSuchUserException e) {
-//			if (Util.autoCreateUser(companyId)) {
-            _log.error("Importing user from session...");
+            LOGGER.error("NoSuchUserException: '{}'", e.getMessage(), e);
             user = createUserFromSession(companyId);
-            _log.error("Created user with ID: " + user.getUserId());
-//			}
+            LOGGER.error("Created user with ID: " + user.getUserId());
         }
 
         return user;
     }
 
     private User createUserFromSession(long companyId) throws Exception {
+
         User user = null;
 
         String screenName = (getSurname() + getGivenName()).toLowerCase();
+
         if (Validator.isNull(screenName)) {
-            _log.info("Cannot create user - missing screen name");
-            return user;
+            LOGGER.info("Cannot create user - missing screen name");
+            return null;
         }
 
         /*
@@ -209,37 +204,28 @@ public class StorkAutoLogin implements AutoLogin {
          users.email.address.required=false
          */
         String emailAddress = getEmailAddress();
-//                if (Validator.isNull(emailAddress))
-//                    emailAddress=screenName + "@stork.eu";
-//
-//		if (Validator.isNull(emailAddress)) {
-//			_log.info("Cannot create user - missing email");
-//			return user;
-//		}
 
         String firstname = getGivenName();
         if (Validator.isNull(firstname)) {
-            _log.info("Cannot create user - missing firstname");
-            return user;
+            LOGGER.info("Cannot create user - missing firstname");
+            return null;
         }
 
         String surname = getSurname();
 
         if (Validator.isNull(surname)) {
-            _log.info("Cannot create user - missing surname");
-            return user;
+            LOGGER.info("Cannot create user - missing surname");
+            return null;
         }
 
-        _log.info("Creating user: screen name = [" + screenName + "], emailAddress = [" + emailAddress
-                + "], first name = [" + firstname + "], surname = [" + surname + "]");
+        LOGGER.info("Creating user: screen name = [{}], emailAddress = [{}], first name = [{}], surname = [{}]",
+                screenName, emailAddress, firstname, surname);
 
         user = addUser(companyId, screenName, emailAddress, firstname, surname);
         return user;
     }
 
-    private User addUser(
-            long companyId, String screenName, String emailAddress,
-            String firstName, String lastName)
+    private User addUser(long companyId, String screenName, String emailAddress, String firstName, String lastName)
             throws Exception {
 
         long creatorUserId = 0;
@@ -265,30 +251,27 @@ public class StorkAutoLogin implements AutoLogin {
         boolean sendEmail = false;
         ServiceContext serviceContext = new ServiceContext();
 
-        User user = UserLocalServiceUtil.addUser(
-                creatorUserId, companyId, autoPassword, password1, password2,
-                autoScreenName, screenName, emailAddress, facebookId, openId,
-                locale, firstName, middleName, lastName, prefixId, suffixId, male,
-                birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
-                organizationIds, roleIds, userGroupIds, sendEmail, serviceContext);
+        User user = UserLocalServiceUtil.addUser(creatorUserId, companyId, autoPassword, password1, password2,
+                autoScreenName, screenName, emailAddress, facebookId, openId, locale, firstName, middleName, lastName,
+                prefixId, suffixId, male, birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds, organizationIds,
+                roleIds, userGroupIds, sendEmail, serviceContext);
 
-        //
         String hcpInfo = getHCPInfo();
         String hcpRole = getHCPRoleString(hcpInfo);
         String epsosRole = getEpsosRole(hcpRole);
-        _log.info("HCP INFO: " + hcpInfo);
-        _log.info("STORK ROLE: " + hcpRole);
-        _log.info("EPSOS ROLE IS: " + epsosRole);
+        LOGGER.info("HCP INFO: '{}'", hcpInfo);
+        LOGGER.info("STORK ROLE: '{}'", hcpRole);
+        LOGGER.info("EPSOS ROLE IS: '{}'", epsosRole);
 
         // Add epsos role
         Role role = null;
         try {
             role = RoleLocalServiceUtil.getRole(companyId, epsosRole);
-            _log.info("LIFERAY ROLE FOR " + epsosRole + " IS " + role.getName());
+            LOGGER.info("LIFERAY ROLE FOR '{}' IS '{}'", epsosRole, role.getName());
             UserLocalServiceUtil.addRoleUser(role.getRoleId(), user.getUserId());
         } catch (Exception e) {
-            _log.error("Problem adding " + epsosRole + " role to the user");
-            e.printStackTrace();
+            LOGGER.error("Problem adding " + epsosRole + " role to the user");
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
         // Add default patient role
@@ -296,54 +279,39 @@ public class StorkAutoLogin implements AutoLogin {
             role = RoleLocalServiceUtil.getRole(companyId, "patient");
             UserLocalServiceUtil.addRoleUser(role.getRoleId(), user.getUserId());
         } catch (Exception e) {
-            _log.error("Problem adding patient role to the user");
-            e.printStackTrace();
+            LOGGER.error("Problem adding patient role to the user");
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
         String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
-        _log.info("The country code is :" + countryCode);
-        _log.info("Reading the required attributes from International Search Mask");
+        LOGGER.info("The country code is: '{}'", countryCode);
+        LOGGER.info("Reading the required attributes from International Search Mask");
         Map<String, String> attributes = PatientSearchAttributes.getRequiredAttributesByCountry(countryCode);
-        Iterator it = attributes.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pairs = (Map.Entry) it.next();
-            _log.info("$$$$ " + pairs.getKey() + " = " + pairs.getValue());
+        for (Object o : attributes.entrySet()) {
+            Map.Entry pairs = (Map.Entry) o;
+            LOGGER.info("$$$$ " + pairs.getKey() + " = " + pairs.getValue());
             try {
                 String attrName = pairs.getValue().toString(); //"2.16.470.1.100.1.1.1000.990.1";
                 String storkKey = pairs.getKey().toString();
                 String value = getSamlValue(storkKey);
-                try {
-                    if (storkKey.equalsIgnoreCase("eIdentifier")) {
-                        String[] temp = value.split("/");
-                        value = temp[2];
-                    } else {
-                        value = getSamlValue(storkKey);
-                    }
-                } catch (Exception e) {
-                    _log.error("Problem with eIdentifier " + value);
+                if (StringUtils.equalsIgnoreCase(storkKey, "eIdentifier")) {
+                    String[] temp = value.split("/");
+                    value = temp[2];
+                } else {
+                    value = getSamlValue(storkKey);
                 }
-
-                _log.info("Adding attribute :" + attrName + " with value " + value);
-                ExpandoTable table = null;
-                table = ExpandoTableLocalServiceUtil.getTable(companyId,
-                        User.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
-                ExpandoColumn column = StorkHelper.addExpandoColumn(companyId, user, role.getRoleId(), attrName);
-                StorkHelper.updateColumnValue(table.getTableId(),
-                        attrName,
-                        value,
-                        companyId,
-                        user.getUserId());
+                LOGGER.info("Adding attribute: '{}' with value: '{}'", attrName, value);
+                ExpandoTable table;
+                table = ExpandoTableLocalServiceUtil.getTable(companyId, User.class.getName(),
+                        ExpandoTableConstants.DEFAULT_TABLE_NAME);
+                StorkHelper.addExpandoColumn(companyId, user, role.getRoleId(), attrName);
+                StorkHelper.updateColumnValue(table.getTableId(), attrName, value, companyId, user.getUserId());
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
             }
-
         }
 
-        // Add custom fields
-//                // Add HCP Role
-//                _log.info(hcpRole);
-//
-        _log.info("After UserLocalServiceUtil.addUser: " + screenName + ", " + emailAddress + ", " + firstName + " " + lastName);
+        LOGGER.info("After UserLocalServiceUtil.addUser: '{}', '{}', '{}', '{}'", screenName, emailAddress, firstName, lastName);
         UserLocalServiceUtil.updatePasswordReset(user.getUserId(), false);
         UserLocalServiceUtil.updateReminderQuery(user.getUserId(), password1, password2);
 
@@ -355,18 +323,19 @@ public class StorkAutoLogin implements AutoLogin {
         boolean modified = false;
 
         String emailAddress = (String) request.getAttribute(Util.getEmailHeaderName(companyId));
-        _log.info("updateUserFromSession: User [" + user.getScreenName() + "]: update email address [" + user.getEmailAddress()
-                + "] --> [" + emailAddress + "]");
+        LOGGER.info("updateUserFromSession: User [{}]: update email address [{}] --> [{}]", user.getScreenName(),
+                user.getEmailAddress(), emailAddress);
+
         if (!Validator.isNull(emailAddress) && !user.getEmailAddress().equals(emailAddress)) {
-            _log.info("User [" + user.getScreenName() + "]: update email address [" + user.getEmailAddress()
-                    + "] --> [" + emailAddress + "]");
+            LOGGER.info("User [{}]: update email address [{}] --> [{}]", user.getScreenName(), user.getEmailAddress(),
+                    emailAddress);
             user.setEmailAddress(emailAddress);
             modified = true;
         }
 
         String firstname = getGivenName();
-        if (firstname.indexOf(";") >= 0) {
-            firstname = firstname.substring(0, firstname.indexOf(";"));
+        if (firstname.contains(";")) {
+            firstname = firstname.substring(0, firstname.indexOf(';'));
         }
         if (!Validator.isNull(firstname) && !user.getFirstName().equals(firstname)) {
             user.setFirstName(firstname);
@@ -374,63 +343,63 @@ public class StorkAutoLogin implements AutoLogin {
         }
 
         String surname = getSurname();
-        if (surname.indexOf(";") >= 0) {
-            surname = surname.substring(0, surname.indexOf(";"));
+        if (surname.contains(";")) {
+            surname = surname.substring(0, surname.indexOf(';'));
         }
         if (!Validator.isNull(surname) && !user.getLastName().equals(surname)) {
-            _log.info("User [" + user.getScreenName() + "]: update last name [" + user.getLastName() + "] --> ["
-                    + surname + "]");
+            LOGGER.info("User [{}]: update last name [{}] --> [{}]", user.getScreenName(), user.getLastName(), surname);
             user.setLastName(surname);
             modified = true;
         }
+        LOGGER.info("User has been modified: '{}'", modified);
         UserLocalServiceUtil.updateUser(user);
     }
 
-    public void logError(Exception e) {
-        _log.error("Exception message = " + e.getMessage() + " cause = " + e.getCause());
-        if (_log.isDebugEnabled()) {
-            e.printStackTrace();
-        }
-
+    private void logError(Exception e) {
+        LOGGER.error("Exception message: '{} - Cause: '{}'", e.getMessage(), e.getCause(), e);
     }
 
     private String getIsoEncoding(String input) throws UnsupportedEncodingException {
+
         byte[] utf = input.getBytes();
         byte[] b = new String(utf, "UTF-8").getBytes("ISO-8859-1");
-        String output = new String(b);
-        return output;
+        return new String(b);
     }
 
-    public String[] handleException(HttpServletRequest request, HttpServletResponse response, Exception e) throws AutoLoginException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String[] handleException(HttpServletRequest request, HttpServletResponse response, Exception e)
+            throws AutoLoginException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public String getSamlValue_(String key) {
+
         String ret = "";
         try {
             ret = attrs.get(key).getValue().get(0);
         } catch (Exception e) {
-            _log.error("Error with value for " + key);
+            LOGGER.error("Error with value for key: '{}' - '{}'", key, e.getMessage(), e);
         }
         return ret;
     }
 
     public String getSamlValue(IPersonalAttributeList attrs, String key) {
+
         String ret = "";
         try {
             ret = attrs.get(key).getValue().get(0);
         } catch (Exception e) {
-            _log.error("Error with value for " + key);
+            LOGGER.error("Error with value for key: '{}' - '{}'", key, e.getMessage(), e);
         }
         return ret;
     }
 
     public String getSamlValue(String key) {
+
         String ret = "";
         try {
             ret = attrs.get(key).getValue().get(0);
         } catch (Exception e) {
-            _log.error("Error with value for " + key);
+            LOGGER.error("Error with value for key: '{}' - '{}'", key, e.getMessage(), e);
         }
         return ret;
     }
@@ -472,27 +441,29 @@ public class StorkAutoLogin implements AutoLogin {
     }
 
     public String getEpsosRole(String HCPRole) {
-        _log.info("Try to find the role from assertion " + HCPRole);
-        if (HCPRole.equalsIgnoreCase("dentist")) {
+
+        LOGGER.info("Try to find the role from assertion: '{}'", HCPRole);
+        if (StringUtils.equalsIgnoreCase(HCPRole, "dentist")) {
             return "dentist";
         }
-        if (HCPRole.equalsIgnoreCase("nurse")) {
+        if (StringUtils.equalsIgnoreCase(HCPRole, "nurse")) {
             return "nurse";
         }
-        if (HCPRole.equalsIgnoreCase("pharmacist")) {
+        if (StringUtils.equalsIgnoreCase(HCPRole, "pharmacist")) {
             return "pharmacist";
         }
-        if (HCPRole.equalsIgnoreCase("physician")) {
+        if (StringUtils.equalsIgnoreCase(HCPRole, "physician")) {
             return "doctor";
         }
         return "patient";
     }
 
     public String getHCPRoleString(String xml) {
-        xml = xml.replaceAll("^\"|\"$", "");
+
+        String xmlTmp = xml.replaceAll("^\"|\"$", "");
         String typeOfHCP = "";
         try {
-            InputSource source = new InputSource(new StringReader(xml));
+            InputSource source = new InputSource(new StringReader(xmlTmp));
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document document = db.parse(source);
@@ -502,10 +473,8 @@ public class StorkAutoLogin implements AutoLogin {
 
             typeOfHCP = xpath.evaluate("/isHealthCareProfessional/typeOfHCP", document);
         } catch (Exception e) {
-            e.printStackTrace();
-            _log.error("Error finding xpath value");
+            LOGGER.error("Error finding xpath value: '{}'", e.getMessage(), e);
         }
-
         return typeOfHCP;
     }
 

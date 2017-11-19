@@ -24,6 +24,7 @@ public enum AuditModel {
     EPSOS_DOC_PATIENT_INFO_NOTIFICATION("epSOS - Documentation of the Patient Information Notification"),
     EPSOS2_ISSUANCE_HCP_ASSERTION("epSOS-2 - Issuance of a HCP Identity Assertion"),
     EPSOS2_FETCH_DOC_SERVICE_SP("epSOS-2 - Fetch Document Service (Service Provider)"),
+    EPSOS2_FETCH_DOC_SERVICE_SC("epSOS-2 - Fetch Document Service (Service Consumer)"),
     EPSOS_ED_DISCARD_AUDITP_SP("epSOS - DispensationService:Discard() Audit (Service Provider)"),
     EPSOS_CS_PUT_AUDIT_SP("epSOS - ConsentService:put() Audit (Service Provider)"),
     EPSOS_PS_RETRIEVE_REQUEST_XCA("epSOS PatientService:retrieve - request (V1 XCA)"),
@@ -40,6 +41,7 @@ public enum AuditModel {
     EPSOS_CS_DISCARD_AUDIT_SP("epSOS - ConsentService:Discard() Audit (Service Provider)"),
     EPSOS2_PROVIDE_DATA_SERVICE_SP("epSOS-2 - Provide Data Service (Service Provider)"),
     EPSOS_IMPORT_NCP_TRUSTED_LIST("epSOS - Import of an epSOS NCP Trusted Service List");
+
     private String name;
 
     AuditModel(String s) {

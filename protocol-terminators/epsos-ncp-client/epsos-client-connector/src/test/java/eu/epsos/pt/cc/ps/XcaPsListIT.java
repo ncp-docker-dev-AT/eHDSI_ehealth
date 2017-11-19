@@ -21,14 +21,15 @@ package eu.epsos.pt.cc.ps;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.pt.cc.ClientGenericIT;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.naming.NamingException;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
+
+import javax.naming.NamingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements all the Integration Test for the XCA List operation for Patient
@@ -47,14 +48,15 @@ public class XcaPsListIT extends ClientGenericIT {
     @BeforeClass
     public static void setUpClass() throws NamingException {
         ClientGenericIT.setUpClass();
-        LOG.info("----------------------------");
-        LOG.info(" Query PS Documents");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Query PS Documents");
+        LOGGER.info("----------------------------");
     }
 
     /*
      * Normal usage
      */
+
     /**
      * This test performs an XCA Query for PS, using valid Patient Identifiers.
      * It is a simple test designed uniquely for testing the normal work-flow of
@@ -62,7 +64,7 @@ public class XcaPsListIT extends ClientGenericIT {
      */
     @Test
     public void testQueryPS() {
-        List<String> permissions = new ArrayList<String>(4);
+        List<String> permissions = new ArrayList<>(4);
         permissions.add("3");
         permissions.add("5");
         permissions.add("10");
@@ -76,11 +78,12 @@ public class XcaPsListIT extends ClientGenericIT {
      * Invalid scenarios
      * see D3.4.2 | 3.3.1.5 & 3.4.1.5
      */
+
     /**
      * (ERROR)
-     *
+     * <p>
      * The patient has not given consent to the requested service.
-     *
+     * <p>
      * Response Status: Failure, Message: No Consent, Code: 4701
      */
     @Test
@@ -91,11 +94,11 @@ public class XcaPsListIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * Country A requests a higher authentication trust level than assigned to
      * the HCP (e.g. password-based login not accepted for the requested
      * operation).
-     *
+     * <p>
      * Response Status: Failure, Message: Weak, Authentication Code: 4702
      */
     @Test
@@ -106,16 +109,16 @@ public class XcaPsListIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * Either the security policy of country A or a privacy policy of the
      * patient (that was given in country A) does not allow the requested
      * operation to be performed by the HCP.
-     *
+     * <p>
      * Response Status: Failure, Message: Insufficient Rights, Code: 4703
      */
     @Test
     public void testQueryPSInsRights() {
-        List<String> permissions = new ArrayList<String>(1);
+        List<String> permissions = new ArrayList<>(1);
         permissions.add("4");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#3.xml", XSPARole.PHYSICIAN);
         testFailScenario("PT_CLIENT_XCA_PS_#3", "4703", REQ_FOLDER + "PT_CLIENT_XCA_PS_#3.xml");
@@ -123,14 +126,14 @@ public class XcaPsListIT extends ClientGenericIT {
 
     /**
      * (WARNING)
-     *
+     * <p>
      * No patient summary is registered for the given patient.
-     *
+     * <p>
      * Response Status: Success, Message: No Data, Code: 1102
      */
     @Test
     public void testQueryNoPS() {
-        List<String> permissions = new ArrayList<String>(4);
+        List<String> permissions = new ArrayList<>(4);
         permissions.add("3");
         permissions.add("5");
         permissions.add("10");
@@ -141,10 +144,10 @@ public class XcaPsListIT extends ClientGenericIT {
 
     /**
      * (INFO)
-     *
+     * <p>
      * If PDF-coded patient summary is requested: Country A does not provide the
      * (optional) source coded version of the patient summary.
-     *
+     * <p>
      * Response Status: Success, Message: Unsupported Feature, Code: 4201
      */
     @Test
@@ -155,10 +158,10 @@ public class XcaPsListIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The query argument slots used by the service consumer are not supported
      * by the service provider.
-     *
+     * <p>
      * Response Status: Failure, Message: Unknown Signifier, Code: 4202
      */
     @Test
@@ -169,9 +172,9 @@ public class XcaPsListIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The requested encoding cannot be provided due to a transcoding error.
-     *
+     * <p>
      * Response Status: Failure, Message: Transcoding Error, Code: 4203
      */
     @Test
@@ -182,9 +185,9 @@ public class XcaPsListIT extends ClientGenericIT {
 
     /**
      * (ERROR).
-     *
+     * <p>
      * The service provider is unable to evaluate the given argument.
-     *
+     * <p>
      * Response Status: Failure, Message: Unknown Filters, Code: 4204
      */
     @Test
@@ -196,6 +199,7 @@ public class XcaPsListIT extends ClientGenericIT {
     /*
      * Additional Invalid scenarios
      */
+
     /**
      * Not all of the requested encodings are provided (e.g. due to inability to
      * transcode a certain national code).

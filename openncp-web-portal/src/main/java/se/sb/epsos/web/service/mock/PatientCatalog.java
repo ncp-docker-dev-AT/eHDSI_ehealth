@@ -66,6 +66,7 @@ public class PatientCatalog {
     }
 
     private static PatientDemographics createPatient(String id, String country, String birthDate, String fName, String lName, String sex) {
+
         String homeCommunityId = CountryConfigManager.getHomeCommunityId(country);
         PatientDemographics patientDemographics = new PatientDemographics();
         PatientId patientId = new PatientId();
@@ -76,16 +77,16 @@ public class PatientCatalog {
         patientDemographics.setFamilyName(lName);
         patientDemographics.setAdministrativeGender(sex);
         patientDemographics.setCountry(country);
-        XMLGregorianCalendar cal = null;
+        XMLGregorianCalendar cal;
         try {
             cal = DatatypeFactory.newInstance().newXMLGregorianCalendar();
+            cal.setYear(Integer.parseInt(birthDate.substring(0, 4)));
+            cal.setMonth(Integer.parseInt(birthDate.substring(4, 6)));
+            cal.setDay(Integer.parseInt(birthDate.substring(6, 8)));
+            patientDemographics.setBirthDate(cal);
         } catch (DatatypeConfigurationException e) {
             LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
         }
-        cal.setYear(Integer.parseInt(birthDate.substring(0, 4)));
-        cal.setMonth(Integer.parseInt(birthDate.substring(4, 6)));
-        cal.setDay(Integer.parseInt(birthDate.substring(6, 8)));
-        patientDemographics.setBirthDate(cal);
         return patientDemographics;
     }
 }

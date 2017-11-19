@@ -1,27 +1,9 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
-
 package org.openhealthtools.openatna.report;
 
 import org.openhealthtools.openatna.audit.persistence.model.Query;
 import org.openhealthtools.openatna.audit.persistence.util.QueryString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -56,22 +38,17 @@ public class ReportConfig extends HashMap<String, Object> {
     public static final String TYPE = "type";
     public static final String STRING = "string";
     public static final String BOOLEAN = "boolean";
-
     public static final String TITLE = "title";
     public static final String QUERY = "query";
     public static final String QUERY_LANGUAGE = "queryLanguage";
     public static final String GROUPING_FIELD = "groupingField";
-
     public static final String OUTPUT_DIRECTORY = "outputDirectory";
     public static final String OUTPUT_FILE_NAME = "outputFileName";
     // PDF, HTML etc
     public static final String OUTPUT_TYPE = "outputType";
-
     public static final String INPUT_DIRECTORY = "inputDirectory";
     public static final String REPORT_INSTANCE = "reportInstance";
     public static final String TARGET = "target";
-
-
     public static final String MESSAGES = "MESSAGES";
     public static final String CODES = "CODES";
     public static final String SOURCES = "SOURCES";
@@ -81,23 +58,18 @@ public class ReportConfig extends HashMap<String, Object> {
     public static final String PROVISIONAL_MESSAGES = "PROVISIONAL_MESSAGES";
     public static final String ALL_SYSTEM = "ALL_SYSTEM";
     public static final String ALL = "ALL";
-
     public static final String HQL = "HQL";
     public static final String ATNA = "ATNA";
-
     public static final String HTML = "HTML";
     public static final String PDF = "PDF";
-
     public static final String[] outputTypes = {
             PDF,
             HTML
     };
-
     public static final String[] queryLanguages = {
             HQL,
             ATNA
     };
-
     public static final String[] targets = {
             MESSAGES,
             CODES,
@@ -106,14 +78,19 @@ public class ReportConfig extends HashMap<String, Object> {
             OBJECTS,
             NETWORK_ACCESS_POINTS
     };
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportConfig.class);
 
     public ReportConfig() {
 
     }
 
     public static ReportConfig fromXml(InputStream in) throws IOException {
+
         ReportConfig conf = new ReportConfig();
         Document doc = newDocument(in);
+        if (doc == null) {
+            throw new IOException("XML Document is null");
+        }
         Element root = doc.getDocumentElement();
         if (!root.getTagName().equalsIgnoreCase(REPORT_CONFIG)) {
             throw new IOException("unknown XML root element:" + root.getTagName());
@@ -135,7 +112,7 @@ public class ReportConfig extends HashMap<String, Object> {
                     }
 
                     String val = p.getTextContent().trim();
-                    if (val != null && val.length() > 0) {
+                    if (val.length() > 0) {
                         Object v = val;
                         if (type.equals(BOOLEAN)) {
                             v = Boolean.valueOf(val);
@@ -149,7 +126,11 @@ public class ReportConfig extends HashMap<String, Object> {
     }
 
     public static void toXml(ReportConfig conf, OutputStream out) throws IOException {
+
         Document doc = newDocument();
+        if (doc == null) {
+            throw new IOException("XML Document is null");
+        }
         Element root = doc.createElement(REPORT_CONFIG);
         Set<String> keys = conf.keySet();
         for (String key : keys) {
@@ -177,21 +158,21 @@ public class ReportConfig extends HashMap<String, Object> {
     }
 
     private static Document newDocument(InputStream stream) throws IOException {
+
         Document doc = null;
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
             doc = db.parse(stream);
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
+        } catch (ParserConfigurationException | SAXException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return doc;
     }
 
     private static Document newDocument() throws IOException {
+
         Document doc = null;
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -199,12 +180,13 @@ public class ReportConfig extends HashMap<String, Object> {
             DocumentBuilder db = dbf.newDocumentBuilder();
             doc = db.newDocument();
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            LOGGER.error("ParserConfigurationException: '{}'", e.getMessage(), e);
         }
         return doc;
     }
 
     private static StreamResult transform(Document doc, OutputStream out, boolean indent) throws IOException {
+
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer t = null;
         try {
@@ -216,15 +198,17 @@ public class ReportConfig extends HashMap<String, Object> {
             }
             t.setOutputProperty(OutputKeys.METHOD, "xml");
             t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        } catch (TransformerConfigurationException tce) {
+        } catch (TransformerConfigurationException e) {
+            LOGGER.error("TransformerConfigurationException: '{}'", e.getMessage(), e);
             assert (false);
         }
         DOMSource doms = new DOMSource(doc);
         StreamResult sr = new StreamResult(out);
         try {
             t.transform(doms, sr);
-        } catch (TransformerException te) {
-            throw new IOException(te.getMessage());
+        } catch (TransformerException e) {
+            LOGGER.error("TransformerException: '{}'", e.getMessage(), e);
+            throw new IOException(e.getMessage());
         }
         return sr;
     }
@@ -243,7 +227,7 @@ public class ReportConfig extends HashMap<String, Object> {
         try {
             ReportConfig.toXml(config, System.out);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }
     }
 

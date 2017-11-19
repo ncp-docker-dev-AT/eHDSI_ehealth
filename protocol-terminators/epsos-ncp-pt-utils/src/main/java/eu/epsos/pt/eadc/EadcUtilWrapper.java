@@ -25,13 +25,6 @@ import eu.epsos.pt.eadc.datamodel.ObjectFactory;
 import eu.epsos.pt.eadc.datamodel.TransactionInfo;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
@@ -46,6 +39,13 @@ import tr.com.srdc.epsos.securityman.helper.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.UUID;
+
 /**
  * This class wraps the EADC invocation. As it gathers several aspects required
  * to its proper usage, such as the compilation and preparation of transaction
@@ -55,41 +55,27 @@ import tr.com.srdc.epsos.util.XMLUtil;
  */
 public class EadcUtilWrapper {
 
-    /*
-     * Date format according to RFC 2822 specifications.
-     */
-    private static final SimpleDateFormat RFC822DATEFORMAT = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.ROOT);
+    private EadcUtilWrapper() {
+    }
 
     /**
-     * Main EADC Wrapper operation. It receives as input all the required
-     * information to successfully fill a transaction object.
+     * Main EADC Wrapper operation. It receives as input all the required information to successfully fill a transaction object.
      *
-     * @param reqMsgCtx the request Servlet Message Context
-     * @param respMsgCtx the response Servlet Message Context
-     * @param CDA the (optional) CDA document
+     * @param reqMsgCtx   the request Servlet Message Context
+     * @param respMsgCtx  the response Servlet Message Context
+     * @param CDA         the (optional) CDA document
      * @param idAssertion the Identity Assertion
-     * @param startTime the transaction start time
-     * @param endTime the transaction end time
-     * @param rcvgIso the country A ISO Code
-     *
-     * @throws ParserConfigurationException
+     * @param startTime   the transaction start time
+     * @param endTime     the transaction end time
+     * @param rcvgIso     the country A ISO Code
      * @throws Exception
      */
-    public static void invokeEadc(MessageContext reqMsgCtx,
-                                  MessageContext respMsgCtx,
-                                  ServiceClient serviceClient,
-                                  Document CDA,
-                                  Date startTime,
-                                  Date endTime,
-                                  String rcvgIso,
-                                  EadcEntry.DsTypes dsType,
-                                  Direction direction) throws ParserConfigurationException, Exception {
+    public static void invokeEadc(MessageContext reqMsgCtx, MessageContext respMsgCtx, ServiceClient serviceClient,
+                                  Document CDA, Date startTime, Date endTime, String rcvgIso, EadcEntry.DsTypes dsType,
+                                  Direction direction) throws Exception {
 
-        EadcUtil.invokeEadc(reqMsgCtx,
-                            respMsgCtx,
-                            CDA,
-                            buildTransactionInfo(reqMsgCtx, respMsgCtx, serviceClient, direction, startTime, endTime, rcvgIso),
-                            dsType);
+        EadcUtil.invokeEadc(reqMsgCtx, respMsgCtx, CDA, buildTransactionInfo(reqMsgCtx, respMsgCtx, serviceClient,
+                direction, startTime, endTime, rcvgIso), dsType);
     }
 
     /**
@@ -97,28 +83,20 @@ public class EadcUtilWrapper {
      *
      * @param reqMsgContext the request Servlet Message Context
      * @param rspMsgContext the response Servlet Message Context
-     * @param direction the request direction, INBOUND or OUTBOUND
-     * @param idAssertion the Identity Assertion
-     * @param startTime the transaction start time
-     * @param endTime the transaction end time
-     * @param countryAcode the country A ISO Code
-     *
+     * @param direction     the request direction, INBOUND or OUTBOUND
+     * @param idAssertion   the Identity Assertion
+     * @param startTime     the transaction start time
+     * @param endTime       the transaction end time
+     * @param countryAcode  the country A ISO Code
      * @return the filled Transaction Info object
      */
-    private static TransactionInfo buildTransactionInfo(MessageContext reqMsgContext,
-                                                        MessageContext rspMsgContext,
-                                                        ServiceClient serviceClient,
-                                                        Direction direction,
-                                                        Date startTime,
-                                                        Date endTime,
-                                                        String countryAcode) throws Exception {
+    private static TransactionInfo buildTransactionInfo(MessageContext reqMsgContext, MessageContext rspMsgContext,
+                                                        ServiceClient serviceClient, Direction direction, Date startTime,
+                                                        Date endTime, String countryAcode) throws Exception {
 
         TransactionInfo result = new ObjectFactory().createComplexTypeTransactionInfo();
-
         result.setAuthentificationLevel("");
-
         result.setDirection(direction.toString());
-
         result.setStartTime(getDateAsRFC822String(startTime));
         result.setEndTime(getDateAsRFC822String(endTime));
         result.setDuration(String.valueOf(endTime.getTime() - startTime.getTime()));
@@ -146,8 +124,6 @@ public class EadcUtilWrapper {
             result.setReceivingHost(serviceClient.getOptions().getTo().getAddress());
             result.setReceivingAddr(EventLogClientUtil.getServerIpAddress(serviceClient.getOptions().getTo().getAddress()));
         }
-        
-
         if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getAction() != null) {
             result.setRequestAction(reqMsgContext.getOptions().getAction());
         }
@@ -158,19 +134,17 @@ public class EadcUtilWrapper {
             result.setServiceName(reqMsgContext.getOperationContext().getServiceName());
         }
         result.setServiceType(null);
-
         result.setTransactionCounter("");
         result.setTransactionPK(UUID.randomUUID().toString());
-
-
         return result;
     }
 
     /**
      * Extracts and assertion from a given message context
+     *
      * @param requestMessageContext
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     private static Assertion getAssertion(MessageContext requestMessageContext) throws Exception {
 
@@ -180,16 +154,14 @@ public class EadcUtilWrapper {
     }
 
     /**
-     * Assertion utility method. Will extract information of a specific
-     * assertion, based on a given expression.
+     * Assertion utility method. Will extract information of a specific assertion, based on a given expression.
      *
      * @param idAssertion the Identity Assertion
-     * @param expression the expression to evaluate
-     *
-     * @return a string representing the information presented on the specified
-     * node
+     * @param expression  the expression to evaluate
+     * @return a string representing the information presented on the specified node
      */
     private static String extractAssertionInfo(Assertion idAssertion, String expression) {
+
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
             for (Attribute attribute : attributeStatement.getAttributes()) {
                 if (attribute.getName().equals(expression)) {
@@ -204,12 +176,12 @@ public class EadcUtilWrapper {
      * Extracts information from a given Assertion attribute.
      *
      * @param attribute the Assertion attribute
-     *
      * @return a string containing the value of the attribute
      */
     private static String getAttributeValue(Attribute attribute) {
+
         String attributeValue = null;
-        if (attribute.getAttributeValues().size() > 0) {
+        if (!attribute.getAttributeValues().isEmpty()) {
             attributeValue = attribute.getAttributeValues().get(0).getDOM().getTextContent();
         }
         return attributeValue;
@@ -220,24 +192,25 @@ public class EadcUtilWrapper {
      * Utility method to convert a specific date to the RFC 2822 format.
      *
      * @param date the date object to be converted
-     *
      * @return the RFC 2822 string representation of the date
      */
     private static String getDateAsRFC822String(Date date) {
+
+        // Date format according to RFC 2822 specifications.
+        SimpleDateFormat RFC822DATEFORMAT = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.ROOT);
         return RFC822DATEFORMAT.format(date);
     }
 
     /**
      * Extracts a CDA document from a RetrieveDocumentSetResponseType
-     * 
+     *
      * @param retrieveDocumentSetResponseType
      * @return
-     * @throws UnsupportedEncodingException
      * @throws ParserConfigurationException
      * @throws SAXException
-     * @throws IOException 
+     * @throws IOException
      */
-    public static Document getCDA(ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponseType) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException {
+    public static Document getCDA(ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponseType) throws ParserConfigurationException, SAXException, IOException {
 
         ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse documentResponse;
 
@@ -252,16 +225,16 @@ public class EadcUtilWrapper {
 
     /**
      * Converts a set of bytes into a Document
-     * 
+     *
      * @param documentData
      * @return
-     * @throws UnsupportedEncodingException
      * @throws ParserConfigurationException
      * @throws SAXException
-     * @throws IOException 
+     * @throws IOException
      */
-    private static Document convertToDomDocument(byte[] documentData) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException {
-        Document xmlDocument = null;
+    private static Document convertToDomDocument(byte[] documentData) throws ParserConfigurationException, SAXException, IOException {
+
+        Document xmlDocument;
         String xmlStr = new String(documentData, "UTF-8");
         xmlDocument = XMLUtil.parseContent(xmlStr);
         return xmlDocument;

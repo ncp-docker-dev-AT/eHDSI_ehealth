@@ -141,8 +141,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
                     continue;
                 }
-                ExtrinsicObjectType eot = (ExtrinsicObjectType) request
-                        .getSubmitObjectsRequest().getRegistryObjectList()
+                ExtrinsicObjectType eot = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
                         .getIdentifiable().get(i).getValue();
                 String documentId = "";
                 for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
@@ -164,21 +163,15 @@ public class XDRServiceImpl implements XDRServiceInterface {
         eventLog.setHR_UserID(Constants.HR_ID_PREFIX + "<" + Helper.getUserID(sh) + "@" + Helper.getOrganization(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getRoleID(sh));
-
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-
         eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
-
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (response.getRegistryErrorList() != null) {
-            RegistryError re = response.getRegistryErrorList()
-                    .getRegistryError().get(0);
+            RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
             eventLog.setEM_PatricipantObjectID(re.getErrorCode());
-            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext()
-                    .getBytes());
+            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
         }
-
         LOGGER.debug("Event log prepared");
     }
 

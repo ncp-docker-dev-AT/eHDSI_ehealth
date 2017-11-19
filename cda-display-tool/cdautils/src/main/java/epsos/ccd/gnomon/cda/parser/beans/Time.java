@@ -9,12 +9,11 @@ import java.util.GregorianCalendar;
  * A class encapsulating a generic effective time.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Time {
 
     // Static date and time formatter
-    private static SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
+    private SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
     // Optional start date
     private Date low;
     // Optional end date
@@ -39,7 +38,7 @@ public class Time {
     /**
      * A constructor initializing an effective time.
      *
-     * @param low the start date of the effective time.
+     * @param low  the start date of the effective time.
      * @param high the end date of the effective time.
      */
     public Time(Date low, Date high) {
@@ -56,7 +55,7 @@ public class Time {
     /**
      * A constructor initializing an effective time.
      *
-     * @param low the start date of the effective time.
+     * @param low  the start date of the effective time.
      * @param days the extension period of the low date.
      */
     public Time(Date low, int days, String type) {

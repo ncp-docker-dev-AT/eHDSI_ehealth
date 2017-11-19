@@ -1,22 +1,3 @@
-/**
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * <p>
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- */
 package tr.com.srdc.epsos.util;
 
 import org.slf4j.Logger;
@@ -37,13 +18,11 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- *
  * @author DG-Sante A4
- *
  */
 public class OidUtil {
 
-    private static Logger logger = LoggerFactory.getLogger(OidUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OidUtil.class);
     // This configuration service is also responsible for accessing country code
     // <-> OID mappings.
     private static final String pn2oidMapFilePathSubString = "pn-oid.xml";
@@ -53,10 +32,11 @@ public class OidUtil {
         readCountryOid2CodeMappingFile();
     }
 
+    private OidUtil() {
+    }
+
     /**
-     *
-     * @param countryOid
-     *            foreign Home Community Id
+     * @param countryOid foreign Home Community Id
      * @return 2-letter ISO code of the country, such as tr, pt, at.
      */
     public static String getCountryCode(String countryOid) {
@@ -66,8 +46,7 @@ public class OidUtil {
     /**
      * Converts a country code into a HomeCommunityId
      *
-     * @param countryCode
-     *            2-letter ISO code of the country, such as tr, pt, at.
+     * @param countryCode 2-letter ISO code of the country, such as tr, pt, at.
      * @return foreign HomeCommunityId
      */
     public static String getHomeCommunityId(String countryCode) {
@@ -81,10 +60,9 @@ public class OidUtil {
     }
 
     /**
-     *
      * @param countryOid
      * @return 2-letter ISO code of the country, but in uppercase, such as TR,
-     *         PT, AT.
+     * PT, AT.
      */
     public static String getCountryCodeUpperCase(String countryOid) {
 
@@ -97,10 +75,10 @@ public class OidUtil {
      */
     private static void readCountryOid2CodeMappingFile() {
 
-        DocumentBuilder dBuilder = null;
-        Document doc = null;
+        DocumentBuilder dBuilder;
+        Document doc;
 
-        oid2CountryCodeMap = new HashMap<String, String>();
+        oid2CountryCodeMap = new HashMap<>();
         String mapFilePath = Constants.EPSOS_PROPS_PATH + pn2oidMapFilePathSubString;
 
         File mapFile = new File(mapFilePath);
@@ -108,40 +86,38 @@ public class OidUtil {
         try {
             dBuilder = dbFactory.newDocumentBuilder();
             doc = dBuilder.parse(mapFile);
-        } catch (ParserConfigurationException e) {
-            logger.error("", e);
-        } catch (SAXException e) {
-            logger.error("", e);
-        } catch (IOException e) {
-            logger.error("", e);
-        }
+            doc.getDocumentElement().normalize();
+            Node mappings = doc.getDocumentElement();
 
-        doc.getDocumentElement().normalize();
-        Node mappings = doc.getDocumentElement();
+            NodeList nodeList = mappings.getChildNodes();
 
-        NodeList childs = mappings.getChildNodes();
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                    Node mapping = nodeList.item(i);
 
-        for (int i = 0; i < childs.getLength(); i++) {
-            if (childs.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                Node mapping = childs.item(i);
+                    String countryOid = mapping.getAttributes().getNamedItem("domainId").getNodeValue().trim();
+                    String countryCode = mapping.getAttributes().getNamedItem("country").getNodeValue().trim();
 
-                String countryOid = mapping.getAttributes().getNamedItem("domainId").getNodeValue().trim();
-                String countryCode = mapping.getAttributes().getNamedItem("country").getNodeValue().trim();
-
-                oid2CountryCodeMap.put(countryOid, countryCode);
+                    oid2CountryCodeMap.put(countryOid, countryCode);
+                }
             }
+        } catch (ParserConfigurationException e) {
+            LOGGER.error("ParserConfigurationException: '{}'", e.getMessage(), e);
+        } catch (SAXException e) {
+            LOGGER.error("SAXException: '{}'", e.getMessage(), e);
+        } catch (IOException e) {
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }
     }
 
     /**
-     *
      * @param uuid
      * @return
      */
     public static String convertUuidToOid(String uuid) {
 
-        uuid = uuid.replaceAll("-", "");
-        BigInteger integer = new BigInteger(uuid, 16);
+        String identifier = uuid.replaceAll("-", "");
+        BigInteger integer = new BigInteger(identifier, 16);
         return "2.25." + integer.toString();
     }
 }

@@ -2,10 +2,11 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3" version="1.0">
 
     <!-- global variable title -->
+    <xsl:import href="common/cdaCommon.xsl"/>
     <xsl:import href="ps/ps.xsl"/>
     <xsl:import href="ep/ep.xsl"/>
-    <xsl:import href="mro/mro.xsl"/>
-    <xsl:import href="hcer/hcer.xsl"/>
+    <!--<xsl:import href="mro/mro.xsl"/>-->
+    <!--<xsl:import href="hcer/hcer.xsl"/>-->
 
     <xsl:variable name="documentCode" select="/n1:ClinicalDocument/n1:code/@code"/>
 
@@ -43,13 +44,10 @@
                 </title>
                 <style type="text/css">
 					<xsl:text>
-
 body {
 /*	color: #003366;*/
 	font-family: Arial;
 	font-size: 12px;
-                                           
-                                            
 }
 div {}
 table {
@@ -79,9 +77,8 @@ th {
 	vertical-align: top;
 	text-align: left;
 }
-
 .h1center {
-	font-size: 18px;
+	font-size: 2em;
 	font-weight: bold;
 	text-align: center;
 }
@@ -109,21 +106,13 @@ th {
 	font-weight: bold;
 	font-size:16px;
 }
-
-
-
-
 .narr_table {
 	width: 100%;
 }
-
 .narrow_table {
 	width: 35%;
 }
-
-                                          
-
-                                        </xsl:text>
+                    </xsl:text>
                 </style>
                 <script language="javascript">
                     function showhide(id){
@@ -155,16 +144,16 @@ th {
                         <br/>
                         <br/>
                     </xsl:when>
-                    <xsl:when test="$documentCode='56445-0'">
-                        <xsl:call-template name="mroCda"/>
-                        <br/>
-                        <br/>
-                    </xsl:when>
-                    <xsl:when test="$documentCode='34133-9'">
-                        <xsl:call-template name="hcerCda"/>
-                        <br/>
-                        <br/>
-                    </xsl:when>
+                    <!--<xsl:when test="$documentCode='56445-0'">-->
+                        <!--<xsl:call-template name="mroCda"/>-->
+                        <!--<br/>-->
+                        <!--<br/>-->
+                    <!--</xsl:when>-->
+                    <!--<xsl:when test="$documentCode='34133-9'">-->
+                        <!--<xsl:call-template name="hcerCda"/>-->
+                        <!--<br/>-->
+                        <!--<br/>-->
+                    <!--</xsl:when>-->
                 </xsl:choose>
                 <br/>
                 <br/>

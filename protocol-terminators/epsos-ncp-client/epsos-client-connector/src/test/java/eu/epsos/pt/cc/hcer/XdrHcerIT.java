@@ -23,13 +23,14 @@ import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.naming.NamingException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
+
+import javax.naming.NamingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements all the Integration Test for the XDR operations for eDispensation
@@ -44,9 +45,9 @@ public class XdrHcerIT extends ClientGenericIT {
     @BeforeClass
     public static void setUpClass() throws NamingException {
         ClientGenericIT.setUpClass();
-        LOG.info("----------------------------");
-        LOG.info(" Submit HCER Documents");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Submit HCER Documents");
+        LOGGER.info("----------------------------");
     }
 
     /*
@@ -56,15 +57,16 @@ public class XdrHcerIT extends ClientGenericIT {
     /*
      * Normal Usage
      */
+
     /**
      * This test performs a simple submitting action for a eDispensation.
-     *
+     * <p>
      * It is a simple test designed uniquely for testing the normal work-flow of
      * the XDR.
      */
     @Test
     public void testSubmitHcer() {
-        List<String> permissions = new ArrayList<String>(1);
+        List<String> permissions = new ArrayList<>(1);
         permissions.add("46");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_HCER_#0.xml", XSPARole.PHYSICIAN);
 

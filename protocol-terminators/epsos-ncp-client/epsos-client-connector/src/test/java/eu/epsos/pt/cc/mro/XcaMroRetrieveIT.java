@@ -23,14 +23,15 @@ import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.naming.NamingException;
-import javax.xml.soap.SOAPElement;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
+
+import javax.naming.NamingException;
+import javax.xml.soap.SOAPElement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements all the Integration Test for the XCA Retrieve operation for MRO
@@ -48,14 +49,15 @@ public class XcaMroRetrieveIT extends ClientGenericIT {
     @BeforeClass
     public static void setUpClass() throws NamingException {
         ClientGenericIT.setUpClass();
-        LOG.info("----------------------------");
-        LOG.info(" Retrieve MRO Documents");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Retrieve MRO Documents");
+        LOGGER.info("----------------------------");
     }
 
     /*
      * Normal usage
      */
+
     /**
      * This test performs an XCA Retrieve for Mro, using valid Document
      * Identifiers. It is a simple test designed uniquely for testing the normal

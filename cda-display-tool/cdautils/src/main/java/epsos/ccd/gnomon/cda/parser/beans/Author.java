@@ -12,12 +12,11 @@ import java.util.Set;
  * A class encapsulating an author of a medical document.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Author {
 
     // Date formatter
-    private static SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
+    private SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
     // Authoring time
     private Date time;
     // Author class code
@@ -57,10 +56,10 @@ public class Author {
         this.address = null;
 
         // Creating an empty set of phone contacts
-        this.phones = new HashSet<Contact>();
+        this.phones = new HashSet<>();
 
         // Creating an empty set of email contacts
-        this.emails = new HashSet<Contact>();
+        this.emails = new HashSet<>();
 
         // Setting a null profession of the author
         this.profession = null;
@@ -72,8 +71,8 @@ public class Author {
     /**
      * A constructor initializing an author of medical document.
      *
-     * @param id the identification number of the author.
-     * @param name the full name of the author.
+     * @param id           the identification number of the author.
+     * @param name         the full name of the author.
      * @param organization the organization represented by the author.
      */
     public Author(Identifier id, Name name, Organization organization) {
@@ -87,10 +86,10 @@ public class Author {
         this.address = null;
 
         // Creating an empty set of phone contacts
-        this.phones = new HashSet<Contact>();
+        this.phones = new HashSet<>();
 
         // Creating an empty set of email contacts
-        this.emails = new HashSet<Contact>();
+        this.emails = new HashSet<>();
 
         // Setting a null profession of the author
         this.profession = null;
@@ -337,7 +336,7 @@ public class Author {
         }
 
         // Checking if any phone contact are provided
-        if (phones.size() > 0) {
+        if (!phones.isEmpty()) {
             // Iterating through the set of phones
             for (Contact phone : phones) {
                 // Checking for a valid contact element
@@ -349,7 +348,7 @@ public class Author {
         }
 
         // Checking if any email contact are provided
-        if (emails.size() > 0) {
+        if (!emails.isEmpty()) {
             // Iterating through the set of emails
             for (Contact email : emails) {
                 // Checking for a valid contact element

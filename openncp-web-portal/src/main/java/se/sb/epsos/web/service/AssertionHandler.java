@@ -14,9 +14,9 @@ import epsos.ccd.gnomon.auditmanager.*;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLObjectBuilder;
@@ -72,6 +72,13 @@ public class AssertionHandler implements Serializable {
 
     AssertionHandler() {
         this(new AssertionHandlerConfigManager());
+    }
+
+    public static void main(String[] args) {
+        DateTime now = new DateTime();
+        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
+        LOGGER.info("NotBefore: '{}'", nowUTC.toDateTime().minusMinutes(1));
+        LOGGER.info("NotOnOrAfter: '{}'", nowUTC.toDateTime().plusHours(2));
     }
 
     Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws ConfigurationException, AssertionException {
@@ -179,7 +186,7 @@ public class AssertionHandler implements Serializable {
         try {
             sendAuditEpsos91(userDetails, assertion);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
         return assertion;
@@ -198,7 +205,7 @@ public class AssertionHandler implements Serializable {
     }
 
     protected String getPrivateKeyPassword() {
-        return  NcpServiceConfigManager.getPrivateKeyPassword("assertion");
+        return NcpServiceConfigManager.getPrivateKeyPassword("assertion");
     }
 
     protected ConfigurationManager getConfigurationManager() {
@@ -207,11 +214,11 @@ public class AssertionHandler implements Serializable {
 
     void sendAuditEpsos91(AuthenticatedUser userDetails, Assertion assertion) throws KeyStoreException, CertificateException, NoSuchAlgorithmException {
         String KEY_ALIAS = getPrivateKeyAlias();
-        LOGGER.debug("KEY_ALIAS : " + KEY_ALIAS);
+        LOGGER.debug("KEY_ALIAS: '{}'", KEY_ALIAS);
         String KEYSTORE_LOCATION = getPrivateKeystoreLocation();
-        LOGGER.debug("KEYSTORE_LOCATION : " + KEYSTORE_LOCATION);
+        LOGGER.debug("KEYSTORE_LOCATION: '{}'", KEYSTORE_LOCATION);
         String KEY_STORE_PASS = getPrivateKeyPassword();
-        LOGGER.debug("KEY_STORE_PASS : " + KEY_STORE_PASS);
+        LOGGER.debug("KEY_STORE_PASS: '{}'", KEY_STORE_PASS);
 
         final ConfigurationManager configurationManager = getConfigurationManager();
 
@@ -246,7 +253,7 @@ public class AssertionHandler implements Serializable {
                 }
             }
         } catch (KeyStoreException | NoSuchAlgorithmException | java.io.IOException | java.security.cert.CertificateException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
 
         String secHead = "No security header provided";
@@ -254,11 +261,14 @@ public class AssertionHandler implements Serializable {
         String reqm_participantObjectID = "urn:uuid:" + assertion.getID();
         String resm_participantObjectID = "urn:uuid:" + assertion.getID();
 
-        InetAddress sourceIP = null;
+        InetAddress sourceIP;
+        String sourceHost;
         try {
             sourceIP = InetAddress.getLocalHost();
+            sourceHost = sourceIP.getHostAddress();
         } catch (UnknownHostException ex) {
-            LOGGER.error(ex.getMessage());
+            LOGGER.error("UnknownHostException: '{}'", ex.getMessage(), ex);
+            sourceHost = "UnknownHost";
         }
 
         String email = userDetails.getUserId() + "@" + configurationManager.getProperty("ncp.country");
@@ -282,7 +292,7 @@ public class AssertionHandler implements Serializable {
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-            LOGGER.error(ex.getMessage());
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog = EventLog.createEventLogHCPIdentity(
@@ -293,7 +303,7 @@ public class AssertionHandler implements Serializable {
                 SP_UserID, AS_AuditSourceId, ET_ObjectID,
                 reqm_participantObjectID, basedSecHead.getBytes(),
                 resm_participantObjectID, ResM_PatricipantObjectDetail,
-                sourceIP.getHostAddress(), "N/A");
+                sourceHost, "N/A");
         eventLog.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog, "13", "2");
         LOGGER.debug("################################################");
@@ -318,8 +328,9 @@ public class AssertionHandler implements Serializable {
         return attribute;
     }
 
-    private Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String FriendlyName, String oasisName, String value, String namespace,
-                                      String xmlschema) {
+    private Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String FriendlyName, String oasisName,
+                                      String value, String namespace, String xmlschema) {
+
         Attribute attrPID = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
         attrPID.setFriendlyName(FriendlyName);
         attrPID.setName(oasisName);
@@ -327,7 +338,7 @@ public class AssertionHandler implements Serializable {
 
         XMLObjectBuilder<Assertion> stringBuilder;
 
-        if (namespace.equals("")) {
+        if (StringUtils.isBlank(namespace)) {
             XSString attrValPID;
             stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
             attrValPID = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
@@ -348,8 +359,9 @@ public class AssertionHandler implements Serializable {
         return (T) Configuration.getBuilderFactory().getBuilder(qname).buildObject(qname);
     }
 
-    public void signSAMLAssertion(SignableSAMLObject assertion) throws KeyStoreInitializationException, KeyStoreException, UnrecoverableKeyException,
-            NoSuchAlgorithmException, SecurityException, MarshallingException, SignatureException {
+    public void signSAMLAssertion(SignableSAMLObject assertion) throws KeyStoreInitializationException, KeyStoreException,
+            UnrecoverableKeyException, NoSuchAlgorithmException, SecurityException, MarshallingException, SignatureException {
+
         LOGGER.debug("################################################");
         LOGGER.debug("# signSAMLAssertion() - start                  #");
         LOGGER.debug("################################################");
@@ -388,7 +400,7 @@ public class AssertionHandler implements Serializable {
     }
 
     private String getAttributeValue(String key) {
-        String returnValue = null;
+        
         List<AttributeStatement> attrStatements = assertion.getAttributeStatements();
         for (AttributeStatement stat : attrStatements) {
             List<Attribute> attributes = stat.getAttributes();
@@ -398,13 +410,6 @@ public class AssertionHandler implements Serializable {
                 }
             }
         }
-        return returnValue;
-    }
-
-    public static void main(String[] args) {
-        DateTime now = new DateTime();
-        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
-        System.out.println("NotBefore : " + nowUTC.toDateTime().minusMinutes(1));
-        System.out.println("NotOnOrAfter : " + nowUTC.toDateTime().plusHours(2));
+        return null;
     }
 }

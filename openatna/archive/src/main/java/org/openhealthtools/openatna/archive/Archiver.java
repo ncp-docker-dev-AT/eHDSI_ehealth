@@ -19,19 +19,20 @@
 
 package org.openhealthtools.openatna.archive;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openhealthtools.openatna.audit.AtnaFactory;
 import org.openhealthtools.openatna.audit.persistence.dao.*;
 import org.openhealthtools.openatna.audit.persistence.model.*;
 import org.openhealthtools.openatna.audit.persistence.model.codes.CodeEntity;
 import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,9 +50,10 @@ public class Archiver {
     public static final String MESSAGES = "messages.xml";
     public static final String ENTITIES = "entities.xml";
     public static final String ERRORS = "errors.xml";
-    protected static DateFormat archiveFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-    protected static DateFormat nameFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
-    static Log log = LogFactory.getLog("org.openhealthtools.openatna.archive.Archiver");
+    private static final Logger LOGGER = LoggerFactory.getLogger(Archiver.class);
+    protected DateFormat archiveFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+    protected DateFormat nameFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
+
     private boolean archiveMessages = true;
     private boolean archiveEntities = true;
     private boolean archiveErrors = true;
@@ -70,6 +72,16 @@ public class Archiver {
         Archiver a = new Archiver();
         a.setArchiveName("test");
         a.archive();
+    }
+
+    public static String formatDate(Date date) {
+        DateFormat archiveFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+        return archiveFormat.format(date);
+    }
+
+    public static Date parseDate(String date) throws ParseException {
+        DateFormat archiveFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+        return archiveFormat.parse(date);
     }
 
     public void archive() throws Exception {
@@ -110,7 +122,7 @@ public class Archiver {
                 offset += msgs.size();
             }
             writer.finish(w);
-            log.info("written " + offset + " messages");
+            LOGGER.info("written '{}' messages", offset);
         }
 
         return ret;
@@ -158,7 +170,7 @@ public class Archiver {
             offset += msgs.size();
         }
         writer.finishType(w);
-        log.info("written " + offset + " sources");
+        LOGGER.info("written '{}' sources", offset);
     }
 
     private void archiveParticipants(EntityWriter writer, XMLStreamWriter w, int max) throws Exception {
@@ -174,7 +186,7 @@ public class Archiver {
             offset += msgs.size();
         }
         writer.finishType(w);
-        log.info("written " + offset + " participants");
+        LOGGER.info("written '{}' participants", offset);
     }
 
     private void archiveObjects(EntityWriter writer, XMLStreamWriter w, int max) throws Exception {
@@ -190,7 +202,7 @@ public class Archiver {
             offset += msgs.size();
         }
         writer.finishType(w);
-        log.info("written " + offset + " objects");
+        LOGGER.info("written '{}' objects", offset);
     }
 
     private void archiveCodes(EntityWriter writer, XMLStreamWriter w, int max) throws Exception {
@@ -206,7 +218,7 @@ public class Archiver {
             offset += msgs.size();
         }
         writer.finishType(w);
-        log.info("written " + offset + " codes");
+        LOGGER.info("written '{}' codes", offset);
     }
 
     private void archiveNaps(EntityWriter writer, XMLStreamWriter w, int max) throws Exception {
@@ -222,7 +234,7 @@ public class Archiver {
             offset += msgs.size();
         }
         writer.finishType(w);
-        log.info("written " + offset + " network access points");
+        LOGGER.info("written " + offset + " network access points");
     }
 
     private File archiveErrors(File directory) throws Exception {
@@ -243,7 +255,7 @@ public class Archiver {
                 offset += msgs.size();
             }
             writer.finish(w);
-            log.info("written " + offset + " errors");
+            LOGGER.info("written '{}' errors", offset);
         }
         return ret;
     }

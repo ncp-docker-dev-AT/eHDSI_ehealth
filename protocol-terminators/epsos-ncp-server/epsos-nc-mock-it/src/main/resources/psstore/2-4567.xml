@@ -32,6 +32,10 @@
                                           displayName="Masculin">
                 </administrativeGenderCode>
                 <birthTime value="18860629"/>
+                <languageCommunication>
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.2.1"/>
+                    <languageCode code="en-GB"/>
+                </languageCommunication>
             </patient>
             <providerOrganization>
                 <id root="2.16.620.1.101.10.1"/>
@@ -43,6 +47,11 @@
         <time value="20150316135535+0000"/>
         <assignedAuthor>
             <id extension="90647" root="2.16.620.1.101.10.2.5"/>
+            <addr>
+                <country>BE</country>
+                <postalCode>B-1000 Bruxelles</postalCode>
+                <streetAddressLine>5 Rue des Fleurs</streetAddressLine>
+            </addr>
             <telecom use="WP" value="tel:+3223456543"/>
             <assignedPerson>
                 <name>
@@ -53,6 +62,7 @@
             <representedOrganization>
                 <id extension="54259" root="2.16.620.1.101.10.3.29"/>
                 <name>Erasme Hostpital</name>
+                <telecom use="WP" value="tel:+3223456543"/>
                 <addr>
                     <country>BE</country>
                     <postalCode>B-1000 Bruxelles</postalCode>
@@ -80,6 +90,12 @@
         <signatureCode code="S"/>
         <assignedEntity>
             <id extension="54259" root="2.16.620.1.101.10.3.29"/>
+            <addr>
+                <streetAddressLine>Hospital Street</streetAddressLine>
+                <city>Nicosia</city>
+                <postalCode>1234</postalCode>
+                <country>CY</country>
+            </addr>
             <telecom use="WP" value="tel:+3229579760"/>
             <assignedPerson>
                 <name>
@@ -110,7 +126,6 @@
                 <streetAddressLine>5 Rue des Fleurs</streetAddressLine>
             </addr>
             <telecom use="WP" value="tel:+351219579760"/>
-            <telecom nullFlavor="NI"/>
             <associatedPerson>
                 <name>
                     <family>Mikolic</family>
@@ -119,20 +134,28 @@
             </associatedPerson>
         </associatedEntity>
     </participant>
-    <documentationOf>
-        <serviceEvent classCode="PCPR">
+    <documentationOf typeCode="DOC">
+        <serviceEvent moodCode="EVN" classCode="PCPR">
             <effectiveTime>
                 <low value="20150316135535+0000"/>
                 <high value="20150316135535+0000"/>
             </effectiveTime>
             <performer typeCode="PRF">
                 <templateId root="1.3.6.1.4.1.19376.1.5.3.1.2.3"/>
+                <functionCode code="221" codeSystem="2.16.840.1.113883.2.9.6.2.7" codeSystemName="ISCO"
+                              displayName="Medical doctors"/>
                 <time>
                     <low value="20150316135535+0000"/>
                     <high value="20150316135535+0000"/>
                 </time>
                 <assignedEntity classCode="ASSIGNED">
                     <id extension="0" root="2.16.620.1.101.10.2"/>
+                    <addr>
+                        <streetAddressLine>Hospital Street</streetAddressLine>
+                        <city>Nicosia</city>
+                        <postalCode>1234</postalCode>
+                        <country>CY</country>
+                    </addr>
                     <telecom use="WP" value="tel:+351219579760"/>
                     <assignedPerson>
                         <name>
@@ -176,7 +199,7 @@
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3"/>
-                            <id root="5f971af4-c818-41e5-87c7-602617079dd8"/>
+                            <id root="5F971AF4-C818-41E5-87C7-602617079DD8"/>
                             <code code="NA" nullFlavor="NA"/>
                             <text>
                                 <reference value="#noallergy"/>
@@ -191,7 +214,7 @@
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.6"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
-                                    <id root="af58c270-6f80-477a-ab05-47bcffbc62f7"/>
+                                    <id root="AF58C270-6F80-477A-AB05-47BCFFBC62F7"/>
                                     <code code="419199007" codeSystem="2.16.840.1.113883.6.96"
                                           codeSystemName="SNOMED CT" codeSystemVersion="2016-07"
                                           displayName="Allergy to substance"/>
@@ -237,7 +260,7 @@
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
-                            <id root="ee9f61cb-5b8c-4f73-8ddc-e802cf5a44e8"/>
+                            <id root="EE9F61CB-5B8C-4F73-8DDC-E802CF5A44E8"/>
                             <code code="182904002" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07" displayName="Drug treatment unknown">
                                 <originalText>
@@ -291,7 +314,7 @@
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
-                            <id root="0e96e8d4-56b1-4c85-8953-251b828ea429"/>
+                            <id root="0E96E8D4-56B1-4C85-8953-251B828EA429"/>
                             <code code="NA" nullFlavor="NA"/>
                             <statusCode code="active"/>
                             <effectiveTime>
@@ -384,7 +407,7 @@
                     <entry>
                         <supply classCode="SPLY" moodCode="EVN" nullFlavor="NA">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.5"/>
-                            <effectiveTime nullFlavor="NA"/>
+                            <effectiveTime value="20170905" xsi:type="IVL_TS"/>
                             <participant typeCode="DEV">
                                 <participantRole classCode="MANU">
                                     <playingDevice classCode="DEV" determinerCode="INSTANCE">
@@ -394,6 +417,27 @@
                             </participant>
                         </supply>
                     </entry>
+                </section>
+            </component>
+            <component>
+                <section moodCode="EVN">
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.8"/>
+                    <code code="11348-0" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
+                    <title>History of Past Illness</title>
+                    <text>NNNN</text>
+                    <!--<entry>-->
+                    <!--<act moodCode="EVN" classCode="ACT">-->
+                    <!--<id nullFlavor="NP"/>-->
+                    <!--<code nullFlavor="NP"/>-->
+                    <!--<text>No Info</text>-->
+                    <!--<statusCode nullFlavor="NP"/>-->
+                    <!--<effectiveTime nullFlavor="NP"/>-->
+                    <!--<entryRelationship typeCode="CAUS">-->
+                    <!---->
+                    <!--</entryRelationship>-->
+                    <!--</act>-->
+                    <!--</entry>-->
                 </section>
             </component>
         </structuredBody>
