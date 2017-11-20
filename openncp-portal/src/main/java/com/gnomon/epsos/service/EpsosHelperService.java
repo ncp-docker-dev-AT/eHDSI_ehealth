@@ -79,6 +79,12 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
 import java.io.*;
 import java.net.InetAddress;
@@ -559,8 +565,7 @@ public class EpsosHelperService {
                     }
 
                     // PRESCRIPTION ITEMS
-                    NodeList entryList = (NodeList) entryExpr.evaluate(
-                            sectionNode, XPathConstants.NODESET);
+                    NodeList entryList = (NodeList) entryExpr.evaluate(sectionNode, XPathConstants.NODESET);
                     if (entryList != null && entryList.getLength() > 0) {
                         for (int i = 0; i < entryList.getLength(); i++) {
                             ViewResult line = new ViewResult(i);
@@ -568,13 +573,10 @@ public class EpsosHelperService {
                             Node entryNode = entryList.item(i);
 
                             String materialID = "";
-                            Node materialIDNode = (Node) idExpr.evaluate(
-                                    entryNode, XPathConstants.NODE);
+                            Node materialIDNode = (Node) idExpr.evaluate(entryNode, XPathConstants.NODE);
                             if (materialIDNode != null) {
                                 try {
-                                    materialID = materialIDNode.getAttributes()
-                                            .getNamedItem("extension")
-                                            .getNodeValue();
+                                    materialID = materialIDNode.getAttributes().getNamedItem("extension").getNodeValue();
                                 } catch (Exception e) {
                                     LOGGER.error("Error getting material");
                                     LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -601,14 +603,10 @@ public class EpsosHelperService {
                                         .getNodeValue();
                             }
 
-                            Node packageExpr1 = (Node) packageExpr.evaluate(
-                                    entryNode, XPathConstants.NODE);
-                            Node packType = (Node) packTypeExpr.evaluate(
-                                    entryNode, XPathConstants.NODE);
-                            Node packQuant = (Node) packQuantityExpr.evaluate(
-                                    entryNode, XPathConstants.NODE);
-                            Node packQuant2 = (Node) packQuantityExpr2
-                                    .evaluate(entryNode, XPathConstants.NODE);
+                            Node packageExpr1 = (Node) packageExpr.evaluate(entryNode, XPathConstants.NODE);
+                            Node packType = (Node) packTypeExpr.evaluate(entryNode, XPathConstants.NODE);
+                            Node packQuant = (Node) packQuantityExpr.evaluate(entryNode, XPathConstants.NODE);
+                            Node packQuant2 = (Node) packQuantityExpr2.evaluate(entryNode, XPathConstants.NODE);
 
                             String dispensedPackage = "";
                             String dispensedPackageUnit = "";
@@ -649,28 +647,43 @@ public class EpsosHelperService {
                             }
 
                             String ingredient = "";
-                            Node ingrNode = (Node) ingredientExpr.evaluate(
-                                    entryNode, XPathConstants.NODE);
+                            Node ingrNode = (Node) ingredientExpr.evaluate(entryNode, XPathConstants.NODE);
+
+                            LOGGER.info("Node: '{}'", toString(ingrNode, true, true));
+
                             if (ingrNode != null) {
-                                ingredient += ingrNode.getAttributes()
-                                        .getNamedItem("code").getNodeValue()
-                                        + " - "
-                                        + ingrNode.getAttributes()
-                                        .getNamedItem("displayName")
-                                        .getNodeValue();
+
+//                                ingredient += ingrNode.getAttributes()
+//                                        .getNamedItem("code").getNodeValue()
+//                                        + " - "
+//                                        + ingrNode.getAttributes()
+//                                        .getNamedItem("displayName")
+//                                        .getNodeValue();
+                                Node code = ingrNode.getAttributes().getNamedItem("code");
+                                LOGGER.info("Node: '{}'", toString(code, true, true));
+                                if (code != null) {
+                                    ingredient += code.getNodeValue() + "-";
+                                }
+                                Node displayName = ingrNode.getAttributes().getNamedItem("displayName");
+                                LOGGER.info("Node: '{}'", toString(displayName, true, true));
+                                if (displayName != null) {
+                                    ingredient += displayName.getNodeValue();
+                                } else {
+                                    Node nullFlavor = ingrNode.getAttributes().getNamedItem("nullFlavor");
+                                    //LOGGER.info("Node: '{}'", toString(nullFlavor, true, true));
+                                    if (nullFlavor != null) {
+                                        ingredient += nullFlavor.getNodeValue();
+                                    }
+                                }
                             }
 
                             String strength = "";
-                            Node strengthExprNode = (Node) strengthExpr
-                                    .evaluate(entryNode, XPathConstants.NODE);
-                            Node strengthExprNode2 = (Node) strengthExpr2
-                                    .evaluate(entryNode, XPathConstants.NODE);
+                            Node strengthExprNode = (Node) strengthExpr.evaluate(entryNode, XPathConstants.NODE);
+                            Node strengthExprNode2 = (Node) strengthExpr2.evaluate(entryNode, XPathConstants.NODE);
                             if (strengthExprNode != null
                                     && strengthExprNode2 != null) {
                                 try {
-                                    strength = strengthExprNode.getAttributes()
-                                            .getNamedItem("value")
-                                            .getNodeValue();
+                                    strength = strengthExprNode.getAttributes().getNamedItem("value").getNodeValue();
                                 } catch (Exception e) {
                                     LOGGER.error("Error parsing strength");
                                     LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -679,9 +692,7 @@ public class EpsosHelperService {
                                 String unit = "";
                                 String unit2 = "";
                                 try {
-                                    unit = strengthExprNode.getAttributes()
-                                            .getNamedItem("unit")
-                                            .getNodeValue();
+                                    unit = strengthExprNode.getAttributes().getNamedItem("unit").getNodeValue();
                                 } catch (Exception e) {
                                     LOGGER.error("Error parsing unit");
                                     LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -691,9 +702,7 @@ public class EpsosHelperService {
                                 }
                                 String denom = "";
                                 try {
-                                    denom = strengthExprNode2.getAttributes()
-                                            .getNamedItem("value")
-                                            .getNodeValue();
+                                    denom = strengthExprNode2.getAttributes().getNamedItem("value").getNodeValue();
                                 } catch (Exception e) {
                                     LOGGER.error("Error parsing denom");
                                     LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -2837,5 +2846,45 @@ public class EpsosHelperService {
 
         pd.setPatientIdArray(idArray);
         return pd;
+    }
+
+    public static String toString(Node node, boolean omitXmlDeclaration, boolean prettyPrint) {
+        if (node == null) {
+            //throw new IllegalArgumentException("node is null.");
+            return "";
+        }
+
+        try {
+            // Remove unwanted whitespaces
+            node.normalize();
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            XPathExpression expr = xpath.compile("//text()[normalize-space()='']");
+            NodeList nodeList = (NodeList) expr.evaluate(node, XPathConstants.NODESET);
+
+            for (int i = 0; i < nodeList.getLength(); ++i) {
+                Node nd = nodeList.item(i);
+                nd.getParentNode().removeChild(nd);
+            }
+
+            // Create and setup transformer
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+            if (omitXmlDeclaration) {
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            }
+
+            if (prettyPrint) {
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            }
+
+            // Turn the node into a string
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(node), new StreamResult(writer));
+            return writer.toString();
+        } catch (TransformerException | XPathExpressionException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
