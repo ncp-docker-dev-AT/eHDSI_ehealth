@@ -79,7 +79,7 @@ public class WsUnmarshaller {
     /**
      * This method performs marshall operation with the provided object.
      *
-     * @param xmlDetails the web-service response in the form of XML String.
+     * @param detailedResult the web-service response in the form of XML String.
      * @return a filled DetailedResult object.
      */
     public static String marshal(DetailedResult detailedResult) {

@@ -26,7 +26,7 @@ package eu.epsos.validation.datamodel.common;
  */
 public enum ObjectType {
 
-    ASSERTION("ASSERION"),
+    ASSERTION("ASSERTION"),
     AUDIT("AUDIT"),
     CDA("CDA"),
     PDQ("PDQ"),

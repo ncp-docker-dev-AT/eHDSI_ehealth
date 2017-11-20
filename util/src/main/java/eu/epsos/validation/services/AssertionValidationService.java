@@ -2,6 +2,7 @@ package eu.epsos.validation.services;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.dts.WsUnmarshaller;
+import eu.epsos.validation.datamodel.saml.AssertionSchematron;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.reporting.ReportBuilder;
 import net.ihe.gazelle.jaxb.assertion.ModelBasedValidationWS;
@@ -76,10 +77,12 @@ public class AssertionValidationService extends ValidationService {
         // Report generation.
         if (!xmlDetails.isEmpty()) {
             LOGGER.info(xmlDetails);
-            return ReportBuilder.build(schematron, XdModel.checkModel(schematron).getObjectType().toString(), object, WsUnmarshaller.unmarshal(xmlDetails), xmlDetails, ncpSide);
+            return ReportBuilder.build(schematron, AssertionSchematron.checkSchematron(schematron).getObjectType().toString(),
+                    object, WsUnmarshaller.unmarshal(xmlDetails), xmlDetails, ncpSide);
         } else {
             LOGGER.error("The webservice response is empty, writing report without validation part.");
-            return ReportBuilder.build(schematron, XdModel.checkModel(schematron).getObjectType().toString(), object, null, null, ncpSide);
+            return ReportBuilder.build(schematron, AssertionSchematron.checkSchematron(schematron).getObjectType().toString(),
+                    object, null, null, ncpSide);
         }
     }
 }
