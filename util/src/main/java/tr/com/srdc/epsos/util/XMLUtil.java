@@ -154,7 +154,7 @@ public class XMLUtil {
         Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.INDENT, "no");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 
         transformer.transform(new DOMSource(node), new StreamResult(stringWriter));
