@@ -216,25 +216,25 @@
                     <th>
                         <!-- 				 Active Ingredient -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'1'"/>
+                            <xsl:with-param name="code" select="'1'"/>
                         </xsl:call-template>
                     </th>
                     <th>
                         <!-- 				Strength -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'70'"/>
+                            <xsl:with-param name="code" select="'70'"/>
                         </xsl:call-template>
                     </th>
                     <th>
                         <!-- 				Dispensed Package Size -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'50'"/>
+                            <xsl:with-param name="code" select="'50'"/>
                         </xsl:call-template>
                     </th>
                     <th>
                         <!-- 				    Dose Form -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'25'"/>
+                            <xsl:with-param name="code" select="'25'"/>
                         </xsl:call-template>
                     </th>
                     <th>
@@ -244,7 +244,7 @@
                                         </xsl:call-template>  -->
                         <!-- 				Country A Brand name -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'9'"/>
+                            <xsl:with-param name="code" select="'9'"/>
                         </xsl:call-template>
                     </th>
                 </tr>
@@ -292,31 +292,31 @@
                     <th>
                         <!-- 				Route of Administration -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'67'"/>
+                            <xsl:with-param name="code" select="'67'"/>
                         </xsl:call-template>
                     </th>
                     <th>
                         <!-- 				Onset Date -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'45'"/>
+                            <xsl:with-param name="code" select="'45'"/>
                         </xsl:call-template>
                     </th>
                     <th>
                         <!-- 				End Date -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'26'"/>
+                            <xsl:with-param name="code" select="'26'"/>
                         </xsl:call-template>
                     </th>
                     <th>
                         <!-- 				Frequency of Intakes -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'32'"/>
+                            <xsl:with-param name="code" select="'32'"/>
                         </xsl:call-template>
                     </th>
                     <th>
                         <!-- 				Units per intake -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'78'"/>
+                            <xsl:with-param name="code" select="'78'"/>
                         </xsl:call-template>
                     </th>
                 </tr>
@@ -396,19 +396,19 @@
                 <tr>
                     <th>
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'43'"/>
+                            <xsl:with-param name="code" select="'43'"/>
                         </xsl:call-template>
                     </th>
                     <th>
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="data" select="'38'"/>
+                            <xsl:with-param name="code" select="'38'"/>
                         </xsl:call-template>
                     </th>
                     <th colspan="3">
                         <!--   Indication:-->
                         <span class="td_label">
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'201'"/>
+                                <xsl:with-param name="code" select="'201'"/>
                             </xsl:call-template>
                         </span>
                     </th>
@@ -443,7 +443,7 @@
                         <!--   Instructions to patient:-->
                         <span class="td_label">
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'37'"/>
+                                <xsl:with-param name="code" select="'37'"/>
                             </xsl:call-template>
                         </span>
                     </th>
@@ -459,7 +459,7 @@
                         <!--  Advise to the dispencer:-->
                         <span class="td_label">
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'4'"/>
+                                <xsl:with-param name="code" select="'4'"/>
                             </xsl:call-template>
                         </span>
                     </th>
@@ -474,7 +474,7 @@
                     <th>
                         <span class="td_label"><!--  Substitute:-->
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'71'"/>
+                                <xsl:with-param name="code" select="'71'"/>
                             </xsl:call-template>
                         </span>
                     </th>
@@ -507,7 +507,7 @@
                     <th>
                         <span class="td_label"><!--  Dispenced Product:-->
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'24'"/>
+                                <xsl:with-param name="code" select="'24'"/>
                             </xsl:call-template>
                         </span>
                     </th>
@@ -540,7 +540,7 @@
                     <th>
                         <span class="td_label"><!--  Dispenced Package Size:-->
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'23'"/>
+                                <xsl:with-param name="code" select="'23'"/>
                             </xsl:call-template>
                         </span>
                     </th>
@@ -596,7 +596,7 @@
                                         <xsl:when test="$unitMeasure = '1'">
                                             <xsl:variable name="units">
                                                 <xsl:call-template name="show-displayLabels">
-                                                    <xsl:with-param name="data" select="'77'"/>
+                                                    <xsl:with-param name="code" select="'77'"/>
                                                 </xsl:call-template>
                                             </xsl:variable>
 
@@ -621,7 +621,7 @@
                                 <input type="submit">
                                     <xsl:attribute name="value">
                                         <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="data" select="'22'"/>
+                                            <xsl:with-param name="code" select="'22'"/>
                                         </xsl:call-template>
                                     </xsl:attribute>
                                 </input>
