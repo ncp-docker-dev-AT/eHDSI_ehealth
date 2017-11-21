@@ -46,6 +46,7 @@ public class XdrRequestDts {
         XdrRequest result = new XdrRequest();
         result.setCda(new String(document.getBase64Binary(), StandardCharsets.UTF_8));
         result.setCdaId(document.getUuid());
+        result.setSubmissionSetId(document.getSubmissionSetId()); 
         result.setPatient(eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(patient));
         result.setcountryCode(Constants.COUNTRY_CODE);
         result.setCountryName(Constants.COUNTRY_NAME);
