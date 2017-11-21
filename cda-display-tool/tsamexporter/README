@@ -1,3 +1,0 @@
-How to build tsam-exporter
-
-Run mvn clean package assembly:single in order to create a jar with all the depedencies

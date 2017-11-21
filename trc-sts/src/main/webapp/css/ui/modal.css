@@ -1,0 +1,71 @@
+/* 
+-----------------------------------
+	MODAL
+-----------------------------------
+*/
+
+.modal-content {
+	border-radius: 2px;
+}
+
+.modal.modal-confirm .modal-dialog {
+	position: absolute;
+	top:40%;
+	left:50%;
+	transform: translate(-50%, -50%);
+	min-width:250px
+}
+
+.modal-backdrop.in + .modal-backdrop.in {
+	filter: alpha(opacity=0);
+	opacity: 0;
+}
+
+/* 
+-----------------------------------
+	HEADER
+-----------------------------------
+*/
+
+.modal-header {
+	background-color:#F2F2F2;
+	border-top:1px solid rgba(255,255,255,0.8);
+	box-shadow: 0 -1px 1px rgba(0,0,0,.07),0 -1px 6px rgba(0,0,0,.06) inset;
+	color: #75919F;
+}
+
+.modal-header.display-table {
+	padding:0;
+}
+
+.modal-header.display-table .display-table-cell {
+	vertical-align:middle;
+	padding:15px;
+}
+
+.modal-header.display-table .modal-header-badge {
+	width:1px;
+	padding-right:0;
+}
+
+/* 
+-----------------------------------
+	FOOTER
+-----------------------------------
+*/
+
+.modal-footer.display-table {
+	padding:0;
+}
+
+.modal-footer.display-table .display-table-cell {
+	vertical-align:middle;
+	padding:15px;
+}
+
+.modal-footer.display-table .modal-footer-badge {
+	width:1px;
+	padding-right:0;
+}
+
+

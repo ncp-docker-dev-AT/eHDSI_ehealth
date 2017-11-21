@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -49,7 +48,6 @@ import java.util.List;
  * @created Oct 25, 2009: 10:13:04 PM
  * @date $Date:$ modified by $Author:$
  */
-
 public class Reporter {
 
     public static final String[] entities = {
@@ -65,8 +63,8 @@ public class Reporter {
             "ObjectDetailEntity",
             "ProvisionalEntity"
     };
-    private static final Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.report.Reporter");
-    private static SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy_hh-mm-ss");
+    private static final Logger LOGGER = LoggerFactory.getLogger(Reporter.class);
+    private SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy_hh-mm-ss");
     private ReportConfig config;
     private boolean isAtnaQuery = false;
 
@@ -76,16 +74,20 @@ public class Reporter {
 
     public static void main(String[] args) {
         try {
-            InputStream in = new FileInputStream(args[0]);//Reporter.class.getResourceAsStream("/rc.xml");
+            //Reporter.class.getResourceAsStream("/rc.xml");
+            InputStream in = new FileInputStream(args[0]);
             ReportConfig rc = ReportConfig.fromXml(in);
             Reporter r = new Reporter(rc);
-            log.info("Report: '{}'", r.report());
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Report: '{}'", r.report());
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
     }
 
     public String report() throws Exception {
+
         if (config.getTitle() == null) {
             config.setTitle("Audit Report");
         }
@@ -116,6 +118,7 @@ public class Reporter {
                 config.setReportInstance("MessageReport");
                 isAtnaQuery = true;
             } catch (Exception e) {
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
                 String target = config.getTarget();
                 if (target == null) {
                     report = guessReportFromHql(query);
@@ -145,6 +148,7 @@ public class Reporter {
     }
 
     private String getInputDirectory() {
+
         if (config.getInputDirectory() != null) {
             String input = config.getInputDirectory();
             if (!input.endsWith(File.separator)) {
@@ -153,7 +157,7 @@ public class Reporter {
             return input;
         }
         URL url = getClass().getResource("/AuditReport.jasper");
-        File parent = null;
+        File parent;
         if (url != null) {
             try {
                 File f = new File(url.toURI());
@@ -167,7 +171,7 @@ public class Reporter {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
             }
         }
         return null;
@@ -210,7 +214,7 @@ public class Reporter {
                     List<? extends MessageEntity> l = dao.getByQuery(QueryString.parse(query));
                     return new EntityDataSource(l);
                 } catch (AtnaPersistenceException e) {
-                    e.printStackTrace();
+                    LOGGER.error("AtnaPersistenceException: '{}'", e.getMessage(), e);
                     return null;
                 }
             } else {
@@ -220,14 +224,8 @@ public class Reporter {
                         Method m = dao.getClass().getMethod("getAll", new Class[0]);
                         List<? extends PersistentEntity> l = (List<? extends PersistentEntity>) m.invoke(dao, new Object[0]);
                         return new EntityDataSource(l);
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LOGGER.error("Exception: '{}'", e.getMessage(), e);
                     }
                 }
             }
@@ -237,7 +235,7 @@ public class Reporter {
                 List<? extends PersistentEntity> l = dao.query(query);
                 return new EntityDataSource(l);
             } catch (AtnaPersistenceException e) {
-                e.printStackTrace();
+                LOGGER.error("AtnaPersistenceException: '{}'", e.getMessage(), e);
                 return null;
             }
         } else {
@@ -247,20 +245,22 @@ public class Reporter {
     }
 
     private Object getObjectForTarget(String target) {
-        if (target.equals("MessageReport")) {
-            return AtnaFactory.messageDao();
-        } else if (target.equals("CodeReport")) {
-            return AtnaFactory.codeDao();
-        } else if (target.equals("ObjectReport")) {
-            return AtnaFactory.objectDao();
-        } else if (target.equals("ParticipantReport")) {
-            return AtnaFactory.participantDao();
-        } else if (target.equals("SourceReport")) {
-            return AtnaFactory.sourceDao();
-        } else if (target.equals("NapReport")) {
-            return AtnaFactory.networkAccessPointDao();
-        } else if (target.equals("ProvisionalReport")) {
-            return AtnaFactory.provisionalDao();
+
+        switch (target) {
+            case "MessageReport":
+                return AtnaFactory.messageDao();
+            case "CodeReport":
+                return AtnaFactory.codeDao();
+            case "ObjectReport":
+                return AtnaFactory.objectDao();
+            case "ParticipantReport":
+                return AtnaFactory.participantDao();
+            case "SourceReport":
+                return AtnaFactory.sourceDao();
+            case "NapReport":
+                return AtnaFactory.networkAccessPointDao();
+            case "ProvisionalReport":
+                return AtnaFactory.provisionalDao();
         }
         return null;
     }
@@ -273,50 +273,55 @@ public class Reporter {
      * @return
      */
     private String getReportFromTarget(String target) {
-        if (target.equals(ReportConfig.MESSAGES)) {
-            return "MessageReport";
-        } else if (target.equals(ReportConfig.CODES)) {
-            return "CodeReport";
-        } else if (target.equals(ReportConfig.OBJECTS)) {
-            return "ObjectReport";
-        } else if (target.equals(ReportConfig.PARTICIPANTS)) {
-            return "ParticipantReport";
-        } else if (target.equals(ReportConfig.SOURCES)) {
-            return "SourceReport";
-        } else if (target.equals(ReportConfig.NETWORK_ACCESS_POINTS)) {
-            return "NapReport";
-        } else if (target.equals(ReportConfig.PROVISIONAL_MESSAGES)) {
-            return "ProvisionalReport";
+
+        switch (target) {
+            case ReportConfig.MESSAGES:
+                return "MessageReport";
+            case ReportConfig.CODES:
+                return "CodeReport";
+            case ReportConfig.OBJECTS:
+                return "ObjectReport";
+            case ReportConfig.PARTICIPANTS:
+                return "ParticipantReport";
+            case ReportConfig.SOURCES:
+                return "SourceReport";
+            case ReportConfig.NETWORK_ACCESS_POINTS:
+                return "NapReport";
+            case ReportConfig.PROVISIONAL_MESSAGES:
+                return "ProvisionalReport";
         }
         return null;
     }
 
     private String getReportFromEntity(String s) {
-        if (s.equals("MessageEntity")) {
-            return "MessageReport";
-        } else if (s.equals("CodeEntity")) {
-            return "CodeReport";
-        } else if (s.equals("ObjectEntity")) {
-            return "ObjectReport";
-        } else if (s.equals("ParticipantEntity")) {
-            return "ParticipantReport";
-        } else if (s.equals("SourceEntity")) {
-            return "SourceReport";
-        } else if (s.equals("NeworkAccessPointEntity")) {
-            return "NapReport";
-        } else if (s.equals("MessageObjectEntity")) {
-            return "MessageObjectReport";
-        } else if (s.equals("MessageParticipantEntity")) {
-            return "MessageParticipantReport";
-        } else if (s.equals("MessageSourceEntity")) {
-            return "MessageSourceReport";
-        } else if (s.equals("ProvisionalEntity")) {
-            return "ProvisionalReport";
+
+        switch (s) {
+            case "MessageEntity":
+                return "MessageReport";
+            case "CodeEntity":
+                return "CodeReport";
+            case "ObjectEntity":
+                return "ObjectReport";
+            case "ParticipantEntity":
+                return "ParticipantReport";
+            case "SourceEntity":
+                return "SourceReport";
+            case "NeworkAccessPointEntity":
+                return "NapReport";
+            case "MessageObjectEntity":
+                return "MessageObjectReport";
+            case "MessageParticipantEntity":
+                return "MessageParticipantReport";
+            case "MessageSourceEntity":
+                return "MessageSourceReport";
+            case "ProvisionalEntity":
+                return "ProvisionalReport";
         }
         return null;
     }
 
     private String guessReportFromHql(String hql) {
+
         int min = Integer.MAX_VALUE;
         String ent = null;
         for (String entity : entities) {

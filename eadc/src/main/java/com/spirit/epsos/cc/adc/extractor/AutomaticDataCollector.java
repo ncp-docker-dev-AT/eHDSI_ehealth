@@ -16,18 +16,17 @@ import org.w3c.dom.Document;
  */
 public interface AutomaticDataCollector {
 
-    // constant fot the cda-namespace
-    public static final String cdaNamespace = "urn:hl7-org:v3";
+    // constant for the cda-namespace
+    String cdaNamespace = "urn:hl7-org:v3";
 
     /**
      * Processes a transaction, extracts data according to config.xml and stores
      * it into the database
      *
-     * @param transaction The transaction-xml-structure as specified by the
-     * XML-Schema
+     * @param transaction    The transaction-xml-structure as specified by the
+     *                       XML-Schema
      * @param dataSourceName The dataSourceName of the Database
      * @throws Exception
      */
-    public void processTransaction(String dsName, Document transaction) throws Exception;
-
+    void processTransaction(String dsName, Document transaction) throws Exception;
 }

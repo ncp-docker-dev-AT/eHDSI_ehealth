@@ -23,14 +23,15 @@ import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.naming.NamingException;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
+
+import javax.naming.NamingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements all the Integration Test for the XDR operations for Consent
@@ -45,9 +46,9 @@ public class XdrCsIT extends ClientGenericIT {
     @BeforeClass
     public static void setUpClass() throws NamingException {
         ClientGenericIT.setUpClass();
-        LOG.info("----------------------------");
-        LOG.info(" Submit Consent Documents   ");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Submit Consent Documents   ");
+        LOGGER.info("----------------------------");
     }
 
     /*
@@ -56,15 +57,16 @@ public class XdrCsIT extends ClientGenericIT {
     /*
      * Normal Usage
      */
+
     /**
      * This test performs a simple submitting action for a consent.
-     *
+     * <p>
      * It is a simple test designed uniquely for testing the normal work-flow of
      * the XDR.
      */
     @Test
     public void testSubmitConsent() {
-        List<String> permissions = new ArrayList<String>(1);
+        List<String> permissions = new ArrayList<>(1);
         permissions.add("32");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_CS_#0.xml", XSPARole.PHYSICIAN);
 
@@ -75,12 +77,13 @@ public class XdrCsIT extends ClientGenericIT {
     /*
      * Invalid Scenarios
      */
+
     /**
      * (ERROR)
-     *
+     * <p>
      * Country A does not allow for consent giving or revoking in other
      * countries
-     *
+     * <p>
      * Response Status: Failure, Message: Policy Violation, Code: 4705
      */
     @Test
@@ -91,11 +94,11 @@ public class XdrCsIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * Country A requests a higher authentication trust level than assigned to
      * the HCP (e.g. password-based login is not accepted for the requested
      * operation).
-     *
+     * <p>
      * Response Status: Failure, Message: Weak Authentication, Code: 4702
      */
     @Test
@@ -106,9 +109,9 @@ public class XdrCsIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The provided privacy policy identifiers not supported by country A.
-     *
+     * <p>
      * Response Status: Failure, Message: Unknown policy, Code: 4706
      */
     @Test
@@ -119,10 +122,10 @@ public class XdrCsIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * Country-A requires for a general consent for epSOS that MUST have been
      * given in country A before more specific consents can be accepted.
-     *
+     * <p>
      * Response Status: Failure, Message: No consent, Code: 4701
      */
     @Test

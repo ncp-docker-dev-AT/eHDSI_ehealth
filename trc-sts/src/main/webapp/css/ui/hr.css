@@ -1,0 +1,15 @@
+/* 
+-----------------------------------
+	HR
+-----------------------------------
+*/
+
+.hr-split-page {
+	border-top: 10px solid #d7dfe4;
+}
+
+.container .hr-split-page {
+	margin-left:-20px;
+	margin-right:-20px;
+}
+	

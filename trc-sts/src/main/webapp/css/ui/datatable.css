@@ -1,0 +1,195 @@
+/* 
+-----------------------------------
+	DATATABLE
+-----------------------------------
+*/
+
+table.dataTable {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+
+	/* 
+	-----------------------------------
+		FILTER
+	-----------------------------------
+	*/
+	
+	.dataTables_filter  {
+		position:relative;
+	}
+	
+	@media (max-width: 767px) {
+		[class*="col-xs"] > .dataTables_filter {
+			text-align:left;
+		}
+	}
+	
+	.dataTables_filter label  {
+		position:relative;
+		margin:0;
+		width:100%;
+	}
+	
+	@media (max-width: 767px) {
+		[class*="col-sm"] > .dataTables_filter label  {
+			display:block;
+		}
+	}
+	
+	.dataTables_filter .btn-reset-search {
+		position:absolute;
+		right:0;
+		top:0;
+	}
+	
+	.dataTables_filter .filter-icon {
+		left:10px;
+		top:7px;
+		position:absolute;
+	}
+	
+	.dataTables_filter input {
+		margin-left:0 !important;
+		display:inline-block;
+		padding-right:25px;
+		padding-left:27px;
+		font-weight:normal;
+		width:100%;
+	}
+	
+	@media (min-width: 768px) {
+		.dataTables_filter .form-control {
+			width:100%;
+		}
+	}
+	
+	/* 
+	-----------------------------------
+		LENGTH MENU
+	-----------------------------------
+	*/
+	
+	.dataTables_length label {
+		font-weight:normal;
+	}	
+	
+	@media (max-width: 767px) {
+		.dataTables_length select {
+			display:inline-block;
+			width:auto;
+		}	
+	}
+	
+	
+	/* 
+	-----------------------------------
+		SORTING
+	-----------------------------------
+	*/
+	
+	table.dataTable thead > tr > th:active,
+	table.dataTable thead > tr > td:active {
+	  outline: none;
+	}
+	table.dataTable thead .sorting,
+	table.dataTable thead .sorting_asc,
+	table.dataTable thead .sorting_desc,
+	table.dataTable thead .sorting_asc_disabled,
+	table.dataTable thead .sorting_desc_disabled {
+	  cursor: pointer;
+	  position: relative;
+	  padding-right:25px;
+	}
+	table.dataTable thead .sorting:after,
+	table.dataTable thead .sorting_asc:after,
+	table.dataTable thead .sorting_desc:after,
+	table.dataTable thead .sorting_asc_disabled:after,
+	table.dataTable thead .sorting_desc_disabled:after {
+	  position: absolute;
+	  bottom: 8px;
+	  right: 8px;
+	  display: block;
+	  font-family: 'Glyphicons Halflings';
+	  opacity: 0.5;
+	}
+	table.dataTable thead .sorting:after {
+	  opacity: 0.2;
+	  content: "\e150";
+	  /* sort */
+	}
+	table.dataTable thead .sorting_asc:after {
+	  content: "\e155";
+	  /* sort-by-attributes */
+	}
+	table.dataTable thead .sorting_desc:after {
+	  content: "\e156";
+	  /* sort-by-attributes-alt */
+	}
+	table.dataTable thead .sorting_asc_disabled:after,
+	table.dataTable thead .sorting_desc_disabled:after {
+	  color: #eee;
+	}
+	
+	
+	/* 
+	-----------------------------------
+		SCROLL BAR
+	-----------------------------------
+	*/
+	
+	.dataTables_scrollHeadInner {
+		box-shadow:0 1px 0 0 #DEE3E6 inset;
+	}
+	
+
+	.modal .dataTables_scrollBody {
+		max-height:70vh !important;
+	}
+
+	@media (max-height: 1000px) {
+		.modal .dataTables_scrollBody {
+			max-height:60vh !important;
+		}
+	}
+	
+	@media (max-height: 900px) {
+		.modal .dataTables_scrollBody {
+			max-height:55vh !important;
+		}
+	}
+	
+	@media (max-height: 800px) {
+		.modal .dataTables_scrollBody {
+			max-height:50vh !important;
+		}
+	}
+	
+	@media (max-height: 700px) {
+		.modal .dataTables_scrollBody {
+			max-height:45vh !important;
+		}
+	}
+	
+	@media (max-height: 600px) {
+		.modal .dataTables_scrollBody {
+			max-height:40vh !important;
+		}
+	}
+	
+	@media (max-height: 500px) {
+		.modal .dataTables_scrollBody {
+			max-height:35vh !important;
+		}
+	}
+	
+	@media (max-height: 400px) {
+		.modal .dataTables_scrollBody {
+			max-height:30vh !important;
+		}
+	}
+	
+		
+
+

@@ -27,6 +27,7 @@ import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
+import org.apache.commons.lang.StringUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Attribute;
 import org.opensaml.saml2.core.AttributeStatement;
@@ -36,7 +37,6 @@ import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.net.InetAddress;
@@ -49,7 +49,7 @@ import java.util.List;
 
 public class EventLogClientUtil {
 
-    private static Logger LOG = LoggerFactory.getLogger(EventLogClientUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventLogClientUtil.class);
 
     private EventLogClientUtil() {
     }
@@ -57,7 +57,8 @@ public class EventLogClientUtil {
     public static void createDummyMustUnderstandHandler(org.apache.axis2.client.Stub stub) {
         HandlerDescription description = new HandlerDescription("DummyMustUnderstandHandler");
         description.setHandler(new DummyMustUnderstandHandler());
-        AxisConfiguration axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext().getAxisConfiguration();
+        AxisConfiguration axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext()
+                .getAxisConfiguration();
         List<Phase> phasesList = axisConfiguration.getInFlowPhases();
         Phase myPhase = new Phase("MyPhase");
         try {
@@ -70,26 +71,21 @@ public class EventLogClientUtil {
     }
 
     public static String getServerCertificateDN(String epr) {
+
         String dn = null;
 
         try {
             // TODO A.R. Silly, very silly  to open connection again just for getting server certificate.
             // But can we get it from AXIS2?
 
-            HostnameVerifier allHostsValid = new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            };
+            HostnameVerifier allHostsValid = (hostname, session) -> true;
             // Install the all-trusting host verifier
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-
-            String ts = (String) System.getProperties().get("javax.net.ssl.trustStore");
 
             URL url = new URL(epr);
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.connect();
-            Certificate certs[] = con.getServerCertificates();
+            Certificate[] certs = con.getServerCertificates();
             // Peers certificate is first
             if (certs != null && certs.length > 0) {
                 X509Certificate cert = (X509Certificate) certs[0];
@@ -97,43 +93,45 @@ public class EventLogClientUtil {
             }
             con.disconnect();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
         }
         return dn;
     }
 
     public static String getLocalIpAddress() {
+
         // TODO A.R. should be changed for multihomed hosts... It's better to get address from AXIS2 actual socket but how?
         String ipAddress = null;
         try {
             ipAddress = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            LOG.error(null, e);
+
+            LOGGER.error("UnknownHostException: '{}'", e.getMessage(), e);
         }
         return ipAddress;
     }
 
     public static String getServerIpAddress(String epr) {
+
         URL url;
         String ipAddress = null;
         try {
             url = new URL(epr);
             ipAddress = InetAddress.getByName(url.getHost()).getHostAddress();
         } catch (Exception e) {
-            LOG.error(null, e);
+            LOGGER.error(null, e);
         }
         return ipAddress;
     }
 
     public static EventLog prepareEventLog(org.apache.axis2.context.MessageContext msgContext, org.apache.axiom.soap.SOAPEnvelope _returnEnv, String address) {
+
         EventLog eventLog = new EventLog();
 
-        //eventLog.setEI_EventDateTime(new XMLGregorianCalendarImpl(new GregorianCalendar()));
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
-            LOG.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
+            LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
         }
 
         // Set Active Participant Identification: Service Consumer NCP
@@ -156,7 +154,6 @@ public class EventLogClientUtil {
             eventLog.setTargetip(serverIp);
         }
 
-
         // Set Participant Object: Request Message
         String reqMessageId = appendUrnUuid(EventLogUtil.getMessageID(msgContext.getEnvelope()));
         eventLog.setReqM_ParticipantObjectID(reqMessageId);
@@ -177,39 +174,39 @@ public class EventLogClientUtil {
                 "@" + cms.getProperty("ncp.country") + ">");
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
             for (Attribute attribute : attributeStatement.getAttributes()) {
-                if (attribute.getName().equals("urn:oasis:names:tc:xacml:1.0:subject:subject-id")) {
+                if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xacml:1.0:subject:subject-id")) {
                     eventLog.setHR_AlternativeUserID(EventLogUtil.getAttributeValue(attribute));
-                } else if (attribute.getName().equals("urn:oasis:names:tc:xacml:2.0:subject:role")) {
+                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xacml:2.0:subject:role")) {
                     eventLog.setHR_RoleID(EventLogUtil.getAttributeValue(attribute));
-                } else if (attribute.getName().equals("urn:epsos:names:wp3.4:subject:healthcare-facility-type")) {
+                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:epsos:names:wp3.4:subject:healthcare-facility-type")) {
                     eventLog.setPC_RoleID(EventLogUtil.getAttributeValue(attribute));
-                } else if (attribute.getName().equals("urn:oasis:names:tc:xspa:1.0:environment:locality")) {
+                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:environment:locality")) {
                     eventLog.setPC_UserID(EventLogUtil.getAttributeValue(attribute));
                 }
             }
         }
-
     }
 
     public static void logTrcAssertion(EventLog eventLog, Assertion idAssertion) {
 
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
             for (Attribute attribute : attributeStatement.getAttributes()) {
-                if (attribute.getName().equals("urn:oasis:names:tc:xacml:1.0:resource:resource-id")) {
+                if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xacml:1.0:resource:resource-id")) {
                     eventLog.setPT_PatricipantObjectID(EventLogUtil.getAttributeValue(attribute));
                     break;
                 }
             }
         }
-
     }
 
     public static void sendEventLog(EventLog eventLog) {
+
         AuditService auditService = new AuditService();
         auditService.write(eventLog, "", "1");
     }
 
     public static String appendUrnUuid(String uuid) {
+
         if (uuid == null || uuid.isEmpty() || uuid.startsWith("urn:uuid:")) {
             return uuid;
         } else return "urn:uuid:" + uuid;

@@ -1,0 +1,25 @@
+/* 
+-----------------------------------
+	PAGE HEADER
+-----------------------------------
+*/
+
+.page-header {
+	border-bottom: 1px solid #DEE3E6;
+}
+
+.page-header-title {
+	color:#7E8E93;
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+h4.page-header-title {
+	font-size:20px;
+}
+
+.page-header-title small {
+	color:#aab7bb;
+}
+
+

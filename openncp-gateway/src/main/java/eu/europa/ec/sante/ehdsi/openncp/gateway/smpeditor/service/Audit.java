@@ -5,6 +5,21 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.util.DateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 
 /**
  * @author Inês Garganta
@@ -152,5 +167,33 @@ public class Audit {
         } catch (Exception e) {
             LOGGER.error("Error sending audit for eHealth SMP Push: '{}'", e.getMessage(), e);
         }
+    }
+
+    public static String prepareEventLog(byte[] bytes) {
+
+        StringWriter sw = new StringWriter();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(bais);
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer;
+            transformer = tf.newTransformer();
+            transformer.transform(new DOMSource(doc), new StreamResult(sw));
+        } catch (TransformerConfigurationException ex) {
+            LOGGER.error("\n TransformerConfigurationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+        } catch (TransformerException ex) {
+            LOGGER.error("\n TransformerException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+        } catch (ParserConfigurationException ex) {
+            LOGGER.error("\n ParserConfigurationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+        } catch (UnsupportedOperationException ex) {
+            LOGGER.error("\n UnsupportedOperationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+        } catch (SAXException ex) {
+            LOGGER.error("\n SAXException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+        } catch (IOException ex) {
+            LOGGER.error("\n IOException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+        }
+        return sw.toString();
     }
 }

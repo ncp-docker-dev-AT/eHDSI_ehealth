@@ -6,14 +6,13 @@ import java.text.SimpleDateFormat;
  * A class encapsulating a medical device entry.
  *
  * @author Akis Papadopoulos
- *
  */
 public class MedicalDevice extends MedicalEntry {
 
     // Static medical device entries counter
     private static int UUID = 1;
     // Static date and time formatter
-    private static SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
+    private SimpleDateFormat dater = new SimpleDateFormat("yyyyMMdd");
 
     /**
      * A constructor initializing a medical device.
@@ -29,7 +28,7 @@ public class MedicalDevice extends MedicalEntry {
     /**
      * A constructor initializing a medical device entry.
      *
-     * @param code the code of the medical device.
+     * @param code          the code of the medical device.
      * @param effectiveTime the effective time of the medical device.
      */
     public MedicalDevice(Code code, Time effectiveTime) {

@@ -23,15 +23,16 @@ import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.naming.NamingException;
-import javax.xml.soap.SOAPElement;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
+
+import javax.naming.NamingException;
+import javax.xml.soap.SOAPElement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements all the Integration Test for the XCA Retrieve operation for
@@ -50,14 +51,15 @@ public class XcaEpRetrieveIT extends ClientGenericIT {
     @BeforeClass
     public static void setUpClass() throws NamingException {
         ClientGenericIT.setUpClass();
-        LOG.info("----------------------------");
-        LOG.info(" Retrieve EP Documents");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Retrieve EP Documents");
+        LOGGER.info("----------------------------");
     }
 
     /*
      * Normal usage
      */
+
     /**
      * This test performs an XCA Retrieve for EP, using valid Document
      * Identifiers. It is a simple test designed uniquely for testing the normal
@@ -65,7 +67,7 @@ public class XcaEpRetrieveIT extends ClientGenericIT {
      */
     @Test
     public void testRetrieveEP() {
-        List<String> permissions = new ArrayList<String>(2);
+        List<String> permissions = new ArrayList<>(2);
         permissions.add("4");
         permissions.add("10");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#9.xml", XSPARole.PHARMACIST);

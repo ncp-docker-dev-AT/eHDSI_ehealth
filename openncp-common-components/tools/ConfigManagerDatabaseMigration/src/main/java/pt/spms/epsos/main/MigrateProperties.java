@@ -24,6 +24,7 @@ import eu.epsos.configmanager.database.model.Property;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,11 +44,11 @@ public final class MigrateProperties {
     /**
      * Epsos properties file name
      */
-    public final static String EPSOS_PROPS = "epsos.properties";
+    private final static String EPSOS_PROPS = "epsos.properties";
     /**
      * Epsos SRDC properties file name
      */
-    public final static String SRDC_PROPS = "epsos-srdc.properties";
+    private final static String SRDC_PROPS = "epsos-srdc.properties";
     /**
      * Class logger
      */
@@ -65,33 +66,32 @@ public final class MigrateProperties {
      * @param args the program arguments
      * @throws ConfigurationException
      */
-    public static void main(final String[] args) throws ConfigurationException, FileNotFoundException, IOException {
+    public static void main(final String[] args) throws ConfigurationException, IOException {
 
         if (args.length != 2) {
             LOGGER.warn("USAGE: java ConfigManagerMigrationTool.java -f < srdc / epsos >");
             return;
         }
 
-        String epsosPropsFile = null;
+        String epsosPropsFile;
 
-        if (args[1].equals("epsos")) {
-            epsosPropsFile = getPropertiesPath(EPSOS_PROPS);
-        } else if (args[1].equals("srdc")) {
-            epsosPropsFile = getPropertiesPath(SRDC_PROPS);
-        } else {
-            LOGGER.warn("USAGE: java ConfigManagerMigrationTool.java -f < srdc / epsos >");
-            return;
+        switch (args[1]) {
+            case "epsos":
+                epsosPropsFile = getPropertiesPath(EPSOS_PROPS);
+                break;
+            case "srdc":
+                epsosPropsFile = getPropertiesPath(SRDC_PROPS);
+                break;
+            default:
+                LOGGER.warn("USAGE: java ConfigManagerMigrationTool.java -f < srdc / epsos >");
+                return;
         }
 
         LOGGER.info("STARTING MIGRATION PROCESS...");
-
-        if (epsosPropsFile.equals("")) {
+        if (StringUtils.isBlank(epsosPropsFile)) {
             return;
         }
-
         processProperties(epsosPropsFile);
-
-
         LOGGER.info("MIGRATION PROCESS SUCCESSFULLY ENDED!");
     }
 
@@ -102,39 +102,34 @@ public final class MigrateProperties {
      * @param epsosPropsFile the properties file name.
      * @throws ConfigurationException if the properties file reading wen wrong.
      */
-    private static void processProperties(final String epsosPropsFile) throws ConfigurationException, FileNotFoundException, IOException {
-        LOGGER.info("READING CONFIGURATION FILE FROM: " + epsosPropsFile);
+    private static void processProperties(final String epsosPropsFile) throws ConfigurationException, IOException {
 
+        LOGGER.info("READING CONFIGURATION FILE FROM: '{}'", epsosPropsFile);
         File propsFile = new File(epsosPropsFile);
-
         processCommaProperties(propsFile, epsosPropsFile);
-
-        propsFile = new File(epsosPropsFile);
 
         final PropertiesConfiguration config = new PropertiesConfiguration();
         config.setReloadingStrategy(new FileChangedReloadingStrategy());
 
-        final Session session = HibernateUtil.getSessionFactory().openSession();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
 
-        LOGGER.info("INSERTING PROPERTIES INTO DATABASE...");
+            LOGGER.info("INSERTING PROPERTIES INTO DATABASE...");
+            session.beginTransaction();
 
-        session.beginTransaction();
+            final Iterator it = config.getKeys();
 
-        final Iterator it = config.getKeys();
+            while (it.hasNext()) {
+                final String key = (String) it.next();
+                final String value = config.getString(key);
 
-        while (it.hasNext()) {
-            final String key = (String) it.next();
-            final String value = (String) config.getString(key);
+                LOGGER.info("INSERTING: { KEY: '{}', VALUE: '{}'}", key, value);
 
-            LOGGER.info("INSERTING: { KEY: " + key + ", VALUE: " + value + " }");
-
-            final Property p = new Property(key, value);
-            session.save(p);
+                final Property p = new Property(key, value);
+                session.save(p);
+            }
+            session.getTransaction().commit();
+            session.close();
         }
-
-        session.getTransaction().commit();
-
-        session.close();
     }
 
     /**
@@ -145,6 +140,7 @@ public final class MigrateProperties {
      * @return the properties file with full path.
      */
     private static String getPropertiesPath(final String fileName) {
+
         final String envKey = getEnvKey("EPSOS_PROPS_PATH");
 
         if (envKey.isEmpty()) {
@@ -165,9 +161,8 @@ public final class MigrateProperties {
         String value = "";
         final Map map = System.getenv();
         final Set keys = map.keySet();
-        final Iterator iterator = keys.iterator();
-        while (iterator.hasNext()) {
-            final String key1 = (String) iterator.next();
+        for (Object key2 : keys) {
+            final String key1 = (String) key2;
             if (key1.equals(key)) {
                 value = (String) map.get(key1);
                 break;
@@ -181,25 +176,26 @@ public final class MigrateProperties {
      *
      * @param propertiesFile
      * @param filePath
-     * @throws FileNotFoundException
      * @throws IOException
      */
-    private static void processCommaProperties(File propertiesFile, String filePath) throws FileNotFoundException, IOException {
+    private static void processCommaProperties(File propertiesFile, String filePath) throws IOException {
+
         try (BufferedReader reader = new BufferedReader(new FileReader(propertiesFile)); FileWriter writer = new FileWriter(filePath)) {
 
-            String line = "", oldtext = "";
+            String line;
+            StringBuilder oldtext = new StringBuilder();
             while ((line = reader.readLine()) != null) {
-                oldtext += line + "\r\n";
+                oldtext.append(line).append("\r\n");
             }
             reader.close();
             // replace a word in a file
-            String newtext = oldtext.replaceAll(",", "\\,");
-            
+            String newtext = oldtext.toString().replaceAll(",", "\\,");
+
             writer.write(newtext);
             writer.close();
 
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            LOGGER.error("IOException: '{}'", ioe.getMessage(), ioe);
         }
     }
 }

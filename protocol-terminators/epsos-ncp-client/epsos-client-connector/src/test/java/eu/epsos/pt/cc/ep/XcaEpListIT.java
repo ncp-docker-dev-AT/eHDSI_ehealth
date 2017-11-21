@@ -21,14 +21,15 @@ package eu.epsos.pt.cc.ep;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.pt.cc.ClientGenericIT;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.naming.NamingException;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
+
+import javax.naming.NamingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements all the Integration Test for the XCA List operation for Order
@@ -47,14 +48,15 @@ public class XcaEpListIT extends ClientGenericIT {
     @BeforeClass
     public static void setUpClass() throws NamingException {
         ClientGenericIT.setUpClass();
-        LOG.info("----------------------------");
-        LOG.info(" Query EP Documents");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Query EP Documents");
+        LOGGER.info("----------------------------");
     }
 
     /*
      * Normal usage
      */
+
     /**
      * This test performs an XCA Query for EP, using valid Patient Identifiers.
      * It is a simple test designed uniquely for testing the normal work-flow of
@@ -62,7 +64,7 @@ public class XcaEpListIT extends ClientGenericIT {
      */
     @Test
     public void testQueryEP() {
-        List<String> permissions = new ArrayList<String>(2);
+        List<String> permissions = new ArrayList<>(2);
         permissions.add("4");
         permissions.add("10");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#0.xml", XSPARole.PHARMACIST);
@@ -74,11 +76,12 @@ public class XcaEpListIT extends ClientGenericIT {
      * Invalid scenarios
      * See D3.4.2 | 3.4.1.5
      */
+
     /**
      * (ERROR)
-     *
+     * <p>
      * The patient has not given consent to the requested service.
-     *
+     * <p>
      * Response Status: Failure, Message: No Consent, Code: 4701
      */
     @Test
@@ -89,11 +92,11 @@ public class XcaEpListIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * Country A requests a higher authentication trust level than assigned to
      * the HCP (e.g. password-based login not accepted for the requested
      * operation).
-     *
+     * <p>
      * Response Status: Failure, Message: Weak, Authentication Code: 4702
      */
     @Test
@@ -104,16 +107,16 @@ public class XcaEpListIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * Either the security policy of country A or a privacy policy of the
      * patient (that was given in country A) does not allow the requested
      * operation to be performed by the HCP.
-     *
+     * <p>
      * Response Status: Failure, Message: Insufficient Rights, Code: 4703
      */
     @Test
     public void testQueryEPInsRights() {
-        List<String> permissions = new ArrayList<String>(1);
+        List<String> permissions = new ArrayList<>(1);
         permissions.add("4");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#3.xml", XSPARole.PHARMACIST);
         testFailScenario("PT_CLIENT_XCA_EP_#3", "4703", REQ_FOLDER + "PT_CLIENT_XCA_EP_#3.xml");
@@ -121,14 +124,14 @@ public class XcaEpListIT extends ClientGenericIT {
 
     /**
      * (INFO)
-     *
+     * <p>
      * There is no ePrescription data registered for the given patient.
-     *
+     * <p>
      * Response Status: Success, Message: No Data, Code: 1101
      */
     @Test
     public void testQueryNoEP() {
-        List<String> permissions = new ArrayList<String>(2);
+        List<String> permissions = new ArrayList<>(2);
         permissions.add("4");
         permissions.add("10");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#4.xml", XSPARole.PHARMACIST);
@@ -137,9 +140,9 @@ public class XcaEpListIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The requested encoding cannot be provided due to a transcoding error.
-     *
+     * <p>
      * Response Status: Failure, Message: Transcoding Error, Code: 4203
      */
     @Test
@@ -150,9 +153,9 @@ public class XcaEpListIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The ePrescription registry is not accessible.
-     *
+     * <p>
      * Response Status: Failure, Message: Registry Failure, Code: 4103
      */
     @Test
@@ -163,10 +166,10 @@ public class XcaEpListIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * There is ePrescription data registered for the patient but the service
      * provider is unable to access it.
-     *
+     * <p>
      * Response Status: Failure, Message: Data Accesss Failure, Code: 4104
      */
     @Test
@@ -177,9 +180,9 @@ public class XcaEpListIT extends ClientGenericIT {
 
     /**
      * (ERROR).
-     *
+     * <p>
      * The service provider is unable to evaluate the given argument.
-     *
+     * <p>
      * Response Status: Failure, Message: Unknown Filters, Code: 4204
      */
     @Test

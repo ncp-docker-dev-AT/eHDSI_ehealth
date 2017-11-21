@@ -1,24 +1,3 @@
-/**
- * Copyright (c) 2000-2007 Liferay, Inc. All rights reserved.
- * <p>
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * <p>
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * <p>
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 package epsos.ccd.gnomon.xslt;
 
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,7 +50,8 @@ public class EpsosXSLTransformer {
 
         String output = "";
         checkLanguageFiles();
-        logger.info("Trying to transform XML using action path for dispensation '{}' and repository path '{}' to language {}", actionpath, path, lang);
+        logger.info("Trying to transform XML using action path for dispensation '{}' and repository path '{}' to language {}",
+                actionpath, path, lang);
 
         try {
             URL xslUrl = this.getClass().getResource(xsl);
@@ -78,24 +59,23 @@ public class EpsosXSLTransformer {
 
             String systemId = xslUrl.toExternalForm();
             System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
-            logger.info("XSL: '{}'", xsl);
-            logger.info("Main XSL: '{}'", xslUrl);
-            logger.info("SystemID: '{}'", systemId);
-            logger.info("Path: '{}'", path);
-            logger.info("Lang: '{}'", lang);
-            logger.info("Show Narrative: '{}'", String.valueOf(shownarrative));
-
+            if (logger.isInfoEnabled()) {
+                logger.info("XSL: '{}'", xsl);
+                logger.info("Main XSL: '{}'", xslUrl);
+                logger.info("SystemID: '{}'", systemId);
+                logger.info("Path: '{}'", path);
+                logger.info("Lang: '{}'", lang);
+                logger.info("Show Narrative: '{}'", String.valueOf(shownarrative));
+            }
             StreamSource xmlSource = new StreamSource(new StringReader(xml));
             StreamSource xslSource = new StreamSource(xslStream);
 
             xslSource.setSystemId(systemId);
 
-            //TransformerFactory transformerFactory = TransformerFactory.newInstance();
             TransformerFactory transformerFactory = net.sf.saxon.TransformerFactoryImpl.newInstance();
             Transformer transformer = transformerFactory.newTransformer(xslSource);
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
             transformer.setParameter("epsosLangDir", path);
-            //transformer.setParameter("epsosLangDir", xslUrl);
             transformer.setParameter("userLang", lang);
             transformer.setParameter("shownarrative", String.valueOf(shownarrative));
 
@@ -112,9 +92,8 @@ public class EpsosXSLTransformer {
             transformer.transform(xmlSource, result);
             output = readFile(resultFile.getAbsolutePath());
             if (!export) {
-
-                boolean deleted = resultFile.delete();
-                logger.debug("Delete temp file '{}' successfully: '{}'", resultFile.getAbsolutePath(), deleted);
+                Files.delete(Paths.get(resultFile.getCanonicalPath()));
+                logger.debug("Deleting temp file '{}' successfully", resultFile.getAbsolutePath());
             }
         } catch (Exception e) {
             logger.error("Exception: '{}'", e.getMessage(), e);
@@ -200,20 +179,23 @@ public class EpsosXSLTransformer {
 
     private void checkLanguageFiles() {
 
-        final String filesNeeded[] = {"epSOSDisplayLabels.xml", "NullFlavor.xml", "SNOMEDCT.xml",
-                "UCUMUnifiedCodeforUnitsofMeasure.xml"};
+//        final String filesNeeded[] = {"epSOSDisplayLabels.xml", "NullFlavor.xml", "SNOMEDCT.xml",
+//                "UCUMUnifiedCodeforUnitsofMeasure.xml"};
+        final String filesNeeded[] = {"1.3.6.1.4.1.12559.11.10.1.3.1.42.17.xml", "1.3.6.1.4.1.12559.11.10.1.3.1.42.37.xml",
+                "1.3.6.1.4.1.12559.11.10.1.3.1.42.46.xml", "1.3.6.1.4.1.12559.11.10.1.3.1.42.16.xml"};
         // get User Path
         try {
-            if (new File(path.toUri()).exists())
-                for (int i = 0; i < filesNeeded.length; i++) {
-                    if (!new File(Paths.get(path.toString(), filesNeeded[i]).toUri()).exists())
-                        throw new Exception("File " + filesNeeded[i] + " doesn't exists");
+            if (new File(path.toUri()).exists()) {
+
+                for (String aFilesNeeded : filesNeeded) {
+                    if (!new File(Paths.get(path.toString(), aFilesNeeded).toUri()).exists())
+                        throw new TerminologyFileNotFoundException("File " + aFilesNeeded + " doesn't exists");
                 }
-            else
-                throw new Exception("Folder " + path.toString() + " doesn't exists");
+            } else {
+                throw new TerminologyFileNotFoundException("Folder " + path.toString() + " doesn't exists");
+            }
         } catch (Exception e) {
             logger.error("FATAL ERROR: " + e.getMessage(), e);
-            //System.exit(-1);
         }
     }
 }

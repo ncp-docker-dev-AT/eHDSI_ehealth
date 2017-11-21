@@ -1,0 +1,52 @@
+/* 
+-----------------------------------
+	LEGEND
+-----------------------------------
+*/
+
+.legend {
+	display:table;
+	width:100%;
+}
+
+.legend > * {
+	display:inline-block;
+	padding:10px 15px;
+	vertical-align:top;
+}
+
+.legend.legend-collapsed > * {
+	padding:10px 5px;
+}
+
+.legend.legend-collapsed > *:first-child {
+	padding-left:15px;
+}
+
+.legend.legend-collapsed > *:last-child {
+	padding-right:15px;
+}
+
+.legend > .legend-heading {
+	white-space:nowrap;
+	padding-bottom:0px;
+}
+
+.legend > .legend-heading .legend-heading-icon {
+	margin-left:10px;
+}
+
+.legend-list {
+	display:block;
+	margin:0;
+	padding:0;
+}
+
+.legend-list li {
+	display:inline-block;
+	margin:0 5px;
+}
+
+.legend-list .legend-item-icon {
+	margin-right:2px;
+}

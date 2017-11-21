@@ -34,7 +34,7 @@ public class DateUtil {
 
     public static final String TIME_DATE_FORMAT = "yyyyMMddHHmmss.SSSZZZZ";
     public static final String DATE_FORMAT = "yyyyMMdd";
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    //private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     private static final int randLimit = 10000;
     private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class);
     private static Random rand = new Random();
@@ -44,7 +44,9 @@ public class DateUtil {
 
     // Returns the current time in the local time zone
     public static String getCurrentTimeLocal() {
-        String currentTime = "";
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        String currentTime;
         dateFormat.setTimeZone(TimeZone.getDefault());
         currentTime = dateFormat.format(new Date());
         return currentTime;
@@ -52,7 +54,9 @@ public class DateUtil {
 
     // Returns the current time in the GMT
     public static String getCurrentTimeGMT() {
-        String currentTime = "";
+
+        String currentTime;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         currentTime = dateFormat.format(new Date());
         return currentTime;
@@ -60,7 +64,8 @@ public class DateUtil {
 
     // Returns the current time in given format
     public static String getDateByDateFormat(String dateFormatString) {
-        String currentTime = "";
+
+        String currentTime;
         SimpleDateFormat dateFormat = new SimpleDateFormat(dateFormatString);
         currentTime = dateFormat.format(new Date());
         return currentTime;
@@ -68,7 +73,8 @@ public class DateUtil {
 
     // Returns the given date in given format
     public static String getDateByDateFormat(String dateFormatString, Date date) {
-        String currentTime = "";
+
+        String currentTime;
         SimpleDateFormat dateFormat = new SimpleDateFormat(dateFormatString);
         currentTime = dateFormat.format(date);
         return currentTime;
@@ -76,17 +82,20 @@ public class DateUtil {
 
     // uses local time zone
     public static String generateUniqueIdExtension() {
+
         String uniqueIdExt = DateUtil.getCurrentTimeLocal();
         uniqueIdExt += "." + rand.nextInt(randLimit);
         return uniqueIdExt;
     }
 
     public static Date parseDateFromString(String date, String pattern) throws ParseException {
+
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         return sdf.parse(date);
     }
 
     public static DateTime GregorianCalendarToJodaTime(XMLGregorianCalendar cal) {
+
         DateTime dt = new DateTime(cal.toGregorianCalendar().getTime());
         LOGGER.info("Date: '{}'", dt);
         return dt;

@@ -3,38 +3,41 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities;
 /**
  * @author Inês Garganta
  */
-
 public enum Countries {
 
-    at("Austria"),
-    be("Belgium"),
-    hr("Croatia"),
-    cy("Cyprus"),
-    cz("Czech Republic"),
-    dk("Denmark"),
-    ee("Estonia"),
-    fi("Finland"),
+    be("Belgique/België"),
+    bg("България"),
+    cz("Česká Republika"),
+    dk("Danmark"),
+    de("Deutschland"),
+    ee("Eesti"),
+    ie("Éire/Ireland"),
+    gr("Ελλάδα"),
+    es("España"),
     fr("France"),
-    de("Germany"),
-    gr("Greece"),
-    hu("Hungary"),
-    ie("Ireland"),
-    it("Italy"),
+    hr("Hrvatska"),
+    it("Italia"),
+    cy("Κύπρος"),
+    lv("Latvija"),
+    lt("Lietuva"),
     lu("Luxembourg"),
+    hu("Magyarország"),
     mt("Malta"),
-    pl("Poland"),
+    nl("Nederland"),
+    at("Österreich"),
+    pl("Polska"),
     pt("Portugal"),
-    es("Spain"),
-    sk("Slovakia"),
-    si("Slovenia"),
-    se("Sweden"),
+    ro("România"),
+    si("Slovenija"),
+    sk("Slovensko"),
+    fi("Suomi/Finland"),
+    se("Sverige"),
+    uk("United Kingdom"),
     ch("Switzerland"),
-    tr("Turkey"),
     eu("European Union");
 
-
-    protected static final Countries[] ALL = {at, be, hr, cy, cz, dk, ee, fi, fr, de, gr, hu, ie,
-            it, lu, mt, pl, pt, es, sk, si, se, ch, tr, eu};
+    protected static final Countries[] ALL = {be, bg, cz, dk, de, ee, ie, gr, es, fr, hr, it, cy, lv, lt, lu, hu, mt,
+            nl, at, pl, pt, ro, si, sk, fi, se, uk, ch, eu};
 
     private final String description;
 

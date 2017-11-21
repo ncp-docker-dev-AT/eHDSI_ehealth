@@ -1,0 +1,33 @@
+/* 
+-----------------------------------
+	ALERT
+-----------------------------------
+*/
+
+.alert {
+	border-radius:0;
+	margin-bottom:0;
+	padding-top:11px;
+	padding-bottom:11px;
+}
+
+.alert.display-table{
+	padding:0;
+}
+
+.alert.display-table .display-table-cell {
+	vertical-align:middle !important;
+	border-bottom:0 !important;
+}
+
+.alert-info.display-table .display-table-cell.alert-icon {
+	border-right:1px dashed #7FC9D8;
+}
+
+
+.alert-btn-right {
+	float:right;
+	margin-top:-7px;
+	margin-right:-7px;
+}
+

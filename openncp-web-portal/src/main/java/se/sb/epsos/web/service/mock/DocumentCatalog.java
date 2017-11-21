@@ -43,14 +43,11 @@ public class DocumentCatalog {
 
         Map<String, List<EpsosDocument>> map = new HashMap<>();
         map.put("191212121212^^^&2.16.17.710.807.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPrescription("191212121212", "1.1.1", "Insulin (human)", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                        createPrescription("191212121212", "1.2.1", "Paracetamol", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                Arrays.asList(createPrescription("191212121212", "1.1.1", "Insulin (human)", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
+                        createPrescription("191212121212", "1.2.1", "Paracetamol", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00")));
 
         map.put("193508249079^^^&2.16.17.710.807.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPrescription("193508249079", "2.1.1", "Terbutaline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
+                Arrays.asList(createPrescription("193508249079", "2.1.1", "Terbutaline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("193508249079", "2.2.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("193508249079", "2.3.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("193508249079", "2.4.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
@@ -58,40 +55,30 @@ public class DocumentCatalog {
                         createPrescription("193508249079", "2.6.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("193508249079", "2.7.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("193508249079", "2.8.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                        createPrescription("193508249079", "2.9.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                        createPrescription("193508249079", "2.9.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00")));
 
         map.put("199604082397^^^&2.16.17.710.807.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPrescription("199604082397", "3.1.1", "Flucloxacillin", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                        createPrescription("199604082397", "3.2.1", "Furosemide", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                Arrays.asList(createPrescription("199604082397", "3.1.1", "Flucloxacillin", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
+                        createPrescription("199604082397", "3.2.1", "Furosemide", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00")));
 
         map.put("192405038569^^^&2.16.17.710.807.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPrescription("192405038569", "4.1.1", "Fenoximetylpenicillin (penivillin V)", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                        createPrescription("192405038569", "4.2.1", "Natriumkromoglikat", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                Arrays.asList(createPrescription("192405038569", "4.1.1", "Fenoximetylpenicillin (penivillin V)", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
+                        createPrescription("192405038569", "4.2.1", "Natriumkromoglikat", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00")));
 
         // SE Special
         map.put("192405038569^^^&2.16.17.710.888.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPrescription("192405038569", "4.1.1", "Fenoximetylpenicillin (penivillin V)", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                        createPrescription("192405038569", "4.2.1", "Natriumkromoglikat", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                Arrays.asList(createPrescription("192405038569", "4.1.1", "Fenoximetylpenicillin (penivillin V)", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
+                        createPrescription("192405038569", "4.2.1", "Natriumkromoglikat", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00")));
 
 
         // DK prescriptions
         map.put("2601010001^^^&2.16.17.710.802.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPrescription("2601010001", "6.1.1", "Panodil, filmovertrukne tabletter", "Terri Dalsgaard", "2012-03-19T00:00:00.000+01:00"),
-                        createPrescription("2601010001", "6.2.1", "Fosavance, tabletter", "Terri Dalsgaard", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                Arrays.asList(createPrescription("2601010001", "6.1.1", "Panodil, filmovertrukne tabletter", "Terri Dalsgaard", "2012-03-19T00:00:00.000+01:00"),
+                        createPrescription("2601010001", "6.2.1", "Fosavance, tabletter", "Terri Dalsgaard", "2012-03-19T00:00:00.000+01:00")));
 
         // FI prescriptions
         map.put("031082-9958^^^&1.2.246.556.12001.4.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPrescription("031082-9958", "1.1.1", "Insulin (human)", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
+                Arrays.asList(createPrescription("031082-9958", "1.1.1", "Insulin (human)", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("031082-9958", "1.2.1", "Paracetamol", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("031082-9958", "2.1.1", "Terbutaline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("031082-9958", "2.2.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
@@ -101,13 +88,11 @@ public class DocumentCatalog {
                         createPrescription("031082-9958", "2.6.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("031082-9958", "2.7.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("031082-9958", "2.8.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                        createPrescription("031082-9958", "2.9.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                        createPrescription("031082-9958", "2.9.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00")));
 
         // EU prescriptions
         map.put("1^^^&2.16.17.710.850.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPrescription("1", "1.1.1", "Insulin (human)", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
+                Arrays.asList(createPrescription("1", "1.1.1", "Insulin (human)", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("1", "1.2.1", "Paracetamol", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("1", "2.1.1", "Terbutaline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("1", "2.2.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
@@ -117,29 +102,20 @@ public class DocumentCatalog {
                         createPrescription("1", "2.6.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("1", "2.7.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
                         createPrescription("1", "2.8.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                        createPrescription("1", "2.9.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                        createPrescription("1", "2.9.1", "Doxycycline", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00")));
         return map;
     }
 
     private static Map<String, List<EpsosDocument>> createPatientSummaries() {
         Map<String, List<EpsosDocument>> map = new HashMap<>();
         map.put("192405038569^^^&2.16.17.710.807.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPatientSummary("192405038569", "192405038569.1.1", "CDA Patientsummary", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                Collections.singletonList(createPatientSummary("192405038569", "192405038569.1.1", "CDA Patientsummary", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00")));
         map.put("2512484916^^^&2.16.17.710.802.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPatientSummary("2512484916", "2512484916.1.1", "Patient Summary for id: 2512484916.cda.ps.1.0:1", "National Board of E-Health", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                Collections.singletonList(createPatientSummary("2512484916", "2512484916.1.1", "Patient Summary for id: 2512484916.cda.ps.1.0:1", "National Board of E-Health", "2012-03-19T00:00:00.000+01:00")));
         map.put("1^^^&2.16.17.710.850.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPatientSummary("1", "192405038569.1.1", "CDA Patientsummary", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                Collections.singletonList(createPatientSummary("1", "192405038569.1.1", "CDA Patientsummary", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00")));
         map.put("1^^^&2.16.17.710.850.1000.990.1",
-                Arrays.asList(new EpsosDocument[]{
-                        createPatientSummary("1", "2512484916.1.1", "Patient Summary for id: 2512484916.cda.ps.1.0:1", "National Board of E-Health", "2012-03-19T00:00:00.000+01:00"),
-                }));
+                Collections.singletonList(createPatientSummary("1", "2512484916.1.1", "Patient Summary for id: 2512484916.cda.ps.1.0:1", "National Board of E-Health", "2012-03-19T00:00:00.000+01:00")));
         return map;
     }
 
@@ -160,17 +136,20 @@ public class DocumentCatalog {
     }
 
     public static byte[] get(String documentId) {
-        InputStream is = null;
+
+        String path = "";
         if (documentId.startsWith("EP")) {
-            is = DocumentCatalog.class.getResourceAsStream("ep/" + documentId + ".xml");
+
+            path = "ep/" + documentId + ".xml";
         } else if (documentId.startsWith("PS")) {
-            is = DocumentCatalog.class.getResourceAsStream("ps/" + documentId + ".xml");
+
+            path = "ps/" + documentId + ".xml";
         }
 
         ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
         byte[] bytes = new byte[512];
         int readBytes;
-        try {
+        try (InputStream is = DocumentCatalog.class.getResourceAsStream(path)) {
             while ((readBytes = is.read(bytes)) > 0) {
                 os.write(bytes, 0, readBytes);
             }
@@ -178,7 +157,6 @@ public class DocumentCatalog {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
         } finally {
             try {
-                is.close();
                 os.close();
             } catch (IOException e) {
                 LOGGER.error("IOException: '{}'", e.getMessage(), e);
@@ -199,8 +177,7 @@ public class DocumentCatalog {
                 "urn:ihe:iti:xds-sd:pdf:2008", "PDF/A coded document", "epSOS formatCodes",
                 "ePrescription",
                 description, author, getDate(createDate));
-//		pdf.setParentDocumentRelationShip("XFRM");
-//		pdf.setParentDocumentId(epDoc.getUUID());
+
         epDoc.getAssociatedDocuments().add(pdf);
         return epDoc;
     }
@@ -217,8 +194,7 @@ public class DocumentCatalog {
                 "urn:ihe:iti:xds-sd:pdf:2008", "PDF/A coded document", "epSOS formatCodes",
                 "Patient Summary",
                 description, author, getDate(createDate));
-//		pdf.setParentDocumentRelationShip("XFRM");
-//		pdf.setParentDocumentId(psDoc.getUUID());
+
         psDoc.getAssociatedDocuments().add(pdf);
         return psDoc;
     }

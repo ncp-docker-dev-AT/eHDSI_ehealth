@@ -23,7 +23,7 @@ import org.opensaml.saml2.core.Assertion;
 
 /**
  * @author erdem
- *
+ * 
  */
 public class XdrRequest {
 
@@ -32,6 +32,7 @@ public class XdrRequest {
     private String countryCode;
     private String countryName;
     private String cdaId;
+    private String submissionSetId;
     private String cda;
     private GenericDocumentCode documentCode;
     private PatientDemographics patient;
@@ -51,6 +52,14 @@ public class XdrRequest {
     public void setCdaId(String cdaId) {
         this.cdaId = cdaId;
     }
+
+  public String getSubmissionSetId() {
+    return submissionSetId;
+  }
+
+  public void setSubmissionSetId(String submissionSetId) {
+    this.submissionSetId = submissionSetId;
+  }
 
     public String getCda() {
         return cda;

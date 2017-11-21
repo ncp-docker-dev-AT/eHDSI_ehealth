@@ -14,43 +14,43 @@
                         <th>
                             <!--  Prefix : -->
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'55'"/>
+                                <xsl:with-param name="code" select="'55'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  Family Name : -->
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'30'"/>
+                                <xsl:with-param name="code" select="'30'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  Given Name:-->
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'34'"/>
+                                <xsl:with-param name="code" select="'34'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  Date of Birth: -->
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'19'"/>
+                                <xsl:with-param name="code" select="'19'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  Gender: -->
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'33'"/>
+                                <xsl:with-param name="code" select="'33'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--   Regional/National Health ID: -->
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'66'"/>
+                                <xsl:with-param name="code" select="'66'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  National Insurance number: -->
                             <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="data" select="'41'"/>
+                                <xsl:with-param name="code" select="'41'"/>
                             </xsl:call-template>
                         </th>
                     </tr>
@@ -71,7 +71,9 @@
                         </td>
                         <td>
                             <xsl:for-each select="n1:patient/n1:administrativeGenderCode">
-                                <xsl:call-template name="show-gender"/>
+                                <xsl:call-template name="show-gender">
+                                    <xsl:with-param name="data" select="@code"/>
+                                </xsl:call-template>
                             </xsl:for-each>
                         </td>
                         <td>

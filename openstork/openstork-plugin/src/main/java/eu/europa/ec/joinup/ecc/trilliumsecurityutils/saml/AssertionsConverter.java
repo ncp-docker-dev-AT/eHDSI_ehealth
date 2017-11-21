@@ -82,10 +82,9 @@ public class AssertionsConverter {
         String pat = "";
         pat = extension + "^^^&" + root + "&ISO";
         LOG.info("TRCA Patient ID : '{}'", pat);
-        LOG.info("Asserion ID :" + idAs.getID());
+        LOG.info("Assertion ID :" + idAs.getID());
         LOG.info("SECMAN URL: " + ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
-        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(
-                idAs, pat).PurposeOfUse(purpose).build();
+        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).PurposeOfUse(purpose).build();
         trc = req1.request();
 
         AssertionMarshaller marshaller = new AssertionMarshaller();

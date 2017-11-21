@@ -23,14 +23,15 @@ import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.naming.NamingException;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
+
+import javax.naming.NamingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements all the Integration Test for the XDR operations for eDispensation
@@ -45,9 +46,9 @@ public class XdrEdIT extends ClientGenericIT {
     @BeforeClass
     public static void setUpClass() throws NamingException {
         ClientGenericIT.setUpClass();
-        LOG.info("----------------------------");
-        LOG.info(" Submit eD Documents");
-        LOG.info("----------------------------");
+        LOGGER.info("----------------------------");
+        LOGGER.info(" Submit eD Documents");
+        LOGGER.info("----------------------------");
     }
     /*
      * Test cases
@@ -58,13 +59,13 @@ public class XdrEdIT extends ClientGenericIT {
 
     /**
      * This test performs a simple submitting action for a eDispensation.
-     *
+     * <p>
      * It is a simple test designed uniquely for testing the normal work-flow of
      * the XDR.
      */
     @Test
     public void testSubmitED() {
-        List<String> permissions = new ArrayList<String>(1);
+        List<String> permissions = new ArrayList<>(1);
         permissions.add("46");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_ED_#0.xml", XSPARole.PHARMACIST);
 
@@ -75,16 +76,17 @@ public class XdrEdIT extends ClientGenericIT {
     /*
      * Invalid Scenarios
      */
+
     /**
      * (ERROR)
-     *
+     * <p>
      * No matching ePrescription was found.
-     *
+     * <p>
      * Response Status: Failure, Message: No Match, Code: 4105
      */
     @Test
     public void testSubmitNoEP() {
-        List<String> permissions = new ArrayList<String>(1);
+        List<String> permissions = new ArrayList<>(1);
         permissions.add("46");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_ED_#1.xml", XSPARole.PHARMACIST);
 
@@ -93,14 +95,14 @@ public class XdrEdIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * ePrescription has already been dispensed.
-     *
+     * <p>
      * Response Status: Failure Message: Invalid Dispensation Code: 4106
      */
     @Test
     public void testSubmitDispEP() {
-        List<String> permissions = new ArrayList<String>(1);
+        List<String> permissions = new ArrayList<>(1);
         permissions.add("46");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_ED_#2.xml", XSPARole.PHARMACIST);
 
@@ -109,11 +111,11 @@ public class XdrEdIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * Country A requests a higher authentication trust level than assigned to
      * the HCP (e.g. password-based login is not accepted for the requested
      * operation).
-     *
+     * <p>
      * Response Status: Failure, Message: Weak Authentication, Code: 4702
      */
     @Test
@@ -124,10 +126,10 @@ public class XdrEdIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The eDispensation service provider only accepts dispensation data that is
      * digitally signed by an HCP.
-     *
+     * <p>
      * Response Status: Failure, Message: No Signature, Code: 4704
      */
     @Test
@@ -138,10 +140,10 @@ public class XdrEdIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The service consumer did not provide the source coded PDF document for an
      * eDispensation.
-     *
+     * <p>
      * Response Status: Failure, Message: Original data missing, Code: 4107
      */
     @Test
@@ -152,16 +154,16 @@ public class XdrEdIT extends ClientGenericIT {
 
     /**
      * (ERROR)
-     *
+     * <p>
      * The service consumer did not provide the epSOS pivot coded document for
      * an eDispensation.
-     *
+     * <p>
      * Response Status: Failure, Message: Original data missing, Code: 4108
      */
     @Test
     @Ignore
     public void testSubmitNoDoc() {
-        List<String> permissions = new ArrayList<String>(1);
+        List<String> permissions = new ArrayList<>(1);
         permissions.add("46");
         assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_ED_#6.xml", XSPARole.PHARMACIST);
         testFailScenario("PT_CLIENT_XDR_ED_#6", "4108", REQ_FOLDER + "PT_CLIENT_XDR_ED_#6.xml");

@@ -1,5 +1,6 @@
 package tr.com.srdc.epsos.securityman.validators;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensaml.saml2.core.Assertion;
@@ -41,7 +42,7 @@ public class FieldValueValidators {
     }
 
     public static void validateMethodValue(Assertion assertion) throws InvalidFieldException {
-        if (!assertion.getSubject().getSubjectConfirmations().get(0).getMethod().equals("urn:oasis:names:tc:SAML:2.0:cm:sender-vouches")) {
+        if (!StringUtils.equals(assertion.getSubject().getSubjectConfirmations().get(0).getMethod(), "urn:oasis:names:tc:SAML:2.0:cm:sender-vouches")) {
             throw (new InvalidFieldException("Method must be 'urn:oasis:names:tc:SAML:2.0:cm:sender-vouches'"));
         }
     }
@@ -82,13 +83,13 @@ public class FieldValueValidators {
         if (assertion.getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef() == null) {
             throw (new InvalidFieldException("AuthnContextClassRef must be 'urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession'"));
         }
-        if (!assertion.getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef().equals("urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession")) {
+        if (!StringUtils.equals(assertion.getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef(), "urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession")) {
             throw (new InvalidFieldException("AuthnContextClassRef must be 'urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession'"));
         }
     }
 
     public static void validateAssertionIdRefValue(Assertion assertion) throws InvalidFieldException {
-        if (assertion.getAdvice().getAssertionIDReferences().get(0).equals("")) {
+        if (org.apache.commons.lang.StringUtils.isBlank(assertion.getAdvice().getAssertionIDReferences().get(0).getAssertionID())) {
             throw (new InvalidFieldException("AssertionIdRef should be filled."));
         }
     }

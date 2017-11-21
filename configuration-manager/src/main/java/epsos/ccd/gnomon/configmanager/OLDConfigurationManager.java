@@ -1,19 +1,3 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements. See the NOTICE file distributed with this
- * work for additional information regarding copyright ownership. The ASF
- * licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
 package epsos.ccd.gnomon.configmanager;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -24,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -51,6 +34,7 @@ public class OLDConfigurationManager implements ConfigurationManagerInt {
     }
 
     public static synchronized OLDConfigurationManager getInstance() {
+
         if (instance == null) {
             synchronized (OLDConfigurationManager.class) {
                 if (instance == null) {
@@ -62,6 +46,7 @@ public class OLDConfigurationManager implements ConfigurationManagerInt {
     }
 
     private String getPropertiesPath() {
+
         String path = getEnvKey("EPSOS_PROPS_PATH") + "epsos.properties";
         logger.debug("EPSOS PROPERTIES PATH: {}", path);
         return path;
@@ -80,65 +65,64 @@ public class OLDConfigurationManager implements ConfigurationManagerInt {
     @Override
     @Deprecated
     public String getProperty(String key) {
+
         Parameters params = new Parameters();
         FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
                 new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
-                        .configure(params.fileBased()
-                                .setFile(new File(getPropertiesPath())));
+                        .configure(params.fileBased().setFile(new File(getPropertiesPath())));
 
-        PropertiesConfiguration config = null;
-        try {
-            config = builder.getConfiguration();
-        } catch (ConfigurationException e) {
-            logger.error("An unexpected configuration error occurred", e);
-        }
-
+        PropertiesConfiguration config;
         Pattern regex = Pattern.compile("%([^]]*)%");
         String specialValue;
         String returnStr = "";
 
-        if (!config.isEmpty()) {
-            // reads property from epsos.properties
-            returnStr = config.getString(key);
-            if (returnStr == null) {
-                returnStr = "";
-            }
-            logger.debug("GETTING PROPERTY = {} = {}", key, returnStr);
-            // try to find % properties
-            try {
-                Matcher m = regex.matcher(returnStr);
-                if (m.find()) {
-                    specialValue = m.group();
-                    String value2;
-                    value2 = config.getString(specialValue.replaceAll("%", ""));
-                    if (value2 != null) {
-                        returnStr = returnStr.replaceAll("%([^]]*)%", value2);
-                        if (returnStr == null) {
-                            returnStr = "";
-                        }
-                        logger.debug("GETTING PROPERTY WITH WILDCARD EXPRESSION = {} = {}", key, returnStr);
-                    } else {
-                        logger.error("ERROR FINDING PROPERTY WITH % WILDCARD = {} = {}", key, returnStr);
-                    }
-                }
-            } catch (Exception e1) {
-                logger.error("ERROR FINDING PROPERTY WITH WILDCARD EXPRESSION %", e1);
-            }
-        } else {
-            logger.error("EPSOS PROPERTIES FILE DOESN'T EXIST OR IS EMPTY");
-        }
-
-        if ("".equals(returnStr)) {
-            logger.debug("TRYING TO READ PROPERTY FROM ENVIRONMENT");
-            try {
-                returnStr = getEnvKey(key);
+        try {
+            config = builder.getConfiguration();
+            if (!config.isEmpty()) {
+                // reads property from epsos.properties
+                returnStr = config.getString(key);
                 if (returnStr == null) {
                     returnStr = "";
                 }
-                logger.debug("GETTING PROPERTY FROM ENVIRONMENT = {} = {}", key, returnStr);
-            } catch (Exception e2) {
-                logger.error("ENVIRONMENT PROPERTY {} NOT FOUND. RETURNS EMPTY STRING", key, e2);
+                logger.debug("GETTING PROPERTY = {} = {}", key, returnStr);
+                // try to find % properties
+                try {
+                    Matcher m = regex.matcher(returnStr);
+                    if (m.find()) {
+                        specialValue = m.group();
+                        String value2;
+                        value2 = config.getString(specialValue.replaceAll("%", ""));
+                        if (value2 != null) {
+                            returnStr = returnStr.replaceAll("%([^]]*)%", value2);
+                            if (returnStr == null) {
+                                returnStr = "";
+                            }
+                            logger.debug("GETTING PROPERTY WITH WILDCARD EXPRESSION = {} = {}", key, returnStr);
+                        } else {
+                            logger.error("ERROR FINDING PROPERTY WITH % WILDCARD = {} = {}", key, returnStr);
+                        }
+                    }
+                } catch (Exception e1) {
+                    logger.error("ERROR FINDING PROPERTY WITH WILDCARD EXPRESSION %", e1);
+                }
+            } else {
+                logger.error("EPSOS PROPERTIES FILE DOESN'T EXIST OR IS EMPTY");
             }
+
+            if ("".equals(returnStr)) {
+                logger.debug("TRYING TO READ PROPERTY FROM ENVIRONMENT");
+                try {
+                    returnStr = getEnvKey(key);
+                    if (returnStr == null) {
+                        returnStr = "";
+                    }
+                    logger.debug("GETTING PROPERTY FROM ENVIRONMENT = {} = {}", key, returnStr);
+                } catch (Exception e2) {
+                    logger.error("ENVIRONMENT PROPERTY {} NOT FOUND. RETURNS EMPTY STRING", key, e2);
+                }
+            }
+        } catch (ConfigurationException e) {
+            logger.error("An unexpected configuration error occurred", e);
         }
         return returnStr;
     }
@@ -152,28 +136,23 @@ public class OLDConfigurationManager implements ConfigurationManagerInt {
      */
     @Override
     @Deprecated
-    public String updateProperty(
-            String key,
-            String value) {
+    public String updateProperty(String key, String value) {
+
         Parameters params = new Parameters();
         FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
                 new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
-                        .configure(params.fileBased()
-                                .setFile(new File(getPropertiesPath())));
+                        .configure(params.fileBased().setFile(new File(getPropertiesPath())));
 
-        PropertiesConfiguration config = null;
+        PropertiesConfiguration config;
         try {
             config = builder.getConfiguration();
-        } catch (ConfigurationException e) {
-            logger.error("An unexpected configuration error occurred", e);
-        }
-
-        try {
             config.setProperty(key, value);
             builder.save();
-            logger.debug("UPDATING PROPERTY: " + key + "=" + value);
+            logger.debug("UPDATING PROPERTY: '{}'='{}'", key, value);
+        } catch (ConfigurationException e) {
+            logger.error("An unexpected configuration error occurred", e);
         } catch (Exception e) {
-            logger.error("ERROR UPDATING PROPERTY " + key + " " + e.getMessage());
+            logger.error("ERROR UPDATING PROPERTY " + key + " " + e.getMessage(), e);
             return "";
         }
         return value;
@@ -188,9 +167,8 @@ public class OLDConfigurationManager implements ConfigurationManagerInt {
      */
     @Override
     @Deprecated
-    public String getServiceWSE(
-            String ISOCountryCode,
-            String ServiceName) {
+    public String getServiceWSE(String ISOCountryCode, String ServiceName) {
+
         return getProperty(ISOCountryCode + "." + ServiceName + ".WSE");
     }
 
@@ -204,10 +182,8 @@ public class OLDConfigurationManager implements ConfigurationManagerInt {
      */
     @Override
     @Deprecated
-    public void setServiceWSE(
-            String ISOCountryCode,
-            String ServiceName,
-            String URL) {
+    public void setServiceWSE(String ISOCountryCode, String ServiceName, String URL) {
+
         updateProperty(ISOCountryCode + "." + ServiceName + ".WSE", URL);
     }
 
@@ -219,12 +195,12 @@ public class OLDConfigurationManager implements ConfigurationManagerInt {
      */
     @Deprecated
     private String getEnvKey(String key1) {
+
         String value = "";
         Map map = System.getenv();
         Set keys = map.keySet();
-        Iterator iterator = keys.iterator();
-        while (iterator.hasNext()) {
-            String key = (String) iterator.next();
+        for (Object key2 : keys) {
+            String key = (String) key2;
             if (key.equals(key1)) {
                 value = (String) map.get(key);
                 break;

@@ -1,24 +1,28 @@
 /**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
+ * Copyright (c) 2009-2011 University of Cardiff and others
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * <p>
+ * Contributors:
+ * University of Cardiff - initial API and implementation
+ * -
  */
 
 package org.openhealthtools.openatna.syslog.bsd;
+
+import org.openhealthtools.openatna.syslog.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,14 +33,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openhealthtools.openatna.syslog.Constants;
-import org.openhealthtools.openatna.syslog.LogMessage;
-import org.openhealthtools.openatna.syslog.SyslogException;
-import org.openhealthtools.openatna.syslog.SyslogMessage;
-import org.openhealthtools.openatna.syslog.SyslogMessageFactory;
 
 /**
  * Reads in data and creates BSD style syslog messages
@@ -49,23 +45,26 @@ import org.openhealthtools.openatna.syslog.SyslogMessageFactory;
 
 public class BsdMessageFactory extends SyslogMessageFactory {
 
-    static Log log = LogFactory.getLog("org.openhealthtools.openatna.syslog.bsd.BsdMessageFactory");
-
-
-    private static SimpleDateFormat format = new SimpleDateFormat("MMM d HH:mm:ss");
-    private static SimpleDateFormat singleDateFormat = new SimpleDateFormat("MMM  d HH:mm:ss");
+    private static final Logger LOGGER = LoggerFactory.getLogger(BsdMessageFactory.class);
+    private static final String DATE_FORMAT = "MMM d HH:mm:ss";
+    private static final String SINGLE_DATE_FORMAT = "MMM  d HH:mm:ss";
 
     public static String createDate(Date date) {
+
         Calendar c = new GregorianCalendar(TimeZone.getDefault());
         c.setTime(date);
         if (c.get(Calendar.DATE) > 9) {
+            SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
             return format.format(date);
         } else {
+            SimpleDateFormat singleDateFormat = new SimpleDateFormat(SINGLE_DATE_FORMAT);
             return singleDateFormat.format(date);
         }
     }
 
     public static Date formatDate(String date) throws Exception {
+
+        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
         return format.parse(date);
     }
 
@@ -76,7 +75,6 @@ public class BsdMessageFactory extends SyslogMessageFactory {
      * @param in
      * @return
      * @throws org.openhealthtools.openatna.syslog.SyslogException
-     *
      */
     private int readPriority(InputStream in) throws SyslogException {
         try {
@@ -112,6 +110,7 @@ public class BsdMessageFactory extends SyslogMessageFactory {
 
 
     public SyslogMessage read(InputStream in) throws SyslogException {
+
         try {
             PushbackInputStream pin = new PushbackInputStream(in, 5);
             int priority = readPriority(pin);
@@ -152,7 +151,6 @@ public class BsdMessageFactory extends SyslogMessageFactory {
                             case 4:
                                 host = currHeader;
                                 break;
-
                         }
                     }
                     spaceBefore = true;
@@ -173,6 +171,7 @@ public class BsdMessageFactory extends SyslogMessageFactory {
                 try {
                     formatDate(timestamp);
                 } catch (Exception e) {
+                    LOGGER.debug("Exception: '{}'", e.getMessage(), e);
                     timestamp = createDate(new Date());
                 }
             }
@@ -199,8 +198,8 @@ public class BsdMessageFactory extends SyslogMessageFactory {
             severity = priority % 8;
             return new BsdMessage(facility, severity, timestamp, host, logMessage, tag);
         } catch (IOException e) {
-            log.debug(e);
-            log.debug(e.getMessage());            
+
+            LOGGER.debug("IOException: '{}'", e.getMessage(), e);
             throw new SyslogException(e);
         }
     }

@@ -1,0 +1,18 @@
+/* 
+-----------------------------------
+	BOXES
+-----------------------------------
+*/
+
+.v-box +.v-box {
+	margin-top:15px;
+}
+
+.v-box > * {
+	margin-top:0;
+	margin-bottom:0;
+}
+
+.h-box +.h-box {
+	margin-right:15px;
+}

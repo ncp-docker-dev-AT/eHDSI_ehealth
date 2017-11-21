@@ -4,6 +4,8 @@ import com.spirit.epsos.cc.adc.db.EadcDbConnect;
 import eu.epsos.pt.eadc.util.EadcFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,6 +13,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 /**
  * This class will test the EADCReceiver class
  */
+@RunWith(JUnit4.class)
 public class EADCReceiverTest extends BaseEadcTest {
 
     @Before
@@ -18,7 +21,7 @@ public class EADCReceiverTest extends BaseEadcTest {
 
         //TODO: Check Logs Jerome
         //DOMConfigurator.configureAndWatch("log4j.xml", 60 * 1000);
-        
+
         /* TEST DATABASE INSTANTIATION */
         EadcDbConnect con = eu.epsos.pt.eadc.util.EadcFactory.INSTANCE.createEadcDbConnect(DS_NAME);
     }

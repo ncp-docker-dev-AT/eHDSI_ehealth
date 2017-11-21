@@ -7,6 +7,8 @@ import eu.epsos.pt.eadc.util.EadcFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -21,6 +23,7 @@ import java.util.UUID;
  *
  * @author mk
  */
+@RunWith(JUnit4.class)
 public class TestAutomaticDataCollector extends BaseEadcTest {
 
     private static Logger log = LoggerFactory.getLogger(TestAutomaticDataCollector.class);

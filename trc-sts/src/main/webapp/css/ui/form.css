@@ -1,0 +1,223 @@
+/* 
+-----------------------------------
+	FORM
+-----------------------------------
+*/
+
+.form-control {
+	border-radius:2px;
+	border-color:#DEE3E6;
+}
+
+.form-control-static.form-control {
+	background:#f8f8f8;
+	cursor:not-allowed;
+}
+
+.mandatory-star,
+.required-star  {
+	color:red;
+}
+
+.input-group-addon {
+	border-radius:2px;
+	border-color:#DEE3E6;
+	background-color:#F5F7F8;
+}
+
+.input-group-addon label,
+.input-group-addon input {
+	margin:0;
+	display:inline-block;
+	vertical-align:middle;
+	font-weight:normal;
+}
+
+.control-label-child {
+	margin-left:30px;
+	position:relative;
+}
+
+.control-label-child-icon {
+	position:absolute;
+	top:2px;
+	left:-20px;
+}
+
+/* 
+-----------------------------------
+	FIELDSET
+-----------------------------------
+*/
+
+.fieldset-border {
+	padding:15px;
+	border:1px solid #DEE3E6;
+	border-radius:2px;
+}
+
+.fieldset-border legend {
+	padding:0 10px;
+	border:0;
+	width:auto;
+	margin-left:-10px;
+	margin-bottom:0;
+	color:#888;
+}
+
+/* 
+-----------------------------------
+	HAS ERROR
+-----------------------------------
+*/
+
+.has-error .form-control,
+.has-error .form-control:focus,
+.has-error .bootstrap-select .dropdown-toggle {
+    border-color: red;
+}
+
+.has-error .checkbox,
+.has-error .checkbox-inline,
+.has-error .control-label,
+.has-error .help-block,
+.has-error .radio,
+.has-error .radio-inline,
+.has-error.checkbox label,
+.has-error.checkbox-inline label,
+.has-error.radio label,
+.has-error.radio-inline label {
+    color:red;
+}
+
+/* 
+-----------------------------------
+	HAS SUCCESS
+-----------------------------------
+*/
+
+.has-success .form-control,
+.has-success .form-control:focus,
+.has-success .bootstrap-select .dropdown-toggle {
+    border-color: #5CB85C;
+}
+
+.has-success .checkbox,
+.has-success .checkbox-inline,
+.has-success .control-label,
+.has-success .help-block,
+.has-success .radio,
+.has-success .radio-inline,
+.has-success.checkbox label,
+.has-success.checkbox-inline label,
+.has-success.radio label,
+.has-success.radio-inline label {
+    color:#5CB85C;
+}
+
+/* 
+-----------------------------------
+	CHECKBOX / RADIO
+-----------------------------------
+*/
+
+.checkbox.checkbox ,
+.checkbox.radio {
+	margin-top:0;
+	margin-bottom:0;
+}
+
+.label-gap {
+	margin-bottom:5px;
+	display:block;
+}
+
+
+/* 
+-----------------------------------
+	BOOTSTRAP SELECT
+-----------------------------------
+*/
+
+.bootstrap-select>.dropdown-toggle {
+	float:none;
+}
+
+.bootstrap-select.bs-searchbox-actionsbox .bs-searchbox,
+.bootstrap-select.bs-searchbox-actionsbox .bs-actionsbox {
+	display:table-cell;
+	vertical-align:top;
+}
+
+.bootstrap-select.bs-searchbox-actionsbox .bs-searchbox {
+	width:500px;
+	padding: 4px 8px 6px 8px;
+}
+
+.bootstrap-select.bs-searchbox-actionsbox .bs-searchbox+.bs-actionsbox {
+    padding: 4px 8px 6px 8px;
+	width:150px;
+}
+
+.bootstrap-select.bs-searchbox-actionsbox .bs-searchbox+.bs-actionsbox .btn-group {
+	white-space:nowrap;
+	float:right;
+}
+
+.bootstrap-select.bs-searchbox-actionsbox .bs-searchbox+.bs-actionsbox .btn {
+    padding: 6px 12px;
+	font-size: 14px;
+}
+
+.bootstrap-select.btn-group .dropdown-menu.inner {
+	border-top:1px solid #ddd;
+}
+
+/* 
+-----------------------------------
+	FAKE FORM ELEMENT
+-----------------------------------
+*/
+
+.fake-radio-button:hover :before {
+	content:"\f192";
+	cursor:pointer;
+}
+
+
+
+/* 
+-----------------------------------
+	DECORATOR FORM ELEMENT
+-----------------------------------
+*/
+
+.checkbox-decorator {
+	position:relative;
+	font-weight:normal;
+	cursor:pointer;
+	white-space:nowrap;
+	margin:0;
+}
+
+.checkbox-decorator input[type="checkbox"] {
+	display:none;
+}
+
+.checkbox-decorator input[type="checkbox"] + .decorator {
+	color:#5BC0DE;
+}
+
+.checkbox-decorator:hover input[type="checkbox"] + .decorator:before {
+	content:"\f0c8";
+	margin-right:-1px;
+}
+
+.checkbox-decorator input[type="checkbox"]:checked  + .decorator:before  {
+	content:"\f14a";
+	margin-right:-1px;
+}
+
+
+
+

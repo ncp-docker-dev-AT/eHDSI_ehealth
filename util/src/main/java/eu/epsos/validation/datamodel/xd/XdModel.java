@@ -19,9 +19,6 @@
  */
 package eu.epsos.validation.datamodel.xd;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.epsos.validation.datamodel.common.ObjectType;
 import tr.com.srdc.epsos.util.Constants;
 
@@ -59,11 +56,10 @@ public enum XdModel {
     EPSOS2_FETCH_DOC_RETRIEVE_RESPONSE("epSOS-2 FetchDocumentService RETRIEVE - response", ObjectType.XCA_RETRIEVE_RESPONSE),
     EPSOS2_PROVIDE_DATA_REQUEST("epSOS-2 ProvideDataService - request", ObjectType.XDR_SUBMIT_REQUEST),
     EPSOS2_PROVIDE_DATA_RESPONSE("epSOS-2 ProvideDataService - response", ObjectType.XDR_SUBMIT_RESPONSE);
+
     private String name;
     private ObjectType objectType;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(XdModel.class);
-	
     XdModel(String s, ObjectType ot) {
         name = s;
         objectType = ot;
@@ -88,6 +84,7 @@ public enum XdModel {
      * @return the proper model to be used in the validation
      */
     public static XdModel obtainModelXca(String message) {
+
         final String QUERY_REQUEST = "AdhocQueryRequest";
         final String QUERY_RESPONSE = "AdhocQueryResponse";
         final String RETRIEVE_REQUEST = "RetrieveDocumentSetRequest";
@@ -142,11 +139,12 @@ public enum XdModel {
      * @return the proper model to be used in the validation
      */
     public static XdModel obtainModelXdr(String message) {
+
         final String PROVIDE_AND_REGISTER_REQUEST = "ProvideAndRegisterDocumentSetRequest";
         final String PROVIDE_AND_REGISTER_RESPONSE = "RegistryResponse";
 
         XdModel result = null;
-        
+
 
         if (message.contains(PROVIDE_AND_REGISTER_REQUEST)) {
             if (message.contains(Constants.CONSENT_CLASSCODE)) {
@@ -169,16 +167,17 @@ public enum XdModel {
     }
 
     public static XdModel obtainResponseModelXdr(String message) {
-    	XdModel result = null;
 
-    	if (message.contains(Constants.CONSENT_CLASSCODE)) {
-    		result = EPSOS_CS_PUT_RESPONSE;
-    	} else if (message.contains(Constants.ED_CLASSCODE)) {
-    		result = EPSOS_ED_INIT_RESPONSE;
-    	} else {
-    		result = EPSOS2_PROVIDE_DATA_RESPONSE;
-    	}
-    	return result;
+        XdModel result;
+
+        if (message.contains(Constants.CONSENT_CLASSCODE)) {
+            result = EPSOS_CS_PUT_RESPONSE;
+        } else if (message.contains(Constants.ED_CLASSCODE)) {
+            result = EPSOS_ED_INIT_RESPONSE;
+        } else {
+            result = EPSOS2_PROVIDE_DATA_RESPONSE;
+        }
+        return result;
     }
 
     @Override

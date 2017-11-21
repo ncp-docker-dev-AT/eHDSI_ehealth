@@ -1,14 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
-import eu.epsos.util.net.ProxyCredentials;
-import eu.epsos.util.net.ProxyUtil;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
-import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
-import eu.europa.ec.dynamicdiscovery.core.fetcher.impl.DefaultURLFetcher;
-import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
-import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
-import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
-import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidator;
 import eu.europa.ec.dynamicdiscovery.exception.ConnectionException;
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
@@ -20,26 +12,13 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp.ReferenceCollection;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPType;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.Audit;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.CustomProxy;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPProperties;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.PrivateKeyDetails;
 import org.apache.http.ssl.PrivateKeyStrategy;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
@@ -62,17 +41,13 @@ import javax.net.ssl.SSLContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.*;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.*;
 
@@ -84,13 +59,16 @@ import java.util.*;
 @SessionAttributes("smpdelete")
 public class SMPDeleteFileController {
 
-    private static final Logger logger = LoggerFactory.getLogger(SMPDeleteFileController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMPDeleteFileController.class);
 
-    @Autowired
+    private ReadSMPProperties readProperties = new ReadSMPProperties();
     private Environment env;
 
     @Autowired
-    private ReadSMPProperties readProperties = new ReadSMPProperties();
+    public SMPDeleteFileController(ReadSMPProperties readProperties, Environment env) {
+        this.readProperties = readProperties;
+        this.env = env;
+    }
 
     /**
      * Generate UploadFile page
@@ -100,7 +78,7 @@ public class SMPDeleteFileController {
      */
     @RequestMapping(value = "/smpeditor/deletesmpfile", method = RequestMethod.GET)
     public String deleteFile(Model model) {
-        logger.debug("\n==== in deleteFile ====");
+        LOGGER.debug("\n==== in deleteFile ====");
         model.addAttribute("smpdelete", new SMPHttp());
 
         return "smpeditor/deletesmpfile";
@@ -116,7 +94,7 @@ public class SMPDeleteFileController {
      */
     @RequestMapping(value = "smpeditor/deletesmpfile", method = RequestMethod.POST)
     public String postDelete(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model, final RedirectAttributes redirectAttributes) {
-        logger.debug("\n==== in postDelete ====");
+        LOGGER.debug("\n==== in postDelete ====");
         model.addAttribute("smpdelete", smpdelete);
 
         String partID = "urn:ehealth:" + smpdelete.getCountry().name() + ":ncp-idp"; //SPECIFICATION
@@ -127,50 +105,60 @@ public class SMPDeleteFileController {
         ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(partID, partScheme);
         DynamicDiscovery smpClient = null;
 
-        ProxyCredentials proxyCredentials = null;
-        if (ProxyUtil.isProxyAnthenticationMandatory()) {
-            proxyCredentials = ProxyUtil.getProxyCredentials();
-        }
-        KeyStore truststore = null;
-        try {
-            truststore = loadTrustStore();
-        } catch (KeyStoreException e) {
-            logger.error("KeyStoreException: '{}'", e.getMessage(), e);
-        } catch (IOException e) {
-            logger.error("IOException: '{}'", e.getMessage(), e);
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("NoSuchAlgorithmException: '{}'", e.getMessage(), e);
-        } catch (CertificateException e) {
-            logger.error("CertificateException: '{}'", e.getMessage(), e);
-        }
-        if (proxyCredentials != null) {
-            try {
+//        ProxyCredentials proxyCredentials = null;
+//        if (ProxyUtil.isProxyAnthenticationMandatory()) {
+//            proxyCredentials = ProxyUtil.getProxyCredentials();
+//        }
+//        KeyStore truststore = null;
+//        try {
+//            truststore = loadTrustStore();
+//        } catch (KeyStoreException e) {
+//            LOGGER.error("KeyStoreException: '{}'", e.getMessage(), e);
+//        } catch (IOException e) {
+//            LOGGER.error("IOException: '{}'", e.getMessage(), e);
+//        } catch (NoSuchAlgorithmException e) {
+//            LOGGER.error("NoSuchAlgorithmException: '{}'", e.getMessage(), e);
+//        } catch (CertificateException e) {
+//            LOGGER.error("CertificateException: '{}'", e.getMessage(), e);
+//        }
 
-                smpClient = DynamicDiscoveryBuilder.newInstance()
-                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
-                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
-                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
-                        .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(),
-                                Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(),
-                                proxyCredentials.getProxyPassword())))
-                        .build();
-            } catch (ConnectionException ex) {
-                success = false;
-                errorType = "ConnectionException";
-                logger.error("\n ConnectionException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (TechnicalException e) {
-                logger.error("TechnicalException: '{}'" + e.getMessage(), e);
-            }
-        } else {
-            try {
-                smpClient = DynamicDiscoveryBuilder.newInstance()
-                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
-                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
-                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
-                        .build();
-            } catch (TechnicalException e) {
-                logger.error("Technical Exception: '{}'", e.getMessage(), e);
-            }
+//        if (proxyCredentials != null) {
+//            try {
+//
+//                smpClient = DynamicDiscoveryBuilder.newInstance()
+//                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
+//                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
+//                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
+//                        .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(),
+//                                Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(),
+//                                proxyCredentials.getProxyPassword())))
+//                        .build();
+//            } catch (ConnectionException ex) {
+//                success = false;
+//                errorType = "ConnectionException";
+//                LOGGER.error("\n ConnectionException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+//            } catch (TechnicalException e) {
+//                LOGGER.error("TechnicalException: '{}'" + e.getMessage(), e);
+//            }
+//        } else {
+//            try {
+//                smpClient = DynamicDiscoveryBuilder.newInstance()
+//                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
+//                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
+//                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
+//                        .build();
+//            } catch (TechnicalException e) {
+//                LOGGER.error("Technical Exception: '{}'", e.getMessage(), e);
+//            }
+//        }
+        try {
+            smpClient = DynamicDiscoveryClient.getInstance();
+        } catch (ConnectionException ex) {
+            success = false;
+            errorType = "ConnectionException";
+            LOGGER.error("\n ConnectionException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+        } catch (TechnicalException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
+            LOGGER.error("Technical Exception: '{}'", e.getMessage(), e);
         }
 
         List<DocumentIdentifier> documentIdentifiers = new ArrayList<>();
@@ -180,7 +168,7 @@ public class SMPDeleteFileController {
         } catch (TechnicalException ex) {
             success = false;
             errorType = "TechnicalException";
-            logger.error("TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
         URI serviceGroup = null;
@@ -201,10 +189,10 @@ public class SMPDeleteFileController {
                 }
             }
             String smpType = documentID;
-            logger.debug("\n******** DOC ID - '{}'", documentIdentifiers.get(i).getIdentifier());
-            logger.debug("\n******** SMP Type - '{}'", smpType);
-            SMPType[] smptypes = SMPType.getALL();
-            for (SMPType smptype1 : smptypes) {
+            LOGGER.debug("\n******** DOC ID - '{}'", documentIdentifiers.get(i).getIdentifier());
+            LOGGER.debug("\n******** SMP Type - '{}'", smpType);
+
+            for (SMPType smptype1 : SMPType.getALL()) {
                 if (smptype1.name().equals(smpType)) {
                     smptype = smptype1.getDescription();
                     break;
@@ -216,7 +204,7 @@ public class SMPDeleteFileController {
             } catch (TechnicalException ex) {
                 success = false;
                 errorType = "TechnicalException";
-                logger.error("\n TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             }
             smpdelete.setSmpURI(smpURI.toString());
             URI uri = smpClient.getService().getMetadataProvider().resolveServiceMetadata(smpURI, participantIdentifier, documentIdentifiers.get(i));
@@ -257,8 +245,8 @@ public class SMPDeleteFileController {
             redirectAttributes.addFlashAttribute("alert", alert);
             return "redirect:/smpeditor/deletesmpinfo";
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("\n********* MODEL - '{}'", model.toString());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("\n********* MODEL - '{}'", model.toString());
         }
         return "redirect:/smpeditor/deletesmpinfo";
     }
@@ -273,7 +261,7 @@ public class SMPDeleteFileController {
      */
     @RequestMapping(value = "smpeditor/deletesmpinfo", method = RequestMethod.GET)
     public String deleteInfo(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model, final RedirectAttributes redirectAttributes) {
-        logger.debug("\n==== in deleteInfo ====");
+        LOGGER.debug("\n==== in deleteInfo ====");
    
     /* Builds html colors and alerts */
         if (smpdelete.getStatusCode() == 400) {
@@ -309,8 +297,8 @@ public class SMPDeleteFileController {
         model.addAttribute("smpdelete", smpdelete);
         model.addAttribute("referenceCollection", smpdelete.getReferenceCollection());
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("\n********* MODEL - '{}'", model.toString());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("\n********* MODEL - '{}'", model.toString());
         }
         return "smpeditor/deletesmpinfo";
     }
@@ -325,7 +313,7 @@ public class SMPDeleteFileController {
      */
     @RequestMapping(value = "smpeditor/deletesmpinfo", method = RequestMethod.POST)
     public String deletePost(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model, final RedirectAttributes redirectAttributes) {
-        logger.debug("\n==== in deletePost ====");
+        LOGGER.debug("\n==== in deletePost ====");
         model.addAttribute("smpdelete", smpdelete);
 
         ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
@@ -341,7 +329,7 @@ public class SMPDeleteFileController {
 
         List<String> referencesSelected = smpdelete.getReferenceSelected();
 
-        List<SMPHttp> allItems = new ArrayList<SMPHttp>();
+        List<SMPHttp> allItems = new ArrayList<>();
 
     /*
       Iterate through all references selected to delete
@@ -349,11 +337,11 @@ public class SMPDeleteFileController {
         for (int i = 0; i < referencesSelected.size(); i++) {
             SMPHttp itemDelete = new SMPHttp();
 
-            logger.debug("\n ************** referencesSelected.get(i) - " + referencesSelected.get(i));
+            LOGGER.debug("\n ************** referencesSelected.get(i) - " + referencesSelected.get(i));
             String[] refs = referencesSelected.get(i).split("&&");
 
-            logger.debug("\n ************** SMPTYPEEEE - '{}'", refs[1]);
-            logger.debug("\n ************** reference - '{}'", refs[0]);
+            LOGGER.debug("\n ************** SMPTYPEEEE - '{}'", refs[1]);
+            LOGGER.debug("\n ************** reference - '{}'", refs[0]);
             itemDelete.setSmptype(refs[1]);
 
             String reference = refs[0];
@@ -365,9 +353,9 @@ public class SMPDeleteFileController {
             try {
                 reference = java.net.URLDecoder.decode(reference, "UTF-8");
             } catch (UnsupportedEncodingException ex) {
-                logger.error("\n UnsupportedEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n UnsupportedEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             }
-            logger.debug("\n ************** referencesSelected - {}", reference);
+            LOGGER.debug("\n ************** referencesSelected - {}", reference);
 
             URI uri = null;
             try {
@@ -377,17 +365,12 @@ public class SMPDeleteFileController {
                         .setPath(reference)
                         .build();
             } catch (URISyntaxException e) {
-                logger.error("URISyntaxException", e);
+                LOGGER.error("URISyntaxException", e);
             }
 
-            logger.debug("\n ************** URI - {}", uri);
+            LOGGER.debug("\n ************** URI - {}", uri);
 
-            PrivateKeyStrategy privatek = new PrivateKeyStrategy() {
-                @Override
-                public String chooseAlias(Map<String, PrivateKeyDetails> map, Socket socket) {
-                    return configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_ALIAS);
-                }
-            };
+            PrivateKeyStrategy privatek = (map, socket) -> configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_ALIAS);
 
             // Trust own CA and all self-signed certs
             SSLContext sslcontext = null;
@@ -402,55 +385,17 @@ public class SMPDeleteFileController {
                                 new TrustSelfSignedStrategy())
                         .build();
             } catch (NoSuchAlgorithmException ex) {
-                logger.error("\n NoSuchAlgorithmException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n NoSuchAlgorithmException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (KeyStoreException ex) {
-                logger.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (CertificateException ex) {
-                logger.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (IOException ex) {
-                logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (KeyManagementException ex) {
-                logger.error("\n KeyManagementException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n KeyManagementException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (UnrecoverableKeyException ex) {
-                logger.error("\n UnrecoverableKeyException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            }
-
-            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                    sslcontext,
-                    //  new String[]{"TLSv1"}, // Allow TLSv1 protocol only
-                    //   null,
-                    //SSLConnectionSocketFactory.getDefaultHostnameVerifier()
-                    new NoopHostnameVerifier());
-
-            ProxyCredentials proxyCredentials = null;
-            if (ProxyUtil.isProxyAnthenticationMandatory()) {
-                proxyCredentials = ProxyUtil.getProxyCredentials();
-            }
-            CloseableHttpClient httpclient;
-            if (proxyCredentials != null) {
-
-                if (proxyCredentials.getProxyUser() != null) {
-                    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                    credentialsProvider.setCredentials(
-                            new AuthScope(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort())),
-                            new UsernamePasswordCredentials(proxyCredentials.getProxyUser(), proxyCredentials.getProxyPassword()));
-
-                    httpclient = HttpClients.custom()
-                            .setDefaultCredentialsProvider(credentialsProvider)
-                            .setSSLSocketFactory(sslsf)
-                            .setProxy(new HttpHost(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort())))
-                            .build();
-                } else {
-                    httpclient = HttpClients.custom()
-                            .setSSLSocketFactory(sslsf)
-                            .setProxy(new HttpHost(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort())))
-                            .build();
-                }
-
-            } else {
-                httpclient = HttpClients.custom()
-                        .setSSLSocketFactory(sslsf)
-                        .build();
+                LOGGER.error("\n UnrecoverableKeyException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             }
 
             //DELETE
@@ -458,9 +403,9 @@ public class SMPDeleteFileController {
 
             CloseableHttpResponse response;
             try {
-                response = httpclient.execute(httpdelete);
+                response = DynamicDiscoveryService.buildHttpClient(sslcontext).execute(httpdelete);
             } catch (IOException ex) {
-                logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 String message = env.getProperty("error.server.failed"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 return "redirect:/smpeditor/deletesmpfile";
@@ -470,8 +415,8 @@ public class SMPDeleteFileController {
             itemDelete.setStatusCode(response.getStatusLine().getStatusCode());
             org.apache.http.HttpEntity entity = response.getEntity();
 
-            logger.debug("\n ************ RESPONSE DELETE - {}", response.getStatusLine().getStatusCode());
-            logger.debug("\n ************ RESPONSE REASON - {}", response.getStatusLine().getReasonPhrase());
+            LOGGER.debug("\n ************ RESPONSE DELETE - {}", response.getStatusLine().getStatusCode());
+            LOGGER.debug("\n ************ RESPONSE REASON - {}", response.getStatusLine().getReasonPhrase());
 
             //Audit vars
             String ncp = configurationManager.getProperty("ncp.country");
@@ -515,9 +460,9 @@ public class SMPDeleteFileController {
                 try {
                     org.apache.commons.io.IOUtils.copy(entity.getContent(), baos);
                 } catch (IOException ex) {
-                    logger.error("\n IOException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n IOException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (UnsupportedOperationException ex) {
-                    logger.error("\n UnsupportedOperationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n UnsupportedOperationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
                 byte[] bytes = baos.toByteArray();
 
@@ -540,42 +485,20 @@ public class SMPDeleteFileController {
                         }
                     }
                 } catch (ParserConfigurationException ex) {
-                    logger.error("\n ParserConfigurationException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n ParserConfigurationException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (SAXException ex) {
-                    logger.error("\n SAXException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n SAXException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (IOException ex) {
-                    logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
         
                 /*transform xml to string in order to send in Audit*/
-                StringWriter sw = new StringWriter();
-                try {
-                    ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-                    builder = factory.newDocumentBuilder();
-                    Document doc = builder.parse(bais);
-                    TransformerFactory tf = TransformerFactory.newInstance();
-                    Transformer transformer;
-                    transformer = tf.newTransformer();
-                    transformer.transform(new DOMSource(doc), new StreamResult(sw));
-                } catch (TransformerConfigurationException ex) {
-                    logger.error("\n TransformerConfigurationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (TransformerException ex) {
-                    logger.error("\n TransformerException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (ParserConfigurationException ex) {
-                    logger.error("\n ParserConfigurationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (UnsupportedOperationException ex) {
-                    logger.error("\n UnsupportedOperationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (SAXException ex) {
-                    logger.error("\n SAXException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (IOException ex) {
-                    logger.error("\n IOException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                }
-                String errorresult = sw.toString();
-                logger.debug("\n ***************** ERROR RESULT - '{}'", errorresult);
+                String errorResult = Audit.prepareEventLog(bytes);
+                LOGGER.debug("\n ***************** ERROR RESULT - '{}'", errorResult);
                 //Audit error
                 //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
                 Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
-                        new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), errorresult.getBytes());
+                        new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), errorResult.getBytes());
             }
 
             if (itemDelete.getStatusCode() == 200 || itemDelete.getStatusCode() == 201) {
@@ -589,8 +512,8 @@ public class SMPDeleteFileController {
         }
         smpdelete.setAllItems(allItems);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("\n********* MODEL - " + model.toString());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("\n********* MODEL - " + model.toString());
         }
         return "redirect:/smpeditor/deletesmpresult";
     }
@@ -604,7 +527,7 @@ public class SMPDeleteFileController {
      */
     @RequestMapping(value = "smpeditor/deletesmpresult", method = RequestMethod.GET)
     public String postInfo(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model) {
-        logger.debug("\n==== in deletesmpresult ====");
+        LOGGER.debug("\n==== in deletesmpresult ====");
     
         /* Builds html colors and alerts */
         for (int i = 0; i < smpdelete.getAllItems().size(); i++) {
@@ -645,24 +568,9 @@ public class SMPDeleteFileController {
         model.addAttribute("smpdelete", smpdelete);
         model.addAttribute("items", smpdelete.getAllItems());
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("\n********* MODEL - {}", model.toString());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("\n********* MODEL - {}", model.toString());
         }
         return "smpeditor/deletesmpresult";
-    }
-
-    /**
-     * @return
-     * @throws KeyStoreException
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws CertificateException
-     */
-    private KeyStore loadTrustStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-
-        ks.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH")),
-                ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
-        return ks;
     }
 }

@@ -41,6 +41,7 @@
                     <!-- Patient's Family Name/Surname -->
                     <given>Pierre</given>
                     <!-- Patient's Given Name -->
+                    <prefix>Mr</prefix>
                 </name>
                 <administrativeGenderCode code="M" codeSystem="2.16.840.1.113883.5.1"
                                           codeSystemName="AdministrativeGender" codeSystemVersion="913-20091020"
@@ -338,13 +339,13 @@
                                 <observation classCode="OBS" moodCode="EVN">
                                     <code code="SUBST" codeSystem="2.16.840.1.113883.5.6" codeSystemName="ActClass"
                                           displayName="Substitutição"/>
-                                    <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" code="G"
+                                    <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" code="N"
                                            codeSystem="2.16.840.1.113883.5.1070"
-                                           codeSystemName="SubstanceAdminSubstitution" codeSystemVersion="913-20091020"
-                                           displayName="Genérico" xsi:type="CE">
-                                        <!--<translation displayName="Generic">
-                                           <translation displayName="Generik"/>
-                                        </translation>-->
+                                           codeSystemName="SubstanceAdminSubstitution" xsi:type="CE">
+                                        <!--<value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" code="G"-->
+                                        <!--codeSystem="2.16.840.1.113883.5.1070"-->
+                                        <!--codeSystemName="SubstanceAdminSubstitution" codeSystemVersion="913-20091020"-->
+                                        <!--displayName="Genérico" xsi:type="CE">-->
                                     </value>
                                 </observation>
                             </entryRelationship>

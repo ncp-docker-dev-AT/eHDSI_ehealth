@@ -12,10 +12,10 @@ public interface EadcDbConnect {
      *
      * @return the current connection
      */
-    public Connection getConnection();
+    Connection getConnection();
 
     /**
      * This method will close the connection
      */
-    public void closeConnection();
+    void closeConnection();
 }

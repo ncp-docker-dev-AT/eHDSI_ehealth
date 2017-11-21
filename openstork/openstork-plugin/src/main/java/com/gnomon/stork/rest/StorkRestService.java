@@ -15,7 +15,8 @@ import eu.stork.peps.auth.commons.IPersonalAttributeList;
 import eu.stork.peps.auth.commons.PEPSUtil;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
-import org.opensaml.saml2.core.Assertion;
+import eu.stork.peps.exceptions.STORKSAMLEngineException;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -37,7 +37,7 @@ import java.util.Map;
 @Path("/stork")
 public class StorkRestService {
 
-    private static final Logger log = LoggerFactory.getLogger("StorkRestService");
+    private static final Logger LOGGER = LoggerFactory.getLogger(StorkRestService.class);
 
     @Context
     private HttpServletRequest servletRequest;
@@ -45,57 +45,61 @@ public class StorkRestService {
     @GET
     @Path("/peps/url/get")
     public Response getPepsURL() throws SystemException {
+
         String pepsurl = StorkHelper.getPepsURL();
-        log.info("pepsurl : " + pepsurl);
+        LOGGER.info("pepsurl: '{}'", pepsurl);
         return Response.status(200).entity(pepsurl).build();
     }
 
     @GET
     @Path("/peps/country/get")
     public Response getPepsCountry() throws SystemException {
+
         String pepscountry = StorkHelper.getPepsCountry();
-        log.info("pepscountry : " + pepscountry);
+        LOGGER.info("pepscountry: '{}'", pepscountry);
         return Response.status(200).entity(pepscountry).build();
     }
 
     @POST
     @Path("/peps/saml/decode")
-    public Response decodeSaml(
-            @FormParam("SAMLResponse") String SAMLResponse) throws UnsupportedEncodingException {
+    public Response decodeSaml(@FormParam("SAMLResponse") String SAMLResponse) throws UnsupportedEncodingException {
+
         String ret = "";
-        log.info("DECODE SAML: Getting saml attributes");
-        log.info("SAML RESPONSE IS : " + SAMLResponse);
-        Map<String, String> ehpattributes = new HashMap();
+        LOGGER.info("DECODE SAML: Getting saml attributes");
+        LOGGER.info("SAML RESPONSE IS: '{}'", SAMLResponse);
+        Map<String, String> ehpattributes = new HashMap<>();
 
         byte[] decSamlToken = PEPSUtil.decodeSAMLToken(SAMLResponse);
         String samlResponseXML = new String(decSamlToken);
-        log.info("SAML RESPONSE IS : " + samlResponseXML);
-        String host = (String) servletRequest.getRemoteHost();
-        log.info("HOST : " + host);
+        LOGGER.info("SAML RESPONSE IS: '{}'", samlResponseXML);
+        String host = servletRequest.getRemoteHost();
+        LOGGER.info("HOST: '{}'", host);
 
         STORKAuthnResponse authnResponse = null;
         IPersonalAttributeList attrs = null;
         STORKSAMLEngine engine = STORKSAMLEngine.getInstance(Constants.SP_CONF);
         try {
             authnResponse = engine.validateSTORKAuthnResponseWithQuery(decSamlToken, host);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (STORKSAMLEngineException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         StorkResponse resp = new StorkResponse();
         if (Validator.isNotNull(authnResponse)) {
-            Assertion onBehalf = StorkUtils.convertOnBehalfStorktoHcpAssertion(authnResponse);
+            StorkUtils.convertOnBehalfStorktoHcpAssertion(authnResponse);
             Map<String, String> onbehalfattrs = StorkUtils.getRepresentedPersonInformation(authnResponse);
             Map<String, String> onbehalfdemattrs = StorkUtils.getRepresentedDemographics(authnResponse);
 
             resp.setRepresentedPersonalData(onbehalfattrs);
             resp.setRepresentedDemographicsData(onbehalfdemattrs);
             try {
-                log.info("###############: " + onbehalfattrs.size());
+                assert onbehalfattrs != null;
+                LOGGER.info("###############: '{}'", onbehalfattrs.size());
             } catch (Exception e) {
-                log.error("Error getting onbehalf attributes");
+                LOGGER.error("Error getting onbehalf attributes: '{}'", e.getMessage(), e);
             }
+            assert authnResponse != null;
             if (authnResponse.isFail()) {
-                log.error("Problem with response");
+                LOGGER.error("Problem with response");
             } else {
                 attrs = authnResponse.getTotalPersonalAttributeList();
                 if (attrs.isEmpty()) {
@@ -118,56 +122,47 @@ public class StorkRestService {
         resp.setAttrs(attrs);
 
         String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
-        log.info("The country code is: '{}'", countryCode);
-        log.info("Reading the required attributes from International Search Mask");
+        LOGGER.info("The country code is: '{}'", countryCode);
+        LOGGER.info("Reading the required attributes from International Search Mask");
         Map<String, String> attributes = PatientSearchAttributes.getRequiredAttributesByCountry(countryCode);
-        Iterator it = attributes.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pairs = (Map.Entry) it.next();
-            log.info("$$$$ " + pairs.getKey() + " = " + pairs.getValue());
+        assert attributes != null;
+        for (Object o : attributes.entrySet()) {
+            Map.Entry pairs = (Map.Entry) o;
+            LOGGER.info("$$$$ " + pairs.getKey() + " = " + pairs.getValue());
             try {
                 String attrName = pairs.getValue().toString(); //"2.16.470.1.100.1.1.1000.990.1";
                 String storkKey = pairs.getKey().toString();
                 String value = sal.getSamlValue(storkKey);
-                try {
-                    if (storkKey.equalsIgnoreCase("eIdentifier")) {
-                        String[] temp = value.split("/");
-                        value = temp[2];
-                    } else {
-                        value = sal.getSamlValue(storkKey);
-                    }
-                } catch (Exception e) {
-                    log.info("Problem with eIdentifier '{}'", value, e);
-                }
 
-                log.info("Adding attribute: '{}' with value: '{}'", attrName, value);
+                if (StringUtils.equalsIgnoreCase(storkKey, "eIdentifier")) {
+                    String[] temp = value.split("/");
+                    value = temp[2];
+                } else {
+                    value = sal.getSamlValue(storkKey);
+                }
+                LOGGER.info("Adding attribute: '{}' with value: '{}'", attrName, value);
                 ehpattributes.put(attrName, value);
                 resp.setAttributes(ehpattributes);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
             }
             ret = new Gson().toJson(resp);
-            log.info(ret);
+            LOGGER.info(ret);
         }
-
         return Response.status(200).entity(ret).build();
     }
 
     @POST
     @Path("/peps/saml/create")
-    public Response createSaml(
-            @FormParam("providerName") String providerName,
-            @FormParam("spSector") String spSector,
-            @FormParam("spApplication") String spApplication,
-            @FormParam("spCountry") String spCountry,
-            @FormParam("spQaLevel") String spQaLevel,
-            @FormParam("pepsURL") String pepsURL,
-            @FormParam("loginURL") String loginURL,
-            @FormParam("spReturnURL") String spReturnURL,
-            @FormParam("spPersonalAttributes") String spPersonalAttributes,
-            @FormParam("spBusinessAttributes") String spBusinessAttributes,
-            @FormParam("spLegalAttributes") String spLegalAttributes) throws SystemException {
+    public Response createSaml(@FormParam("providerName") String providerName, @FormParam("spSector") String spSector,
+                               @FormParam("spApplication") String spApplication, @FormParam("spCountry") String spCountry,
+                               @FormParam("spQaLevel") String spQaLevel, @FormParam("pepsURL") String pepsURL,
+                               @FormParam("loginURL") String loginURL, @FormParam("spReturnURL") String spReturnURL,
+                               @FormParam("spPersonalAttributes") String spPersonalAttributes,
+                               @FormParam("spBusinessAttributes") String spBusinessAttributes,
+                               @FormParam("spLegalAttributes") String spLegalAttributes) throws SystemException {
+
         StorkProperties properties = new StorkProperties();
         properties.setLoginURL(loginURL);
         properties.setPepsURL(pepsURL);
@@ -182,7 +177,7 @@ public class StorkRestService {
         properties.setSpSector(spSector);
 
         String saml = StorkHelper.createStorkSAML(properties);
-        log.info("saml : '{}'", saml);
+        LOGGER.info("saml : '{}'", saml);
         return Response.status(200).entity(saml).build();
     }
 }

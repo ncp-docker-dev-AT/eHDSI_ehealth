@@ -1,0 +1,87 @@
+/* 
+-----------------------------------
+	TABLE FORM / TABLE LIKE
+-----------------------------------
+*/
+
+
+.display-table,
+.display-table-form {
+	width:100%;
+	vertical-align:top;
+	display:table;
+}
+
+.display-table-row {
+	display:table-row;
+}
+
+.display-table-cell {
+	display:table-cell;
+	float:none;
+}
+
+.display-table-cell-nowrap {
+	width:1%;
+	white-space:nowrap;
+}
+
+.display-table-form .control-label {
+	margin-top:5px;
+}
+
+
+.panel-body + .display-table-form {
+	border-top:1px dashed #DEE3E6;
+}
+
+
+.display-table-form  + .display-table-form  {
+	border-top:1px dashed #DEE3E6;
+}
+
+.display-table-form .display-table-cell {
+    vertical-align: top;
+    float: none;
+    border-bottom: 1px dashed #DEE3E6;
+    padding: 10px 10px;
+    vertical-align: top;
+    background-color: rgba(0, 0, 0, 0.005);
+}
+
+.display-table-form > .display-table-row > .display-table-cell:first-child {
+    padding-left: 15px;
+}
+
+.display-table-form > .display-table-row > .display-table-cell:last-child {
+    padding-right: 15px;
+}
+
+.display-table-form .display-table-row:last-child > .display-table-cell {
+	border-bottom:0;
+}
+
+.display-table-form .display-table-cell + .display-table-cell {
+	border-left:1px dashed #DEE3E6;
+}
+
+.display-table-form .display-table-cell .display-table-wrapper {
+	margin:-11px;
+}
+
+.display-table-form .display-table-cell .display-table-wrapper + .display-table-wrapper:not(.active) {
+	margin-top:10px;
+	border-top:1px dashed #DEE3E6;
+}
+
+.display-table-form .display-table-cell .display-table-wrapper + .tab-content {
+	margin-top:10px;
+}
+
+.display-table-form .display-table-cell p:last-child {
+	margin-bottom:0;
+}
+
+.display-table-form  .display-table-cell .control-label {
+	display:block;
+}

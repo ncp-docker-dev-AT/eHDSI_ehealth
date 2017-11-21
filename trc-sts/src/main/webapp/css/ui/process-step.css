@@ -1,0 +1,228 @@
+/*
+-------------------------
+	STEP PROCESS NAV
+-------------------------
+*/
+
+.nav-process{
+	display:table;
+	width:100%;
+	margin:0;
+	padding:0;
+	table-layout: fixed;
+}
+
+.nav-process .process-step {
+	display:table-cell !important;
+	text-align:center;
+	padding-bottom:30px;
+	position:relative;
+	vertical-align: bottom;
+}
+
+.nav-process .process-half-step {
+	z-index:5;
+}
+
+.nav-process .process-half-step + .process-half-step {
+	z-index:4;
+}
+
+.nav-process .process-step .process-step-title {
+	padding:5px;
+	display:block;
+	margin-bottom:5px;
+	position:relative;
+	font-size:13px;
+	line-height:15px;
+}
+
+.nav-process .process-step.process-half-step .process-step-title {
+	left:50%;
+}
+
+.nav-process .process-step .process-step-help {
+	cursor:help;
+}
+
+.nav-process .process-step.has_step-start-branche:before,
+.nav-process .process-step.has_step-end-branche:before {
+	content:"";
+	display:inline-block;
+	width:10px;
+	height:55px;
+	background-color:#eee;
+	border-radius:6px 6px 0 6px;
+	box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
+	position:absolute;
+	z-index:11;
+	bottom:15px;
+	left:50%;
+	margin-left:-5px;
+}
+
+.nav-process .process-step.has_step-end-branche:before {
+	border-radius:6px 6px 6px 0 ;
+	box-shadow: inset -1px 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.nav-process .process-step.is_complete:before,
+.nav-process .process-step.is_active:before {
+	background-color:#81c844;
+}
+
+.nav-process .process-step-progress {
+	position:absolute;
+	bottom:0;
+	left:0;
+	width:100%;
+}
+
+
+	/*
+	-----------------------
+		STEP PROCESS BADGE
+	-----------------------
+	*/
+
+	.nav-process .process-step-progress .process-step-badge {
+		min-width:30px;
+		height:30px;
+		line-height:30px;
+		border-radius:30px;
+		padding:0;
+		position:absolute;
+		z-index:10;
+		display:inline-block;
+		background-color:#eee;
+		box-shadow: inset 0 1px rgba(0,0,0,0.1);
+		bottom:5px;
+		left:50%;
+		margin-left:-15px;
+		font-weight:bold;
+		color:#888;
+		font-size:12px;
+	}
+	
+	.nav-process .process-step.is_complete .process-step-badge {
+		background-color:#81c844;
+		color:#fff;
+		
+	}
+	
+	.nav-process .process-step.is_active .process-step-badge {
+		border:2px solid #81c844;
+		color:#81c844;
+		line-height:26px;
+		/*box-shadow: inset 0 0 0 2px  #337ab7;*/
+	}
+	
+	.nav-process .has_step-start-branche .process-step-badge,
+	.nav-process .has_step-end-branche .process-step-badge {
+		display:none;
+	}
+	
+	.nav-process .process-half-step.has_step-start-branche .process-step-badge {
+		display:inline-block;
+		left:100%;
+	}
+	
+	/*
+	-----------------------
+		STEP PROCESS ARROW
+	-----------------------
+	*/
+
+	.nav-process .process-step-arrow {
+		position: absolute;
+		z-index: 11;
+		left: 100%;
+		bottom: 5px;
+		margin-left: -18px;
+		color: #eee;
+		font-size: 28px;
+		text-shadow: 5px 0  rgba(255, 255, 255, 1);
+	}
+	
+	.nav-process  .process-half-step.has_step-start-branche .process-step-arrow {
+		display:none;
+	}
+	
+	.nav-process .process-step.is_complete:not(.is_going-new-branche) .process-step-arrow {
+		color: #81c844;
+	}
+	
+	.nav-process .process-step.is_complete.is_going-new-branche .process-step-arrow {
+		color: #eee;
+	}
+	
+	
+	/*
+	-----------------------------
+		STEP PROCESS PROGRESS BAR
+	-----------------------------
+	*/
+
+	.nav-process .process-step-progress .progress {
+		bottom:15px;
+		position:absolute;
+		z-index:9;
+		width:100%;
+		height:10px;
+		border-radius:0;
+		box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1);
+		margin:0;
+		background-image:none;
+		background-color:#eeeeee;
+	}
+	
+	.nav-process .process-step-progress .progress .progress-bar {
+		background-color:#81c844;
+	}
+	
+	.nav-process .process-step.is_optional .progress:before {
+		content:"";
+		display:block;
+		width:100%;
+		border:5px dashed #fff;
+		position:absolute;
+	}
+	
+	.nav-process .has_step-start-branche .process-step-progress .progress {
+		width:50%;
+		left:50%;
+	}
+	
+	.nav-process .has_step-end-branche .process-step-progress .progress {
+		width:50%;
+	}
+	
+	.nav-process .process-step:first-child .process-step-progress .progress {
+		border-radius:6px 0 0 6px;
+	}
+	
+	.nav-process .process-step:last-child .process-step-progress .progress {
+		border-radius:0 6px 6px 0 ;
+	}
+	
+	.nav-process .process-step.is_active .progress .progress-bar {
+		width:50%;
+	}
+	
+	.nav-process .process-step.is_complete .progress .progress-bar,
+	.nav-process .process-step.has_step-start-branche.is_active .progress .progress-bar {
+		width:100%;
+	}
+	
+	.nav-process .process-step.is_going-new-branche .progress .progress-bar {
+		width:50%;
+	}
+	
+	.nav-process .process-step.is_active.is_receiving-complete-branche .progress .progress-bar {
+		width:0%;
+	}
+	
+	.nav-process .process-step.is_complete.is_receiving-complete-branche .progress .progress-bar {
+		width:50%;
+		margin-left:50%;
+	}

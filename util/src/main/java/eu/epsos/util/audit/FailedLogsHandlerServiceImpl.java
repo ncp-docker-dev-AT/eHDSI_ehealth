@@ -17,9 +17,8 @@ public class FailedLogsHandlerServiceImpl implements FailedLogsHandlerService {
     public static final int WAIT_FOR_TERMINATION = 5000;
     // Default time scheduler is fix to 1 hour
     private static final long DEFAULT_SCHEDULER_TIME_MINUTES = 60;
-    private static final Logger log = LoggerFactory.getLogger("eu.epsos.util.audit.FailedLogsHandlerServiceImpl");
+    private static final Logger LOGGER = LoggerFactory.getLogger(FailedLogsHandlerServiceImpl.class);
     private ScheduledExecutorService service = null;
-    private FailedLogsHandler failedLogsHandlerCommand = null;
     private MessageHandlerListener listener;
     private Type type;
 
@@ -29,19 +28,20 @@ public class FailedLogsHandlerServiceImpl implements FailedLogsHandlerService {
     }
 
     public synchronized void start() {
+
         if (service == null) {
-            failedLogsHandlerCommand = new FailedLogsHandlerImpl(listener, type);
+            FailedLogsHandler failedLogsHandlerCommand = new FailedLogsHandlerImpl(listener, type);
             service = new ScheduledThreadPoolExecutor(SCHEDULED_THREAD_POOL_SIZE);
             service.scheduleWithFixedDelay(failedLogsHandlerCommand, getTimeBetween(), getTimeBetween(), TimeUnit.MINUTES);
-            log.info("Started FailedLogsHandlerService. Logs will be scanned every '{}' minutes.", getTimeBetween());
+            LOGGER.info("Started FailedLogsHandlerService. Logs will be scanned every '{}' minutes.", getTimeBetween());
         } else {
-            log.warn("Attempted to start FailedLogsHandlerService even already running.");
+            LOGGER.warn("Attempted to start FailedLogsHandlerService even already running.");
         }
     }
 
     public synchronized void stop() {
 
-        log.info("Shutting down FailedLogsHandlerService");
+        LOGGER.info("Shutting down FailedLogsHandlerService");
         if (service != null) {
             service.shutdown();
 
@@ -49,17 +49,16 @@ public class FailedLogsHandlerServiceImpl implements FailedLogsHandlerService {
             try {
                 shutdownOk = service.awaitTermination(WAIT_FOR_TERMINATION, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
-                // Ignored
-                log.error("InterruptedException: '{}'", e.getMessage(), e);
+                Thread.currentThread().interrupt();
+                LOGGER.error("InterruptedException: '{}'", e.getMessage(), e);
             }
-
             if (!shutdownOk) {
                 service.shutdownNow();
             }
 
             service = null;
         } else {
-            log.warn("Unable to stop FailedLogsHandlerService. Service is not running.");
+            LOGGER.warn("Unable to stop FailedLogsHandlerService. Service is not running.");
         }
     }
 
@@ -79,7 +78,7 @@ public class FailedLogsHandlerServiceImpl implements FailedLogsHandlerService {
         try {
             l = Long.parseLong(sValue);
         } catch (Exception e) {
-            log.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             return DEFAULT_SCHEDULER_TIME_MINUTES;
         }
         return l;

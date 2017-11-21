@@ -21,6 +21,10 @@ package eu.epsos.pt.cc.dts.axis2;
 
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
+import tr.com.srdc.epsos.data.model.xds.XDSDocument;
+import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
+import tr.com.srdc.epsos.util.Constants;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,12 +32,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import tr.com.srdc.epsos.data.model.xds.XDSDocument;
-import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
-import tr.com.srdc.epsos.util.Constants;
 
 /**
  * This is an Data Transformation Service. This provide functions to transform
@@ -43,7 +41,6 @@ import tr.com.srdc.epsos.util.Constants;
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class DocumentDts {
-    private static final Logger LOG = LoggerFactory.getLogger(DocumentDts.class);
 
     /**
      * Private constructor to disable class instantiation.
@@ -58,6 +55,7 @@ public class DocumentDts {
      * @return the result of the conversion, as a Document.
      */
     public static EpsosDocument1 newInstance(XDSDocument document) {
+
         /*
          * PRE-CONDITIONS
          */
@@ -68,9 +66,7 @@ public class DocumentDts {
         /*
          * BODY
          */
-
         final EpsosDocument1 result = EpsosDocument1.Factory.newInstance();
-
         result.setUuid(document.getDocumentUniqueId());
         result.setDescription(document.getDescription());
         result.setCreationDate(convertDate(document.getCreationTime()));
@@ -100,10 +96,10 @@ public class DocumentDts {
      * @return the result of the conversion, as a list of Document.
      */
     public static EpsosDocument1[] newInstance(List<XDSDocumentAssociation> documentAssociation) {
+
         /*
          * PRE-CONDITIONS
          */
-
         if (documentAssociation == null || documentAssociation.isEmpty()) {
             return null;
         }
@@ -111,9 +107,7 @@ public class DocumentDts {
         /*
          * BODY
          */
-
-
-        List<EpsosDocument1> resultList = new ArrayList<EpsosDocument1>();
+        List<EpsosDocument1> resultList = new ArrayList<>();
 
         for (XDSDocumentAssociation doc : documentAssociation) {
             EpsosDocument1 xmlDoc = DocumentDts.newInstance(doc.getCdaXML());
@@ -127,9 +121,7 @@ public class DocumentDts {
             }
         }
 
-        final EpsosDocument1[] result = resultList.toArray(new EpsosDocument1[resultList.size()]);
-        return result;
-
+        return resultList.toArray(new EpsosDocument1[resultList.size()]);
     }
 
     /**
@@ -139,20 +131,17 @@ public class DocumentDts {
      * @return the result of the conversion, as a Document.
      */
     public static EpsosDocument1 newInstance(DocumentResponse documentResponse) {
+
         /*
          * PRE-CONDITIONS
          */
-
         if (documentResponse == null) {
             return null;
         }
-
         /*
          * BODY
          */
-
         final EpsosDocument1 result = EpsosDocument1.Factory.newInstance();
-
         result.setUuid(documentResponse.getDocumentUniqueId());
         result.setMimeType(documentResponse.getMimeType());
         result.setBase64Binary(documentResponse.getDocument());
@@ -188,7 +177,7 @@ public class DocumentDts {
 
         formatter = new SimpleDateFormat(selectedPattern);
         try {
-            date = (Date) formatter.parse(dateString);
+            date = formatter.parse(dateString);
             cal = Calendar.getInstance();
             cal.setTime(date);
         } catch (ParseException ex) {

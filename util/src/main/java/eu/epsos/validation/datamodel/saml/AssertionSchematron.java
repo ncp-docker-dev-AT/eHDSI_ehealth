@@ -31,6 +31,7 @@ public enum AssertionSchematron {
 
     EPSOS_HCP_IDENTITY_ASSERTION("epSOS - HCP Identity Assertion"),
     EPSOS_TRC_ASSERTION("epSOS - TRC Assertion");
+
     private String name;
 
     AssertionSchematron(String s) {
@@ -38,6 +39,7 @@ public enum AssertionSchematron {
     }
 
     public static AssertionSchematron checkSchematron(String model) {
+
         for (AssertionSchematron s : AssertionSchematron.values()) {
             if (model.equals(s.toString())) {
                 return s;

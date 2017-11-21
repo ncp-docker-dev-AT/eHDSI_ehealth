@@ -1,24 +1,4 @@
-/*
- *  This file is part of integration of STORK within OpenNCP
- *  Copyright (C) 2014 iUZ Technologies and Gnomon Informatics
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *  Contact email: contact@iuz.pt, info@gnomon.com.gr
- */
 package eu.europa.ec.joinup.ecc.openstork.utils;
-
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.util.validation.StringPool;
@@ -52,12 +32,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 /**
- * This class gathers a set of utilities specifically addressed to the
- * information extraction and conversion of Mandate structures.
+ * This class gathers a set of utilities specifically addressed to the information extraction
+ * and conversion of Mandate structures.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
@@ -65,11 +44,8 @@ public class StorkUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(StorkUtils.class);
 
-    /*
-
-     CONVERSION METHODS
-
-     */
+    private StorkUtils() {
+    }
 
     /**
      * Converts a given STORK Authentication Response into an epSOS Assertion.
@@ -80,6 +56,7 @@ public class StorkUtils {
      * @return
      */
     public static Assertion convertStorkToHcpAssertion(final STORKAuthnResponse storkResponse) {
+
         return convertStorkToHcpAssertion(storkResponse, obtainPermissionsForRole(obtainHcpRole(storkResponse)));
     }
 
@@ -92,6 +69,7 @@ public class StorkUtils {
      * @return
      */
     public static Assertion convertOnBehalfStorktoHcpAssertion(final STORKAuthnResponse storkResponse) {
+
         /* PRE-CONDITIONS */
         if (storkResponse == null) {
             return null;
@@ -108,31 +86,20 @@ public class StorkUtils {
 
         /* BODY */
         Assertion result;
-
         final HCPIAssertionBuilder assertionBuilder;
         final String hcpRole;
         final String hcpId;
-        final String hcpSpecialty;
-
-        final String orgId;
-        final String orgName;
         final String healthCareFacilityType;
-
         final String purposeOfUse;
         final String pointOfCare;
-
         final String onBehalfOfId;
-
         final List<String> permissions;
-
         final String hcpOrgId;
         final String hcpOrgName;
 
         LOG.info("Converting Assertion.");
-
         // Initialize Assertions Builder with minimum initial parameters.
-        assertionBuilder
-                = new HCPIAssertionBuilder("UID=medical doctor", X509_SUBJECT_FORMAT, "sender-vouches")
+        assertionBuilder = new HCPIAssertionBuilder("UID=medical doctor", X509_SUBJECT_FORMAT, "sender-vouches")
                 .issuer("O=European HCP,L=Europe,ST=Europe,C=EU", X509_SUBJECT_FORMAT)
                 .audienceRestrictions("http://ihe.connecthaton.XUA/X-ServiceProvider-IHE-Connectathons")
                 .notOnOrAfter(4);
@@ -144,19 +111,15 @@ public class StorkUtils {
         } else {
             hcpId = NOT_AVAILABLE;
         }
-        assertionBuilder
-                .hcpIdentifier(hcpId)
-                .hcpRole(hcpRole);
+        assertionBuilder.hcpIdentifier(hcpId).hcpRole(hcpRole);
 
         // MANDATORY: HealthCare Facility Type
         healthCareFacilityType = OTHER_FACILITY_TYPE;
-        assertionBuilder
-                .healthCareFacilityType(healthCareFacilityType);
+        assertionBuilder.healthCareFacilityType(healthCareFacilityType);
 
         // MANDATORY: Purpose of Use
         purposeOfUse = TREATMENT_PURPOSE_OF_USE;
-        assertionBuilder
-                .purposeOfUse(purposeOfUse);
+        assertionBuilder.purposeOfUse(purposeOfUse);
 
         // MANDATORY: Point Of Care
         pointOfCare = DUMMY_POINT_OF_CARE;
@@ -180,8 +143,7 @@ public class StorkUtils {
 
         // OPTIONAL (0..*): Permissions
         permissions = obtainPermissionsForRole(obtainHcpRole(storkResponse));
-        assertionBuilder
-                .permissions(permissions);
+        assertionBuilder.permissions(permissions);
 
         // BUILD Assertion
         result = assertionBuilder.build();
@@ -199,6 +161,7 @@ public class StorkUtils {
      * @return a converted epSOS assertion
      */
     public static Assertion convertStorkToHcpAssertion(STORKAuthnResponse storkResponse, List<String> permissions) {
+
         /* PRE-CONDITIONS */
         if (storkResponse == null) {
             return null;
@@ -237,6 +200,7 @@ public class StorkUtils {
      * represented person.
      */
     public static List<PatientId> getRepresentedEidentifiers(final STORKAuthnResponse storkResponse, final String countryCode) {
+
         final String MANDATE_INFORMATION = "mandateContent";
         final String REPRESENTED_EIDENTIFIER_XPATH = "/mandate/represented/eIdentifier";
         final String EIDENTIFIER = "eIdentifier";
@@ -245,14 +209,14 @@ public class StorkUtils {
         // PRE-CONDITIONS
         if (storkResponse == null) {
             LOG.error("Provided STORK response is null.");
-            return null;
+            return Collections.emptyList();
         }
         if (getPersonalAttribute(storkResponse, MANDATE_INFORMATION) == null
                 || getPersonalAttribute(storkResponse, MANDATE_INFORMATION).getValue() == null
                 || getPersonalAttribute(storkResponse, MANDATE_INFORMATION).getValue().get(0) == null
                 || getPersonalAttribute(storkResponse, MANDATE_INFORMATION).getValue().get(0).isEmpty()) {
             LOG.error("Mandate information is missing in the provided STORK response.");
-            return null;
+            return Collections.emptyList();
         }
 
         // BODY
@@ -270,7 +234,7 @@ public class StorkUtils {
             if (patientSearchAttributes.containsKey(EIDENTIFIER)) {
                 result.add(new PatientId(patientSearchAttributes.get(EIDENTIFIER), obtainNodeValue(mandateInformation, REPRESENTED_EIDENTIFIER_XPATH))); // Identifier domain obtained from searchmask file
             } else {
-                LOG.info("It was not possible to obtain identifier domain from searchmask file for country: " + countryCode + ", using N/A as identifier domain.");
+                LOG.info("It was not possible to obtain identifier domain from searchmask file for country: '{}', using N/A as identifier domain.", countryCode);
                 result.add(new PatientId(NOT_AVAILABLE, obtainNodeValue(mandateInformation, REPRESENTED_EIDENTIFIER_XPATH))); // Identifier domain missing from search mask file
             }
         } else {
@@ -291,6 +255,7 @@ public class StorkUtils {
      * @return a Map, containing the demographic data.
      */
     public static Map<String, String> getRepresentedDemographics(final STORKAuthnResponse storkResponse) {
+
         // PRE-CONDITIONS
         if (storkResponse == null) {
             LOG.error("Provided STORK response is null.");
@@ -327,6 +292,7 @@ public class StorkUtils {
      * @return a Map with the information organized into key-value.
      */
     public static Map<String, String> getRepresentedPersonInformation(final STORKAuthnResponse storkResponse) {
+
         final String MANDATE_INFORMATION = "mandateContent";
         final String EIDENTIFIER = "eIdentifier";
         final String GIVENNAME = "givenName";
@@ -382,8 +348,8 @@ public class StorkUtils {
      * @return
      */
     public static HcpRole obtainHcpRole(STORKAuthnResponse storkResponse) {
+
         final String IS_HCP_ATTR_NAME = "isHealthCareProfessional";
-        final String TITTLE_ATTR_NAME = "Title";
         Boolean isHcpProfessional = false;
         String tittle = StringPool.BLANK;
 
@@ -398,15 +364,15 @@ public class StorkUtils {
     }
 
     public static HcpRole obtainRole(IPersonalAttributeList attrs) {
+
         final String IS_HCP_ATTR_NAME = "isHealthCareProfessional";
-        final String TITTLE_ATTR_NAME = "Title";
         Boolean isHcpProfessional = false;
         String tittle = "";
         try {
             isHcpProfessional = Boolean.parseBoolean(getPersonalAttribute(attrs, IS_HCP_ATTR_NAME).getValue().get(0));
             tittle = getPersonalAttribute(attrs, IS_HCP_ATTR_NAME).getValue().get(0);
         } catch (Exception e) {
-            LOG.error("Problem getting role attrs");
+            LOG.error("Problem getting role attrs", e);
         }
 
         return obtainHcpRole(isHcpProfessional, tittle);
@@ -421,6 +387,7 @@ public class StorkUtils {
      * @return
      */
     public static HcpRole obtainHcpRole(boolean isHcpProfessional, String title) {
+
         HcpRole result = null;
         if (isHcpProfessional) {
             if (title.equals(HcpRole.ADMINISTRATOR.toString())) {
@@ -456,31 +423,21 @@ public class StorkUtils {
         List<String> result = new ArrayList<>();
 
         switch (role) {
-            case ADMINISTRATOR: {
-                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager()
-                        .getProperty(PORTAL_ADMIN_PERMISSIONS));
+            case ADMINISTRATOR:
+                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_ADMIN_PERMISSIONS));
                 break;
-            }
-            case MEDICAL_DOCTOR: {
-                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager()
-                        .getProperty(PORTAL_DOCTOR_PERMISSIONS));
+            case MEDICAL_DOCTOR:
+                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_DOCTOR_PERMISSIONS));
                 break;
-            }
-            case NURSE: {
-                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager()
-                        .getProperty(PORTAL_NURSE_PERMISSIONS));
+            case NURSE:
+                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_NURSE_PERMISSIONS));
                 break;
-            }
-            case PATIENT: {
-                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager()
-                        .getProperty(PORTAL_PATIENT_PERMISSIONS));
+            case PATIENT:
+                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PATIENT_PERMISSIONS));
                 break;
-            }
-            case PHARMACIST: {
-                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager()
-                        .getProperty(PORTAL_PHARMACIST_PERMISSIONS));
+            case PHARMACIST:
+                result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PHARMACIST_PERMISSIONS));
                 break;
-            }
         }
 
         return result;
@@ -499,10 +456,12 @@ public class StorkUtils {
     }
 
     public static PersonalAttribute getPersonalAttribute(STORKAuthnResponse storkResponse, String key) {
+
         return storkResponse.getPersonalAttributeList().get(key);
     }
 
     public static PersonalAttribute getPersonalAttribute(IPersonalAttributeList attrs, String key) {
+
         return attrs.get(key);
     }
 
@@ -514,6 +473,7 @@ public class StorkUtils {
      * @return The node value.
      */
     private static String obtainNodeValue(final String xmlContent, final String xpathExpression) {
+
         if (xmlContent.isEmpty()) {
             LOG.error("The provided XML content is empty.");
             return null;
@@ -567,6 +527,7 @@ public class StorkUtils {
      * @return
      */
     public static Map<String, String> getRequiredAttributesByCountry(String countryCode) {
+
         /* PRE-CONDITIONS */
         if (countryCode.isEmpty()) {
             LOG.error("Country code is empty.");
@@ -581,8 +542,6 @@ public class StorkUtils {
         final String FILE_FOLDER = "portal/forms";
         final String FILE_PATH;
         final String FILE_NAME;
-        final String fileContent;
-        final Path filePath;
         final Document searchMaskFileDom;
         final NodeList nl;
         Map<String, String> result;
@@ -595,7 +554,7 @@ public class StorkUtils {
         try {
             searchMaskFileDom = XMLUtil.parseContent(Files.readAllBytes(FileSystems.getDefault().getPath(FILE_PATH, FILE_NAME)));
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            LOG.error(ex.getLocalizedMessage());
+            LOG.error(ex.getLocalizedMessage(), ex);
             return null;
         }
 
@@ -603,11 +562,11 @@ public class StorkUtils {
         try {
             nl = (NodeList) XPathFactory.newInstance().newXPath().compile(XPATH_EXPR).evaluate(searchMaskFileDom, XPathConstants.NODESET);
         } catch (XPathExpressionException ex) {
-            LOG.error(ex.getLocalizedMessage());
+            LOG.error(ex.getLocalizedMessage(), ex);
             return null;
         }
 
-        /* CHECK IF EACH ATTRIBUTE FOUND IN SEARCH MASK FILE HAS A CORRESPONDANT MAPPING (STORK ATTRIBUTE), IF YES FILL RESULT MAP WITH THE MAPPING */
+        /* CHECK IF EACH ATTRIBUTE FOUND IN SEARCH MASK FILE HAS A CORRESPONDENT MAPPING (STORK ATTRIBUTE), IF YES FILL RESULT MAP WITH THE MAPPING */
         for (int i = 0; i < nl.getLength(); i++) {
 
             Element elem = (Element) nl.item(i);
@@ -615,7 +574,7 @@ public class StorkUtils {
             String domainAttrValue = elem.getAttribute(DOMAIN_ATTR_NAME);
             String storkAttrValue = elem.getAttribute(STORK_ATTR_NAME);
 
-            if (!searchMaskAttrId.isEmpty() & !storkAttrValue.isEmpty()) {
+            if (!searchMaskAttrId.isEmpty() && !storkAttrValue.isEmpty()) {
                 if (!domainAttrValue.isEmpty()) { // FILL DOMAIN VALUES FOR eIdentifiers (e.g. eIdentifier=2.16.470.1.100.1.1.1000.990.1)
                     result.put(storkAttrValue, domainAttrValue);
                 } else { // FILL NORMAL MAPPING (e.g. surname=patient.data.surname)
@@ -625,7 +584,6 @@ public class StorkUtils {
                 LOG.error("There is no STORK attribute defined for required searchmask attribute '{}' present in Search Mask file for country '{}'.", searchMaskAttrId, countryCode);
             }
         }
-
         return result;
     }
 }

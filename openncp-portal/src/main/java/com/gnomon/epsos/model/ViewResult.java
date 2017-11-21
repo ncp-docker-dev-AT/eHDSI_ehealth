@@ -1036,8 +1036,6 @@ public class ViewResult implements Serializable {
             case 20:
                 result = this.getField20();
                 break;
-
-
             case 21:
                 result = this.getField21();
                 break;
@@ -1138,7 +1136,6 @@ public class ViewResult implements Serializable {
             case 20:
                 this.setField20(value);
                 break;
-
             case 21:
                 this.setField21(value);
                 break;

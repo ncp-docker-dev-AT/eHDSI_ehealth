@@ -35,13 +35,12 @@ import java.util.Set;
  */
 public class StorkHelper {
 
-    private static Logger log = LoggerFactory.getLogger(StorkHelper.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(StorkHelper.class);
     private static long companyId = CompanyThreadLocal.getCompanyId();
-    private final String USER_AGENT = "Mozilla/5.0";
 
     public static String getPepsURL() throws com.liferay.portal.kernel.exception.SystemException {
         String pepsurl = PrefsPropsUtil.getString(companyId, "peps.url");
-        log.info("### PEPS URL IS : '{}'", pepsurl);
+        LOGGER.info("### PEPS URL IS : '{}'", pepsurl);
         return pepsurl;
     }
 
@@ -54,21 +53,19 @@ public class StorkHelper {
     }
 
     public static String createStorkSAML(StorkProperties properties) {
-        log.info("############################");
+        LOGGER.info("############################");
 
         IPersonalAttributeList pAttList = new PersonalAttributeList();
-        StringBuilder strBld = new StringBuilder();
-
-        log.info("GET STORK ATTRIBUTES");
-        log.info("sp.mandatory.personal.attributes:" + properties.getSpPersonalAttributes());
-        log.info("sp.mandatory.business.attributes:" + properties.getSpBusinessAttributes());
-        log.info("sp.mandatory.legal.attributes:" + properties.getSpLegalAttributes());
+        LOGGER.info("GET STORK ATTRIBUTES");
+        LOGGER.info("sp.mandatory.personal.attributes:" + properties.getSpPersonalAttributes());
+        LOGGER.info("sp.mandatory.business.attributes:" + properties.getSpBusinessAttributes());
+        LOGGER.info("sp.mandatory.legal.attributes:" + properties.getSpLegalAttributes());
 
         String[] identifiers = properties.getSpPersonalAttributes().split(",");
 
         for (String identifier : identifiers) {
             if (Validator.isNotNull(identifier)) {
-                log.info("PERSONAL IDENTIFIER IS : " + identifier);
+                LOGGER.info("PERSONAL IDENTIFIER IS: '{}'", identifier);
                 PersonalAttribute attr = new PersonalAttribute();
                 attr.setName(identifier);
                 attr.setIsRequired(true);
@@ -80,7 +77,7 @@ public class StorkHelper {
 
         for (String identifier : businessIdentifiers) {
             if (Validator.isNotNull(identifier)) {
-                log.info("BUSINESS IDENTIFIER IS : " + identifier);
+                LOGGER.info("BUSINESS IDENTIFIER IS: '{}'", identifier);
                 PersonalAttribute attr = new PersonalAttribute();
                 attr.setName(identifier);
                 attr.setIsRequired(true);
@@ -93,7 +90,7 @@ public class StorkHelper {
 
         for (String identifier : legalIdentifiers) {
             if (Validator.isNotNull(identifier)) {
-                log.info("LEGAL IDENTIFIER IS : " + identifier);
+                LOGGER.info("LEGAL IDENTIFIER IS: '{}'", identifier);
                 PersonalAttribute attr = new PersonalAttribute();
                 attr.setName(identifier);
                 attr.setIsRequired(true);
@@ -102,7 +99,7 @@ public class StorkHelper {
             }
         }
         String providerName = properties.getProviderName();
-        byte[] token = null;
+        byte[] token;
         String pepsUrl = properties.getPepsURL();
         STORKAuthnRequest authnRequest = new STORKAuthnRequest();
         try {
@@ -117,44 +114,42 @@ public class StorkHelper {
             authnRequest.setSPID(properties.getProviderName());
             authnRequest.setAssertionConsumerServiceURL(properties.getSpReturnURL());
 
-            log.info("sp.peps.url: " + authnRequest.getDestination());
-            log.info("sp.country: " + authnRequest.getSpCountry());
-            log.info("sp.provider: " + providerName);
-            log.info("sp.qaa: " + authnRequest.getQaa());
-            log.info("sp.assertionurl: " + authnRequest.getAssertionConsumerServiceURL());
-            log.info("sp.sector: " + authnRequest.getSpSector());
-            log.info("sp.application: " + authnRequest.getSpApplication());
-            log.info("sp.id: " + authnRequest.getSPID());
+            LOGGER.info("sp.peps.url: '{}'", authnRequest.getDestination());
+            LOGGER.info("sp.country: '{}'", authnRequest.getSpCountry());
+            LOGGER.info("sp.provider: '{}'", providerName);
+            LOGGER.info("sp.qaa: '{}'", authnRequest.getQaa());
+            LOGGER.info("sp.assertionurl: '{}'", authnRequest.getAssertionConsumerServiceURL());
+            LOGGER.info("sp.sector: '{}'", authnRequest.getSpSector());
+            LOGGER.info("sp.application: '{}'", authnRequest.getSpApplication());
+            LOGGER.info("sp.id: '{}'", authnRequest.getSPID());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
         try {
             STORKSAMLEngine engine = STORKSAMLEngine.getInstance(Constants.SP_CONF);
-            log.info("ENGINE: " + Validator.isNotNull(engine));
+            LOGGER.info("ENGINE: " + Validator.isNotNull(engine));
             authnRequest = engine.generateSTORKAuthnRequest(authnRequest);
         } catch (STORKSAMLEngineException e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            LOGGER.error("STORKSAMLEngineException: '{}'", e.getMessage(), e);
         }
 
         token = authnRequest.getTokenSaml();
 
         String SAMLRequest = PEPSUtil.encodeSAMLToken(token);
         String samlRequestXML = new String(token);
-        log.info(samlRequestXML);
+        LOGGER.info(samlRequestXML);
         return SAMLRequest;
     }
 
     public static String createStorkSAML() throws com.liferay.portal.kernel.exception.SystemException {
-        log.info("############################");
+
+        LOGGER.info("############################");
         StorkProperties properties = new StorkProperties();
         long companyId = CompanyThreadLocal.getCompanyId();
-        log.info("COMPANY FROM THREAD LOCAL IS " + companyId);
-        IPersonalAttributeList pAttList = new PersonalAttributeList();
-        StringBuilder strBld = new StringBuilder();
+        LOGGER.info("COMPANY FROM THREAD LOCAL IS: '{}'", companyId);
 
-        log.info("GET STORK ATTRIBUTES");
+        LOGGER.info("GET STORK ATTRIBUTES");
         properties.setSpPersonalAttributes(PrefsPropsUtil.getString(companyId, "sp.mandatory.personal.attributes", ""));
         properties.setSpBusinessAttributes(PrefsPropsUtil.getString(companyId, "sp.mandatory.business.attributes", ""));
         properties.setSpLegalAttributes(PrefsPropsUtil.getString(companyId, "sp.mandatory.legal.attributes", ""));
@@ -170,8 +165,9 @@ public class StorkHelper {
     }
 
     public static void updateColumnValue(long expGroupTableId, String columnName, String value, long companyId, long groupId) {
-        ExpandoColumn expandoColumn = null;
-        ExpandoValue expandoValue = null;
+
+        ExpandoColumn expandoColumn;
+        ExpandoValue expandoValue;
         try {
             expandoColumn = ExpandoColumnLocalServiceUtil.getColumn(expGroupTableId, columnName);
             if (Validator.isNotNull(expandoColumn)) {
@@ -187,14 +183,15 @@ public class StorkHelper {
                 ExpandoValueLocalServiceUtil.addValue(companyId, User.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME, columnName, groupId, value);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
     }
 
     public static ExpandoColumn addExpandoColumn(long companyId, User user, long roleId, String colname) throws PortalException, com.liferay.portal.kernel.exception.SystemException {
-        ExpandoTable table = null;
+
+        ExpandoTable table;
         ExpandoColumn column = null;
-        log.info("Adding column " + colname);
+        LOGGER.info("Adding column: '{}'", colname);
         table = ExpandoTableLocalServiceUtil.getTable(companyId,
                 User.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
 
@@ -202,38 +199,25 @@ public class StorkHelper {
             column = ExpandoColumnLocalServiceUtil.getColumn(table.getPrimaryKey(), colname);
 
             if (Validator.isNull(column)) {
-                column = ExpandoColumnLocalServiceUtil.addColumn(
-                        table.getTableId(), colname,
-                        ExpandoColumnConstants.STRING);
-                //String[] actionsRW = new String[] { ActionKeys.VIEW, ActionKeys.UPDATE };
+                column = ExpandoColumnLocalServiceUtil.addColumn(table.getTableId(), colname, ExpandoColumnConstants.STRING);
                 String[] actionsRW = new String[]{ActionKeys.VIEW};
-                log.info("Try to set permissions for expando column " + colname);
-                /*
-                 public static void setResourcePermissions(long companyId,
-                 String name,
-                 int scope,
-                 String primKey,
-                 long roleId,
-                 String[] actionIds) throws PortalException, SystemException
-                 */
-                ResourcePermissionLocalServiceUtil.
-                        setResourcePermissions(companyId,
-                                ExpandoColumn.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL,
-                                String.valueOf(column.getColumnId()), roleId, actionsRW);
+                LOGGER.info("Try to set permissions for expando column: '{}¼ ", colname);
+                ResourcePermissionLocalServiceUtil.setResourcePermissions(companyId, ExpandoColumn.class.getName(),
+                        ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(column.getColumnId()), roleId, actionsRW);
             } else {
-                log.info("COLUMN NAME EXISTING: " + column.getName());
+                LOGGER.info("COLUMN NAME EXISTING: '{}'", column.getName());
             }
         } catch (Exception dcne) {
-            dcne.printStackTrace();
-
+            LOGGER.error("Exception: '{}'", dcne.getMessage(), dcne);
         }
-
         return column;
     }
 
     public String doSubmit(String url, Map<String, String> data) throws Exception {
+
         URL siteUrl = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) siteUrl.openConnection();
+        String USER_AGENT = "Mozilla/5.0";
         conn.setRequestProperty("User-Agent", USER_AGENT);
         conn.setRequestProperty("referer", "localhost");
         conn.setRequestMethod("POST");
@@ -252,13 +236,12 @@ public class StorkHelper {
             }
             content += key + "=" + URLEncoder.encode(data.get(key), "UTF-8");
         }
-        //log.info(content);
         out.writeBytes(content);
         out.flush();
         out.close();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String line = "";
+        String line;
         while ((line = in.readLine()) != null) {
             sb.append(line);
         }

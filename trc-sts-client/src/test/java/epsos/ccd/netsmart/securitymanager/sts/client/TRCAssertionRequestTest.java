@@ -1,20 +1,3 @@
-/***Licensed to the Apache Software Foundation (ASF) under one
- *or more contributor license agreements.  See the NOTICE file
- *distributed with this work for additional information
- *regarding copyright ownership.  The ASF licenses this file
- *to you under the Apache License, Version 2.0 (the
- *"License"); you may not use this file except in compliance
- *with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- *Unless required by applicable law or agreed to in writing,
- *software distributed under the License is distributed on an
- *"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *KIND, either express or implied.  See the License for the
- *specific language governing permissions and limitations
- *under the License.
- **/
 package epsos.ccd.netsmart.securitymanager.sts.client;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -52,14 +35,13 @@ import static org.junit.Assert.fail;
 @RunWith(JMockit.class)
 public class TRCAssertionRequestTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(TRCAssertionRequestTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TRCAssertionRequestTest.class);
 
     @Mocked
-    TRCAssertionRequest req;
-    @Mocked
-    Marshaller marshaller;
+    private TRCAssertionRequest req;
 
-    protected static final Logger LOG = LoggerFactory.getLogger(TRCAssertionRequestTest.class);
+    @Mocked
+    private Marshaller marshaller;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -76,7 +58,7 @@ public class TRCAssertionRequestTest {
             try {
                 ds.setDriverClass(databaseProps.getProperty("db.driverclass"));
             } catch (PropertyVetoException ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             }
             ds.setJdbcUrl(databaseProps.getProperty("db.jdbcurl"));
             ds.setUser(databaseProps.getProperty("db.user"));
@@ -89,28 +71,18 @@ public class TRCAssertionRequestTest {
             builder.bind(databaseProps.getProperty("db.resname"), ds);
             try {
                 builder.activate();
-            } catch (IllegalStateException ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
-            } catch (NamingException ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+            } catch (IllegalStateException | NamingException ex) {
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             }
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
 
         Properties systemProps = System.getProperties();
-        systemProps.put(
-                "javax.net.ssl.trustStore",
-                "C:/Users/Jerouris/testKeystore.jks");
-        systemProps.put(
-                "javax.net.ssl.keyStore",
-                "C:/Users/Jerouris/testKeystore.jks");
-        systemProps.put(
-                "javax.net.ssl.trustStorePassword",
-                "tomcat");
-        systemProps.put(
-                "javax.net.ssl.keyStorePassword",
-                "tomcat");
+        systemProps.put("javax.net.ssl.trustStore", "C:/Users/Jerouris/testKeystore.jks");
+        systemProps.put("javax.net.ssl.keyStore", "C:/Users/Jerouris/testKeystore.jks");
+        systemProps.put("javax.net.ssl.trustStorePassword", "tomcat");
+        systemProps.put("javax.net.ssl.keyStorePassword", "tomcat");
         //  systemProps.put("javax.net.debug", "SSL,handshake");
         //  systemProps.put("java.security.debug", "all");
 
@@ -118,8 +90,6 @@ public class TRCAssertionRequestTest {
         //for localhost testing only
 
         DefaultBootstrap.bootstrap();
-
-
     }
 
     @AfterClass
@@ -143,7 +113,7 @@ public class TRCAssertionRequestTest {
 
         new NonStrictExpectations() {{
             req.request();
-            returns((Assertion) any);
+            returns(any);
         }};
 
         try {
@@ -165,11 +135,10 @@ public class TRCAssertionRequestTest {
             try {
                 XMLUtils.sendXMLtoStream(signedDoc, new FileOutputStream("SignedTRCAssertion.xml"));
             } catch (FileNotFoundException ex) {
-                logger.error(null, ex);
+                LOGGER.error(null, ex);
             }
-
         } catch (Exception ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             fail("Could not make the request: " + ex.getMessage());
         }
     }
@@ -195,11 +164,11 @@ public class TRCAssertionRequestTest {
             try {
                 XMLUtils.sendXMLtoStream(signedDoc, new FileOutputStream("SignedTRCAssertion.xml"));
             } catch (FileNotFoundException ex) {
-                logger.error(null, ex);
+                LOGGER.error(null, ex);
             }
 
         } catch (Exception ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             fail("Could not make the request: " + ex.getMessage());
         }
     }
@@ -218,10 +187,8 @@ public class TRCAssertionRequestTest {
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(samlasRoot);
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
             hcpIdentityAssertion = (Assertion) unmarshaller.unmarshall(samlasRoot);
-        } catch (UnmarshallingException ex) {
-            logger.error(null, ex);
-        } catch (XMLParserException ex) {
-            logger.error(null, ex);
+        } catch (UnmarshallingException | XMLParserException ex) {
+            LOGGER.error(null, ex);
         }
         return hcpIdentityAssertion;
     }
