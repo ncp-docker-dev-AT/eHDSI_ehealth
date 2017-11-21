@@ -1,29 +1,3 @@
-/**
- * Patient summary and ePrescription XCA server implementation
- * <p>
- * Patient summary implementation by SRDC Copyright (C) 2011, 2012 SRDC Yazilim
- * Arastirma ve Gelistirme ve Danismanlik Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * <p>
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- * <p>
- * ePrescription implementation by Kela (The Social Insurance Institution of
- * Finland) and SALAR/Diabol of Sweden GNU General Public License v3
- * <p>
- * Corrections/updates by other epSOS project participants
- */
 package tr.com.srdc.epsos.ws.server.xca.impl;
 
 import epsos.ccd.gnomon.auditmanager.*;
@@ -83,18 +57,16 @@ import java.util.*;
 public class XCAServiceImpl implements XCAServiceInterface {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCAServiceImpl.class);
-    ITransformationService transformationService;
-    OMFactory factory;
+    private ITransformationService transformationService;
+    private OMFactory factory;
     private oasis.names.tc.ebxml_regrep.xsd.query._3.ObjectFactory ofQuery;
     private oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory ofRim;
     private oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
-    private ihe.iti.xds_b._2007.ObjectFactory ofXds;
-    private ServiceLoader<DocumentSearchInterface> serviceLoader;
     private DocumentSearchInterface documentSearchService;
 
     public XCAServiceImpl() throws Exception {
 
-        serviceLoader = ServiceLoader.load(DocumentSearchInterface.class);
+        ServiceLoader<DocumentSearchInterface> serviceLoader = ServiceLoader.load(DocumentSearchInterface.class);
         try {
             LOGGER.info("Loading National implementation of DocumentSearchInterface...");
             documentSearchService = serviceLoader.iterator().next();
@@ -107,7 +79,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         ofQuery = new oasis.names.tc.ebxml_regrep.xsd.query._3.ObjectFactory();
         ofRim = new oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory();
         ofRs = new oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory();
-        ofXds = new ihe.iti.xds_b._2007.ObjectFactory();
 
         factory = OMAbstractFactory.getOMFactory();
 
@@ -115,7 +86,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         transformationService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
     }
 
-    public void prepareEventLogForQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, Element sh, String classCode) {
+    private void prepareEventLogForQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, Element sh, String classCode) {
 
         switch (classCode) {
             case Constants.EP_CLASSCODE:
@@ -176,11 +147,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eventLog.setHR_UserID(Constants.HR_ID_PREFIX + "<" + Helper.getUserID(sh) + "@" + Helper.getOrganization(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getRoleID(sh));
-
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-
         eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
-
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (response.getRegistryErrorList() != null) {
@@ -190,15 +158,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
     }
 
-    public void prepareEventLogForRetrieve(EventLog eventLog, RetrieveDocumentSetRequestType request,
-                                           boolean errorsDiscovered, boolean documentReturned, OMElement registryErrorList,
-                                           Element sh, String classCode) {
+    private void prepareEventLogForRetrieve(EventLog eventLog, RetrieveDocumentSetRequestType request,
+                                            boolean errorsDiscovered, boolean documentReturned, OMElement registryErrorList,
+                                            Element sh, String classCode) {
 
         LOGGER.info("method prepareEventLogForRetrieve({})", classCode);
         if (classCode == null || classCode.equals(Constants.EP_CLASSCODE)) {
             // In case the document is not found, audit log cannot be properly filled, as we don't know the event type
             // Log this under Order Service
-            // TODO: define the default service in NCP properties
             eventLog.setEventType(EventType.epsosOrderServiceRetrieve);
             eventLog.setEI_TransactionName(TransactionName.epsosOrderServiceRetrieve);
         } else if (classCode.equals(Constants.PS_CLASSCODE)) {
@@ -249,6 +216,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private String getDocumentEntryClassCode(AdhocQueryRequest request) {
+
         for (SlotType1 sl : request.getAdhocQuery().getSlot()) {
             if (sl.getName().equals("$XDSDocumentEntryClassCode")) {
                 String classCode = sl.getValueList().getValue().get(0);
@@ -265,6 +233,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      * Extracts the XDS patient ID from the XCA query
      */
     private String getDocumentEntryPatientId(AdhocQueryRequest request) {
+
         for (SlotType1 sl : request.getAdhocQuery().getSlot()) {
             if (sl.getName().equals("$XDSDocumentEntryPatientId")) {
                 String patientId = sl.getValueList().getValue().get(0);
@@ -291,10 +260,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
      * @return repositoryUniqueId
      */
     private String getRepositoryUniqueId(RetrieveDocumentSetRequestType request) {
+
         return request.getDocumentRequest().get(0).getRepositoryUniqueId();
     }
 
     private String trimDocumentEntryPatientId(String patientId) {
+
         if (patientId.contains("^^^")) {
             return patientId.substring(0, patientId.indexOf("^^^"));
         }
@@ -302,6 +273,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private SlotType1 makeSlot(String name, String value) {
+
         SlotType1 sl = ofRim.createSlotType1();
         sl.setName(name);
         sl.setValueList(ofRim.createValueListType());
@@ -310,6 +282,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private ClassificationType makeClassification(String classificationScheme, String classifiedObject, String nodeRepresentation, String value, String name) {
+
         String uuid = "urn:uuid:" + UUID.randomUUID().toString();
         ClassificationType cl = ofRim.createClassificationType();
         cl.setId(uuid);
@@ -325,6 +298,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private ClassificationType makeClassification(String classificationScheme, String classifiedObject, String nodeRepresentation) {
+
         String uuid = "urn:uuid:" + UUID.randomUUID().toString();
         ClassificationType cl = ofRim.createClassificationType();
         cl.setId(uuid);
@@ -335,6 +309,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private ExternalIdentifierType makeExternalIdentifier(String identificationScheme, String registryObject, String value, String name) {
+
         String uuid = "urn:uuid:" + UUID.randomUUID().toString();
         ExternalIdentifierType ex = ofRim.createExternalIdentifierType();
         ex.setId(uuid);
@@ -350,6 +325,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private String prepareExtrinsicObjectEpsosDoc(DocumentType docType, Date effectiveTime, String repositoryId, AdhocQueryRequest request, ExtrinsicObjectType eot, boolean isPDF, String documentId) {
+
         final String title;
         final String classCode;
         final String nodeRepresentation;
@@ -422,45 +398,25 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // repositoryUniqueId (optional)
         //eot.getSlot().add(makeSlot("repositoryUniqueId", Constants.HOME_COMM_ID));
-        eot.getClassification().add(makeClassification(
-                "urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a",
-                uuid,
-                classCode,
-                "2.16.840.1.113883.6.1",
-                title));
+        eot.getClassification().add(makeClassification("urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a",
+                uuid, classCode, "2.16.840.1.113883.6.1", title));
         // Type code (not written in 3.4.2)
-        eot.getClassification().add(makeClassification(
-                "urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
-                uuid,
-                classCode,
-                "2.16.840.1.113883.6.1",
-                title));
+        eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
+                uuid, classCode, "2.16.840.1.113883.6.1", title));
         // Confidentiality Code
-        eot.getClassification().add(makeClassification(
-                "urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
-                uuid,
-                "N",
-                "2.16.840.1.113883.5.25",
-                "Normal"));
+        eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
+                uuid, "N", "2.16.840.1.113883.5.25", "Normal"));
         // FormatCode
         if (isPDF) {
-            eot.getClassification().add(makeClassification(
-                    "urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
-                    uuid,
-                    "urn:ihe:iti:xds-sd:pdf:2008",
-                    "IHE PCC",
-                    "PDF/A coded document"));
+            eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
+                    uuid, "urn:ihe:iti:xds-sd:pdf:2008", "IHE PCC", "PDF/A coded document"));
         } else {
-            eot.getClassification().add(makeClassification(
-                    "urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
-                    uuid,
-                    nodeRepresentation,
-                    "epSOS formatCodes",
-                    displayName));
+            eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
+                    uuid, nodeRepresentation, "epSOS formatCodes", displayName));
         }
         // Healthcare facility code
-        /**
-         * TODO: Get healthcare facility info from national implementaition
+        /*
+         * TODO: Get healthcare facility info from national implementation
          */
         eot.getClassification().add(makeClassification(
                 "urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
@@ -493,6 +449,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private String prepareExtrinsicObjectEP(AdhocQueryRequest request, ExtrinsicObjectType eot, EPDocumentMetaData document) {
+
         String name = "ePrescription";
         String uuid = "urn:uuid:" + UUID.randomUUID().toString();
         boolean isPDF = document.getFormat() == EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF;
@@ -614,13 +571,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private AssociationType1 makeAssociation(String source, String target) {
+
         String uuid = "urn:uuid:" + UUID.randomUUID().toString();
         AssociationType1 association = ofRim.createAssociationType1();
         association.setId(uuid);
         association.setAssociationType("urn:ihe:iti:2007:AssociationType:XFRM");
         association.setSourceObject(source);
         association.setTargetObject(target);
-        /**
+        /*
          * Gazelle does not like this information when validating. Uncomment if
          * really needed.
          */
@@ -673,6 +631,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      * @throws Exception
      */
     private void AdhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader sh, EventLog eventLog) throws Exception {
+
         String sigCountryCode = null;
         Element shElement = null;
         // What's being requested: eP or PS?
@@ -700,12 +659,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
         String fullPatientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement));
         if (!getDocumentEntryPatientId(request).contains(fullPatientId)) {
             // Patient ID in TRC assertion does not match the one given in the request. Return "No documents found".
-            if (classCodeValue.contains(Constants.EP_CLASSCODE)) {
-                rel.getRegistryError().add(createErrorMessage("1102", "No ePrescriptions are registered for the given patient.", "", true));
-            } else if (classCodeValue.contains(Constants.PS_CLASSCODE)) {
+            if (StringUtils.contains(classCodeValue, Constants.EP_CLASSCODE)) {
+                rel.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
+            } else if (StringUtils.contains(classCodeValue, Constants.PS_CLASSCODE)) {
                 rel.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
             } else {
-                rel.getRegistryError().add(createErrorMessage("1102", "No documents are registered for the given patient.", "", true));
+                rel.getRegistryError().add(createErrorMessage("1100", "No documents are registered for the given patient.", "", true));
             }
         }
         String patientId = trimDocumentEntryPatientId(fullPatientId);
@@ -770,55 +729,63 @@ public class XCAServiceImpl implements XCAServiceInterface {
             response.setStatus(IheConstants.REGREP_RESPONSE_FAILURE);
 
         } else {
+
             if (StringUtils.equals(classCodeValue, Constants.EP_CLASSCODE) || StringUtils.equals(classCodeValue,
                     Constants.PS_CLASSCODE) || StringUtils.equals(classCodeValue, Constants.MRO_CLASSCODE)) {
 
                 LOGGER.info("XCA Query Request for '{}' is valid.", getDocumentName(classCodeValue));
-                if (classCodeValue.contains(Constants.EP_CLASSCODE)) { // Document search for ePrescription service.
-                    List<DocumentAssociation<EPDocumentMetaData>> prescriptions
-                            = documentSearchService.getEPDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
+                // Document search for ePrescription service.
+                if (StringUtils.contains(classCodeValue, Constants.EP_CLASSCODE)) {
+
+                    List<DocumentAssociation<EPDocumentMetaData>> prescriptions = documentSearchService.getEPDocumentList(
+                            DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
+
                     if (prescriptions == null) {
+
                         rel.getRegistryError().add(createErrorMessage("4103", "ePrescription registry could not be accessed.", "", true));
                         response.setRegistryErrorList(rel);
                         response.setStatus(IheConstants.REGREP_RESPONSE_FAILURE);
                     } else if (prescriptions.isEmpty()) {
-                        rel.getRegistryError().add(createErrorMessage("1102", "No ePrescriptions are registered for the given patient.", "", true));
+
+                        rel.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
                         response.setRegistryErrorList(rel);
                         response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
                     } else {
+
                         // Multiple prescriptions mean multiple PDF and XML files, multiple ExtrinsicObjects and associations
                         response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
                         for (DocumentAssociation<EPDocumentMetaData> prescription : prescriptions) {
-                            String xmlUUID = "";
+
+                            String xmlUUID;
                             ExtrinsicObjectType eotXML = ofRim.createExtrinsicObjectType();
                             xmlUUID = prepareExtrinsicObjectEP(request, eotXML, prescription.getXMLDocumentMetaData());
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
 
-                            String pdfUUID = "";
+                            String pdfUUID;
                             ExtrinsicObjectType eotPDF = ofRim.createExtrinsicObjectType();
                             pdfUUID = prepareExtrinsicObjectEP(request, eotPDF, prescription.getPDFDocumentMetaData());
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotPDF));
 
-                            if (!xmlUUID.equals("") && !pdfUUID.equals("")) {
+                            if (StringUtils.isNotBlank(xmlUUID) && StringUtils.isNotBlank(pdfUUID)) {
+
                                 response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(pdfUUID, xmlUUID)));
                             }
                         }
                     }
-                } else if (classCodeValue.contains(Constants.PS_CLASSCODE)) { // Document search for Patient service.
-                    DocumentAssociation<PSDocumentMetaData> psDoc
-                            = documentSearchService.getPSDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
+                } else if (StringUtils.contains(classCodeValue, Constants.PS_CLASSCODE)) {
+
+                    // Document search for Patient service.
+                    DocumentAssociation<PSDocumentMetaData> psDoc = documentSearchService.getPSDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
                     if (psDoc == null || (psDoc.getPDFDocumentMetaData() == null && psDoc.getXMLDocumentMetaData() == null)) {
-                        rel.getRegistryError().add(createErrorMessage("1102",
-                                "No patient summary is registered for the given patient.",
-                                "",
-                                true));
+
+                        rel.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
                         response.setRegistryErrorList(rel);
                         response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
                     } else {
+
                         PSDocumentMetaData docPdf = psDoc.getPDFDocumentMetaData();
                         PSDocumentMetaData docXml = psDoc.getXMLDocumentMetaData();
-
                         response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
 
                         String xmlUUID = "";
@@ -837,18 +804,18 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(pdfUUID, xmlUUID)));
                         }
                     }
-                } else if (classCodeValue.contains(Constants.MRO_CLASSCODE)) { // Document search for MRO service.
-                    DocumentAssociation<MroDocumentMetaData> mro
-                            = documentSearchService.getMroDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
+                } else if (StringUtils.contains(classCodeValue, Constants.MRO_CLASSCODE)) {
+
+                    // Document search for MRO service.
+                    DocumentAssociation<MroDocumentMetaData> mro = documentSearchService.getMroDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
                     if (mro == null || (mro.getPDFDocumentMetaData() == null && mro.getXMLDocumentMetaData() == null)) {
-                        rel.getRegistryError().add(createErrorMessage("1102",
-                                "No MRO summary is registered for the given patient.",
-                                "",
-                                true));
+
+                        rel.getRegistryError().add(createErrorMessage("1100", "No MRO summary is registered for the given patient.", "", true));
                         response.setRegistryErrorList(rel);
                         response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
                     } else {
+
                         MroDocumentMetaData docPdf = mro.getPDFDocumentMetaData();
                         MroDocumentMetaData docXml = mro.getXMLDocumentMetaData();
 
@@ -1194,6 +1161,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
                     if (!checkIfOnlyWarnings(registryErrorList)) {
 
+                        // If the transformation process has raised at least one FATAL Error, we should determine which
+                        // XCAError code has to be provided according the corresponding TM Error Code
                         Iterator<OMElement> errors = registryErrorList.getChildElements();
                         while (errors.hasNext()) {
 
@@ -1202,6 +1171,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             if (StringUtils.equals(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED.getCode(), errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
                                 //throw new TranscodingErrorException("The requested encoding cannot be provided due to a transcoding error.");
                                 registryErrorList.addChild(createErrorOMMessage(ns, "4203", "The requested encoding cannot be provided due to a transcoding error.", "", false));
+                                // If the error is FATAL flag failure has been set to true
                                 failure = true;
                                 break;
                             }
@@ -1212,6 +1182,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             CdaModel.obtainCdaModel(epsosDoc.getClassCode(), true), NcpSide.NCP_A);
                 }
 
+                // If the registryErrorList is empty or contains only Warning, the status of the request is SUCCESS
                 if (!registryErrorList.getChildElements().hasNext()) {
                     registryResponse.addAttribute(factory.createOMAttribute("status", null,
                             IheConstants.REGREP_RESPONSE_SUCCESS));
@@ -1220,14 +1191,17 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         registryResponse.addAttribute(factory.createOMAttribute("status", null,
                                 IheConstants.REGREP_RESPONSE_SUCCESS));
                     } else if (failure) {
+                        // If there is a failure during the request process, the status is FAILURE
                         registryResponse.addAttribute(factory.createOMAttribute("status", null,
                                 IheConstants.REGREP_RESPONSE_FAILURE));
                     } else {
+                        //Otherwise the status is PARTIALSUCCESS
                         registryResponse.addAttribute(factory.createOMAttribute("status", null,
                                 IheConstants.REGREP_RESPONSE_PARTIALSUCCESS));
                     }
                 }
 
+                // If there is no failure during the process, the CDA document has been attached to the response
                 if (!failure) {
                     ByteArrayDataSource dataSource = new ByteArrayDataSource(XMLUtils.toOM(doc.getDocumentElement())
                             .toString().getBytes(), "text/xml;charset=UTF-8");
@@ -1240,9 +1214,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     documentResponse.addChild(document);
                     documentReturned = true;
                 }
-             /*catch (TranscodingErrorException e) {
-                LOGGER.error("TranscodingErrorException: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(ns, e.getCode(), e.getMessage(), "", false));*/
             } catch (Exception e) {
                 LOGGER.error("Exception: '{}'", e.getMessage(), e);
                 registryResponse.addAttribute(factory.createOMAttribute("status", null, IheConstants.REGREP_RESPONSE_FAILURE));
@@ -1265,15 +1236,17 @@ public class XCAServiceImpl implements XCAServiceInterface {
             // Is this fatal?
         }
 
-        Iterator<OMElement> errors = registryErrorList.getChildElements();
-        while (errors.hasNext()) {
+        //Once the response and the audit message have been prepared, the registryErrorList might be cleaned depending of the errors status.
+        if (failure) {
+            //Only XCA Error Code defined into the XCA Profile might be attached to the response in case of FAILURE.
+            Iterator<OMElement> errors = registryErrorList.getChildElements();
+            while (errors.hasNext()) {
 
-            OMElement errorCode = errors.next();
-            LOGGER.error("Error: '{}'-'{}'", errorCode.getText(), errorCode.getAttributeValue(QName.valueOf("errorCode")));
-            if (!StringUtils.equals(XCAError.ERROR_4203.getCode(), errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
-                //   errorCode.detach();
-                errors.remove();
-
+                OMElement errorCode = errors.next();
+                LOGGER.error("Error: '{}'-'{}'", errorCode.getText(), errorCode.getAttributeValue(QName.valueOf("errorCode")));
+                if (!StringUtils.equals(XCAError.ERROR_4203.getCode(), errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
+                    errors.remove();
+                }
             }
         }
     }

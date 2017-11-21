@@ -1,6 +1,10 @@
 package eu.epsos.pt.cc;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
+import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.epsos.validation.datamodel.saml.AssertionSchematron;
+import eu.epsos.validation.services.AssertionValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMXMLBuilderFactory;
@@ -13,6 +17,7 @@ import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.xmlbeans.XmlBeansXMLReader;
+import org.apache.commons.lang.StringUtils;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.opensaml.saml2.core.Assertion;
@@ -23,7 +28,6 @@ import tr.com.srdc.epsos.securityman.SAML2Validator;
 import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.TransformerException;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +56,6 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
             LOG.debug("Incoming " + operationName + " request message from portal:"
                     + System.getProperty("line.separator") + logRequestMsg);
 
-        } catch (TransformerException ex) {
-            LOG.debug(ex.getLocalizedMessage(), ex);
         } catch (Exception ex) {
             LOG.debug(ex.getLocalizedMessage(), ex);
         }
@@ -173,7 +175,11 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 //                    } catch (Exception e) {
 //                        LOG.error(ExceptionUtils.getStackTrace(e));
 //                    }
-
+                    if (StringUtils.equals(ConfigurationManagerFactory.getConfigurationManager().getProperty("automated.validation"), "true")) {
+                        AssertionValidationService assertionValidationService = new AssertionValidationService();
+                        assertionValidationService.validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
+                                AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString(), NcpSide.NCP_B);
+                    }
                     QueryPatientDocument wrappedParam;
                     wrappedParam = (QueryPatientDocument) fromOM(reqEnv.getBody().getFirstElement(),
                             QueryPatientDocument.class,
@@ -212,11 +218,14 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 //                    SAML2Validator.validateXCAHeader(soapHeader, Constants.PS_CLASSCODE);
                     Assertion hcpAssertion = null;
                     Assertion trcAssertion = null;
+                    String assertionSchematron = null;
                     for (Assertion ass : assertions) {
                         if (ass.getAdvice() == null) {
                             hcpAssertion = ass;
+                            assertionSchematron = AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString();
                         } else {
                             trcAssertion = ass;
+                            assertionSchematron = AssertionSchematron.EPSOS_TRC_ASSERTION.toString();
                         }
                     }
 
@@ -234,6 +243,11 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 //                    } catch (Exception e) {
 //                        LOG.error(ExceptionUtils.getStackTrace(e));
 //                    }
+
+
+                    AssertionValidationService assertionValidationService = new AssertionValidationService();
+                    assertionValidationService.validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()), assertionSchematron
+                            , NcpSide.NCP_B);
 
                     QueryDocumentsResponseDocument queryDocumentsResponse17;
 
@@ -267,11 +281,14 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 //                    SAML2Validator.validateXCAHeader(soapHeader, Constants.PS_CLASSCODE);
                     Assertion hcpAssertion = null;
                     Assertion trcAssertion = null;
+                    String assertionSchematron = null;
                     for (Assertion ass : assertions) {
                         if (ass.getAdvice() == null) {
                             hcpAssertion = ass;
+                            assertionSchematron = AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString();
                         } else {
                             trcAssertion = ass;
+                            assertionSchematron = AssertionSchematron.EPSOS_TRC_ASSERTION.toString();
                         }
                     }
 
@@ -288,6 +305,9 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 //                    } catch (Exception e) {
 //                        LOG.error(ExceptionUtils.getStackTrace(e));
 //                    }
+                    AssertionValidationService assertionValidationService = new AssertionValidationService();
+                    assertionValidationService.validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()), assertionSchematron
+                            , NcpSide.NCP_B);
 
                     RetrieveDocumentResponseDocument retrieveDocumentResponse19;
                     RetrieveDocumentDocument1 wrappedParam;

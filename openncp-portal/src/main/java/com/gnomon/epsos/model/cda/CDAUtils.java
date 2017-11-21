@@ -510,23 +510,40 @@ public class CDAUtils {
     }
 
     private static String addCustodian(String custodianOid, String custodianName, String country) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<custodian typeCode=\"CST\">" + "\r\n" + "<assignedCustodian classCode=\"ASSIGNED\">" + "\r\n" + "<representedCustodianOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\">" + "\r\n" + "<id root=\"").append(custodianOid).append("\"/>" + "\r\n" + "<name>").append(custodianName).append("</name>" + "\r\n" + "<telecom nullFlavor=\"NI\"/>" + "\r\n" + "<addr>" + "\r\n" + "<country>").append(country).append("</country>" + "\r\n"
+
+        return ("<custodian typeCode=\"CST\">" + "\r\n" + "<assignedCustodian classCode=\"ASSIGNED\">" + "\r\n" +
+                "<representedCustodianOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\">" + "\r\n" + "<id root=\"") + custodianOid + "\"/>" + "\r\n" + "<name>" + custodianName + "</name>" + "\r\n" + "<telecom nullFlavor=\"UNK\"/>" + "\r\n" + "<addr>" + "\r\n" + "<country>" + country + "</country>" + "\r\n"
                 + "</addr>" + "\r\n"
                 + "</representedCustodianOrganization>" + "\r\n"
-                + "</assignedCustodian></custodian>" + "\r\n");
-        return sb.toString();
+                + "</assignedCustodian></custodian>" + "\r\n";
     }
 
-    private static String addLegalAuthenticator(String legalOrgOid, String legalauthenticatorfirstname, String legalauthenticatorlastname,
-                                                String legalauthenticatorcity, String legalauthenticatorpostalcode, String edCountry) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<legalAuthenticator contextControlCode=\"OP\" typeCode=\"LA\">" + "\r\n" + "<time value=\"20120927112208\"/>" + "\r\n" + "<signatureCode code=\"S\"/>" + "\r\n" + "<assignedEntity classCode=\"ASSIGNED\">" + "\r\n" + "<id root=\"").append(legalOrgOid).append("\"/>" + "\r\n" + "<telecom nullFlavor=\"NI\"/>" + "\r\n" + "<assignedPerson>" + "\r\n" + "<name>" + "\r\n" + "<family>").append(legalauthenticatorfirstname).append("</family>" + "\r\n" + "<given>").append(legalauthenticatorlastname).append("</given>" + "\r\n" + "</name>" + "\r\n" + "</assignedPerson>" + "\r\n" + "<representedOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\">" + "\r\n" + "<id root=\"").append(legalOrgOid).append("\"/>" + "\r\n" + "<name>Kansaneläkelaitos</name>" + "\r\n" + "<addr use=\"PST\">" + "\r\n" + "<streetAddressLine>N/A</streetAddressLine>" + "\r\n" + "<city>").append(legalauthenticatorcity).append("</city>" + "\r\n" + "<postalCode>").append(legalauthenticatorpostalcode).append("</postalCode>" + "\r\n" + "<state nullFlavor=\"UNK\"/>" + "\r\n" + "<country>").append(edCountry).append("</country>" + "\r\n"
+    private static String addLegalAuthenticator(String legalOrgOid, String legalauthenticatorfirstname,
+                                                String legalauthenticatorlastname, String legalauthenticatorcity,
+                                                String legalauthenticatorpostalcode, String edCountry) {
+
+        LOGGER.info("addLegalAuthenticator('{}', '{}', '{}', '{}', '{}', '{}')", legalOrgOid, legalauthenticatorfirstname,
+                legalauthenticatorlastname, legalauthenticatorcity, legalauthenticatorpostalcode, edCountry);
+
+        return ("<legalAuthenticator contextControlCode=\"OP\" typeCode=\"LA\">" + "\r\n" + "<time value=\"20120927112208\"/>"
+                + "\r\n" + "<signatureCode code=\"S\"/>" + "\r\n" + "<assignedEntity classCode=\"ASSIGNED\">" + "\r\n"
+                + "<id root=\"") +
+                legalOrgOid + "\"/>" + "\r\n" + "<addr><streetAddressLine>4, Breydel Street" +
+                "</streetAddressLine><city>Brussels</city><postalCode>B-1000</postalCode><state nullFlavor=\"UNK\"/><country>BE</country></addr><telecom nullFlavor=\"NI\"/>" + "\r\n"
+                + "<assignedPerson>" + "\r\n" + "<name>" + "\r\n" + "<family>" +
+                legalauthenticatorfirstname + "</family>"
+                + "\r\n" + "<given>" +
+                legalauthenticatorlastname + "</given>" + "\r\n" + "</name>" + "\r\n"
+                + "</assignedPerson>" + "\r\n" + "<representedOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\">"
+                + "\r\n" + "<id root=\"" +
+                legalOrgOid + "\"/>" + "\r\n" + "<name>Kansaneläkelaitos</name><telecom nullFlavor=\"UNK\"/>"
+                + "\r\n" + "<addr use=\"PST\">" + "\r\n" + "<streetAddressLine>N/A</streetAddressLine>" + "\r\n" + "<city>" +
+                legalauthenticatorcity + "</city>" + "\r\n" + "<postalCode>" + legalauthenticatorpostalcode +
+                "</postalCode>" + "\r\n" + "<state nullFlavor=\"UNK\"/>" + "\r\n" + "<country>" + edCountry + "</country>" + "\r\n"
                 + "</addr>" + "\r\n"
                 + "</representedOrganization>" + "\r\n"
                 + "</assignedEntity>" + "\r\n"
-                + "</legalAuthenticator>" + "\r\n");
-        return sb.toString();
+                + "</legalAuthenticator>" + "\r\n";
     }
 
     private static String CDAModelToEDXML(Document epDoc, CDAHeader cda, String eDuuid) {
@@ -550,7 +567,7 @@ public class CDAUtils {
         sb.append("<ClinicalDocument xmlns:epsos=\"urn:epsos-org:ep:medication\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:hl7-org:v3\" "
                 + "xsi:schemaLocation=\"urn:hl7-org:v3\">");
         sb.append("\r\n");
-        sb.append("<typeId root=\"2.16.840.1.113883.1.3\" extension=\"POCD_MT000040\"/>");
+        sb.append("<typeId root=\"2.16.840.1.113883.1.3\" extension=\"POCD_HD000040\"/>");
         sb.append("\r\n");
         sb.append("<templateId root=\"1.3.6.1.4.1.12559.11.10.1.3.1.1.2\"/>");
         sb.append("\r\n");
@@ -616,7 +633,7 @@ public class CDAUtils {
         // Add relative prescription
         sb.append("<inFulfillmentOf>");
         sb.append("\r\n");
-        sb.append("<order>");
+        sb.append("<order moodCode=\"RQO\">");
         sb.append("\r\n");
         sb.append(" <id extension=\"").append(cda.getPrescriptionBarcode()).append("\" root=\"").append(relRoot).append("\" />");
         sb.append("\r\n");
@@ -664,7 +681,7 @@ public class CDAUtils {
         for (int i = 0; i < cda.getEDDetail().size(); i++) {
             EDDetail detail = (EDDetail) cda.getEDDetail().get(i);
             // prescription details
-            sb.append("<entry>");
+            sb.append("<entry typeCode=\"COMP\">");
             sb.append("\r\n");
             sb.append("<supply classCode=\"SPLY\" moodCode=\"EVN\">");
             sb.append("\r\n");
@@ -929,30 +946,26 @@ public class CDAUtils {
 
     private static String addQuantity(String lowValue, String lowUnit, String highValue, String highUnit) {
 
-        StringBuilder et = new StringBuilder();
-        et.append("<epsos:quantity>");
-        et.append("\r\n");
-        et.append("<epsos:numerator xsi:type=\"epsos:PQ\" value=\"").append(lowValue).append("\" unit=\"").append(lowUnit).append("\"/>");
-        et.append("\r\n");
-        et.append("<epsos:denominator xsi:type=\"epsos:PQ\" value=\"").append(lowValue).append("\" unit=\"").append(lowUnit).append("\"/>");
-        et.append("\r\n");
-        et.append("</epsos:quantity>");
-        et.append("\r\n");
-        return et.toString();
+        return "<epsos:quantity>" +
+                "\r\n" +
+                "<epsos:numerator xsi:type=\"epsos:PQ\" value=\"" + lowValue + "\" unit=\"" + lowUnit + "\"/>" +
+                "\r\n" +
+                "<epsos:denominator xsi:type=\"epsos:PQ\" value=\"" + lowValue + "\" unit=\"" + lowUnit + "\"/>" +
+                "\r\n" +
+                "</epsos:quantity>" +
+                "\r\n";
     }
 
     private static String addDoseQuantity(String lowValue, String lowUnit, String highValue, String highUnit) {
 
-        StringBuilder et = new StringBuilder();
-        et.append("<doseQuantity>");
-        et.append("\r\n");
-        et.append("<low value=\"").append(lowValue).append("\" unit=\"").append(lowUnit).append("\"/>");
-        et.append("\r\n");
-        et.append("<high value=\"").append(highValue).append("\" unit=\"").append(highUnit).append("\"/>");
-        et.append("\r\n");
-        et.append("</doseQuantity>");
-        et.append("\r\n");
-        return et.toString();
+        return "<doseQuantity>" +
+                "\r\n" +
+                "<low value=\"" + lowValue + "\" unit=\"" + lowUnit + "\"/>" +
+                "\r\n" +
+                "<high value=\"" + highValue + "\" unit=\"" + highUnit + "\"/>" +
+                "\r\n" +
+                "</doseQuantity>" +
+                "\r\n";
     }
 
     /*
@@ -1082,12 +1095,14 @@ public class CDAUtils {
     private static String addAddress(String streetAddress, String city, String postalCode, String country, String tel,
                                      String email, boolean addressPointInStart) {
 
+        LOGGER.info("method addAddress('{}', '{}', '{}', '{}', '{}', '{}', '{}', )", streetAddress, city, postalCode,
+                country, tel, email, addressPointInStart);
+
         StringBuilder sb = new StringBuilder();
         if (addressPointInStart) {
             if (Validator.isNull(email) && Validator.isNull(tel)) {
-                sb.append("<telecom nullFlavor=\"NI\" />");
+                sb.append("<telecom nullFlavor=\"UNK\" />");
             }
-
             if (Validator.isNotNull(tel)) {
                 sb.append("<telecom use=\"WP\" value=\"tel:+").append(tel).append("\" />");
             }
@@ -1113,7 +1128,6 @@ public class CDAUtils {
             if (Validator.isNull(email) && Validator.isNull(tel)) {
                 sb.append("<telecom nullFlavor=\"NI\" />");
             }
-
             if (Validator.isNotNull(tel)) {
                 sb.append("<telecom use=\"WP\" value=\"tel:+").append(tel).append("\" />");
             }

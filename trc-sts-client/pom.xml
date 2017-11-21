@@ -84,6 +84,11 @@
             <version>${commons-lang.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
