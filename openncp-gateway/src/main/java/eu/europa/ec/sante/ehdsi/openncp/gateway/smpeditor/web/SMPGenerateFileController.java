@@ -242,8 +242,7 @@ public class SMPGenerateFileController {
                         participantID = ids[0];
                         String[] cc = participantID.split(":"); //SPECIFICATION May change if Participant Identifier specification change
 
-                        Countries count = null;
-                        Countries[] countries = count.getALL();
+                        Countries[] countries = Countries.getALL();
                         for (Countries country : countries) {
                             if (cc[4].equals(country.name())) {
                                 smpfile.setCountry(cc[4]);

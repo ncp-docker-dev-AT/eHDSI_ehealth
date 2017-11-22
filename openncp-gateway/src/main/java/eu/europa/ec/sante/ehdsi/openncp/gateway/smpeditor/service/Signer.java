@@ -51,6 +51,7 @@ public class Signer {
             ks.load(keystoreResPath.getInputStream(), keystorePass.toCharArray());
         } catch (KeyStoreException ex) {
             logger.error("\nKeyStoreException 1 - " + SimpleErrorHandler.printExceptionStackTrace(ex), ex);
+            return;
         } catch (IOException ex) {
             invalidKeystore = true;
             logger.error("\nIOException 2 - " + SimpleErrorHandler.printExceptionStackTrace(ex), ex);

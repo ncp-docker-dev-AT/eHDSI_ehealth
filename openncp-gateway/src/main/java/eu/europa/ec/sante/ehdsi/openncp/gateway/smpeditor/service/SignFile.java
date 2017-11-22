@@ -57,9 +57,7 @@ public class SignFile {
         invalidKeystoreSMP = NATIONAL_INFRASTRUCTURE_SIGNER.isInvalidKeystore();
         invalidKeyPairSMP = NATIONAL_INFRASTRUCTURE_SIGNER.isInvalidKeyPair();
 
-        if (invalidKeystoreSMP) {
-            return;
-        } else if (invalidKeyPairSMP) {
+        if (invalidKeystoreSMP || invalidKeyPairSMP) {
             return;
         }
 
@@ -121,7 +119,7 @@ public class SignFile {
 
     private Element findSignatureByParentNode(Element sigParent) {
         for (Node child = sigParent.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if ("Signature".equals(child.getLocalName()) && XMLDSIG_NS.equals(child.getNamespaceURI())) {
+            if ("Signature" .equals(child.getLocalName()) && XMLDSIG_NS.equals(child.getNamespaceURI())) {
                 return (Element) child;
             }
         }
@@ -134,7 +132,7 @@ public class SignFile {
             logger.debug("\n ********* ServiceInformation");
             Element serviceInformation = findFirstElementByName(doc, "ServiceInformation");
             for (Node child = serviceInformation.getFirstChild(); child != null; child = child.getNextSibling()) {
-                if ("Extension".equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
+                if ("Extension" .equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
                     extension = (Element) child;
                 }
             }
@@ -145,7 +143,7 @@ public class SignFile {
             logger.debug("\n ********* Redirect");
             Element redirect = findFirstElementByName(doc, "Redirect");
             for (Node child = redirect.getFirstChild(); child != null; child = child.getNextSibling()) {
-                if ("Extension".equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
+                if ("Extension" .equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
                     extension = (Element) child;
                 }
             }
@@ -162,7 +160,7 @@ public class SignFile {
             Element serviceInformation = findFirstElementByName(doc, "ServiceInformation");
             //Find extension, if exists delete all childs
             for (Node child = serviceInformation.getFirstChild(); child != null; child = child.getNextSibling()) {
-                if ("Extension".equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
+                if ("Extension" .equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
                     extension = (Element) child;
                     while (extension.hasChildNodes()) {
                         extension.removeChild(extension.getFirstChild());
@@ -178,7 +176,7 @@ public class SignFile {
             Element redirect = findFirstElementByName(doc, "Redirect");
             //Find extension, if exists delete all childs
             for (Node child = redirect.getFirstChild(); child != null; child = child.getNextSibling()) {
-                if ("Extension".equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
+                if ("Extension" .equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
                     extension = (Element) child;
                     while (extension.hasChildNodes()) {
                         extension.removeChild(extension.getFirstChild());
