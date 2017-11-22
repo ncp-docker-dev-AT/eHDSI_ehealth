@@ -123,12 +123,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                 }
                 // PT-237 fix. This method should be somewhere centrally
-                if (documentId == null || documentId.isEmpty() || documentId.startsWith("urn:uuid:")) {
-                    documentId = documentId;
-                } else {
+                if (!StringUtils.startsWith(documentId, "urn:uuid:")) {
                     documentId = "urn:uuid:" + documentId;
                 }
-
                 eventLog.setET_ObjectID(documentId);
                 break;
             }
@@ -459,11 +456,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Description (optional)
         eot.setDescription(ofRim.createInternationalStringType());
         eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
-        if (isPDF) {
-            eot.getDescription().getLocalizedString().get(0).setValue(document.getTitle());
-        } else {
-            eot.getDescription().getLocalizedString().get(0).setValue(document.getTitle());
-        }
+        eot.getDescription().getLocalizedString().get(0).setValue(document.getTitle());
 
         // Version Info
         eot.setVersionInfo(ofRim.createVersionInfoType());
@@ -720,7 +713,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             if (StringUtils.equals(classCodeValue, Constants.EP_CLASSCODE) || StringUtils.equals(classCodeValue,
                     Constants.PS_CLASSCODE) || StringUtils.equals(classCodeValue, Constants.MRO_CLASSCODE)) {
 
-                LOGGER.info("XCA Query Request for '{}' is valid.", getDocumentName(classCodeValue));
+                LOGGER.info("XCA Query Request for '{}' is valid.", classCodeValue);
                 // Document search for ePrescription service.
                 if (StringUtils.contains(classCodeValue, Constants.EP_CLASSCODE)) {
 

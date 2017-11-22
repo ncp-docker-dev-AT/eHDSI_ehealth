@@ -173,7 +173,7 @@ public class DocumentDts {
 
         DateFormat formatter;
         Date date;
-        Calendar cal = null;
+        Calendar cal;
 
         formatter = new SimpleDateFormat(selectedPattern);
         try {
@@ -181,7 +181,7 @@ public class DocumentDts {
             cal = Calendar.getInstance();
             cal.setTime(date);
         } catch (ParseException ex) {
-            new RuntimeException(ex);
+            throw new RuntimeException(ex);
         }
 
         return cal;

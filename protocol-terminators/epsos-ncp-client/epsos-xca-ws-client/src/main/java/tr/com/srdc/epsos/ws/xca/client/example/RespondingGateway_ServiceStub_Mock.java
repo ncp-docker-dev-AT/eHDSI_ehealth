@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012  SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * Contact email: epsos@iuz.pt
- */
 package tr.com.srdc.epsos.ws.xca.client.example;
 
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -49,18 +30,18 @@ import java.util.UUID;
 public class RespondingGateway_ServiceStub_Mock {
 
     private static final Logger logger = LoggerFactory.getLogger(RespondingGateway_ServiceStub_Mock.class);
-
-    private oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory ofRim;
-    private ihe.iti.xds_b._2007.ObjectFactory ofXds;
-    private OMFactory factory;
     private final String HCID = "2.16.17.710.820.1000.990.1.1.1";
     private final String RUID = "2.16.17.710.820.1000.990.1.1.1";
     private final String DOCID = "urn:oid:2.16.17.710.820.1000.990.1.1.1.6b13180-a63e-11e1-b3dd-0800200c9a61";
+    private oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory ofRim;
+    private ihe.iti.xds_b._2007.ObjectFactory ofXds;
+    private OMFactory factory;
 
     /**
      * Class constructor.
      */
     public RespondingGateway_ServiceStub_Mock() {
+
         ofRim = new oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory();
         ofXds = new ihe.iti.xds_b._2007.ObjectFactory();
         factory = OMAbstractFactory.getOMFactory();
@@ -84,8 +65,7 @@ public class RespondingGateway_ServiceStub_Mock {
     }
 
     public RetrieveDocumentSetResponseType respondingGateway_CrossGatewayRetrieve(RetrieveDocumentSetRequestType retrieveDocumentSetRequest,
-                                                                                  Assertion idAssertion,
-                                                                                  Assertion trcAssertion) {
+                                                                                  Assertion idAssertion, Assertion trcAssertion) {
 
         RetrieveDocumentSetResponseType mockResponse = ofXds.createRetrieveDocumentSetResponseType();
 
@@ -144,6 +124,7 @@ public class RespondingGateway_ServiceStub_Mock {
     }
 
     private String prepareExtrinsicObjectPS(ExtrinsicObjectType eot, Boolean isPDF, String documentId) {
+
         String name = "Patient Summary";
         String uuid = "urn:uuid:" + UUID.randomUUID().toString();
         // Set Extrinsic Object
@@ -175,11 +156,7 @@ public class RespondingGateway_ServiceStub_Mock {
         eot.getVersionInfo().setVersionName("1.1");
 
         // Creation Date (optional)
-        if (isPDF) {
-            eot.getSlot().add(makeSlot("creationTime", "20120817091805"));
-        } else {
-            eot.getSlot().add(makeSlot("creationTime", "20120817091805"));
-        }
+        eot.getSlot().add(makeSlot("creationTime", "20120817091805"));
 
         // Source Patient Id
         eot.getSlot().add(makeSlot("sourcePatientId", "123456789^^^&amp;2.16.17.710.820.1000.990.1&amp;ISO"));
@@ -228,7 +205,7 @@ public class RespondingGateway_ServiceStub_Mock {
                     "epSOS coded Patient Summary"));
         }
         // Healthcare facility code
-        /**
+        /*
          * TODO: Get healthcare facility info from national implementaition
          */
         eot.getClassification().add(makeClassification(

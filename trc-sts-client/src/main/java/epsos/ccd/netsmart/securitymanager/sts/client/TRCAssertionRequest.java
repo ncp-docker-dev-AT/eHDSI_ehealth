@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.*;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -269,7 +270,7 @@ public class TRCAssertionRequest {
 
     public SSLSocketFactory getEpsosSSLSocketFactory() {
 
-        SSLContext ctx = null;
+        SSLContext ctx;
         try {
             KeyStoreManager ksm = new DefaultKeyStoreManager();
             String KEYSTORE_PASS = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
@@ -283,13 +284,10 @@ public class TRCAssertionRequest {
             tmf.init(ksm.getTrustStore());
 
             ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+            return ctx.getSocketFactory();
 
-        } catch (KeyManagementException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException ex) {
-            LOGGER.error(null, ex);
-        } finally {
-            if (ctx != null) {
-                return ctx.getSocketFactory();
-            }
+        } catch (KeyManagementException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException | IOException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             return null;
         }
     }

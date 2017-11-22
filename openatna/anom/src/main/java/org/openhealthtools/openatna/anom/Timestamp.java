@@ -1,23 +1,3 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
-
 package org.openhealthtools.openatna.anom;
 
 import java.text.DateFormat;
@@ -47,13 +27,14 @@ public class Timestamp {
     private static final DecimalFormat XX_FORMAT = new DecimalFormat("00");
     private static final DecimalFormat XXX_FORMAT = new DecimalFormat("000");
     private static final DecimalFormat XXXX_FORMAT = new DecimalFormat("0000");
-    private static DateFormat df = new SimpleDateFormat("yyy-MM-dd HH:mm:ss.SSS");
 
     private Timestamp() {
         super();
     }
 
     public static Date parseToDate(String text) {
+
+        DateFormat df = new SimpleDateFormat("yyy-MM-dd HH:mm:ss.SSS");
         Calendar c = parse(text);
         if (c != null) {
             return c.getTime();
@@ -75,6 +56,7 @@ public class Timestamp {
      * @throws IllegalArgumentException if a <code>null</code> argument is passed
      */
     public static Calendar parse(String text) {
+
         if (text == null) {
             throw new IllegalArgumentException("argument can not be null");
         }
@@ -93,7 +75,7 @@ public class Timestamp {
             start = 0;
         }
 
-        /**
+        /*
          * the expected format of the remainder of the string is:
          * YYYY-MM-DDThh:mm:ss.SSSTZD
          *
@@ -172,10 +154,7 @@ public class Timestamp {
                 // invalid time zone designator
                 return null;
             }
-        } catch (IndexOutOfBoundsException e) {
-            //TODO: Manage Exception: either log or re-throw.
-            return null;
-        } catch (NumberFormatException e) {
+        } catch (IndexOutOfBoundsException | NumberFormatException e) {
             //TODO: Manage Exception: either log or re-throw.
             return null;
         }
@@ -213,12 +192,12 @@ public class Timestamp {
         cal.set(Calendar.MILLISECOND, ms);
 
         try {
-            /**
+            /*
              * the following call will trigger an IllegalArgumentException
              * if any of the set values are illegal or out of range
              */
             cal.getTime();
-            /**
+            /*
              * in addition check the validity of the year
              */
             getYear(cal);
@@ -231,6 +210,7 @@ public class Timestamp {
     }
 
     public static String format(Date date) {
+
         Calendar c = Calendar.getInstance(TimeZone.getDefault());
         c.setTime(date);
         return format(c);
@@ -247,6 +227,7 @@ public class Timestamp {
      *                                  with more than four digits).
      */
     public static String format(Calendar cal) {
+
         if (cal == null) {
             throw new IllegalArgumentException("argument can not be null");
         }
@@ -306,10 +287,10 @@ public class Timestamp {
      *                                  than four digits).
      */
     public static int getYear(Calendar cal) {
+
         // determine era and adjust year if necessary
         int year = cal.get(Calendar.YEAR);
-        if (cal.isSet(Calendar.ERA)
-                && cal.get(Calendar.ERA) == GregorianCalendar.BC) {
+        if (cal.isSet(Calendar.ERA) && cal.get(Calendar.ERA) == GregorianCalendar.BC) {
             /*
              * calculate year using astronomical system:
              * year n BCE => astronomical year -n + 1
