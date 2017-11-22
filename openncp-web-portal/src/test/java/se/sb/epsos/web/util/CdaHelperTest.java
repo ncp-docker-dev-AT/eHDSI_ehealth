@@ -57,6 +57,7 @@ public class CdaHelperTest {
         assert("Medical doctors".equals(prescription.getProfession()));
         assert(prescription.getAddress().startsWith("V\u00e5rdcentralen TC"));
         assert(prescription.getAddress().startsWith("V\u00e5rdcentralen TC"));
+        assert(prescription.getRows() != null);
         assert(prescription.getRows().size()==1);
         PrescriptionRow row = prescription.getRows().get(0);
         assert(row.getDescription().startsWith("A10AB01 - insulin (human)"));

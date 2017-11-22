@@ -155,12 +155,12 @@
 										<!--Varunamn -->
 										<name/>
 										<!-- Beredningsform, Måste vara samma som eP -->
-										<epsos:formCode code="" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.1" codeSystemName="EDQM" displayName=""/>
+										<epsos:formCode code="" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName=""/>
 										<epsos:asContent classCode="CONT">
 											<epsos:containerPackagedMedicine classCode="CONT" determinerCode="INSTANCE">
 												<!--produktbeskrivning -->
 												<epsos:name/>
-												<epsos:formCode/>
+												<epsos:formCode code="" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName=""/>
 												<!-- paketstorlek-->
 												<epsos:capacityQuantity unit="1" value=""/>
 											</epsos:containerPackagedMedicine>
