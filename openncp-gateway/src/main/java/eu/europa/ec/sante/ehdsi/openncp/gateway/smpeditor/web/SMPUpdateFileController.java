@@ -161,10 +161,8 @@ public class SMPUpdateFileController {
                 participantID = ids[0];
                 String[] cc = participantID.split(":");
 
-                Countries count = null;
-                Countries[] countries = count.getALL();
-                for (int i = 0; i < countries.length; i++) {
-                    if (cc[4].equals(countries[i].name())) {
+                for (Countries country : Countries.getALL()) {
+                    if (cc[4].equals(country.name())) {
                         smpfileupdate.setCountry(cc[4]);
 
                     }
@@ -231,10 +229,9 @@ public class SMPUpdateFileController {
 
             String participanteID = serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue();
             String[] cc = participanteID.split(":");//SPECIFICATION
-            Countries count = null;
-            Countries[] countries = count.getALL();
-            for (int i = 0; i < countries.length; i++) {
-                if (cc[2].equals(countries[i].name())) {
+
+            for (Countries country : Countries.getALL()) {
+                if (cc[2].equals(country.name())) {
                     smpfileupdate.setCountry(cc[2]);
                 }
             }
@@ -278,7 +275,7 @@ public class SMPUpdateFileController {
         model.addAttribute("smpfields", smpfields);
 
 
-        if ("ServiceInformation".equals(type)) {
+        if ("ServiceInformation" .equals(type)) {
             EndpointType endpoint = serviceMetadata.getServiceInformation().getProcessList().getProcesses().get(0).getServiceEndpointList().getEndpoints().get(0);
 
             X509Certificate cert = null;
@@ -291,15 +288,10 @@ public class SMPUpdateFileController {
                         subjectName = "Issuer: " + cert.getIssuerX500Principal().getName() + "\nSerial Number #"
                                 + cert.getSerialNumber();
                         smpfileupdate.setCertificateContent(subjectName);
+                        smpfileupdate.setCertificate(cert.getEncoded());
                     }
                 } catch (CertificateException ex) {
                     LOGGER.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                }
-
-                try {
-                    smpfileupdate.setCertificate(cert.getEncoded());
-                } catch (CertificateEncodingException ex) {
-                    LOGGER.error("\n CertificateEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
             } else {
                 smpfileupdate.setCertificate(null);
@@ -352,7 +344,7 @@ public class SMPUpdateFileController {
                 }
             }
 
-        } else if ("Redirect".equals(type)) {
+        } else if ("Redirect" .equals(type)) {
             RedirectType redirect = serviceMetadata.getRedirect();
             smpfileupdate.setCertificateUID(redirect.getCertificateUID());
             smpfileupdate.setHref(redirect.getHref());

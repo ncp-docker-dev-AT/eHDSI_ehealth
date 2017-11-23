@@ -406,16 +406,10 @@ public class SMPSignFileController {
                         if (cert != null) {
                             subjectName = "Issuer: " + cert.getIssuerX500Principal().getName() + "\nSerial Number #" + cert.getSerialNumber();
                             smpfile.setCertificateContent(subjectName);
+                            smpfile.setCertificate(cert.getEncoded());
                         }
                     } catch (CertificateException ex) {
                         LOGGER.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                    }
-
-                    try {
-                        smpfile.setCertificate(cert.getEncoded());
-
-                    } catch (CertificateEncodingException ex) {
-                        LOGGER.error("\n CertificateEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                     }
                 } else {
                     smpfile.setCertificate(null);
