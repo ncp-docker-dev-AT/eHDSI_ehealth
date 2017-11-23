@@ -300,7 +300,8 @@ public class EpsosHelperService {
         return pd;
     }
 
-    public static byte[] generateDispensationDocumentFromPrescription2(byte[] bytes, List<ViewResult> dispensedLines, User user) {
+    public static byte[] generateDispensationDocumentFromPrescription2(
+            byte[] bytes, List<ViewResult> dispensedLines, User user, String eDuuid) {
 
         PersonDetail pd = getUserInfo("", user);
         String edDoc = "";
@@ -332,7 +333,7 @@ public class EpsosHelperService {
             Document epDoc = db.parse(new ByteArrayInputStream(bytes));
             cda.setPrescriptionBarcode(CDAUtils.getRelativePrescriptionBarcode(epDoc));
             cda.setDispensationId("D-" + CDAUtils.getRelativePrescriptionBarcode(epDoc));
-            edDoc = CDAUtils.createDispensation(epDoc, cda);
+            edDoc = CDAUtils.createDispensation(epDoc, cda, eDuuid);
             Document document = XMLUtil.parseContent(edDoc);
             LOGGER.info("### DISPENSATION START ###\n '{}' \n ### DISPENSATION END ###",
                     XMLUtil.prettyPrintForValidation(document.getDocumentElement()));

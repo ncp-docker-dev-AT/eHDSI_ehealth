@@ -8,6 +8,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
+import epsos.ccd.posam.tm.util.XmlUtil;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
@@ -29,6 +30,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import org.w3c.dom.Document;
 
 public class DispenseServlet extends HttpServlet {
 
@@ -109,8 +111,10 @@ public class DispenseServlet extends HttpServlet {
                     dispensedLines.add(d_line);
                 }
 
+                String eDuuid = java.util.UUID.randomUUID().toString().replaceAll("-", "");
+                String edOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DISPENSATION_OID);
                 if (!dispensedLines.isEmpty()) {
-                    edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user);
+                    edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user, eDuuid);
                 }
 
                 if (Validator.isNotNull(edBytes)) {
@@ -132,7 +136,8 @@ public class DispenseServlet extends HttpServlet {
                     document.setCreationDate(cal);
                     document.setDescription(Constants.ED_TITLE);
                     document.setTitle(Constants.ED_TITLE);
-                    document.setUuid(EpsosHelperService.getUniqueId());
+                    document.setUuid(edOid + "^" + eDuuid);
+                    document.setSubmissionSetId(EpsosHelperService.getUniqueId());
                     document.setClassCode(classCode);
                     document.setFormatCode(formatCode);
                     document.setBase64Binary(edBytes);

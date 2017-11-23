@@ -123,12 +123,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                 }
                 // PT-237 fix. This method should be somewhere centrally
-                if (documentId == null || documentId.isEmpty() || documentId.startsWith("urn:uuid:")) {
-                    documentId = documentId;
-                } else {
+                if (!StringUtils.startsWith(documentId, "urn:uuid:")) {
                     documentId = "urn:uuid:" + documentId;
                 }
-
                 eventLog.setET_ObjectID(documentId);
                 break;
             }
@@ -324,7 +321,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return ex;
     }
 
-    private String prepareExtrinsicObjectEpsosDoc(DocumentType docType, Date effectiveTime, String repositoryId, AdhocQueryRequest request, ExtrinsicObjectType eot, boolean isPDF, String documentId) {
+    private String prepareExtrinsicObjectEpsosDoc(DocumentType docType, Date effectiveTime, String repositoryId,
+                                                  AdhocQueryRequest request, ExtrinsicObjectType eot, boolean isPDF,
+                                                  String documentId) {
 
         final String title;
         final String classCode;
@@ -332,6 +331,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         final String displayName;
 
         switch (docType) {
+
             case PATIENT_SUMMARY: {
                 title = Constants.PS_TITLE;
                 classCode = Constants.PS_CLASSCODE;
@@ -347,10 +347,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 break;
             }
             default: {
-                title = "";
-                classCode = "";
-                nodeRepresentation = "";
-                displayName = "";
                 LOGGER.error("Unsupported document for query in epSOS. Requested document type: " + docType.name());
                 return "";
             }
@@ -387,8 +383,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Creation Date (optional)
         eot.getSlot().add(makeSlot("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", effectiveTime)));
-        // repositoryUniqueId (optional)
-        eot.getSlot().add(makeSlot("repositoryUniqueId", repositoryId));
 
         // Source Patient Id
         eot.getSlot().add(makeSlot("sourcePatientId", getDocumentEntryPatientId(request)));
@@ -398,6 +392,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // repositoryUniqueId (optional)
         //eot.getSlot().add(makeSlot("repositoryUniqueId", Constants.HOME_COMM_ID));
+        eot.getSlot().add(makeSlot("repositoryUniqueId", repositoryId));
+
         eot.getClassification().add(makeClassification("urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a",
                 uuid, classCode, "2.16.840.1.113883.6.1", title));
         // Type code (not written in 3.4.2)
@@ -414,36 +410,24 @@ public class XCAServiceImpl implements XCAServiceInterface {
             eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
                     uuid, nodeRepresentation, "epSOS formatCodes", displayName));
         }
-        // Healthcare facility code
+
         /*
+         * Healthcare facility code
          * TODO: Get healthcare facility info from national implementation
          */
-        eot.getClassification().add(makeClassification(
-                "urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
-                uuid,
-                Constants.COUNTRY_CODE,
-                "1.0.3166.1",
-                Constants.COUNTRY_NAME));
+        eot.getClassification().add(makeClassification("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
+                uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
+
         // Practice Setting code
-        eot.getClassification().add(makeClassification(
-                "urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
-                uuid,
-                "Not Used",
-                "epSOS Practice Setting Codes-Not Used",
-                "Not Used"));
+        eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
+                uuid, "Not Used", "epSOS Practice Setting Codes-Not Used", "Not Used"));
 
         // External Identifiers
-        eot.getExternalIdentifier().add(makeExternalIdentifier(
-                "urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
-                uuid,
-                getDocumentEntryPatientId(request),
-                "XDSDocumentEntry.patientId"));
+        eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
+                uuid, getDocumentEntryPatientId(request), "XDSDocumentEntry.patientId"));
 
-        eot.getExternalIdentifier().add(makeExternalIdentifier(
-                "urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab",
-                uuid,
-                documentId,
-                "XDSDocumentEntry.uniqueId"));
+        eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab",
+                uuid, documentId, "XDSDocumentEntry.uniqueId"));
 
         return uuid;
     }
@@ -472,11 +456,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Description (optional)
         eot.setDescription(ofRim.createInternationalStringType());
         eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
-        if (isPDF) {
-            eot.getDescription().getLocalizedString().get(0).setValue(document.getTitle());
-        } else {
-            eot.getDescription().getLocalizedString().get(0).setValue(document.getTitle());
-        }
+        eot.getDescription().getLocalizedString().get(0).setValue(document.getTitle());
 
         // Version Info
         eot.setVersionInfo(ofRim.createVersionInfoType());
@@ -733,7 +713,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             if (StringUtils.equals(classCodeValue, Constants.EP_CLASSCODE) || StringUtils.equals(classCodeValue,
                     Constants.PS_CLASSCODE) || StringUtils.equals(classCodeValue, Constants.MRO_CLASSCODE)) {
 
-                LOGGER.info("XCA Query Request for '{}' is valid.", getDocumentName(classCodeValue));
+                LOGGER.info("XCA Query Request for '{}' is valid.", classCodeValue);
                 // Document search for ePrescription service.
                 if (StringUtils.contains(classCodeValue, Constants.EP_CLASSCODE)) {
 

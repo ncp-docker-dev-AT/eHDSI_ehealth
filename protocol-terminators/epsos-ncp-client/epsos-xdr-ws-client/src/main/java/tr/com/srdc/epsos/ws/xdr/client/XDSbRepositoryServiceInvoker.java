@@ -412,8 +412,8 @@ public class XDSbRepositoryServiceInvoker {
                 getSbmsSetFromClassCode(docClassCode)));
 
         rpt.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_UNIQUEID_SCHEME,
-                submissionSetUuid,
-                request.getCdaId(),
+                submissionSetUuid,  
+                request.getSubmissionSetId(),
                 XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_UNIQUEID_STR));
 
         rpt.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_PATIENTID_SCHEME,

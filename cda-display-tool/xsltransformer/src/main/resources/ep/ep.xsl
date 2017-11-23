@@ -1,5 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:n1="urn:hl7-org:v3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:n1="urn:hl7-org:v3"
+                xmlns:epsos="urn:epsos-org:ep:medication"
+                version="1.0">
 
     <xsl:import href="epHeader.xsl"/>
     <xsl:import href="epPrescriptionItem.xsl"/>
@@ -46,6 +49,13 @@
 
     <xsl:variable name="entryNode"
                   select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]"/>
+
+    <xsl:variable name="activeIngredient"
+                  select="//n1:entry/n1:substanceAdministration/n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']"/>
+
+    <xsl:variable name="strength"
+                  select="//n1:entry/n1:substanceAdministration/n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:quantity"/>
+
 
     <xsl:template name="show-fpn">
         <xsl:param name="value"/>

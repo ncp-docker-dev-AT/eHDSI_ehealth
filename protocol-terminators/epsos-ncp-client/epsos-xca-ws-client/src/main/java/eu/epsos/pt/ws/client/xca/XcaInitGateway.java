@@ -203,7 +203,7 @@ public class XcaInitGateway {
             List<RegistryError> errorList = registryErrorList.getRegistryError();
 
             if (errorList != null) {
-                String msg = "";
+                StringBuilder msg = new StringBuilder();
                 boolean hasError = false;
                 for (RegistryError error : errorList) {
                     String errorCode = error.getErrorCode();
@@ -214,11 +214,10 @@ public class XcaInitGateway {
                     LOGGER.error("errorCode=" + errorCode + "\ncodeContext=" + codeContext
                             + "\nlocation=" + location + "\nseverity=" + severity + "\n" + value + "\n");
 
-                    if ("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".equals(severity)) {
-                        msg += errorCode + " " + codeContext + " " + value;
-                        hasError = true;
-                    } else if (errorCode.equals("1101") || errorCode.equals("1102")) { // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/2. (Needs to be revised according to new error communication strategy to the portal).
-                        msg += errorCode + " " + codeContext + " " + value;
+                    // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/2.
+                    // (Needs to be revised according to new error communication strategy to the portal).
+                    if ("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".equals(severity) || errorCode.equals("1101") || errorCode.equals("1102")) {
+                        msg.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                         hasError = true;
                     }
 
@@ -229,7 +228,7 @@ public class XcaInitGateway {
 
                     //Throw all the remaining errors
                     if (hasError) {
-                        LOGGER.error(msg);
+                        LOGGER.error(msg.toString());
                         throw new XCAException(errorCode);
                     }
                 }
