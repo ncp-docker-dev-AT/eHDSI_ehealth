@@ -193,7 +193,7 @@ public class EpsosHelperService {
         return langs;
     }
 
-    public static CDAHeader setPharmInfo(CDAHeader cda, PersonDetail pd) {
+    private static void populatePharmacistInfo(CDAHeader cda, PersonDetail pd) {
 
         cda.setPharmacistAddress(pd.getAddress());
         cda.setPharmacistCity(pd.getCity());
@@ -211,7 +211,6 @@ public class EpsosHelperService {
         cda.setPharmacistOrgCity(pd.getCity());
         cda.setPharmacistOrgPostalCode(pd.getPostalCode());
         cda.setPharmacistOrgCountry(pd.getCountry());
-        return cda;
     }
 
     public static String createConsent(Patient patient, String consentCode, String consentDisplayName,
@@ -235,12 +234,12 @@ public class EpsosHelperService {
         if (LiferayUtils.isDoctor(user.getUserId(), user.getCompanyId())) {
             rolename = "doctor";
             cda.setDoctorOid(doctorsOid);
-            cda = setPharmInfo(cda, pd);
+            populatePharmacistInfo(cda, pd);
         }
         if (LiferayUtils.isPharmacist(user.getUserId(), user.getCompanyId())) {
             rolename = "pharmacist";
             cda.setPharmacistOid(pharmacistsOid);
-            cda = setPharmInfo(cda, pd);
+            populatePharmacistInfo(cda, pd);
         }
 
         cda.setPatientId(patient.getExtension());
@@ -300,8 +299,8 @@ public class EpsosHelperService {
         return pd;
     }
 
-    public static byte[] generateDispensationDocumentFromPrescription2(
-            byte[] bytes, List<ViewResult> dispensedLines, User user, String eDuuid) {
+    public static byte[] generateDispensationDocumentFromPrescription2(byte[] bytes, List<ViewResult> dispensedLines,
+                                                                       User user, String eDuuid) {
 
         PersonDetail pd = getUserInfo("", user);
         String edDoc = "";
@@ -310,7 +309,7 @@ public class EpsosHelperService {
         String language = user.getLanguageId().replace("_", "-");
         cda.setEffectiveTime(EpsosHelperService.formatDateHL7(now));
         cda.setLanguageCode(language);
-        cda = setPharmInfo(cda, pd);
+        populatePharmacistInfo(cda, pd);
 
         List<EDDetail> edDetails = new ArrayList<>();
         for (ViewResult dispensedLine : dispensedLines) {
@@ -2358,27 +2357,22 @@ public class EpsosHelperService {
         return mayoTransformed;
     }
 
-    public static boolean isCDA(Document xmlDocument)
-            throws XPathExpressionException {
+    public static boolean isCDA(Document xmlDocument) throws XPathExpressionException {
+
         XPath xPath = XPathFactory.newInstance().newXPath();
         xPath.setNamespaceContext(new CDANameSpaceContext());
-        boolean isCDA = false;
+        boolean isCDA;
         boolean isHCER = false;
 
         String expression1 = "/xsi:ClinicalDocument/xsi:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.1.3']";
         String epExpression = "/xsi:ClinicalDocument/xsi:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.1.1']";
-        Node node = (Node) xPath.compile(expression1).evaluate(xmlDocument,
-                XPathConstants.NODE);
-        Node epnode = (Node) xPath.compile(epExpression).evaluate(xmlDocument,
-                XPathConstants.NODE);
+        Node node = (Node) xPath.compile(expression1).evaluate(xmlDocument, XPathConstants.NODE);
+        Node epnode = (Node) xPath.compile(epExpression).evaluate(xmlDocument, XPathConstants.NODE);
         isCDA = !Validator.isNull(node) || !Validator.isNull(epnode);
         expression1 = "/xsi:ClinicalDocument/xsi:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.1.4']";
-        node = (Node) xPath.compile(expression1).evaluate(xmlDocument,
-                XPathConstants.NODE);
-        if (Validator.isNull(node)) {
-            isHCER = false;
-        } else {
-            isCDA = true;
+        node = (Node) xPath.compile(expression1).evaluate(xmlDocument, XPathConstants.NODE);
+        if (Validator.isNotNull(node)) {
+            isHCER = true;
         }
 
         return isCDA || isHCER;
@@ -2493,10 +2487,11 @@ public class EpsosHelperService {
         return patientDocuments;
     }
 
-    public static List<PatientDocument> getEPDocs(Assertion assertion,
-                                                  Assertion trca, String root, String extension, String country) {
+    public static List<PatientDocument> getEPDocs(Assertion assertion, Assertion trca, String root, String extension, String country) {
+
         List<PatientDocument> patientDocuments = null;
         PatientId patientId;
+
         try {
             patientDocuments = new ArrayList<>();
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);

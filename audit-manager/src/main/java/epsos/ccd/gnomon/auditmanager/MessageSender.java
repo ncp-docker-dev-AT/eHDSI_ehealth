@@ -34,7 +34,7 @@ import java.util.TimeZone;
  * @author mail:k.karkaletsis@gnomon.com.gr
  * @version 1.0, 2010, 30 Jun
  */
-public class MessageSender extends java.lang.Thread {
+public class MessageSender extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSender.class);
     private static String[] enabledProtocols = {"TLSv1"};
@@ -50,6 +50,7 @@ public class MessageSender extends java.lang.Thread {
     private String severity;
 
     public MessageSender(AuditLogSerializer auditLogSerializer, AuditMessage auditmessage, String facility, String severity) {
+
         super();
         this.auditLogSerializer = auditLogSerializer;
         this.auditmessage = auditmessage;

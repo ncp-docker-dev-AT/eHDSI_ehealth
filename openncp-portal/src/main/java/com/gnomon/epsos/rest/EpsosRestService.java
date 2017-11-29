@@ -152,20 +152,16 @@ public class EpsosRestService {
         }
 
         long auth = 0;
-        if (Validator.isNotNull(user)) {
+        if (user != null) {
 
             if (!user.isActive()) {
                 LOGGER.info("USER ACTIVE: " + user.isActive());
                 ret = "401";
             } else {
 
-                auth = UserLocalServiceUtil.authenticateForBasic(companyId,
-                        CompanyConstants.AUTH_TYPE_EA,
-                        username, password);
+                auth = UserLocalServiceUtil.authenticateForBasic(companyId, CompanyConstants.AUTH_TYPE_EA, username, password);
                 if (auth < 1) {
-                    auth = UserLocalServiceUtil.authenticateForBasic(companyId,
-                            CompanyConstants.AUTH_TYPE_SN,
-                            username, password);
+                    auth = UserLocalServiceUtil.authenticateForBasic(companyId, CompanyConstants.AUTH_TYPE_SN, username, password);
                 }
                 LOGGER.info("auth: '{}'", auth);
                 if (auth == 0) {
@@ -373,7 +369,7 @@ public class EpsosRestService {
                                           @PathParam("extension") String extension) throws Exception {
 
         LOGGER.info("Get into search patients");
-        String ret = "";
+        String ret;
         String username = getUsernameFromHeaders();
         User user = utils.getLiferayUserUnEncrypted(username);
 
@@ -400,7 +396,7 @@ public class EpsosRestService {
     @Path("/search/mydocuments/{doctype}")
     public Response getMyPatientDocuments(StreamSource streamSource, @PathParam("doctype") String doctype) throws Exception {
 
-        String ret = "";
+        String ret;
         String purposeOfUse = "TREATMENT";
 
         populatePatient(streamSource);
