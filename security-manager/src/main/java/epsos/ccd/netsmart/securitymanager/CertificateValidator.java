@@ -1,19 +1,3 @@
-/*
- *  Copyright 2010 Jerry Dimitriou <jerouris at netsmart.gr>.
- * 
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
 package epsos.ccd.netsmart.securitymanager;
 
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
@@ -33,22 +17,21 @@ import java.util.Collections;
 import java.util.Date;
 
 /**
- * The Certificate Validator is a component that is responsible for validating
- * certificates against the NCP Trust Store. The certificate validation consists
- * of checking if the certificate is trusted and if it is not revoked: All
- * certificates registered with the local NCP trust store are assumed as
- * trusted. For revocation check both CRL retrieval and OCSP are supported.
+ * The Certificate Validator is a component that is responsible for validating certificates against the NCP Trust Store.
+ * The certificate validation consists of checking if the certificate is trusted and if it is not revoked:
+ * <p>
+ * All certificates registered with the local NCP trust store are assumed as trusted. For revocation check both CRL
+ * retrieval and OCSP are supported.
  *
  * @author Jerry Dimitriou <jerouris at netsmart.gr>
  */
 public final class CertificateValidator extends KeySelector {
 
-    public static final String CRLDP_OID = "2.5.29.31";
-    public static final String AIA_OID = "1.3.6.1.5.5.7.1.1";
-    public static final String PROP_CHECK_FOR_KEYUSAGE = "secman.cert.validator.checkforkeyusage";
     private static final Logger LOGGER = LoggerFactory.getLogger(CertificateValidator.class);
+    private static final String CRLDP_OID = "2.5.29.31";
+    private static final String AIA_OID = "1.3.6.1.5.5.7.1.1";
+    private static final String PROP_CHECK_FOR_KEYUSAGE = "secman.cert.validator.checkforkeyusage";
     private final KeyStore trustStore;
-
     private boolean CHECK_FOR_KEYUSAGE;
     private Certificate cert = null;
     private boolean isRevocationEnabled = false;
@@ -66,12 +49,8 @@ public final class CertificateValidator extends KeySelector {
 
     private static boolean algEquals(String algURI, String algName) {
 
-        if ((algName.equalsIgnoreCase("DSA") && algURI.contains("#dsa"))
-                || (algName.equalsIgnoreCase("RSA") && algURI.contains("#rsa"))) {
-            return true;
-        } else {
-            return false;
-        }
+        return (algName.equalsIgnoreCase("DSA") && algURI.contains("#dsa"))
+                || (algName.equalsIgnoreCase("RSA") && algURI.contains("#rsa"));
     }
 
     /**
@@ -92,10 +71,8 @@ public final class CertificateValidator extends KeySelector {
                         validateCertificate(xcert);
                         cert = xcert;
                         return;
-                    } else {
-                        // skip all other entries
-                        continue;
                     }
+                    // skip all other entries
                 }
                 throw new SMgrException("The KeyInfo Structure does not contain X509Data element: No Certificate Present");
             }
@@ -113,10 +90,8 @@ public final class CertificateValidator extends KeySelector {
                         validateCertificate(xcert);
                         cert = xcert;
                         return;
-                    } else {
-                        // skip all other entries
-                        continue;
                     }
+                    // skip all other entries
                 }
                 throw new SMgrException("The KeyInfo Structure does not contain X509Data element: No Certificate Present");
             }
@@ -211,15 +186,8 @@ public final class CertificateValidator extends KeySelector {
                 final PublicKey key = ((X509Certificate) o).getPublicKey();
                 // Make sure the algorithm is compatible with the method.
                 if (algEquals(method.getAlgorithm(), key.getAlgorithm())) {
-                    return new KeySelectorResult() {
-                        public Key getKey() {
-                            return key;
-                        }
-                    };
+                    return () -> key;
                 }
-                // if (algEquals(method.getAlgorithm(), key.getAlgorithm())) {
-                //return () -> key;
-                //}
             }
         }
         throw new KeySelectorException("No key found!");
