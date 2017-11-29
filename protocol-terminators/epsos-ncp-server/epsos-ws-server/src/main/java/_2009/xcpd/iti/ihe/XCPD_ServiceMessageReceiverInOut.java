@@ -181,6 +181,36 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
  */
 /**
  * XCPD_ServiceMessageReceiverInOut.java
@@ -200,6 +230,8 @@ import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.services.XcpdValidationService;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.slf4j.Logger;
@@ -209,7 +241,6 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import java.util.Date;
 import java.util.Iterator;
@@ -263,28 +294,22 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
         }
     }
 
-    public void invokeBusinessLogic(org.apache.axis2.context.MessageContext msgContext,
-                                    org.apache.axis2.context.MessageContext newMsgContext)
-            throws org.apache.axis2.AxisFault {
+    public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
 
         try {
             Date startTime = new Date();
 
             // get the implementation class for the Web Service
             Object obj = getTheImplementationObject(msgContext);
-
             SOAPHeader sh = msgContext.getEnvelope().getHeader();
 
             EventLog eventLog = new EventLog();
             String ip = getIPofSender(msgContext);
             eventLog.setSourceip(ip);
-            eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext
-                    .getEnvelope()));
-            eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope()
-                    .getHeader().toString().getBytes());
+            eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
+            eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
 
-            HttpServletRequest req = (HttpServletRequest) msgContext
-                    .getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+            HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
             String clientDN = HTTPUtil.getClientCertificate(req);
             eventLog.setSC_UserID(clientDN);
             eventLog.setTargetip(req.getServerName());
@@ -298,17 +323,16 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
 
             XCPD_ServiceSkeleton skel = (XCPD_ServiceSkeleton) obj;
             // Out Envelop
-            org.apache.axiom.soap.SOAPEnvelope envelope = null;
+            org.apache.axiom.soap.SOAPEnvelope envelope;
             // Find the axisOperation that has been set by the Dispatch phase.
-            org.apache.axis2.description.AxisOperation op = msgContext
-                    .getOperationContext().getAxisOperation();
+            org.apache.axis2.description.AxisOperation op = msgContext.getOperationContext().getAxisOperation();
             if (op == null) {
                 throw new org.apache.axis2.AxisFault("Operation is not located, if this is doclit style the SOAP-ACTION " +
                         "should specified via the SOAP Action to use the RawXMLProvider");
             }
 
             String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID().toString();
-            java.lang.String methodName;
+            String methodName;
 
             if ((op.getName() != null) && ((methodName = org.apache.axis2.util.JavaUtils.xmlNameToJavaIdentifier(
                     op.getName().getLocalPart())) != null)) {
@@ -324,7 +348,7 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), pRPA_IN201306UV021, false);
 
-                    /* Validate reponse message */
+                    /* Validate response message */
                     XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(XMLUtils.toDOM(
                             envelope.getBody().getFirstElement())),
                             Hl7v3Schematron.EPSOS_ID_SERVICE_RESPONSE.toString(),
@@ -332,11 +356,9 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
 
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
-
+                    LOGGER.info("EventLog: '{}'", eventLog.getEventType());
                     AuditService auditService = new AuditService();
                     auditService.write(eventLog, "", "1");
-
-                    XMLGregorianCalendar cal = eventLog.getEI_EventDateTime();
 
                     LOGGER.debug("Outgoing XCPD Response Message:\n '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
  * Tic. Ltd. Sti. <epsos@srdc.com.tr>
  * <p>
@@ -71,10 +71,9 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
- */
-/**
+ * <p>
  * XCA_ServiceMessageReceiverInOut.java
- *
+ * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
  */
@@ -119,8 +118,7 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
 
     static {
         logger.debug("Loading the WS-Security init libraries in XCA 2007");
-
-        org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
+        org.apache.xml.security.Init.init();
     }
 
     static {
@@ -179,11 +177,9 @@ public class XCA_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
             }
 
             String randomUUID = tr.com.srdc.epsos.util.Constants.UUID_PREFIX + UUID.randomUUID().toString();
-            java.lang.String methodName;
-            if ((op.getName() != null)
-                    && ((methodName = org.apache.axis2.util.JavaUtils
-                    .xmlNameToJavaIdentifier(op.getName()
-                            .getLocalPart())) != null)) {
+            String methodName;
+
+            if ((op.getName() != null) && ((methodName = org.apache.axis2.util.JavaUtils.xmlNameToJavaIdentifier(op.getName().getLocalPart())) != null)) {
 
                 SOAPHeader sh = msgContext.getEnvelope().getHeader();
 
