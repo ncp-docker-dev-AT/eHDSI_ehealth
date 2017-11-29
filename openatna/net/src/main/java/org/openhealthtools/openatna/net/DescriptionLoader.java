@@ -610,7 +610,9 @@ public class DescriptionLoader {
             // We did, add the authority
             // Create a property set for this entry
             Identifier theAuthority = new Identifier(namespaceId, universalId, universalIdType);
-            connection.addIdentifier(setName, type, theAuthority);
+            if (connection != null) {
+                connection.addIdentifier(setName, type, theAuthority);
+            }
         }
     }
 

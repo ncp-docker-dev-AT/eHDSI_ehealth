@@ -290,12 +290,14 @@ public class Query implements Serializable {
     }
 
     public Query orderAscending(Target value) {
-        addConditional(Conditional.ASC, createPath(value).toString(), Target.RESULT);
+        TargetPath path = createPath(value);
+        addConditional(Conditional.ASC, (path == null) ? null : path.toString(), Target.RESULT);
         return this;
     }
 
     public Query orderDescending(Target value) {
-        addConditional(Conditional.DESC, createPath(value).toString(), Target.RESULT);
+        TargetPath path = createPath(value);
+        addConditional(Conditional.DESC, (path == null) ? null : path.toString(), Target.RESULT);
         return this;
     }
 
