@@ -1,10 +1,7 @@
-<ClinicalDocument xmlns="urn:hl7-org:v3"
-                  xmlns:ext="urn:hl7-EE-DL-Ext:v1"
-                  xmlns:sch="http://www.ascc.net/xml/schematron"
-                  xmlns:mif="urn:hl7-org:v3/mif"
-                  xmlns:epsos="urn:epsos-org:ep:medication"
+<ClinicalDocument xmlns:epsos="urn:epsos-org:ep:medication"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="urn:hl7-org:v3 http://pub.e-tervis.ee/standards2/Schema/V3/HL7-ORG-V3-2005-NORMATIVE-EE-DL-Ext-V1/infrastructure/cda/CDA_EE01.xsd urn:hl7-EE-DL-Ext:v1 http://pub.e-tervis.ee/standards2/Schema/V3/HL7-ORG-V3-2006-NORMATIVE-EE-DL-Ext-V1/processable/multicacheschemas/POCD_MT00040_EE01_Extension.xsd">
+                  xmlns="urn:hl7-org:v3"
+                  xsi:schemaLocation="urn:hl7-org:v3 http://pub.e-tervis.ee/standards2/Schema/V3/HL7-ORG-V3-2005-NORMATIVE-EE-DL-Ext-V1/infrastructure/cda/CDA_EE01.xsd">
     <realmCode code="EN"/>
     <typeId extension="POCD_HD000040" root="2.16.840.1.113883.1.3"/>
     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.3"/>
@@ -15,10 +12,6 @@
           codeSystemName="LOINC"
           codeSystemVersion="2.59"
           displayName="Patient summary">
-        <translation code="60591-5"
-                     codeSystem="2.16.840.1.113883.6.1"
-                     codeSystemName="LOINC"
-                     displayName="Patient Summary"/>
     </code>
     <title>Patient Summary</title>
     <effectiveTime value="20170918"/>
@@ -237,8 +230,7 @@
                           codeSystemVersion="2.59"
                           displayName="Allergies, adverse reactions, alerts"/>
                     <title>Allergies, adverse reactions, alerts</title>
-                    <text>
-                        <table border="1">
+                    <text><table border="1">
                             <tbody>
                                 <tr>
                                     <th>Onset Date</th>
@@ -249,8 +241,7 @@
                                     <td>Allergy to Penicillin</td>
                                 </tr>
                             </tbody>
-                        </table>
-                    </text>
+                        </table></text>
                     <entry typeCode="DRIV">
                         <act classCode="ACT" moodCode="EVN">
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
@@ -274,9 +265,7 @@
                                           codeSystemName="SNOMED CT"
                                           codeSystemVersion="2016-07"
                                           displayName="Drug allergy"/>
-                                    <text>
-                                        <reference value="#allergy.1"/>
-                                    </text>
+                                    <text><reference value="#allergy.1"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low value="20170221"/>
@@ -290,9 +279,7 @@
                                                       codeSystemName="Anatomical Therapeutic Chemical"
                                                       codeSystemVersion="2017-01"
                                                       displayName="BETA-LACTAM ANTIBACTERIALS, PENICILLINS">
-                                                    <originalText mediaType="text/xml">
-                                                        <reference value="#allergy.1"/>
-                                                    </originalText>
+                                                    <originalText mediaType="text/xml"><reference value="#allergy.1"/></originalText>
                                                 </code>
                                             </playingEntity>
                                         </participantRole>
@@ -314,8 +301,7 @@
                           codeSystemVersion="2.59"
                           displayName="Problem list"/>
                     <title>Problem list</title>
-                    <text>
-                        <table border="1">
+                    <text><table border="1">
                             <tbody>
                                 <tr>
                                     <th>Onset Date</th>
@@ -359,8 +345,7 @@
                                     <td>Radiculopathy, Left L2 Selective Root Block</td>
                                 </tr>
                             </tbody>
-                        </table>
-                    </text>
+                        </table></text>
                     <entry typeCode="DRIV">
                         <act classCode="ACT" moodCode="EVN">
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
@@ -382,9 +367,7 @@
                                           codeSystemName="SNOMED CT"
                                           codeSystemVersion="2016-07"
                                           displayName="Problem"/>
-                                    <text>
-                                        <reference value="#problem.1"/>
-                                    </text>
+                                    <text><reference value="#problem.1"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low value="20170909"/>
@@ -420,9 +403,7 @@
                                           codeSystemName="SNOMED CT"
                                           codeSystemVersion="2016-07"
                                           displayName="Problem"/>
-                                    <text>
-                                        <reference value="#problem.2"/>
-                                    </text>
+                                    <text><reference value="#problem.2"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low value="20170221"/>
@@ -458,9 +439,7 @@
                                           codeSystemName="SNOMED CT"
                                           codeSystemVersion="2016-07"
                                           displayName="Problem"/>
-                                    <text>
-                                        <reference value="#problem.3"/>
-                                    </text>
+                                    <text><reference value="#problem.3"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low value="20151203"/>
@@ -496,9 +475,7 @@
                                           codeSystemName="SNOMED CT"
                                           codeSystemVersion="2016-07"
                                           displayName="Problem"/>
-                                    <text>
-                                        <reference value="#problem.4"/>
-                                    </text>
+                                    <text><reference value="#problem.4"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low value="20141115"/>
@@ -534,9 +511,7 @@
                                           codeSystemName="SNOMED CT"
                                           codeSystemVersion="2016-07"
                                           displayName="Problem"/>
-                                    <text>
-                                        <reference value="#problem.5"/>
-                                    </text>
+                                    <text><reference value="#problem.5"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low value="20140419"/>
@@ -572,9 +547,7 @@
                                           codeSystemName="SNOMED CT"
                                           codeSystemVersion="2016-07"
                                           displayName="Problem"/>
-                                    <text>
-                                        <reference value="#problem.6"/>
-                                    </text>
+                                    <text><reference value="#problem.6"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low value="20130624"/>
@@ -610,9 +583,7 @@
                                           codeSystemName="SNOMED CT"
                                           codeSystemVersion="2016-07"
                                           displayName="Problem"/>
-                                    <text>
-                                        <reference value="#problem.7"/>
-                                    </text>
+                                    <text><reference value="#problem.7"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low value="20130330"/>
@@ -648,9 +619,7 @@
                                           codeSystemName="SNOMED CT"
                                           codeSystemVersion="2016-07"
                                           displayName="Problem"/>
-                                    <text>
-                                        <reference value="#problem.8"/>
-                                    </text>
+                                    <text><reference value="#problem.8"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low value="20130330"/>
@@ -679,8 +648,7 @@
                           codeSystemVersion="2.59"
                           displayName="History of Procedures"/>
                     <title>History of Procedures</title>
-                    <text>
-                        <table border="1">
+                    <text><table border="1">
                             <tbody>
                                 <tr>
                                     <th>Onset Date</th>
@@ -729,8 +697,7 @@
                                     <td>LT L2 SELECTIVE ROOT BLOCK</td>
                                 </tr>
                             </tbody>
-                        </table>
-                    </text>
+                        </table></text>
                     <entry>
                         <procedure classCode="PROC" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>
@@ -741,13 +708,9 @@
                                   codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07"
                                   displayName="Surgical procedure on eye proper">
-                                <originalText mediaType="text/xml">
-                                    <reference value="#proc.1"/>
-                                </originalText>
+                                <originalText mediaType="text/xml"><reference value="#proc.1"/></originalText>
                             </code>
-                            <text>
-                                <reference value="#proc.1"/>
-                            </text>
+                            <text><reference value="#proc.1"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20170805"/>
@@ -764,13 +727,9 @@
                                   codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07"
                                   displayName="Surgical procedure on eye proper">
-                                <originalText mediaType="text/xml">
-                                    <reference value="#proc.2"/>
-                                </originalText>
+                                <originalText mediaType="text/xml"><reference value="#proc.2"/></originalText>
                             </code>
-                            <text>
-                                <reference value="#proc.2"/>
-                            </text>
+                            <text><reference value="#proc.2"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20170624"/>
@@ -787,13 +746,9 @@
                                   codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07"
                                   displayName="Surgical procedure on eye proper">
-                                <originalText mediaType="text/xml">
-                                    <reference value="#proc.3"/>
-                                </originalText>
+                                <originalText mediaType="text/xml"><reference value="#proc.3"/></originalText>
                             </code>
-                            <text>
-                                <reference value="#proc.3"/>
-                            </text>
+                            <text><reference value="#proc.3"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20170508"/>
@@ -810,13 +765,9 @@
                                   codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07"
                                   displayName="Limb operation">
-                                <originalText mediaType="text/xml">
-                                    <reference value="#proc.4"/>
-                                </originalText>
+                                <originalText mediaType="text/xml"><reference value="#proc.4"/></originalText>
                             </code>
-                            <text>
-                                <reference value="#proc.4"/>
-                            </text>
+                            <text><reference value="#proc.4"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20170220"/>
@@ -833,13 +784,9 @@
                                   codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07"
                                   displayName="Endoscopy">
-                                <originalText mediaType="text/xml">
-                                    <reference value="#proc.5"/>
-                                </originalText>
+                                <originalText mediaType="text/xml"><reference value="#proc.5"/></originalText>
                             </code>
-                            <text>
-                                <reference value="#proc.5"/>
-                            </text>
+                            <text><reference value="#proc.5"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20160502"/>
@@ -856,13 +803,9 @@
                                   codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07"
                                   displayName="Operation on breast">
-                                <originalText mediaType="text/xml">
-                                    <reference value="#proc.6"/>
-                                </originalText>
+                                <originalText mediaType="text/xml"><reference value="#proc.6"/></originalText>
                             </code>
-                            <text>
-                                <reference value="#proc.6"/>
-                            </text>
+                            <text><reference value="#proc.6"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20151202"/>
@@ -879,13 +822,9 @@
                                   codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07"
                                   displayName="Extracapsular extraction">
-                                <originalText mediaType="text/xml">
-                                    <reference value="#proc.7"/>
-                                </originalText>
+                                <originalText mediaType="text/xml"><reference value="#proc.7"/></originalText>
                             </code>
-                            <text>
-                                <reference value="#proc.7"/>
-                            </text>
+                            <text><reference value="#proc.7"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20141115"/>
@@ -902,13 +841,9 @@
                                   codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07"
                                   displayName="Extracapsular extraction">
-                                <originalText mediaType="text/xml">
-                                    <reference value="#proc.8"/>
-                                </originalText>
+                                <originalText mediaType="text/xml"><reference value="#proc.8"/></originalText>
                             </code>
-                            <text>
-                                <reference value="#proc.8"/>
-                            </text>
+                            <text><reference value="#proc.8"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20140419"/>
@@ -925,13 +860,9 @@
                                   codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07"
                                   displayName="Colonoscopy">
-                                <originalText mediaType="text/xml">
-                                    <reference value="#proc.9"/>
-                                </originalText>
+                                <originalText mediaType="text/xml"><reference value="#proc.9"/></originalText>
                             </code>
-                            <text>
-                                <reference value="#proc.9"/>
-                            </text>
+                            <text><reference value="#proc.9"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20130624"/>
@@ -948,13 +879,9 @@
                                   codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07"
                                   displayName="Operation on nervous system">
-                                <originalText mediaType="text/xml">
-                                    <reference value="#proc.10"/>
-                                </originalText>
+                                <originalText mediaType="text/xml"><reference value="#proc.10"/></originalText>
                             </code>
-                            <text>
-                                <reference value="#proc.10"/>
-                            </text>
+                            <text><reference value="#proc.10"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20130330"/>
@@ -974,8 +901,7 @@
                           codeSystemVersion="2.59"
                           displayName="History of medication use"/>
                     <title>History of medication use</title>
-                    <text>
-                        <table border="1">
+                    <text><table border="1">
                             <tbody>
                                 <tr>
                                     <th>Onset Date</th>
@@ -1002,16 +928,13 @@
                                     <td>omeprazole, Oral use, 40mg-daily-</td>
                                 </tr>
                             </tbody>
-                        </table>
-                    </text>
+                        </table></text>
                     <entry typeCode="DRIV">
                         <substanceAdministration classCode="SBADM" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id extension="med.1" root="2.16.470.1.100.1.1.1000.990.1"/>
-                            <text>
-                                <reference value="#med.1"/>
-                            </text>
+                            <text><reference value="#med.1"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime xmlns:urn="urn:hl7-org:v3" xsi:type="IVL_TS">
                                 <low value="20170308"/>
@@ -1026,16 +949,14 @@
                             <doseQuantity nullFlavor="UNK"/>
                             <consumable typeCode="CSM">
                                 <manufacturedProduct>
-                                    <templateId root="2.16.840.1.113883.10.20.1.53"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
                                         <code code="N02AA59"
                                               codeSystem="2.16.840.1.113883.6.73"
                                               codeSystemName="Anatomical Therapeutic Chemical"
                                               codeSystemVersion="2017-01"
                                               displayName="30mg-TDS/PRN-if in pain">
-                                            <originalText>
-                                                <reference value="#med.1"/>
-                                            </originalText>
+                                            <originalText><reference value="#med.1"/></originalText>
                                         </code>
                                         <name>30mg-TDS/PRN-if in pain</name>
                                         <epsos:ingredient classCode="ACTI">
@@ -1109,9 +1030,7 @@
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id extension="med.2" root="2.16.470.1.100.1.1.1000.990.1"/>
-                            <text>
-                                <reference value="#med.2"/>
-                            </text>
+                            <text><reference value="#med.2"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime xmlns:urn="urn:hl7-org:v3" xsi:type="IVL_TS">
                                 <low value="20170308"/>
@@ -1126,16 +1045,14 @@
                             <doseQuantity nullFlavor="UNK"/>
                             <consumable typeCode="CSM">
                                 <manufacturedProduct>
-                                    <templateId root="2.16.840.1.113883.10.20.1.53"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
                                         <code code="N02BE01"
                                               codeSystem="2.16.840.1.113883.6.73"
                                               codeSystemName="Anatomical Therapeutic Chemical"
                                               codeSystemVersion="2017-01"
                                               displayName="1g-QDS/PRN-">
-                                            <originalText>
-                                                <reference value="#med.2"/>
-                                            </originalText>
+                                            <originalText><reference value="#med.2"/></originalText>
                                         </code>
                                         <name>1g-QDS/PRN-</name>
                                         <epsos:ingredient classCode="ACTI">
@@ -1204,9 +1121,7 @@
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id extension="med.3" root="2.16.470.1.100.1.1.1000.990.1"/>
-                            <text>
-                                <reference value="#med.3"/>
-                            </text>
+                            <text><reference value="#med.3"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime xmlns:urn="urn:hl7-org:v3" xsi:type="IVL_TS">
                                 <low value="20140517"/>
@@ -1221,16 +1136,14 @@
                             <doseQuantity nullFlavor="UNK"/>
                             <consumable typeCode="CSM">
                                 <manufacturedProduct>
-                                    <templateId root="2.16.840.1.113883.10.20.1.53"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
                                         <code code="S01AA11"
                                               codeSystem="2.16.840.1.113883.6.73"
                                               codeSystemName="Anatomical Therapeutic Chemical"
                                               codeSystemVersion="2017-01"
                                               displayName="1-QDS 4 times a day-">
-                                            <originalText>
-                                                <reference value="#med.3"/>
-                                            </originalText>
+                                            <originalText><reference value="#med.3"/></originalText>
                                         </code>
                                         <name>1-QDS 4 times a day-</name>
                                         <epsos:ingredient classCode="ACTI">
@@ -1304,9 +1217,7 @@
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id extension="med.4" root="2.16.470.1.100.1.1.1000.990.1"/>
-                            <text>
-                                <reference value="#med.4"/>
-                            </text>
+                            <text><reference value="#med.4"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime xmlns:urn="urn:hl7-org:v3" xsi:type="IVL_TS">
                                 <low nullFlavor="UNK"/>
@@ -1321,16 +1232,14 @@
                             <doseQuantity nullFlavor="UNK"/>
                             <consumable typeCode="CSM">
                                 <manufacturedProduct>
-                                    <templateId root="2.16.840.1.113883.10.20.1.53"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
                                         <code code="C10AB05"
                                               codeSystem="2.16.840.1.113883.6.73"
                                               codeSystemName="Anatomical Therapeutic Chemical"
                                               codeSystemVersion="2017-01"
                                               displayName="200mg-daily-">
-                                            <originalText>
-                                                <reference value="#med.4"/>
-                                            </originalText>
+                                            <originalText><reference value="#med.4"/></originalText>
                                         </code>
                                         <name>200mg-daily-</name>
                                         <epsos:ingredient classCode="ACTI">
@@ -1399,9 +1308,7 @@
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id extension="med.5" root="2.16.470.1.100.1.1.1000.990.1"/>
-                            <text>
-                                <reference value="#med.5"/>
-                            </text>
+                            <text><reference value="#med.5"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime xmlns:urn="urn:hl7-org:v3" xsi:type="IVL_TS">
                                 <low nullFlavor="UNK"/>
@@ -1416,16 +1323,14 @@
                             <doseQuantity nullFlavor="UNK"/>
                             <consumable typeCode="CSM">
                                 <manufacturedProduct>
-                                    <templateId root="2.16.840.1.113883.10.20.1.53"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
                                         <code code="A02BC01"
                                               codeSystem="2.16.840.1.113883.6.73"
                                               codeSystemName="Anatomical Therapeutic Chemical"
                                               codeSystemVersion="2017-01"
                                               displayName="40mg-daily-">
-                                            <originalText>
-                                                <reference value="#med.5"/>
-                                            </originalText>
+                                            <originalText><reference value="#med.5"/></originalText>
                                         </code>
                                         <name>40mg-daily-</name>
                                         <epsos:ingredient classCode="ACTI">
@@ -1503,15 +1408,11 @@
                           codeSystemVersion="2.59"
                           displayName="History of medical device use"/>
                     <title>History of medical device use</title>
-                    <text>
-                        <paragraph ID="dev.1">No Information</paragraph>
-                    </text>
+                    <text><paragraph ID="dev.1">No Information</paragraph></text>
                     <entry typeCode="DRIV">
                         <supply classCode="SPLY" moodCode="EVN" nullFlavor="NI">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.5"/>
-                            <text>
-                                <reference value="#dev.1"/>
-                            </text>
+                            <text><reference value="#dev.1"/></text>
                             <effectiveTime nullFlavor="NI" xsi:type="IVL_TS"/>
                             <participant typeCode="DEV">
                                 <participantRole classCode="MANU">
