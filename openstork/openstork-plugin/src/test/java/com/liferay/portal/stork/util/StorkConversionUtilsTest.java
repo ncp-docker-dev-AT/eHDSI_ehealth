@@ -1,31 +1,11 @@
-/*
- *  StorkConversionUtilsTest.java
- *  Created on 19/06/2014, 1:23:03 PM
- *
- *  stork-plugin
- *  com.liferay.portal.stork.util
- *
- *  Copyright (C) 2014 iUZ Technologies, Lda - http://www.iuz.pt
- */
 package com.liferay.portal.stork.util;
 
-import eu.epsos.configmanager.database.HibernateConfigFile;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.services.AssertionValidationService;
 import eu.europa.ec.joinup.ecc.openstork.utils.StorkUtils;
-import eu.stork.peps.auth.commons.IPersonalAttributeList;
-import eu.stork.peps.auth.commons.PersonalAttribute;
-import eu.stork.peps.auth.commons.PersonalAttributeList;
-import eu.stork.peps.auth.commons.STORKAuthnRequest;
-import eu.stork.peps.auth.commons.STORKAuthnResponse;
-import eu.stork.peps.auth.commons.STORKStatusCode;
+import eu.stork.peps.auth.commons.*;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
 import eu.stork.peps.exceptions.STORKSAMLEngineException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import javax.xml.transform.TransformerException;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,8 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.transform.TransformerException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
- *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
 public class StorkConversionUtilsTest {
@@ -47,7 +33,7 @@ public class StorkConversionUtilsTest {
 
     @BeforeClass
     public static void setUpClass() {
-        HibernateConfigFile.name = "src/test/resources/configmanager.hibernate.xml";
+        //HibernateConfigFile.name = "src/test/resources/configmanager.hibernate.xml";
         /*
          * Initialize required properties to perform the tests in in-memory database
          */
@@ -92,7 +78,8 @@ public class StorkConversionUtilsTest {
         LOG.info("----------------------------------------------");
 
         try {
-            assertTrue(new AssertionValidationService().validateSchematron(XMLUtil.prettyPrint(result.getDOM()), VALIDATION_SCHEMATRON, NcpSide.NCP_A));
+            assertTrue(AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(result.getDOM()),
+                    VALIDATION_SCHEMATRON, NcpSide.NCP_A));
         } catch (TransformerException ex) {
             LOG.error(null, ex);
         }
@@ -100,109 +87,107 @@ public class StorkConversionUtilsTest {
 
     /**
      * This method generates a generic and signed STORK Authentication Response.
-     *
-     * @return
      */
     private STORKAuthnResponse generateStorkResponse() {
         STORKAuthnResponse result = null;
 
         STORKSAMLEngine engine = STORKSAMLEngine.getInstance("SP");
 
-        /**
+        /*
          * The destination.
          */
         String destination;
 
-        /**
+        /*
          * The service provider name.
          */
         String spName;
 
-        /**
+        /*
          * The service provider sector.
          */
         String spSector;
 
-        /**
+        /*
          * The service provider institution.
          */
         String spInstitution;
 
-        /**
+        /*
          * The service provider application.
          */
         String spApplication;
 
-        /**
+        /*
          * The service provider country.
          */
         String spCountry;
 
-        /**
+        /*
          * The service provider id.
          */
         String spId;
 
-        /**
+        /*
          * The quality authentication assurance level.
          */
         final int QAAL = 3;
 
-        /**
+        /*
          * The state.
          */
         String state = "ES";
 
-        /**
+        /*
          * The town.
          */
         String town = "Madrid";
 
-        /**
+        /*
          * The municipality code.
          */
         String municipalityCode = "MA001";
 
-        /**
+        /*
          * The postal code.
          */
         String postalCode = "28038";
 
-        /**
+        /*
          * The street name.
          */
         String streetName = "Marchamalo";
 
-        /**
+        /*
          * The street number.
          */
         String streetNumber = "3";
 
-        /**
+        /*
          * The apartament number.
          */
         String apartamentNumber = "5º E";
 
-        /**
+        /*
          * The List of Personal Attributes.
          */
         IPersonalAttributeList pal;
 
-        /**
+        /*
          * The assertion consumer URL.
          */
         String assertConsumerUrl;
 
-        /**
+        /*
          * The authentication request.
          */
         byte[] authRequest;
 
-        /**
+        /*
          * The authentication response.
          */
         byte[] authResponse = null;
-        /**
+        /*
          * The authentication request.
          */
         STORKAuthnRequest authenRequest = null;
@@ -214,7 +199,7 @@ public class StorkConversionUtilsTest {
         PersonalAttribute isAgeOver = new PersonalAttribute();
         isAgeOver.setName("isAgeOver");
         isAgeOver.setIsRequired(false);
-        ArrayList<String> ages = new ArrayList<String>();
+        ArrayList<String> ages = new ArrayList<>();
         ages.add("16");
         ages.add("18");
         isAgeOver.setValue(ages);
@@ -281,7 +266,7 @@ public class StorkConversionUtilsTest {
         isAgeOver = new PersonalAttribute();
         isAgeOver.setName("isAgeOver");
         isAgeOver.setIsRequired(true);
-        ages = new ArrayList<String>();
+        ages = new ArrayList<>();
         ages.add("16");
         ages.add("18");
         isAgeOver.setValue(ages);
@@ -291,7 +276,7 @@ public class StorkConversionUtilsTest {
         dateOfBirth = new PersonalAttribute();
         dateOfBirth.setName("dateOfBirth");
         dateOfBirth.setIsRequired(false);
-        final ArrayList<String> date = new ArrayList<String>();
+        final ArrayList<String> date = new ArrayList<>();
         date.add("16/12/2008");
         dateOfBirth.setValue(date);
         dateOfBirth.setStatus(STORKStatusCode.STATUS_AVAILABLE.toString());
@@ -300,7 +285,7 @@ public class StorkConversionUtilsTest {
         eIDNumber = new PersonalAttribute();
         eIDNumber.setName("eIdentifier");
         eIDNumber.setIsRequired(true);
-        final ArrayList<String> idNumber = new ArrayList<String>();
+        final ArrayList<String> idNumber = new ArrayList<>();
 
         idNumber.add("123456789PÑ");
         eIDNumber.setValue(idNumber);
@@ -313,7 +298,7 @@ public class StorkConversionUtilsTest {
         canRessAddress.setName("canonicalResidenceAddress");
         canRessAddress.setIsRequired(true);
         canRessAddress.setStatus(STORKStatusCode.STATUS_AVAILABLE.toString());
-        final HashMap<String, String> address = new HashMap<String, String>();
+        final HashMap<String, String> address = new HashMap<>();
 
         address.put("state", state);
         address.put("municipalityCode", municipalityCode);
@@ -340,5 +325,4 @@ public class StorkConversionUtilsTest {
 
         return result;
     }
-
 }

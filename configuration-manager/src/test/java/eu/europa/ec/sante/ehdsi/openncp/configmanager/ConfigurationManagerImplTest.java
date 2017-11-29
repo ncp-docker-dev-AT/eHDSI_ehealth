@@ -49,7 +49,7 @@ public class ConfigurationManagerImplTest {
     @Test(expected = PropertyNotFoundException.class)
     public void testGetInvalidProperty() {
         ConfigurationManager configurationManager = new ConfigurationManagerImpl(sessionFactory);
-//        ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
+        // ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
         configurationManager.getProperty("INVALID_OPENNCP_PROPERTY");
     }
 
@@ -69,7 +69,7 @@ public class ConfigurationManagerImplTest {
 
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
-        //TypedQuery<Long> query = session.createQuery("select count(p.key) from Property p", Long.class);
+        // TypedQuery<Long> query = session.createQuery("select count(p.key) from Property p", Long.class);
         Query query = session.createQuery("select count(p.key) from Property p");
         List result = query.list();
 
