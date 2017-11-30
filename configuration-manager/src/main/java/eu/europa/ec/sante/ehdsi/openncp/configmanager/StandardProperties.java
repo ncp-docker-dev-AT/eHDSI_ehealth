@@ -39,4 +39,18 @@ public final class StandardProperties {
     public static final String SMP_SML_SUPPORT = "SMP_SUPPORT";
 
     public static final String SMP_SML_SUPPORT_EMAIL = "SMP_SUPPORT_EMAIL";
+
+    // Proxy Properties
+
+    public static final String HTTP_PROXY_USED = "APP_BEHIND_PROXY";
+
+    public static final String HTTP_PROXY_HOST = "APP_PROXY_HOST";
+
+    public static final String HTTP_PROXY_PORT = "APP_PROXY_PORT";
+
+    public static final String HTTP_PROXY_AUTHENTICATED = "APP_PROXY_AUTHENTICATED";
+
+    public static final String HTTP_PROXY_USERNAME = "APP_PROXY_USERNAME";
+
+    public static final String HTTP_PROXY_PASSWORD = "APP_PROXY_USERNAME";
 }

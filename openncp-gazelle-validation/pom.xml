@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>openncp</artifactId>
+        <groupId>eu.europa.ec.sante.ehdsi</groupId>
+        <version>2.5.2.RC5-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>openncp-gazelle-validation</artifactId>
+
+    <name>OpenNCP Gazelle Validation</name>
+
+    <properties>
+        <httpclient.version>4.5.2</httpclient.version>
+        <jaxb2-plugin.version>2.3.1</jaxb2-plugin.version>
+        <spring-ws.version>2.4.2.RELEASE</spring-ws.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.ws</groupId>
+            <artifactId>spring-ws-core</artifactId>
+            <version>${spring-ws.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-configuration-manager</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>${jaxb2-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>Assertions Validator</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <packageName>net.ihe.gazelle.jaxb.assertion</packageName>
+                            <sourceType>wsdl</sourceType>
+                            <sources>
+                                <source>src/main/wsdl/assertion-validator/ModelBasedValidationWS.wsdl</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>AuditMessage Validator</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <packageName>net.ihe.gazelle.jaxb.audit</packageName>
+                            <sourceType>wsdl</sourceType>
+                            <sources>
+                                <source>src/main/wsdl/audit-validator/AuditMessageValidationWS.wsdl</source>
+                            </sources>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Model-Based CDA Validator</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <packageName>net.ihe.gazelle.jaxb.cda</packageName>
+                            <sourceType>wsdl</sourceType>
+                            <sources>
+                                <source>src/main/wsdl/cda-validator/ModelBasedValidationWS.wsdl</source>
+                            </sources>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>TLS certificate Validator</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <packageName>net.ihe.gazelle.jaxb.certificate</packageName>
+                            <sourceType>wsdl</sourceType>
+                            <sources>
+                                <source>src/main/wsdl/certificate-validator/CertificateValidator.wsdl</source>
+                            </sources>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Schematron Validator</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <packageName>net.ihe.gazelle.jaxb.schematron</packageName>
+                            <sourceType>wsdl</sourceType>
+                            <sources>
+                                <source>src/main/wsdl/schematron-validator/GazelleObjectValidator.wsdl</source>
+                            </sources>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Model-based XDS Validator</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <packageName>net.ihe.gazelle.jaxb.xds</packageName>
+                            <sourceType>wsdl</sourceType>
+                            <sources>
+                                <source>src/main/wsdl/xds-validator/ModelBasedValidationWS.wsdl</source>
+                            </sources>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
