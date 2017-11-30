@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class AuditValidationService extends ValidationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditValidationService.class);
-    private static AuditValidationService instance;
+    private static AuditValidationService INSTANCE = null;
 
     /**
      * Private constructor to avoid instantiation.
@@ -27,12 +27,12 @@ public class AuditValidationService extends ValidationService {
     private AuditValidationService() {
     }
 
-    public static AuditValidationService getInstance() {
-        if (instance == null) {
+    public synchronized static AuditValidationService getInstance() {
+        if (INSTANCE == null) {
 
-            instance = new AuditValidationService();
+            INSTANCE = new AuditValidationService();
         }
-        return instance;
+        return INSTANCE;
     }
 
     @Override

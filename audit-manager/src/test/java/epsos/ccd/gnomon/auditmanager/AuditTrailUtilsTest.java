@@ -22,7 +22,6 @@
 
 package epsos.ccd.gnomon.auditmanager;
 
-import eu.epsos.configmanager.database.HibernateConfigFile;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,7 @@ public class AuditTrailUtilsTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        HibernateConfigFile.name = "src/test/resources/configmanager.hibernate.xml";
+        //HibernateConfigFile.name = "src/test/resources/configmanager.hibernate.xml";
     }
 
     @AfterClass

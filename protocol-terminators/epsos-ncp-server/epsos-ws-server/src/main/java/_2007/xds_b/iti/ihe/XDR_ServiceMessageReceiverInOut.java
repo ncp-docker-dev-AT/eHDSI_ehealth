@@ -101,8 +101,7 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
     }
 
     private String getIPofSender(org.apache.axis2.context.MessageContext msgContext) {
-        String remoteAddress_IPConsumer = (String) msgContext.getProperty("REMOTE_ADDR");
-        return remoteAddress_IPConsumer;
+        return (String) msgContext.getProperty("REMOTE_ADDR");
     }
 
     private String getMessageID(org.apache.axiom.soap.SOAPEnvelope envelope) {
@@ -173,24 +172,21 @@ public class XDR_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.
 //                    log.error(ExceptionUtils.getStackTrace(e));
 //                }
 
-                if ("documentRecipient_ProvideAndRegisterDocumentSetB"
-                        .equals(methodName)) {
+                if ("documentRecipient_ProvideAndRegisterDocumentSetB".equals(methodName)) {
 
                     /* Validate incoming request */
                     String requestMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
                     XdrValidationService.getInstance().validateModel(requestMessage, XdModel.obtainModelXdr(requestMessage).toString(), NcpSide.NCP_A);
 
-                    oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType registryResponse = null;
+                    oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType registryResponse;
                     ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType wrappedParam = (ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType) fromOM(
-                            msgContext.getEnvelope().getBody()
-                                    .getFirstElement(),
+                            msgContext.getEnvelope().getBody().getFirstElement(),
                             ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
                     registryResponse = skel.documentRecipient_ProvideAndRegisterDocumentSetB(wrappedParam, sh, eventLog);
 
-                    envelope = toEnvelope(getSOAPFactory(msgContext),
-                            registryResponse, false);
+                    envelope = toEnvelope(getSOAPFactory(msgContext),registryResponse, false);
 
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());

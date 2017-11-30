@@ -176,8 +176,8 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 //                        LOG.error(ExceptionUtils.getStackTrace(e));
 //                    }
                     if (StringUtils.equals(ConfigurationManagerFactory.getConfigurationManager().getProperty("automated.validation"), "true")) {
-                        AssertionValidationService assertionValidationService = new AssertionValidationService();
-                        assertionValidationService.validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
+
+                        AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
                                 AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString(), NcpSide.NCP_B);
                     }
                     QueryPatientDocument wrappedParam;
@@ -244,9 +244,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 //                        LOG.error(ExceptionUtils.getStackTrace(e));
 //                    }
 
-
-                    AssertionValidationService assertionValidationService = new AssertionValidationService();
-                    assertionValidationService.validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()), assertionSchematron
+                    AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()), assertionSchematron
                             , NcpSide.NCP_B);
 
                     QueryDocumentsResponseDocument queryDocumentsResponse17;
@@ -305,9 +303,9 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 //                    } catch (Exception e) {
 //                        LOG.error(ExceptionUtils.getStackTrace(e));
 //                    }
-                    AssertionValidationService assertionValidationService = new AssertionValidationService();
-                    assertionValidationService.validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()), assertionSchematron
-                            , NcpSide.NCP_B);
+
+                    AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
+                            assertionSchematron, NcpSide.NCP_B);
 
                     RetrieveDocumentResponseDocument retrieveDocumentResponse19;
                     RetrieveDocumentDocument1 wrappedParam;

@@ -93,7 +93,9 @@ public class JaxbIOFactory implements AtnaIOFactory {
                     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                     marshaller.marshal(a, bout);
                     LOGGER.info("\n" + new String(bout.toByteArray()));
-                    LOGGER.debug("Event Outcome: '{}'", am.getEventOutcome());
+                    if (LOGGER.isDebugEnabled() && am != null) {
+                        LOGGER.debug("Event Outcome: '{}'", am.getEventOutcome());
+                    }
                 }
 
             } catch (JAXBException e) {

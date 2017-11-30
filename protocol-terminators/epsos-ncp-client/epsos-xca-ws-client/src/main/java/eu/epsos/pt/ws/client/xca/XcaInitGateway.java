@@ -23,6 +23,7 @@ import org.apache.axis2.util.XMLUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
@@ -164,9 +165,9 @@ public class XcaInitGateway {
                 CdaValidationService cdaValidationService = CdaValidationService.getInstance();
 
                 /* Validate CDA epSOS Pivot */
-                cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(
-                        queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
-                        CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
+                Element elementNormalize = TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement();
+                elementNormalize.normalize();
+                cdaValidationService.validateModel(XMLUtils.toOM(elementNormalize).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
 
                 queryResponse.getDocumentResponse().get(0).setDocument(TMServices.transformDocument(
                         queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage)); //Resets the response document to a translated version.
@@ -203,7 +204,7 @@ public class XcaInitGateway {
             List<RegistryError> errorList = registryErrorList.getRegistryError();
 
             if (errorList != null) {
-                String msg = "";
+                StringBuilder msg = new StringBuilder();
                 boolean hasError = false;
                 for (RegistryError error : errorList) {
                     String errorCode = error.getErrorCode();
@@ -214,11 +215,10 @@ public class XcaInitGateway {
                     LOGGER.error("errorCode=" + errorCode + "\ncodeContext=" + codeContext
                             + "\nlocation=" + location + "\nseverity=" + severity + "\n" + value + "\n");
 
-                    if ("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".equals(severity)) {
-                        msg += errorCode + " " + codeContext + " " + value;
-                        hasError = true;
-                    } else if (errorCode.equals("1101") || errorCode.equals("1102")) { // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/2. (Needs to be revised according to new error communication strategy to the portal).
-                        msg += errorCode + " " + codeContext + " " + value;
+                    // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/2.
+                    // (Needs to be revised according to new error communication strategy to the portal).
+                    if ("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".equals(severity) || errorCode.equals("1101") || errorCode.equals("1102")) {
+                        msg.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                         hasError = true;
                     }
 
@@ -229,7 +229,7 @@ public class XcaInitGateway {
 
                     //Throw all the remaining errors
                     if (hasError) {
-                        LOGGER.error(msg);
+                        LOGGER.error(msg.toString());
                         throw new XCAException(errorCode);
                     }
                 }

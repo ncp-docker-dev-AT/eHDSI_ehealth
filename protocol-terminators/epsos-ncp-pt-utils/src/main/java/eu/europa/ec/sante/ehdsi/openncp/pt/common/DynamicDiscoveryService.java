@@ -1,7 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.pt.common;
 
 import epsos.ccd.gnomon.auditmanager.*;
-import epsos.ccd.gnomon.configmanager.SMLSMPClientException;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
@@ -83,15 +82,7 @@ public class DynamicDiscoveryService {
 
             String sc_userid = sc_fullname + "<saml:" + sc_email + ">";
             String sp_userid = sp_fullname + "<saml:" + sp_email + ">";
-//            EventLog eventLog1 = EventLog.createEventLogPatientPrivacy(TransactionName.ehealthSMPQuery,
-//                    EventActionCode.EXECUTE, date2, EventOutcomeIndicator.FULL_SUCCESS, null, null, null, sc_userid,
-//                    sp_userid, partid, null, EM_PatricipantObjectID, EM_PatricipantObjectDetail, objectID,
-//                    "urn:uuid:00000000-0000-0000-0000-000000000000", new byte[1],
-//                    "urn:uuid:00000000-0000-0000-0000-000000000000", new byte[1], // Base64
-//                    // encoded
-//                    // error
-//                    // message
-//                    sourceip, targetip);
+
             EventLog eventLog1 = EventLog.createEventLogPatientPrivacy(TransactionName.ehealthSMPQuery,
                     EventActionCode.EXECUTE, date2, EventOutcomeIndicator.FULL_SUCCESS, null, null,
                     null, sc_userid, sp_userid, partid, null, EM_PatricipantObjectID,
@@ -102,10 +93,7 @@ public class DynamicDiscoveryService {
             // conditions
             // Acording to https://tools.ietf.org/html/rfc5424 (Syslog Protocol)
             asd.write(eventLog1, "13", "2");
-            /*
-             * try { Thread.sleep(10000); } catch (InterruptedException ex) {
-			 * logger.error(null, ex); }
-			 */
+
         } catch (Exception e) {
             LOGGER.error("Error sending audit for eHealth SMP Query: '{}'", e.getMessage(), e);
         }
@@ -155,46 +143,16 @@ public class DynamicDiscoveryService {
                     lookup(countryCode, service.getUrn(), key);
                     return getAddress().toExternalForm();
                 }
-
-                //Catch PropertyNotFoundException
-
-//            Optional<String> endpoint = ConfigurationManagerFactory.getConfigurationManager().getProperty()
-//            findProperty(key);
-//            if (endpoint.isPresent()) {
-//                return endpoint.get();
-//            }
             }
             lookup(countryCode, service.getUrn(), key);
             return getAddress().toExternalForm();
-        } catch (SMLSMPClientException e) {
+        } catch (ConfigurationManagerException e) {
             LOGGER.error("SMLSMPClientException: '{}'", e.getMessage(), e);
             throw new ConfigurationManagerException("An internal error occurred while retrieving the endpoint URL", e);
         }
-
-//        SMLSMPClient client = new SMLSMPClient();
-//
-//        try {
-//            lookup(countryCode, service.getUrn());
-//            URL endpointUrl = client.getEndpointReference();
-//            if (endpointUrl == null) {
-//                throw new PropertyNotFoundException("Property '" + key + "' not found!");
-//            }
-//
-//            String value = endpointUrl.toExternalForm();
-//            setProperty(key, value);
-//
-//            X509Certificate certificate = client.getCertificate();
-//            if (certificate != null) {
-//                String endpointId = countryCode.toLowerCase() + "_" + StringUtils.substringAfter(service.getUrn(), "##");
-//                storeEndpointCertificate(endpointId, certificate);
-//            }
-//            return value;
-//        } catch (SMLSMPClientException e) {
-//            throw new ConfigurationManagerException("An internal error occurred while retrieving the endpoint URL", e);
-//        }
     }
 
-    private void lookup(String countryCode, String documentType, String key) throws SMLSMPClientException {
+    private void lookup(String countryCode, String documentType, String key) throws ConfigurationManagerException {
 
         LOGGER.info("SML Client: '{}'-'{}'", countryCode, documentType);
         try {
@@ -254,34 +212,6 @@ public class DynamicDiscoveryService {
                 setAddress(urlAddress);
                 setCertificate(certificate);
             }
-            // 2.5.2.RC2 DG Sante
-
-//            List<Endpoint> endpoints = serviceMetadata.getEndpoints();
-//
-//			/*
-//             * Constraint: here I think I have just one endpoint
-//			 */
-//            int size = endpoints.size();
-//            if (size != 1) {
-//                throw new Exception(
-//                        "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
-//            }
-//
-//            Endpoint e = endpoints.get(0);
-//            String address = e.getAddress();
-//            if (address == null) {
-//                throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
-//            }
-//            URL urlAddress = new URL(address);
-//
-//            X509Certificate certificate = e.getCertificate();
-//            if (certificate == null) {
-//                throw new Exception("no certificate found for endpoint: " + e.getAddress());
-//            }
-//            LOGGER.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
-
-
-            //URL endpointUrl = client.getEndpointReference();
 
             URL endpointUrl = getAddress();
             if (endpointUrl == null) {
@@ -297,7 +227,6 @@ public class DynamicDiscoveryService {
                 String endpointId = countryCode.toLowerCase() + "_" + StringUtils.substringAfter(documentType, "##");
                 storeEndpointCertificate(endpointId, certificate);
             }
-
 
             //Audit vars
             String ncp = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
@@ -326,7 +255,7 @@ public class DynamicDiscoveryService {
 
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
-            throw new SMLSMPClientException(e);
+            throw new ConfigurationManagerException(e);
         }
     }
 

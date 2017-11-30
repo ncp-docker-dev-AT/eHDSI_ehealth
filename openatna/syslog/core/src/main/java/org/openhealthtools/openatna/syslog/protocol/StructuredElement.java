@@ -1,5 +1,6 @@
 package org.openhealthtools.openatna.syslog.protocol;
 
+import org.apache.commons.lang.StringUtils;
 import org.openhealthtools.openatna.syslog.Constants;
 import org.openhealthtools.openatna.syslog.SyslogException;
 
@@ -16,44 +17,37 @@ import java.util.Set;
  *
  * @author Andrew Harrison
  * @version $Revision:$
- * @created Aug 14, 2009: 1:20:36 PM
- * @date $Date:$ modified by $Author:$
  */
-
 public class StructuredElement implements Serializable {
 
-    public static final int docEnterpriseNumber = 32473;
+    protected static final int docEnterpriseNumber = 32473;
     /**
      * timeQuality parameters
      */
-    public static final String TZ_KNOWN = "tzKnown";
-    public static final String IS_SYNCED = "isSynced";
-    public static final String SYNC_ACCURACY = "syncAccuracy";
+    protected static final String TZ_KNOWN = "tzKnown";
+    protected static final String IS_SYNCED = "isSynced";
+    protected static final String SYNC_ACCURACY = "syncAccuracy";
     /**
      * origin parameters
      */
-    public static final String IP = "ip";
-    public static final String ENTERPRISE_ID = "enterpriseId";
-    public static final String SOFTWARE = "software";
-    public static final String SW_VERSION = "swVersion";
+    protected static final String IP = "ip";
+    protected static final String ENTERPRISE_ID = "enterpriseId";
+    protected static final String SOFTWARE = "software";
+    protected static final String SW_VERSION = "swVersion";
     /**
      * meta parameters
      */
-    public static final String SEQUENCE_ID = "sequenceId";
-    public static final String SYS_UPTIME = "sysUpTime";
-    public static final String LANGUAGE = "language";
-    public static char[] escaped = {'"', '\\', ']'};
-    public static char[] disallowed = {' ', '=', '\\', ']'};
-    public static String[] ianaIds =
-            {
-                    "timeQuality",
-                    "origin",
-                    "meta",
-            };
+    protected static final String SEQUENCE_ID = "sequenceId";
+    protected static final String SYS_UPTIME = "sysUpTime";
+    protected static final String LANGUAGE = "language";
+    protected static char[] escaped = {'"', '\\', ']'};
+    protected static char[] disallowed = {' ', '=', '\\', ']'};
+    protected static String[] ianaIds = {"timeQuality", "origin", "meta",};
+    protected Set<SdParam> params = new HashSet<>();
     private String id;
-    private Set<SdParam> params = new HashSet<SdParam>();
 
     public StructuredElement(String id, List<SdParam> params) {
+
         this.id = id;
         this.params.addAll(params);
     }
@@ -86,6 +80,7 @@ public class StructuredElement implements Serializable {
     }
 
     public static String escape(String param) {
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < param.length(); i++) {
             char c = param.charAt(i);
@@ -263,7 +258,6 @@ public class StructuredElement implements Serializable {
                         break;
                     default:
                         throw new SyslogException("unknown state:" + state);
-
                 }
             }
         } catch (Exception e) {
@@ -273,6 +267,7 @@ public class StructuredElement implements Serializable {
     }
 
     private static void verifyId(String id) throws SyslogException {
+
         boolean iana = false;
         for (String ianaId : ianaIds) {
             if (id.equals(ianaId)) {
@@ -280,16 +275,25 @@ public class StructuredElement implements Serializable {
                 break;
             }
         }
-        if (!iana && id.indexOf("@") == -1) {
+        if (!iana && !id.contains("@")) {
             throw new SyslogException("Non reserverd id with no @ symbol");
         }
 
     }
 
     private static void verifyName(String name) throws SyslogException {
-        if (name.equals(docEnterpriseNumber)) {
+
+        if (StringUtils.equals(name, String.valueOf(docEnterpriseNumber))) {
             throw new SyslogException("documentation enterprise number not allowed");
         }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

@@ -174,7 +174,7 @@ public class AssertionHandler implements Serializable {
 
         String permissionPrefix = AssertionHandlerConfigManager.getPersmissionsPrefix();
         for (String permission : permissions) {
-            attrPID_8 = AddAttributeValue(builderFactory, attrPID_8, permissionPrefix + permission, "", "");
+            AddAttributeValue(builderFactory, attrPID_8, permissionPrefix + permission, "", "");
         }
 
         attributeStatement.getAttributes().add(attrPID_8);
@@ -400,7 +400,7 @@ public class AssertionHandler implements Serializable {
     }
 
     private String getAttributeValue(String key) {
-        
+
         List<AttributeStatement> attrStatements = assertion.getAttributeStatements();
         for (AttributeStatement stat : attrStatements) {
             List<Attribute> attributes = stat.getAttributes();

@@ -19,7 +19,11 @@
  */
 package tr.com.srdc.epsos.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xml.security.c14n.Canonicalizer;
+import org.dom4j.DocumentHelper;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -96,9 +100,9 @@ public class XMLUtil {
         return dbf.newDocumentBuilder().parse(new ByteArrayInputStream(back));
     }
 
-    public static org.w3c.dom.Document parseContent(byte[] byteContent) throws ParserConfigurationException, SAXException, IOException {
+    public static Document parseContent(byte[] byteContent) throws ParserConfigurationException, SAXException, IOException {
 
-        org.w3c.dom.Document doc;
+        Document doc;
         String content = new String(byteContent);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -116,10 +120,10 @@ public class XMLUtil {
      * @throws SAXException
      * @throws IOException
      */
-    public static org.w3c.dom.Document parseContent(String content) throws ParserConfigurationException, SAXException, IOException {
+    public static Document parseContent(String content) throws ParserConfigurationException, SAXException, IOException {
 
         LOGGER.debug("parseContent(): \n'{}'", content);
-        org.w3c.dom.Document doc;
+        Document doc;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
@@ -159,6 +163,26 @@ public class XMLUtil {
 
         transformer.transform(new DOMSource(node), new StreamResult(stringWriter));
         return stringWriter.toString();
+    }
+
+    private static String unPrettyPrint(final String xml) {
+
+        if (StringUtils.isBlank(xml)) {
+            throw new RuntimeException("xml was null or blank in unPrettyPrint()");
+        }
+
+        final StringWriter sw;
+
+        try {
+            final OutputFormat format = OutputFormat.createCompactFormat();
+            final org.dom4j.Document document = DocumentHelper.parseText(xml);
+            sw = new StringWriter();
+            final XMLWriter writer = new XMLWriter(sw, format);
+            writer.write(document);
+        } catch (Exception e) {
+            throw new RuntimeException("Error un-pretty printing xml:\n" + xml, e);
+        }
+        return sw.toString();
     }
 
     /**

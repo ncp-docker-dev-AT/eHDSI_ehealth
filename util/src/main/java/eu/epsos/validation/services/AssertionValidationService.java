@@ -24,6 +24,18 @@ import javax.xml.bind.DatatypeConverter;
 public class AssertionValidationService extends ValidationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionValidationService.class);
+    private static AssertionValidationService INSTANCE = null;
+
+    private AssertionValidationService() {
+    }
+
+    public synchronized static AssertionValidationService getInstance() {
+
+        if (INSTANCE == null) {
+            INSTANCE = new AssertionValidationService();
+        }
+        return INSTANCE;
+    }
 
     @Override
     public boolean validateModel(String object, String model, NcpSide ncpSide) {

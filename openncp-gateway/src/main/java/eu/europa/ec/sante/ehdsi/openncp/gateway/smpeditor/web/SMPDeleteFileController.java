@@ -201,12 +201,12 @@ public class SMPDeleteFileController {
             URI smpURI = null;
             try {
                 smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
+                smpdelete.setSmpURI(smpURI.toString());
             } catch (TechnicalException ex) {
                 success = false;
                 errorType = "TechnicalException";
                 LOGGER.error("\n TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             }
-            smpdelete.setSmpURI(smpURI.toString());
             URI uri = smpClient.getService().getMetadataProvider().resolveServiceMetadata(smpURI, participantIdentifier, documentIdentifiers.get(i));
             ReferenceCollection reference = new ReferenceCollection(uri.toString(), smptype, i);
             referenceCollection.add(reference);
