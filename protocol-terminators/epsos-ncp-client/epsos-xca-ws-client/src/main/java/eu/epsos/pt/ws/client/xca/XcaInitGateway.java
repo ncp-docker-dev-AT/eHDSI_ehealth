@@ -23,6 +23,7 @@ import org.apache.axis2.util.XMLUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
@@ -164,9 +165,9 @@ public class XcaInitGateway {
                 CdaValidationService cdaValidationService = CdaValidationService.getInstance();
 
                 /* Validate CDA epSOS Pivot */
-                cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(
-                        queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
-                        CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
+                Element elementNormalize = TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement();
+                elementNormalize.normalize();
+                cdaValidationService.validateModel(XMLUtils.toOM(elementNormalize).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
 
                 queryResponse.getDocumentResponse().get(0).setDocument(TMServices.transformDocument(
                         queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage)); //Resets the response document to a translated version.

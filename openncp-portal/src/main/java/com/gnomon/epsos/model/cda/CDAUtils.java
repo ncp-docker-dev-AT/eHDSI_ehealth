@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.h2.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -123,11 +124,26 @@ public class CDAUtils {
         Node nl;
         String nodeString = "";
         try {
-            Document doc = epDoc;
+            //Document doc = epDoc;
             XPath xpath = getXPathFactory();
+            XPathExpression xPathExpression = xpath.compile("//xsi:substanceAdministration");
+            Node substanceNode = (Node) xPathExpression.evaluate(epDoc, XPathConstants.NODE);
+            if (substanceNode != null) {
+                LOGGER.info("Source Node: '{}'-'{}'", substanceNode.getNodeName(), substanceNode.getNodeValue());
+                substanceNode.getAttributes().getNamedItem("moodCode").setNodeValue("EVN");
+                NodeList nodeList = substanceNode.getChildNodes();
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    LOGGER.info("Node: '{}'", nodeList.item(i).getNodeName());
+                    if (StringUtils.equals(nodeList.item(i).getNodeName(), "templateId")) {
+                        substanceNode.removeChild(nodeList.item(i));
+                    }
+                }
+            }
+
             XPathExpression epExpr = xpath.compile("//xsi:substanceAdministration[xsi:id/@extension='" + id + "']");
-            nl = (Node) epExpr.evaluate(doc, XPathConstants.NODE);
+            nl = (Node) epExpr.evaluate(epDoc, XPathConstants.NODE);
             nodeString = Utils.nodeToString(nl);
+            LOGGER.info("********************* AFTER {}", nodeString);
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
@@ -180,6 +196,7 @@ public class CDAUtils {
      */
     private static String getSubstitutedRelativeProductLineFromEP(org.dom4j.Document doc, String id, String product, String unit, String quantity) {
 
+        LOGGER.info("getSubstitutedRelativeProductLineFromEP(Product:'{}')", product);
         //Context of the substituted product
         String context = "";
 
@@ -246,7 +263,7 @@ public class CDAUtils {
             //Creating an xpath expression for the manufacturedMaterial code element
             expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code";
 
-            //Setting the xpath procesor and the namespaces
+            //Setting the xpath processor and the namespaces
             xpath = org.dom4j.DocumentHelper.createXPath(expression);
             xpath.setNamespaceURIs(namespaces);
 

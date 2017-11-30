@@ -42,8 +42,8 @@ public enum CdaModel {
     }
 
     /**
-     * This helper method will return a specific CDA model based on a document
-     * class code (also choosing between friendly or pivot documents).
+     * This helper method will return a specific CDA model based on a document class code
+     * (also choosing between friendly or pivot documents).
      *
      * @param classCode The document class code.
      * @param isPivot   The boolean flag stating if the document is pivot or
@@ -59,11 +59,8 @@ public enum CdaModel {
             if (classCode.equals(Constants.MRO_CLASSCODE)) {
                 return CdaModel.MRO.toString();
             }
-            if (classCode.equals(Constants.PS_CLASSCODE) || classCode.equals(Constants.EP_CLASSCODE)) {
+            if (classCode.equals(Constants.PS_CLASSCODE) || classCode.equals(Constants.EP_CLASSCODE) || classCode.equals(Constants.ED_CLASSCODE)) {
                 return CdaModel.ART_DECOR_CDA_PIVOT.toString();
-            }
-            if (classCode.equals(Constants.ED_CLASSCODE)) {
-                return CdaModel.ED_PIVOT.toString();
             }
             if (classCode.equals(Constants.HCER_CLASSCODE)) {
                 return CdaModel.HCER.toString();
@@ -75,11 +72,8 @@ public enum CdaModel {
             if (classCode.equals(Constants.MRO_CLASSCODE)) {
                 return CdaModel.MRO.toString();
             }
-            if (classCode.equals(Constants.PS_CLASSCODE) || classCode.equals(Constants.EP_CLASSCODE)) {
+            if (classCode.equals(Constants.PS_CLASSCODE) || classCode.equals(Constants.EP_CLASSCODE) || classCode.equals(Constants.ED_CLASSCODE)) {
                 return CdaModel.ART_DECOR_CDA_FRIENDLY.toString();
-            }
-            if (classCode.equals(Constants.ED_CLASSCODE)) {
-                return CdaModel.ED_FRIENDLY.toString();
             }
             if (classCode.equals(Constants.HCER_CLASSCODE)) {
                 return CdaModel.HCER.toString();
