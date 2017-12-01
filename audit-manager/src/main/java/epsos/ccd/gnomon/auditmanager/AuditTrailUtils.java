@@ -31,8 +31,8 @@ import java.util.Date;
  * @author Organization: Gnomon
  * @author mail:k.karkaletsis@gnomon.com.gr
  * @version 1.0, 2010, 30 Jun Provides methods for creating AuditMessage
- *          instances of the spSOS defined services, as for constructing and
- *          sending the syslog message to the repository
+ * instances of the spSOS defined services, as for constructing and
+ * sending the syslog message to the repository
  */
 public enum AuditTrailUtils {
 
@@ -225,8 +225,8 @@ public enum AuditTrailUtils {
                     eventLog.getResM_PatricipantObjectDetail());
         }
         /* Invoke audit message validation services */
-        validateAuditMessage(eventLog, am);
-
+        boolean validated = validateAuditMessage(eventLog, am);
+        LOGGER.info("Audit Message validated and  report generated: '{}'", validated);
         return am;
     }
 
@@ -1257,12 +1257,12 @@ public enum AuditTrailUtils {
      */
     private boolean validateAuditMessage(EventLog eventLog, AuditMessage am) {
 
-        LOGGER.info("validateAuditMessage(EventLog '{}', AudiMessage '{}')", eventLog.getEventType(),
-                am.getEventIdentification().getEventActionCode());
+        LOGGER.info("validateAuditMessage(EventLog '{}', AudiMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
+                am.getEventIdentification().getEventActionCode(), eventLog.getPC_UserID());
         String model = "";
         NcpSide ncpSide;
 
-        if (eventLog.getPC_UserID() == null || eventLog.getPC_UserID().isEmpty()) {
+        if (StringUtils.isBlank(eventLog.getPC_UserID())) {
             ncpSide = NcpSide.NCP_A;
         } else {
             ncpSide = NcpSide.NCP_B;

@@ -1,5 +1,8 @@
 package org.openhealthtools.openatna.archive;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,15 +17,14 @@ import java.util.zip.ZipEntry;
  * @author Andrew Harrison
  * @version 1.0.0
  */
-
 public class ArchiveHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveHandler.class);
     private static final String JAR_SEP = "/";
 
-    private static ArrayList<String> ignores = new ArrayList<String>();
+    private static ArrayList<String> ignores = new ArrayList<>();
 
     static {
-
         ignores.add(".DS_Store");
         ignores.add("CVS");
         ignores.add(".svn");
@@ -39,11 +41,16 @@ public class ArchiveHandler {
     public static File archive(String jarName, List<File> files, File destDir, boolean recursive) throws IOException {
 
         if (!destDir.exists()) {
-            destDir.mkdirs();
+
+            if (!destDir.mkdirs()) {
+                LOGGER.error("Cannot create directory: '{}'", destDir.getAbsolutePath());
+            }
         }
         File jar = new File(destDir, jarName);
         if (jar.exists()) {
-            jar.delete();
+            if (!jar.delete()) {
+                LOGGER.error("Cannot delete JAR file: '{}'", jar.getAbsolutePath());
+            }
         }
         File parent = destDir.getParentFile();
         if (parent == null) {
@@ -52,7 +59,7 @@ public class ArchiveHandler {
         jar = new File(parent, jarName);
         JarOutputStream jos = new JarOutputStream(new FileOutputStream(jar));
         writeManifest(jos);
-        ArrayList<String> entries = new ArrayList<String>();
+        ArrayList<String> entries = new ArrayList<>();
         for (File file : files) {
             writeEntry(file, jos, file.getParentFile(), entries, recursive);
         }
@@ -80,8 +87,10 @@ public class ArchiveHandler {
             jos.closeEntry();
             if (recursive) {
                 File[] childers = f.listFiles();
-                for (File childer : childers) {
-                    writeEntry(childer, jos, build, entries, true);
+                if (childers != null) {
+                    for (File childer : childers) {
+                        writeEntry(childer, jos, build, entries, true);
+                    }
                 }
             }
         } else {
@@ -139,14 +148,19 @@ public class ArchiveHandler {
         }
         if (src.isDirectory()) {
             if (!dest.exists()) {
-                dest.mkdirs();
+
+                if (!dest.mkdirs()) {
+                    LOGGER.error("Cannot create directory: '{}''", dest.getAbsolutePath());
+                }
             } else if (!dest.isDirectory()) {
                 throw new IOException("cannot write a directory to a file.");
             }
             list.add(dest);
             File[] srcFiles = src.listFiles();
-            for (int i = 0; i < srcFiles.length; i++) {
-                list.addAll(copyFilesRecursive(srcFiles[i], new File(dest, srcFiles[i].getName())));
+            if (srcFiles != null) {
+                for (File srcFile : srcFiles) {
+                    list.addAll(copyFilesRecursive(srcFile, new File(dest, srcFile.getName())));
+                }
             }
         } else {
             if (dest.exists() && dest.isDirectory()) {
@@ -186,12 +200,16 @@ public class ArchiveHandler {
         }
         if (parent.isDirectory() && !(parent.listFiles() == null)) {
             File[] files = parent.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                deleteFiles(files[i], true);
+            if (files != null) {
+                for (File file : files) {
+                    deleteFiles(file, true);
+                }
             }
         }
         if (incParent) {
-            parent.delete();
+            if (!parent.delete()) {
+                LOGGER.error("Cannot delete directory: '{}'", parent.getAbsolutePath());
+            }
         }
     }
 
@@ -255,8 +273,7 @@ public class ArchiveHandler {
         if (entry == null) {
             return null;
         }
-        InputStream in = jarFile.getInputStream(entry);
-        return in;
+        return jarFile.getInputStream(entry);
     }
 
     public static File extractEntry(File file, String path, File destDir) throws IOException {
@@ -279,7 +296,9 @@ public class ArchiveHandler {
         }
         String path = jarEntry.substring(0, jarEntry.lastIndexOf(JAR_SEP)).replace(JAR_SEP, File.separator);
         File dir = new File(destDir, path);
-        dir.mkdirs();
+        if (!dir.mkdirs()) {
+            LOGGER.error("Cannot create directory: '{}'-'{}'", destDir, path);
+        }
         String name = jarEntry.substring(jarEntry.lastIndexOf(JAR_SEP) + 1, jarEntry.length());
         if (name.length() == 0) {
             return dir;

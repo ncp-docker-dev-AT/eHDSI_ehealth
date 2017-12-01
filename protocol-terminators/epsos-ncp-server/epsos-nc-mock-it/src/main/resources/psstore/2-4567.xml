@@ -191,9 +191,7 @@
                     <code code="48765-2" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
                           codeSystemVersion="2.59" displayName="Allergies, effets indésirables, alertes"/>
                     <title>Allergies, effets indésirables, alertes TITLE</title>
-                    <text>
-                        <content ID="noallergy">No known allergies.</content>
-                    </text>
+                    <text><content ID="noallergy">No known allergies.</content></text>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
@@ -201,26 +199,22 @@
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3"/>
                             <id root="5F971AF4-C818-41E5-87C7-602617079DD8"/>
                             <code code="NA" nullFlavor="NA"/>
-                            <text>
-                                <reference value="#noallergy"/>
-                            </text>
+                            <text><reference value="#noallergy"/></text>
                             <statusCode code="active"/>
                             <effectiveTime>
                                 <low nullFlavor="NA"/>
                             </effectiveTime>
                             <entryRelationship inversionInd="false" typeCode="SUBJ">
                                 <observation classCode="OBS" moodCode="EVN" negationInd="true">
-                                    <templateId root="2.16.840.1.113883.10.20.1.18"/>
-                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.6"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
+                                    <templateId root="2.16.840.1.113883.10.20.1.18"/>
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
+                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.6"/>
                                     <id root="AF58C270-6F80-477A-AB05-47BCFFBC62F7"/>
                                     <code code="419199007" codeSystem="2.16.840.1.113883.6.96"
                                           codeSystemName="SNOMED CT" codeSystemVersion="2016-07"
                                           displayName="Allergy to substance"/>
-                                    <text>
-                                        <reference value="#noallergy"/>
-                                    </text>
+                                    <text><reference value="#noallergy"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low nullFlavor="UNK"/>
@@ -228,9 +222,6 @@
                                     <value code="716186003" codeSystem="2.16.840.1.113883.6.96"
                                            codeSystemName="SNOMED CT" codeSystemVersion="2016-07"
                                            displayName="No known allergy" xsi:type="CD"/>
-                                    <!--<value code="160244002" codeSystem="2.16.840.1.113883.6.96"-->
-                                    <!--codeSystemName="SNOMED CT" codeSystemVersion="2016-07"-->
-                                    <!--displayName="No known allergies" xsi:type="CD"/>-->
                                     <participant nullFlavor="NA" typeCode="CSM">
                                         <participantRole classCode="MANU">
                                             <playingEntity classCode="MMAT" nullFlavor="NA">
@@ -251,21 +242,19 @@
                     <code code="10160-0" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
                           displayName="History of medication use"/>
                     <title>History of medical device use</title>
-                    <text>
-                        <content ID="nomedicationdescription">No known drug allergies</content>
-                    </text>
+                    <text><content ID="nomedicationdescription">No known drug allergies</content></text>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="EVN">
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.11"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.9"/>
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
                             <id root="EE9F61CB-5B8C-4F73-8DDC-E802CF5A44E8"/>
                             <code code="182904002" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07" displayName="Drug treatment unknown">
-                                <originalText>
-                                    <reference value="#nomedicationdescription"/>
-                                </originalText>
+                                <originalText><reference value="#nomedicationdescription"/></originalText>
                             </code>
                             <statusCode code="completed"/>
                             <effectiveTime xsi:type="IVL_TS">
@@ -276,10 +265,8 @@
                             <doseQuantity nullFlavor="NI"/>
                             <consumable>
                                 <manufacturedProduct>
-                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2"/>
-                                    <templateId root="2.16.840.1.113883.10.20.1.53"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                         <code nullFlavor="NA"/>
                                         <name nullFlavor="NA"/>
                                         <epsos:ingredient classCode="ACTI" nullFlavor="NA">
@@ -306,9 +293,7 @@
                           codeSystemVersion="2.59" displayName="Problem list">
                     </code>
                     <title>Problem list</title>
-                    <text>
-                        <content ID="actnoproblem">No current problems or disability</content>
-                    </text>
+                    <text><content ID="actnoproblem">No current problems or disability</content></text>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
@@ -326,9 +311,7 @@
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <id root="2.25.204676361010975441454110131417885024444"/>
                                     <code nullFlavor="NA"/>
-                                    <text>
-                                        <reference value="#actnoproblem"/>
-                                    </text>
+                                    <text><reference value="#actnoproblem"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low nullFlavor="UNK"/>
@@ -337,9 +320,7 @@
                                     <value code="160245001" codeSystem="2.16.840.1.113883.6.96"
                                            codeSystemName="SNOMED CT" codeSystemVersion="2016-07"
                                            displayName="No current problems or disability" xsi:type="CD">
-                                        <originalText>
-                                            <reference value="#actnoproblem"/>
-                                        </originalText>
+                                        <originalText><reference value="#actnoproblem"/></originalText>
                                     </value>
                                 </observation>
                             </entryRelationship>
@@ -355,38 +336,15 @@
                     <code code="47519-4" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
                           codeSystemVersion="2.59" displayName="History of Procedures"/>
                     <title>History of Procedures</title>
-                    <text>
-                        <content ID="surgeries">No medical history.</content>
-                    </text>
+                    <text><content ID="surgeries">No medical history.</content></text>
                     <entry>
-                        <!--<procedure classCode="PROC" moodCode="EVN" nullFlavor="NA">-->
-                        <!--<templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>-->
-                        <!--<templateId root="2.16.840.1.113883.10.20.1.29"/>-->
-                        <!--<id root="5f971af4-c818-41e5-87c7-602617079dd8"/>-->
-                        <!--<code code="NA" nullFlavor="NA"/>-->
-                        <!--<statusCode code="completed"/>-->
-                        <!--</procedure>-->
-                        <!--<procedure classCode="PROC" moodCode="EVN">-->
-                        <!--<templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>-->
-                        <!--<templateId root="2.16.840.1.113883.10.20.1.29"/>-->
-                        <!--<id nullFlavor="NA"/>-->
-                        <!--<code code="112802009" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"-->
-                        <!--displayName="FR_Cardiovascular surgical procedure"/>-->
-                        <!--<text>-->
-                        <!--<reference value="#surgeries"/>-->
-                        <!--</text>-->
-                        <!--<statusCode code="completed"/>-->
-                        <!--<effectiveTime value="20130201"/>-->
-                        <!--</procedure>-->
                         <procedure classCode="PROC" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>
                             <templateId root="2.16.840.1.113883.10.20.1.29"/>
                             <id nullFlavor="NA"/>
-                            <code code="80286-8" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
-                                  displayName="History of Surgical procedures of cardiovascular system"/>
-                            <text>
-                                <reference value="#surgeries"/>
-                            </text>
+                            <code code="112802009" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
+                                  displayName="Cardiovascular surgical procedure"/>
+                            <text><reference value="#surgeries"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime value="20130201"/>
                         </procedure>
@@ -401,9 +359,7 @@
                     <code code="46264-8" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
                           codeSystemVersion="2.59" displayName="History of medical device use"/>
                     <title>History of medical device use</title>
-                    <text>
-                        <content ID="nomedicalequipment">Medical history unknown</content>
-                    </text>
+                    <text><content ID="nomedicalequipment">Medical history unknown</content></text>
                     <entry>
                         <supply classCode="SPLY" moodCode="EVN" nullFlavor="NA">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.5"/>
@@ -426,18 +382,6 @@
                     <code code="11348-0" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
                     <title>History of Past Illness</title>
                     <text>NNNN</text>
-                    <!--<entry>-->
-                    <!--<act moodCode="EVN" classCode="ACT">-->
-                    <!--<id nullFlavor="NP"/>-->
-                    <!--<code nullFlavor="NP"/>-->
-                    <!--<text>No Info</text>-->
-                    <!--<statusCode nullFlavor="NP"/>-->
-                    <!--<effectiveTime nullFlavor="NP"/>-->
-                    <!--<entryRelationship typeCode="CAUS">-->
-                    <!---->
-                    <!--</entryRelationship>-->
-                    <!--</act>-->
-                    <!--</entry>-->
                 </section>
             </component>
         </structuredBody>

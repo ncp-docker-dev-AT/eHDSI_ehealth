@@ -1,23 +1,3 @@
-/**
- * This file is part of epSOS OpenNCP implementation Copyright (C) 2012 SALAR
- * and Kela (The Social Insurance Institution of Finland)
- * <p>
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- * <p>
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * <p>
- * You should have received a copy of the GNU General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
- * <p>
- * Contact email: daniel.gronberg@diabol.se (SALAR) epsos@kanta.fi or
- * Konstantin.Hypponen@kela.fi (Kela)
- */
 package eu.epsos.protocolterminators.ws.server.xcpd.impl;
 
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
@@ -41,10 +21,9 @@ import java.util.*;
  * @author danielgronberg
  * @author Konstantin.Hypponen@kela.fi
  */
-public class PatientSearchMockImpl extends NationalConnectorGateway
-        implements PatientSearchInterfaceWithDemographics {
+public class PatientSearchMockImpl extends NationalConnectorGateway implements PatientSearchInterfaceWithDemographics {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PatientSearchMockImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PatientSearchMockImpl.class);
 
     private static final String GENDER = "administrativeGender";
     private static final String BIRTH_DATE = "birthDate";
@@ -62,13 +41,14 @@ public class PatientSearchMockImpl extends NationalConnectorGateway
 
     @Override
     public String getPatientId(String citizenNumber) throws NIException, InsufficientRightsException {
+
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<PatientDemographics> getPatientDemographics(List<PatientId> idList) throws NIException, InsufficientRightsException {
 
-        LOG.info("Searching patients at NI Mock...");
+        LOGGER.info("Searching patients at NI Mock...");
 
         List<PatientDemographics> result = new ArrayList<>(1);
 
@@ -96,7 +76,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway
         }
 
         if (id == null) {
-            LOG.info("Patient not found: " + idList.get(0));
+            LOGGER.info("Patient not found: " + idList.get(0));
             return new ArrayList<>(0);
         }
 
@@ -106,7 +86,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway
             properties.load(new FileInputStream(patientFile));
 
             PatientDemographics patient = new PatientDemographics();
-            patient.setIdList(Arrays.asList(id));
+            patient.setIdList(Collections.singletonList(id));
             patient.setAdministrativeGender(Gender.parseGender(properties.getProperty(GENDER)));
 
             Calendar birth;
@@ -125,10 +105,9 @@ public class PatientSearchMockImpl extends NationalConnectorGateway
             patient.setStreetAddress(properties.getProperty(STREET));
             patient.setTelephone(properties.getProperty(TELEPHONE));
             result.add(patient);
-        }
-        catch (Exception ex) {
-            LOG.error(null,ex);
-            return new ArrayList<PatientDemographics>(0);
+        } catch (Exception ex) {
+            LOGGER.error(null, ex);
+            return new ArrayList<>(0);
         }
 
         return result;
@@ -136,6 +115,6 @@ public class PatientSearchMockImpl extends NationalConnectorGateway
 
     @Override
     public void setPatientDemographics(PatientDemographics pd) {
-        LOG.info(pd.toString());
+        LOGGER.info(pd.toString());
     }
 }

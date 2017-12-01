@@ -88,6 +88,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
     public void prepareEventLog(EventLog eventLog, PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, Element sh) {
 
+        LOGGER.info("prepareEventLog('{}')", eventLog.getEventType());
         eventLog.setEventType(EventType.epsosIdentificationServiceFindIdentityByTraits);
         eventLog.setEI_TransactionName(TransactionName.epsosIdentificationServiceFindIdentityByTraits);
         eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
@@ -139,6 +140,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     }
 
     public PRPAIN201306UV02 queryPatient(PRPAIN201305UV02 pRPA_IN201305UV02, SOAPHeader sh, EventLog eventLog) throws Exception {
+
         PRPAIN201306UV02 result = of.createPRPAIN201306UV02();
         pRPAIN201306UV02Builder(pRPA_IN201305UV02, result, sh, eventLog);
         return result;
@@ -490,12 +492,12 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
         // Generate and Set random extension
         Random generator = new Random();
-        String extension = "";
+        StringBuilder extension = new StringBuilder();
         for (int i = 0; i < 13; i++) {
             int d = generator.nextInt(10);
-            extension += d;
+            extension.append(d);
         }
-        outputMessage.getId().setExtension(extension);
+        outputMessage.getId().setExtension(extension.toString());
 
         // Set creation time
         outputMessage.setCreationTime(of.createTS());
@@ -746,6 +748,9 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         // Prepare Audit Log
         try {
             prepareEventLog(eventLog, inputMessage, outputMessage, shElement);
+            LOGGER.info("Preparing Event Log: '{}' - SC UserId: '{}' - SP UserId: '{}'", eventLog.getEventType(),
+                    eventLog.getSC_UserID(), eventLog.getSP_UserID());
+
         } catch (Exception ex) {
             LOGGER.error("Prepare Audit log failed.", ex);
             // Is it fatal, if Audit log cannot be created?

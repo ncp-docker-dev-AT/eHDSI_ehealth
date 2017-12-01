@@ -63,9 +63,7 @@ public class MyBean implements Serializable {
     private List<PatientDocument> patientDocuments;
     private PatientDocument selectedDocument;
     private EpsosDocument selectedEpsosDocument;
-    private String documentHtml;
     private List<PatientDocument> patientPrescriptions;
-    private String prescriptionHtml;
     private boolean showDemographics;
     private boolean showPatientList = true;
     private StreamedContent prescriptionFile;
@@ -283,7 +281,7 @@ public class MyBean implements Serializable {
     }
 
     public void setDocumentHtml(String documentHtml) {
-        this.documentHtml = documentHtml;
+        String documentHtml1 = documentHtml;
     }
 
     public List<PatientDocument> getPatientPrescriptions() {
@@ -297,7 +295,7 @@ public class MyBean implements Serializable {
     }
 
     public void setPrescriptionHtml(String prescriptionHtml) {
-        this.prescriptionHtml = prescriptionHtml;
+        String prescriptionHtml1 = prescriptionHtml;
     }
 
     public boolean isShowDemographics() {
@@ -424,7 +422,7 @@ public class MyBean implements Serializable {
             patientDocuments = new ArrayList<>();
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
 
-            LOGGER.info("CLIENTCONNECTOR: '{}'", serviceUrl);
+            LOGGER.info("Client Connector URL: '{}'", serviceUrl);
             ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
 
             patientId = PatientId.Factory.newInstance();
@@ -433,16 +431,14 @@ public class MyBean implements Serializable {
             GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
             classCode.setNodeRepresentation(Constants.MRO_CLASSCODE);
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
-            classCode.setValue(Constants.MRO_TITLE); // Patient
-            // Summary
-            // ClassCode.
+            // Patient Summary ClassCode.
+            classCode.setValue(Constants.MRO_TITLE);
 
-            LOGGER.info("MRO QUERY: Getting mro documents for : " + patientId.getExtension() + " from " + selectedCountry);
+            LOGGER.info("MRO QUERY: Getting mro documents for: " + patientId.getExtension() + " from " + selectedCountry);
             List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion, selectedCountry, patientId, classCode);
             LOGGER.info("MRO QUERY: Found " + queryDocuments.size() + " for : " + patientId.getExtension() + " from " + selectedCountry);
 
             showMRO = true;
-            consentExists = true;
             for (EpsosDocument1 aux : queryDocuments) {
                 PatientDocument document = EpsosHelperService.populateDocument(aux, "mro");
                 patientDocuments.add(document);
@@ -451,7 +447,6 @@ public class MyBean implements Serializable {
             LOGGER.debug("Selected Country: " + LiferayUtils.getFromSession("selectedCountry"));
         } catch (Exception ex) {
 
-            consentExists = true;
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
             FacesContext.getCurrentInstance().addMessage(
                     null,
@@ -467,12 +462,13 @@ public class MyBean implements Serializable {
                 consentExists = false;
                 throw new ConsentException();
             }
-
         }
     }
 
     public void getPSDocs() throws ConsentException {
+
         String runningMode = MyServletContextListener.getRunningMode();
+
         if (runningMode.equals("demo")) {
             patientDocuments = EpsosHelperService.getMockPSDocuments();
             consentExists = true;
@@ -501,35 +497,24 @@ public class MyBean implements Serializable {
                 LOGGER.info("patientId: " + patientId);
                 LOGGER.info("classCode: " + classCode);
 
-                List<EpsosDocument1> queryDocuments = clientConectorConsumer
-                        .queryDocuments(hcpAssertion, trcAssertion,
-                                selectedCountry, patientId, classCode);
+                List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion,
+                        selectedCountry, patientId, classCode);
 
-                LOGGER.info("PS QUERY: Found " + queryDocuments.size() + " for : "
-                        + patientId.getExtension() + " from " + selectedCountry);
+                LOGGER.info("PS QUERY: Found " + queryDocuments.size() + " for : " + patientId.getExtension() + " from " + selectedCountry);
 
                 showPS = true;
-                consentExists = true;
                 for (EpsosDocument1 aux : queryDocuments) {
-                    PatientDocument document = EpsosHelperService
-                            .populateDocument(aux, "ps");
+                    PatientDocument document = EpsosHelperService.populateDocument(aux, "ps");
                     patientDocuments.add(document);
                 }
-                queryDocumentsException = LiferayUtils
-                        .getPortalTranslation("report.list.no.document");
-                LOGGER.debug("Selected Country: "
-                        + LiferayUtils.getFromSession("selectedCountry"));
+                queryDocumentsException = LiferayUtils.getPortalTranslation("report.list.no.document");
+                LOGGER.debug("Selected Country: " + LiferayUtils.getFromSession("selectedCountry"));
+
             } catch (Exception ex) {
 
-                consentExists = true;
                 LOGGER.error(ExceptionUtils.getStackTrace(ex));
-                FacesContext.getCurrentInstance()
-                        .addMessage(
-                                null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        "DOCUMENT QUERY", LiferayUtils
-                                        .getPortalTranslation(ex
-                                                .getMessage())));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "DOCUMENT QUERY", LiferayUtils.getPortalTranslation(ex.getMessage())));
                 if (patientId != null) {
                     LOGGER.error("PS QUERY: Error getting ps documents for : "
                             + patientId.getExtension() + " from " + selectedCountry

@@ -37,26 +37,15 @@ import java.util.*;
  */
 public class StorkServlet extends HttpServlet {
 
-    private static Logger log = LoggerFactory.getLogger(StorkServlet.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(StorkServlet.class.getName());
+    private static final String USER_AGENT = "Mozilla/5.0";
     private static Properties configs;
-    private static String providerName;
     private static String homepage = "/SP/";
     private static String allowIP = "127.0.0.1";
-    private final String USER_AGENT = "Mozilla/5.0";
-    private String SAMLResponse;
-    private String samlResponseXML;
     private String SAMLRequest;
     private String samlRequestXML;
     private ArrayList<PersonalAttribute> attrList;
     private HttpServletRequest request;
-
-    public static Logger getLog() {
-        return log;
-    }
-
-    public static void setLog(Logger log) {
-        StorkServlet.log = log;
-    }
 
     public static String getHomepage() {
         return homepage;
@@ -77,9 +66,9 @@ public class StorkServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        try {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -90,8 +79,6 @@ public class StorkServlet extends HttpServlet {
             out.println("<h1>Servlet StorkServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
-        } finally {
-            out.close();
         }
     }
 
@@ -115,34 +102,29 @@ public class StorkServlet extends HttpServlet {
             ipAddress = request.getRemoteAddr();
         }
 
-        log.info("IP-Addr: " + ipAddress);
+        LOGGER.info("IP-Addr: " + ipAddress);
 
         String STORK_ENABLED = "stork.enabled";
         Company company;
         try {
             company = PortalUtil.getCompany(request);
             String storkEnabled = PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false");
-            log.info("storkEnabled:" + PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false"));
-            log.info("provider.name:" + PrefsPropsUtil.getString(company.getCompanyId(), "provider.name", ""));
-            log.info("sp.sector:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.sector", ""));
-            log.info("sp.aplication:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.aplication", ""));
-            log.info("sp.country:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.country", ""));
-            log.info("sp.qaalevel:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.qaalevel", ""));
-            log.info("peps.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "peps.url", ""));
-            log.info("stork.login.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "stork.login.url", ""));
-            log.info("sp.mandatory.personal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.personal.attributes", ""));
-            log.info("sp.mandatory.business.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.business.attributes", ""));
-            log.info("sp.mandatory.legal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.legal.attributes", ""));
+            LOGGER.info("storkEnabled:" + PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false"));
+            LOGGER.info("provider.name:" + PrefsPropsUtil.getString(company.getCompanyId(), "provider.name", ""));
+            LOGGER.info("sp.sector:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.sector", ""));
+            LOGGER.info("sp.aplication:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.aplication", ""));
+            LOGGER.info("sp.country:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.country", ""));
+            LOGGER.info("sp.qaalevel:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.qaalevel", ""));
+            LOGGER.info("peps.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "peps.url", ""));
+            LOGGER.info("stork.login.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "stork.login.url", ""));
+            LOGGER.info("sp.mandatory.personal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.personal.attributes", ""));
+            LOGGER.info("sp.mandatory.business.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.business.attributes", ""));
+            LOGGER.info("sp.mandatory.legal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.legal.attributes", ""));
 
             request.getRequestDispatcher("/stork.jsp").forward(request, response);
-        } catch (PortalException ex) {
-            //java.util.logging.LoggerFactory.getLogger(StorkServlet.class.getName()).log(Level.SEVERE, null, ex);
-            log.error(null, ex);
-        } catch (SystemException ex) {
-            //java.util.logging.LoggerFactory.getLogger(StorkServlet.class.getName()).log(Level.SEVERE, null, ex);
-            log.error(null, ex);
+        } catch (PortalException | SystemException ex) {
+            LOGGER.error(null, ex);
         }
-
     }
 
     /**
@@ -154,33 +136,32 @@ public class StorkServlet extends HttpServlet {
      * @throws IOException      if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        log.info("##################### Stork Servlet Post ...");
-        providerName = PropsUtil.get("provider.name");
-        SAMLResponse = request.getParameter("SAMLResponse");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        LOGGER.info("##################### Stork Servlet Post ...");
+        String providerName = PropsUtil.get("provider.name");
+        String SAMLResponse = request.getParameter("SAMLResponse");
         byte[] decSamlToken = PEPSUtil.decodeSAMLToken(SAMLResponse);
-        samlResponseXML = new String(decSamlToken);
-        log.info("SAML IS : " + samlResponseXML);
+        String samlResponseXML = new String(decSamlToken);
+        LOGGER.info("SAML IS : " + samlResponseXML);
 
         STORKAuthnResponse authnResponse = null;
         IPersonalAttributeList personalAttributeList = null;
         STORKSAMLEngine engine = STORKSAMLEngine.getInstance(Constants.SP_CONF);
-        String host = (String) request.getRemoteHost();
-        log.info("HOST IS : " + host);
+        String host = request.getRemoteHost();
+        LOGGER.info("HOST IS : " + host);
         try {
             authnResponse = engine.validateSTORKAuthnResponseWithQuery(decSamlToken, host);
         } catch (STORKSAMLEngineException e) {
-            log.error("######################" + e.getMessage());
+            LOGGER.error("######################" + e.getMessage());
         }
         if (authnResponse.isFail()) {
-            log.error("Problem with response");
+            LOGGER.error("Problem with response");
         } else {
             personalAttributeList = authnResponse.getPersonalAttributeList();
         }
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        try {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -191,8 +172,6 @@ public class StorkServlet extends HttpServlet {
             out.println("Servlet StorkServlet at " + personalAttributeList.get("givenName"));
             out.println("</body>");
             out.println("</html>");
-        } finally {
-            out.close();
         }
     }
 
@@ -204,7 +183,7 @@ public class StorkServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
+    }
 
     public HttpServletRequest getRequest() {
         return request;
@@ -215,6 +194,7 @@ public class StorkServlet extends HttpServlet {
     }
 
     private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
+
         StringBuilder result = new StringBuilder();
         boolean first = true;
 
@@ -224,7 +204,6 @@ public class StorkServlet extends HttpServlet {
             } else {
                 result.append("&");
             }
-
             result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
             result.append("=");
             result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
@@ -234,6 +213,7 @@ public class StorkServlet extends HttpServlet {
     }
 
     public String doSubmit(String url, Map<String, String> data) throws Exception {
+
         URL siteUrl = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) siteUrl.openConnection();
         conn.setRequestProperty("User-Agent", USER_AGENT);
@@ -246,16 +226,15 @@ public class StorkServlet extends HttpServlet {
 
         Set keys = data.keySet();
         Iterator keyIter = keys.iterator();
-        String content = "";
+        StringBuilder content = new StringBuilder();
         for (int i = 0; keyIter.hasNext(); i++) {
             Object key = keyIter.next();
             if (i != 0) {
-                content += "&";
+                content.append("&");
             }
-            content += key + "=" + URLEncoder.encode(data.get(key), "UTF-8");
+            content.append(key).append("=").append(URLEncoder.encode(data.get(key), "UTF-8"));
         }
-        //log.info(content);
-        out.writeBytes(content);
+        out.writeBytes(content.toString());
         out.flush();
         out.close();
         StringBuilder sb = new StringBuilder();

@@ -147,8 +147,8 @@
                           displayName="Prescriptions"/>
                     <title>Prescriptions</title>
                     <text ID="eP_as_text"><paragraph>
-                        <content>TRIVERAM</content>
-                    </paragraph>
+                            <content>TRIVERAM</content>
+                        </paragraph>
                         <paragraph>
                             <content>Yksi tabletti päivässä</content>
                         </paragraph>
@@ -173,7 +173,7 @@
                         <substanceAdministration classCode="SBADM" moodCode="INT">
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.2"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.11"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7"/>
                             <id extension="187" root="1.2.246.556.12001.4.93.1.1"/>
                             <text><reference value="#eP_as_text"/></text>
                             <statusCode code="active"/>
@@ -295,11 +295,11 @@
                                 </observation>
                             </entryRelationship>
                             <entryRelationship inversionInd="true" typeCode="SUBJ">
-                                <act classCode="ACT" moodCode="EVN">
+                                <act classCode="ACT" moodCode="INT">
                                     <templateId root="2.16.840.1.113883.10.20.1.43"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.3.1"/>
                                     <code code="FINSTRUCT" codeSystem="1.3.6.1.4.1.19376.1.5.3.2"
-                                          codeSystemName="IHEActCode" />
+                                          codeSystemName="IHEActCode"/>
                                     <text><reference value="#FINSTRUCT"/></text>
                                     <statusCode code="completed"/>
                                 </act>

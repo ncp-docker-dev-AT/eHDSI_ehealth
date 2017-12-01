@@ -114,8 +114,6 @@ public class DocumentCatalog {
                 Collections.singletonList(createPatientSummary("2512484916", "2512484916.1.1", "Patient Summary for id: 2512484916.cda.ps.1.0:1", "National Board of E-Health", "2012-03-19T00:00:00.000+01:00")));
         map.put("1^^^&2.16.17.710.850.1000.990.1",
                 Collections.singletonList(createPatientSummary("1", "192405038569.1.1", "CDA Patientsummary", "Lars L\u00E4kare", "2012-03-19T00:00:00.000+01:00")));
-        map.put("1^^^&2.16.17.710.850.1000.990.1",
-                Collections.singletonList(createPatientSummary("1", "2512484916.1.1", "Patient Summary for id: 2512484916.cda.ps.1.0:1", "National Board of E-Health", "2012-03-19T00:00:00.000+01:00")));
         return map;
     }
 

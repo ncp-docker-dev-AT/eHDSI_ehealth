@@ -256,8 +256,8 @@ public class TRCAssertionRequest {
 
             Assertion trcAssertion = (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
             if (StringUtils.equals(ConfigurationManagerFactory.getConfigurationManager().getProperty("automated.validation"), "true")) {
-                AssertionValidationService assertionValidationService = new AssertionValidationService();
-                assertionValidationService.validateSchematron(XMLUtil.prettyPrint(trcAssertion.getDOM()),
+
+                AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(trcAssertion.getDOM()),
                         AssertionSchematron.EPSOS_TRC_ASSERTION.toString(), NcpSide.NCP_B);
             }
             return trcAssertion;

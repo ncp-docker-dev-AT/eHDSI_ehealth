@@ -131,18 +131,21 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
     @Override
     public void XCAPermissionValidator(Assertion assertion, String documentClass) throws InsufficientRightsException, MissingFieldException {
-        if (documentClass.equals(Constants.PS_CLASSCODE)) {
-            XCAPermissionValidatorPS(assertion);
-        } else if (documentClass.equals(Constants.EP_CLASSCODE)) {
-            XCAPermissionValidatorEP(assertion);
-        } else if (documentClass.equals(Constants.MRO_CLASSCODE)) {
-            XCAPermissionValidatorMro(assertion);
-        } else {
-            String errorMsg = "Invalid document class code: " + documentClass;
-            LOGGER.error(errorMsg);
-            throw new MissingFieldException(errorMsg);  // TODO: What to do when wrong class code
+        switch (documentClass) {
+            case Constants.PS_CLASSCODE:
+                XCAPermissionValidatorPS(assertion);
+                break;
+            case Constants.EP_CLASSCODE:
+                XCAPermissionValidatorEP(assertion);
+                break;
+            case Constants.MRO_CLASSCODE:
+                XCAPermissionValidatorMro(assertion);
+                break;
+            default:
+                String errorMsg = "Invalid document class code: " + documentClass;
+                LOGGER.error(errorMsg);
+                throw new MissingFieldException(errorMsg);  // TODO: What to do when wrong class code
         }
-
     }
 
     private void XCAPermissionValidatorPS(Assertion assertion) throws InsufficientRightsException {
@@ -173,18 +176,23 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         for (XMLObject permission : permissions) {
             permissionValue = permission.getDOM().getTextContent();
             LOGGER.info("HCP Identity Assertion XSPA Permission: '{}'", permissionValue);
-            if (permissionValue.equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_003)) {
-                medicalHistory = true;
-                LOGGER.info("Found permission for PRD-003 (Review Medical History)");
-            } else if (permissionValue.equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_005)) {
-                vitalSign = true;
-                LOGGER.info("Found permission for PRD-005 (Review Vital Signs/Patient Measurements)");
-            } else if (permissionValue.equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_010)) {
-                patientMedications = true;
-                LOGGER.info("Found permission for PRD-010 (Review Patient Medications)");
-            } else if (permissionValue.equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_016)) {
-                reviewProblem = true;
-                LOGGER.info("Found permission for PRD-016 (Review Problems)");
+            switch (permissionValue) {
+                case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_003:
+                    medicalHistory = true;
+                    LOGGER.info("Found permission for PRD-003 (Review Medical History)");
+                    break;
+                case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_005:
+                    vitalSign = true;
+                    LOGGER.info("Found permission for PRD-005 (Review Vital Signs/Patient Measurements)");
+                    break;
+                case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_010:
+                    patientMedications = true;
+                    LOGGER.info("Found permission for PRD-010 (Review Patient Medications)");
+                    break;
+                case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_016:
+                    reviewProblem = true;
+                    LOGGER.info("Found permission for PRD-016 (Review Problems)");
+                    break;
             }
         }
 
@@ -251,14 +259,18 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
     @Override
     public void XDRPermissionValidator(Assertion assertion, String documentClass) throws InsufficientRightsException, MissingFieldException, InvalidFieldException {
-        if (documentClass.equals(Constants.ED_CLASSCODE) || documentClass.equals(Constants.HCER_CLASSCODE)) {
-            XDRPermissionValidatorEDOrHCER(assertion);
-        } else if (documentClass.equals(Constants.CONSENT_CLASSCODE)) {
-            XDRPermissionValidatorConsent(assertion);
-        } else {
-            String errorMsg = "Invalid document class code: " + documentClass;
-            LOGGER.error(errorMsg);
-            throw new MissingFieldException(errorMsg);  // TODO: What to do when wrong class code?
+        switch (documentClass) {
+            case Constants.ED_CLASSCODE:
+            case Constants.HCER_CLASSCODE:
+                XDRPermissionValidatorEDOrHCER(assertion);
+                break;
+            case Constants.CONSENT_CLASSCODE:
+                XDRPermissionValidatorConsent(assertion);
+                break;
+            default:
+                String errorMsg = "Invalid document class code: " + documentClass;
+                LOGGER.error(errorMsg);
+                throw new MissingFieldException(errorMsg);  // TODO: What to do when wrong class code?
         }
     }
 
