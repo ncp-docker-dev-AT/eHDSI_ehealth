@@ -9,8 +9,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
-
 public class ConfigurationManagerImplTest {
 
     private static final String COUNTRY_VALUE = "FR";
@@ -49,7 +47,6 @@ public class ConfigurationManagerImplTest {
     @Test(expected = PropertyNotFoundException.class)
     public void testGetInvalidProperty() {
         ConfigurationManager configurationManager = new ConfigurationManagerImpl(sessionFactory);
-//        ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
         configurationManager.getProperty("INVALID_OPENNCP_PROPERTY");
     }
 
@@ -69,14 +66,12 @@ public class ConfigurationManagerImplTest {
 
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
-        //TypedQuery<Long> query = session.createQuery("select count(p.key) from Property p", Long.class);
         Query query = session.createQuery("select count(p.key) from Property p");
-        List result = query.list();
-
         Property property = session.get(Property.class, StandardProperties.NCP_EMAIL);
-        transaction.commit();
 
-        Assert.assertEquals(2L, result.get(0));
+        Assert.assertEquals(2L, query.uniqueResult());
         Assert.assertEquals(EMAIL_VALUE, property.getValue());
+
+        transaction.commit();
     }
 }
