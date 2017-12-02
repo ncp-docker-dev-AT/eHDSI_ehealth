@@ -27,6 +27,7 @@ import org.openhealthtools.openatna.syslog.message.StringLogMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
@@ -36,17 +37,20 @@ import java.net.InetSocketAddress;
  *
  * @author Andrew Harrison
  * @version $Revision:$
- * @created Aug 19, 2009: 2:56:20 PM
- * @date $Date:$ modified by $Author:$
  */
 public class BsdClientTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BsdClientTest.class);
 
     public static void main(String[] args) throws Exception {
 
-        BsdMessage m = new BsdMessage(10, 5, "Oct  1 22:14:15", "127.0.0.1", new StringLogMessage("!Don't panic!"), "ATNALOG");
-        LOGGER.info("message:");
-        m.write(System.out);
+        BsdMessage m = new BsdMessage(10, 5, "Oct  1 22:14:15", "127.0.0.1",
+                new StringLogMessage("!Don't panic!"), "ATNALOG");
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        m.write(outputStream);
+        LOGGER.info("Output:\n{}", outputStream.toString());
+
         SyslogMessageFactory.registerLogMessage("ATNALOG", StringLogMessage.class);
         SyslogMessageFactory.setFactory(new BsdMessageFactory());
         byte[] bytes = m.toByteArray();

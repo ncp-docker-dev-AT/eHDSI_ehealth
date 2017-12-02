@@ -185,9 +185,10 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             format.setOmitXMLDeclaration(false);
             format.setVersion("1.0");
             format.setStandalone(true);
-
-            XMLSerializer serializer = new XMLSerializer(System.out, format);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            XMLSerializer serializer = new XMLSerializer(outputStream, format);
             serializer.serialize(el.getOwnerDocument());
+            LOGGER.info("STSEid:\n{}", outputStream.toString());
             return resp;
 
         } catch (Exception ex) {

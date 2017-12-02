@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -99,9 +100,8 @@ public class Utilities {
     }
 
     public static void serialize(Element request) throws TransformerException {
-        //TODO: Check if the rendering to System.out was necessary or not?
-        serialize(request, System.out);
-        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         serialize(request, outputStream);
         logger.debug("Stream: '{}'", outputStream.toString());
     }

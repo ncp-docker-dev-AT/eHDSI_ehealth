@@ -85,23 +85,16 @@ public class EvidenceUtils {
                 recipientCertAlias, eventType, submissionTime, status, title, msguuid);
     }
 
-    public static void createEvidenceREMNRR(
-            Document incomingMsg,
-            String issuerKeyStorePath,
-            String issuerKeyPassword,
-            String issuerCertAlias,
-            String senderKeyStorePath,
-            String senderKeyPassword,
-            String senderCertAlias,
-            String recipientKeyStorePath,
-            String recipientKeyPassword,
-            String recipientCertAlias,
-            String eventType,
-            DateTime submissionTime,
-            String status,
-            String title,
-            String msguuid
-    ) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+    public static void createEvidenceREMNRR(Document incomingMsg, String issuerKeyStorePath, String issuerKeyPassword,
+                                            String issuerCertAlias, String senderKeyStorePath, String senderKeyPassword,
+                                            String senderCertAlias, String recipientKeyStorePath, String recipientKeyPassword,
+                                            String recipientCertAlias, String eventType, DateTime submissionTime,
+                                            String status, String title, String msguuid)
+            throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException,
+            SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException,
+            ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException,
+            NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
             statusmsg = "success";
@@ -153,14 +146,12 @@ public class EvidenceUtils {
 
         Element request = requestCreator.getRequest();
 
-        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
         // just some printouts
         Utilities.serialize(request);
 
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
-
         enforcePolicy.decide(request);
-        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
+
         Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
 
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
@@ -192,8 +183,8 @@ public class EvidenceUtils {
                 messageType, obligations, context);
 
         for (ObligationHandler oh : handlers) {
+
             oh.discharge();
-            //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
             Utilities.serialize(oh.getMessage().getDocumentElement());
             String oblString = XMLUtil.DocumentToString(oh.getMessage());
             if (title == null || title.isEmpty()) {
@@ -205,31 +196,6 @@ public class EvidenceUtils {
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
     }
-
-    /* Joao: commented since this is not used anymore */
-//    public static void createEvidenceREMNRR(
-//            Document incomingSoap,
-//            String eventType,
-//            DateTime submissionTime,
-//            String status,
-//            String title,
-//            String msguuid) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
-//
-//        createEvidenceREMNRR(incomingSoap, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS, eventType, submissionTime, status, title, msguuid);
-//    }
-
-    /* Joao: commented since this is not used anymore */
-//    public static void createEvidenceREMNRO(
-//            Document incomingSoap,
-//            String eventType,
-//            DateTime submissionTime,
-//            String status,
-//            String title,
-//            String msguuid) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
-//
-//        createEvidenceREMNRO(incomingSoap, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS, eventType, submissionTime, status, title, msguuid);
-//
-//    }
 
     public static void createEvidenceREMNRO(
             Document incomingSoap,
@@ -246,8 +212,6 @@ public class EvidenceUtils {
             DateTime submissionTime,
             String status,
             String title) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
-
-//        Document incomingMsg = XMLUtil.parseContent(incomingSoap);
 
         MessageType messageType = null;
         String msguuid = "";
@@ -295,10 +259,9 @@ public class EvidenceUtils {
 
             statusmsg = "success";
         }
-//        Document incomingMsg = XMLUtil.parseContent(incomingSoap);
+
         PDP simplePDP = SimplePDPFactory.getSimplePDP();
-        UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP
-                .getPolicyRepository();
+        UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP.getPolicyRepository();
 
         JAXBMarshallerConfiguration conf = new JAXBMarshallerConfiguration();
         conf.setValidateParsing(false);
@@ -345,7 +308,6 @@ public class EvidenceUtils {
                 messageType, null, null, actionList, environmentList);
 
         Element request = requestCreator.getRequest();
-        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
         Utilities.serialize(request);
 
         /*
@@ -356,7 +318,6 @@ public class EvidenceUtils {
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
 
         enforcePolicy.decide(request);
-        //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
         Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
 
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
@@ -386,8 +347,8 @@ public class EvidenceUtils {
 
         // Here I discharge manually. This behavior is to let free an implementation
         for (ObligationHandler handler : handlers) {
+
             handler.discharge();
-            //TODO: Check if this call to serialize is mandatory as it only achieving a System.out logging.
             Utilities.serialize(handler.getMessage().getDocumentElement());
             String oblString = XMLUtil.DocumentToString(handler.getMessage());
             if (title == null || title.isEmpty()) {
@@ -398,10 +359,10 @@ public class EvidenceUtils {
             LOGGER.info("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
-
     }
 
     private static String getPath() {
+
         String exportPath = System.getenv("EPSOS_PROPS_PATH");
         String evidencesPath = exportPath + "obligations/";
         LOGGER.debug("Evidences Path: '{}'", evidencesPath);
@@ -409,11 +370,12 @@ public class EvidenceUtils {
     }
 
     private static String getDocumentTitle(String uuid, String title) {
+
         return DateUtil.getCurrentTimeGMT() + "_" + uuid + "_" + title;
     }
 
-    public static Document readMessage(String file)
-            throws ParserConfigurationException, SAXException, IOException {
+    public static Document readMessage(String file) throws ParserConfigurationException, SAXException, IOException {
+
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -421,6 +383,7 @@ public class EvidenceUtils {
     }
 
     private static X509Certificate getCertificate(String keyStorePath, String keyPassword, String certAlias) throws KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
+
         LOGGER.debug("X509Certificate getCertificate('{}', '{}', '{}", keyStorePath, keyPassword, certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
@@ -429,6 +392,7 @@ public class EvidenceUtils {
     }
 
     private static PrivateKey getSigningKey(String keyStorePath, String keyPassword, String certAlias) throws FileNotFoundException, KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+
         LOGGER.debug("PrivateKey getSigningKey('{}', '{}', '{}", keyStorePath, keyPassword, certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
