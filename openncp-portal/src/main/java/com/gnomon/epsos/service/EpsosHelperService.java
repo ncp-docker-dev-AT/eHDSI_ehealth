@@ -25,6 +25,7 @@ import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import net.ihe.gazelle.medication.NullFlavor;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
@@ -1985,6 +1986,7 @@ public class EpsosHelperService {
                 String day = input.substring(6);
                 result = day + "/" + month + "/" + year;
             } catch (Exception e) {
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
             }
         }
         return result;
@@ -1993,19 +1995,20 @@ public class EpsosHelperService {
     public static String getUniqueId() {
 
         String uniqueId;
-        String pnoid = ConfigurationManagerFactory.getConfigurationManager().getProperty("HOME_COMM_ID");
         String prop = "pn.uniqueid";
-        String id = ConfigurationManagerFactory.getConfigurationManager().getProperty(prop);
-        int pid;
-        if (Validator.isNull(id)) {
-            ConfigurationManagerFactory.getConfigurationManager().setProperty(prop, "1");
-            uniqueId = pnoid + "." + "1";
-        } else {
-            pid = Integer.parseInt(ConfigurationManagerFactory.getConfigurationManager().getProperty(prop));
+        String pnoid = ConfigurationManagerFactory.getConfigurationManager().getProperty("HOME_COMM_ID");
+
+        try {
+
+            int pid = Integer.parseInt(ConfigurationManagerFactory.getConfigurationManager().getProperty(prop));
             pid = pid + 1;
             uniqueId = pnoid + "." + pid;
-            ConfigurationManagerFactory.getConfigurationManager().setProperty(prop, pid + "");
+            ConfigurationManagerFactory.getConfigurationManager().setProperty(prop, String.valueOf(pid));
+        } catch (PropertyNotFoundException e) {
+            ConfigurationManagerFactory.getConfigurationManager().setProperty(prop, "1");
+            uniqueId = pnoid + "." + "1";
         }
+
         return uniqueId;
     }
 
