@@ -15,8 +15,7 @@
     <name>openncp-common-components</name>
 
     <modules>
-        <module>tools/ConfigManagerDatabaseMigration</module>
-        <module>tools/NcpConfigurationUtil</module>
+        <module>openncp-configuration-utility</module>
     </modules>
 
     <build>
