@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import javax.naming.NamingException;
-import javax.xml.parsers.ParserConfigurationException;
 import java.sql.SQLException;
 
 public enum EadcFactory {
@@ -25,7 +24,7 @@ public enum EadcFactory {
     private EadcReceiver receiver = null;
     private EadcEntry entry = null;
 
-    public EadcDbConnect createEadcDbConnect(String dsName) throws NamingException, SQLException, ParserConfigurationException, ClassNotFoundException {
+    public EadcDbConnect createEadcDbConnect(String dsName) throws NamingException, SQLException {
         return new EadcDbConnectImpl(dsName);
     }
 
@@ -46,14 +45,16 @@ public enum EadcFactory {
      * at the NCP the default EadcReceiverImpl is used - only one receiver impl
      * can be used in one classPath!
      */
-    public EadcReceiver getReceiver(String implClass) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public EadcReceiver getReceiver(String implClass) throws InstantiationException, IllegalAccessException,
+            ClassNotFoundException {
         return initReceiver(implClass);
     }
 
     /**
      * returns the default EadcEntry
      */
-    public EadcEntry getEntry(String dsName, Document data, Document soapRqData, Document soapRspData) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public EadcEntry getEntry(String dsName, Document data, Document soapRqData, Document soapRspData)
+            throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         return initEntry(EadcEntryImpl.class.getName(), dsName, data, soapRqData, soapRspData);
     }
 
@@ -62,16 +63,17 @@ public enum EadcFactory {
      * called by the NCP implementation - if no entry impl is configured at the
      * NCP the default EadcEntryImpl is used
      */
-    public EadcEntry getEntry(String implClass, String dsName, Document data, Document soapRqData, Document soapRspData) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public EadcEntry getEntry(String implClass, String dsName, Document data, Document soapRqData, Document soapRspData)
+            throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         return initEntry(implClass, dsName, data, soapRqData, soapRspData);
     }
 
     /**
-     * initializes the EadcReceiver - using a different EadcReceiverImpl would
-     * enable you to add additional functionality during the data collection
-     * from the EadcEntry to the Database tables
+     * initializes the EadcReceiver - using a different EadcReceiverImpl would enable you to add additional
+     * functionality during the data collection from the EadcEntry to the Database tables
      */
-    private synchronized EadcReceiver initReceiver(String implClass) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    private synchronized EadcReceiver initReceiver(String implClass) throws InstantiationException, IllegalAccessException,
+            ClassNotFoundException {
 
         if (receiver == null) {
             LOGGER.debug("initReceiver - instantiate new : '{}'", implClass);
@@ -79,7 +81,6 @@ public enum EadcFactory {
         } else {
             LOGGER.trace("initReceiver - use old singleton instance: '{}'", implClass);
         }
-        //if (!implClass.equals(receiver.getClass().getName())) {
         if (!StringUtils.equals(implClass, receiver.getClass().getName())) {
             throw new IllegalArgumentException("singleton / implClass conflict - receivedImplClass :" + implClass + ", actUsedSingleton :" + receiver.getClass().getName());
         }
@@ -88,13 +89,14 @@ public enum EadcFactory {
     }
 
     /**
-     * initializes the EadcEntry - using a different EadcEntryImpl would enable
-     * you to extract additional data from the soap request or response data to
-     * the data xml before the entry is processed by the EadcReceiverImpl - the
-     * default EadcReceiverImpl is only using the data xml and not the soap
-     * request and response data
+     * initializes the EadcEntry - using a different EadcEntryImpl would enable you to extract additional data
+     * from the soap request or response data to the data xml before the entry is processed by the EadcReceiverImpl -
+     * the default EadcReceiverImpl is only using the data xml and not the soap request and response data
      */
-    private synchronized EadcEntry initEntry(String implClass, String dsName, Document data, Document soapRqData, Document soapRspData) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    private synchronized EadcEntry initEntry(String implClass, String dsName, Document data, Document soapRqData,
+                                             Document soapRspData) throws InstantiationException, IllegalAccessException,
+            ClassNotFoundException {
+
         if (entry == null) {
             LOGGER.debug("initEntry - instantiate new: '{}'", implClass);
             entry = (EadcEntry) Class.forName(implClass).newInstance();
@@ -102,7 +104,6 @@ public enum EadcFactory {
         } else {
             LOGGER.trace("initEntry - use old singleton instance: '{}'", implClass);
         }
-        //if (!implClass.equals(entry.getClass().getName())) {
         if (!StringUtils.equals(implClass, entry.getClass().getName())) {
             throw new IllegalArgumentException("singleton / implClass conflict - receivedImplClass :" + implClass + ", actUsedSingleton :" + entry.getClass().getName());
         }

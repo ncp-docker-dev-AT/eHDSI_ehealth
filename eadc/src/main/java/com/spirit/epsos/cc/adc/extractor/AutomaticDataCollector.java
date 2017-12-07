@@ -25,7 +25,7 @@ public interface AutomaticDataCollector {
      *
      * @param transaction    The transaction-xml-structure as specified by the
      *                       XML-Schema
-     * @param dataSourceName The dataSourceName of the Database
+     * @param dsName The dataSourceName of the Database
      * @throws Exception
      */
     void processTransaction(String dsName, Document transaction) throws Exception;

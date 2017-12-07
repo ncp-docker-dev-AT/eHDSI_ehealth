@@ -1,34 +1,16 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2013  SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.eadc.helper;
 
 import eu.epsos.pt.eadc.datamodel.ObjectFactory;
 import eu.epsos.pt.eadc.datamodel.Transaction;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  * This class gathers a set of utilities to manipulate eADC Transactions. For
@@ -44,16 +26,15 @@ public class TransactionHelper {
      * producing a Transaction Document.
      *
      * @param transaction the Transaction object
-     * @param cda the CDA document
-     *
+     * @param cda         the CDA document
      * @return a Document containing the Transaction Information combined with
      * the CDA document
-     *
-     * @throws JAXBException thrown by the Transaction conversion process
+     * @throws JAXBException                thrown by the Transaction conversion process
      * @throws ParserConfigurationException thrown by the Transaction conversion
-     * process
+     *                                      process
      */
-    public static Document insertCdaInTransaction(Transaction transaction, Document cda) throws JAXBException, ParserConfigurationException {
+    public static Document insertCdaInTransaction(Transaction transaction, Document cda)
+            throws JAXBException, ParserConfigurationException {
         return insertCdaInTransaction(convertTransaction(transaction), cda);
     }
 
@@ -63,8 +44,8 @@ public class TransactionHelper {
      * element.
      *
      * @param transaction the Transaction document that will receive the CDA
-     * document
-     * @param cda the CDA document to be inserted
+     *                    document
+     * @param cda         the CDA document to be inserted
      * @return a Transaction object filled with a CDA document also
      */
     public static Document insertCdaInTransaction(Document transaction, final Document cda) {
@@ -87,15 +68,14 @@ public class TransactionHelper {
      *
      * @param transaction the transaction object to be converted
      * @return a Document object representing the transaction
-     *
-     * @throws JAXBException thrown by the conversion of the transaction object
-     * to the JAXB element
+     * @throws JAXBException                thrown by the conversion of the transaction object
+     *                                      to the JAXB element
      * @throws ParserConfigurationException
      */
-    public static Document convertTransaction(final Transaction transaction) throws JAXBException, ParserConfigurationException {
+    public static Document convertTransaction(final Transaction transaction)
+            throws JAXBException, ParserConfigurationException {
 
         /* SETUP */
-
         DocumentBuilderFactory dbf;
         Document result;
         JAXBContext jaxbContext;
@@ -103,7 +83,6 @@ public class TransactionHelper {
         JAXBElement<Transaction> transElem;
 
         /* BODY */
-
         dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         result = dbf.newDocumentBuilder().newDocument(); // Create document to hold Transaction
