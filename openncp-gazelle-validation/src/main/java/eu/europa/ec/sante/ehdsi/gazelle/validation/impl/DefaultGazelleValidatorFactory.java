@@ -2,7 +2,6 @@ package eu.europa.ec.sante.ehdsi.gazelle.validation.impl;
 
 import eu.europa.ec.sante.ehdsi.gazelle.validation.*;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -21,27 +20,31 @@ import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
 public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory {
 
-    private static final String GAZELLE_ASSERTION_VALIDATOR_URI =
+    public static final String GAZELLE_ASSERTION_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    private static final String GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI =
+    public static final String GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS";
 
-    private static final String GAZELLE_CDA_VALIDATOR_URI =
+    public static final String GAZELLE_CDA_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    private static final String GAZELLE_CERTIFICATE_VALIDATOR_URI =
+    public static final String GAZELLE_CERTIFICATE_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator";
 
-    private static final String GAZELLE_SCHEMATRON_VALIDATOR_URI =
+    public static final String GAZELLE_SCHEMATRON_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator";
 
-    private static final String GAZELLE_XDS_VALIDATOR_URI =
+    public static final String GAZELLE_XDS_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
 
     private final Logger logger = LoggerFactory.getLogger(DefaultGazelleValidatorFactory.class);
 
-    private final ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
+    private final ConfigurationManager configurationManager;
+
+    public DefaultGazelleValidatorFactory(ConfigurationManager configurationManager) {
+        this.configurationManager = configurationManager;
+    }
 
     @Override
     public AssertionValidator getAssertionValidator() {
@@ -62,8 +65,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
     @Override
     public CdaValidator getCdaValidator() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda");
-
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda", "net.ihe.gazelle.jaxb.result");
         return new CdaValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_CDA_VALIDATOR_URI));
     }
 
@@ -92,7 +94,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
     }
 
     private WebServiceTemplate createWebServiceTemplate(Marshaller marshaller, String defaultUri) {
-        logger.debug("Configuring WebServiceTemplate");
+        logger.debug("Configuring WebServiceTemplate ...");
 
         HttpClientBuilder httpClientBuilder = HttpClients.custom()
                 .addInterceptorFirst(new HttpComponentsMessageSender.RemoveSoapHeadersInterceptor());

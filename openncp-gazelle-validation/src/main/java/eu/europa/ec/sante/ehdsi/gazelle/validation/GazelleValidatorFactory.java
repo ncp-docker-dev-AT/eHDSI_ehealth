@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation;
 
 import eu.europa.ec.sante.ehdsi.gazelle.validation.impl.DefaultGazelleValidatorFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 
 public class GazelleValidatorFactory {
 
@@ -38,6 +39,6 @@ public class GazelleValidatorFactory {
     }
 
     private static IGazelleValidatorFactory getIGazelleValidatorFactory() {
-        return new DefaultGazelleValidatorFactory();
+        return new DefaultGazelleValidatorFactory(ConfigurationManagerFactory.getConfigurationManager());
     }
 }
