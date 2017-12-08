@@ -51,6 +51,10 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="eu.esens.abb.nonrep" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="eu.epsos.pt.ws.client.xdr" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>

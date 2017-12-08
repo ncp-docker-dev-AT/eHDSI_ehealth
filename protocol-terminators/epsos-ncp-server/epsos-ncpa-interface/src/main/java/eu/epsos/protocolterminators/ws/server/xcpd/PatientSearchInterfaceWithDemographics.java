@@ -7,6 +7,5 @@ public interface PatientSearchInterfaceWithDemographics extends PatientSearchInt
     /**
      * Sets patient demographics for NI
      */
-    public void setPatientDemographics(PatientDemographics pd);
-
+    void setPatientDemographics(PatientDemographics pd);
 }

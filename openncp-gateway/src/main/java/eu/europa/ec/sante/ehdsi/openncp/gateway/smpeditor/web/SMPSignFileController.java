@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -36,20 +35,19 @@ import java.util.regex.Pattern;
 /**
  * @author Inês Garganta
  */
-
 @Controller
 @SessionAttributes("smpfilesign")
 public class SMPSignFileController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SMPSignFileController.class);
 
-    private SMPConverter smpconverter = new SMPConverter();
+    private SMPConverter smpconverter;
 
-    private XMLValidator xmlValidator = new XMLValidator();
+    private XMLValidator xmlValidator;
 
     private Environment env;
 
-    private ReadSMPProperties readProperties = new ReadSMPProperties();
+    private ReadSMPProperties readProperties;
 
     private String type;
 
@@ -84,6 +82,7 @@ public class SMPSignFileController {
      */
     @RequestMapping(value = "/smpeditor/signsmpfile/generated", method = RequestMethod.GET)
     public String signCreatedFile(Model model, @ModelAttribute("smpfile") SMPFile smpfile) {
+
         LOGGER.debug("\n==== in signCreatedFile ====");
         SMPFileOps smpfilesign = new SMPFileOps();
 
@@ -105,7 +104,7 @@ public class SMPSignFileController {
             LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
-        List<MultipartFile> files = new ArrayList<MultipartFile>();
+        List<MultipartFile> files = new ArrayList<>();
         files.add(0, fileSign);
 
         smpfilesign.setSignFiles(files);
@@ -175,7 +174,7 @@ public class SMPSignFileController {
         List<MultipartFile> signFiles = new ArrayList<MultipartFile>();
         signFiles = smpfilesign.getSignFiles();
 
-    /*Iterate each chosen file*/
+        /*Iterate each chosen file*/
         for (int k = 0; k < signFiles.size(); k++) {
             LOGGER.debug("\n***** MULTIPLE FILE NAME " + k + " - " + signFiles.get(k).getOriginalFilename());
             SMPFileOps smpfile = new SMPFileOps();
@@ -287,8 +286,8 @@ public class SMPSignFileController {
                         redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                         return "redirect:/smpeditor/signsmpfile";
                     }
-          
-          /*Builds final file name*/
+
+                    /*Builds final file name*/
                     String timeStamp = new SimpleDateFormat("yyyyMMdd'T'HHmmss").format(new java.util.Date());
                     String fileName = smpfile.getType().name() + "_" + smpType + "_" + smpfile.getCountry().toUpperCase() + "_Signed_" + timeStamp + ".xml";
                     smpfile.setFileName(fileName);
@@ -362,8 +361,8 @@ public class SMPSignFileController {
                     redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                     return "redirect:/smpeditor/signsmpfile";
                 }
-        
-        /*Builds final file name*/
+
+                /*Builds final file name*/
                 String timeStamp = new SimpleDateFormat("yyyyMMdd'T'HHmmss").format(new java.util.Date());
                 String fileName = smpfile.getType().name() + "_" + smpfile.getCountry().toUpperCase() + "_Signed_" + timeStamp + ".xml";
                 smpfile.setFileName(fileName);
@@ -377,9 +376,9 @@ public class SMPSignFileController {
                 smpfile.setMinimumAutenticationLevel(serviceMetadata.getServiceInformation().getProcessList().getProcesses().get(0).getServiceEndpointList().getEndpoints().get(0).getMinimumAuthenticationLevel());
             }
 
-      /*
-       * Read smpeditor.properties file
-       */
+            /*
+             * Read smpeditor.properties file
+             */
             readProperties.readProperties(smpfile);
 
             smpfields.setUri(readProperties.getUri());

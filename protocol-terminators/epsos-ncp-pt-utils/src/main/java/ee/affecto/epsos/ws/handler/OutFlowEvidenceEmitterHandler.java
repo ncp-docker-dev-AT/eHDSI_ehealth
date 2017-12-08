@@ -1,15 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ee.affecto.epsos.ws.handler;
 
 import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import eu.epsos.util.EvidenceUtils;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.Handler;
@@ -33,12 +27,11 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutFlowEvidenceEmitterHandler.class);
 
-    private EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils;
-
     @Override
-    public Handler.InvocationResponse invoke(MessageContext msgcontext) throws AxisFault {
+    public Handler.InvocationResponse invoke(MessageContext msgcontext) {
+
         LOG.debug("OutFlow Evidence Emitter handler is executing");
-        this.evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
+        EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
 
         /* I'll leave this here as it might be useful in the future */
 
@@ -113,12 +106,12 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 
         try {
             /* Canonicalizing the full SOAP message */
-            Document envCanonicalized = this.evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(msgcontext.getEnvelope());
+            Document envCanonicalized = evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(msgcontext.getEnvelope());
 
             SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
             SOAPBody soapBody = msgcontext.getEnvelope().getBody();
-            String eventType = null;
-            String title = null;
+            String eventType;
+            String title;
             String msgUUID = null;
             AxisService axisService = msgcontext.getServiceContext().getAxisService();
             boolean isClientSide = axisService.isClientSide();
@@ -130,8 +123,8 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
                     title = "NCPB_XCPD_REQ"
                     eventType = ihe event 
                 */
-                eventType = this.evidenceEmitterHandlerUtils.getEventTypeFromMessage(soapBody);
-                title = "NCPB_" + this.evidenceEmitterHandlerUtils.getTransactionNameFromMessage(soapBody);
+                eventType = evidenceEmitterHandlerUtils.getEventTypeFromMessage(soapBody);
+                title = "NCPB_" + evidenceEmitterHandlerUtils.getTransactionNameFromMessage(soapBody);
                 //msgUUID = null; It stays as null because it's fetched from soap msg
                 LOG.debug("eventType: " + eventType);
                 LOG.debug("title: " + title);
@@ -151,6 +144,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                         title);
             } else {
+                LOG.debug("Server Side");
                 /* NCP-A replies to NCP-B, e.g.: 
                     NRO
                     title = "NCPA_XCPD_RES"

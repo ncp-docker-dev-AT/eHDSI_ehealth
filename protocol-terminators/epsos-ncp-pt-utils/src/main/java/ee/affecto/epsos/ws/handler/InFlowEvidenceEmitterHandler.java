@@ -4,7 +4,6 @@ import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import eu.epsos.util.EvidenceUtils;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.Handler;
@@ -28,7 +27,7 @@ public class InFlowEvidenceEmitterHandler extends AbstractHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(InFlowEvidenceEmitterHandler.class);
 
     @Override
-    public Handler.InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
+    public Handler.InvocationResponse invoke(MessageContext msgContext) {
 
         LOGGER.debug("InFlow Evidence Emitter handler is executing");
         EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
@@ -117,8 +116,7 @@ public class InFlowEvidenceEmitterHandler extends AbstractHandler {
             String msgUUID;
             AxisService axisService = msgContext.getServiceContext().getAxisService();
             boolean isClientSide = axisService.isClientSide();
-            LOGGER.debug("AxisService name: '{}'", axisService.getName());
-            LOGGER.debug("AxisService isClientSide: '{}'", isClientSide);
+            LOGGER.debug("AxisService name: '{}' - isClientSide: '{}'", axisService.getName(), isClientSide);
             if (isClientSide) {
                 /* NCP-B receives from NCP-A, e.g.:
                     NRR
@@ -161,9 +159,7 @@ public class InFlowEvidenceEmitterHandler extends AbstractHandler {
                 eventType = evidenceEmitterHandlerUtils.getEventTypeFromMessage(soapBody);
                 title = evidenceEmitterHandlerUtils.getServerSideTitle(soapBody);
                 msgUUID = evidenceEmitterHandlerUtils.getMsgUUID(soapHeader, soapBody);
-                LOGGER.debug("eventType: '{}'", eventType);
-                LOGGER.debug("title: '{}'", title);
-//                LOGGER.debug("msgUUID: '{}'", msgUUID); //It stays as null because it's fetched from soap msg
+                LOGGER.debug("eventType: '{}' - title: '{}'", eventType, title);
 
                 if (msgUUID != null) {
                     // this is a Portal-NCPB interaction: msgUUID comes from IdA or TRCA or is random
