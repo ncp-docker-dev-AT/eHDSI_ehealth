@@ -6,12 +6,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
-import tr.com.srdc.epsos.util.DateUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
@@ -131,7 +134,7 @@ public class ReportBuilder {
 
         StringBuilder fileName = new StringBuilder();
 
-        fileName.append(DateUtil.getCurrentTimeLocal());
+        fileName.append(formatDate());
 
         if (objectType != null && !objectType.isEmpty()) {
             fileName.append(SEPARATOR);
@@ -173,5 +176,14 @@ public class ReportBuilder {
             }
         }
         return true;
+    }
+
+    private static String formatDate() {
+
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        //ISO 8601 format: 2017-11-25T10:59:53Z
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        df.setTimeZone(tz);
+        return df.format(new Date());
     }
 }
