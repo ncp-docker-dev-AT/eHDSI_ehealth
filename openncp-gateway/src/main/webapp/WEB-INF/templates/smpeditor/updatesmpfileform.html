@@ -7,8 +7,6 @@
     <link th:href="@{/resources/css/smpeditor.css}" rel="stylesheet">
     <link th:href="@{/resources/css/tooltip.css}" rel="stylesheet">
     <link th:href="@{/resources/css/bootstrap-datetimepicker.min.css}" rel="stylesheet">
-    <script th:href="@{/resources/vendor/bootstrap/js/bootstrap.min.js}"></script>
-    <script th:href="@{/resources/vendor/jquery/js/jquery-3.1.1.min.js}"></script>
 </head>
 <body>
 <nav class="navbar navbar-default navbar-inverse navbar-static-top">
@@ -297,7 +295,9 @@
 
 </div>
 
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" th:src="@{/resources/vendor/jquery/js/jquery-3.1.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/resources/vendor/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/resources/vendor/moment/js/moment-2.12.0.js}"></script>
 <script type="text/javascript" th:src="@{/resources/js/bootstrap-datetimepicker.min.js}"></script>
 <script type="text/javascript">
     $("#dateactinput")

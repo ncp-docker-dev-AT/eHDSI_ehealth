@@ -5,8 +5,6 @@
     <title></title>
     <link th:href="@{/resources/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/resources/css/smpeditor.css}" rel="stylesheet">
-    <script th:href="@{/resources/vendor/bootstrap/js/bootstrap.min.js}"></script>
-    <script th:href="@{/resources/vendor/jquery/js/jquery-3.1.1.min.js}"></script>
 </head>
 <body>
 <nav class="navbar navbar-default navbar-inverse navbar-static-top">
@@ -70,6 +68,7 @@
        th:text="#{label.button.back}">Back</a>
     <a href="#" id="abutton" th:href="@{/smpeditor/smpeditor}" class="btn btn-default" th:text="#{label.button.done}">Done</a>
 </div>
-
+<script type="text/javascript" th:src="@{/resources/vendor/jquery/js/jquery-3.1.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/resources/vendor/bootstrap/js/bootstrap.min.js}"></script>
 </body>
 </html>
