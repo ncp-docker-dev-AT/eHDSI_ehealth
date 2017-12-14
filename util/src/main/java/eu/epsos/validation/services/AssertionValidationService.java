@@ -88,7 +88,7 @@ public class AssertionValidationService extends ValidationService {
 
         // Report generation.
         if (!xmlDetails.isEmpty()) {
-            LOGGER.info(xmlDetails);
+            LOGGER.info("Building Validation Report");
             return ReportBuilder.build(schematron, AssertionSchematron.checkSchematron(schematron).getObjectType().toString(),
                     object, WsUnmarshaller.unmarshal(xmlDetails), xmlDetails, ncpSide);
         } else {
