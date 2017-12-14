@@ -1,22 +1,3 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
 package epsos.ccd.gnomon.auditmanager.ssl;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,14 +16,15 @@ public class AuthSSLX509TrustManager implements X509TrustManager {
      * Log object for this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthSSLX509TrustManager.class);
-    List<String> authorizedDns = null;
-    private X509TrustManager trustManager = null;
-    private X509TrustManager defaultTrustManager = null;
+    private List<String> authorizedDns;
+    private X509TrustManager trustManager;
+    private X509TrustManager defaultTrustManager;
 
     /**
      * Constructor for AuthSSLX509TrustManager.
      */
-    public AuthSSLX509TrustManager(final X509TrustManager trustManager, final X509TrustManager defaultTrustManager, List<String> authorizedDns) {
+    public AuthSSLX509TrustManager(final X509TrustManager trustManager, final X509TrustManager defaultTrustManager,
+                                   List<String> authorizedDns) {
 
         super();
         if (trustManager == null) {
@@ -75,12 +57,13 @@ public class AuthSSLX509TrustManager implements X509TrustManager {
                         }
                     }
                 }
-                LOGGER.info(" Client certificate '{}':", (c + 1));
-                LOGGER.info("  Subject DN: '{}'", cert.getSubjectDN());
-                LOGGER.info("  Signature Algorithm: '{}'", cert.getSigAlgName());
-                LOGGER.info("  Valid from: '{}'", cert.getNotBefore());
-                LOGGER.info("  Valid until: '{}'", cert.getNotAfter());
-                LOGGER.info("  Issuer: '{}'", cert.getIssuerDN());
+                LOGGER.debug("Client certificate '{}':", (c + 1));
+                LOGGER.debug("   Subject DN: '{}'", cert.getSubjectDN());
+                LOGGER.debug("   Serial Number: '{}'", cert.getSerialNumber());
+                LOGGER.debug("   Signature Algorithm: '{}'", cert.getSigAlgName());
+                LOGGER.debug("   Valid from: '{}'", cert.getNotBefore());
+                LOGGER.debug("   Valid until: '{}'", cert.getNotAfter());
+                LOGGER.debug("   Issuer: '{}'", cert.getIssuerDN());
             }
             if (!isAuthDN) {
                 throw new CertificateException("Subject DN is not authorized to perform the requested action.");
@@ -97,22 +80,25 @@ public class AuthSSLX509TrustManager implements X509TrustManager {
         if (certificates != null) {
             for (int c = 0; c < certificates.length; c++) {
                 X509Certificate cert = certificates[c];
-                LOGGER.info(" Server certificate '{}':", (c + 1));
-                LOGGER.info("  Subject DN: '{}'", cert.getSubjectDN());
-                LOGGER.info("  Signature Algorithm: '{}'", cert.getSigAlgName());
-                LOGGER.info("  Valid from: '{}'", cert.getNotBefore());
-                LOGGER.info("  Valid until: '{}'", cert.getNotAfter());
-                LOGGER.info("  Issuer: '{}'", cert.getIssuerDN());
+                LOGGER.debug("Server certificate '{}':", (c + 1));
+                LOGGER.debug("   Subject DN: '{}'", cert.getSubjectDN());
+                LOGGER.debug("   Serial Number: '{}'", cert.getSerialNumber());
+                LOGGER.debug("   Signature Algorithm: '{}'", cert.getSigAlgName());
+                LOGGER.debug("   Valid from: '{}'", cert.getNotBefore());
+                LOGGER.debug("   Valid until: '{}'", cert.getNotAfter());
+                LOGGER.debug("   Issuer: '{}'", cert.getIssuerDN());
             }
         }
 
         try {
             if (defaultTrustManager != null) {
                 defaultTrustManager.checkServerTrusted(certificates, authType);
+                LOGGER.info("Default Trust Manager validated: '{}'", defaultTrustManager.toString());
             }
         } catch (CertificateException e) {
-            LOGGER.error("CertificateException: '{}'", e.getMessage(), e);
+            LOGGER.warn("Default Trust Manager does not contain ROOT CA: '{}'", e.getMessage());
             trustManager.checkServerTrusted(certificates, authType);
+            LOGGER.debug("Trust Manager validated");
         }
     }
 
