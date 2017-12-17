@@ -20,10 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.*;
 
 /**
@@ -50,9 +47,8 @@ public class StorkServlet extends HttpServlet {
      *
      * @param request  servlet request
      * @param response servlet response
-     * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
 
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
@@ -66,6 +62,8 @@ public class StorkServlet extends HttpServlet {
             out.println("<h1>Servlet StorkServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
+        } catch (IOException e) {
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }
     }
 
@@ -83,7 +81,12 @@ public class StorkServlet extends HttpServlet {
         // Check for IP address called this servlet
         String ipAddress;
         if (request.getHeader("x-forwarded-for") != null) {
-            ipAddress = InetAddress.getByName(request.getHeader("x-forwarded-for")).getHostAddress();
+            try {
+                ipAddress = InetAddress.getByName(request.getHeader("x-forwarded-for")).getHostAddress();
+            } catch (UnknownHostException e) {
+                LOGGER.error("UnknownHostException: '{}'", e);
+                ipAddress = "Client IP not found";
+            }
         } else {
             ipAddress = request.getRemoteAddr();
         }
@@ -95,21 +98,21 @@ public class StorkServlet extends HttpServlet {
         try {
             company = PortalUtil.getCompany(request);
             String storkEnabled = PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false");
-            LOGGER.info("storkEnabled:" + PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false"));
-            LOGGER.info("provider.name:" + PrefsPropsUtil.getString(company.getCompanyId(), "provider.name", ""));
-            LOGGER.info("sp.sector:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.sector", ""));
-            LOGGER.info("sp.aplication:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.aplication", ""));
-            LOGGER.info("sp.country:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.country", ""));
-            LOGGER.info("sp.qaalevel:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.qaalevel", ""));
-            LOGGER.info("peps.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "peps.url", ""));
-            LOGGER.info("stork.login.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "stork.login.url", ""));
-            LOGGER.info("sp.mandatory.personal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.personal.attributes", ""));
-            LOGGER.info("sp.mandatory.business.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.business.attributes", ""));
-            LOGGER.info("sp.mandatory.legal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.legal.attributes", ""));
+            LOGGER.info("storkEnabled: '{}'", PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false"));
+            LOGGER.info("provider.name: '{}'", PrefsPropsUtil.getString(company.getCompanyId(), "provider.name", ""));
+            LOGGER.info("sp.sector: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.sector", ""));
+            LOGGER.info("sp.aplication: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.aplication", ""));
+            LOGGER.info("sp.country: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.country", ""));
+            LOGGER.info("sp.qaalevel: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.qaalevel", ""));
+            LOGGER.info("peps.url: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "peps.url", ""));
+            LOGGER.info("stork.login.url: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "stork.login.url", ""));
+            LOGGER.info("sp.mandatory.personal.attributes: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.personal.attributes", ""));
+            LOGGER.info("sp.mandatory.business.attributes: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.business.attributes", ""));
+            LOGGER.info("sp.mandatory.legal.attributes: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.legal.attributes", ""));
             request.getRequestDispatcher("/stork.jsp").forward(request, response);
 
-        } catch (PortalException | SystemException ex) {
-            LOGGER.error(null, ex);
+        } catch (PortalException | SystemException | UnknownHostException e) {
+            LOGGER.error(null, e);
         }
     }
 

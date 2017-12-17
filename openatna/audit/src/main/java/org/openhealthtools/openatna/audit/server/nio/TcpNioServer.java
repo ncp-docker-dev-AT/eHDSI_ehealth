@@ -1,27 +1,5 @@
-/**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
- */
-
 package org.openhealthtools.openatna.audit.server.nio;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.mina.common.*;
 import org.apache.mina.filter.SSLFilter;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -37,6 +15,8 @@ import org.openhealthtools.openatna.syslog.SyslogMessage;
 import org.openhealthtools.openatna.syslog.mina.Notifier;
 import org.openhealthtools.openatna.syslog.mina.tls.SyslogProtocolCodecFactory;
 import org.openhealthtools.openatna.syslog.mina.tls.SyslogProtocolHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -49,8 +29,7 @@ import java.util.concurrent.Executors;
  */
 public class TcpNioServer implements Notifier, Server {
 
-    private static Log log = LogFactory.getLog("org.openhealthtools.openatna.audit.server.nio.TcpNioServer");
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(TcpNioServer.class);
 
     private AtnaServer atnaServer;
     private IConnectionDescription tlsConnection;
@@ -63,6 +42,7 @@ public class TcpNioServer implements Notifier, Server {
     }
 
     public void start() {
+
         try {
             String host = tlsConnection.getHostname();
             ByteBuffer.setUseDirectBuffers(false);
@@ -83,19 +63,18 @@ public class TcpNioServer implements Notifier, Server {
             chain.addLast("codec", new ProtocolCodecFilter(new SyslogProtocolCodecFactory()));
             acceptor.setFilterChainBuilder(chain);
             acceptor.bind(new InetSocketAddress(host, tlsConnection.getPort()), new SyslogProtocolHandler(this));
-            log.info("TLS Server running on port:" + tlsConnection.getPort());
+            LOGGER.info("TLS Server running on port: '{}'", tlsConnection.getPort());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("IoException: '{}'", e.getMessage(), e);
         }
     }
 
     public void stop() {
-        log.info("TLS Server shutting down...");
+        LOGGER.info("TLS Server shutting down...");
         if (acceptor != null) {
             acceptor.unbindAll();
         }
     }
-
 
     public void notifyMessage(SyslogMessage msg) {
         atnaServer.notifyListeners(msg);
