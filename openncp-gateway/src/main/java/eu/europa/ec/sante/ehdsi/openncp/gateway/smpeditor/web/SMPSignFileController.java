@@ -100,15 +100,15 @@ public class SMPSignFileController {
         MultipartFile fileSign = null;
         try {
             fileSign = new MockMultipartFile("fileSign", file.getName(), "text/xml", input);
+            List<MultipartFile> files = new ArrayList<>();
+            files.add(0, fileSign);
+
+            smpfilesign.setSignFiles(files);
+            smpfilesign.setSignFileName(fileSign.getOriginalFilename());
         } catch (IOException ex) {
             LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
-        List<MultipartFile> files = new ArrayList<>();
-        files.add(0, fileSign);
-
-        smpfilesign.setSignFiles(files);
-        smpfilesign.setSignFileName(fileSign.getOriginalFilename());
         model.addAttribute("hasfile", true);
         model.addAttribute("smpfilesign", smpfilesign);
 
@@ -124,6 +124,7 @@ public class SMPSignFileController {
      */
     @RequestMapping(value = "/smpeditor/signsmpfile/updated", method = RequestMethod.GET)
     public String signUpdatedFile(Model model, @ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate) {
+
         LOGGER.debug("\n==== in signCreatedFile ====");
         SMPFileOps smpfilesign = new SMPFileOps();
 
@@ -142,15 +143,15 @@ public class SMPSignFileController {
         MultipartFile fileSign = null;
         try {
             fileSign = new MockMultipartFile("fileSign", file.getName(), "text/xml", input);
+            List<MultipartFile> files = new ArrayList<>();
+            files.add(0, fileSign);
+
+            smpfilesign.setSignFiles(files);
+            smpfilesign.setSignFileName(fileSign.getOriginalFilename());
         } catch (IOException ex) {
             LOGGER.error("\nIOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
-        List<MultipartFile> files = new ArrayList<MultipartFile>();
-        files.add(0, fileSign);
-
-        smpfilesign.setSignFiles(files);
-        smpfilesign.setSignFileName(fileSign.getOriginalFilename());
         model.addAttribute("hasfile", true);
         model.addAttribute("smpfilesign", smpfilesign);
 
@@ -167,11 +168,12 @@ public class SMPSignFileController {
      */
     @RequestMapping(value = "/smpeditor/signsmpfile", method = RequestMethod.POST)
     public String postSign(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model, final RedirectAttributes redirectAttributes) {
+
         LOGGER.debug("\n==== in postSign ====");
         model.addAttribute("smpfilesign", smpfilesign);
 
-        List<SMPFileOps> allFiles = new ArrayList<SMPFileOps>();
-        List<MultipartFile> signFiles = new ArrayList<MultipartFile>();
+        List<SMPFileOps> allFiles = new ArrayList<>();
+        List<MultipartFile> signFiles;
         signFiles = smpfilesign.getSignFiles();
 
         /*Iterate each chosen file*/
@@ -262,7 +264,6 @@ public class SMPSignFileController {
                         redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                         return "redirect:/smpeditor/signsmpfile";
                     }
-
 
                     String docID = ids[1];
                     HashMap<String, String> propertiesMap = readProperties.readPropertiesFile();

@@ -1,6 +1,5 @@
 package epsos.ccd.gnomon.auditmanager.ssl;
 
-import eu.epsos.util.xca.XCAConstants;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,15 +75,17 @@ public class KeystoreManager {
             // Perhaps exist() method would be more appropriate?
             if (certs != null) {
                 KeyStore ks = KeyStore.getInstance("jks");
-                ks.load(new FileInputStream(certs), pass.toCharArray());
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
-                tmf.init(ks);
-                TrustManager tms[] = tmf.getTrustManagers();
-                for (TrustManager tm : tms) {
-                    if (tm instanceof X509TrustManager) {
-                        LOGGER.info("Found default trust manager.");
-                        sunTrustManager = (X509TrustManager) tm;
-                        break;
+                try (FileInputStream inputStream = new FileInputStream(certs)) {
+                    ks.load(inputStream, pass.toCharArray());
+                    TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
+                    tmf.init(ks);
+                    TrustManager tms[] = tmf.getTrustManagers();
+                    for (TrustManager tm : tms) {
+                        if (tm instanceof X509TrustManager) {
+                            LOGGER.info("Found default trust manager.");
+                            sunTrustManager = (X509TrustManager) tm;
+                            break;
+                        }
                     }
                 }
             }
@@ -104,8 +105,7 @@ public class KeystoreManager {
             try {
                 int port = Integer.parseInt(host.substring(colon + 1, host.length()), host.length());
                 host = host.substring(0, colon);
-                LOGGER.info("KeystoreManager.trimPort up to colon: '{}'", host);
-                LOGGER.info("KeystoreManager.trimPort port: '{}'", port);
+                LOGGER.info("KeystoreManager.trimPort up to colon: '{}' and port: '{}'", host, port);
 
                 return host;
             } catch (NumberFormatException e) {

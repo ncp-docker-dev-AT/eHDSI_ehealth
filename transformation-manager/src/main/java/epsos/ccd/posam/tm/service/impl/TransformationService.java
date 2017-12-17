@@ -206,18 +206,18 @@ public class TransformationService implements ITransformationService, TMConstant
                 }
 
                 // validate INPUT (schematron)
-                if (config
-                        .isSchematronValidationEnabled()) {
+                if (config.isSchematronValidationEnabled()) {
                     // if transcoding, validate against friendly scheme,
                     // else against pivot scheme
                     boolean validateFriendly = isTranscode;
-                    SchematronResult result = Validator.validateSchematron(
-                            inputDocument, cdaDocumentType, validateFriendly);
+                    SchematronResult result = Validator.validateSchematron(inputDocument, cdaDocumentType, validateFriendly);
                     if (result == null || !result.isValid()) {
                         status = STATUS_FAILURE;
                         warnings.add(TMError.WARNING_INPUT_SCHEMATRON_VALIDATION_FAILED);
                         LOGGER.error("Schematron validation error, input document is invalid!");
-                        LOGGER.error(result.toString());
+                        if (result != null) {
+                            LOGGER.error(result.toString());
+                        }
                     }
                 } else {
                     LOGGER.info("Schematron validation disabled");
@@ -297,37 +297,44 @@ public class TransformationService implements ITransformationService, TMConstant
 
     private void writeAuditTrail(TMResponseStructure responseStructure) {
 
-        if (config.isAuditTrailEnabled()) {
-            LOGGER.debug("Audit trail BEGIN");
-            try {
-                GregorianCalendar calendar = new GregorianCalendar();
-                calendar.setTime(new Date());
-                // TODO this is not final/correct version
-                EventLog logg = EventLog.createEventLogPivotTranslation(
-                        //config.getAuditTrailTransactionNumber(),// The number of transaction including the epsos- prefix
-                        TransactionName.epsosPivotTranslation, // Possible values according to D4.5.6 are E,R,U,D
-                        EventActionCode.EXECUTE,
-                        DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar),
-                        (responseStructure != null && responseStructure.getStatus().equals(STATUS_SUCCESS) ? EventOutcomeIndicator.FULL_SUCCESS : EventOutcomeIndicator.PERMANENT_FAILURE),
-                        HTTPUtil.getSubjectDN(false), // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
-                        getOIDFromDocument(responseStructure.getDocument()), // Identifier that allows to univocally identify the SOURCE document or source data entries. (UUID Format)
-                        getOIDFromDocument(responseStructure.getResponseCDA()), // Identifier that allows to univocally identify the TARGET document. (UUID Format)
-                        Constants.UUID_PREFIX + "", // The value MUST contain the base64 encoded security header
-                        new byte[0], // ReqM_PatricipantObjectDetail - The value MUST contain the base64 encoded security header
-                        Constants.UUID_PREFIX + "", // String-encoded UUID of the response message
-                        new byte[0], // ResM_PatricipantObjectDetail - The value MUST contain the base64 encoded security header
-                        ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP") // The IP Address of the target Gateway
-                );
-                logg.setEventType(EventType.epsosPivotTranslation);
-                LOGGER.info("Write AuditTrail: '{}'", logg.getEventType());
-                new AuditService().write(logg, config.getAuditTrailFacility(), config.getAuditTrailSeverity());
-            } catch (Exception e) {
-                LOGGER.error("Audit trail ERROR! ", e);
+        LOGGER.debug("Audit trail BEGIN");
+
+        if (responseStructure != null) {
+            if (config.isAuditTrailEnabled()) {
+
+                try {
+                    GregorianCalendar calendar = new GregorianCalendar();
+                    calendar.setTime(new Date());
+                    // TODO this is not final/correct version
+                    EventLog logg = EventLog.createEventLogPivotTranslation(
+                            //config.getAuditTrailTransactionNumber(),// The number of transaction including the epsos- prefix
+                            TransactionName.epsosPivotTranslation, // Possible values according to D4.5.6 are E,R,U,D
+                            EventActionCode.EXECUTE,
+                            DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar),
+                            responseStructure.getStatus().equals(STATUS_SUCCESS) ? EventOutcomeIndicator.FULL_SUCCESS : EventOutcomeIndicator.PERMANENT_FAILURE,
+                            HTTPUtil.getSubjectDN(false), // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
+                            getOIDFromDocument(responseStructure.getDocument()), // Identifier that allows to univocally identify the SOURCE document or source data entries. (UUID Format)
+                            getOIDFromDocument(responseStructure.getResponseCDA()), // Identifier that allows to univocally identify the TARGET document. (UUID Format)
+                            Constants.UUID_PREFIX + "", // The value MUST contain the base64 encoded security header
+                            new byte[0], // ReqM_PatricipantObjectDetail - The value MUST contain the base64 encoded security header
+                            Constants.UUID_PREFIX + "", // String-encoded UUID of the response message
+                            new byte[0], // ResM_PatricipantObjectDetail - The value MUST contain the base64 encoded security header
+                            ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP") // The IP Address of the target Gateway
+                    );
+                    logg.setEventType(EventType.epsosPivotTranslation);
+                    LOGGER.info("Write AuditTrail: '{}'", logg.getEventType());
+                    new AuditService().write(logg, config.getAuditTrailFacility(), config.getAuditTrailSeverity());
+                } catch (Exception e) {
+                    LOGGER.error("Audit trail ERROR! ", e);
+                }
+                LOGGER.debug("Audit trail END");
+            } else {
+                LOGGER.debug("Audit trail DISABLED");
             }
-            LOGGER.debug("Audit trail END");
         } else {
-            LOGGER.debug("Audit trail DISABLED");
+            LOGGER.error("Write AuditTrail Error: Cannot process Transformation Manager response");
         }
+
     }
 
     /**
@@ -359,6 +366,7 @@ public class TransformationService implements ITransformationService, TMConstant
     @SuppressWarnings("unused")
     @Deprecated
     private void replaceReferencedValues(Document document, HashMap<String, String> hmReffIdDisplayName, String process) {
+
         // just log referenced keys and displayNames
         logReferences(hmReffIdDisplayName, process);
         LOGGER.debug("replaceReferencedValues BEGIN");
@@ -366,14 +374,13 @@ public class TransformationService implements ITransformationService, TMConstant
             // find elements with ID attribute which id=remembered reference key
             // and
             // replace their textContent
-            List<Node> idElements = XmlUtil.getNodeList(document,
-                    XPATH_ALL_ELEMENTS_WITH_ID_ATTR);
+            List<Node> idElements = XmlUtil.getNodeList(document, XPATH_ALL_ELEMENTS_WITH_ID_ATTR);
             String id;
             for (Node idElement1 : idElements) {
                 Element idElement = (Element) idElement1;
                 id = idElement.getAttribute(ID);
-                if (notEmpty(id) && hmReffIdDisplayName.containsKey(id)
-                        && idElement.getChildNodes().getLength() == 1) {
+                if (notEmpty(id) && hmReffIdDisplayName != null && hmReffIdDisplayName.containsKey(id) && idElement.getChildNodes().getLength() == 1) {
+
                     LOGGER.debug("replaced id: '{}' '{}' --> '{}'", id, idElement.getTextContent(), hmReffIdDisplayName.get(id));
                     idElement.setTextContent(hmReffIdDisplayName.get(id));
                 }
@@ -390,8 +397,8 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param hmReffIdDisplayName
      * @param process
      */
-    private void logReferences(HashMap<String, String> hmReffIdDisplayName,
-                               String process) {
+    private void logReferences(HashMap<String, String> hmReffIdDisplayName, String process) {
+
         if (hmReffIdDisplayName != null && !hmReffIdDisplayName.isEmpty()) {
             Iterator<String> iKeys = hmReffIdDisplayName.keySet().iterator();
             LOGGER.debug("List ('{}') - Reference id : displayName - ", process);

@@ -92,6 +92,7 @@ public class TerminologyService implements ITerminologyService {
             String csVersion = localConcept.getVersion();
             String vsOid = localConcept.getVsOid();
             String vsVersion = localConcept.getValueSetVersion();
+
             // obtain CodeSystem
             CodeSystem system = dao.getCodeSystem(csOid);
             checkCodeSystemName(system, csName, response);
@@ -116,22 +117,28 @@ public class TerminologyService implements ITerminologyService {
             checkConceptStatus(target, response);
 
             Designation designation = designations.get(0);
-            response.setCode(target.getCode());
-            response.setDesignation(designation.getDesignation());
+            if (target != null) {
 
-            // obtain Target Code System Version
-            CodeSystemVersion targetVersion = target.getCodeSystemVersion();
-            checkTargedVersion(targetVersion);
-            response.setCodeSystemVersion(targetVersion.getLocalName());
+                response.setCode(target.getCode());
+                response.setDesignation(designation.getDesignation());
 
-            // obtain Target Code System
-            CodeSystem targetCodeSystem = targetVersion.getCodeSystem();
-            checkTargetCodeSystem(targetCodeSystem);
-            response.setCodeSystem(targetCodeSystem.getOid());
-            response.setCodeSystemName(targetCodeSystem.getName());
+                // obtain Target Code System Version
+                CodeSystemVersion targetVersion = target.getCodeSystemVersion();
+                checkTargedVersion(targetVersion);
+                response.setCodeSystemVersion(targetVersion.getLocalName());
 
-            checkValueSet(concept, vsOid, vsVersion, response);
-            checkManyDesignations(response, designations);
+                // obtain Target Code System
+                CodeSystem targetCodeSystem = targetVersion.getCodeSystem();
+                checkTargetCodeSystem(targetCodeSystem);
+                response.setCodeSystem(targetCodeSystem.getOid());
+                response.setCodeSystemName(targetCodeSystem.getName());
+
+                checkValueSet(concept, vsOid, vsVersion, response);
+                checkManyDesignations(response, designations);
+            }
+            else {
+                //TODO: Review this method
+            }
         } catch (TSAMException e) {
             response.addError(e.getReason(), localConcept.toString());
             LOGGER.warn(localConcept + ", " + e.toString(), e);
@@ -160,7 +167,12 @@ public class TerminologyService implements ITerminologyService {
 
         DebugUtils.showTransactionStatus("checkCodeSystemName()");
         if (name == null || codeSystem == null || !name.equals(codeSystem.getName())) {
-            String ctx = codeSystem.getName() + " != " + name;
+            String ctx;
+            if (codeSystem != null) {
+                ctx = codeSystem.getName() + " != " + name;
+            } else {
+                ctx = "Code System is null and  != " + name;
+            }
             response.addWarning(TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
             LOGGER.warn("[{}] '{}': '{}'", response.getInputCodedElement(), TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
         }

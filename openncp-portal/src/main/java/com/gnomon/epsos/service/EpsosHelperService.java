@@ -1217,23 +1217,6 @@ public class EpsosHelperService {
                 LOGGER.info("Certificate Common Name: '{}'", name);
 
             }
-
-            // List the aliases
-//            Enumeration enum1 = keystore.aliases();
-//            while (enum1.hasMoreElements()) {
-//                String alias = (String) enum1.nextElement();
-//                LOGGER.info("ALIAS IS '{}'", alias);
-//                if (cert instanceof X509Certificate) {
-//                    X509Certificate x509cert = (X509Certificate) cert;
-//
-//                    // Get subject
-//                    Principal principal = x509cert.getSubjectDN();
-//                    String subjectDn = principal.getName();
-//                    name = subjectDn;
-//                    // Get issuer
-//                    principal = x509cert.getIssuerDN();
-//                }
-//            }
         } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
@@ -1273,10 +1256,16 @@ public class EpsosHelperService {
         } catch (DatatypeConfigurationException ex) {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
-        EventLog eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
+        EventLog eventLog1;
+        String hostSource = "UnknownHost";
+        if (sourceIP != null) {
+            hostSource = sourceIP.getHostAddress();
+        }
+        eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID, basedSecHead.getBytes(),
-                resm_participantObjectID, ResM_PatricipantObjectDetail, sourceIP.getHostAddress(), "N/A");
+                resm_participantObjectID, ResM_PatricipantObjectDetail, hostSource, "N/A");
+
 
         LOGGER.info("The audit has been prepared");
         eventLog1.setEventType(EventType.epsosHcpAuthentication);
