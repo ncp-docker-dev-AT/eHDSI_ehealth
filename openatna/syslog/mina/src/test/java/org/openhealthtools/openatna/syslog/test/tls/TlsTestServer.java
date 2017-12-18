@@ -61,7 +61,7 @@ public class TlsTestServer {
             server.addSyslogListener(new Listener());
             server.start();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 
@@ -73,8 +73,8 @@ public class TlsTestServer {
             LOGGER.info("application message: '{}'", message.getMessage().getMessageObject());
         }
 
-        public void exceptionThrown(SyslogException exception) {
-            exception.printStackTrace();
+        public void exceptionThrown(SyslogException e) {
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 }

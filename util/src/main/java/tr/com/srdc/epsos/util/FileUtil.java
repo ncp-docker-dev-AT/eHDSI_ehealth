@@ -22,8 +22,8 @@ public class FileUtil {
     }
 
     /**
-     * Constructs a new file with the given content and filePath. If a file with
-     * the same name already exists, simply overwrites the content.
+     * Constructs a new file with the given content and filePath. If a file with the same name already exists,
+     * simply overwrites the content.
      *
      * @param filePath
      * @param content  : expressed as byte[]
@@ -35,11 +35,16 @@ public class FileUtil {
     public static void constructNewFile(String filePath, byte[] content) throws IOException {
 
         File file = new File(filePath);
-        file.mkdirs();
+        boolean dirCreated = file.mkdirs();
+        boolean fileDeleted = false;
+        boolean fileCreated;
+
         if (file.exists()) {
-            file.delete();
+            fileDeleted = file.delete();
         }
-        file.createNewFile();
+        fileCreated = file.createNewFile();
+        LOGGER.debug("New File result: Folder created: '{}' - Old File Deleted: '{}' - New File Created: '{}'",
+                dirCreated, fileDeleted, fileCreated);
 
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(content);
@@ -109,7 +114,7 @@ public class FileUtil {
         }
     }
 
-    public static List<String> readFileLines(String filePath) throws IOException {
+    public static List<String> readFileLines(String filePath) {
 
         try (FileInputStream fis = new FileInputStream(filePath)) {
             BufferedReader buf;
@@ -131,7 +136,7 @@ public class FileUtil {
         }
     }
 
-    public static String readWholeFile(File file) throws IOException {
+    public static String readWholeFile(File file) {
 
         return readInpustream(file, StandardCharsets.UTF_8);
     }
@@ -141,7 +146,7 @@ public class FileUtil {
         return readInpustream(new File(filePath), StandardCharsets.UTF_8);
     }
 
-    public static String readWholeFile(String filePath, String encoding) throws IOException {
+    public static String readWholeFile(String filePath, String encoding) {
 
         return readInpustream(new File(filePath), Charset.forName(encoding));
     }

@@ -29,19 +29,19 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 public class DisplayTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(DisplayTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DisplayTest.class);
 
     //	@Test
     private void fileTest(String input, TRANSFORMATION type) throws UnsupportedEncodingException, FileNotFoundException, IOException {
 
         EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
-        logger.info("Transforming file: " + input);
+        LOGGER.info("Transforming file: " + input);
 
         String cda = "";
         try {
             cda = xlsClass.readFile(input);
         } catch (Exception e) {
-            logger.error("File not found");
+            LOGGER.error("File not found");
         }
         String out = "";
         switch (type) {
@@ -81,7 +81,7 @@ public class DisplayTest {
                 }
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
 
     }

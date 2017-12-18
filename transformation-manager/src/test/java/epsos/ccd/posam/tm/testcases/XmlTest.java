@@ -45,7 +45,7 @@ public class XmlTest extends TestCase {
             Document doc = XmlUtil.getDocument(new File(samplesDir + "unstructuredCDANS.xml"), false);
             printNode(doc);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 
@@ -107,7 +107,7 @@ public class XmlTest extends TestCase {
                 LOGGER.info(n.getNamespaceURI() + ": " + n.getNodeName());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 

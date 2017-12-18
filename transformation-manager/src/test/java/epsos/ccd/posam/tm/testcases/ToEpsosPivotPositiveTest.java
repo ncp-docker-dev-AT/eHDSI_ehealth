@@ -34,8 +34,7 @@ public class ToEpsosPivotPositiveTest extends TBase {
         try {
             LOGGER.info("XML Response: '{}'", response.getDocument());
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
 
         assertNotNull(response);
@@ -56,7 +55,7 @@ public class ToEpsosPivotPositiveTest extends TBase {
             transformer.transform(new DOMSource(response.getResponseCDA()), new StreamResult(outputStream));
             LOGGER.info("Response:\n{}", outputStream.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
         assertNotNull(response);
         assertTrue(response.isStatusSuccess());
@@ -77,7 +76,7 @@ public class ToEpsosPivotPositiveTest extends TBase {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.transform(new DOMSource(response.getDocument()), new StreamResult(new FileOutputStream("tmresult.xml")));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
         assertNotNull(response);
         assertTrue(response.isStatusSuccess());

@@ -75,7 +75,7 @@ public class DisplayIntegrationTest extends TestCase {
                 }
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
             fail("IOException while executing the folderTest");
         }
     }

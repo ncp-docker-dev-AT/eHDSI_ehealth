@@ -62,8 +62,7 @@ public class TranscodeTranslateTest extends TBase {
                 fw.write(XmlUtil.xmlToString(result.getDocument()));
                 fw.close();
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.error("{}: '{}'", e.getClass(), e.getMessage(), e);
             }
             assertNotNull(result);
             logger.info("Error Size: '{}'", result.getErrors().size());
