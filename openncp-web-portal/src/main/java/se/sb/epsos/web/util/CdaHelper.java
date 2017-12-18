@@ -138,7 +138,10 @@ public class CdaHelper {
                             XPathExpression nameExpr = xpath.compile(
                                     "hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:name");
                             Node materialName = (Node) nameExpr.evaluate(entryNode, XPathConstants.NODE);
-                            String name = materialName.getTextContent().trim();
+                            String name = "";
+                            if(materialName != null) {
+                                name = materialName.getTextContent().trim();
+                            }
 
                             String formCode = null;
                             String packsString = "";
