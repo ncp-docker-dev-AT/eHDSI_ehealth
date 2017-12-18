@@ -72,7 +72,7 @@ public class XCARetrieveTest {
                 try {
                     LOGGER.info("document: " + new String(result.getDocument(), "UTF-8"));
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
                 }
             }
         }
