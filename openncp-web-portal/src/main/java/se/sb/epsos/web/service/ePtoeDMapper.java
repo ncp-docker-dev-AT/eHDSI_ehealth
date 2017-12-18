@@ -245,6 +245,9 @@ public class ePtoeDMapper {
         ArrayList<String> refTargetsToPreserve = new ArrayList<String>();
 
         for (DispensationRow dispRow : dispensation.getRows()) {
+        	if(dispRow == null) {
+        		continue;
+        	}
             eD_Document_section.getText().getTableArray(0).getTbodyArray(0).addNewTr();
             for (int i = 0; i <= 9; i++) {
                 eD_Document_section.getText().getTableArray(0).getTbodyArray(0).getTrArray(0).addNewTd();
@@ -254,8 +257,10 @@ public class ePtoeDMapper {
             eD_Document_Tr.getTdArray(0).newCursor().setTextValue(dispRow.getProductId());
             eD_Document_Tr.getTdArray(1).newCursor().setTextValue(dispRow.getProductName());
             eD_Document_Tr.getTdArray(1).setID("dispensedProduct");
-            eD_Document_Tr.getTdArray(2).newCursor()
+            if(dispRow.getPrescriptionRow() != null && dispRow.getPrescriptionRow().getIngredient() != null && dispRow.getPrescriptionRow().getIngredient().size() > 0 && dispRow.getPrescriptionRow().getIngredient().get(0) != null) {
+            	eD_Document_Tr.getTdArray(2).newCursor()
                     .setTextValue(dispRow.getPrescriptionRow().getIngredient().get(0).getStrength());
+            }
             eD_Document_Tr.getTdArray(3).newCursor().setTextValue(dispRow.getPrescriptionRow().getFormCode());
             eD_Document_Tr.getTdArray(4).newCursor().setTextValue(dispRow.getPrescriptionRow().getTypeOfPackage());
             eD_Document_Tr.getTdArray(5).newCursor().setTextValue(
@@ -383,33 +388,41 @@ public class ePtoeDMapper {
                     .setNullFlavor(NULLFLAVOR_NI);
         }
 
-        // Overall strength
-        eD_Document_material.getIngredientArray(0)
-                .setQuantity(eP_Document.getClinicalDocument().getComponent().getStructuredBody().getComponentArray(0)
-                        .getSection().getEntryArray(0).getSubstanceAdministration().getConsumable()
-                        .getManufacturedProduct().getManufacturedMaterial().getIngredientArray(0).getQuantity());
+        try {
+            
+            eD_Document_material.getIngredientArray(0)
+                    .setQuantity(eP_Document.getClinicalDocument().getComponent().getStructuredBody().getComponentArray(0)
+                            .getSection().getEntryArray(0).getSubstanceAdministration().getConsumable()
+                            .getManufacturedProduct().getManufacturedMaterial().getIngredientArray(0).getQuantity());
 
-        // Active ingredient code
-        eD_Document_material.getIngredientArray(0).getIngredient().getCode()
-                .setCode(eP_Document.getClinicalDocument().getComponent().getStructuredBody().getComponentArray(0)
-                        .getSection().getEntryArray(0).getSubstanceAdministration().getConsumable()
-                        .getManufacturedProduct().getManufacturedMaterial().getIngredientArray(0).getIngredient()
-                        .getCode().getCode());
+            // Active ingredient code
+            eD_Document_material.getIngredientArray(0).getIngredient().getCode()
+                    .setCode(eP_Document.getClinicalDocument().getComponent().getStructuredBody().getComponentArray(0)
+                            .getSection().getEntryArray(0).getSubstanceAdministration().getConsumable()
+                            .getManufacturedProduct().getManufacturedMaterial().getIngredientArray(0).getIngredient()
+                            .getCode().getCode());
 
-        // Active ingredient display name
-        eD_Document_material.getIngredientArray(0).getIngredient().getCode()
-                .setDisplayName(eP_Document.getClinicalDocument().getComponent().getStructuredBody()
-                        .getComponentArray(0).getSection().getEntryArray(0).getSubstanceAdministration().getConsumable()
-                        .getManufacturedProduct().getManufacturedMaterial().getIngredientArray(0).getIngredient()
-                        .getCode().getDisplayName());
+            // Active ingredient display name
+            eD_Document_material.getIngredientArray(0).getIngredient().getCode()
+                    .setDisplayName(eP_Document.getClinicalDocument().getComponent().getStructuredBody()
+                            .getComponentArray(0).getSection().getEntryArray(0).getSubstanceAdministration().getConsumable()
+                            .getManufacturedProduct().getManufacturedMaterial().getIngredientArray(0).getIngredient()
+                            .getCode().getDisplayName());
 
-        // Active ingredient name
-        eD_Document_material.getIngredientArray(0).getIngredient().getNameArray(0).newCursor()
-                .setTextValue(eP_Document.getClinicalDocument().getComponent().getStructuredBody().getComponentArray(0)
-                        .getSection().getEntryArray(0).getSubstanceAdministration().getConsumable()
-                        .getManufacturedProduct().getManufacturedMaterial().getIngredientArray(0).getIngredient()
-                        .getNameArray(0).newCursor().getTextValue());
+            // Active ingredient name
+            eD_Document_material.getIngredientArray(0).getIngredient().getNameArray(0).newCursor()
+                    .setTextValue(eP_Document.getClinicalDocument().getComponent().getStructuredBody().getComponentArray(0)
+                            .getSection().getEntryArray(0).getSubstanceAdministration().getConsumable()
+                            .getManufacturedProduct().getManufacturedMaterial().getIngredientArray(0).getIngredient()
+                            .getNameArray(0).newCursor().getTextValue());
 
+        }
+        catch (NullPointerException npe) {
+            LOGGER.trace("Optional element (or part of its path) resulted in npe.", npe);
+        }
+        catch (IndexOutOfBoundsException aie) {
+            LOGGER.trace("Optional element (or part of its path) resulted in index out bounds.", aie);
+        }
         // Update references
 
         return handleReferences(eP_Document, eD_Document, refTargetsToPreserve);
