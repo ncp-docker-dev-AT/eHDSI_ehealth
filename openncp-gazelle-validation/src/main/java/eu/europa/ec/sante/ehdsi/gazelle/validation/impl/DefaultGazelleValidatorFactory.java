@@ -20,22 +20,22 @@ import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
 public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory {
 
-    public static final String GAZELLE_ASSERTION_VALIDATOR_URI =
+    private static final String GAZELLE_ASSERTION_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    public static final String GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI =
+    private static final String GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS";
 
-    public static final String GAZELLE_CDA_VALIDATOR_URI =
+    private static final String GAZELLE_CDA_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    public static final String GAZELLE_CERTIFICATE_VALIDATOR_URI =
+    private static final String GAZELLE_CERTIFICATE_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator";
 
-    public static final String GAZELLE_SCHEMATRON_VALIDATOR_URI =
+    private static final String GAZELLE_SCHEMATRON_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator";
 
-    public static final String GAZELLE_XDS_VALIDATOR_URI =
+    private static final String GAZELLE_XDS_VALIDATOR_URI =
             "https://gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
 
     private final Logger logger = LoggerFactory.getLogger(DefaultGazelleValidatorFactory.class);
