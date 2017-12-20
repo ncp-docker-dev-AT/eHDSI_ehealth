@@ -1,21 +1,3 @@
-/*
- * Copyright (c) 2009-2010 University of Cardiff and others.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Contributors:
- * Cardiff University - intial API and implementation
- */
 package org.openhealthtools.openatna.jaxb21;
 
 import org.apache.xml.security.utils.XMLUtils;
@@ -45,29 +27,27 @@ import java.util.List;
 
 /**
  * @author Andrew Harrison
- * @version $Revision:$
- * @created Sep 30, 2009: 11:18:47 AM
- * @date $Date:$ modified by $Author:$
  */
 public class JaxbIOFactory implements AtnaIOFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("org.openhealthtools.openatna.jaxb21.JaxbIOFactory");
+    private static final Logger LOGGER = LoggerFactory.getLogger(JaxbIOFactory.class);
 
 
-    static JAXBContext jc;
+    private static JAXBContext jc;
 
     static {
         try {
             jc = JAXBContext.newInstance("org.openhealthtools.openatna.jaxb21");
         } catch (JAXBException e) {
-            // this is fatal and our fault
+            // Fatal error if the JAXBContext cannot be instantiated.
             throw new RuntimeException("Error creating JAXB context:", e);
         }
     }
 
     public AtnaMessage read(InputStream in) throws AtnaException {
+
         if (jc == null) {
-            throw new AtnaException("Could not create Jaxb Context");
+            throw new AtnaException("Could not create JAXB Context");
         }
 
         try {
@@ -75,18 +55,14 @@ public class JaxbIOFactory implements AtnaIOFactory {
             if (doc.getDocumentElement().getTagName().equalsIgnoreCase("IHEYr4")) {
                 return createProv(doc);
             }
-            LOGGER.debug(XMLUtils.getFullTextChildrenFromElement(doc.getDocumentElement()));
+            LOGGER.debug("Read Input Document: '{}'", XMLUtils.getFullTextChildrenFromElement(doc.getDocumentElement()));
             Unmarshaller u = jc.createUnmarshaller();
             AuditMessage a = (AuditMessage) u.unmarshal(doc);
-            AtnaMessage am = null;
-            AtnaException ae = null;
+            AtnaMessage am;
+
             try {
                 am = createMessage(a);
-            } catch (AtnaException e) {
-                LOGGER.error("Exception: '{}'", e.getMessage(), e);
-                ae = e;
-            }
-            try {
+
                 if (LOGGER.isInfoEnabled()) {
                     ByteArrayOutputStream bout = new ByteArrayOutputStream();
                     Marshaller marshaller = jc.createMarshaller();
@@ -97,13 +73,11 @@ public class JaxbIOFactory implements AtnaIOFactory {
                         LOGGER.debug("Event Outcome: '{}'", am.getEventOutcome());
                     }
                 }
+            } catch (AtnaException e) {
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
+                throw new AtnaException(e, AtnaException.AtnaError.INVALID_MESSAGE);
+            }
 
-            } catch (JAXBException e) {
-                LOGGER.error("JAXBException: '{}'", e.getMessage(), e);
-            }
-            if (ae != null) {
-                throw ae;
-            }
             return am;
         } catch (Exception e) {
             throw new AtnaException(e, AtnaException.AtnaError.INVALID_MESSAGE);
@@ -111,6 +85,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private Document newDocument(InputStream stream) throws IOException {
+
         Document doc;
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -128,6 +103,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private StreamResult transform(Document doc, OutputStream out) throws IOException {
+
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer t = null;
         try {
@@ -151,6 +127,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private AtnaMessage createProv(Document doc) throws IOException {
+
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         transform(doc, bout);
         byte[] bytes = bout.toByteArray();
@@ -161,10 +138,12 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     public void write(AtnaMessage message, OutputStream out) throws AtnaException {
+
         write(message, out, true);
     }
 
     public void write(AtnaMessage message, OutputStream out, boolean includeDeclaration) throws AtnaException {
+
         if (jc == null) {
             throw new AtnaException("Could not create Jaxb Context");
         }
@@ -191,6 +170,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private AtnaMessage createMessage(AuditMessage msg) throws AtnaException {
+
         EventIdentificationType evt = msg.getEventIdentification();
         if (evt == null) {
             throw new AtnaException("Message has no event");
@@ -224,6 +204,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private AuditMessage createMessage(AtnaMessage msg) throws AtnaException {
+
         if (msg.getEventOutcome() == null) {
             throw new AtnaException("message has no event outcome");
         }
@@ -265,9 +246,6 @@ public class JaxbIOFactory implements AtnaIOFactory {
     private AtnaMessageObject createObject(ParticipantObjectIdentificationType obj) throws AtnaException {
 
         LOGGER.info("Display NAME: '{}'", obj.getParticipantObjectIDTypeCode().displayName);
-        //if (obj.getParticipantObjectID() == null) {
-        //throw new AtnaException("object has no Id");
-        //}
         if (obj.getParticipantObjectIDTypeCode() == null) {
             throw new AtnaException("object has no Id type code");
         }
@@ -321,6 +299,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private ParticipantObjectIdentificationType createObject(AtnaMessageObject obj) throws AtnaException {
+
         if (obj.getObject() == null) {
             throw new AtnaException("object has no object");
         }
@@ -387,6 +366,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private AuditSourceIdentificationType createSource(AtnaSource source) throws AtnaException {
+
         if (source.getSourceId() == null) {
             throw new AtnaException("source has no Id");
         }
@@ -401,6 +381,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private AtnaSource createSource(AuditSourceIdentificationType source) throws AtnaException {
+
         if (source.getAuditSourceID() == null) {
             throw new AtnaException("source has no Id");
         }
@@ -414,6 +395,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private ActiveParticipantType createParticipant(AtnaMessageParticipant participant) throws AtnaException {
+
         if (participant.getParticipant() == null) {
             throw new AtnaException("participant has no participant");
         }
@@ -440,6 +422,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private AtnaMessageParticipant createParticipant(ActiveParticipantType participant) throws AtnaException {
+
         if (participant.getUserID() == null) {
             throw new AtnaException("participant has no Id");
         }
@@ -472,6 +455,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
     }
 
     private CodedValueType createCode(AtnaCode code) throws AtnaException {
+
         if (code.getCode() == null) {
             throw new AtnaException("Code has no code");
         }
