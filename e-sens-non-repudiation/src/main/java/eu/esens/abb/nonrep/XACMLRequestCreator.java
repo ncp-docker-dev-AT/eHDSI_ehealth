@@ -24,11 +24,9 @@ public class XACMLRequestCreator {
     private final AttributeValueTypeImplBuilder avtib;
     private Element request;
 
-    public XACMLRequestCreator(MessageType messageType,
-                               List<XACMLAttributes> subjectAttributes,
-                               List<XACMLAttributes> resourceAttributes,
-                               List<XACMLAttributes> actionAttributes,
-                               List<XACMLAttributes> environmentAttributes) throws TOElementException {
+    public XACMLRequestCreator(MessageType messageType, List<XACMLAttributes> subjectAttributes, List<XACMLAttributes> resourceAttributes,
+                               List<XACMLAttributes> actionAttributes, List<XACMLAttributes> environmentAttributes)
+            throws TOElementException {
 
         atib = (AttributeTypeImplBuilder) bf.getBuilder(AttributeType.DEFAULT_ELEMENT_NAME);
         avtib = (AttributeValueTypeImplBuilder) bf.getBuilder(AttributeValueType.DEFAULT_ELEMENT_NAME);
@@ -78,7 +76,6 @@ public class XACMLRequestCreator {
                 attributeValue.setValue(attributeItem.getValue());
                 attribute.getAttributeValues().add(attributeValue);
                 resource.getAttributes().add(attribute);
-
             }
         }
 
@@ -93,7 +90,6 @@ public class XACMLRequestCreator {
                 attributeValue.setValue(attributeItem.getValue());
                 attribute.getAttributeValues().add(attributeValue);
                 action.getAttributes().add(attribute);
-
             }
         }
 

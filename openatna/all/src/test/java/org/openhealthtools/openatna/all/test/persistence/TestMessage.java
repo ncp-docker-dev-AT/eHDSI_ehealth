@@ -129,7 +129,7 @@ public class TestMessage {
                 LOGGER.info("=========================");
             }
         } catch (AtnaPersistenceException e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
 
 

@@ -80,7 +80,7 @@ public class UdpClientTest0 extends ClientTest {
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
                 }
                 message.setEventDateTime(new Date());
                 ProtocolMessage sl = new ProtocolMessage(10, 5, "carefx1/10.243.0.118", new JaxbLogMessage(message), "XDS", "AUDIT", "777");
@@ -91,12 +91,8 @@ public class UdpClientTest0 extends ClientTest {
                 s.send(packet);
                 s.close();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (AtnaException e) {
-            e.printStackTrace();
-        } catch (SyslogException e) {
-            e.printStackTrace();
+        } catch (IOException | AtnaException | SyslogException e) {
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 
@@ -111,10 +107,8 @@ public class UdpClientTest0 extends ClientTest {
             DatagramPacket packet = new DatagramPacket(bytes, 0, bytes.length, addr);
             s.send(packet);
             s.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SyslogException e) {
-            e.printStackTrace();
+        } catch (IOException | SyslogException e) {
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 
@@ -128,10 +122,8 @@ public class UdpClientTest0 extends ClientTest {
             DatagramPacket packet = new DatagramPacket(bytes, 0, bytes.length, addr);
             s.send(packet);
             s.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SyslogException e) {
-            e.printStackTrace();
+        } catch (IOException | SyslogException e) {
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 

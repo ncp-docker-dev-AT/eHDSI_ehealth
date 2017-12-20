@@ -1,5 +1,7 @@
 package epsos.ccd.gnomon.xslt.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -12,6 +14,8 @@ import javax.xml.xpath.XPathFactory;
 import java.io.StringReader;
 
 abstract class AbstractValidator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractValidator.class);
 
     protected static Document transformStringToDocument(String documentAsString) throws ParserConfigurationException {
 
@@ -49,7 +53,7 @@ abstract class AbstractValidator {
             builder = factory.newDocumentBuilder();
             document = builder.parse(new InputSource(new StringReader(documentAsString)));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
         return document;
     }

@@ -15,6 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,8 +25,6 @@ import java.io.OutputStream;
  *
  * @author Andrew Harrison
  * @version $Revision:$
- * @created Oct 7, 2009: 7:40:47 PM
- * @date $Date:$ modified by $Author:$
  */
 public class PersistencePoliciesIO {
 
@@ -114,7 +113,6 @@ public class PersistencePoliciesIO {
         return pp;
     }
 
-
     private static Element element(String name, boolean b, Document doc) {
         Element el = doc.createElement(name);
         el.setTextContent(Boolean.toString(b));
@@ -137,7 +135,6 @@ public class PersistencePoliciesIO {
         }
         return doc;
     }
-
 
     private static Document newDocument() throws IOException {
 
@@ -184,7 +181,9 @@ public class PersistencePoliciesIO {
 
     public static void main(String[] args) {
         try {
-            PersistencePoliciesIO.write(System.out, new PersistencePolicies());
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            PersistencePoliciesIO.write(outputStream, new PersistencePolicies());
+            LOGGER.info("Persistence Policy:\n{}", outputStream.toString());
         } catch (IOException e) {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }

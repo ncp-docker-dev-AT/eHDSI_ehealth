@@ -19,18 +19,13 @@ public class EADCReceiverTest extends BaseEadcTest {
     @Before
     public void setUp() throws Exception {
 
-        //TODO: Check Logs Jerome
-        //DOMConfigurator.configureAndWatch("log4j.xml", 60 * 1000);
-
+        super.setUp();
         /* TEST DATABASE INSTANTIATION */
         EadcDbConnect con = eu.epsos.pt.eadc.util.EadcFactory.INSTANCE.createEadcDbConnect(DS_NAME);
     }
 
     @Test
     public void dbConnectTest() throws Exception {
-
-        //TODO: Check Logs Jerome
-        //DOMConfigurator.configureAndWatch("log4j.xml", 60 * 1000);
 
         DocumentBuilderFactory document_factory = DocumentBuilderFactory.newInstance();
         Document notNullDoc = document_factory.newDocumentBuilder().getDOMImplementation().createDocument("test", "test", null);

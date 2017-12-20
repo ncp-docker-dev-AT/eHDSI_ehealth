@@ -1,17 +1,9 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
- *
- *    This file is part of epSOS-WEB.
- *
- *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
- **/
 package se.sb.epsos.web.service;
 
 import com.itextpdf.text.DocumentException;
 import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import hl7OrgV3.ClinicalDocumentDocument1;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
@@ -60,7 +52,8 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
     private String sessionId;
     private AssertionHandler assertionHandler = new AssertionHandler();
 
-    public NcpServiceFacadeImpl(ClientConnectorServiceService service, ClientConnectorService shelobConnector, TrcServiceHandler trcServiceHandler) {
+    public NcpServiceFacadeImpl(ClientConnectorServiceService service, ClientConnectorService shelobConnector,
+                                TrcServiceHandler trcServiceHandler) {
         this.service = service;
         this.trcServiceHandler = trcServiceHandler;
         this.shelobConnector = shelobConnector;
@@ -86,6 +79,27 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         return getXMLGregorian(dateTime.toGregorianCalendar());
     }
 
+    private static String getUniqueId() {
+
+        String uniqueId;
+        String pnoid = ConfigurationManagerFactory.getConfigurationManager().getProperty("HOME_COMM_ID");
+        String prop = "pn.uniqueid";
+        int pid;
+
+        try {
+
+            pid = Integer.parseInt(ConfigurationManagerFactory.getConfigurationManager().getProperty(prop));
+            pid = pid + 1;
+            uniqueId = pnoid + "." + pid;
+            ConfigurationManagerFactory.getConfigurationManager().setProperty(prop, String.valueOf(pid));
+        } catch (PropertyNotFoundException e) {
+            ConfigurationManagerFactory.getConfigurationManager().setProperty(prop, "1");
+            uniqueId = pnoid + "." + "1";
+        }
+
+        return uniqueId;
+    }
+
     @Override
     public String about() {
         return getClass().getSimpleName() + " (online: epSOS-Web)";
@@ -98,19 +112,19 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
     }
 
     @Override
-    public void initUser(final AuthenticatedUser userDetails) throws NcpServiceException {
+    public void initUser(final AuthenticatedUser userDetails) {
         /*
          * Creating web service call header with assertion.
-		 */
+         */
         service.setHandlerResolver(portInfo -> {
             List<Handler> handlerList = new ArrayList<>();
             handlerList.add(new RGBSOAPHandler(userDetails));
             return handlerList;
         });
 
-		/*
+        /*
          * If you want to change this port you have to change it on server side in the axis2.xml
-		 */
+         */
         if (FeatureFlagsManager.check(Feature.ENABLE_SSL)) {
             shelobConnector = service.getPort(new QName("http://cc.pt.epsos.eu", "ClientConnectorServiceHttpsSoap11Endpoint"), ClientConnectorService.class);
         } else {
@@ -245,7 +259,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
     @Override
     public List<MetaDocument> queryDocuments(Person person, String doctype, AuthenticatedUser userDetails) throws NcpServiceException {
         PatientDemographics dem = person.getPatientDemographics();
-        LOGGER.debug("HomecommunityId: " + dem.getPatientId().get(0).getRoot());
+        LOGGER.debug("HomeCommunityId: " + dem.getPatientId().get(0).getRoot());
         QueryDocumentRequest request = new QueryDocumentRequest();
         GenericDocumentCode classCode = new GenericDocumentCode();
         if ("EP".equals(doctype)) {
@@ -365,6 +379,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         EpsosDocument doc = dispensation.getDoc();
         doc.setMimeType("text/xml");
         doc.setBase64Binary(bytes);
+        doc.setSubmissionSetId(getUniqueId());
 
         GenericDocumentCode classCode = new GenericDocumentCode();
         classCode.setNodeRepresentation("60593-1");

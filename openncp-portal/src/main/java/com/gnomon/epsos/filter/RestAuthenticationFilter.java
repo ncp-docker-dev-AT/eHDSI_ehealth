@@ -27,7 +27,7 @@ public class RestAuthenticationFilter implements javax.servlet.Filter {
             httpServletRequest = (HttpServletRequest) request;
         }
 
-        if (StringUtils.equalsIgnoreCase(httpServletRequest.getMethod(), "OPTIONS")) {
+        if (httpServletRequest != null && StringUtils.equalsIgnoreCase(httpServletRequest.getMethod(), "OPTIONS")) {
             LOGGER.info("OPTIONS METHOD ACCEPTED");
             if (response instanceof HttpServletResponse) {
                 HttpServletResponse httpServletResponse = (HttpServletResponse) response;

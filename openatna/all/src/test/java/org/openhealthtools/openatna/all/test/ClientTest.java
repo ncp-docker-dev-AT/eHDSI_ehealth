@@ -43,7 +43,7 @@ import java.util.List;
 
 public abstract class ClientTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientTest.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(ClientTest.class);
 
     static {
         URL defCodes = Thread.currentThread().getContextClassLoader().getResource("atnacodes.xml");

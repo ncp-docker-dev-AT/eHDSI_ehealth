@@ -1,17 +1,3 @@
-/**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
- * <p>
- * This library is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or (at your option)
- * any later version.
- * <p>
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- */
-
 package com.gnomon.epsos.util;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -25,30 +11,33 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.Set;
 
 public class ConnectionPool {
 
-    private static Logger _log = LoggerFactory.getLogger("ConnectionPool");
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionPool.class);
     private static ConnectionPool _instance = new ConnectionPool();
     private ComboPooledDataSource _cpds;
     private Properties _props;
 
     private ConnectionPool() {
+
         try {
-            _log.info("ConnectionPool Initialization...");
+            LOGGER.info("ConnectionPool Initialization...");
+
             // Properties
-
             ClassLoader classLoader = getClass().getClassLoader();
-
             _props = new Properties();
+            _props.load(classLoader.getResourceAsStream("connection-pool.properties"));
 
-            _props.load(
-                    classLoader.getResourceAsStream("connection-pool.properties"));
+            Set<String> names = _props.stringPropertyNames();
+            for (String name : names) {
 
-            _props.list(System.out);
+                LOGGER.info("{}: '{}'", name, _props.getProperty(name));
+            }
+
 
             // Pooled data source
-
             String driverClass = _props.getProperty("driver.class");
             String jdbcUrl = _props.getProperty("jdbc.url");
             String user = _props.getProperty("user");
@@ -57,43 +46,38 @@ public class ConnectionPool {
             int minPoolSize = 5;
 
             try {
-                minPoolSize = Integer.parseInt(
-                        _props.getProperty("min.pool.size"));
+                minPoolSize = Integer.parseInt(_props.getProperty("min.pool.size"));
             } catch (Exception e) {
-                _log.error("ConnectionPool Exception: '{}'", e.getMessage(), e);
+                LOGGER.error("ConnectionPool Exception: '{}'", e.getMessage(), e);
             }
 
             int maxPoolSize = 5;
 
             try {
-                maxPoolSize = Integer.parseInt(
-                        _props.getProperty("max.pool.size"));
+                maxPoolSize = Integer.parseInt(_props.getProperty("max.pool.size"));
             } catch (Exception e) {
-                _log.error("ConnectionPool Exception: '{}'", e.getMessage(), e);
+                LOGGER.error("ConnectionPool Exception: '{}'", e.getMessage(), e);
             }
 
             int acquireIncrement = 5;
 
             try {
-                acquireIncrement = Integer.parseInt(
-                        _props.getProperty("acquire.increment"));
+                acquireIncrement = Integer.parseInt(_props.getProperty("acquire.increment"));
             } catch (Exception e) {
-                _log.error("ConnectionPool Exception: '{}'", e.getMessage(), e);
+                LOGGER.error("ConnectionPool Exception: '{}'", e.getMessage(), e);
             }
 
             _cpds = new ComboPooledDataSource();
-
             _cpds.setDriverClass(driverClass);
             _cpds.setJdbcUrl(jdbcUrl);
             _cpds.setUser(user);
             _cpds.setPassword(password);
-
             _cpds.setMinPoolSize(minPoolSize);
             _cpds.setMaxPoolSize(maxPoolSize);
             _cpds.setAcquireIncrement(acquireIncrement);
         } catch (Exception e) {
-            _log.error(ExceptionUtils.getStackTrace(e));
-            _log.error("Exception: " + e);
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Exception: " + e);
         }
     }
 
@@ -135,7 +119,7 @@ public class ConnectionPool {
                 rs.close();
             }
         } catch (SQLException sqle) {
-            _log.error("SQLException: '{}'-'{}'", sqle.getErrorCode(), sqle.getSQLState(), sqle);
+            LOGGER.error("SQLException: '{}'-'{}'", sqle.getErrorCode(), sqle.getSQLState(), sqle);
         }
 
         try {
@@ -143,7 +127,7 @@ public class ConnectionPool {
                 s.close();
             }
         } catch (SQLException sqle) {
-            _log.error("SQLException: '{}'-'{}'", sqle.getErrorCode(), sqle.getSQLState(), sqle);
+            LOGGER.error("SQLException: '{}'-'{}'", sqle.getErrorCode(), sqle.getSQLState(), sqle);
         }
 
         try {
@@ -151,7 +135,7 @@ public class ConnectionPool {
                 con.close();
             }
         } catch (SQLException sqle) {
-            _log.error("SQLException: '{}'-'{}'", sqle.getErrorCode(), sqle.getSQLState(), sqle);
+            LOGGER.error("SQLException: '{}'-'{}'", sqle.getErrorCode(), sqle.getSQLState(), sqle);
         }
     }
 

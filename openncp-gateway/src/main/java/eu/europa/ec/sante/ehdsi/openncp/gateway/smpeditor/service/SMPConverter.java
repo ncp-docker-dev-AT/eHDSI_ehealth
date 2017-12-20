@@ -61,26 +61,8 @@ public class SMPConverter {
 
     /**
      * Converts the data received from the SMPGenerateFileController to a xml file
-     *
-     * @param type
-     * @param clientServer
-     * @param issuanceType
-     * @param CC
-     * @param endpointUri
-     * @param servDescription
-     * @param servExpDate
-     * @param certificateFile
-     * @param tecContact
-     * @param tecInformation
-     * @param servActDate
-     * @param extension
-     * @param fileName
-     * @param businessLevelSignature
-     * @param certificateUID
-     * @param redirectHref
-     * @param minimumAuthLevel
      */
-    public void convertToXml(String type, /*int clientServer,*/ String issuanceType, String CC, String endpointUri,
+    public void convertToXml(String type, String issuanceType, String CC, String endpointUri,
                              String servDescription, String tecContact, String tecInformation, Date servActDate,
                              Date servExpDate, MultipartFile extension, FileInputStream certificateFile, String fileName,
                              SMPFieldProperties businessLevelSignature, SMPFieldProperties minimumAuthLevel,
@@ -711,16 +693,17 @@ public class SMPConverter {
                 }
             });
 
+            StringWriter stringWriter = new StringWriter();
+
             JAXBContext jaxbContext = JAXBContext.newInstance(ServiceMetadata.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            LOGGER.info("JAXB Class: '{}'", jaxbContext.getClass());
-
             jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
             //jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "false");
-
             jaxbMarshaller.marshal(serviceMetadata, generatedFileOS);
-            jaxbMarshaller.marshal(serviceMetadata, System.out);
-            // jaxbMarshaller.marshal(serviceMetadata, generatedFile);
+            jaxbMarshaller.marshal(serviceMetadata, stringWriter);
+
+            LOGGER.info("JAXB Class: '{}'", jaxbContext.getClass());
+            LOGGER.info("Service Metadata:\n{}", stringWriter.toString());
 
             generatedFileOS.flush();
             generatedFileOS.close();

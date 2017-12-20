@@ -25,10 +25,11 @@ public class XmlFileReader {
     // Singleton-object
     private static XmlFileReader singletonInstance = null;
     private static Boolean syncVariable = Boolean.TRUE;
-    private DocumentBuilder objDocBuilder = null;
+    private DocumentBuilder objDocBuilder;
 
     /**
-     * This constructor is private to ensure, that it is only called by the getInstance() method It initializes the static DocumentBuilderFactory object and the static DocumentBuilderFactory object.
+     * This constructor is private to ensure, that it is only called by the getInstance() method.
+     * It initializes the static DocumentBuilderFactory object and the static DocumentBuilderFactory object.
      *
      * @throws Exception
      */

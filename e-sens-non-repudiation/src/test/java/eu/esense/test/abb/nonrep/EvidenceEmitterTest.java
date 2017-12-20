@@ -58,16 +58,13 @@ public class EvidenceEmitterTest {
 
         // Populate the policy repository
         Document policy = readMessage("src/test/testData/samplePolicy.xml");
-
         polrep.deploy(PolicyMarshaller.unmarshal(policy));
 
         KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(new FileInputStream("src/test/testData/s1.keystore"),
-                "spirit".toCharArray());
+        ks.load(new FileInputStream("src/test/testData/s1.keystore"), "spirit".toCharArray());
         cert = (X509Certificate) ks.getCertificate("server1");
         key = (PrivateKey) ks.getKey("server1", "spirit".toCharArray());
         org.apache.xml.security.Init.init();
-        
     }
 
     private static Document readMessage(String file)
@@ -75,8 +72,7 @@ public class EvidenceEmitterTest {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document incomingMsg = db.parse(new File(file));
-        return incomingMsg;
+        return db.parse(new File(file));
     }
 
     /**
@@ -93,10 +89,10 @@ public class EvidenceEmitterTest {
      * @throws ObligationDischargeException
      * @throws SOAPException
      */
-    public void testGenerateATNA() throws ParserConfigurationException,
-            SAXException, IOException, MalformedIHESOAPException,
-            URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, TransformerException {
+    public void testGenerateATNA() throws ParserConfigurationException, SAXException, IOException, MalformedIHESOAPException,
+            URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, SOAPException,
+            TransformerException {
+
         testGenerateAtna();
     }
 
@@ -115,10 +111,10 @@ public class EvidenceEmitterTest {
      * @throws ObligationDischargeException
      * @throws SOAPException
      */
-    public Document testGenerateAtna() throws ParserConfigurationException,
-            SAXException, IOException, MalformedIHESOAPException,
-            URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, TransformerException {
+    public Document testGenerateAtna() throws ParserConfigurationException, SAXException, IOException,
+            MalformedIHESOAPException, URISyntaxException, TOElementException, EnforcePolicyException,
+            ObligationDischargeException, TransformerException {
+
         /*
          * AlternativeUserID = IP of the machine NetworkAccessPointID = IP of
          * the machine UserName = user from the SAML assertion
@@ -141,9 +137,7 @@ public class EvidenceEmitterTest {
         //BasicConfigurator.configure();
 
         // Read the message as it arrives at the facade
-//		Document incomingMsg = readMessage("test/testData/incomingMsg.xml");
         Document incomingMsg = readMessage("src/test/testData/audit.xml");
-        //	SOAPMessage message = Utilities.toSoap(incomingMsg, null);
         /*
          * Instantiate the message inspector, to see which type of message is
          */
@@ -162,13 +156,9 @@ public class EvidenceEmitterTest {
         LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
-        action.setIdentifier(new URI(
-                "urn:oasis:names:tc:xacml:1.0:action:action-id"));
+        action.setIdentifier(new URI("urn:oasis:names:tc:xacml:1.0:action:action-id"));
         actionList.add(action);
-
-        // Here I imagine a table lookup or similar
-        action.setValue(messageType instanceof IHEXCARetrieve ? "IHE_ITI_XCA_RETRIEVE"
-                : "UNKNOWN");
+        action.setValue(messageType instanceof IHEXCARetrieve ? "IHE_ITI_XCA_RETRIEVE" : "UNKNOWN");
 
         LinkedList<XACMLAttributes> environmentList = new LinkedList<XACMLAttributes>();
         XACMLAttributes environment = new XACMLAttributes();
@@ -177,8 +167,8 @@ public class EvidenceEmitterTest {
         environment.setValue(new DateTime().toString());
         environmentList.add(environment);
 
-        XACMLRequestCreator requestCreator = new XACMLRequestCreator(
-                messageType, null, null, actionList, environmentList);
+        XACMLRequestCreator requestCreator = new XACMLRequestCreator(messageType, null, null,
+                actionList, environmentList);
 
         Element request = requestCreator.getRequest();
         assertNotNull(request);
@@ -196,8 +186,7 @@ public class EvidenceEmitterTest {
         enforcePolicy.decide(request);
         assertNotNull(enforcePolicy.getResponseAsDocument());
         assertNotNull(enforcePolicy.getResponseAsObject());
-        Utilities.serialize(enforcePolicy.getResponseAsDocument()
-                .getDocumentElement());
+        Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
 
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
         assertNotNull(obligations);
@@ -205,23 +194,17 @@ public class EvidenceEmitterTest {
         Context context = new Context();
         context.setIncomingMsg(incomingMsg);
         context.setRequest(request); // here I pass the XML in order to give to
-        // the developers the posisbility
-        // to use their own implementation. Although an object is easier to get
-        // the relevant types (e.g., action
-        // environment
+        // the developers the possibility to use their own implementation. Although an object is easier to get
+        // the relevant types (e.g., action environment
         context.setEnforcer(enforcePolicy);
         context.setUsername("demo2");
         context.setCurrentHost("127.0.0.1");
         context.setRemoteHost("192.168.10.1");
 
-        ObligationHandlerFactory handlerFactory = ObligationHandlerFactory
-                .getInstance();
-        List<ObligationHandler> handlers = handlerFactory.createHandler(
-                messageType, obligations, context);
+        ObligationHandlerFactory handlerFactory = ObligationHandlerFactory.getInstance();
+        List<ObligationHandler> handlers = handlerFactory.createHandler(messageType, obligations, context);
 
-        // Here I discharge manually. This behavior is to let free an
-        // implementation
-        // to still decide which handler to trigger
+        // Here I discharge manually. This behavior is to let free an implementation to still decide which handler to trigger
         handlers.get(0).discharge();
         handlers.get(1).discharge();
 
@@ -229,16 +212,16 @@ public class EvidenceEmitterTest {
         assertNotNull(handlers.get(0).getMessage());
         Utilities.serialize(handlers.get(0).getMessage().getDocumentElement());
 
-        // I think I need to return handler.getMessage() which will be the audit
-        // the audit will go to the server and get validated by another wrapper
+        // I think I need to return handler.getMessage() which will be the audit the audit will go to the server and get
+        // validated by another wrapper
         return handlers.get(0).getMessage();
     }
 
     @Test
-    public void testGenerateRemNRO() throws ParserConfigurationException,
-            SAXException, IOException, MalformedIHESOAPException,
-            URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, TransformerException {
+    public void testGenerateRemNRO() throws ParserConfigurationException, SAXException, IOException, MalformedIHESOAPException,
+            URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, SOAPException,
+            MalformedMIMEMessageException, TransformerException {
+
         testGenerateREMNRO();
     }
 
@@ -257,11 +240,9 @@ public class EvidenceEmitterTest {
      * @throws SOAPException
      * @throws MalformedMIMEMessageException
      */
-    public Document testGenerateREMNRO() throws ParserConfigurationException,
-            SAXException, IOException, MalformedIHESOAPException,
-            URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, TransformerException {
-
+    public Document testGenerateREMNRO() throws ParserConfigurationException, SAXException, IOException, MalformedIHESOAPException,
+            URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, SOAPException,
+            TransformerException {
 
         /*
          * The flow is as follows (imagine that the PEP is a facade in front of
@@ -269,9 +250,6 @@ public class EvidenceEmitterTest {
          * retrieved and placed into the XACML request. The PDP evaluates the
          * request and returns the pointer of the obligation handler.
          */
-        // Configure Log4j
-        //BasicConfigurator.configure();
-
         // Read the message as it arrives at the facade
         Document incomingMsg = readMessage("src/test/testData/incomingMsg.xml");
         SOAPMessage message = Utilities.toSoap(incomingMsg, null);
@@ -296,8 +274,7 @@ public class EvidenceEmitterTest {
         LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
-        action.setIdentifier(new URI(
-                "urn:eSENS:outcome"));
+        action.setIdentifier(new URI("urn:eSENS:outcome"));
         actionList.add(action);
 
         // Here I imagine a table lookup or similar

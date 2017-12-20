@@ -41,7 +41,7 @@ public class NcpServiceException extends Exception implements Serializable {
     
     private void setEpsosError(String errorCode) {
         this.epsosErrorCode = errorCode;
-        this.epsosErrorMessage="error.epsos." + errorCode;
+        //this.epsosErrorMessage="error.epsos." + errorCode;
         this.knownEpsosError = true;
     }
 

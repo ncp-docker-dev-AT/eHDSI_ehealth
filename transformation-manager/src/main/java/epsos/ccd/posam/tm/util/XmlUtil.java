@@ -1,5 +1,6 @@
 package epsos.ccd.posam.tm.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.jaxen.JaxenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -48,12 +48,9 @@ public class XmlUtil implements TMConstants {
             Transformer transformer = factory.newTransformer();
             // FIX: https://ec.europa.eu/cefdigital/tracker/browse/EHNCP-1342
             transformer.setOutputProperty(OutputKeys.INDENT, "no");
-//            transformer.setOutputProperty(
-//                    "{http://xml.apache.org/xslt}indent-amount", "2");
+            //transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.transform(source, result);
             return stringWriter.getBuffer().toString();
-        } catch (TransformerConfigurationException e) {
-            log.error("xmlToString error: ", e);
         } catch (TransformerException e) {
             log.error("xmlToString error: ", e);
         }
@@ -67,8 +64,7 @@ public class XmlUtil implements TMConstants {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer transformer = factory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(
-                    "{http://xml.apache.org/xslt}indent-amount", "2");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
             for (Node node : nodes) {
                 Source source = new DOMSource(node);
@@ -94,8 +90,7 @@ public class XmlUtil implements TMConstants {
         Document document = null;
         try {
             // parse an XML document into a DOM tree
-            DocumentBuilderFactory documentFactory = DocumentBuilderFactory
-                    .newInstance();
+            DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
             documentFactory.setNamespaceAware(namespaceAware);
             // documentFactory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaLanguage",
             // "http://www.w3.org/2001/XMLSchema");
@@ -117,6 +112,7 @@ public class XmlUtil implements TMConstants {
      * @return Document
      */
     public static Document bytesToXml(byte[] xml, boolean namespaceAware) {
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(namespaceAware);
         DocumentBuilder builder;
@@ -124,11 +120,7 @@ public class XmlUtil implements TMConstants {
             builder = factory.newDocumentBuilder();
             return builder.parse(new ByteArrayInputStream(xml));
 
-        } catch (ParserConfigurationException e) {
-            log.error("bytesToXml error: ", e);
-        } catch (SAXException e) {
-            log.error("bytesToXml error: ", e);
-        } catch (IOException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             log.error("bytesToXml error: ", e);
         }
         return null;
@@ -149,8 +141,6 @@ public class XmlUtil implements TMConstants {
             Transformer transformer = factory.newTransformer();
             transformer.transform(source, result);
             return out.toByteArray();
-        } catch (TransformerConfigurationException e) {
-            log.error("doc2bytes error: ", e);
         } catch (TransformerException e) {
             log.error("doc2bytes error: ", e);
         }
@@ -173,8 +163,7 @@ public class XmlUtil implements TMConstants {
     }
 
     /**
-     * Returns namespace NOT Aware Document (namespace NOT Aware Document is
-     * required bye XPath evaluation)
+     * Returns namespace NOT Aware Document (namespace NOT Aware Document is required bye XPath evaluation)
      *
      * @param inputDocument Document
      * @return output Namespace NOT aware Document
@@ -186,13 +175,11 @@ public class XmlUtil implements TMConstants {
     /**
      * Using XPath expression evaluates input node
      *
-     * @param node        input Document
+     * @param node            input Document
      * @param xpathexpression XPath expression to be evaluated
      * @return NodeList
-     * @throws XPathExpressionException
      */
-    public static List<Node> getNodeList(Node node, String xpathexpression)
-            throws XPathExpressionException {
+    public static List<Node> getNodeList(Node node, String xpathexpression) {
         List<Node> result;
         try {
             NoNsXpath xpath = new NoNsXpath(xpathexpression);
@@ -204,8 +191,8 @@ public class XmlUtil implements TMConstants {
         return result;
     }
 
-    public static Node getNode(Node node, String xpathexpression)
-            throws XPathExpressionException {
+    public static Node getNode(Node node, String xpathexpression) {
+
         try {
             NoNsXpath xpath = new NoNsXpath(xpathexpression);
             return (Node) xpath.selectSingleNode(node);
@@ -215,8 +202,8 @@ public class XmlUtil implements TMConstants {
         }
     }
 
-    public static Document stringToDom(String xmlSource) throws SAXException,
-            ParserConfigurationException, IOException {
+    public static Document stringToDom(String xmlSource) throws SAXException, ParserConfigurationException, IOException {
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -232,12 +219,11 @@ public class XmlUtil implements TMConstants {
      * @throws ParserConfigurationException
      * @throws IOException
      */
-    public static Document removeEmptyXmlns(Document input)
-            throws SAXException, ParserConfigurationException, IOException {
+    public static Document removeEmptyXmlns(Document input) throws SAXException, ParserConfigurationException, IOException {
+
         String s = xmlToString(input);
-        s = s.replace(EMPTY_XMLNS, EMPTY_STRING);
-        Document output = stringToDom(s);
-        return output;
+        s = StringUtils.replace(s, EMPTY_XMLNS, EMPTY_STRING);
+        return stringToDom(s);
     }
 
     /**
@@ -247,8 +233,8 @@ public class XmlUtil implements TMConstants {
      * @return InputStream
      * @throws TransformerException
      */
-    public static InputStream nodeToInputStream(Node node)
-            throws TransformerException {
+    public static InputStream nodeToInputStream(Node node) throws TransformerException {
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Result outputTarget = new StreamResult(outputStream);
         Transformer t = TransformerFactory.newInstance().newTransformer();
@@ -258,7 +244,8 @@ public class XmlUtil implements TMConstants {
     }
 
     public static String getElementPath(Node e) {
-        ArrayList<String> path = new ArrayList<String>();
+
+        ArrayList<String> path = new ArrayList<>();
         Node parent = null;
         while (!(parent instanceof Document)) {
             String name = e.getLocalName();
@@ -317,6 +304,7 @@ public class XmlUtil implements TMConstants {
 }
 
 class CdaNameSpaceContext implements NamespaceContext {
+
     private static final String NsCda = "urn:hl7-org:v3";
 
     public String getNamespaceURI(String prefix) {
@@ -333,5 +321,4 @@ class CdaNameSpaceContext implements NamespaceContext {
     public Iterator getPrefixes(String namespaceURI) {
         return null;
     }
-
-};
+}

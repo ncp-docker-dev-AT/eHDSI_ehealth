@@ -74,9 +74,7 @@
                     <xsl:when test="not($act/@nullFlavor)">
                         <xsl:choose>
                             <xsl:when test="$shownarrative='true'">
-                                <a href="javascript: showhide('reactionsTr'); self.focus(); void(0);">
-                                    <h2>Show/Hide</h2>
-                                </a>
+                                <a href="javascript: showhide('reactionsTr'); self.focus(); void(0);">Show/Hide</a>
                                 <div id="reactionsTr" style="display:block">
                                     <xsl:apply-templates
                                             select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='48765-2']/../n1:text/*"/>

@@ -138,7 +138,10 @@ public class CdaHelper {
                             XPathExpression nameExpr = xpath.compile(
                                     "hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:name");
                             Node materialName = (Node) nameExpr.evaluate(entryNode, XPathConstants.NODE);
-                            String name = materialName.getTextContent().trim();
+                            String name = "";
+                            if(materialName != null) {
+                                name = materialName.getTextContent().trim();
+                            }
 
                             String formCode = null;
                             String packsString = "";
@@ -418,13 +421,17 @@ public class CdaHelper {
                     }
                 }
             } else {
-                strength = numeratorNode.getAttributes().getNamedItem("nullFlavor").getNodeValue();
+                if (numeratorNode != null) {
+                    strength = numeratorNode.getAttributes().getNamedItem("nullFlavor").getNodeValue();
+                }
                 if (!Validator.isNull(strength)) {
                     strength = NullFlavorManager.getNullFlavor(strength);
                 }
             }
         } else {
-            strength = quantityNode.getAttributes().getNamedItem("nullFlavor").getNodeValue();
+            if (quantityNode != null) {
+                strength = quantityNode.getAttributes().getNamedItem("nullFlavor").getNodeValue();
+            }
             if (!Validator.isNull(strength)) {
                 strength = NullFlavorManager.getNullFlavor(strength);
             }
@@ -639,7 +646,7 @@ public class CdaHelper {
             } else {
                 if (effectiveTimeNode.getAttributes().getNamedItem("nullFlavor") != null) {
                     freqString = effectiveTimeNode.getAttributes().getNamedItem("nullFlavor").getNodeValue();
-                } else if (periodNode.getAttributes().getNamedItem("nullFlavor") != null) {
+                } else if (periodNode != null && periodNode.getAttributes().getNamedItem("nullFlavor") != null) {
                     freqString = periodNode.getAttributes().getNamedItem("nullFlavor").getNodeValue();
                 }
                 if (!Validator.isNull(freqString)) {

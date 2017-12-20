@@ -87,7 +87,7 @@ public class StorkUtils {
         /* BODY */
         Assertion result;
         final HCPIAssertionBuilder assertionBuilder;
-        final String hcpRole;
+        final String hcpRoleValue;
         final String hcpId;
         final String healthCareFacilityType;
         final String purposeOfUse;
@@ -105,14 +105,16 @@ public class StorkUtils {
                 .notOnOrAfter(4);
 
         // MANDATORY: HCP ID and HCP Role
-        hcpRole = obtainHcpRole(storkResponse).toString();
-        if (getPersonalAttribute(storkResponse, SUBJECT_EIDENTIFIER) != null) {
-            hcpId = getPersonalAttribute(storkResponse, SUBJECT_EIDENTIFIER).getValue().get(0);
-        } else {
-            hcpId = NOT_AVAILABLE;
+        HcpRole hcpRole = obtainHcpRole(storkResponse);
+        if (hcpRole != null) {
+            hcpRoleValue = hcpRole.toString();
+            if (getPersonalAttribute(storkResponse, SUBJECT_EIDENTIFIER) != null) {
+                hcpId = getPersonalAttribute(storkResponse, SUBJECT_EIDENTIFIER).getValue().get(0);
+            } else {
+                hcpId = NOT_AVAILABLE;
+            }
+            assertionBuilder.hcpIdentifier(hcpId).hcpRole(hcpRoleValue);
         }
-        assertionBuilder.hcpIdentifier(hcpId).hcpRole(hcpRole);
-
         // MANDATORY: HealthCare Facility Type
         healthCareFacilityType = OTHER_FACILITY_TYPE;
         assertionBuilder.healthCareFacilityType(healthCareFacilityType);
@@ -123,8 +125,7 @@ public class StorkUtils {
 
         // MANDATORY: Point Of Care
         pointOfCare = DUMMY_POINT_OF_CARE;
-        assertionBuilder
-                .pointOfCare(pointOfCare);
+        assertionBuilder.pointOfCare(pointOfCare);
 
         // OPTIONAL: HCP Organization Details
         hcpOrgId = DUMMY_HCP_ORG_ID;
@@ -169,18 +170,21 @@ public class StorkUtils {
 
         /* BODY */
         Assertion result;
-        HcpRole role;
+        HcpRole role = obtainHcpRole(storkResponse);
 
-        role = obtainHcpRole(storkResponse);
-        result = HCPIAssertionCreator.createHCPIAssertion(permissions, role.getXspaRole());
+        if (role != null) {
+            result = HCPIAssertionCreator.createHCPIAssertion(permissions, role.getXspaRole());
 
-        if (result != null) {
-            LOG.info("Assertion conversion done with success.");
+            if (result != null) {
+                LOG.info("Assertion conversion done with success.");
+            } else {
+                LOG.info("Assertion conversion done unsuccessfully.");
+            }
+
+            return result;
         } else {
-            LOG.info("Assertion conversion done unsuccessfully.");
+            return null;
         }
-
-        return result;
     }
 
     /*
@@ -231,11 +235,13 @@ public class StorkUtils {
         //Create and add identifier
         if (countryCode != null) {
             patientSearchAttributes = getRequiredAttributesByCountry(countryCode);
-            if (patientSearchAttributes.containsKey(EIDENTIFIER)) {
-                result.add(new PatientId(patientSearchAttributes.get(EIDENTIFIER), obtainNodeValue(mandateInformation, REPRESENTED_EIDENTIFIER_XPATH))); // Identifier domain obtained from searchmask file
-            } else {
-                LOG.info("It was not possible to obtain identifier domain from searchmask file for country: '{}', using N/A as identifier domain.", countryCode);
-                result.add(new PatientId(NOT_AVAILABLE, obtainNodeValue(mandateInformation, REPRESENTED_EIDENTIFIER_XPATH))); // Identifier domain missing from search mask file
+            if (patientSearchAttributes != null) {
+                if (patientSearchAttributes.containsKey(EIDENTIFIER)) {
+                    result.add(new PatientId(patientSearchAttributes.get(EIDENTIFIER), obtainNodeValue(mandateInformation, REPRESENTED_EIDENTIFIER_XPATH))); // Identifier domain obtained from searchmask file
+                } else {
+                    LOG.info("It was not possible to obtain identifier domain from searchmask file for country: '{}', using N/A as identifier domain.", countryCode);
+                    result.add(new PatientId(NOT_AVAILABLE, obtainNodeValue(mandateInformation, REPRESENTED_EIDENTIFIER_XPATH))); // Identifier domain missing from search mask file
+                }
             }
         } else {
             LOG.info("The supplied country code is null, using N/A as identifier domain.");
@@ -267,13 +273,13 @@ public class StorkUtils {
         final Map<String, String> representedInformation = getRepresentedPersonInformation(storkResponse);
 
         //Obtain Mandate Information
-        if (representedInformation.containsKey(StorkAttributes.GIVEN_NAME.getStorkDesignation())) {
+        if (representedInformation != null && representedInformation.containsKey(StorkAttributes.GIVEN_NAME.getStorkDesignation())) {
             result.put(StorkAttributes.GIVEN_NAME.getSearchMaskValue(), representedInformation.get(StorkAttributes.GIVEN_NAME.getStorkDesignation()));
         }
-        if (representedInformation.containsKey(StorkAttributes.SURNAME.getStorkDesignation())) {
+        if (representedInformation != null && representedInformation.containsKey(StorkAttributes.SURNAME.getStorkDesignation())) {
             result.put(StorkAttributes.SURNAME.getSearchMaskValue(), representedInformation.get(StorkAttributes.SURNAME.getStorkDesignation()));
         }
-        if (representedInformation.containsKey(StorkAttributes.DATE_OF_BIRTH.getStorkDesignation())) {
+        if (representedInformation != null && representedInformation.containsKey(StorkAttributes.DATE_OF_BIRTH.getStorkDesignation())) {
             result.put(StorkAttributes.DATE_OF_BIRTH.getSearchMaskValue(), representedInformation.get(StorkAttributes.DATE_OF_BIRTH.getStorkDesignation()));
         }
 

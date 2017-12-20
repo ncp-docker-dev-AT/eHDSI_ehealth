@@ -9,6 +9,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -22,19 +23,18 @@ import java.io.FileOutputStream;
  */
 public class ToEpsosPivotPositiveTest extends TBase {
 
-    private static final Logger logger = LoggerFactory.getLogger(ToEpsosPivotPositiveTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ToEpsosPivotPositiveTest.class);
 
     public void testToEpSOSPivotPatientSummaryL3() {
+
         Document validDocument = getDocument();
-        //Document validDocument = getDocument(new File(samplesDir + "HuberMelanie_PS.xml"));
         assertNotNull(validDocument);
 
         TMResponseStructure response = tmService.toEpSOSPivot(validDocument);
         try {
-            logger.info("XML Response: '{}'", response.getDocument());
+            LOGGER.info("XML Response: '{}'", response.getDocument());
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
 
         assertNotNull(response);
@@ -44,15 +44,18 @@ public class ToEpsosPivotPositiveTest extends TBase {
     }
 
     public void testToEpSOSPivotPatientSummaryL1() {
+
         Document doc = getDocument(new File(samplesDir + "unstructuredCDA.xml"));
         assertNotNull(doc);
 
         TMResponseStructure response = tmService.toEpSOSPivot(doc);
         try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.transform(new DOMSource(response.getResponseCDA()), new StreamResult(System.out));
+            transformer.transform(new DOMSource(response.getResponseCDA()), new StreamResult(outputStream));
+            LOGGER.info("Response:\n{}", outputStream.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
         assertNotNull(response);
         assertTrue(response.isStatusSuccess());
@@ -64,6 +67,7 @@ public class ToEpsosPivotPositiveTest extends TBase {
      * otestuje ci coded element ma rovnaky NS ako jeho parrent
      */
     public void testToEpSOSPivotPatientSummaryL1NS() {
+
         Document doc = getDocument(new File(samplesDir + "PS_Katzlmacher.xml"));
         assertNotNull(doc);
 
@@ -72,7 +76,7 @@ public class ToEpsosPivotPositiveTest extends TBase {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.transform(new DOMSource(response.getDocument()), new StreamResult(new FileOutputStream("tmresult.xml")));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
         assertNotNull(response);
         assertTrue(response.isStatusSuccess());

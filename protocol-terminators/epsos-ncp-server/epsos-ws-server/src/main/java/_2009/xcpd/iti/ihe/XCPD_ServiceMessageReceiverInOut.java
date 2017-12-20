@@ -211,10 +211,18 @@
  * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
- */
-/**
+ * <p>
  * XCPD_ServiceMessageReceiverInOut.java
- *
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * <p>
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
+ * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
+ * Built on : Dec 19, 2010 (08:18:42 CET)
+ * XCPD_ServiceMessageReceiverInOut.java
+ * <p>
  * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
  * Built on : Dec 19, 2010 (08:18:42 CET)
  */
@@ -228,12 +236,19 @@ import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.services.XcpdValidationService;
-import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.*;
+import org.apache.axiom.om.impl.builder.SAXOMBuilder;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.XMLUtils;
+import org.h2.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
@@ -241,15 +256,19 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.*;
 import javax.xml.namespace.QName;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.UUID;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.util.*;
 
 /**
  * XCPD_ServiceMessageReceiverInOut message receiver
  */
-public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers.AbstractInOutMessageReceiver {
+public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
 
@@ -262,12 +281,9 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
     }
 
     static {
-        javax.xml.bind.JAXBContext jc;
-        jc = null;
+        JAXBContext jc = null;
         try {
-            jc = javax.xml.bind.JAXBContext.newInstance(
-                    org.hl7.v3.PRPAIN201305UV02.class,
-                    org.hl7.v3.PRPAIN201306UV02.class);
+            jc = JAXBContext.newInstance(org.hl7.v3.PRPAIN201305UV02.class, org.hl7.v3.PRPAIN201306UV02.class);
         } catch (javax.xml.bind.JAXBException ex) {
             LOGGER.error("Unable to create JAXBContext: '{}'", ex.getMessage(), ex);
             // Runtime.getRuntime().exit(-1);
@@ -276,20 +292,19 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
         }
     }
 
-    private String getIPofSender(org.apache.axis2.context.MessageContext msgContext) {
+    private String getIPofSender(MessageContext msgContext) {
 
         return (String) msgContext.getProperty("REMOTE_ADDR");
     }
 
-    private String getMessageID(org.apache.axiom.soap.SOAPEnvelope envelope) {
+    private String getMessageID(SOAPEnvelope envelope) {
 
         Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(
                 new QName("http://www.w3.org/2005/08/addressing", "MessageID"));
         if (it.hasNext()) {
             return it.next().getText();
         } else {
-            // [Mustafa: May 8, 2012]: Should not be empty string, sch. gives
-            // error.
+            // [Mustafa: May 8, 2012]: Should not be empty string, sch. giveserror.
             return Constants.UUID_PREFIX;
         }
     }
@@ -314,7 +329,7 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
             eventLog.setSC_UserID(clientDN);
             eventLog.setTargetip(req.getServerName());
 
-            LOGGER.debug("Incoming XCPD Request Message:\n '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
+            LOGGER.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
 
             /* Validate incoming request message */
             XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(
@@ -323,21 +338,20 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
 
             XCPD_ServiceSkeleton skel = (XCPD_ServiceSkeleton) obj;
             // Out Envelop
-            org.apache.axiom.soap.SOAPEnvelope envelope;
+            SOAPEnvelope envelope;
             // Find the axisOperation that has been set by the Dispatch phase.
-            org.apache.axis2.description.AxisOperation op = msgContext.getOperationContext().getAxisOperation();
+            AxisOperation op = msgContext.getOperationContext().getAxisOperation();
             if (op == null) {
-                throw new org.apache.axis2.AxisFault("Operation is not located, if this is doclit style the SOAP-ACTION " +
+                throw new AxisFault("Operation is not located, if this is doclit style the SOAP-ACTION " +
                         "should specified via the SOAP Action to use the RawXMLProvider");
             }
 
             String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID().toString();
             String methodName;
 
-            if ((op.getName() != null) && ((methodName = org.apache.axis2.util.JavaUtils.xmlNameToJavaIdentifier(
-                    op.getName().getLocalPart())) != null)) {
+            if ((op.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(op.getName().getLocalPart())) != null)) {
 
-                if ("respondingGateway_PRPA_IN201305UV02".equals(methodName)) {
+                if (StringUtils.equals("respondingGateway_PRPA_IN201305UV02", methodName)) {
 
                     org.hl7.v3.PRPAIN201306UV02 pRPA_IN201306UV021;
                     org.hl7.v3.PRPAIN201305UV02 wrappedParam = (org.hl7.v3.PRPAIN201305UV02) fromOM(
@@ -360,134 +374,133 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
                     AuditService auditService = new AuditService();
                     auditService.write(eventLog, "", "1");
 
-                    LOGGER.debug("Outgoing XCPD Response Message:\n '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
+                    LOGGER.debug("Outgoing XCPD Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
 
                 } else {
-                    throw new java.lang.RuntimeException("method not found");
+                    LOGGER.error("Method not Found: '{}'", methodName);
+                    throw new RuntimeException("method not found");
                 }
 
                 Date endTime = new Date();
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
+                //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
                 try {
                     EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                            endTime, "", EadcEntry.DsTypes.XCA, EadcUtil.Direction.OUTBOUND);
+                            endTime, "", EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND);
                 } catch (Exception ex) {
-                    LOGGER.error("EADC INVOCATION FAILED!", ex);
+                    LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
                 }
             }
-        } catch (java.lang.Exception e) {
+        } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            throw org.apache.axis2.AxisFault.makeFault(e);
+            throw AxisFault.makeFault(e);
         }
     }
 
-    private org.apache.axiom.om.OMElement toOM(org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent)
-            throws org.apache.axis2.AxisFault {
+    private OMElement toOM(org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent) throws AxisFault {
 
         try {
-            javax.xml.bind.JAXBContext context = wsContext;
-            javax.xml.bind.Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
-            org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
+            Marshaller marshaller = wsContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+
+            OMFactory factory = OMAbstractFactory.getOMFactory();
 
             JaxbRIDataSource source = new JaxbRIDataSource(org.hl7.v3.PRPAIN201305UV02.class, param, marshaller,
                     "urn:hl7-org:v3", "PRPA_IN201305UV02");
-            org.apache.axiom.om.OMNamespace namespace = factory.createOMNamespace("urn:hl7-org:v3", null);
+            OMNamespace namespace = factory.createOMNamespace("urn:hl7-org:v3", null);
+
             return factory.createOMElement(source, "PRPA_IN201305UV02", namespace);
-        } catch (javax.xml.bind.JAXBException bex) {
-            throw org.apache.axis2.AxisFault.makeFault(bex);
+
+        } catch (JAXBException bex) {
+            throw AxisFault.makeFault(bex);
         }
     }
 
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory,
-                                                          org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent)
-            throws org.apache.axis2.AxisFault {
+    private SOAPEnvelope toEnvelope(SOAPFactory factory, org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent) throws AxisFault {
 
-        org.apache.axiom.soap.SOAPEnvelope envelope = factory.getDefaultEnvelope();
+        SOAPEnvelope envelope = factory.getDefaultEnvelope();
         envelope.getBody().addChild(toOM(param, optimizeContent));
+
         return envelope;
     }
 
-    private org.apache.axiom.om.OMElement toOM(org.hl7.v3.PRPAIN201306UV02 param, boolean optimizeContent)
-            throws org.apache.axis2.AxisFault {
+    private OMElement toOM(org.hl7.v3.PRPAIN201306UV02 param, boolean optimizeContent) throws AxisFault {
 
         try {
-            javax.xml.bind.JAXBContext context = wsContext;
-            javax.xml.bind.Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT,
-                    Boolean.TRUE);
 
-            org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
+            Marshaller marshaller = wsContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
-            JaxbRIDataSource source = new JaxbRIDataSource(org.hl7.v3.PRPAIN201306UV02.class, param, marshaller,
-                    "urn:hl7-org:v3", "PRPA_IN201306UV02");
-            org.apache.axiom.om.OMNamespace namespace = factory.createOMNamespace("urn:hl7-org:v3", null);
+            OMFactory factory = OMAbstractFactory.getOMFactory();
+            JaxbRIDataSource source = new JaxbRIDataSource(org.hl7.v3.PRPAIN201306UV02.class, param, marshaller, "urn:hl7-org:v3", "PRPA_IN201306UV02");
+            OMNamespace namespace = factory.createOMNamespace("urn:hl7-org:v3", null);
+
             return factory.createOMElement(source, "PRPA_IN201306UV02", namespace);
-        } catch (javax.xml.bind.JAXBException bex) {
-            throw org.apache.axis2.AxisFault.makeFault(bex);
+
+        } catch (JAXBException bex) {
+            throw AxisFault.makeFault(bex);
         }
     }
 
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory,
-                                                          org.hl7.v3.PRPAIN201306UV02 param, boolean optimizeContent)
-            throws org.apache.axis2.AxisFault {
+    private SOAPEnvelope toEnvelope(SOAPFactory factory, org.hl7.v3.PRPAIN201306UV02 param, boolean optimizeContent) throws AxisFault {
 
-        org.apache.axiom.soap.SOAPEnvelope envelope = factory.getDefaultEnvelope();
+        SOAPEnvelope envelope = factory.getDefaultEnvelope();
         envelope.getBody().addChild(toOM(param, optimizeContent));
+
         return envelope;
     }
 
     /**
      * get the default envelope
      */
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory) {
+    private SOAPEnvelope toEnvelope(SOAPFactory factory) {
 
         return factory.getDefaultEnvelope();
     }
 
-    private java.lang.Object fromOM(org.apache.axiom.om.OMElement param, java.lang.Class type, java.util.Map extraNamespaces)
-            throws org.apache.axis2.AxisFault {
+    private Object fromOM(OMElement param, Class type, Map extraNamespaces) throws AxisFault {
+
         try {
-            javax.xml.bind.JAXBContext context = wsContext;
-            javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
+            Unmarshaller unmarshaller = wsContext.createUnmarshaller();
 
             return unmarshaller.unmarshal(param.getXMLStreamReaderWithoutCaching(), type).getValue();
-        } catch (javax.xml.bind.JAXBException bex) {
-            throw org.apache.axis2.AxisFault.makeFault(bex);
+
+        } catch (JAXBException bex) {
+            throw AxisFault.makeFault(bex);
         }
     }
 
     /**
      * A utility method that copies the namepaces from the SOAPEnvelope
      */
-    private java.util.Map getEnvelopeNamespaces(org.apache.axiom.soap.SOAPEnvelope env) {
+    private Map getEnvelopeNamespaces(SOAPEnvelope env) {
 
-        java.util.Map returnMap = new java.util.HashMap();
-        java.util.Iterator namespaceIterator = env.getAllDeclaredNamespaces();
+        Map returnMap = new HashMap();
+        Iterator namespaceIterator = env.getAllDeclaredNamespaces();
         while (namespaceIterator.hasNext()) {
-            org.apache.axiom.om.OMNamespace ns = (org.apache.axiom.om.OMNamespace) namespaceIterator.next();
+            OMNamespace ns = (OMNamespace) namespaceIterator.next();
             returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
         }
         return returnMap;
     }
 
-    private org.apache.axis2.AxisFault createAxisFault(java.lang.Exception e) {
+    private AxisFault createAxisFault(Exception e) {
 
-        org.apache.axis2.AxisFault f;
+        AxisFault f;
         Throwable cause = e.getCause();
         if (cause != null) {
-            f = new org.apache.axis2.AxisFault(e.getMessage(), cause);
+            f = new AxisFault(e.getMessage(), cause);
         } else {
-            f = new org.apache.axis2.AxisFault(e.getMessage());
+            f = new AxisFault(e.getMessage());
         }
 
         return f;
     }
 
-    class JaxbRIDataSource implements org.apache.axiom.om.OMDataSource {
+    class JaxbRIDataSource implements OMDataSource {
 
         /**
          * Bound object for output.
@@ -500,7 +513,7 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
         /**
          * Marshaller.
          */
-        private final javax.xml.bind.Marshaller marshaller;
+        private final Marshaller marshaller;
         /**
          * Namespace
          */
@@ -516,7 +529,7 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
          * @param obj
          * @param marshaller
          */
-        public JaxbRIDataSource(Class clazz, Object obj, javax.xml.bind.Marshaller marshaller, String nsuri, String name) {
+        public JaxbRIDataSource(Class clazz, Object obj, Marshaller marshaller, String nsuri, String name) {
             this.outClazz = clazz;
             this.outObject = obj;
             this.marshaller = marshaller;
@@ -524,60 +537,49 @@ public class XCPD_ServiceMessageReceiverInOut extends org.apache.axis2.receivers
             this.name = name;
         }
 
-        public void serialize(java.io.OutputStream output, org.apache.axiom.om.OMOutputFormat format)
-                throws javax.xml.stream.XMLStreamException {
+        public void serialize(OutputStream output, OMOutputFormat format) throws XMLStreamException {
 
             try {
-                marshaller.marshal(new javax.xml.bind.JAXBElement(new javax.xml.namespace.QName(nsuri, name),
-                        outObject.getClass(), outObject), output);
-            } catch (javax.xml.bind.JAXBException e) {
-                throw new javax.xml.stream.XMLStreamException("Error in JAXB marshalling", e);
+                marshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), output);
+
+            } catch (JAXBException e) {
+                throw new XMLStreamException("Error in JAXB marshalling", e);
             }
         }
 
-        public void serialize(java.io.Writer writer, org.apache.axiom.om.OMOutputFormat format) throws javax.xml.stream.XMLStreamException {
+        public void serialize(Writer writer, OMOutputFormat format) throws XMLStreamException {
 
             try {
-                marshaller.marshal(
-                        new javax.xml.bind.JAXBElement(
-                                new javax.xml.namespace.QName(nsuri, name),
-                                outObject.getClass(), outObject), writer);
-            } catch (javax.xml.bind.JAXBException e) {
-                throw new javax.xml.stream.XMLStreamException(
-                        "Error in JAXB marshalling", e);
+                marshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), writer);
+
+            } catch (JAXBException e) {
+                throw new XMLStreamException("Error in JAXB marshalling", e);
             }
         }
 
-        public void serialize(javax.xml.stream.XMLStreamWriter xmlWriter)
-                throws javax.xml.stream.XMLStreamException {
+        public void serialize(XMLStreamWriter xmlWriter) throws XMLStreamException {
+
             try {
-                marshaller.marshal(
-                        new javax.xml.bind.JAXBElement(
-                                new javax.xml.namespace.QName(nsuri, name),
-                                outObject.getClass(), outObject), xmlWriter);
-            } catch (javax.xml.bind.JAXBException e) {
-                throw new javax.xml.stream.XMLStreamException(
-                        "Error in JAXB marshalling", e);
+                marshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), xmlWriter);
+
+            } catch (JAXBException e) {
+                throw new XMLStreamException("Error in JAXB marshalling", e);
             }
         }
 
-        public javax.xml.stream.XMLStreamReader getReader()
-                throws javax.xml.stream.XMLStreamException {
+        public XMLStreamReader getReader() throws XMLStreamException {
+
             try {
-                javax.xml.bind.JAXBContext context = wsContext;
-                org.apache.axiom.om.impl.builder.SAXOMBuilder builder = new org.apache.axiom.om.impl.builder.SAXOMBuilder();
-                javax.xml.bind.Marshaller marshaller = context
-                        .createMarshaller();
-                marshaller.marshal(
-                        new javax.xml.bind.JAXBElement(
-                                new javax.xml.namespace.QName(nsuri, name),
-                                outObject.getClass(), outObject), builder);
+
+                SAXOMBuilder builder = new SAXOMBuilder();
+                Marshaller marshaller = wsContext.createMarshaller();
+                marshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
 
                 return builder.getRootElement().getXMLStreamReader();
-            } catch (javax.xml.bind.JAXBException e) {
-                throw new javax.xml.stream.XMLStreamException(
-                        "Error in JAXB marshalling", e);
+
+            } catch (JAXBException e) {
+                throw new XMLStreamException("Error in JAXB marshalling", e);
             }
         }
     }
-}// end of class
+}

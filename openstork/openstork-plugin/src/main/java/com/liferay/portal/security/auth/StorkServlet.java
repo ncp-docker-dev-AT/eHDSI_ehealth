@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.liferay.portal.security.auth;
 
 import com.liferay.portal.kernel.exception.PortalException;
@@ -13,7 +8,6 @@ import com.liferay.portal.model.Company;
 import com.liferay.portal.util.PortalUtil;
 import eu.stork.peps.auth.commons.IPersonalAttributeList;
 import eu.stork.peps.auth.commons.PEPSUtil;
-import eu.stork.peps.auth.commons.PersonalAttribute;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
 import eu.stork.peps.exceptions.STORKSAMLEngineException;
@@ -26,10 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.*;
 
 /**
@@ -37,15 +28,11 @@ import java.util.*;
  */
 public class StorkServlet extends HttpServlet {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StorkServlet.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(StorkServlet.class);
     private static final String USER_AGENT = "Mozilla/5.0";
     private static Properties configs;
     private static String homepage = "/SP/";
     private static String allowIP = "127.0.0.1";
-    private String SAMLRequest;
-    private String samlRequestXML;
-    private ArrayList<PersonalAttribute> attrList;
-    private HttpServletRequest request;
 
     public static String getHomepage() {
         return homepage;
@@ -56,16 +43,12 @@ public class StorkServlet extends HttpServlet {
     }
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      *
      * @param request  servlet request
      * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
 
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
@@ -79,6 +62,8 @@ public class StorkServlet extends HttpServlet {
             out.println("<h1>Servlet StorkServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
+        } catch (IOException e) {
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }
     }
 
@@ -91,39 +76,43 @@ public class StorkServlet extends HttpServlet {
      * @throws IOException      if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // Check for ip address called this servlet
-        String ipAddress = "";
+        // Check for IP address called this servlet
+        String ipAddress;
         if (request.getHeader("x-forwarded-for") != null) {
-            ipAddress = InetAddress.getByName(request.getHeader("x-forwarded-for")).getHostAddress();
+            try {
+                ipAddress = InetAddress.getByName(request.getHeader("x-forwarded-for")).getHostAddress();
+            } catch (UnknownHostException e) {
+                LOGGER.error("UnknownHostException: '{}'", e);
+                ipAddress = "Client IP not found";
+            }
         } else {
             ipAddress = request.getRemoteAddr();
         }
 
-        LOGGER.info("IP-Addr: " + ipAddress);
-
+        LOGGER.info("IP-Addr: '{}'", ipAddress);
         String STORK_ENABLED = "stork.enabled";
         Company company;
+
         try {
             company = PortalUtil.getCompany(request);
             String storkEnabled = PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false");
-            LOGGER.info("storkEnabled:" + PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false"));
-            LOGGER.info("provider.name:" + PrefsPropsUtil.getString(company.getCompanyId(), "provider.name", ""));
-            LOGGER.info("sp.sector:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.sector", ""));
-            LOGGER.info("sp.aplication:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.aplication", ""));
-            LOGGER.info("sp.country:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.country", ""));
-            LOGGER.info("sp.qaalevel:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.qaalevel", ""));
-            LOGGER.info("peps.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "peps.url", ""));
-            LOGGER.info("stork.login.url:" + PrefsPropsUtil.getString(company.getCompanyId(), "stork.login.url", ""));
-            LOGGER.info("sp.mandatory.personal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.personal.attributes", ""));
-            LOGGER.info("sp.mandatory.business.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.business.attributes", ""));
-            LOGGER.info("sp.mandatory.legal.attributes:" + PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.legal.attributes", ""));
-
+            LOGGER.info("storkEnabled: '{}'", PrefsPropsUtil.getString(company.getCompanyId(), STORK_ENABLED, "false"));
+            LOGGER.info("provider.name: '{}'", PrefsPropsUtil.getString(company.getCompanyId(), "provider.name", ""));
+            LOGGER.info("sp.sector: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.sector", ""));
+            LOGGER.info("sp.aplication: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.aplication", ""));
+            LOGGER.info("sp.country: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.country", ""));
+            LOGGER.info("sp.qaalevel: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.qaalevel", ""));
+            LOGGER.info("peps.url: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "peps.url", ""));
+            LOGGER.info("stork.login.url: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "stork.login.url", ""));
+            LOGGER.info("sp.mandatory.personal.attributes: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.personal.attributes", ""));
+            LOGGER.info("sp.mandatory.business.attributes: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.business.attributes", ""));
+            LOGGER.info("sp.mandatory.legal.attributes: {}'", PrefsPropsUtil.getString(company.getCompanyId(), "sp.mandatory.legal.attributes", ""));
             request.getRequestDispatcher("/stork.jsp").forward(request, response);
-        } catch (PortalException | SystemException ex) {
-            LOGGER.error(null, ex);
+
+        } catch (PortalException | SystemException | UnknownHostException e) {
+            LOGGER.error(null, e);
         }
     }
 
@@ -132,46 +121,47 @@ public class StorkServlet extends HttpServlet {
      *
      * @param request  servlet request
      * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        LOGGER.info("##################### Stork Servlet Post ...");
+        LOGGER.info("Stork Servlet Post ...");
         String providerName = PropsUtil.get("provider.name");
         String SAMLResponse = request.getParameter("SAMLResponse");
         byte[] decSamlToken = PEPSUtil.decodeSAMLToken(SAMLResponse);
         String samlResponseXML = new String(decSamlToken);
-        LOGGER.info("SAML IS : " + samlResponseXML);
+        LOGGER.info("SAML is: '{}'", samlResponseXML);
 
-        STORKAuthnResponse authnResponse = null;
+        STORKAuthnResponse authnResponse;
         IPersonalAttributeList personalAttributeList = null;
         STORKSAMLEngine engine = STORKSAMLEngine.getInstance(Constants.SP_CONF);
         String host = request.getRemoteHost();
-        LOGGER.info("HOST IS : " + host);
+        LOGGER.info("HOST IS: '{}'", host);
+
         try {
             authnResponse = engine.validateSTORKAuthnResponseWithQuery(decSamlToken, host);
+
+            if (authnResponse.isFail()) {
+                LOGGER.error("Problem with response");
+            } else {
+                personalAttributeList = authnResponse.getPersonalAttributeList();
+            }
+            response.setContentType("text/html;charset=UTF-8");
+            try (PrintWriter out = response.getWriter()) {
+                /* TODO output your page here. You may use following sample code. */
+                out.println("<!DOCTYPE html>");
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>Servlet StorkServlet</title>");
+                out.println("</head>");
+                out.println("<body>");
+                out.println("Servlet StorkServlet at " + (personalAttributeList != null ? personalAttributeList.get("givenName") : "Given Name Not Found"));
+                out.println("</body>");
+                out.println("</html>");
+            }
         } catch (STORKSAMLEngineException e) {
-            LOGGER.error("######################" + e.getMessage());
-        }
-        if (authnResponse.isFail()) {
-            LOGGER.error("Problem with response");
-        } else {
-            personalAttributeList = authnResponse.getPersonalAttributeList();
-        }
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet StorkServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("Servlet StorkServlet at " + personalAttributeList.get("givenName"));
-            out.println("</body>");
-            out.println("</html>");
+            LOGGER.error("STORKSAMLEngineException: '{}'", e.getMessage(), e);
         }
     }
 
@@ -183,14 +173,6 @@ public class StorkServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Short description";
-    }
-
-    public HttpServletRequest getRequest() {
-        return request;
-    }
-
-    public void setRequest(HttpServletRequest request) {
-        this.request = request;
     }
 
     private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
@@ -239,7 +221,7 @@ public class StorkServlet extends HttpServlet {
         out.close();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String line = "";
+        String line;
         while ((line = in.readLine()) != null) {
             sb.append(line);
         }

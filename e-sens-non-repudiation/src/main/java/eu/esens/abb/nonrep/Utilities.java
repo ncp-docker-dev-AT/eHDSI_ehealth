@@ -28,13 +28,14 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 
 public class Utilities {
 
-    private static Logger logger = LoggerFactory.getLogger(Utilities.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utilities.class);
 
     private Utilities() {
     }
@@ -62,10 +63,8 @@ public class Utilities {
                 new XACMLPolicyStatementTypeMarshaller());
         marshallerFactory.registerMarshaller(XACMLAuthzDecisionQueryType.DEFAULT_ELEMENT_NAME_XACML20,
                 new XACMLAuthzDecisionQueryTypeMarshaller());
-        marshallerFactory.registerMarshaller(PolicySetType.DEFAULT_ELEMENT_NAME,
-                new PolicySetTypeMarshaller());
-        marshallerFactory.registerMarshaller(PolicyType.DEFAULT_ELEMENT_NAME,
-                new PolicyTypeMarshaller());
+        marshallerFactory.registerMarshaller(PolicySetType.DEFAULT_ELEMENT_NAME, new PolicySetTypeMarshaller());
+        marshallerFactory.registerMarshaller(PolicyType.DEFAULT_ELEMENT_NAME, new PolicyTypeMarshaller());
         marshallerFactory.registerMarshaller(org.opensaml.xml.schema.XSDateTime.TYPE_NAME, new XSDateTimeMarshaller());
 
         Marshaller marshaller = marshallerFactory.getMarshaller(a);
@@ -74,8 +73,7 @@ public class Utilities {
 
             // The XACMLPolicyStatementType needs a separate marshaller
             if (a instanceof XACMLPolicyStatementType) {
-                Marshaller policyStmtMarshaller = marshallerFactory
-                        .getMarshaller(XACMLPolicyStatementType.DEFAULT_ELEMENT_NAME_XACML20);
+                Marshaller policyStmtMarshaller = marshallerFactory.getMarshaller(XACMLPolicyStatementType.DEFAULT_ELEMENT_NAME_XACML20);
 
                 try {
                     return policyStmtMarshaller.marshall(a);
@@ -92,18 +90,17 @@ public class Utilities {
             assertionElement = marshaller.marshall(a);
             return assertionElement;
         } catch (Exception e1) {
-            logger.error("Exception: {}", e1.getMessage(), e1);
+            LOGGER.error("Exception: {}", e1.getMessage(), e1);
             throw new TOElementException("Unable to marshall the assertion: "
                     + e1.getMessage(), e1);
         }
     }
 
     public static void serialize(Element request) throws TransformerException {
-        //TODO: Check if the rendering to System.out was necessary or not?
-        serialize(request, System.out);
-        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         serialize(request, outputStream);
-        logger.debug("Stream: '{}'", outputStream.toString());
+        LOGGER.debug("Stream: '{}'", outputStream.toString());
     }
 
     /**
@@ -116,19 +113,6 @@ public class Utilities {
     public static void serialize(Element request, OutputStream out) throws TransformerException {
 
         //TODO: @DG Sante - Validate this serialization
-        //OutputFormat format = new OutputFormat();
-        //format.setIndenting(false);
-        //format.setEncoding("UTF-8");
-        //format.setOmitXMLDeclaration(false);
-        //format.setVersion("1.0");
-        //format.setStandalone(true);
-        //XMLSerializer serializer = new XMLSerializer(out, format);
-        //serializer.serialize(request.getOwnerDocument());
-
-//        format.setLineWidth(65);
-//        format.setIndent(2);
-//        format.setOmitComments(true);
-
         DOMSource source = new DOMSource(request);
         StreamResult result = new StreamResult(out);
 
@@ -157,19 +141,19 @@ public class Utilities {
         DOMSource domSource = new DOMSource(doc);
         message.getSOAPPart().setContent(domSource);
 
-        logger.info("Checking if I need to add mime headers");
+        LOGGER.info("Checking if I need to add mime headers");
 
         // If I have some mime headers, I have to remove them first.
         if (requestMimeHeaders != null) {
 
-            logger.info("Now adding the ones requested");
+            LOGGER.info("Now adding the ones requested");
             Iterator<?> it = requestMimeHeaders.getAllHeaders();
             while (it.hasNext()) {
                 MimeHeader mimeItem = (MimeHeader) it.next();
 
                 String retValue = mimeItem.getValue().replace("Multipart/Related", "multipart/related");
 
-                logger.info("ADDING MIME: '{}' : '{}'", mimeItem.getName(), retValue);
+                LOGGER.info("ADDING MIME: '{}' : '{}'", mimeItem.getName(), retValue);
                 message.getMimeHeaders().addHeader(mimeItem.getName(), retValue);
 
             }
@@ -178,7 +162,7 @@ public class Utilities {
 
         }
         if (message.saveRequired()) {
-            logger.info("Saving changes");
+            LOGGER.info("Saving changes");
             message.saveChanges();
         }
 

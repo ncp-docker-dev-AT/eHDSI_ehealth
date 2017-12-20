@@ -106,7 +106,6 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
 //						}
 //					});
 //		} catch (EhrException_Exception e) {
-//			e.printStackTrace();
 //		}
     }
 

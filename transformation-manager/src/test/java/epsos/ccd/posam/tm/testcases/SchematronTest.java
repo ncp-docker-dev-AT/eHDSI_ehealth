@@ -59,7 +59,7 @@ public class SchematronTest extends TBase {
 
         } catch (Exception e) {
             fail();
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 }

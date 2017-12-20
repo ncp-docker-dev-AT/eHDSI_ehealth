@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ee.affecto.epsos.ws.handler;
 
 import epsos.ccd.gnomon.auditmanager.IHEEventType;
@@ -22,7 +17,6 @@ import tr.com.srdc.epsos.securityman.helper.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
-import javax.xml.transform.TransformerException;
 import java.util.*;
 
 /**
@@ -45,8 +39,10 @@ public class EvidenceEmitterHandlerUtils {
     private static final String CLIENT_CONNECTOR_RETRIEVE_DOCUMENT_RESPONSE = "retrieveDocumentResponse";
 
     private static final List<String> clientConnectorOperations;
-    private static final Map<String, String> iheEvents; // maps the message type to its related IHE event
-    private static final Map<String, String> transactionNames; // maps the message type to the ad-hoc transaction name to be placed in the evidence filename
+    // maps the message type to its related IHE event
+    private static final Map<String, String> iheEvents;
+    // maps the message type to the ad-hoc transaction name to be placed in the evidence filename
+    private static final Map<String, String> transactionNames;
 
     static {
         List<String> list = new ArrayList<>();
@@ -63,15 +59,27 @@ public class EvidenceEmitterHandlerUtils {
 
     static {
         Map<String, String> map = new HashMap<>();
-        map.put(XCPDConstants.PATIENT_DISCOVERY_REQUEST, IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode()); // ITI-55
-        map.put(XCPDConstants.PATIENT_DISCOVERY_RESPONSE, IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode()); // ITI-55
-        map.put(XCAConstants.ADHOC_QUERY_REQUEST, IHEEventType.epsosPatientServiceList.getCode()); // ITI-38: same for PS or eP List
-        map.put(XCAConstants.ADHOC_QUERY_RESPONSE, IHEEventType.epsosPatientServiceList.getCode()); // ITI-38: same for PS or eP List
-        map.put(XCAConstants.RETRIEVE_DOCUMENTSET_REQUEST, IHEEventType.epsosPatientServiceRetrieve.getCode()); // ITI-39: same for PS or eP Retrieve
-        map.put(XCAConstants.RETRIEVE_DOCUMENTSET_RESPONSE, IHEEventType.epsosPatientServiceRetrieve.getCode()); // ITI-39: same for PS or eP Retrieve
-        map.put(XDRConstants.PROVIDE_AND_REGISTER_DOCUMENT_SET_REQ_STR, IHEEventType.epsosDispensationServiceInitialize.getCode()); // ITI-41: same for Dispensation Initialize/Discard
-        map.put(XDRConstants.DOC_RCP_PRVDANDRGSTDOCSETB_STR, IHEEventType.epsosConsentServicePut.getCode()); // ITI-41: same for Consent Put/Discard
-        map.put(XDRConstants.REGISTRY_RESPONSE_STR, IHEEventType.epsosDispensationServiceInitialize.getCode()); // ITI-41: same for Dispensation Initialize/Discard and Consent Put/Discard
+        // ITI-55
+        map.put(XCPDConstants.PATIENT_DISCOVERY_REQUEST, IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode());
+        map.put(XCPDConstants.PATIENT_DISCOVERY_RESPONSE, IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode());
+
+        // ITI-38: same for PS or eP List
+        map.put(XCAConstants.ADHOC_QUERY_REQUEST, IHEEventType.epsosPatientServiceList.getCode());
+        map.put(XCAConstants.ADHOC_QUERY_RESPONSE, IHEEventType.epsosPatientServiceList.getCode());
+
+        // ITI-39: same for PS or eP Retrieve
+        map.put(XCAConstants.RETRIEVE_DOCUMENTSET_REQUEST, IHEEventType.epsosPatientServiceRetrieve.getCode());
+        map.put(XCAConstants.RETRIEVE_DOCUMENTSET_RESPONSE, IHEEventType.epsosPatientServiceRetrieve.getCode());
+
+        // ITI-41: same for Dispensation Initialize/Discard
+        map.put(XDRConstants.PROVIDE_AND_REGISTER_DOCUMENT_SET_REQ_STR, IHEEventType.epsosDispensationServiceInitialize.getCode());
+
+        // ITI-41: same for Consent Put/Discard
+        map.put(XDRConstants.DOC_RCP_PRVDANDRGSTDOCSETB_STR, IHEEventType.epsosConsentServicePut.getCode());
+        // ITI-41: same for Dispensation Initialize/Discard and Consent Put/Discard
+
+        map.put(XDRConstants.REGISTRY_RESPONSE_STR, IHEEventType.epsosDispensationServiceInitialize.getCode());
+
         // Portal-NCP interactions
         map.put(CLIENT_CONNECTOR_SUBMIT_DOCUMENT_REQUEST, "PORTAL_PD_REQ");
         map.put(CLIENT_CONNECTOR_SUBMIT_DOCUMENT_RESPONSE, "NCPB_XDR_RES");
@@ -136,6 +144,7 @@ public class EvidenceEmitterHandlerUtils {
     }
 
     public String getMsgUUID(SOAPHeader soapHeader, SOAPBody soapBody) throws Exception {
+
         String msguuid = null;
         Element elemSoapHeader = XMLUtils.toDOM(soapHeader);
         String operation = soapBody.getFirstElementLocalName();
@@ -158,12 +167,10 @@ public class EvidenceEmitterHandlerUtils {
         return msguuid;
     }
 
-    public Document canonicalizeAxiomSoapEnvelope(SOAPEnvelope env) throws TransformerException, Exception {
-        Document envCanonicalized = null;
-        LOG.debug("Step 1: marshall it to document, since no c14n are available in OM");
+    public Document canonicalizeAxiomSoapEnvelope(SOAPEnvelope env) throws Exception {
+
         Element envAsDom = XMLUtils.toDOM(env);
-        LOG.debug("Step 2: canonicalize it");
-        envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
+        Document envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
         LOG.debug("Pretty printing canonicalized: \n" + XMLUtil.prettyPrint(envCanonicalized));
         return envCanonicalized;
     }

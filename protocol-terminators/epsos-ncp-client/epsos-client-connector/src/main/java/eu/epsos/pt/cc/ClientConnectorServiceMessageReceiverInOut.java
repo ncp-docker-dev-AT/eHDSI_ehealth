@@ -175,7 +175,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 //                    } catch (Exception e) {
 //                        LOG.error(ExceptionUtils.getStackTrace(e));
 //                    }
-                    if (StringUtils.equals(ConfigurationManagerFactory.getConfigurationManager().getProperty("automated.validation"), "true")) {
+                    if (StringUtils.equalsIgnoreCase(ConfigurationManagerFactory.getConfigurationManager().getProperty("automated.validation"), "true")) {
 
                         AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
                                 AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString(), NcpSide.NCP_B);

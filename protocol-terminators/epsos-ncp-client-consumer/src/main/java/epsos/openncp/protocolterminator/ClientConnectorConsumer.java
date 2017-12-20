@@ -17,24 +17,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
-import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 
 /*
- *  ClientConnectorServiceService
+ *  ClientConnectorConsumer
  */
 public class ClientConnectorConsumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClientConnectorConsumer.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorConsumer.class.getName());
 
     // Three minutes
     private static final long TIMEOUT = 180000;
+
+    private static final String EXCEPTION_FORMATTER = "{}: {}";
 
     private String epr;
 
     public ClientConnectorConsumer(String epr) {
 
+        //TODO: Review this SSL Context initialization
         // EHNCP-1293 OpenNCP Portal - Certificate initialization
         // System.setProperty("javax.net.ssl.keyStore", Constants.SC_KEYSTORE_PATH);
         // System.setProperty("javax.net.ssl.keyStorePassword", Constants.SC_KEYSTORE_PASSWORD);
@@ -44,20 +46,23 @@ public class ClientConnectorConsumer {
         this.epr = epr;
     }
 
-    private static void addAssertions(ClientConnectorServiceServiceStub stub, Assertion idAssertion, Assertion trcAssertion) throws Exception {
+    private static void addAssertions(ClientConnectorServiceServiceStub stub, Assertion idAssertion, Assertion trcAssertion)
+            throws Exception {
+
         OMFactory omFactory = OMAbstractFactory.getOMFactory();
-        OMElement omSecurityElement = omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security", "wsse"), null);
+        OMElement omSecurityElement = omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+                "Security", "wsse"), null);
         if (trcAssertion != null) {
             omSecurityElement.addChild(XMLUtils.toOM(trcAssertion.getDOM()));
         }
         omSecurityElement.addChild(XMLUtils.toOM(idAssertion.getDOM()));
         stub._getServiceClient().addHeader(omSecurityElement);
-
     }
 
-    private void registerEvidenceEmitterHandler(ClientConnectorServiceServiceStub stub) throws AxisFault {
-        /* Adding custom phase for evidence emitter processing */
-        logger.info("Adding custom phase for outflow evidence emitter processing");
+    private void registerEvidenceEmitterHandler(ClientConnectorServiceServiceStub stub) {
+
+        // Adding custom phase for evidence emitter processing.
+        LOGGER.debug("Adding custom phase for outflow evidence emitter processing");
         HandlerDescription outFlowHandlerDescription = new HandlerDescription("OutFlowEvidenceEmitterHandler");
         outFlowHandlerDescription.setHandler(new OutFlowEvidenceEmitterHandler());
         AxisConfiguration axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext().getAxisConfiguration();
@@ -66,222 +71,156 @@ public class ClientConnectorConsumer {
         try {
             outFlowEvidenceEmitterPhase.addHandler(outFlowHandlerDescription);
         } catch (PhaseException ex) {
-            logger.error("PhaseException: '{}'", ex.getMessage(), ex);
+            LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
         }
         outFlowPhasesList.add(outFlowEvidenceEmitterPhase);
-        logger.info("Resetting global Out phases");
+        LOGGER.debug("Resetting global Out phases");
         axisConfiguration.setGlobalOutPhase(outFlowPhasesList);
-        logger.info("Ended phases restrucruting");
+        LOGGER.debug("Ended phases restructuring");
     }
 
-    /**
-     * Auto generated test method
-     */
     public List<EpsosDocument1> queryDocuments(Assertion idAssertion, Assertion trcAssertion, String countryCode,
                                                PatientId patientId, GenericDocumentCode classCode) {
-        ClientConnectorServiceServiceStub stub;
-        try {
-            stub = new ClientConnectorServiceServiceStub(epr);
-            stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
-            this.registerEvidenceEmitterHandler(stub);
-        } catch (AxisFault ex) {
-            throw new RuntimeException(ex);
-        }
+
+        LOGGER.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
+        ClientConnectorServiceServiceStub stub = initializeServiceStub();
+
         try {
             addAssertions(stub, idAssertion, trcAssertion);
+
+            QueryDocumentsDocument queryDocumentsDocument = QueryDocumentsDocument.Factory.newInstance();
+            QueryDocuments queryDocuments = queryDocumentsDocument.addNewQueryDocuments();
+            QueryDocumentRequest queryDocumentRequest = queryDocuments.addNewArg0();
+            queryDocumentRequest.setClassCode(classCode);
+            queryDocumentRequest.setPatientId(patientId);
+            queryDocumentRequest.setCountryCode(countryCode);
+
+            QueryDocumentsResponseDocument queryDocumentsResponseDocument;
+            queryDocumentsResponseDocument = stub.queryDocuments(queryDocumentsDocument);
+            EpsosDocument1[] docArray = queryDocumentsResponseDocument.getQueryDocumentsResponse().getReturnArray();
+
+            return Arrays.asList(docArray);
         } catch (Exception ex) {
+            LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
-
-        QueryDocumentsDocument queryDocumentsDocument = QueryDocumentsDocument.Factory.newInstance();
-        QueryDocuments queryDocuments = queryDocumentsDocument.addNewQueryDocuments();
-        QueryDocumentRequest queryDocumentRequest = queryDocuments.addNewArg0();
-        queryDocumentRequest.setClassCode(classCode);
-        queryDocumentRequest.setPatientId(patientId);
-        queryDocumentRequest.setCountryCode(countryCode);
-
-        QueryDocumentsResponseDocument queryDocumentsResponseDocument;
-        try {
-            queryDocumentsResponseDocument = stub.queryDocuments(queryDocumentsDocument);
-        } catch (RemoteException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
-        }
-
-        EpsosDocument1[] docArray = queryDocumentsResponseDocument.getQueryDocumentsResponse().getReturnArray();
-        return Arrays.asList(docArray);
     }
 
-    /**
-     * @param idAssertion
-     * @param countryCode
-     * @param pd
-     * @return
-     */
     public List<PatientDemographics> queryPatient(Assertion idAssertion, String countryCode, PatientDemographics pd) {
-        /*
-         * Stub
-         */
-        ClientConnectorServiceServiceStub stub;
-        try {
-            stub = new ClientConnectorServiceServiceStub(epr);
-            stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
-            this.registerEvidenceEmitterHandler(stub);
-        } catch (AxisFault ex) {
-            throw new RuntimeException(ex);
-        }
+
+        LOGGER.info("[Portal]: queryPatient(countryCode:'{}')", countryCode);
+        ClientConnectorServiceServiceStub stub = initializeServiceStub();
+
         try {
             addAssertions(stub, idAssertion, null);
+            QueryPatientRequest queryPatientRequest = QueryPatientRequest.Factory.newInstance();
+
+            queryPatientRequest.setPatientDemographics(pd);
+            queryPatientRequest.setCountryCode(countryCode);
+
+            QueryPatientDocument queryPatientDocument = QueryPatientDocument.Factory.newInstance();
+            queryPatientDocument.addNewQueryPatient().setArg0(queryPatientRequest);
+
+            QueryPatientResponseDocument queryPatientResponseDocument = stub.queryPatient(queryPatientDocument);
+            PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
+            return Arrays.asList(pdArray);
         } catch (Exception ex) {
+            LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
-
-        QueryPatientRequest queryPatientRequest = QueryPatientRequest.Factory.newInstance();
-
-        /*
-         * Patient
-         */
-        queryPatientRequest.setPatientDemographics(pd);
-        queryPatientRequest.setCountryCode(countryCode);
-
-        /*
-         * Request
-         */
-        QueryPatientDocument queryPatientDocument = QueryPatientDocument.Factory.newInstance();
-        queryPatientDocument.addNewQueryPatient().setArg0(queryPatientRequest);
-
-        QueryPatientResponseDocument queryPatientResponseDocument;
-        try {
-            queryPatientResponseDocument = stub.queryPatient(queryPatientDocument);
-        } catch (RemoteException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
-        }
-
-        PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
-        return Arrays.asList(pdArray);
     }
 
     /**
      * Auto generated test method
      */
     public String sayHello(Assertion idAssertion, String name) {
-        ClientConnectorServiceServiceStub stub;
-        try {
-            stub = new ClientConnectorServiceServiceStub(epr);
-            stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
-            this.registerEvidenceEmitterHandler(stub);
-        } catch (AxisFault ex) {
-            throw new RuntimeException(ex);
-        }
+
+        LOGGER.info("[Portal]: sayHello(name:'{}')", name);
+        ClientConnectorServiceServiceStub stub = initializeServiceStub();
         try {
             addAssertions(stub, idAssertion, null);
+            SayHelloDocument sayHelloDocument = SayHelloDocument.Factory.newInstance();
+            sayHelloDocument.addNewSayHello().setArg0(name);
+
+            SayHelloResponseDocument sayHelloResponseDocument = stub.sayHello(sayHelloDocument);
+            return sayHelloResponseDocument.getSayHelloResponse().getReturn();
         } catch (Exception ex) {
+            LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
-
-        SayHelloDocument sayHelloDocument = SayHelloDocument.Factory.newInstance();
-        sayHelloDocument.addNewSayHello().setArg0(name);
-
-        SayHelloResponseDocument sayHelloResponseDocument;
-        try {
-            sayHelloResponseDocument = stub.sayHello(sayHelloDocument);
-        } catch (RemoteException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
-        }
-        return sayHelloResponseDocument.getSayHelloResponse().getReturn();
     }
 
-    /**
-     * Auto generated test method
-     */
     public EpsosDocument1 retrieveDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode,
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode, String targetLanguage) {
-        ClientConnectorServiceServiceStub stub;
-        try {
-            stub = new ClientConnectorServiceServiceStub(epr);
-            stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
-            this.registerEvidenceEmitterHandler(stub);
-        } catch (AxisFault ex) {
-            throw new RuntimeException(ex);
-        }
+
+        LOGGER.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}', targetLanguage:'{}')", countryCode, homeCommunityId, targetLanguage);
+        ClientConnectorServiceServiceStub stub = initializeServiceStub();
+
         try {
             addAssertions(stub, idAssertion, trcAssertion);
+            RetrieveDocumentDocument1 retrieveDocumentDocument = RetrieveDocumentDocument1.Factory.newInstance();
+            RetrieveDocument1 retrieveDocument = retrieveDocumentDocument.addNewRetrieveDocument();
+
+            RetrieveDocumentRequest retrieveDocumentRequest = retrieveDocument.addNewArg0();
+            retrieveDocumentRequest.setDocumentId(documentId);
+            retrieveDocumentRequest.setHomeCommunityId(homeCommunityId);
+            retrieveDocumentRequest.setCountryCode(countryCode);
+            retrieveDocumentRequest.setClassCode(classCode);
+            retrieveDocumentRequest.setTargetLanguage(targetLanguage);
+
+            RetrieveDocumentResponseDocument retrieveDocumentResponseDocument = stub.retrieveDocument(retrieveDocumentDocument);
+            return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
         } catch (Exception ex) {
+            LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
-
-        RetrieveDocumentDocument1 retrieveDocumentDocument = RetrieveDocumentDocument1.Factory.newInstance();
-        RetrieveDocument1 retrieveDocument = retrieveDocumentDocument.addNewRetrieveDocument();
-
-        RetrieveDocumentRequest retrieveDocumentRequest = retrieveDocument.addNewArg0();
-        retrieveDocumentRequest.setDocumentId(documentId);
-        retrieveDocumentRequest.setHomeCommunityId(homeCommunityId);
-        retrieveDocumentRequest.setCountryCode(countryCode);
-        retrieveDocumentRequest.setClassCode(classCode);
-        retrieveDocumentRequest.setTargetLanguage(targetLanguage);
-
-        RetrieveDocumentResponseDocument retrieveDocumentResponseDocument;
-        try {
-            retrieveDocumentResponseDocument = stub.retrieveDocument(retrieveDocumentDocument);
-        } catch (RemoteException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
-        }
-
-        return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
     }
 
-    /**
-     * @param idAssertion
-     * @param trcAssertion
-     * @param countryCode
-     * @param documentId
-     * @param homeCommunityId
-     * @param classCode
-     * @return
-     */
     @Deprecated
     public EpsosDocument1 retrieveDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode,
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) {
+
+        LOGGER.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}')", countryCode, homeCommunityId);
         return retrieveDocument(idAssertion, trcAssertion, countryCode, documentId, homeCommunityId, classCode, null);
     }
 
-    /**
-     * Auto generated test method
-     */
     public SubmitDocumentResponse submitDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode,
                                                  EpsosDocument1 document, PatientDemographics pd) {
 
-        SubmitDocumentResponse response;
-        ClientConnectorServiceServiceStub stub;
-        try {
-            stub = new ClientConnectorServiceServiceStub(epr);
-            stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
-            this.registerEvidenceEmitterHandler(stub);
-        } catch (AxisFault ex) {
-            throw new RuntimeException(ex);
-        }
+        LOGGER.info("[Portal]: submitDocument(countryCode:'{}')", countryCode);
+        ClientConnectorServiceServiceStub stub = initializeServiceStub();
+
         try {
             addAssertions(stub, idAssertion, trcAssertion);
+            SubmitDocumentDocument1 submitDocumentDoc = SubmitDocumentDocument1.Factory.newInstance();
+            SubmitDocument1 submitDocument = SubmitDocument1.Factory.newInstance();
+            SubmitDocumentRequest submitDocRequest = SubmitDocumentRequest.Factory.newInstance();
+
+            submitDocRequest.setPatientDemographics(pd);
+            submitDocRequest.setDocument(document);
+            submitDocRequest.setCountryCode(countryCode);
+            submitDocument.setArg0(submitDocRequest);
+            submitDocumentDoc.setSubmitDocument(submitDocument);
+
+            return stub.submitDocument(submitDocumentDoc).getSubmitDocumentResponse();
         } catch (Exception ex) {
+            LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
+    }
 
-        SubmitDocumentDocument1 submitDocumentDoc = SubmitDocumentDocument1.Factory.newInstance();
-        SubmitDocument1 submitDocument = SubmitDocument1.Factory.newInstance();
-        SubmitDocumentRequest submitDocRequest = SubmitDocumentRequest.Factory.newInstance();
+    private ClientConnectorServiceServiceStub initializeServiceStub() {
 
-        submitDocRequest.setPatientDemographics(pd);
-        submitDocRequest.setDocument(document);
-        submitDocRequest.setCountryCode(countryCode);
-        submitDocument.setArg0(submitDocRequest);
-        submitDocumentDoc.setSubmitDocument(submitDocument);
-
+        LOGGER.debug("Initializing Client Connector Stub Services");
 
         try {
-            response = stub.submitDocument(submitDocumentDoc).getSubmitDocumentResponse();
-        } catch (RemoteException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
+            ClientConnectorServiceServiceStub stub = new ClientConnectorServiceServiceStub(epr);
+            stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
+            this.registerEvidenceEmitterHandler(stub);
+            return stub;
+        } catch (AxisFault ex) {
+            LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
+            throw new RuntimeException(ex);
         }
-
-        return response;
     }
 }

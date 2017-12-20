@@ -20,12 +20,13 @@ tsam-sync
 transformation-manager
 eadc
 consent-manager
-tsl-utils
 protocol-terminators
 openatna
 openncp-portal
+openncp-web-portal
 openncp-common-components
 openstork
+openncp-gateway
 
 Maven Configuration
 -------------------

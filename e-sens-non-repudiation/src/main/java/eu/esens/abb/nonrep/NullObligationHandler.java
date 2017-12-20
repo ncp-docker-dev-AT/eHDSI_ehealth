@@ -4,16 +4,12 @@ import org.w3c.dom.Document;
 
 public class NullObligationHandler implements ObligationHandler {
 
-	@Override
-	public void discharge() throws ObligationDischargeException {
-		// TODO Auto-generated method stub
+    @Override
+    public void discharge() {
+    }
 
-	}
-
-	@Override
-	public Document getMessage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+    @Override
+    public Document getMessage() {
+        return null;
+    }
 }
