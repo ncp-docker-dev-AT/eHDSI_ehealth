@@ -96,12 +96,14 @@ public class StorkAutoLogin implements AutoLogin {
         } catch (Exception e) {
             LOGGER.info("Exception: '{}'", e.getMessage(), e);
         }
-        if (authnResponse.isFail()) {
-            LOGGER.info("Problem with response");
-        } else {
-            attrs = authnResponse.getTotalPersonalAttributeList();
-            if (attrs.isEmpty()) {
-                attrs = authnResponse.getPersonalAttributeList();
+        if (authnResponse != null) {
+            if (authnResponse.isFail()) {
+                LOGGER.info("Problem with response");
+            } else {
+                attrs = authnResponse.getTotalPersonalAttributeList();
+                if (attrs.isEmpty()) {
+                    attrs = authnResponse.getPersonalAttributeList();
+                }
             }
         }
     }
@@ -136,7 +138,7 @@ public class StorkAutoLogin implements AutoLogin {
             }
 
             user = loginFromSession(companyId, req);
-            if (Validator.isNull(user)) {
+            if (user == null) {
                 return null;
             }
 

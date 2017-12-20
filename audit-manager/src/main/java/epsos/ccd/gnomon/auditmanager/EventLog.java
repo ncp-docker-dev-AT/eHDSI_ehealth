@@ -16,7 +16,7 @@ import java.math.BigInteger;
  * @author Organization: Gnomon
  * @author mail:k.karkaletsis@gnomon.com.gr
  * @version 1.0, 2010, 30 Jun EventLog is a java object with the minimal input
- *          variables needed to construct an AuditMessage according to RFC3881
+ * variables needed to construct an AuditMessage according to RFC3881
  */
 public class EventLog {
 
@@ -267,7 +267,7 @@ public class EventLog {
     /**
      * This method creates an EventLog object for use in Consent PIN
      *
-     * @param TransactionName              value is epsosConsentServicePin
+     * @param EI_TransactionName           value is epsosConsentServicePin
      * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
      * @param EI_EventDateTime             The datetime the event occured
      * @param EI_EventOutcomeIndicator     <br>
@@ -323,7 +323,7 @@ public class EventLog {
     /**
      * This method creates an EventLog object for use in Consent PIN
      *
-     * @param TransactionName              value is epsosConsentServicePin
+     * @param EI_TransactionName           value is epsosConsentServicePin
      * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
      * @param EI_EventDateTime             The datetime the event occured
      * @param EI_EventOutcomeIndicator     <br>
@@ -721,7 +721,7 @@ public class EventLog {
      * as is
      */
     private static String NullToEmptyString(String s) {
-        String ret = "";
+        String ret;
         if (s == null) {
             ret = "";
         } else {

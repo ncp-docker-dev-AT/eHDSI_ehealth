@@ -81,23 +81,7 @@ public class FacesService {
         PortletRequest portletRequest = (PortletRequest) externalContext.getRequest();
         return PortalUtil.getHttpServletRequest(portletRequest);
     }
-
-    public static void storeToSession(String param, Object value) {
-
-        try {
-            LOGGER.info("Try to store to session the parameter: '{}' with value: '{}'", param, value);
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            ExternalContext externalContext = facesContext.getExternalContext();
-            PortletRequest portletRequest = (PortletRequest) externalContext.getRequest();
-            HttpServletRequest req = PortalUtil.getHttpServletRequest(portletRequest);
-            HttpSession session = req.getSession();
-            session.setAttribute(param, value);
-        } catch (Exception e) {
-            LOGGER.error("ERROR: While trying to store to session the parameter : " + param + " with value : " + value + ": " + e.getMessage());
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
-        }
-    }
-
+    
     public static Object getFromSession(String param) {
 
         Object ret = null;

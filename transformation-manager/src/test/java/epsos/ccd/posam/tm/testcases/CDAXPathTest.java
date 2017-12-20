@@ -3,6 +3,8 @@ package epsos.ccd.posam.tm.testcases;
 import epsos.ccd.posam.tm.util.Validator;
 import epsos.ccd.posam.tm.util.XmlUtil;
 import junit.framework.TestCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -25,6 +27,7 @@ import java.io.IOException;
  */
 public class CDAXPathTest extends TestCase {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CDAXPathTest.class);
     protected String samplesDir = ".//src//test//resources//samples//";
 
     @Override
@@ -40,7 +43,7 @@ public class CDAXPathTest extends TestCase {
         try {
             Validator.validateToSchema(namespaceAwareDoc);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
             fail();
         }
 
@@ -72,9 +75,9 @@ public class CDAXPathTest extends TestCase {
 
         //"entry" check
 
-		/*
-		 * entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/code
-		 */
+        /*
+         * entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/code
+         */
         String entryXPathExpression = "//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/code";
         XPath xpath2 = XPathFactory.newInstance().newXPath();
         XPathExpression expr2 = xpath2.compile(entryXPathExpression);

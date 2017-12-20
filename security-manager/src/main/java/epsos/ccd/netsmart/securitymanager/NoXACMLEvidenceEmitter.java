@@ -32,24 +32,21 @@ public class NoXACMLEvidenceEmitter implements EvidenceEmitter {
 
     /**
      * Constructor. It instantiates the velocity context.
-     *
-     * @throws Exception
      */
-    public NoXACMLEvidenceEmitter(KeyStoreManager ks) throws Exception {
+    public NoXACMLEvidenceEmitter(KeyStoreManager ks) {
         Velocity.init();
         context = new VelocityContext();
         this.ks = ks;
     }
 
-    /* (non-Javadoc)
+    /**
      * @see eu.esens.abb.eid.EvidenceEmitter#emitNRO(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public final Element emitNRO(String uuid, String policyId,
-                                 String issuerCertificate, String authenticationTime,
+    public final Element emitNRO(String uuid, String policyId, String issuerCertificate, String authenticationTime,
                                  String authenticationMethod, String senderCertificateDetails,
-                                 String recipientCertificateDetails, String evidenceEvent,
-                                 String uaMessageIdentifier, String digest) throws Exception {
+                                 String recipientCertificateDetails, String evidenceEvent, String uaMessageIdentifier,
+                                 String digest) throws Exception {
 
         context.put("evidenceIdentifier", uuid);
         context.put("evidenceIssuerPolicyId", policyId);
@@ -79,15 +76,14 @@ public class NoXACMLEvidenceEmitter implements EvidenceEmitter {
         return sign(doc);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see eu.esens.abb.eid.EvidenceEmitter#emitNRR(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public final Element emitNRR(String uuid, String policyId,
-                                 String issuerCertificate, String authenticationTime,
+    public final Element emitNRR(String uuid, String policyId, String issuerCertificate, String authenticationTime,
                                  String authenticationMethod, String senderCertificateDetails,
-                                 String recipientCertificateDetails, String evidenceEvent,
-                                 String uaMessageIdentifier, String digest) throws Exception {
+                                 String recipientCertificateDetails, String evidenceEvent, String uaMessageIdentifier,
+                                 String digest) throws Exception {
 
         context.put("evidenceIdentifier", uuid);
         context.put("evidenceIssuerPolicyId", policyId);
@@ -119,6 +115,7 @@ public class NoXACMLEvidenceEmitter implements EvidenceEmitter {
 
 
     private Element sign(Document doc) throws SMgrException, IOException {
+        
         SignatureManager m = new SignatureManager(ks);
         m.signXMLWithEnvelopedSig(doc);
         return doc.getDocumentElement();

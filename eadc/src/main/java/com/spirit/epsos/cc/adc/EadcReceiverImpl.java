@@ -1,15 +1,12 @@
 package com.spirit.epsos.cc.adc;
 
-import org.slf4j.Logger;
 import com.spirit.epsos.cc.adc.extractor.AutomaticDataCollector;
-
 import eu.epsos.pt.eadc.util.EadcFactory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * the EadcReceiverImpl is instantiated from the EADCFactory as a singleton
- * instance
- *
+ * the EadcReceiverImpl is instantiated from the EADCFactory as a singleton instance
  */
 public class EadcReceiverImpl implements EadcReceiver {
 
@@ -22,6 +19,7 @@ public class EadcReceiverImpl implements EadcReceiver {
      */
     @Override
     public void process(EadcEntry entry) throws Exception {
+        
         LOGGER.debug("process entry start");
         if (entry == null) {
             throw new Exception("EADCEntry == null");

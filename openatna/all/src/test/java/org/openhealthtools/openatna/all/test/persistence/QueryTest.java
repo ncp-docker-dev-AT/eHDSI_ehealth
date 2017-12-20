@@ -58,7 +58,7 @@ public class QueryTest {
                 LOGGER.info("Entity: '{}'", ent);
             }
         } catch (AtnaPersistenceException e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 }

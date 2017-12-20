@@ -24,7 +24,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -65,8 +64,8 @@ public class ETSIREMObligationHandler implements ObligationHandler {
     public void discharge() throws ObligationDischargeException {
         /*
          * Here I need to check the IHE message type. It can be XCA, XCF,
-		 * whatever
-		 */
+         * whatever
+         */
 
         // if (messageType instanceof IHEXCARetrieve) {
         // try {
@@ -79,10 +78,10 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         // throw new ObligationDischargeException("Unkwnon message type");
         // }
 
-		/*
+        /*
          * For the e-SENS pilot we issue the NRO and NRR token to all the
-		 * incoming messages -> This is the per hop protocol.
-		 */
+         * incoming messages -> This is the per hop protocol.
+         */
         try {
             makeETSIREM();
         } catch (Exception e) {
@@ -91,7 +90,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
     }
 
     private void makeETSIREM() throws DatatypeConfigurationException, JAXBException, CertificateEncodingException,
-            NoSuchAlgorithmException, IOException, SOAPException, ParserConfigurationException, XMLSecurityException, TransformerException {
+            NoSuchAlgorithmException, SOAPException, ParserConfigurationException, XMLSecurityException, TransformerException {
 
         JAXBContext jc = JAXBContext.newInstance("eu.esens.abb.nonrep.etsi.rem");
         ObjectFactory of = new ObjectFactory();
@@ -100,130 +99,133 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         for (ESensObligation eSensObl : obligations) {
 
             LOGGER.info("ObligationID '{}'", eSensObl.getObligationID());
-            LOGGER.info(REM_NRO_PREFIX);
-            if (eSensObl.getObligationID().equals(REM_NRO_PREFIX)) {
-                String outcome;
-                if (eSensObl instanceof PERMITEsensObligation) {
-                    outcome = "Acceptance";
-                } else {
-                    outcome = "Rejection";
-                }
-                List<AttributeAssignmentType> listAttr = eSensObl.getAttributeAssignments();
+            switch (eSensObl.getObligationID()) {
+                case REM_NRO_PREFIX: {
+                    String outcome;
+                    if (eSensObl instanceof PERMITEsensObligation) {
+                        outcome = "Acceptance";
+                    } else {
+                        outcome = "Rejection";
+                    }
+                    List<AttributeAssignmentType> listAttr = eSensObl.getAttributeAssignments();
 
-                type.setVersion(find(REM_NRO_PREFIX + ":version", listAttr));
-                type.setEventCode(outcome);
+                    type.setVersion(find(REM_NRO_PREFIX + ":version", listAttr));
+                    type.setEventCode(outcome);
 
-                type.setEvidenceIdentifier(UUID.randomUUID().toString());
+                    type.setEvidenceIdentifier(UUID.randomUUID().toString());
 
-				/*
-                 * ISO Token mappings
-				 */
-                // This is the Pol field of the ISO13888 token
-                EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
-                eipid.getPolicyIDs().add(find(REM_NRO_PREFIX + ":PolicyID", listAttr));
-                type.setEvidenceIssuerPolicyID(eipid);
-
-                mapToIso(type);
-
-                // Imp is the signature
-
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                Document doc = db.newDocument();
-
-                JAXBElement<REMEvidenceType> back = of.createSubmissionAcceptanceRejection(type);
-                Marshaller marshaller = jc.createMarshaller();
-                marshaller.marshal(back, doc);
-
-                sign(doc, context.getIssuerCertificate(), context.getSigningKey());
-                audit = doc;
-            } else if (eSensObl.getObligationID().equals(REM_NRR_PREFIX)) { // it
-                // is
-                // an
-                // NRR,
-                // AcceptanceRejectionByRecipient
-
-                String outcome;
-                if (eSensObl instanceof PERMITEsensObligation) {
-                    outcome = "Acceptance";
-                } else {
-                    outcome = "Rejection";
-                }
-                List<AttributeAssignmentType> listAttr = eSensObl.getAttributeAssignments();
-
-                type.setVersion(find(REM_NRR_PREFIX + ":version", listAttr));
-                type.setEventCode(outcome);
-
-                type.setEvidenceIdentifier(UUID.randomUUID().toString());
-
-				/*
-                 * ISO Token mappings
-				 */
-                // This is the Pol field of the ISO13888 token
-                EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
-                eipid.getPolicyIDs().add(find(REM_NRR_PREFIX + ":PolicyID", listAttr));
-                type.setEvidenceIssuerPolicyID(eipid);
-
-                mapToIso(type);
-
-                // Imp is the signature
-
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                Document doc = db.newDocument();
-
-                JAXBElement<REMEvidenceType> back = of.createAcceptanceRejectionByRecipient(type);
-                Marshaller marshaller = jc.createMarshaller();
-                marshaller.marshal(back, doc);
-
-                sign(doc, context.getIssuerCertificate(), context.getSigningKey());
-                audit = doc;
-
-            } else if (eSensObl.getObligationID().equals(REM_NRD_PREFIX)) {
-                String outcome;
-                if (eSensObl instanceof PERMITEsensObligation) {
-                    outcome = "Delivery";
-                } else {
-                    outcome = "DeliveryExpiration";
-                }
-                List<AttributeAssignmentType> listAttr = eSensObl.getAttributeAssignments();
-
-                type.setVersion(find(REM_NRD_PREFIX + ":version", listAttr));
-                type.setEventCode(outcome);
-
-                type.setEvidenceIdentifier(UUID.randomUUID().toString());
-
-				/*
-                 * ISO Token mappings
-				 */
-                // This is the Pol field of the ISO13888 token
-                String policyUrl = find(REM_NRD_PREFIX + ":PolicyID", listAttr);
-                if (policyUrl != null) {
+                    /*
+                     * ISO Token mappings
+                     */
+                    // This is the Pol field of the ISO13888 token
                     EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
-                    eipid.getPolicyIDs().add(policyUrl);
+                    eipid.getPolicyIDs().add(find(REM_NRO_PREFIX + ":PolicyID", listAttr));
                     type.setEvidenceIssuerPolicyID(eipid);
+
+                    mapToIso(type);
+
+                    // Imp is the signature
+
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.newDocument();
+
+                    JAXBElement<REMEvidenceType> back = of.createSubmissionAcceptanceRejection(type);
+                    Marshaller marshaller = jc.createMarshaller();
+                    marshaller.marshal(back, doc);
+
+                    sign(doc, context.getIssuerCertificate(), context.getSigningKey());
+                    audit = doc;
+                    break;
                 }
-                mapToIso(type);
+                case REM_NRR_PREFIX: { // it
+                    // is
+                    // an
+                    // NRR,
+                    // AcceptanceRejectionByRecipient
 
-                // Imp is the signature
+                    String outcome;
+                    if (eSensObl instanceof PERMITEsensObligation) {
+                        outcome = "Acceptance";
+                    } else {
+                        outcome = "Rejection";
+                    }
+                    List<AttributeAssignmentType> listAttr = eSensObl.getAttributeAssignments();
 
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                Document doc = db.newDocument();
+                    type.setVersion(find(REM_NRR_PREFIX + ":version", listAttr));
+                    type.setEventCode(outcome);
 
-                JAXBElement<REMEvidenceType> back = of.createDeliveryNonDeliveryToRecipient(type);
-                Marshaller marshaller = jc.createMarshaller();
-                marshaller.marshal(back, doc);
+                    type.setEvidenceIdentifier(UUID.randomUUID().toString());
 
-                sign(doc, context.getIssuerCertificate(), context.getSigningKey());
-                audit = doc;
+                    /*
+                     * ISO Token mappings
+                     */
+                    // This is the Pol field of the ISO13888 token
+                    EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
+                    eipid.getPolicyIDs().add(find(REM_NRR_PREFIX + ":PolicyID", listAttr));
+                    type.setEvidenceIssuerPolicyID(eipid);
+
+                    mapToIso(type);
+
+                    // Imp is the signature
+
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.newDocument();
+
+                    JAXBElement<REMEvidenceType> back = of.createAcceptanceRejectionByRecipient(type);
+                    Marshaller marshaller = jc.createMarshaller();
+                    marshaller.marshal(back, doc);
+
+                    sign(doc, context.getIssuerCertificate(), context.getSigningKey());
+                    audit = doc;
+
+                    break;
+                }
+                case REM_NRD_PREFIX: {
+                    String outcome;
+                    if (eSensObl instanceof PERMITEsensObligation) {
+                        outcome = "Delivery";
+                    } else {
+                        outcome = "DeliveryExpiration";
+                    }
+                    List<AttributeAssignmentType> listAttr = eSensObl.getAttributeAssignments();
+
+                    type.setVersion(find(REM_NRD_PREFIX + ":version", listAttr));
+                    type.setEventCode(outcome);
+                    type.setEvidenceIdentifier(UUID.randomUUID().toString());
+
+                    /*
+                     * ISO Token mappings
+                     */
+                    // This is the Pol field of the ISO13888 token
+                    String policyUrl = find(REM_NRD_PREFIX + ":PolicyID", listAttr);
+                    if (policyUrl != null) {
+                        EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
+                        eipid.getPolicyIDs().add(policyUrl);
+                        type.setEvidenceIssuerPolicyID(eipid);
+                    }
+                    mapToIso(type);
+
+                    // Imp is the signature
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.newDocument();
+
+                    JAXBElement<REMEvidenceType> back = of.createDeliveryNonDeliveryToRecipient(type);
+                    Marshaller marshaller = jc.createMarshaller();
+                    marshaller.marshal(back, doc);
+
+                    sign(doc, context.getIssuerCertificate(), context.getSigningKey());
+                    audit = doc;
+                    break;
+                }
             }
-        } // for
-
+        }
     }
 
-    private void mapToIso(REMEvidenceType type)
-            throws CertificateEncodingException, NoSuchAlgorithmException, DatatypeConfigurationException, IOException, SOAPException, TransformerException {
+    private void mapToIso(REMEvidenceType type) throws CertificateEncodingException, NoSuchAlgorithmException,
+            DatatypeConfigurationException, SOAPException, TransformerException {
 
         // The flag f1 is the AcceptanceRejection (the evidence type)
         // This is the A field the originator
@@ -239,8 +241,8 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
         // This is the B field, the recipient
         /*
-		 * Made optional by a request from the eJustice domain
-		 */
+         * Made optional by a request from the eJustice domain
+         */
         EntityDetailsType edt2 = new EntityDetailsType();
 
         if (context.getRecipientCertificate() != null) {
@@ -252,13 +254,12 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         }
         if (context.getRecipientNamePostalAddress() != null) {
             LinkedList<String> list = context.getRecipientNamePostalAddress();
-            int size = list.size();
 
             NamesPostalAddresses npas = new NamesPostalAddresses();
 
-            for (int i = 0; i < size; i++) {
+            for (String aList : list) {
                 EntityName en = new EntityName();
-                en.getNames().add(list.get(i));
+                en.getNames().add(aList);
                 NamePostalAddress npa = new NamePostalAddress();
                 npa.setEntityName(en);
                 npas.getNamePostalAddresses().add(npa);
@@ -280,12 +281,9 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
         // This is the T_g field
         DateTime dt = new DateTime();
-        //type.setEventTime(new XMLGregorianCalendarImpl(dt.toGregorianCalendar()));
-        //XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar();
         type.setEventTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(dt.toGregorianCalendar()));
 
         // This is the T_1 field
-        //type.setSubmissionTime(new XMLGregorianCalendarImpl(context.getSubmissionTime().toGregorianCalendar()));
         type.setSubmissionTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(context.getSubmissionTime().toGregorianCalendar()));
 
         // This is mandated by REM. If this is the full message,
@@ -311,7 +309,6 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         }
         md.update(baos.toByteArray());
         mdt.setDigestValue(md.digest());
-
         mdt.setIsNotification(false);
         mdt.setMessageSubject(context.getEvent());
         mdt.setUAMessageIdentifier(context.getMessageUUID());
@@ -351,21 +348,17 @@ public class ETSIREMObligationHandler implements ObligationHandler {
     private void sign(Document doc, X509Certificate cert, PrivateKey key) throws XMLSecurityException {
 
         String BaseURI = "./";
-        XMLSignature sig = new XMLSignature(doc, BaseURI,
-                org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256);
+        XMLSignature sig = new XMLSignature(doc, BaseURI, XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256);
         doc.getDocumentElement().appendChild(sig.getElement());
-
         doc.appendChild(doc.createComment(" Comment after "));
 
         Transforms transforms = new Transforms(doc);
-
         transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
         transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
-        sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
 
+        sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
         sig.addKeyInfo(cert);
         sig.addKeyInfo(cert.getPublicKey());
-
         sig.sign(key);
     }
 

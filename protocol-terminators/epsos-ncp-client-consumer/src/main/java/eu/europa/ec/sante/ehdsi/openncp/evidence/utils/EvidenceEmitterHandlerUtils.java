@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eu.europa.ec.sante.ehdsi.openncp.evidence.utils;
 
 import org.apache.axiom.soap.SOAPBody;
@@ -18,7 +13,6 @@ import tr.com.srdc.epsos.securityman.helper.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
-import javax.xml.transform.TransformerException;
 import java.util.*;
 
 /**
@@ -41,8 +35,10 @@ public class EvidenceEmitterHandlerUtils {
     private static final String CLIENT_CONNECTOR_RETRIEVE_DOCUMENT_RESPONSE = "retrieveDocumentResponse";
 
     private static final List<String> clientConnectorOperations;
-    private static final Map<String, String> events; // maps the message type to its related ad-hoc event
-    private static final Map<String, String> transactionNames; // maps the message type to the ad-hoc transaction name to be placed in the evidence filename
+    // maps the message type to its related ad-hoc event
+    private static final Map<String, String> events;
+    // maps the message type to the ad-hoc transaction name to be placed in the evidence filename
+    private static final Map<String, String> transactionNames;
 
     static {
         List<String> list = new ArrayList<>();
@@ -127,12 +123,10 @@ public class EvidenceEmitterHandlerUtils {
         return msguuid;
     }
 
-    public Document canonicalizeAxiomSoapEnvelope(SOAPEnvelope env) throws TransformerException, Exception {
-        Document envCanonicalized = null;
-        LOG.debug("Step 1: marshall it to document, since no c14n are available in OM");
+    public Document canonicalizeAxiomSoapEnvelope(SOAPEnvelope env) throws Exception {
+
         Element envAsDom = XMLUtils.toDOM(env);
-        LOG.debug("Step 2: canonicalize it");
-        envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
+        Document envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
         LOG.debug("Pretty printing canonicalized: \n" + XMLUtil.prettyPrint(envCanonicalized));
         return envCanonicalized;
     }

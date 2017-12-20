@@ -18,7 +18,7 @@ public class MessageInspector {
     public static final String WS_ADDRESSING_NS = "http://www.w3.org/2005/08/addressing";
     public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
 
-    public final static Logger l = LoggerFactory.getLogger(MessageInspector.class);
+    public final static Logger LOGGER = LoggerFactory.getLogger(MessageInspector.class);
 
     private MessageType messageType;
     private String messageUUID;
@@ -28,7 +28,7 @@ public class MessageInspector {
         throw new MalformedMIMEMessageException("Not yet implemented");
     }
 
-    public MessageInspector(final SOAPMessage incomingMsg) throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException {
+    public MessageInspector(final SOAPMessage incomingMsg) throws MalformedIHESOAPException, SOAPException {
         this(incomingMsg.getSOAPBody().getOwnerDocument());
     }
 
@@ -41,38 +41,29 @@ public class MessageInspector {
         if (incomingMsg == null) {
             throw new NullPointerException("No message has been passed");
         }
-        l.debug("MessageInspector, called with a document. Checking headers");
+        LOGGER.debug("MessageInspector, called with a document. Checking headers");
         checkHeaders(incomingMsg);
     }
 
     private void checkHeaders(Document incomingMsg) throws MalformedIHESOAPException {
 
-		/*
-		 * Here call the message inspectors which are configured for this system. Fake check for the moment
-		 */
-		
-		
-		/*
-		 * First, check if it is a SOAP
-		 */
+        LOGGER.debug("Checking if it is a SOAP document");
         Element docElement = incomingMsg.getDocumentElement();
 
-        l.debug("Checking if it is a SOAP document");
         if (docElement.getLocalName().equals(SOAP_LOCAL_NAME) &&
                 docElement.getNamespaceURI().equals(SOAP12_NAMESPACE)) {
             // I found a soap element, now proceed with the addressing
-            l.debug("Found a SOAP message");
+            LOGGER.debug("Found a SOAP message");
 
             // The SOAP Message must be well structured to avoid MITM attacks
             // e.g., it must have one soap header and one single addressing
             // No WSSE4j is used here (which doesn't check for it).
-
             NodeList nl = docElement.getElementsByTagNameNS(SOAP12_NAMESPACE, "Header");
-            Utilities.checkForNull(nl, "Header", l);
+            Utilities.checkForNull(nl, "Header", LOGGER);
 
             // get the body
             NodeList nlBody = docElement.getElementsByTagNameNS(SOAP12_NAMESPACE, "Body");
-            Utilities.checkForNull(nlBody, "Body", l);
+            Utilities.checkForNull(nlBody, "Body", LOGGER);
             Element body = (Element) nlBody.item(0);
 
             // it can only be an element here, no classcasts
@@ -80,7 +71,7 @@ public class MessageInspector {
 
             // header must have one addressing action
             nl = header.getElementsByTagNameNS(WS_ADDRESSING_NS, "Action");
-            Utilities.checkForNull(nl, "WS-Addressing action", l);
+            Utilities.checkForNull(nl, "WS-Addressing action", LOGGER);
 
 
             Element action = (Element) nl.item(0);
@@ -90,11 +81,11 @@ public class MessageInspector {
             }
 
             if (actionText.equals(IHE_ITI_XCA_RETRIEVE)) {
-                l.debug("Found an IHE ITI XCA RETRIEVE");
+                LOGGER.debug("Found an IHE ITI XCA RETRIEVE");
                 IHEXCARetrieve xcaRetrieve = new IHEXCARetrieve(body);
                 this.setMessageType(xcaRetrieve);
             } else {
-                l.error("Action not recognized: " + actionText);
+                LOGGER.error("Action not recognized: " + actionText);
 
                 // I differentiate here, since one may do some other guesses, to see if it is a valid message
                 //TODO
@@ -103,7 +94,7 @@ public class MessageInspector {
             }
 
             nl = header.getElementsByTagNameNS(WS_ADDRESSING_NS, "MessageID");
-            Utilities.checkForNull(nl, "WS-Addressing MessageID", l);
+            Utilities.checkForNull(nl, "WS-Addressing MessageID", LOGGER);
 
             Element uuidEl = (Element) nl.item(0);
             String uuidText = uuidEl.getTextContent();
@@ -112,14 +103,11 @@ public class MessageInspector {
             } else {
                 this.messageUUID = uuidText;
             }
-
-
         } else {
-            l.error("The document passed is not a SOAP.");
+            LOGGER.error("The document passed is not a SOAP.");
             UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             this.setMessageType(umt);
         }
-
     }
 
     public MessageType getMessageType() {
@@ -133,6 +121,4 @@ public class MessageInspector {
     public String getMessageUUID() {
         return this.messageUUID;
     }
-
-
 }

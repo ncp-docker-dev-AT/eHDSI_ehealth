@@ -77,21 +77,20 @@ public enum AuditTrailUtils {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
-
-        boolean forcewrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "TRUE", true));
+        boolean forceWrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "true", true));
         if (!validated) {
             LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message not validated");
-            if (!forcewrite) {
+            if (!forceWrite) {
                 auditmsg = "";
             }
         }
-        if (validated || forcewrite) {
+        if (validated || forceWrite) {
             if (validated) {
                 LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message validated");
             } else {
                 LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " message not validated");
             }
-            if (forcewrite && !validated) {
+            if (forceWrite && !validated) {
                 LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode()
                         + " AuditManager is force to send the message. So trying ...");
             }

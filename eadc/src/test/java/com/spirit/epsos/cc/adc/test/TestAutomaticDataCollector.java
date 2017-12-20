@@ -18,44 +18,42 @@ import java.io.File;
 import java.util.UUID;
 
 /**
- * Test-class for testing the DataExtractionMechanism and storing the results
- * into a database
+ * Test-class for testing the DataExtractionMechanism and storing the results into a database
  *
  * @author mk
  */
 @RunWith(JUnit4.class)
 public class TestAutomaticDataCollector extends BaseEadcTest {
 
-    private static Logger log = LoggerFactory.getLogger(TestAutomaticDataCollector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestAutomaticDataCollector.class);
     private static AutomaticDataCollector automaticDataCollectorInstance;
     private static Document transactionDemo;
-    private static String basedir = "src/test/resources/EADC_resources";
     private EadcDbConnect con;
 
     @Before
     public void setUp() throws Exception {
 
-        //TODO: Check Logs Jerome
-        /*DOMConfigurator.configureAndWatch("log4j.xml",
-                60 * 1000);*/
+        super.setUp();
 
         /* TEST DATABASE INSTANTIATION */
         con = EadcFactory.INSTANCE.createEadcDbConnect(DS_NAME);
 
         automaticDataCollectorInstance = EadcFactory.INSTANCE.createAutomaticDataCollector();
+        String basedir = "src/test/resources/EADC_resources";
         transactionDemo = XmlFileReader.getInstance()
                 .readXmlDocumentFromFile(basedir + File.separator
                         + "demo"
                         + File.separator
                         + "TransactionDemo.xml");
         // Insert the currently tested Transaction-Primary-Key into the TransactionDemo XML-Structure
-        ((Element) (transactionDemo.getElementsByTagName("TransactionInfo").item(0))).setAttribute("Transaction_PK",
-                UUID.randomUUID()
-                        .toString());
+        ((Element) (transactionDemo.getElementsByTagName("TransactionInfo").item(0))).setAttribute(
+                "Transaction_PK", UUID.randomUUID().toString());
     }
 
     @After
     public void tearDown() throws Exception {
+
+        super.tearDown();
         con.closeConnection();
     }
 
@@ -66,7 +64,8 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     @Test
     public void testWithDifferentCodeAndMatchingCodeSystem() throws Exception {
-        SetCodeAndCodeSystem(transactionDemo, "2.16.840.1.113883.6.1", "60591-4");
+        SetCodeAndCodeSystem(transactionDemo, "2.16.840.1.113883.6.1",
+                "60591-4");
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
 
@@ -77,7 +76,8 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     @Test
     public void testWithMathingCodeAndDifferentCodeSystem() throws Exception {
-        SetCodeAndCodeSystem(transactionDemo, "2.16.840.1.113883.6.0", "60591-5");
+        SetCodeAndCodeSystem(transactionDemo, "2.16.840.1.113883.6.0",
+                "60591-5");
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
 
@@ -88,7 +88,8 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     @Test
     public void testWithMatchingCodeAndMatchingCodeSystem() throws Exception {
-        SetCodeAndCodeSystem(transactionDemo, "2.16.840.1.113883.6.1", "60591-5");
+        SetCodeAndCodeSystem(transactionDemo, "2.16.840.1.113883.6.1",
+                "60591-5");
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
 
@@ -99,7 +100,9 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     @Test(expected = Exception.class)
     public void testWithNoCodeElementInCdaDocument() throws Exception {
-        transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace, "ClinicalDocument").item(0).removeChild(transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace, "code").item(0));
+        transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace, "ClinicalDocument")
+                .item(0).removeChild(transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace,
+                "code").item(0));
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
 
@@ -111,7 +114,8 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     @Test(expected = Exception.class)
     public void testWithNoCodeSystemAttributeInCodeElementOfCdaDocument() throws Exception {
-        ((Element) transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace, "code").item(0)).removeAttribute("code");
+        ((Element) transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace,
+                "code").item(0)).removeAttribute("code");
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
 
@@ -123,7 +127,8 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     @Test(expected = Exception.class)
     public void testWithNoCodeSystemAttributeInCodeSystemElementOfCdaDocument() throws Exception {
-        ((Element) transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace, "code").item(0)).removeAttribute("codeSystem");
+        ((Element) transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace,
+                "code").item(0)).removeAttribute("codeSystem");
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
 
@@ -134,7 +139,8 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     @Test
     public void testWithNoCdaDocument() throws Exception {
-        transactionDemo.getFirstChild().removeChild(transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace, "ClinicalDocument").item(0));
+        transactionDemo.getFirstChild().removeChild(transactionDemo.getElementsByTagNameNS(
+                AutomaticDataCollector.cdaNamespace, "ClinicalDocument").item(0));
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
 
@@ -158,17 +164,16 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     public void SetCodeAndCodeSystem(Document transactionXmlStructure, String currentProcessedDocumentCodeSystem,
                                      String currentProcessedDocumentCode) {
-        log.info("currentProcessedDocumentCodeSystem:" + currentProcessedDocumentCodeSystem);
-        log.info("currentProcessedDocumentCode:" + currentProcessedDocumentCode);
+
+        LOGGER.info("currentProcessedDocumentCodeSystem:" + currentProcessedDocumentCodeSystem);
+        LOGGER.info("currentProcessedDocumentCode:" + currentProcessedDocumentCode);
 
         // Insert the currently tested code Attribute into the TransactionDemo XML-Structure
         ((Element) (transactionXmlStructure.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace,
-                "code").item(0))).setAttribute("codeSystem",
-                currentProcessedDocumentCodeSystem);
+                "code").item(0))).setAttribute("codeSystem", currentProcessedDocumentCodeSystem);
         // Insert the currently tested codeSystem Attribute into the TransactionDemo XML-Structure
-        ((Element) (transactionXmlStructure.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace,
-                "code").item(0))).setAttribute("code",
-                currentProcessedDocumentCode);
+        ((Element) (transactionXmlStructure.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace, "code")
+                .item(0))).setAttribute("code", currentProcessedDocumentCode);
     }
 
     /**

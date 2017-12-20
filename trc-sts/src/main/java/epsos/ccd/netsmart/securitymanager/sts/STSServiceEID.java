@@ -1,7 +1,5 @@
 package epsos.ccd.netsmart.securitymanager.sts;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import com.sun.xml.ws.api.security.trust.WSTrustException;
 import epsos.ccd.netsmart.securitymanager.EvidenceEmitter;
 import epsos.ccd.netsmart.securitymanager.NoXACMLEvidenceEmitter;
@@ -25,11 +23,17 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.*;
 import javax.xml.ws.Service.Mode;
 import javax.xml.ws.handler.MessageContext;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
@@ -146,14 +150,16 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             String strRespHeader = STSUtils.domElementToString(resp.getSOAPHeader());
             String strReqHeader = STSUtils.domElementToString(header);
 
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("STSServiceEID: Request Header:\n{}\nResponse Header:\n{}", strReqHeader, strRespHeader);
+            }
 
             String tls_cn = STSUtils.getSSLCertPeer(context.getMessageContext());
-            LOGGER.info("tls_cn: '{}'", tls_cn);
 
             if (context.getUserPrincipal() != null) {
                 tls_cn = context.getUserPrincipal().getName();
             }
-
+            LOGGER.info("tls_cn: '{}'", tls_cn);
             DefaultKeyStoreManager lamkm = new DefaultKeyStoreManager();
 
             X509Certificate clientCert = getSSLCert();
@@ -161,33 +167,15 @@ public class STSServiceEID implements Provider<SOAPMessage> {
                 clientCert = (X509Certificate) lamkm.getDefaultCertificate();
             }
             EvidenceEmitter ee = new NoXACMLEvidenceEmitter(lamkm);
-            Element el = ee.emitNRR(UUID.randomUUID().toString(),
-                    "urn:esens:policyId:trc",
-                    c2s(lamkm.getDefaultCertificate()),
-                    new DateTime().toString(),
-                    "3",
-                    c2s(lamkm.getDefaultCertificate()),
-                    c2s(clientCert),
-                    "TRC-Issuance",
-                    messageIdResponse,
+
+            Element el = ee.emitNRR(UUID.randomUUID().toString(), "urn:esens:policyId:trc",
+                    c2s(lamkm.getDefaultCertificate()), new DateTime().toString(), "3",
+                    c2s(lamkm.getDefaultCertificate()), c2s(clientCert), "TRC-Issuance", messageIdResponse,
                     doDigest(resp)
             );
 
-            // what should I do here? Let me just print it out, waiting for an official
-            // notary service
-            OutputFormat format = new OutputFormat();
-
-            format.setLineWidth(65);
-            format.setIndenting(false);
-            format.setIndent(2);
-            format.setEncoding("UTF-8");
-            format.setOmitComments(true);
-            format.setOmitXMLDeclaration(false);
-            format.setVersion("1.0");
-            format.setStandalone(true);
-
-            XMLSerializer serializer = new XMLSerializer(System.out, format);
-            serializer.serialize(el.getOwnerDocument());
+            // what should I do here? Let me just print it out, waiting for an official notary service
+            LOGGER.info("STSEid:\n{}", convertDocumentToString(el.getOwnerDocument()));
             return resp;
 
         } catch (Exception ex) {
@@ -197,27 +185,27 @@ public class STSServiceEID implements Provider<SOAPMessage> {
     }
 
     private String c2s(Certificate certificate) throws CertificateEncodingException {
+
         byte[] cert = certificate.getEncoded();
         return Base64.getEncoder().encodeToString(cert);
     }
 
     private String getIdaReference(SOAPBody body) {
+
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
             throw new WebServiceException("No TRC Parameters in RST");
         }
 
-        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(
-                TRC_NS, "TRCParameters").item(0);
+        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "IdAReference").item(0) == null) {
             return null;
         }
 
-        return trcDetails
-                .getElementsByTagNameNS(TRC_NS, "IdAReference").item(0)
-                .getTextContent();
+        return trcDetails.getElementsByTagNameNS(TRC_NS, "IdAReference").item(0).getTextContent();
     }
 
     private DateTime getSessionNotOnOrAfter(SOAPBody body) {
+
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
             throw new WebServiceException("No TRC Parameters in RST");
         }
@@ -228,50 +216,45 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             return null;
         }
 
-        String sessionNotOnOrAfter = trcDetails
-                .getElementsByTagNameNS(TRC_NS, "SessionNotOnOrAfter").item(0)
-                .getTextContent();
+        String sessionNotOnOrAfter = trcDetails.getElementsByTagNameNS(TRC_NS, "SessionNotOnOrAfter").item(0).getTextContent();
 
         return new DateTime(sessionNotOnOrAfter);
     }
 
     private DateTime getAuthNInstant(SOAPBody body) {
+
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
             throw new WebServiceException("No TRC Parameters in RST");
         }
 
-        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(
-                TRC_NS, "TRCParameters").item(0);
+        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "AuthnInstant").item(0) == null) {
             return null;
         }
 
-        String authnInstant = trcDetails
-                .getElementsByTagNameNS(TRC_NS, "AuthnInstant").item(0)
-                .getTextContent();
+        String authnInstant = trcDetails.getElementsByTagNameNS(TRC_NS, "AuthnInstant").item(0).getTextContent();
 
         return new DateTime(authnInstant);
     }
 
     private DateTime getNotOnOrAfter(SOAPBody body) {
+
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
             throw new WebServiceException("No TRC Parameters in RST");
         }
 
-        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(
-                TRC_NS, "TRCParameters").item(0);
+        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "NotOnOrAfter").item(0) == null) {
             return null;
         }
 
-        String notOnOrAfter = trcDetails
-                .getElementsByTagNameNS(TRC_NS, "NotOnOrAfter").item(0)
-                .getTextContent();
+        String notOnOrAfter = trcDetails.getElementsByTagNameNS(TRC_NS, "NotOnOrAfter").item(0).getTextContent();
 
         return new DateTime(notOnOrAfter);
     }
 
     private DateTime getNotBefore(SOAPBody body) {
+
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
             throw new WebServiceException("No TRC Parameters in RST");
         }
@@ -282,9 +265,7 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             return null;
         }
 
-        String notBefore = trcDetails
-                .getElementsByTagNameNS(TRC_NS, "NotBefore").item(0)
-                .getTextContent();
+        String notBefore = trcDetails.getElementsByTagNameNS(TRC_NS, "NotBefore").item(0).getTextContent();
 
         return new DateTime(notBefore);
     }
@@ -310,16 +291,12 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             throw new WebServiceException("No TRC Parameters in RST");
         }
 
-        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(
-                TRC_NS, "TRCParameters").item(0);
+        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "PatientId").item(0) == null) {
-            throw new WebServiceException("Patient ID is Missing from the RST"); // Cannot
-            // be
-            // null!
+            // Cannot be null
+            throw new WebServiceException("Patient ID is Missing from the RST");
         }
-        return trcDetails
-                .getElementsByTagNameNS(TRC_NS, "PatientId").item(0)
-                .getTextContent();
+        return trcDetails.getElementsByTagNameNS(TRC_NS, "PatientId").item(0).getTextContent();
     }
 
     private String getMessageIdFromHeader(SOAPHeader header) {
@@ -330,8 +307,7 @@ public class STSServiceEID implements Provider<SOAPMessage> {
         }
         String mid = header.getElementsByTagNameNS(ADDRESSING_NS, "MessageID")
                 .item(0).getTextContent();
-        // PT-236 has to be checked again why is coming like this from soap
-        // header
+        // PT-236 has to be checked again why is coming like this from soap header
         if (mid.startsWith("uuid"))
             mid = "urn:" + mid;
         return mid;
@@ -386,16 +362,7 @@ public class STSServiceEID implements Provider<SOAPMessage> {
             throw new WSTrustException("No Token Type is Specified.");
         }
 
-        return body.getElementsByTagNameNS(WS_TRUST_NS, "TokenType").item(0)
-                .getTextContent();
-
-    }
-
-    private String getClientIP() {
-
-        MessageContext mc = context.getMessageContext();
-        HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
-        return req.getRemoteAddr();
+        return body.getElementsByTagNameNS(WS_TRUST_NS, "TokenType").item(0).getTextContent();
     }
 
     private X509Certificate getSSLCert() {
@@ -419,30 +386,37 @@ public class STSServiceEID implements Provider<SOAPMessage> {
      * Performs a digest over the soapBody.getOwnerDocument().
      *
      * @return The md5 string
-     * @throws IOException              in case of I/O error serializing
      * @throws SOAPException            if the document created is wrong
      * @throws NoSuchAlgorithmException If the message digest is not able to find SHA-1
      */
-    public final String doDigest(SOAPMessage envelope) throws IOException, SOAPException, NoSuchAlgorithmException {
+    private String doDigest(SOAPMessage envelope) throws SOAPException, NoSuchAlgorithmException, TransformerException {
 
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         md.reset();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer;
 
-        OutputFormat format = new OutputFormat();
+        transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "false");
+        transformer.setOutputProperty(OutputKeys.INDENT, "false");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.transform(new DOMSource(envelope.getSOAPBody().getOwnerDocument()), new StreamResult(outputStream));
 
-        format.setIndenting(false);
-        format.setIndent(2);
-        format.setEncoding("UTF-8");
-        format.setOmitComments(true);
-        format.setOmitXMLDeclaration(false);
-        format.setVersion("1.0");
-        format.setStandalone(true);
-
-
-        XMLSerializer serializer = new XMLSerializer(outputStream, format);
-        serializer.serialize(envelope.getSOAPBody().getOwnerDocument());
         md.update(outputStream.toByteArray());
         return Base64.getEncoder().encodeToString(md.digest());
+    }
+
+    private String convertDocumentToString(Document doc) throws TransformerException {
+
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer;
+
+        transformer = tf.newTransformer();
+        // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+        return writer.getBuffer().toString();
     }
 }

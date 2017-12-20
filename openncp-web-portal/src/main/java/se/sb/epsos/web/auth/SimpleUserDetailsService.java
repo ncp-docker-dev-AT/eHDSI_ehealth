@@ -86,10 +86,11 @@ public class SimpleUserDetailsService implements UserDetailsService {
     }
 
     private void init() throws ConfigurationException, IOException {
-        LOGGER.info("Initializing user catalogue from XML in '{}'", usersXML.getURL().getPath());
+
         if (usersXML == null) {
             throw new ConfigurationException("users xml config file path not set");
         }
+        LOGGER.info("Initializing user catalogue from XML in '{}'", usersXML.getURL().getPath());
         config = new XMLConfiguration(usersXML.getURL());
     }
 

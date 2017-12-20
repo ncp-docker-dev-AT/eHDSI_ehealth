@@ -1,22 +1,3 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
 package org.openhealthtools.openatna.syslog.mina.udp;
 
 import org.apache.mina.common.ByteBuffer;
@@ -45,12 +26,10 @@ import java.util.concurrent.Executors;
  *
  * @author Andrew Harrison
  * @version $Revision:$
- * @created Aug 19, 2009: 2:34:33 PM
- * @date $Date:$ modified by $Author:$
  */
 public class UdpServer implements Notifier {
 
-    static Logger log = LoggerFactory.getLogger(UdpServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UdpServer.class);
 
     private ExecutorService exec = Executors.newFixedThreadPool(5);
     private UdpConfig udpconfig;
@@ -75,13 +54,13 @@ public class UdpServer implements Notifier {
 
             acceptor.setFilterChainBuilder(chain);
             acceptor.bind(new InetSocketAddress(host, udpconfig.getPort()), new UdpProtocolHandler(this, udpconfig.getMtu()));
-            log.info("server started on port " + udpconfig.getPort());
+            LOGGER.info("Server has been started on port '{}'", udpconfig.getPort());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }
     }
 
-    public void stop() throws IOException {
+    public void stop() {
         if (acceptor != null) {
             acceptor.unbindAll();
         }
@@ -99,21 +78,18 @@ public class UdpServer implements Notifier {
     }
 
     public void notifyMessage(final SyslogMessage msg) {
-        exec.execute(new Runnable() {
-            public void run() {
-                for (SyslogListener listener : listeners) {
-                    listener.messageArrived(msg);
-                }
+
+        exec.execute(() -> {
+            for (SyslogListener listener : listeners) {
+                listener.messageArrived(msg);
             }
         });
     }
 
     public void notifyException(final SyslogException ex) {
-        exec.execute(new Runnable() {
-            public void run() {
-                for (SyslogListener listener : listeners) {
-                    listener.exceptionThrown(ex);
-                }
+        exec.execute(() -> {
+            for (SyslogListener listener : listeners) {
+                listener.exceptionThrown(ex);
             }
         });
     }

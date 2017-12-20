@@ -44,11 +44,11 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     // Logger object for logging to log4j
     private static final Logger LOGGER = LoggerFactory.getLogger(AutomaticDataCollector.class);
     // map with one intermediaTransformer per CDA-classcode
-    private TreeMap<String, EasyXsltTransformer> intermediaTransformerList = null;
+    private TreeMap<String, EasyXsltTransformer> intermediaTransformerList;
     // DOM structure for caching the factory.xslt
-    private Document factoryXslt = null;
+    private Document factoryXslt;
     // DOM structure for caching the config.xml
-    private Document configXml = null;
+    private Document configXml;
 
     /**
      * Initialize a new AutomaticDataCollector
@@ -105,8 +105,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
             LOGGER.debug("XML Document: {}", EadcUtil.convertXMLDocumentToString(transaction));
         }
 
-        NodeList clinicalDocumentNodeList = transaction.getElementsByTagNameNS(cdaNamespace,
-                "ClinicalDocument");
+        NodeList clinicalDocumentNodeList = transaction.getElementsByTagNameNS(cdaNamespace, "ClinicalDocument");
         int numberOfCdaDocuments = clinicalDocumentNodeList.getLength();
         // Test, if the currently processed comes without a CDA-document
         if (numberOfCdaDocuments < 1) {

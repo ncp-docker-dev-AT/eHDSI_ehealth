@@ -16,20 +16,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Set;
 
 /**
  * @author Andrew Harrison
  * @version $Revision:$
- * @created Oct 7, 2009: 9:33:16 PM
- * @date $Date:$ modified by $Author:$
  */
-
 public class ReportConfig extends HashMap<String, Object> {
 
     public static final String REPORT_CONFIG = "reportConfig";
@@ -125,7 +119,7 @@ public class ReportConfig extends HashMap<String, Object> {
         return conf;
     }
 
-    public static void toXml(ReportConfig conf, OutputStream out) throws IOException {
+    private static void toXml(ReportConfig conf, OutputStream out) throws IOException {
 
         Document doc = newDocument();
         if (doc == null) {
@@ -225,7 +219,9 @@ public class ReportConfig extends HashMap<String, Object> {
         config.setTitle("Messages");
         config.setOutputType("PDF");
         try {
-            ReportConfig.toXml(config, System.out);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ReportConfig.toXml(config, outputStream);
+            LOGGER.info("Report:\n{}", outputStream.toString());
         } catch (IOException e) {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }

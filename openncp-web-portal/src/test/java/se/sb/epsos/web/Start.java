@@ -55,7 +55,7 @@ public class Start {
             server.stop();
             server.join();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
             System.exit(100);
         }
     }

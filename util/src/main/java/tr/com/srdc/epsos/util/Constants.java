@@ -56,36 +56,36 @@ public class Constants {
 
     public static final String NOT_USED_FIELD = "Not Used";
     public static final String MIME_TYPE = "text/xml";
+    public static final String SERVER_IP;
+    public static final String HOME_COMM_ID;
+    public static final String COUNTRY_CODE;
+    public static final String COUNTRY_NAME;
+    public static final String COUNTRY_PRINCIPAL_SUBDIVISION; // ISO 3166-2
+    public static final String LANGUAGE_CODE;
+    public static final String HR_ID_PREFIX = "SPProvidedID";
+    /**
+     * Path to the folder containing the configuration files.
+     */
+    public static final String EPSOS_PROPS_PATH;
+    public static final String TRUSTSTORE_PATH;
+    public static final String TRUSTSTORE_PASSWORD;
+    public static final String SP_KEYSTORE_PATH;
+    public static final String SP_KEYSTORE_PASSWORD;
+    public static final String SP_PRIVATEKEY_ALIAS;
+    public static final String SP_PRIVATEKEY_PASSWORD;
+    public static final String SC_KEYSTORE_PATH;
+    public static final String SC_KEYSTORE_PASSWORD;
+    public static final String SC_PRIVATEKEY_ALIAS;
+    public static final String SC_PRIVATEKEY_PASSWORD;
+    public static final String NCP_SIG_KEYSTORE_PATH;
+    public static final String NCP_SIG_KEYSTORE_PASSWORD;
+    public static final String NCP_SIG_PRIVATEKEY_ALIAS;
+    public static final String NCP_SIG_PRIVATEKEY_PASSWORD;
+    public static final String WRITE_TEST_AUDITS;
     /**
      * Name of the System Variable containing the path to the folder containing the configuration files.
      */
     private static final String PROPS_ENV_VAR = "EPSOS_PROPS_PATH";
-    public static String SERVER_IP = "127.0.0.1"; // default value
-    public static String HOME_COMM_ID;
-    public static String COUNTRY_CODE;
-    public static String COUNTRY_NAME;
-    public static String COUNTRY_PRINCIPAL_SUBDIVISION; // ISO 3166-2
-    public static String LANGUAGE_CODE;
-    public static String HR_ID_PREFIX = "SPProvidedID";
-    /**
-     * Path to the folder containing the configuration files.
-     */
-    public static String EPSOS_PROPS_PATH;
-    public static String TRUSTSTORE_PATH;
-    public static String TRUSTSTORE_PASSWORD;
-    public static String SP_KEYSTORE_PATH;
-    public static String SP_KEYSTORE_PASSWORD;
-    public static String SP_PRIVATEKEY_ALIAS;
-    public static String SP_PRIVATEKEY_PASSWORD;
-    public static String SC_KEYSTORE_PATH;
-    public static String SC_KEYSTORE_PASSWORD;
-    public static String SC_PRIVATEKEY_ALIAS;
-    public static String SC_PRIVATEKEY_PASSWORD;
-    public static String NCP_SIG_KEYSTORE_PATH;
-    public static String NCP_SIG_KEYSTORE_PASSWORD;
-    public static String NCP_SIG_PRIVATEKEY_ALIAS;
-    public static String NCP_SIG_PRIVATEKEY_PASSWORD;
-    public static String WRITE_TEST_AUDITS;
 
     static {
         String epsosPath = System.getenv(PROPS_ENV_VAR);
@@ -94,13 +94,6 @@ public class Constants {
         }
         EPSOS_PROPS_PATH = epsosPath;
         LOGGER.info("OpenNCP Util Constants Initialization - EPSOS_PROPS_PATH: '{}'", EPSOS_PROPS_PATH);
-        fill();
-    }
-
-    private Constants() {
-    }
-
-    private static void fill() {
 
         SERVER_IP = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");
 
@@ -131,18 +124,20 @@ public class Constants {
         WRITE_TEST_AUDITS = ConfigurationManagerFactory.getConfigurationManager().getProperty("WRITE_TEST_AUDITS");
     }
 
+    private Constants() {
+    }
+
     /**
-     * check whether the input path is global, modify accordingly (global paths
-     * can come within linux)
+     * check whether the input path is global, modify accordingly (global paths can come within linux)
      *
      * @param path
      * @return
      */
     private static String globalizePath(String path) {
+
         if (path == null) {
             return null;
         }
-
         if (!(path.startsWith("/") || path.matches("[A-Z]:.*"))) {
             path = EPSOS_PROPS_PATH + path;
         }

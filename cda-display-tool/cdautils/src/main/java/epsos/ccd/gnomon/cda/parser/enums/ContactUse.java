@@ -2,16 +2,15 @@ package epsos.ccd.gnomon.cda.parser.enums;
 
 /**
  * A basic enum coding the uses of a telecommunication contact.
- * 
+ *
  * @author Akis Papadopoulos
- * 
  */
 public enum ContactUse {
-    
+
     // Communication use code and display name
     AS("AS", "answering service"),
     EC("EC", "emergency contact"),
-    H("H", "home"),
+    H("H", "home address"),
     HP("HP", "primary home"),
     HV("HV", "vacation home"),
     MC("MC", "mobile contact"),
@@ -25,11 +24,11 @@ public enum ContactUse {
 
     /**
      * A basic constructor initializing the contact use.
-     * 
-     * @param code the code of the contact use.
+     *
+     * @param code    the code of the contact use.
      * @param display the display name of the contact use.
      */
-    private ContactUse(String code, String display) {
+    ContactUse(String code, String display) {
         // Setting the code of the contact use
         this.code = code;
 
@@ -39,7 +38,7 @@ public enum ContactUse {
 
     /**
      * A method returning the code of the contact use.
-     * 
+     *
      * @return the code of the contact use.
      */
     public String getCode() {
@@ -48,7 +47,7 @@ public enum ContactUse {
 
     /**
      * A method returning the display name of the contact use.
-     * 
+     *
      * @return the display name of the contact use.
      */
     public String getDisplay() {
@@ -57,7 +56,7 @@ public enum ContactUse {
 
     /**
      * A method returning an alphanumeric representation of the object.
-     * 
+     *
      * @return the code of the contact use.
      */
     @Override

@@ -38,7 +38,7 @@ public class ModelValidatorTest extends TBase {
             assertNotNull(result);
             LOGGER.info("Result: '{}'", result);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
     }
 
