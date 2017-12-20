@@ -4,6 +4,7 @@ import epsos.ccd.gnomon.cda.parser.beans.*;
 import epsos.ccd.gnomon.cda.parser.docs.ClinicalDocument;
 import epsos.ccd.gnomon.cda.parser.docs.HCEReport;
 import epsos.ccd.gnomon.cda.parser.enums.*;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -25,11 +26,13 @@ import java.util.Date;
  *
  * @author Akis Papadopoulos
  */
-public class HCERTester {
+public class HCERTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(HCERTester.class);
+    private static final Logger logger = LoggerFactory.getLogger(HCERTest.class);
 
-    public static void main(String[] args) throws Exception {
+    @Test
+    public void transformHCERReport() {
+
         // Creating the patient id
         Identifier pid = new Identifier("48905059995", "1.3.6.1.4.1.28284.6.2.2.1");
 
