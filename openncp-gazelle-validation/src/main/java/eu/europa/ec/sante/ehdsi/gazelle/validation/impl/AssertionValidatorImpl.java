@@ -13,7 +13,7 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 
 public class AssertionValidatorImpl extends AbstractValidator implements AssertionValidator {
 
-    private final Logger logger = LoggerFactory.getLogger(AssertionValidatorImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssertionValidatorImpl.class);
 
     AssertionValidatorImpl(WebServiceTemplate webServiceTemplate) {
         super(webServiceTemplate);
@@ -27,9 +27,10 @@ public class AssertionValidatorImpl extends AbstractValidator implements Asserti
 
         try {
             ValidateDocumentResponse response = (ValidateDocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
+            LOGGER.info("Gazelle Result:\n{}", response.getDetailedResult());
             return StringUtils.hasText(response.getDetailedResult());
         } catch (WebServiceClientException e) {
-            logger.error("An error occurred during validation process of the AssertionValidator. Please check the stack trace for more details.", e);
+            LOGGER.error("An error occurred during validation process of the AssertionValidator. Please check the stack trace for more details.", e);
             return false;
         }
     }
@@ -42,9 +43,11 @@ public class AssertionValidatorImpl extends AbstractValidator implements Asserti
 
         try {
             ValidateBase64DocumentResponse response = (ValidateBase64DocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
+            LOGGER.info("Gazelle Result:\n{}", response.getDetailedResult());
+
             return StringUtils.hasText(response.getDetailedResult());
         } catch (WebServiceClientException e) {
-            logger.error("An error occurred during validation process of the AssertionValidator. Please check the stack trace for more details.", e);
+            LOGGER.error("An error occurred during validation process of the AssertionValidator. Please check the stack trace for more details.", e);
             return false;
         }
     }
