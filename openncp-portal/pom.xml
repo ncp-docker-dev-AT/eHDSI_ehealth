@@ -405,12 +405,6 @@
 
     <build>
         <resources>
-            <!--<resource>-->
-            <!--<directory>src/main/resources/content</directory>-->
-            <!--<includes>-->
-            <!--<include>../*.properties</include>-->
-            <!--</includes>-->
-            <!--</resource>-->
             <resource>
                 <directory>src/main/java</directory>
                 <includes>
@@ -423,6 +417,28 @@
                 <directory>${project.basedir}/src/main/resources</directory>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jasperreports-maven-plugin</artifactId>
+                <version>1.0-beta-2</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile-reports</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.jasperreports</groupId>
+                        <artifactId>jasperreports</artifactId>
+                        <version>5.0.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <!--<plugin>-->
@@ -455,7 +471,6 @@
                     <version>2.17</version>
                     <configuration>
                         <consoleOutput>true</consoleOutput>
-                        <!-- <configLocation>http://jenkins.gnomon.com.gr/examples/checkstyle.xml</configLocation> -->
                         <failsOnError>false</failsOnError>
                         <excludes>
                             **/resources/**/*,**/generated-sources/**/*,**/target/**/*
@@ -492,13 +507,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
                     <version>2.6</version>
-                    <!-- <configuration> -->
-                    <!-- <webResources> -->
-                    <!-- <resource> -->
-                    <!-- <directory>/src/main/webapp/WEB-INF/flags</directory> -->
-                    <!-- </resource> -->
-                    <!-- </webResources> -->
-                    <!-- </configuration> -->
                 </plugin>
                 <plugin>
                     <groupId>com.liferay.maven.plugins</groupId>
