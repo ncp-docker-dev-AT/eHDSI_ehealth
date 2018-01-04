@@ -219,8 +219,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
                     adhocQueryResponse1 = skel.respondingGateway_CrossGatewayQuery(wrappedParam, sh, eventLog);
-                    envelope = toEnvelope(getSOAPFactory(msgContext),
-                            adhocQueryResponse1, false);
+                    envelope = toEnvelope(getSOAPFactory(msgContext), adhocQueryResponse1, false);
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
 
