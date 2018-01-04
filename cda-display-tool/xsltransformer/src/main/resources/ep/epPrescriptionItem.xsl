@@ -541,16 +541,14 @@
                         </xsl:call-template>
                     </td>
                     <th>
-                        <span class="td_label"><!--  Dispenced Product:-->
+                        <!--  Dispensed Product:-->
+                        <span class="td_label">
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'24'"/>
                             </xsl:call-template>
                         </span>
                     </th>
                     <td colspan="2">
-                        <xsl:variable name="dispensedProductValue">
-                            <xsl:call-template name="pure-substitution-code"/>
-                        </xsl:variable>
                         <input type="text">
                             <xsl:attribute name="id">
                                 <xsl:text>dispensedProductValue_</xsl:text>
@@ -560,11 +558,6 @@
                                 <xsl:text>dispensedProductValue_</xsl:text>
                                 <xsl:value-of select="position()-1"/>
                             </xsl:attribute>
-                            <xsl:choose>
-                                <xsl:when test="not($dispensedProductValue='Yes')">
-                                    <xsl:attribute name="readonly"/>
-                                </xsl:when>
-                            </xsl:choose>
                             <xsl:attribute name="value">
                                 <xsl:value-of
                                         select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:name"/>
@@ -574,7 +567,8 @@
                 </tr>
                 <tr>
                     <th>
-                        <span class="td_label"><!--  Dispenced Package Size:-->
+                        <!--  Dispensed Package Size:-->
+                        <span class="td_label">
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'23'"/>
                             </xsl:call-template>
@@ -779,10 +773,6 @@
                 <xsl:with-param name="name" select="'dispense'"/>
             </xsl:call-template>&#160;
             <xsl:call-template name="add-javascript-variable">
-                <xsl:with-param name="variable" select="'productValue'"/>
-                <xsl:with-param name="name" select="'dispensedProductValue'"/>
-            </xsl:call-template>&#160;
-            <xsl:call-template name="add-javascript-variable">
                 <xsl:with-param name="variable" select="'packageSize'"/>
                 <xsl:with-param name="name" select="'dispensedPackageSize'"/>
             </xsl:call-template>&#160;
@@ -802,10 +792,6 @@
                 <xsl:with-param name="variable" select="'cb'"/>
             </xsl:call-template>
             <xsl:text disable-output-escaping="yes">.checked == 0 ) { </xsl:text> &#160;
-            <xsl:call-template name="add-underscore">
-                <xsl:with-param name="variable" select="'productValue'"/>
-            </xsl:call-template>
-            <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
             <xsl:call-template name="add-underscore">
                 <xsl:with-param name="variable" select="'packageSize'"/>
             </xsl:call-template>
@@ -830,10 +816,6 @@
             </xsl:call-template>
             <xsl:text disable-output-escaping="yes">.checked == 0 ) { </xsl:text> &#160;
             <xsl:call-template name="add-underscore">
-                <xsl:with-param name="variable" select="'productValue'"/>
-            </xsl:call-template>
-            <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
-            <xsl:call-template name="add-underscore">
                 <xsl:with-param name="variable" select="'packageSize'"/>
             </xsl:call-template>
             <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;; </xsl:text>
@@ -846,10 +828,6 @@
                 </xsl:when>
             </xsl:choose>
             <xsl:text> } else {</xsl:text>&#160;
-            <xsl:call-template name="add-underscore">
-                <xsl:with-param name="variable" select="'productValue'"/>
-            </xsl:call-template>
-            <xsl:text disable-output-escaping="yes">.disabled=!&apos;true&apos;;</xsl:text>&#160;
             <xsl:call-template name="add-underscore">
                 <xsl:with-param name="variable" select="'packageSize'"/>
             </xsl:call-template>
