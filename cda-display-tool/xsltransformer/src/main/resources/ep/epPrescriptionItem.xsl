@@ -776,17 +776,10 @@
                 <xsl:with-param name="variable" select="'packageSize'"/>
                 <xsl:with-param name="name" select="'dispensedPackageSize'"/>
             </xsl:call-template>&#160;
-            <xsl:variable name="substitutionValueCheck">
-                <xsl:call-template name="pure-substitution-code"/>
-            </xsl:variable>
-            <xsl:choose>
-                <xsl:when test="$substitutionValueCheck ='Yes'">
-                    <xsl:call-template name="add-javascript-variable">
-                        <xsl:with-param name="variable" select="'measures'"/>
-                        <xsl:with-param name="name" select="'measures'"/>
-                    </xsl:call-template>&#160;
-                </xsl:when>
-            </xsl:choose>
+            <xsl:call-template name="add-javascript-variable">
+                <xsl:with-param name="variable" select="'measures'"/>
+                <xsl:with-param name="name" select="'measures'"/>
+            </xsl:call-template>&#160;
             <xsl:text disable-output-escaping="yes">if  (</xsl:text>
             <xsl:call-template name="add-underscore">
                 <xsl:with-param name="variable" select="'cb'"/>
@@ -796,14 +789,10 @@
                 <xsl:with-param name="variable" select="'packageSize'"/>
             </xsl:call-template>
             <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
-            <xsl:choose>
-                <xsl:when test="$substitutionValueCheck ='Yes'">
-                    <xsl:call-template name="add-underscore">
-                        <xsl:with-param name="variable" select="'measures'"/>
-                    </xsl:call-template>
-                    <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
-                </xsl:when>
-            </xsl:choose>
+            <xsl:call-template name="add-underscore">
+                <xsl:with-param name="variable" select="'measures'"/>
+            </xsl:call-template>
+            <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
             <xsl:text disable-output-escaping="yes">};</xsl:text>&#160;
             <xsl:text disable-output-escaping="yes">function </xsl:text>
             <xsl:call-template name="add-underscore">
@@ -819,27 +808,19 @@
                 <xsl:with-param name="variable" select="'packageSize'"/>
             </xsl:call-template>
             <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;; </xsl:text>
-            <xsl:choose>
-                <xsl:when test="$substitutionValueCheck ='Yes'">
-                    <xsl:call-template name="add-underscore">
-                        <xsl:with-param name="variable" select="'measures'"/>
-                    </xsl:call-template>
-                    <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
-                </xsl:when>
-            </xsl:choose>
+            <xsl:call-template name="add-underscore">
+                <xsl:with-param name="variable" select="'measures'"/>
+            </xsl:call-template>
+            <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
             <xsl:text> } else {</xsl:text>&#160;
             <xsl:call-template name="add-underscore">
                 <xsl:with-param name="variable" select="'packageSize'"/>
             </xsl:call-template>
             <xsl:text disable-output-escaping="yes">.disabled=!&apos;true&apos;;</xsl:text>&#160;
-            <xsl:choose>
-                <xsl:when test="$substitutionValueCheck ='Yes'">
-                    <xsl:call-template name="add-underscore">
-                        <xsl:with-param name="variable" select="'measures'"/>
-                    </xsl:call-template>
-                    <xsl:text disable-output-escaping="yes">.disabled=!&apos;true&apos;;</xsl:text>&#160;
-                </xsl:when>
-            </xsl:choose>
+            <xsl:call-template name="add-underscore">
+                <xsl:with-param name="variable" select="'measures'"/>
+            </xsl:call-template>
+            <xsl:text disable-output-escaping="yes">.disabled=!&apos;true&apos;;</xsl:text>&#160;
             <xsl:text disable-output-escaping="yes">};</xsl:text>&#160;
             <xsl:text disable-output-escaping="yes">};</xsl:text>
         </script>
