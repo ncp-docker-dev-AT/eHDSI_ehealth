@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
+import javax.xml.ws.soap.SOAPFaultException;
 
 /**
  * Assertion Validation Service
@@ -52,7 +53,9 @@ public class AssertionValidationService extends ValidationService {
             ModelBasedValidationWSService assertionService = new ModelBasedValidationWSService();
             ModelBasedValidationWS assertionPort = assertionService.getModelBasedValidationWSPort();
             xmlDetails = assertionPort.validateDocument(object, model);
-        } catch (Exception ex) {
+        } catch (SOAPFaultException e) {
+            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
+        } catch (net.ihe.gazelle.jaxb.assertion.SOAPException_Exception ex) {
             LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
         }
 
@@ -81,6 +84,8 @@ public class AssertionValidationService extends ValidationService {
             GazelleObjectValidator gazellePort = objectValidatorService.getGazelleObjectValidatorPort();
             // Invocation of Web Service.
             xmlDetails = gazellePort.validateObject(DatatypeConverter.printBase64Binary(object.getBytes()), schematron, schematron);
+        } catch (SOAPFaultException e) {
+            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
         } catch (SOAPException_Exception | TransformerException_Exception ex) {
             LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
         }

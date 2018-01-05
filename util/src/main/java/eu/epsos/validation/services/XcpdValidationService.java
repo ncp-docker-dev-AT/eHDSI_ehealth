@@ -7,8 +7,11 @@ import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.reporting.ReportBuilder;
 import net.ihe.gazelle.jaxb.xds.ModelBasedValidationWS;
 import net.ihe.gazelle.jaxb.xds.ModelBasedValidationWSService;
+import net.ihe.gazelle.jaxb.xds.SOAPException_Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.ws.soap.SOAPFaultException;
 
 /**
  * This class represents the wrapper for the XCPD messages validation.
@@ -27,6 +30,7 @@ public class XcpdValidationService extends ValidationService {
     }
 
     public static XcpdValidationService getInstance() {
+
         if (instance == null) {
             instance = new XcpdValidationService();
         }
@@ -49,24 +53,16 @@ public class XcpdValidationService extends ValidationService {
             return false;
         }
 
-        //TODO: Fix Gazelle timeout and validation error.
-        //        try {
-        //        ModelBasedValidationWSService hl7Service = new net.ihe.gazelle.validator.mb.ws.ModelBasedValidationWSService();
-        //        ModelBasedValidationWS hl7v3Port = hl7Service.getModelBasedValidationWSPort();
-        //            hl7v3XmlDetails = hl7v3Port.validateDocument(object, model); // Invocation of Web Service client.
-        //        } catch (Exception ex) {
-        //            LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
-        //            //return false;
-        //        }
         try {
             LOGGER.info("Automated validation requested to Gazelle eHDSI platform...");
             ModelBasedValidationWSService hl7Service = new ModelBasedValidationWSService();
             ModelBasedValidationWS hl7v3Port = hl7Service.getModelBasedValidationWSPort();
             // Invocation of Web Service client.
             hl7v3XmlDetails = hl7v3Port.validateDocument(object, model);
-        } catch (Exception ex) {
+        } catch (SOAPFaultException e) {
+            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
+        } catch (SOAPException_Exception ex) {
             LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
-            //return false;
         }
 
         if (!hl7v3XmlDetails.isEmpty()) {
@@ -79,6 +75,7 @@ public class XcpdValidationService extends ValidationService {
 
     @Override
     public boolean validateSchematron(String object, String schematron, NcpSide ncpSide) {
+
         if (Hl7v3Schematron.checkSchematron(schematron) == null) {
             LOGGER.error("The specified schematron is not supported by the WebService.");
             return false;

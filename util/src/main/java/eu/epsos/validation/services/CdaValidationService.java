@@ -11,6 +11,8 @@ import net.ihe.gazelle.jaxb.cda.SOAPException_Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.ws.soap.SOAPFaultException;
+
 /**
  * This class represents the wrapper for the CDA documents validation.
  *
@@ -57,6 +59,8 @@ public class CdaValidationService extends ValidationService {
             ModelBasedValidationWS cdaPort = cdaService.getModelBasedValidationWSPort();
             // Invocation of Web Service client.
             cdaXmlDetails = cdaPort.validateDocument(object, model);
+        } catch (SOAPFaultException e) {
+            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
         } catch (SOAPException_Exception ex) {
             LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stacktrace.", ex);
         }
@@ -72,6 +76,7 @@ public class CdaValidationService extends ValidationService {
 
     @Override
     public boolean validateSchematron(String object, String schematron, NcpSide ncpSide) {
+
         if (CdaSchematron.checkSchematron(schematron) == null) {
             LOGGER.error("The specified schematron is not supported by the WebService.");
             return false;

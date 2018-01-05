@@ -10,6 +10,8 @@ import net.ihe.gazelle.jaxb.xds.SOAPException_Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.ws.soap.SOAPFaultException;
+
 /**
  * This class represents the wrapper for the XCA messages validation.
  *
@@ -27,6 +29,7 @@ public class XcaValidationService extends ValidationService {
     }
 
     public static XcaValidationService getInstance() {
+
         if (instance == null) {
 
             instance = new XcaValidationService();
@@ -64,8 +67,8 @@ public class XcaValidationService extends ValidationService {
             ModelBasedValidationWSService xdService = new ModelBasedValidationWSService();
             ModelBasedValidationWS xdPort = xdService.getModelBasedValidationWSPort();
             xdXmlDetails = xdPort.validateDocument(object, model);
-            //String encoded = Base64.getEncoder().encodeToString(object.getBytes(StandardCharsets.UTF_8));
-            //xdXmlDetails = xdPort.validateBase64Document(encoded, model);
+        } catch (SOAPFaultException e) {
+            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
         } catch (SOAPException_Exception ex) {
             LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
         }
