@@ -4,6 +4,8 @@ import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.saml.AssertionSchematron;
 import eu.epsos.validation.services.AssertionValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.AssertionValidator;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.GazelleValidatorFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -27,6 +29,7 @@ import org.w3c.dom.Element;
 import tr.com.srdc.epsos.securityman.SAML2Validator;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.stream.XMLStreamReader;
 import java.util.List;
 import java.util.Map;
@@ -176,6 +179,11 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 //                        LOG.error(ExceptionUtils.getStackTrace(e));
 //                    }
                     if (StringUtils.equalsIgnoreCase(ConfigurationManagerFactory.getConfigurationManager().getProperty("automated.validation"), "true")) {
+
+                        String assertionsSTR = DatatypeConverter.printBase64Binary(XMLUtil.prettyPrint(hcpAssertion.getDOM()).getBytes());
+
+                        AssertionValidator assertionValidator = GazelleValidatorFactory.getAssertionValidator();
+                        assertionValidator.validateBase64Document(assertionsSTR, AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString());
 
                         AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
                                 AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString(), NcpSide.NCP_B);

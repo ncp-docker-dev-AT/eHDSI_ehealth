@@ -38,7 +38,7 @@ public enum CdaModel {
                 return m;
             }
         }
-        return null;
+        throw new IllegalArgumentException("Invalid CDA model value: " + model);
     }
 
     /**

@@ -69,6 +69,16 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
     }
 
     @Override
+    public boolean getBooleanProperty(String key) {
+        return Boolean.valueOf(getProperty(key));
+    }
+
+    @Override
+    public int getIntegerProperty(String key) {
+        return Integer.valueOf(getProperty(key));
+    }
+
+    @Override
     public void setProperty(String key, String value) {
         Property property = new Property(key, value);
 
