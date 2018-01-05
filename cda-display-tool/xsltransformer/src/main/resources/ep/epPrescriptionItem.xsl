@@ -264,7 +264,7 @@
                 <xsl:text>mytable</xsl:text>
                 <xsl:value-of select="position()"/>
             </xsl:attribute>
-            <form name="DISPENCE_FORM" method="post">
+            <form name="DISPENSE_FORM" method="post">
                 <xsl:attribute name="action">
                     <xsl:value-of select="$actionpath"/>
                 </xsl:attribute>
@@ -282,7 +282,13 @@
                         )
                     </th>
                     <th>
-                        <!-- Dispensed Package Size -->
+                        <!-- Number of Packages -->
+                        <xsl:call-template name="show-displayLabels">
+                            <xsl:with-param name="code" select="'43'"/>
+                        </xsl:call-template>
+                    </th>
+                    <th>
+                        <!-- Package Size -->
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'50'"/>
                         </xsl:call-template>
@@ -294,11 +300,7 @@
                         </xsl:call-template>
                     </th>
                     <th>
-                        <!-- Other Active Ingredients
-                                        <xsl:call-template  name="show-displayLabels">
-                                            <xsl:with-param name="data" select="'48'"/>
-                                        </xsl:call-template>  -->
-                        <!-- 				Country A Brand name -->
+                        <!-- Brand Name -->
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'9'"/>
                         </xsl:call-template>
@@ -317,6 +319,11 @@
                                 <xsl:call-template name="show-single-active-ingredient"/>
                             </xsl:otherwise>
                         </xsl:choose>
+                    </td>
+                    <td>
+                        <xsl:call-template name="number-of-packages">
+                            <xsl:with-param name="supply" select="n1:entryRelationship[@typeCode='COMP']"/>
+                        </xsl:call-template>
                     </td>
                     <td>
                         <xsl:variable name="hasPackage">
@@ -348,39 +355,39 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>
-                        <!-- 				Route of Administration -->
+                    <th colspan="2">
+                        <!-- Route of Administration -->
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'67'"/>
                         </xsl:call-template>
                     </th>
                     <th>
-                        <!-- 				Onset Date -->
+                        <!-- Onset Date -->
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'45'"/>
                         </xsl:call-template>
                     </th>
                     <th>
-                        <!-- 				End Date -->
+                        <!-- End Date -->
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'26'"/>
                         </xsl:call-template>
                     </th>
                     <th>
-                        <!-- 				Frequency of Intakes -->
+                        <!-- Frequency of Intakes -->
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'32'"/>
                         </xsl:call-template>
                     </th>
                     <th>
-                        <!-- 				Units per intake -->
+                        <!-- Units per intake -->
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'78'"/>
                         </xsl:call-template>
                     </th>
                 </tr>
                 <tr>
-                    <td>
+                    <td colspan="2">
                         <!-- RoA -->
                         <xsl:call-template name="show-formCode">
                             <xsl:with-param name="parameter" select="n1:routeCode"/>
@@ -453,24 +460,14 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>
-                        <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="code" select="'43'"/>
-                        </xsl:call-template>
-                    </th>
-                    <th colspan="4">
+                    <th colspan="6">
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'38'"/>
                         </xsl:call-template>
                     </th>
                 </tr>
                 <tr>
-                    <td>
-                        <xsl:call-template name="number-of-packages">
-                            <xsl:with-param name="supply" select="n1:entryRelationship[@typeCode='COMP']"/>
-                        </xsl:call-template>
-                    </td>
-                    <td colspan="4">
+                    <td colspan="6">
                         <xsl:call-template name="substitution-code"/>
                     </td>
                 </tr>
@@ -483,7 +480,7 @@
                             </xsl:call-template>
                         </span>
                     </th>
-                    <td colspan="4">
+                    <td colspan="5">
                         <xsl:call-template name="show-text">
                             <xsl:with-param name="txt"
                                             select="n1:entryRelationship[@typeCode='SUBJ']/n1:act[n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.3'] ]/n1:text"/>
@@ -492,14 +489,14 @@
                 </tr>
                 <tr>
                     <th>
-                        <!--  Advise to the dispencer:-->
+                        <!--  Advise to the dispenser:-->
                         <span class="td_label">
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'4'"/>
                             </xsl:call-template>
                         </span>
                     </th>
-                    <td colspan="4">
+                    <td colspan="5">
                         <xsl:call-template name="show-text">
                             <xsl:with-param name="txt"
                                             select="n1:entryRelationship[@typeCode='SUBJ']/n1:act[n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.3.1'] ]/n1:text"/>
@@ -531,7 +528,6 @@
                                 <xsl:text>enableValues_</xsl:text>
                                 <xsl:value-of select="position()-1"/>
                                 <xsl:text>();</xsl:text>
-
                             </xsl:attribute>
                         </input>
                         <br/>
@@ -540,47 +536,15 @@
                             <xsl:with-param name="code" select="'202'"/>
                         </xsl:call-template>
                     </td>
-                    <th>
-                        <span class="td_label"><!--  Dispenced Product:-->
-                            <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="code" select="'24'"/>
-                            </xsl:call-template>
-                        </span>
-                    </th>
-                    <td colspan="2">
-                        <xsl:variable name="dispensedProductValue">
-                            <xsl:call-template name="pure-substitution-code"/>
-                        </xsl:variable>
-                        <input type="text">
-                            <xsl:attribute name="id">
-                                <xsl:text>dispensedProductValue_</xsl:text>
-                                <xsl:value-of select="position()-1"/>
-                            </xsl:attribute>
-                            <xsl:attribute name="name">
-                                <xsl:text>dispensedProductValue_</xsl:text>
-                                <xsl:value-of select="position()-1"/>
-                            </xsl:attribute>
-                            <xsl:choose>
-                                <xsl:when test="not($dispensedProductValue='Yes')">
-                                    <xsl:attribute name="readonly"/>
-                                </xsl:when>
-                            </xsl:choose>
-                            <xsl:attribute name="value">
-                                <xsl:value-of
-                                        select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:name"/>
-                            </xsl:attribute>
-                        </input>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <span class="td_label"><!--  Dispenced Package Size:-->
+                    <th colspan="2">
+                        <!-- Dispensed Package Size:-->
+                        <span class="td_label">
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'23'"/>
                             </xsl:call-template>
                         </span>
                     </th>
-                    <td>
+                    <td colspan="2">
                         <input type="text">
                             <xsl:attribute name="id">
                                 <xsl:text>dispensedPackageSize_</xsl:text>
@@ -650,11 +614,71 @@
                             </xsl:choose>
                         </select>
                     </td>
+                </tr>
+                <tr>
+                    <th>
+                        <!--  Dispensed Product:-->
+                        <span class="td_label">
+                            <xsl:call-template name="show-displayLabels">
+                                <xsl:with-param name="code" select="'24'"/>
+                            </xsl:call-template>
+                        </span>
+                    </th>
                     <td>
+                        <xsl:variable name="dispensedProductValue">
+                            <xsl:call-template name="pure-substitution-code"/>
+                        </xsl:variable>
+                        <input type="text">
+                            <xsl:attribute name="id">
+                                <xsl:text>dispensedProductValue_</xsl:text>
+                                <xsl:value-of select="position()-1"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="name">
+                                <xsl:text>dispensedProductValue_</xsl:text>
+                                <xsl:value-of select="position()-1"/>
+                            </xsl:attribute>
+                            <xsl:choose>
+                                <xsl:when test="not($dispensedProductValue='Yes')">
+                                    <xsl:attribute name="readonly"/>
+                                </xsl:when>
+                            </xsl:choose>
+                            <xsl:attribute name="value">
+                                <xsl:value-of
+                                        select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:name"/>
+                            </xsl:attribute>
+                        </input>
+                    </td>
+                    <th colspan="2">
+                        <!-- Dispensed Number of Packages:-->
+                        <span class="td_label">
+                            <!-- HOTFIX - Has to be replaced with a value from the epSOSDisplayLabel value set -->
+                            Dispensed Number of packages
+                        </span>
+                    </th>
+                    <td colspan="2">
+                        <input type="text">
+                            <xsl:attribute name="id">
+                                <xsl:text>dispensedNumberOfPackages_</xsl:text>
+                                <xsl:value-of select="position()-1"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="name">
+                                <xsl:text>dispensedNumberOfPackages_</xsl:text>
+                                <xsl:value-of select="position()-1"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="value">
+                                <xsl:call-template name="number-of-packages">
+                                    <xsl:with-param name="supply" select="n1:entryRelationship[@typeCode='COMP']"/>
+                                </xsl:call-template>
+                            </xsl:attribute>
+                        </input>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
                         <!--  Dispense -->
                         <xsl:choose>
                             <xsl:when test="$allowDispense='true'">
-                                <input type="submit">
+                                <input type="submit" style="float: right;">
                                     <xsl:attribute name="value">
                                         <xsl:call-template name="show-displayLabels">
                                             <xsl:with-param name="code" select="'22'"/>
@@ -786,6 +810,10 @@
                 <xsl:with-param name="variable" select="'packageSize'"/>
                 <xsl:with-param name="name" select="'dispensedPackageSize'"/>
             </xsl:call-template>&#160;
+            <xsl:call-template name="add-javascript-variable">
+                <xsl:with-param name="variable" select="'numberOfPackages'"/>
+                <xsl:with-param name="name" select="'dispensedNumberOfPackages'"/>
+            </xsl:call-template>&#160;
             <xsl:variable name="substitutionValueCheck">
                 <xsl:call-template name="pure-substitution-code"/>
             </xsl:variable>
@@ -808,6 +836,10 @@
             <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
             <xsl:call-template name="add-underscore">
                 <xsl:with-param name="variable" select="'packageSize'"/>
+            </xsl:call-template>
+            <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
+            <xsl:call-template name="add-underscore">
+                <xsl:with-param name="variable" select="'numberOfPackages'"/>
             </xsl:call-template>
             <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
             <xsl:choose>
@@ -836,6 +868,10 @@
             <xsl:call-template name="add-underscore">
                 <xsl:with-param name="variable" select="'packageSize'"/>
             </xsl:call-template>
+            <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;;</xsl:text>&#160;
+            <xsl:call-template name="add-underscore">
+                <xsl:with-param name="variable" select="'numberOfPackages'"/>
+            </xsl:call-template>
             <xsl:text disable-output-escaping="yes">.disabled=&apos;true&apos;; </xsl:text>
             <xsl:choose>
                 <xsl:when test="$substitutionValueCheck ='Yes'">
@@ -852,6 +888,10 @@
             <xsl:text disable-output-escaping="yes">.disabled=!&apos;true&apos;;</xsl:text>&#160;
             <xsl:call-template name="add-underscore">
                 <xsl:with-param name="variable" select="'packageSize'"/>
+            </xsl:call-template>
+            <xsl:text disable-output-escaping="yes">.disabled=!&apos;true&apos;;</xsl:text>&#160;
+            <xsl:call-template name="add-underscore">
+                <xsl:with-param name="variable" select="'numberOfPackages'"/>
             </xsl:call-template>
             <xsl:text disable-output-escaping="yes">.disabled=!&apos;true&apos;;</xsl:text>&#160;
             <xsl:choose>

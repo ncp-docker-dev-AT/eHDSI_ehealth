@@ -8,7 +8,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
-import epsos.ccd.posam.tm.util.XmlUtil;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
@@ -30,7 +29,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import org.w3c.dom.Document;
 
 public class DispenseServlet extends HttpServlet {
 
@@ -89,23 +87,26 @@ public class DispenseServlet extends HttpServlet {
                     String dispensed_substitute = req.getParameter("dispense_" + id); // field3
                     boolean substitute = GetterUtil.getBoolean(dispensed_substitute, false);
 
-                    String dispensed_quantity = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
+                    String dispensed_packageSize = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
+                    if (Validator.isNull(dispensed_packageSize)) {
+                        dispensed_packageSize = line.getField21() + "";
+                    }
 
-                    if (Validator.isNull(dispensed_quantity)) {
-                        dispensed_quantity = line.getField21() + "";
+                    String dispensed_nrOfPacks = req.getParameter("dispensedNumberOfPackages_" + id);
+                    if (Validator.isNull(dispensed_nrOfPacks)) {
+                        dispensed_nrOfPacks = line.getField8() + "";
                     }
 
                     String dispensed_name = dispensedProduct;
                     String dispensed_strength = line.getField3() + "";
                     String dispensed_form = line.getField4() + "";
                     String dispensed_package = line.getField4() + ""; //request.getParameter("packaging2_"+id); // field6
-                    String dispensed_nrOfPacks = line.getField8().toString();
                     String prescriptionid = line.getField14() + ""; // field9 //lathos
                     String materialid = line.getField19() + ""; // field10
                     String activeIngredient = line.getField2().toString();
 
                     ViewResult d_line = new ViewResult(id, dispensed_id, dispensed_name, substitute, dispensed_strength,
-                            dispensed_form, dispensed_package, dispensed_quantity, dispensed_nrOfPacks, prescriptionid,
+                            dispensed_form, dispensed_package, dispensed_packageSize, dispensed_nrOfPacks, prescriptionid,
                             materialid, activeIngredient, measures_id);
 
                     dispensedLines.add(d_line);
