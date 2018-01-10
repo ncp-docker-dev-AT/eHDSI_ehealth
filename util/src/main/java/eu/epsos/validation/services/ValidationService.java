@@ -24,6 +24,11 @@ public abstract class ValidationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidationService.class);
     private static final String VALIDATION_STATUS_PROPERTY_NAME = "automated.validation";
 
+    protected static boolean isRemoteValidationOn() {
+
+        return ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.remote");
+    }
+
     /**
      * This method will check is the automated validation is turned on, by the setting of a specific property in
      * the properties database.
@@ -77,16 +82,17 @@ public abstract class ValidationService {
             LOGGER.info("Automated validation turned off, not validating.");
             return false;
         }
-
-        try {
-            GazelleObjectValidatorService objectValidatorService = new GazelleObjectValidatorService();
-            GazelleObjectValidator gazellePort = objectValidatorService.getGazelleObjectValidatorPort();
-            xmlDetails = gazellePort.validateObject(DatatypeConverter.printBase64Binary(object.getBytes()), schematron, schematron);
-        } catch (SOAPFaultException e) {
-            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
-        } catch (SOAPException_Exception | TransformerException_Exception ex) {
-            LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
-            return false;
+        if (ValidationService.isRemoteValidationOn()) {
+            try {
+                GazelleObjectValidatorService objectValidatorService = new GazelleObjectValidatorService();
+                GazelleObjectValidator gazellePort = objectValidatorService.getGazelleObjectValidatorPort();
+                xmlDetails = gazellePort.validateObject(DatatypeConverter.printBase64Binary(object.getBytes()), schematron, schematron);
+            } catch (SOAPFaultException e) {
+                LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
+            } catch (SOAPException_Exception | TransformerException_Exception ex) {
+                LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+                return false;
+            }
         }
 
         if (!xmlDetails.isEmpty()) {

@@ -53,19 +53,19 @@ public class CdaValidationService extends ValidationService {
             LOGGER.error("The specified model is not supported by the WebService.");
             return false;
         }
-
-        try {
-            LOGGER.info("Automated validation for CDA document...");
-            ModelBasedValidationWSService cdaService = new ModelBasedValidationWSService();
-            ModelBasedValidationWS cdaPort = cdaService.getModelBasedValidationWSPort();
-            // Invocation of Web Service client.
-            cdaXmlDetails = cdaPort.validateDocument(object, model);
-        } catch (SOAPFaultException e) {
-            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
-        } catch (SOAPException_Exception ex) {
-            LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stacktrace.", ex);
+        if (ValidationService.isRemoteValidationOn()) {
+            try {
+                LOGGER.info("Automated validation for CDA document...");
+                ModelBasedValidationWSService cdaService = new ModelBasedValidationWSService();
+                ModelBasedValidationWS cdaPort = cdaService.getModelBasedValidationWSPort();
+                // Invocation of Web Service client.
+                cdaXmlDetails = cdaPort.validateDocument(object, model);
+            } catch (SOAPFaultException e) {
+                LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
+            } catch (SOAPException_Exception ex) {
+                LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stacktrace.", ex);
+            }
         }
-
         if (!cdaXmlDetails.isEmpty()) {
             return ReportBuilder.build(model, CdaModel.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(cdaXmlDetails), cdaXmlDetails.toString(), ncpSide); // Report generation.
         } else {

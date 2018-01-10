@@ -63,17 +63,17 @@ public class XcaValidationService extends ValidationService {
             LOGGER.error("The specified object to validate is empty.");
             return false;
         }
-
-        try {
-            ModelBasedValidationWSService xdService = new ModelBasedValidationWSService();
-            ModelBasedValidationWS xdPort = xdService.getModelBasedValidationWSPort();
-            xdXmlDetails = xdPort.validateDocument(object, model);
-        } catch (SOAPFaultException e) {
-            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
-        } catch (SOAPException_Exception ex) {
-            LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+        if (ValidationService.isRemoteValidationOn()) {
+            try {
+                ModelBasedValidationWSService xdService = new ModelBasedValidationWSService();
+                ModelBasedValidationWS xdPort = xdService.getModelBasedValidationWSPort();
+                xdXmlDetails = xdPort.validateDocument(object, model);
+            } catch (SOAPFaultException e) {
+                LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
+            } catch (SOAPException_Exception ex) {
+                LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+            }
         }
-
         if (!xdXmlDetails.isEmpty()) {
             return ReportBuilder.build(model, XdModel.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(xdXmlDetails), xdXmlDetails.toString(), ncpSide); // Report generation.
         } else {

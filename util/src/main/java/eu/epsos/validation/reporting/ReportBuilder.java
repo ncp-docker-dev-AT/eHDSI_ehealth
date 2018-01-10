@@ -2,6 +2,7 @@ package eu.epsos.validation.reporting;
 
 import eu.epsos.validation.datamodel.common.DetailedResult;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,8 @@ public class ReportBuilder {
      * @return A boolean flag, indicating if the reporting process succeed or
      * not.
      */
-    public static boolean build(final String model, final String objectType, final String validationObject, final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
+    public static boolean build(final String model, final String objectType, final String validationObject,
+                                final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
 
         LOGGER.info("Build report for '{}' Model for '{}' side", objectType, ncpSide.getName());
         String reportFileName;
@@ -94,18 +96,26 @@ public class ReportBuilder {
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(reportFile.getAbsoluteFile()))) {
 
                 bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-                bw.write("\n");
-                bw.write("<validationReport>");
-                bw.write("\n");
-                bw.write("<validatedObject>");
+                if (ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.remote")) {
+                    bw.write("\n");
+                    bw.write("<validationReport>");
+                    bw.write("\n");
+                    bw.write("<validatedObject>");
+                }
                 bw.write(validationObject.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""));
-                bw.write("</validatedObject>");
+                if (ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.remote")) {
+                    bw.write("</validatedObject>");
+                    bw.write("\n");
+                }
+                if (ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.remote")) {
+                    bw.write("<validationResult>");
+                    bw.write(validationBody);
+                    bw.write("</validationResult>");
+                }
                 bw.write("\n");
-                bw.write("<validationResult>");
-                bw.write(validationBody);
-                bw.write("</validationResult>");
-                bw.write("\n");
-                bw.write("</validationReport>");
+                if (ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.remote")) {
+                    bw.write("</validationReport>");
+                }
 
                 LOGGER.info("Validation report written with success");
                 return true;

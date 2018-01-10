@@ -53,19 +53,19 @@ public class XcpdValidationService extends ValidationService {
             LOGGER.error("The specified model is not supported by the WebService.");
             return false;
         }
-
-        try {
-            LOGGER.info("Automated validation requested to Gazelle eHDSI platform...");
-            ModelBasedValidationWSService hl7Service = new ModelBasedValidationWSService();
-            ModelBasedValidationWS hl7v3Port = hl7Service.getModelBasedValidationWSPort();
-            // Invocation of Web Service client.
-            hl7v3XmlDetails = hl7v3Port.validateDocument(object, model);
-        } catch (SOAPFaultException e) {
-            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
-        } catch (SOAPException_Exception ex) {
-            LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+        if (ValidationService.isRemoteValidationOn()) {
+            try {
+                LOGGER.info("Automated validation requested to Gazelle eHDSI platform...");
+                ModelBasedValidationWSService hl7Service = new ModelBasedValidationWSService();
+                ModelBasedValidationWS hl7v3Port = hl7Service.getModelBasedValidationWSPort();
+                // Invocation of Web Service client.
+                hl7v3XmlDetails = hl7v3Port.validateDocument(object, model);
+            } catch (SOAPFaultException e) {
+                LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
+            } catch (SOAPException_Exception ex) {
+                LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+            }
         }
-
         if (!hl7v3XmlDetails.isEmpty()) {
             return ReportBuilder.build(model, Hl7v3Model.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(hl7v3XmlDetails), hl7v3XmlDetails.toString(), ncpSide); // Report generation.
         } else {

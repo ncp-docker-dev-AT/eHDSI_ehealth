@@ -50,14 +50,16 @@ public class AssertionValidationService extends ValidationService {
             return false;
         }
 
-        try {
-            ModelBasedValidationWSService assertionService = new ModelBasedValidationWSService();
-            ModelBasedValidationWS assertionPort = assertionService.getModelBasedValidationWSPort();
-            xmlDetails = assertionPort.validateDocument(object, model);
-        } catch (SOAPFaultException e) {
-            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
-        } catch (net.ihe.gazelle.jaxb.assertion.SOAPException_Exception ex) {
-            LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+        if (ValidationService.isRemoteValidationOn()) {
+            try {
+                ModelBasedValidationWSService assertionService = new ModelBasedValidationWSService();
+                ModelBasedValidationWS assertionPort = assertionService.getModelBasedValidationWSPort();
+                xmlDetails = assertionPort.validateDocument(object, model);
+            } catch (SOAPFaultException e) {
+                LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
+            } catch (net.ihe.gazelle.jaxb.assertion.SOAPException_Exception ex) {
+                LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+            }
         }
 
         if (!xmlDetails.isEmpty()) {
@@ -80,15 +82,17 @@ public class AssertionValidationService extends ValidationService {
             return false;
         }
 
-        try {
-            GazelleObjectValidatorService objectValidatorService = new GazelleObjectValidatorService();
-            GazelleObjectValidator gazellePort = objectValidatorService.getGazelleObjectValidatorPort();
-            // Invocation of Web Service.
-            xmlDetails = gazellePort.validateObject(DatatypeConverter.printBase64Binary(object.getBytes()), schematron, schematron);
-        } catch (SOAPFaultException e) {
-            LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
-        } catch (SOAPException_Exception | TransformerException_Exception ex) {
-            LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+        if(ValidationService.isRemoteValidationOn()) {
+            try {
+                GazelleObjectValidatorService objectValidatorService = new GazelleObjectValidatorService();
+                GazelleObjectValidator gazellePort = objectValidatorService.getGazelleObjectValidatorPort();
+                // Invocation of Web Service.
+                xmlDetails = gazellePort.validateObject(DatatypeConverter.printBase64Binary(object.getBytes()), schematron, schematron);
+            } catch (SOAPFaultException e) {
+                LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
+            } catch (SOAPException_Exception | TransformerException_Exception ex) {
+                LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace.", ex);
+            }
         }
         LOGGER.info("epSOS Assertion validation result, using '{}' schematron", schematron);
 
