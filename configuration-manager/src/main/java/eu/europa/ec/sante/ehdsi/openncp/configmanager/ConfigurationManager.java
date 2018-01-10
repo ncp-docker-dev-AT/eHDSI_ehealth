@@ -1,5 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.configmanager;
 
+import java.util.Map;
+
 public interface ConfigurationManager {
 
     /**
@@ -7,6 +9,10 @@ public interface ConfigurationManager {
      * @return
      */
     String getProperty(String key);
+
+    String getProperty(String key, boolean checkMap);
+
+    Map<String, String> getProperties();
 
     boolean getBooleanProperty(String key);
 
