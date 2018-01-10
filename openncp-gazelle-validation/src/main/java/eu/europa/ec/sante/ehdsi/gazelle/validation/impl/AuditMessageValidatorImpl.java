@@ -1,10 +1,10 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation.impl;
 
 import eu.europa.ec.sante.ehdsi.gazelle.validation.AuditMessageValidator;
-import net.ihe.gazelle.jaxb.audit.ValidateBase64Document;
-import net.ihe.gazelle.jaxb.audit.ValidateBase64DocumentResponse;
-import net.ihe.gazelle.jaxb.audit.ValidateDocument;
-import net.ihe.gazelle.jaxb.audit.ValidateDocumentResponse;
+import net.ihe.gazelle.jaxb.audit.sante.ValidateBase64Document;
+import net.ihe.gazelle.jaxb.audit.sante.ValidateBase64DocumentResponse;
+import net.ihe.gazelle.jaxb.audit.sante.ValidateDocument;
+import net.ihe.gazelle.jaxb.audit.sante.ValidateDocumentResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;

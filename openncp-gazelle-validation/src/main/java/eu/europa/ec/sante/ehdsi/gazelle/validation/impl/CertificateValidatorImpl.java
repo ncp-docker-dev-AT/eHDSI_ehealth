@@ -1,8 +1,8 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation.impl;
 
 import eu.europa.ec.sante.ehdsi.gazelle.validation.CertificateValidator;
-import net.ihe.gazelle.jaxb.certificate.Validate;
-import net.ihe.gazelle.jaxb.certificate.ValidateResponse;
+import net.ihe.gazelle.jaxb.certificate.sante.Validate;
+import net.ihe.gazelle.jaxb.certificate.sante.ValidateResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ws.client.WebServiceClientException;

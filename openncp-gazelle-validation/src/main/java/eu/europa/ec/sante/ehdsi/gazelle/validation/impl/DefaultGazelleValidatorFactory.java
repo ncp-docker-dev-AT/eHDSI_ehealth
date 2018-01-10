@@ -49,7 +49,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
     @Override
     public AssertionValidator getAssertionValidator() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.assertion");
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.assertion.sante");
 
         return new AssertionValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_ASSERTION_VALIDATOR_URI));
     }
@@ -57,7 +57,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
     @Override
     public AuditMessageValidator getAuditMessageValidator() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.audit");
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.audit.sante");
 
         return new AuditMessageValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI));
     }
@@ -65,14 +65,14 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
     @Override
     public CdaValidator getCdaValidator() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda", "net.ihe.gazelle.jaxb.result");
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda.sante", "net.ihe.gazelle.jaxb.result.sante");
         return new CdaValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_CDA_VALIDATOR_URI));
     }
 
     @Override
     public CertificateValidator getCertificateValidator() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.certificate");
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.certificate.sante");
 
         return new CertificateValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_CERTIFICATE_VALIDATOR_URI));
     }
@@ -80,7 +80,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
     @Override
     public SchematronValidator getSchematronValidator() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.schematron");
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.schematron.sante");
 
         return new SchematronValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_SCHEMATRON_VALIDATOR_URI));
     }
@@ -88,7 +88,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
     @Override
     public XdsValidator getXdsValidator() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.xsd");
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.xsd.sante");
 
         return new XdsValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_XDS_VALIDATOR_URI));
     }

@@ -4,11 +4,11 @@ import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.CdaValidator;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.reporting.ReportBuilder;
-import net.ihe.gazelle.jaxb.cda.ValidateBase64Document;
-import net.ihe.gazelle.jaxb.cda.ValidateBase64DocumentResponse;
-import net.ihe.gazelle.jaxb.cda.ValidateDocument;
-import net.ihe.gazelle.jaxb.cda.ValidateDocumentResponse;
-import net.ihe.gazelle.jaxb.result.DetailedResult;
+import net.ihe.gazelle.jaxb.cda.sante.ValidateBase64Document;
+import net.ihe.gazelle.jaxb.cda.sante.ValidateBase64DocumentResponse;
+import net.ihe.gazelle.jaxb.cda.sante.ValidateDocument;
+import net.ihe.gazelle.jaxb.cda.sante.ValidateDocumentResponse;
+import net.ihe.gazelle.jaxb.result.sante.DetailedResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ws.client.WebServiceClientException;
@@ -27,6 +27,7 @@ public class CdaValidatorImpl extends AbstractValidator implements CdaValidator 
 
     @Override
     public boolean validateDocument(String document, String validator, NcpSide ncpSide) {
+
         ValidateDocument request = new ValidateDocument();
         request.setDocument(document);
         request.setValidator(validator);

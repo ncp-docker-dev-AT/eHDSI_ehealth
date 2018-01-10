@@ -1,8 +1,8 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation.impl;
 
 import eu.europa.ec.sante.ehdsi.gazelle.validation.SchematronValidator;
-import net.ihe.gazelle.jaxb.schematron.ValidateObject;
-import net.ihe.gazelle.jaxb.schematron.ValidateObjectResponse;
+import net.ihe.gazelle.jaxb.schematron.sante.ValidateObject;
+import net.ihe.gazelle.jaxb.schematron.sante.ValidateObjectResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -13,12 +13,13 @@ public class SchematronValidatorImpl extends AbstractValidator implements Schema
 
     private final Logger logger = LoggerFactory.getLogger(SchematronValidatorImpl.class);
 
-    SchematronValidatorImpl(WebServiceTemplate webServiceTemplate) {
+    public SchematronValidatorImpl(WebServiceTemplate webServiceTemplate) {
         super(webServiceTemplate);
     }
 
     @Override
     public boolean validateObject(String base64Object, String xmlReferencedStandard, String xmlMetadata) {
+
         ValidateObject request = new ValidateObject();
         request.setBase64ObjectToValidate(base64Object);
         request.setXmlReferencedStandard(xmlReferencedStandard);

@@ -1,7 +1,7 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation.reporting;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
-import net.ihe.gazelle.jaxb.result.DetailedResult;
+import net.ihe.gazelle.jaxb.result.sante.DetailedResult;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,8 @@ public class ReportBuilder {
      * @return A boolean flag, indicating if the reporting process succeed or
      * not.
      */
-    public static boolean build(final String model, final String objectType, final String validationObject, final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
+    public static boolean build(final String model, final String objectType, final String validationObject,
+                                final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
 
         LOGGER.info("Build report for '{}' Model for '{}' side", objectType, ncpSide.getName());
         String reportFileName;

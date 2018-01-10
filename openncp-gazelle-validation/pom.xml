@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -75,7 +74,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>RELEASE</version>
+            <version>${junit.version}</version>
         </dependency>
     </dependencies>
 
@@ -92,7 +91,10 @@
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
-                            <packageName>net.ihe.gazelle.jaxb.assertion</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.assertion.sante</packageName>
+                            <xjbSources>
+                                <xjbSource>src/main/xjb/bindings.xjb</xjbSource>
+                            </xjbSources>
                             <sourceType>wsdl</sourceType>
                             <sources>
                                 <source>src/main/wsdl/assertion-validator/ModelBasedValidationWS.wsdl</source>
@@ -105,7 +107,10 @@
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
-                            <packageName>net.ihe.gazelle.jaxb.audit</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.audit.sante</packageName>
+                            <xjbSources>
+                                <xjbSource>src/main/xjb/bindings.xjb</xjbSource>
+                            </xjbSources>
                             <sourceType>wsdl</sourceType>
                             <sources>
                                 <source>src/main/wsdl/audit-validator/AuditMessageValidationWS.wsdl</source>
@@ -119,7 +124,10 @@
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
-                            <packageName>net.ihe.gazelle.jaxb.cda</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.cda.sante</packageName>
+                            <xjbSources>
+                                <xjbSource>src/main/xjb/bindings.xjb</xjbSource>
+                            </xjbSources>
                             <sourceType>wsdl</sourceType>
                             <sources>
                                 <source>src/main/wsdl/cda-validator/ModelBasedValidationWS.wsdl</source>
@@ -133,7 +141,10 @@
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
-                            <packageName>net.ihe.gazelle.jaxb.certificate</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.certificate.sante</packageName>
+                            <xjbSources>
+                                <xjbSource>src/main/xjb/bindings.xjb</xjbSource>
+                            </xjbSources>
                             <sourceType>wsdl</sourceType>
                             <sources>
                                 <source>src/main/wsdl/certificate-validator/CertificateValidator.wsdl</source>
@@ -147,7 +158,10 @@
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
-                            <packageName>net.ihe.gazelle.jaxb.schematron</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.schematron.sante</packageName>
+                            <xjbSources>
+                                <xjbSource>src/main/xjb/bindings.xjb</xjbSource>
+                            </xjbSources>
                             <sourceType>wsdl</sourceType>
                             <sources>
                                 <source>src/main/wsdl/schematron-validator/GazelleObjectValidator.wsdl</source>
@@ -161,7 +175,10 @@
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
-                            <packageName>net.ihe.gazelle.jaxb.xds</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.xds.sante</packageName>
+                            <xjbSources>
+                                <xjbSource>src/main/xjb/bindings.xjb</xjbSource>
+                            </xjbSources>
                             <sourceType>wsdl</sourceType>
                             <sources>
                                 <source>src/main/wsdl/xds-validator/ModelBasedValidationWS.wsdl</source>
@@ -175,7 +192,7 @@
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
-                            <packageName>net.ihe.gazelle.jaxb.result</packageName>
+                            <packageName>net.ihe.gazelle.jaxb.result.sante</packageName>
                             <clearOutputDir>false</clearOutputDir>
                         </configuration>
                     </execution>

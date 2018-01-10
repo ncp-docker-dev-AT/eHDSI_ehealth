@@ -34,7 +34,7 @@ public class CdaValidatorTest {
     @Before
     public void setUp() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda", "net.ihe.gazelle.jaxb.result");
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda.sante", "net.ihe.gazelle.jaxb.result.sante");
 
 
         WebServiceTemplate webServiceTemplate = new WebServiceTemplate(marshaller);

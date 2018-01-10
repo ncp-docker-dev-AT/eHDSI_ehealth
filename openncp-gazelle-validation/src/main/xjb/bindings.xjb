@@ -1,8 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+               version="2.0"
+               jaxb:extensionBindingPrefixes="xjc">
 
-<jxb:bindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
-              xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" version="2.1">
-    <jxb:globalBindings>
+    <jaxb:globalBindings>
         <xjc:simple/>
-    </jxb:globalBindings>
-</jxb:bindings>
+    </jaxb:globalBindings>
+</jaxb:bindings>
