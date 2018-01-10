@@ -1,0 +1,27 @@
+debug: false
+logging:
+  level:
+     org.springframework.web.client: DEBUG
+openncp:
+  truststore:
+    #Path to your Truststore
+    path: /opt/ehealth-openncp/openncp-configuration/keystore/truststore.jks
+    #Password of your Truststore
+    password: changeit
+  signature:
+    path: /opt/ehealth-openncp/openncp-configuration/keystore/signature-keystore.jks
+    password: changeit
+    alias: ncp-signature.openncp.alias.key
+  consumer:
+    path: /opt/ehealth-openncp/openncp-configuration/keystore/eu-service-consumer-keystore.jks
+    password: MyKeystorePwd
+    alias: ppt.ncp-sc.openncp.alias.key
+  provider:
+    path: /opt/ehealth-openncp/openncp-configuration/keystore/service-provider-keystore.jks
+    password: MyKeystorePwd
+    alias: ppt.ncp-sp.openncp.alias.key
+  sml:
+    #SML Domain name: Testa-> ehealth.testa.eu OR Internet-> ehealth.edelivery.tech.ec.europa.eu
+    domain: ehealth.testa.eu
+    #Iso code of the country that you want to fetch
+    country: fi

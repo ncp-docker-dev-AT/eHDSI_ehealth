@@ -16,6 +16,7 @@
 
     <modules>
         <module>openncp-configuration-utility</module>
+        <module>openncp-discovery-client</module>
     </modules>
 
     <build>
