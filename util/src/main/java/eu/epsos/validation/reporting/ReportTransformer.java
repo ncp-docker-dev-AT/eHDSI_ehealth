@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+@Deprecated
 public class ReportTransformer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportTransformer.class);

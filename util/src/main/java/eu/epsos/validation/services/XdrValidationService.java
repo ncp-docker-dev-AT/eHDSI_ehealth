@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
+@Deprecated
 public class XdrValidationService extends ValidationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XdrValidationService.class);

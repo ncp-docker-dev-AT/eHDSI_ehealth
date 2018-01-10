@@ -22,6 +22,7 @@ import javax.xml.ws.soap.SOAPFaultException;
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
+@Deprecated
 public class AssertionValidationService extends ValidationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionValidationService.class);

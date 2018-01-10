@@ -30,6 +30,7 @@ import java.io.File;
 /**
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
+@Deprecated
 public class ValidationReport {
 
     private static final Logger LOG = LoggerFactory.getLogger(ValidationReport.class);

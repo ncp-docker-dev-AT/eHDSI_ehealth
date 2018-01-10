@@ -17,6 +17,7 @@ import javax.xml.ws.soap.SOAPFaultException;
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
+@Deprecated
 public class XcaValidationService extends ValidationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XcaValidationService.class);
