@@ -64,6 +64,7 @@
 
     <xsl:template name="show-package">
         <xsl:param name="medPackage"/>
+        <xsl:param name="showValue"/>
         <xsl:choose>
             <xsl:when test="($medPackage/@nullFlavor)">
                 <xsl:call-template name="show-noneFlavor">
@@ -71,7 +72,11 @@
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="translate(($medPackage)/@value, '.', ',')"/>
+                <xsl:choose>
+                    <xsl:when test="$showValue='YES'">
+                        <xsl:value-of select="translate(($medPackage)/@value, '.', ',')"/>
+                    </xsl:when>
+                </xsl:choose>
                 <xsl:text> </xsl:text>
                 <xsl:choose>
                     <xsl:when test="($medPackage/@unit)='1'">
