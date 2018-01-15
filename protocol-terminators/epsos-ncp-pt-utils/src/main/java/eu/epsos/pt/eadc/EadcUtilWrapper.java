@@ -43,8 +43,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
+import javax.xml.namespace.QName;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.opensaml.saml2.core.AuthnStatement;
+import org.opensaml.saml2.core.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class wraps the EADC invocation. As it gathers several aspects required
@@ -54,6 +62,8 @@ import java.util.UUID;
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
 public class EadcUtilWrapper {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(EadcUtilWrapper.class);
 
     private EadcUtilWrapper() {
     }
@@ -95,29 +105,34 @@ public class EadcUtilWrapper {
                                                         Date endTime, String countryAcode) throws Exception {
 
         TransactionInfo result = new ObjectFactory().createComplexTypeTransactionInfo();
-        result.setAuthentificationLevel("");
+        result.setAuthentificationLevel(extractAuthenticationMethodFromAssertion(getAssertion(reqMsgContext)));
         result.setDirection(direction.toString());
         result.setStartTime(getDateAsRFC822String(startTime));
         result.setEndTime(getDateAsRFC822String(endTime));
         result.setDuration(String.valueOf(endTime.getTime() - startTime.getTime()));
 
         result.setHomeAddress(EventLogClientUtil.getLocalIpAddress());
+        result.setSndISO(Constants.COUNTRY_CODE);
+        result.setSndNCPOID(Constants.HOME_COMM_ID);
 
         if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getFrom() != null && reqMsgContext.getOptions().getFrom().getAddress() != null) {
             result.setHomeHost(reqMsgContext.getOptions().getFrom().getAddress());
         }
+
+        /* we cannot get the MessageID from the reqMsgContext, it returns a wrong one. 
+        Probably related to how the Axis2 engine sets the MessageID, similar issues 
+        were faced during the Evidence Emitter refactoring */
+        result.setSndMsgID(reqMsgContext != null ? getMessageID(reqMsgContext.getEnvelope()) : null);
         result.setHomeHCID(Constants.HOME_COMM_ID);
         result.setHomeISO(Constants.COUNTRY_CODE);
         result.setHomeNCPOID("");
 
-        result.setHumanRequestor(extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xacml:1.0:subject:subject-id"));
+        result.setHumanRequestor(extractNameIdFromAssertion(getAssertion(reqMsgContext)));
+        result.setUserId(extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xacml:1.0:subject:subject-id"));
 
-        if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getUserName() != null) {
-            result.setUserId(reqMsgContext.getOptions().getUserName());
-        }
-
-        result.setPOC(extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type"));
-        result.setPOCID("");
+        result.setPOC(extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
+                      extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type") + ")");
+        result.setPOCID(extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:subject:organization-id"));
 
         result.setReceivingISO(countryAcode);
         if (serviceClient != null && serviceClient.getOptions() != null && serviceClient.getOptions().getTo() != null && serviceClient.getOptions().getTo().getAddress() != null) {
@@ -133,6 +148,7 @@ public class EadcUtilWrapper {
         if (reqMsgContext != null && reqMsgContext.getOperationContext() != null && reqMsgContext.getOperationContext().getServiceName() != null) {
             result.setServiceName(reqMsgContext.getOperationContext().getServiceName());
         }
+        result.setReceivingMsgID(rspMsgContext != null ? rspMsgContext.getOptions().getMessageId() : null);
         result.setServiceType(null);
         result.setTransactionCounter("");
         result.setTransactionPK(UUID.randomUUID().toString());
@@ -187,7 +203,7 @@ public class EadcUtilWrapper {
         return attributeValue;
 
     }
-
+    
     /**
      * Utility method to convert a specific date to the RFC 2822 format.
      *
@@ -238,5 +254,51 @@ public class EadcUtilWrapper {
         String xmlStr = new String(documentData, "UTF-8");
         xmlDocument = XMLUtil.parseContent(xmlStr);
         return xmlDocument;
+    }
+    
+    /**
+     * Extracts the HP Authentication Method from the given Assertion.
+     * All AuthN methods start with "urn:oasis:names:tc:SAML:2.0:ac:classes", e.g.
+     * "urn:oasis:names:tc:SAML:2.0:ac:classes:Password", so we just extract the last portion.
+     * 
+     * @param idAssertion the Identity Assertion
+     * @return a string containing the authentication method
+     */
+    private static String extractAuthenticationMethodFromAssertion(Assertion idAssertion) {
+        if (!idAssertion.getAuthnStatements().isEmpty()) {
+            AuthnStatement authnStatement = idAssertion.getAuthnStatements().get(0);
+            String authnContextClassRef = authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
+            return authnContextClassRef.substring(authnContextClassRef.lastIndexOf(":")+1);
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Extracts the Subject NameID from the given Assertion.
+     * 
+     * @param idAssertion the Identity Assertion
+     * @return string containing the assertion's Subject NameID
+     */
+    private static String extractNameIdFromAssertion(Assertion idAssertion) {
+        return idAssertion.getSubject().getNameID().getValue();
+    }
+    
+    /**
+     * Copied from *_ServiceMessageReceiverInOut.java
+     * It returns the MessageID directly from the SOAP Envelope.
+     * 
+     * @param envelope The SOAP envelope
+     * @return The message ID
+     */
+    private static String getMessageID(SOAPEnvelope envelope) {
+
+        Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(new QName("http://www.w3.org/2005/08/addressing", "MessageID"));
+        if (it.hasNext()) {
+            return it.next().getText();
+        } else {
+            // [Mustafa: May 8, 2012]: Should not be empty string, sch. giveserror.
+            return Constants.UUID_PREFIX;
+        }
     }
 }
