@@ -389,7 +389,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
                 try {
                     EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                            endTime, "", EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND);
+                            endTime, "", EadcEntry.DsTypes.XCPD, EadcUtil.Direction.INBOUND);
                 } catch (Exception ex) {
                     LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
                 }
