@@ -293,9 +293,9 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
         }
     }
 
-    private String getIPofSender(MessageContext msgContext) {
+    private String getIPofSender(MessageContext messageContext) {
 
-        return (String) msgContext.getProperty("REMOTE_ADDR");
+        return (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
     }
 
     private String getMessageID(SOAPEnvelope envelope) {

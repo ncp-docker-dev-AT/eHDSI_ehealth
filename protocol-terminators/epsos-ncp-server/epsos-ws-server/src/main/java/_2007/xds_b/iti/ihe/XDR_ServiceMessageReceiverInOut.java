@@ -112,8 +112,9 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         }
     }
 
-    private String getIPofSender(org.apache.axis2.context.MessageContext msgContext) {
-        return (String) msgContext.getProperty("REMOTE_ADDR");
+    private String getIPofSender(MessageContext messageContext) {
+
+        return (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
     }
 
     private String getMessageID(org.apache.axiom.soap.SOAPEnvelope envelope) {

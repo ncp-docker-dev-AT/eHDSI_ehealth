@@ -151,9 +151,9 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         }
     }
 
-    private String getIPofSender(MessageContext msgContext) {
+    private String getIPofSender(MessageContext messageContext) {
 
-        return (String) msgContext.getProperty("REMOTE_ADDR");
+        return (String)messageContext.getProperty(MessageContext.REMOTE_ADDR);
     }
 
     private String getMessageID(SOAPEnvelope envelope) {
