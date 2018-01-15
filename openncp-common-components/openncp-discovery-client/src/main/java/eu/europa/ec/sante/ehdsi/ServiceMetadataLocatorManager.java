@@ -308,60 +308,60 @@ public class ServiceMetadataLocatorManager {
             KeyStore ks = KeyStore.getInstance("JKS");
 
             File file = new File(KEYSTORE_PATH);
-            FileInputStream fileInputStream = new FileInputStream(file);
-            ks.load(fileInputStream, KEYSTORE_PASSWORD.toCharArray());
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                ks.load(fileInputStream, KEYSTORE_PASSWORD.toCharArray());
 
-            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
-                    .locator(new DefaultBDXRLocator(SML_DOMAIN, new DefaultDNSLookup()))
-                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
-                    .build();
+                DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+                        .locator(new DefaultBDXRLocator(SML_DOMAIN, new DefaultDNSLookup()))
+                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
+                        .build();
 
-            DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
-            //DocumentIdentifier documentIdentifier = new DocumentIdentifier(documentType, DOCUMENT_IDENTIFIER_SCHEME);
-            ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(PARTICIPANT_IDENTIFIER, PARTICIPANT_IDENTIFIER_SCHEME);
+                DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
+                //DocumentIdentifier documentIdentifier = new DocumentIdentifier(documentType, DOCUMENT_IDENTIFIER_SCHEME);
+                ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(PARTICIPANT_IDENTIFIER, PARTICIPANT_IDENTIFIER_SCHEME);
 
-            ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
-            LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
-            ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation()
-                    .getProcessList();
-            for (ProcessType processType : processListType.getProcess()) {
+                ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
+                LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
+                ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation()
+                        .getProcessList();
+                for (ProcessType processType : processListType.getProcess()) {
 
-                LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier()
-                        .getScheme());
-                ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
-                for (EndpointType endpointType : serviceEndpointList.getEndpoint()) {
-                    LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
-                }
-                List<EndpointType> endpoints = serviceEndpointList.getEndpoint();
+                    LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier()
+                            .getScheme());
+                    ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
+                    for (EndpointType endpointType : serviceEndpointList.getEndpoint()) {
+                        LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
+                    }
+                    List<EndpointType> endpoints = serviceEndpointList.getEndpoint();
 
-                /*
-                 * Constraint: here I think I have just one endpoint
-                 */
-                int size = endpoints.size();
-                if (size != 1) {
-                    throw new Exception(
-                            "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
-                }
+                    /*
+                     * Constraint: here I think I have just one endpoint
+                     */
+                    int size = endpoints.size();
+                    if (size != 1) {
+                        throw new Exception(
+                                "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
+                    }
 
-                EndpointType e = endpoints.get(0);
-                String address = e.getEndpointURI();
-                if (address == null) {
-                    // throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
-                    throw new Exception("No address found for");
-                }
-                URL urlAddress = new URL(address);
+                    EndpointType e = endpoints.get(0);
+                    String address = e.getEndpointURI();
+                    if (address == null) {
+                        // throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
+                        throw new Exception("No address found for");
+                    }
+                    URL urlAddress = new URL(address);
 
-                InputStream inStream = new ByteArrayInputStream(e.getCertificate());
-                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
+                    InputStream inStream = new ByteArrayInputStream(e.getCertificate());
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                    X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
 
-                if (certificate == null) {
-                    throw new Exception("no certificate found for endpoint: " + e.getEndpointURI());
-                }
-                LOGGER.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
+                    if (certificate == null) {
+                        throw new Exception("no certificate found for endpoint: " + e.getEndpointURI());
+                    }
+                    LOGGER.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
 //                setAddress(urlAddress);
 //                setCertificate(certificate);
-            }
+                }
 
 //            URL endpointUrl = getAddress();
 //            if (endpointUrl == null) {
@@ -377,6 +377,7 @@ public class ServiceMetadataLocatorManager {
 //                String endpointId = countryCode.toLowerCase() + "_" + StringUtils.substringAfter(documentType, "##");
 //                storeEndpointCertificate(endpointId, certificate);
 //            }
+            }
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
             // throw new ConfigurationManagerException(e);
