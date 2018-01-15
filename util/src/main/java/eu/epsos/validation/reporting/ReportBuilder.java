@@ -1,13 +1,19 @@
 package eu.epsos.validation.reporting;
 
+import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.DetailedResult;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -30,15 +36,13 @@ public class ReportBuilder {
     }
 
     /**
-     * This is the main operation in the report building process. It main
-     * responsibility is to generate a report based on a supplied model,
-     * validation object and detailed result.
+     * This is the main operation in the report building process. It main responsibility is to generate a report based
+     * on a supplied model, validation object and detailed result.
      *
      * @param model            the model used in the Web Service invocation.
      * @param validationObject the validated object.
      * @param validationResult the validation result.
-     * @return A boolean flag, indicating if the reporting process succeed or
-     * not.
+     * @return A boolean flag, indicating if the reporting process succeed or not.
      */
     public static boolean build(final String model, final String objectType, final String validationObject,
                                 final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
@@ -102,7 +106,25 @@ public class ReportBuilder {
                     bw.write("\n");
                     bw.write("<validatedObject>");
                 }
-                bw.write(validationObject.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""));
+                //  Validation Service Model
+                String object = validationObject.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
+
+                LOGGER.info("[Report Builder]\n{}", object);
+                if (EnumUtils.isValidEnum(CdaModel.class, model)) {
+                    Node objectNode = XMLUtil.stringToNode(object);
+                    try {
+                        object = XMLUtil.prettyPrintForValidation(objectNode);
+                    } catch (TransformerException | XPathExpressionException e) {
+                        LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
+                    }
+                }
+                bw.write(object);
+                /*
+                    ART_DECOR_CDA_PIVOT("eHDSI - ART-DECOR based CDA validation (PIVOT)"),
+                    ART_DECOR_CDA_FRIENDLY("eHDSI - ART-DECOR based CDA validation (FRIENDLY)"),
+                    ART_DECOR_SCANNED("eHDSI - ART-DECOR based Scanned Document"),
+                */
+
                 if (ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.remote")) {
                     bw.write("</validatedObject>");
                     bw.write("\n");
@@ -160,6 +182,9 @@ public class ReportBuilder {
         if (validationTestResult != null && !validationTestResult.isEmpty()) {
             fileName.append(SEPARATOR);
             fileName.append(validationTestResult.toUpperCase());
+        } else {
+            fileName.append(SEPARATOR);
+            fileName.append("NOT-TESTED");
         }
 
         fileName.append(FILE_EXTENSION);

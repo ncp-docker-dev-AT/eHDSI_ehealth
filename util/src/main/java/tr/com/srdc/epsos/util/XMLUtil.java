@@ -27,6 +27,7 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -52,6 +53,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -345,5 +347,17 @@ public class XMLUtil {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return ret;
+    }
+
+    public static Node stringToNode(String xml) throws IOException {
+
+        try {
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+                    new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8")))).getDocumentElement();
+        } catch (SAXException | ParserConfigurationException e) {
+            return null;
+        }
+
+
     }
 }

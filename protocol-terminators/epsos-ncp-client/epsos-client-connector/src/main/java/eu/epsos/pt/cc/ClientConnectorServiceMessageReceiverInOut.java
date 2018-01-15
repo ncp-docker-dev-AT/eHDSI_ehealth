@@ -4,8 +4,6 @@ import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.saml.AssertionSchematron;
 import eu.epsos.validation.services.AssertionValidationService;
-import eu.europa.ec.sante.ehdsi.gazelle.validation.AssertionValidator;
-import eu.europa.ec.sante.ehdsi.gazelle.validation.GazelleValidatorFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -39,15 +37,16 @@ import java.util.Map;
  */
 public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
-    protected static final Logger LOG = LoggerFactory.getLogger(ClientConnectorServiceMessageReceiverInOut.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorServiceMessageReceiverInOut.class);
 
     static {
-        LOG.debug("Loading the WS-Security init libraries in ClientConnectorServiceMessageReceiverInOut 2009");
+        LOGGER.debug("Loading the WS-Security init libraries in ClientConnectorServiceMessageReceiverInOut 2009");
         org.apache.xml.security.Init.init(); // Joao added 10/03/2017. 
     }
 
     @Override
     public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
+
         SOAPEnvelope reqEnv = msgContext.getEnvelope();
         String operationName = msgContext.getOperationContext().getOperationName();
 
@@ -56,11 +55,11 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
          */
         try {
             String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv));
-            LOG.debug("Incoming " + operationName + " request message from portal:"
+            LOGGER.debug("Incoming " + operationName + " request message from portal:"
                     + System.getProperty("line.separator") + logRequestMsg);
 
         } catch (Exception ex) {
-            LOG.debug(ex.getLocalizedMessage(), ex);
+            LOGGER.debug(ex.getLocalizedMessage(), ex);
         }
 
         /*
@@ -104,8 +103,10 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 /*
                  * Call to service
                  */
+                //  Submit Document
                 if ("submitDocument".equals(methodName)) {
-//                    SAML2Validator.validateXDRHeader(soapHeader, Constants.CONSENT_CLASSCODE);
+
+                    // SAML2Validator.validateXDRHeader(soapHeader, Constants.CONSENT_CLASSCODE);
                     Assertion hcpAssertion = null;
                     Assertion trcAssertion = null;
                     for (Assertion ass : assertions) {
@@ -116,20 +117,6 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                         }
                     }
 
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv)),
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                "PORTAL_XDR_REQ",
-//                                new DateTime(),
-//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                "PORTAL_XDR_REQ_RECEIVED");
-//
-//                    } catch (Exception e) {
-//                        LOG.error(ExceptionUtils.getStackTrace(e));
-//                    }
-
                     SubmitDocumentResponseDocument submitDocumentResponse11;
                     SubmitDocumentDocument1 wrappedParam;
                     wrappedParam = (SubmitDocumentDocument1) fromOM(reqEnv.getBody().getFirstElement(),
@@ -139,23 +126,11 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), submitDocumentResponse11);
 
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                "NCPB_XDR_RES",
-//                                new DateTime(),
-//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                "NCPB_XDR_RES_SENT");
-//
-//                    } catch (Exception e) {
-//                        LOG.error(ExceptionUtils.getStackTrace(e));
-//                    }
+                }
+                //  Query Patient
+                else if ("queryPatient".equals(methodName)) {
 
-                    /* Query Patient */
-                } else if ("queryPatient".equals(methodName)) {
-//                    SAML2Validator.validateXCPDHeader(soapHeader);
+                    //  SAML2Validator.validateXCPDHeader(soapHeader);
                     Assertion hcpAssertion = null;
                     for (Assertion ass : assertions) {
                         hcpAssertion = ass;
@@ -164,26 +139,19 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                         }
                     }
 
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv)),
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                "PORTAL_PD_REQ",
-//                                new DateTime(),
-//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                "PORTAL_PD_REQ_RECEIVED",
-//                                hcpAssertion.getID() + "__" + DateUtil.getCurrentTimeGMT());
+                    String assertionsSTR = DatatypeConverter.printBase64Binary(XMLUtil.prettyPrint(hcpAssertion.getDOM()).getBytes());
+//                    LOGGER.info("[Validation Service: Assertion Validator: '{}']", ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.new"));
+//                    if (ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.new")) {
 //
-//                    } catch (Exception e) {
-//                        LOG.error(ExceptionUtils.getStackTrace(e));
+//                        SchematronValidator schematronValidator = GazelleValidatorFactory.getSchematronValidator();
+//                        boolean validated = schematronValidator.validateObject(XMLUtil.prettyPrint(hcpAssertion.getDOM()), AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString(), NcpSide.NCP_B.getName());
+//
+//                        LOGGER.info("[Validation Service: Assertion Validator: '{}']", validated);
+//                        //                        AssertionValidator assertionValidator = GazelleValidatorFactory.getAssertionValidator();
+////                        assertionValidator.validateBase64Document(assertionsSTR, AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString());
 //                    }
+
                     if (StringUtils.equalsIgnoreCase(ConfigurationManagerFactory.getConfigurationManager().getProperty("automated.validation"), "true")) {
-
-                        String assertionsSTR = DatatypeConverter.printBase64Binary(XMLUtil.prettyPrint(hcpAssertion.getDOM()).getBytes());
-
-                        AssertionValidator assertionValidator = GazelleValidatorFactory.getAssertionValidator();
-                        assertionValidator.validateBase64Document(assertionsSTR, AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString());
 
                         AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
                                 AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString(), NcpSide.NCP_B);
@@ -195,23 +163,9 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 
                     QueryPatientResponseDocument queryPatientResponse13 = skel.queryPatient(wrappedParam, hcpAssertion);
                     envelope = toEnvelope(getSOAPFactory(msgContext), queryPatientResponse13);
-
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                "NCPB_PD_RES",
-//                                new DateTime(),
-//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                "NCPB_PD_RES_SENT",
-//                                hcpAssertion.getID() + "__" + DateUtil.getCurrentTimeGMT());
-//                    } catch (Exception e) {
-//                        LOG.error(ExceptionUtils.getStackTrace(e));
-//                    }
-
-                    /* Say hello */
-                } else if ("sayHello".equals(methodName)) {
+                }
+                // Say hello
+                else if ("sayHello".equals(methodName)) {
                     SayHelloResponseDocument sayHelloResponse15;
                     SayHelloDocument wrappedParam;
                     wrappedParam = (SayHelloDocument) fromOM(reqEnv.getBody().getFirstElement(),
@@ -220,10 +174,11 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                     sayHelloResponse15 = skel.sayHello(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), sayHelloResponse15);
+                }
+                // Query Documents
+                else if ("queryDocuments".equals(methodName)) {
 
-                    /* Query Documents */
-                } else if ("queryDocuments".equals(methodName)) {
-//                    SAML2Validator.validateXCAHeader(soapHeader, Constants.PS_CLASSCODE);
+                    //  SAML2Validator.validateXCAHeader(soapHeader, Constants.PS_CLASSCODE);
                     Assertion hcpAssertion = null;
                     Assertion trcAssertion = null;
                     String assertionSchematron = null;
@@ -236,22 +191,6 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                             assertionSchematron = AssertionSchematron.EPSOS_TRC_ASSERTION.toString();
                         }
                     }
-
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv)),
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                "PORTAL_DQ_REQ",
-//                                new DateTime(),
-//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                "PORTAL_DQ_REQ_RECEIVED",
-//                                hcpAssertion.getID() + "__" + DateUtil.getCurrentTimeGMT());
-//
-//                    } catch (Exception e) {
-//                        LOG.error(ExceptionUtils.getStackTrace(e));
-//                    }
-
                     AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()), assertionSchematron
                             , NcpSide.NCP_B);
 
@@ -264,27 +203,11 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                     queryDocumentsResponse17 = skel.queryDocuments(wrappedParam, hcpAssertion, trcAssertion);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), queryDocumentsResponse17);
+                }
+                //  Retrieve Document
+                else if ("retrieveDocument".equals(methodName)) {
 
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                "NCPB_DQ_RES",
-//                                new DateTime(),
-//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                "NCPB_DQ_RES_SENT",
-//                                hcpAssertion.getID() + "__" + DateUtil.getCurrentTimeGMT());
-//
-//                    } catch (Exception e) {
-//                        LOG.error(ExceptionUtils.getStackTrace(e));
-//                    }
-
-                    /*
-                     * Retrieve Document
-                     */
-                } else if ("retrieveDocument".equals(methodName)) {
-//                    SAML2Validator.validateXCAHeader(soapHeader, Constants.PS_CLASSCODE);
+                    //  SAML2Validator.validateXCAHeader(soapHeader, Constants.PS_CLASSCODE);
                     Assertion hcpAssertion = null;
                     Assertion trcAssertion = null;
                     String assertionSchematron = null;
@@ -298,20 +221,6 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                         }
                     }
 
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv)),
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                "PORTAL_DR_REQ",
-//                                new DateTime(),
-//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                "PORTAL_DR_REQ_RECEIVED",
-//                                hcpAssertion.getID() + "__" + DateUtil.getCurrentTimeGMT());
-//                    } catch (Exception e) {
-//                        LOG.error(ExceptionUtils.getStackTrace(e));
-//                    }
-
                     AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
                             assertionSchematron, NcpSide.NCP_B);
 
@@ -323,25 +232,8 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                     retrieveDocumentResponse19 = skel.retrieveDocument(wrappedParam, hcpAssertion, trcAssertion);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), retrieveDocumentResponse19);
-
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                "NCPB_DR_RES",
-//                                new DateTime(),
-//                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                                "NCPB_DR_RES_SENT",
-//                                hcpAssertion.getID() + "__" + DateUtil.getCurrentTimeGMT());
-//
-//                    } catch (Exception e) {
-//                        LOG.error(ExceptionUtils.getStackTrace(e));
-//                    }
-                    /*
-                     * Else
-                     */
                 } else {
+                    // Else Method not Available
                     throw new java.lang.RuntimeException("method not found");
                 }
 
@@ -350,32 +242,18 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                  */
                 try {
                     String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope));
-                    LOG.debug("Outgoing " + operationName + " response message to portal:"
+                    LOGGER.debug("Outgoing " + operationName + " response message to portal:"
                             + System.getProperty("line.separator") + logRequestMsg);
 
                 } catch (Exception ex) {
-                    LOG.debug(ex.getLocalizedMessage(), ex);
-//                    try {
-//                        EvidenceUtils.createEvidenceREMNRO(XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)),
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                "PORTAL_RES",
-//                                new DateTime(),
-//                                EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
-//                                "PORTAL_RES_SENT",
-//                                mainHcpAssertion.getID() + "__" + DateUtil.getCurrentTimeGMT());
-//
-//                    } catch (Exception e) {
-//                        LOG.error(ExceptionUtils.getStackTrace(e));
-//                    }
+                    LOGGER.debug(ex.getLocalizedMessage(), ex);
                 }
                 newMsgContext.setEnvelope(envelope);
             }
 
         } catch (java.lang.Exception e) {
 
-            LOG.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
             throw AxisFault.makeFault(e);
         }
     }
@@ -558,9 +436,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 if (extraNamespaces != null) {
                     XMLStreamReader xmlStreamReaderWithoutCaching = param.getXMLStreamReaderWithoutCaching();
                     XmlOptions setLoadAdditionalNamespaces = new XmlOptions().setLoadAdditionalNamespaces(extraNamespaces);
-                    SayHelloDocument parse = SayHelloDocument.Factory.parse(xmlStreamReaderWithoutCaching, setLoadAdditionalNamespaces);
-
-                    return parse;
+                    return SayHelloDocument.Factory.parse(xmlStreamReaderWithoutCaching, setLoadAdditionalNamespaces);
 
                 } else {
                     return SayHelloDocument.Factory.parse(
