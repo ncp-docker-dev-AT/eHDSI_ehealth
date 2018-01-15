@@ -11,6 +11,7 @@ import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -323,7 +324,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     );
                     logg.setEventType(EventType.epsosPivotTranslation);
                     LOGGER.info("Write AuditTrail: '{}'", logg.getEventType());
-                    new AuditService().write(logg, config.getAuditTrailFacility(), config.getAuditTrailSeverity());
+                    AuditServiceFactory.getInstance().write(logg, config.getAuditTrailFacility(), config.getAuditTrailSeverity());
                 } catch (Exception e) {
                     LOGGER.error("Audit trail ERROR! ", e);
                 }

@@ -52,6 +52,7 @@ import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XdrValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -181,7 +182,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
-                    AuditService auditService = new AuditService();
+                    AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
                     /* Validate outgoing response */

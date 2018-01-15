@@ -24,6 +24,7 @@ import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import net.ihe.gazelle.medication.NullFlavor;
@@ -1239,7 +1240,7 @@ public class EpsosHelperService {
         String ET_ObjectID = "urn:uuid:" + message;
         byte[] ResM_PatricipantObjectDetail = new byte[1];
 
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;

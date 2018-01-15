@@ -850,8 +850,8 @@ public enum AuditTrailUtils {
 
         ParticipantObjectIdentificationType poit = new ParticipantObjectIdentificationType();
         poit.setParticipantObjectID(PS_PatricipantObjectID);
-        poit.setParticipantObjectTypeCode(new Short(PS_TypeCode));
-        poit.setParticipantObjectTypeCodeRole(new Short(PS_TypeRole)); // short
+        poit.setParticipantObjectTypeCode(PS_TypeCode);
+        poit.setParticipantObjectTypeCodeRole(PS_TypeRole);
         poit.setParticipantObjectName(PS_Name);
         CodedValueType PS_object = new CodedValueType();
         PS_object.setCode(PS_ObjectCode);
@@ -918,6 +918,7 @@ public enum AuditTrailUtils {
 
         LOGGER.info("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", am.toString(), ET_ObjectID,
                 ObjectTypeCode, ObjectDataLifeCycle, EM_Code, EM_CodeSystemName, EM_DisplayName);
+
         ParticipantObjectIdentificationType em = new ParticipantObjectIdentificationType();
         em.setParticipantObjectID(ET_ObjectID);
         em.setParticipantObjectTypeCode(ObjectTypeCode);
@@ -930,6 +931,7 @@ public enum AuditTrailUtils {
         EM_object.setDisplayName(EM_DisplayName);
         em.setParticipantObjectIDTypeCode(EM_object);
         am.getParticipantObjectIdentification().add(em);
+
         return am;
     }
 
@@ -949,10 +951,10 @@ public enum AuditTrailUtils {
             addEventIdentification(am, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
                     eventLog.getEI_EventOutcomeIndicator());
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS", "epSOS Service Consumer",
-                    eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
-                    eventLog.getTargetip());
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS",
+                    "epSOS Service Consumer", eventLog.getSourceip());
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS",
+                    "epSOS Service Provider", eventLog.getTargetip());
             addAuditSource(am, eventLog.getAS_AuditSourceId());
             addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
                     new Short("3"), "9", "errormsg");

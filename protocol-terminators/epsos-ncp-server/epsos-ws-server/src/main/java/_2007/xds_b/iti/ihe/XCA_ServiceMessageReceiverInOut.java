@@ -87,6 +87,7 @@ import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XcaValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -223,7 +224,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
 
-                    AuditService auditService = new AuditService();
+                    AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
                     /* Validate outgoing query response */
@@ -255,7 +256,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
 
-                    AuditService auditService = new AuditService();
+                    AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));

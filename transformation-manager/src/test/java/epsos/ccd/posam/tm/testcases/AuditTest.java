@@ -1,6 +1,7 @@
 package epsos.ccd.posam.tm.testcases;
 
 import epsos.ccd.gnomon.auditmanager.*;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import junit.framework.TestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class AuditTest extends TestCase {
                     new byte[0], "");
             logg.setEventType(EventType.epsosPivotTranslation);
             //AuditMessage am = AuditTrailUtils.getInstance().createAuditMessage(logg);
-            boolean result = new AuditService().write(logg, "testfacility", "testseverity");
+            boolean result = AuditServiceFactory.getInstance().write(logg, "testfacility", "testseverity");
             assertTrue(result);
         } catch (DatatypeConfigurationException e) {
             LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
