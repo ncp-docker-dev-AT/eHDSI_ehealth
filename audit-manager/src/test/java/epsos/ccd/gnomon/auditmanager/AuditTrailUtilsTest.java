@@ -1,27 +1,6 @@
-/***Licensed to the Apache Software Foundation (ASF) under one
- *or more contributor license agreements.  See the NOTICE file
- *distributed with this work for additional information
- *regarding copyright ownership.  The ASF licenses this file
- *to you under the Apache License, Version 2.0 (the
- *"License"); you may not use this file except in compliance
- *with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- *Unless required by applicable law or agreed to in writing,
- *software distributed under the License is distributed on an
- *"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *KIND, either express or implied.  See the License for the
- *specific language governing permissions and limitations
- *under the License.
- **/
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package epsos.ccd.gnomon.auditmanager;
 
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,18 +18,18 @@ import java.util.GregorianCalendar;
  */
 public class AuditTrailUtilsTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuditTrailUtilsTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuditTrailUtilsTest.class);
 
     public AuditTrailUtilsTest() {
     }
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
         //HibernateConfigFile.name = "src/test/resources/configmanager.hibernate.xml";
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
     }
 
     @Before
@@ -70,22 +49,22 @@ public class AuditTrailUtilsTest {
             // Close the output stream
             out.close();
         } catch (Exception e) {// Catch exception if any
-            logger.error("Error: {}", e.getMessage(), e);
+            LOGGER.error("Error: {}", e.getMessage(), e);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosPACService() {
-        logger.info("########## createAuditMessage for PAC");
+        LOGGER.info("########## createAuditMessage for PAC");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
         EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosPACRetrieve,
                 EventActionCode.QUERY, date2, EventOutcomeIndicator.FULL_SUCCESS,
@@ -107,22 +86,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(10000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosConsentServicePin() {
-        logger.info("########### createAuditMessage for Consent Service PIN");
+        LOGGER.info("########### createAuditMessage for Consent Service PIN");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogConsentPINdny(TransactionName.epsosConsentServicePin,
@@ -137,66 +116,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
-    // @Test
-    // public void testCreateAuditMessage_epsosCommunicationFailure() {
-    // logger.info("createAuditMessage for comm failure");
-    // //
-    // AuditService asd = new AuditService();
-    // GregorianCalendar c = new GregorianCalendar();
-    // c.setTime(new Date());
-    // XMLGregorianCalendar date2 = null;
-    // try {
-    // date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-    // } catch (DatatypeConfigurationException ex) {
-    //
-    // }
-    //
-    //
-    //
-    // EventLog eventLog1 = EventLog.createEventLogCommunicationFailure(
-    // TransactionName.epsosCommunicationFailure,
-    // EventActionCode.QUERY,
-    // date2,
-    // EventOutcomeIndicator.FULL_SUCCESS,
-    //
-    // "PC_USERID","Hospital","aaa","dentist","AT","Vienna AKH",null,null,
-    //
-    // null, new byte[1],
-    // null, new byte[1],null,new byte[1],
-    // "1.2.3.4","1.2.3.4");
-    //
-    // // EventLog eventLog2= EventLog.createEventNonRepudiation("a1", null,
-    // "a2", null);
-    //
-    // eventLog1.setEventType(EventType.epsosCommunicationFailure);
-    // //eventLog2.setEventType(EventType.epsosNonRepudiationService);
-    // AuditMessage am =
-    // AuditTrailUtils.getInstance().createAuditMessage(eventLog1);
-    // asd.write(eventLog1, "13", "1");
-    // try {
-    // Thread.sleep(30000);
-    // } catch (InterruptedException ex) {
-    // LoggerFactory.getLogger(AuditTrailUtilsTest.class.getName()).log(Level.SEVERE,
-    // null, ex);
-    // }
-    // }
-
     @Test
     public void testCreateAuditMessage_epsosIdentificationServiceFindIdentityByTraits() {
-        logger.info("######## createAuditMessage XCPD");
+        LOGGER.info("######## createAuditMessage XCPD");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogPatientMapping(
@@ -215,22 +150,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosPatientService() {
-        logger.info("########## createAuditMessage for patient list");
+        LOGGER.info("########## createAuditMessage for patient list");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
         EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosPatientServiceList,
                 EventActionCode.QUERY, date2, EventOutcomeIndicator.FULL_SUCCESS,
@@ -252,22 +187,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosOrderService() {
-        logger.info("########## createAuditMessage for Order Service");
+        LOGGER.info("########## createAuditMessage for Order Service");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosOrderServiceList,
@@ -288,22 +223,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosDispensationServiceInit() {
-        logger.info("########## createAuditMessage for Dispensation Service Initialize");
+        LOGGER.info("########## createAuditMessage for Dispensation Service Initialize");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-            logger.error("DatatypeConfigurationException: ", ex);
+            LOGGER.error("DatatypeConfigurationException: ", ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosDispensationServiceInitialize,
@@ -324,22 +259,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosDispensationServiceDiscard() {
-        logger.info("########## createAuditMessage for Dispensation Service Discard");
+        LOGGER.info("########## createAuditMessage for Dispensation Service Discard");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosDispensationServiceDiscard,
@@ -359,22 +294,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosConsentServicePut() {
-        logger.info("########## createAuditMessage for Consent Service Put");
+        LOGGER.info("########## createAuditMessage for Consent Service Put");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosConsentServicePut,
@@ -394,22 +329,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosConsentServiceDiscard() {
-        logger.info("########## createAuditMessage for Consent Service Discard");
+        LOGGER.info("########## createAuditMessage for Consent Service Discard");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogHCPAssurance(
@@ -430,22 +365,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosHCPIdentity() {
-        logger.info("########## createAuditMessage for HCP Identity");
+        LOGGER.info("########## createAuditMessage for HCP Identity");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication,
@@ -468,22 +403,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosTRCA() {
-        logger.info("########## createAuditMessage for TRCA");
+        LOGGER.info("########## createAuditMessage for TRCA");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogTRCA(TransactionName.epsosTRCAssertion, EventActionCode.EXECUTE,
@@ -506,22 +441,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosNCPTrustedServiceList() {
-        logger.info("########## createAuditMessage for NCPTrustedServiceList");
+        LOGGER.info("########## createAuditMessage for NCPTrustedServiceList");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogNCPTrustedServiceList(TransactionName.epsosNCPTrustedServiceList,
@@ -542,22 +477,22 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 
     @Test
     public void testCreateAuditMessage_epsosPivotTranslation() {
-        logger.info("########## createAuditMessage for PivotTranslation");
+        LOGGER.info("########## createAuditMessage for PivotTranslation");
         //
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-
+            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog1 = EventLog.createEventLogPivotTranslation(TransactionName.epsosPivotTranslation,
@@ -571,7 +506,7 @@ public class AuditTrailUtilsTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
     }
 }

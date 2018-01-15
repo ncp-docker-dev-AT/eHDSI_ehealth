@@ -6,6 +6,7 @@ import epsos.ccd.netsmart.securitymanager.SamlTRCIssuer;
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.sts.util.STSUtils;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
@@ -286,7 +287,7 @@ public class STSService implements Provider<SOAPMessage> {
                        String humanRequestorRole, String patientID, String facilityType, String assertionId,
                        String tls_cn, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
 
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
