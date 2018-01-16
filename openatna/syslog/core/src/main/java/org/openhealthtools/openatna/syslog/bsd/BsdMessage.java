@@ -39,6 +39,8 @@ public class BsdMessage<M> extends SyslogMessage {
     public static void main(String[] args) {
 
         try {
+            
+            @SuppressWarnings("squid:S1313")
             BsdMessage m = new BsdMessage(10, 5, "Oct  1 22:14:15", "127.0.0.1", new StringLogMessage("Don't panic"), "ATNALOG");
             SyslogMessageFactory.registerLogMessage("ATNALOG", StringLogMessage.class);
             SyslogMessageFactory.setFactory(new BsdMessageFactory());

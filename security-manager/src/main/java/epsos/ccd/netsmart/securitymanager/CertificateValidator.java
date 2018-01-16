@@ -28,6 +28,7 @@ import java.util.Date;
 public final class CertificateValidator extends KeySelector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CertificateValidator.class);
+    @SuppressWarnings("squid:S1313")
     private static final String CRLDP_OID = "2.5.29.31";
     private static final String AIA_OID = "1.3.6.1.5.5.7.1.1";
     private static final String PROP_CHECK_FOR_KEYUSAGE = "secman.cert.validator.checkforkeyusage";

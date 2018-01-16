@@ -21,15 +21,14 @@ import javax.mail.util.ByteArrayDataSource;
 import java.util.UUID;
 
 /**
- * Represents a mock of the RespondingGateway_ServiceStub class, with
- * corresponding mock operations and results.
+ * Represents a mock of the RespondingGateway_ServiceStub class, with corresponding mock operations and results.
  *
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class RespondingGateway_ServiceStub_Mock {
 
-    private static final Logger logger = LoggerFactory.getLogger(RespondingGateway_ServiceStub_Mock.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RespondingGateway_ServiceStub_Mock.class);
     private final String HCID = "2.16.17.710.820.1000.990.1.1.1";
     private final String RUID = "2.16.17.710.820.1000.990.1.1.1";
     private final String DOCID = "urn:oid:2.16.17.710.820.1000.990.1.1.1.6b13180-a63e-11e1-b3dd-0800200c9a61";
@@ -117,7 +116,7 @@ public class RespondingGateway_ServiceStub_Mock {
             documentResponse.addChild(document);
 
         } catch (Exception ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
 
         return mockResponse;
@@ -284,7 +283,7 @@ public class RespondingGateway_ServiceStub_Mock {
  */
 class DummyCDA {
 
-    public static String CDA = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> "
+    public static final String CDA = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> "
             + "<ClinicalDocument xmlns=\"urn:hl7-org:v3\" xmlns:epsos=\"urn:epsos-org:ep:medication\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:hl7-org:v3 CDA.xsd\"> "
             + "	<typeId extension=\"POCD_HD000040\" root=\"2.16.840.1.113883.1.3\" /> "
             + "	<templateId root='1.3.6.1.4.1.12559.11.10.1.3.1.1.3'/> "

@@ -140,7 +140,7 @@ public class SMPSignFileController {
         } catch (FileNotFoundException ex) {
             LOGGER.error("\nFileNotFoundException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
-        MultipartFile fileSign = null;
+        MultipartFile fileSign;
         try {
             fileSign = new MockMultipartFile("fileSign", file.getName(), "text/xml", input);
             List<MultipartFile> files = new ArrayList<>();
@@ -194,16 +194,25 @@ public class SMPSignFileController {
             }
 
             boolean valid = xmlValidator.validator(convFile.getPath());
+            boolean fileDeleted;
+
             if (valid) {
                 LOGGER.debug("\n****VALID XML File");
             } else {
                 LOGGER.debug("\n****NOT VALID XML File");
                 String message = env.getProperty("error.notsmp"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
-                convFile.delete();
+
+                fileDeleted = convFile.delete();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+                }
                 return "redirect:/smpeditor/signsmpfile";
             }
-            convFile.delete();
+            fileDeleted = convFile.delete();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+            }
 
             ServiceMetadata serviceMetadata;
             serviceMetadata = smpconverter.convertFromXml(smpfile.getSignFile());
@@ -211,7 +220,10 @@ public class SMPSignFileController {
             boolean isSigned = smpconverter.getIsSignedServiceMetadata();
             if (isSigned) {
                 LOGGER.debug("\n****SIGNED SMP File");
-                convFile.delete();
+                fileDeleted = convFile.delete();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+                }
                 String message = env.getProperty("warning.isSigned.sigmenu"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.warning));
                 return "redirect:/smpeditor/signsmpfile";
@@ -331,7 +343,7 @@ public class SMPSignFileController {
                     }
                 }
 
-                SMPType[] smptypes = SMPType.ALL;
+                SMPType[] smptypes = SMPType.getALL();
                 for (SMPType smptype : smptypes) {
                     if (smptype.name().equals(documentID)) {
                         smpfile.setType(smptype);

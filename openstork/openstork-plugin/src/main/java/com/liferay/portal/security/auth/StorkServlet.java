@@ -32,7 +32,6 @@ public class StorkServlet extends HttpServlet {
     private static final String USER_AGENT = "Mozilla/5.0";
     private static Properties configs;
     private static String homepage = "/SP/";
-    private static String allowIP = "127.0.0.1";
 
     public static String getHomepage() {
         return homepage;
@@ -159,6 +158,8 @@ public class StorkServlet extends HttpServlet {
                 out.println("Servlet StorkServlet at " + (personalAttributeList != null ? personalAttributeList.get("givenName") : "Given Name Not Found"));
                 out.println("</body>");
                 out.println("</html>");
+            } catch (IOException e) {
+                LOGGER.error("IOException: '{}'", e.getMessage(), e);
             }
         } catch (STORKSAMLEngineException e) {
             LOGGER.error("STORKSAMLEngineException: '{}'", e.getMessage(), e);
@@ -194,38 +195,51 @@ public class StorkServlet extends HttpServlet {
         return result.toString();
     }
 
-    public String doSubmit(String url, Map<String, String> data) throws Exception {
+    public String doSubmit(String url, Map<String, String> data) {
 
-        URL siteUrl = new URL(url);
-        HttpURLConnection conn = (HttpURLConnection) siteUrl.openConnection();
-        conn.setRequestProperty("User-Agent", USER_AGENT);
-        conn.setRequestProperty("referer", "localhost");
-        conn.setRequestMethod("POST");
-        conn.setDoOutput(true);
-        conn.setDoInput(true);
+        try {
 
-        DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+            URL siteUrl = new URL(url);
+            HttpURLConnection conn;
+            conn = (HttpURLConnection) siteUrl.openConnection();
+            conn.setRequestProperty("User-Agent", USER_AGENT);
+            conn.setRequestProperty("referer", "localhost");
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
 
-        Set keys = data.keySet();
-        Iterator keyIter = keys.iterator();
-        StringBuilder content = new StringBuilder();
-        for (int i = 0; keyIter.hasNext(); i++) {
-            Object key = keyIter.next();
-            if (i != 0) {
-                content.append("&");
+            try (DataOutputStream out = new DataOutputStream(conn.getOutputStream())) {
+
+                Set keys = data.keySet();
+                Iterator iterator = keys.iterator();
+                StringBuilder content = new StringBuilder();
+                for (int i = 0; iterator.hasNext(); i++) {
+                    Object key = iterator.next();
+                    if (i != 0) {
+                        content.append("&");
+                    }
+                    content.append(key).append("=").append(URLEncoder.encode(data.get(key), "UTF-8"));
+                }
+                out.writeBytes(content.toString());
+
+                StringBuilder sb = new StringBuilder();
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    return sb.toString();
+
+                } catch (IOException e) {
+                    LOGGER.error("IOException: '{}'", e.getMessage(), e);
+                }
+            } catch (IOException e) {
+                LOGGER.error("IOException: '{}'", e.getMessage(), e);
             }
-            content.append(key).append("=").append(URLEncoder.encode(data.get(key), "UTF-8"));
+        } catch (IOException e) {
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }
-        out.writeBytes(content.toString());
-        out.flush();
-        out.close();
-        StringBuilder sb = new StringBuilder();
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String line;
-        while ((line = in.readLine()) != null) {
-            sb.append(line);
-        }
-        in.close();
-        return sb.toString();
+        return "Error";
     }
 }

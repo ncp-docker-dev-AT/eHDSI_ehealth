@@ -8,7 +8,6 @@ import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,11 +21,11 @@ public class ConsentServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsentServlet.class);
 
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) {
 
         LOGGER.info("Servlet Consent Document");
 
-        try {
+        try (OutputStream outputStream = res.getOutputStream()) {
             byte[] pdf;
             HttpSession session = req.getSession();
 
@@ -40,21 +39,18 @@ public class ConsentServlet extends HttpServlet {
             pdf = EpsosHelperService.getConsentReport(user.getLanguageId(), user.getFullName(), patient);
 
             res.setContentType("application/pdf");
-
             res.setHeader("Content-Disposition", "inline; filename=architect.pdf");
             res.setHeader("Cache-Control", "no-cache");
             res.setDateHeader("Expires", 0);
             res.setHeader("Pragma", "No-cache");
 
-            OutputStream outputStream = res.getOutputStream();
             outputStream.write(pdf);
             outputStream.flush();
-            outputStream.close();
 
         } catch (Exception ex) {
+
             LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
             res.setContentType("text/html");
-
             res.setHeader("Cache-Control", "no-cache");
             res.setDateHeader("Expires", 0);
             res.setHeader("Pragma", "No-cache");
@@ -62,7 +58,6 @@ public class ConsentServlet extends HttpServlet {
             try (OutputStream outputStream = res.getOutputStream()) {
                 outputStream.write(ex.getMessage().getBytes());
                 outputStream.flush();
-                outputStream.close();
             } catch (IOException e) {
                 LOGGER.error(ExceptionUtils.getStackTrace(e));
             }

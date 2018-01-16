@@ -22,44 +22,44 @@ public class EventLog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventLog.class);
 
-    public String EI_TransactionNumber;  // Number of the transaction including the 'Epsos-' prefix
-    public String EI_TransactionName;    // Name of the transaction, specified in the use cases diagram
-    public XMLGregorianCalendar EI_EventDateTime;
+    private String EI_TransactionNumber;  // Number of the transaction including the 'Epsos-' prefix
+    private String EI_TransactionName;    // Name of the transaction, specified in the use cases diagram
+    private XMLGregorianCalendar EI_EventDateTime;
     // Point of Care
-    public String PC_UserID;  // Point of Care: Oid of the department
-    public String PC_RoleID;  // Point of Care: Role of the department
+    private String PC_UserID;  // Point of Care: Oid of the department
+    private String PC_RoleID;  // Point of Care: Role of the department
     // Human Requestor
-    public String HR_UserID;  // Identifier of the HCP initiated the event
-    public String HR_AlternativeUserID; // Human readable name of the HCP as given in the Subject-ID
-    public String HR_UserName;
-    public String HR_RoleID;
+    private String HR_UserID;  // Identifier of the HCP initiated the event
+    private String HR_AlternativeUserID; // Human readable name of the HCP as given in the Subject-ID
+    private String HR_UserName;
+    private String HR_RoleID;
     // Service Consumer NCP
     // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
-    public String SC_UserID;
+    private String SC_UserID;
     // Service Provider
     // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
-    public String SP_UserID;
+    private String SP_UserID;
     // Audit Source
-    public String AS_AuditSourceId; // The authority that is legally responsible for the audit source
+    private String AS_AuditSourceId; // The authority that is legally responsible for the audit source
     // Patient Source
-    public String PS_PatricipantObjectID; // Patient Code in HL7 format
+    private String PS_PatricipantObjectID; // Patient Code in HL7 format
     // Patient Target
-    public String PT_PatricipantObjectID; // Mapped PatientCode in HL7 format
+    private String PT_PatricipantObjectID; // Mapped PatientCode in HL7 format
     // Error Message
-    public String EM_PatricipantObjectID;  // String-encoded error code
-    public byte[] EM_PatricipantObjectDetail;  // Base64 encoded error message
+    private String EM_PatricipantObjectID;  // String-encoded error code
+    private byte[] EM_PatricipantObjectDetail;  // Base64 encoded error message
     // Mapping Service
-    public String MS_UserID;  // The string encoded OID of the service instance performed the mapping
-    public String ET_ObjectID; // The string encoded UUID of the returned document
-    public String ET_ObjectID_additional; // The string encoded UUID of the returned document
+    private String MS_UserID;  // The string encoded OID of the service instance performed the mapping
+    private String ET_ObjectID; // The string encoded UUID of the returned document
+    private String ET_ObjectID_additional; // The string encoded UUID of the returned document
     // Non-Repudiation
-    public String ReqM_ParticipantObjectID;  // ReqM_ParticipantObjectID String-encoded UUID of the request message
-    public byte[] ReqM_PatricipantObjectDetail;  // Base64 encoded error message
-    public String ResM_ParticipantObjectID;   // ReqM_ParticipantObjectID String-encoded UUID of the response message
-    public byte[] ResM_PatricipantObjectDetail;  // Base64 encoded error message
+    private String ReqM_ParticipantObjectID;  // ReqM_ParticipantObjectID String-encoded UUID of the request message
+    private byte[] ReqM_PatricipantObjectDetail;  // Base64 encoded error message
+    private String ResM_ParticipantObjectID;   // ReqM_ParticipantObjectID String-encoded UUID of the response message
+    private byte[] ResM_PatricipantObjectDetail;  // Base64 encoded error message
     // IP Addresses
-    public String sourceip;
-    public String targetip;
+    private String sourceip;
+    private String targetip;
     // Event Identification
     private String EventType;             // one of the availbale epsos event ids
     private String EI_EventActionCode;    //  C:create, R:Read,View,Print,Query, U:Update, D:Delete, E:Execute

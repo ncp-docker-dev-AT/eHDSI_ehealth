@@ -13,6 +13,7 @@ import java.net.URL;
 public class IPUtil {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(IPUtil.class);
+    @SuppressWarnings("squid:S1313")
     private static final String LOCAL_IP_ADDRESS = "127.0.0.1";
 
     private IPUtil() {
