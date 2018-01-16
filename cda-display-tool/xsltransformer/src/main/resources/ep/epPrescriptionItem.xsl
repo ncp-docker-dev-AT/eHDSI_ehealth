@@ -910,11 +910,18 @@
         </script>
         <table class="narr_table">
             <xsl:for-each select="$entryNode">
-                <xsl:variable name="activeIngredient">
-                    <xsl:call-template name="show-formCode">
-                        <xsl:with-param name="parameter"
-                                        select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:ingredient/epsos:code"/>
-                    </xsl:call-template>
+                <xsl:variable name="activeIngredientHeader">
+                    <xsl:choose>
+                        <xsl:when test="count($activeIngredient)>1">
+                            Multiple active ingredients
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:call-template name="show-formCode">
+                                <xsl:with-param name="parameter"
+                                                select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:ingredient/epsos:code"/>
+                            </xsl:call-template>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:variable>
 
                 <xsl:variable name="manufacturedMaterialFormCode">
@@ -929,7 +936,7 @@
                         <countNo><xsl:value-of select="position()"/>.
                         </countNo>
                         &#160;
-                        <xsl:value-of select="$activeIngredient"/>
+                        <xsl:value-of select="$activeIngredientHeader"/>
                         &#160;
                         <xsl:call-template name="strength"/>
                         &#160;
