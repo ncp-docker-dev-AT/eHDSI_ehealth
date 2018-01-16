@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import org.w3c.dom.Document;
 
 public class DispenseServlet extends HttpServlet {
 
@@ -80,33 +79,41 @@ public class DispenseServlet extends HttpServlet {
 
                     String dispensedSubstitute = req.getParameter("dispense_" + id); // field3
                     boolean substitute = GetterUtil.getBoolean(dispensedSubstitute, false);
+                    //  dispenseQuantity replaced by dispensedPackageSize
+                    //  String dispensedQuantity = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
+                    //  if (Validator.isNull(dispensedQuantity)) {
+                    //      dispensedQuantity = line.getField21() + "";
+                    //  }
 
-                    String dispensedQuantity = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
+                    String dispensedPackageSize = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
+                    if (Validator.isNull(dispensedPackageSize)) {
+                        dispensedPackageSize = line.getField21() + "";
+                    }
 
-                    if (Validator.isNull(dispensedQuantity)) {
-                        dispensedQuantity = line.getField21() + "";
+                    String dispensedNumberOfPacks = req.getParameter("dispensedNumberOfPackages_" + id);
+                    if (Validator.isNull(dispensedNumberOfPacks)) {
+                        dispensedNumberOfPacks = line.getField8() + "";
                     }
 
                     String dispensedName = dispensedProduct;
                     String dispensedStrength = line.getField3() + "";
                     String dispensedForm = line.getField4() + "";
                     String dispensedPackage = line.getField4() + ""; // field6
-                    String dispensedNumberOfPacks = line.getField8().toString();
+                    //  String dispensedNumberOfPacks = line.getField8().toString();
                     String prescriptionId = line.getField14() + ""; // field9
                     String materialId = line.getField19() + ""; // field10
                     String activeIngredient = line.getField2().toString();
 
                     ViewResult dispensedResult = new ViewResult(id, dispensedId, dispensedName, substitute, dispensedStrength,
-                            dispensedForm, dispensedPackage, dispensedQuantity, dispensedNumberOfPacks, prescriptionId,
+                            dispensedForm, dispensedPackage, dispensedPackageSize, dispensedNumberOfPacks, prescriptionId,
                             materialId, activeIngredient, measuresId);
-
                     dispensedLines.add(dispensedResult);
                 }
 
-                String eDuuid = java.util.UUID.randomUUID().toString().replaceAll("-", "");
+                String eDUUID = java.util.UUID.randomUUID().toString().replaceAll("-", "");
                 String edOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DISPENSATION_OID);
                 if (!dispensedLines.isEmpty()) {
-                    edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user, eDuuid);
+                    edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user, eDUUID);
                 }
 
                 if (Validator.isNotNull(edBytes)) {
@@ -128,7 +135,7 @@ public class DispenseServlet extends HttpServlet {
                     document.setCreationDate(cal);
                     document.setDescription(Constants.ED_TITLE);
                     document.setTitle(Constants.ED_TITLE);
-                    document.setUuid(edOid + "^" + eDuuid);
+                    document.setUuid(edOid + "^" + eDUUID);
                     document.setSubmissionSetId(EpsosHelperService.getUniqueId());
                     document.setClassCode(classCode);
                     document.setFormatCode(formatCode);

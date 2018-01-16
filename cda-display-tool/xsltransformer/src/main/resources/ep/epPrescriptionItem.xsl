@@ -27,22 +27,6 @@
                             select="epsos:denominator"/>
         </xsl:call-template>
     </xsl:template>
-    <!--<xsl:template name="strength">-->
-    <!--<xsl:call-template name="show-strength">-->
-    <!--<xsl:with-param name="medStrengthUnit1"-->
-    <!--select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:quantity/epsos:numerator/@unit"/>-->
-    <!--<xsl:with-param name="medStrengthUnit2"-->
-    <!--select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:quantity/epsos:denominator/@unit"/>-->
-    <!--<xsl:with-param name="medStrengthValue1"-->
-    <!--select="translate(n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:quantity/epsos:numerator/@value, '.', ',')"/>-->
-    <!--<xsl:with-param name="medStrengthValue2"-->
-    <!--select="translate(n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:quantity/epsos:denominator/@value, '.', ',')"/>-->
-    <!--<xsl:with-param name="medStrength1"-->
-    <!--select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:quantity/epsos:numerator"/>-->
-    <!--<xsl:with-param name="medStrength2"-->
-    <!--select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:quantity/epsos:denominator"/>-->
-    <!--</xsl:call-template>-->
-    <!--</xsl:template>-->
 
     <xsl:template name="package">
         <xsl:call-template name="show-package">
@@ -192,21 +176,15 @@
         )
     </xsl:template>
 
-    <!--<xsl:variable name="strengthValue">-->
-    <!--<xsl:call-template name="strength"/>-->
-    <!--</xsl:variable>-->
-
     <xsl:variable name="numberOfPacks">
         <xsl:call-template name="number-of-packages">
             <xsl:with-param name="supply" select="n1:entryRelationship[@typeCode='COMP']"/>
         </xsl:call-template>
     </xsl:variable>
 
-
     <xsl:template name="inputform">
         <xsl:param name="txt"/>
         <xsl:param name="val"/>
-
         <xsl:attribute name="id">
             <xsl:value-of select="$txt"/>
             <xsl:value-of select="position()-1"/>
@@ -218,7 +196,6 @@
         <xsl:attribute name="value">
             <xsl:value-of select="$val"/>
         </xsl:attribute>
-
     </xsl:template>
 
     <xsl:template name="add-newUnitMeasure">
@@ -239,7 +216,6 @@
             </xsl:when>
         </xsl:choose>
     </xsl:template>
-
 
     <xsl:template name="check-EffectiveTime">
         <xsl:value-of select="''"/>
