@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import org.w3c.dom.Document;
 
 public class DispenseServlet extends HttpServlet {
 
