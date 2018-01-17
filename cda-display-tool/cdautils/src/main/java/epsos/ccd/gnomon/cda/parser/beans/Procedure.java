@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating a surgical procedure entry.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Procedure extends MedicalEntry {
 
@@ -21,7 +20,7 @@ public class Procedure extends MedicalEntry {
         super();
 
         // Setting the procedure UUID number
-        this.uuid = "proc." + String.valueOf(UUID++);
+        this.uuid = "proc." + UUID++;
 
         // Setting a null mood of the surgical procedure
         this.mood = null;
@@ -30,16 +29,16 @@ public class Procedure extends MedicalEntry {
     /**
      * A constructor initializing a surgical procedure entry.
      *
-     * @param code the code of the procedure.
+     * @param code          the code of the procedure.
      * @param effectiveTime the effective time of the procedure.
-     * @param mood the mood of the procedure.
+     * @param mood          the mood of the procedure.
      */
     public Procedure(Code code, Time effectiveTime, String mood) {
         // Calling the constructor of the super class
         super(code, effectiveTime);
 
         // Setting the procedure UUID number
-        this.uuid = "proc." + String.valueOf(UUID++);
+        this.uuid = "proc." + UUID++;
 
         // Setting the mood of the surgical procedure
         this.mood = mood;

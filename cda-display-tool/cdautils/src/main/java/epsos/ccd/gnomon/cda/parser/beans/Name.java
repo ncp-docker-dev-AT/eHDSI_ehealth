@@ -9,7 +9,6 @@ import java.util.Set;
  * A class encapsulating the full name of a person.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Name {
 
@@ -25,30 +24,30 @@ public class Name {
      */
     public Name() {
         // Creating an empty family name set
-        this.families = new HashSet<String>();
+        this.families = new HashSet<>();
 
         // Creating an empty given name set
-        this.givens = new HashSet<String>();
+        this.givens = new HashSet<>();
 
         // Crating an empty prefix set
-        this.prefixes = new HashSet<Prefix>();
+        this.prefixes = new HashSet<>();
     }
-    
+
     public Name(String family, String given) {
         // Creating an empty family name set
-        this.families = new HashSet<String>();
+        this.families = new HashSet<>();
 
         // Adding the family name
         families.add(family);
 
         // Creating an empty given name set
-        this.givens = new HashSet<String>();
+        this.givens = new HashSet<>();
 
         // Adding the given name
         givens.add(given);
 
         // Crating an empty prefix set
-        this.prefixes = new HashSet<Prefix>();
+        this.prefixes = new HashSet<>();
     }
 
     /**
@@ -119,7 +118,7 @@ public class Name {
         context.append("<name>");
 
         // Checking if any family name is provided
-        if (families.size() > 0) {
+        if (!families.isEmpty()) {
             // Iterating through the family name set
             for (String family : families) {
                 // Checking for a valid family name
@@ -135,7 +134,7 @@ public class Name {
         }
 
         // Checking if any given name is provided
-        if (givens.size() > 0) {
+        if (!givens.isEmpty()) {
             // Iterating through the given name set
             for (String given : givens) {
                 // Checking for a valid given name
@@ -151,7 +150,7 @@ public class Name {
         }
 
         // Checking if any prefix is provided
-        if (prefixes.size() > 0) {
+        if (!prefixes.isEmpty()) {
             // Iterating through the prefix set
             for (Prefix prefix : prefixes) {
                 // Checking for a valid prefix
@@ -166,7 +165,7 @@ public class Name {
 
         // Closing the name element
         context.append("</name>");
-        
+
         return context.toString();
     }
 }

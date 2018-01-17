@@ -7,7 +7,6 @@ import epsos.ccd.gnomon.cda.parser.enums.RoleClass;
  * document.
  *
  * @author Akis Papadopoulos
- *
  */
 public abstract class Participant {
 

@@ -6,7 +6,6 @@ import epsos.ccd.gnomon.cda.parser.enums.RoleClass;
  * A class encapsulating a participant as a legal organization.
  *
  * @author Akis Papadopoulos
- *
  */
 public class LegalOrganization extends Participant {
 
@@ -27,7 +26,7 @@ public class LegalOrganization extends Participant {
     /**
      * A constructor initializing a legal organization.
      *
-     * @param role the class role of the legal organization.
+     * @param role         the class role of the legal organization.
      * @param organization the organization.
      */
     public LegalOrganization(RoleClass role, Organization organization) {
@@ -80,7 +79,7 @@ public class LegalOrganization extends Participant {
                     .append(typeCode)
                     .append("\"");
         }
-        
+
         // Closing the participant opening element
         context.append("/>");
 

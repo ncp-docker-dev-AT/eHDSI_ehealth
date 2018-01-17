@@ -28,7 +28,7 @@ public class DisplayIntegrationTest extends TestCase {
 
 
     @Test
-    public void runFolder() throws Exception {
+    public void runFolder() {
 
         Path path = Paths.get("samples");
         try {

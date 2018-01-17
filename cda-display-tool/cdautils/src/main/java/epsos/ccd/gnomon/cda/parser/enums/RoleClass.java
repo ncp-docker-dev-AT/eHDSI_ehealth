@@ -2,12 +2,11 @@ package epsos.ccd.gnomon.cda.parser.enums;
 
 /**
  * A basic enum coding the participant role class codes.
- * 
+ *
  * @author Akis Papadopoulos
- * 
  */
 public enum RoleClass {
-    
+
     // Role class code and display name
     ECON("ECON", "emergency contact"),
     NOK("NOK", "next of kin"),
@@ -21,8 +20,8 @@ public enum RoleClass {
 
     /**
      * A basic constructor initializing the class role.
-     * 
-     * @param code the code of the class role.
+     *
+     * @param code    the code of the class role.
      * @param display the display name of the class role.
      */
     private RoleClass(String code, String display) {
@@ -35,7 +34,7 @@ public enum RoleClass {
 
     /**
      * A method returning the code of the class role.
-     * 
+     *
      * @return the code of the class role.
      */
     public String getCode() {
@@ -44,7 +43,7 @@ public enum RoleClass {
 
     /**
      * A method returning the display name of the class role.
-     * 
+     *
      * @return the display name of the class role.
      */
     public String getDisplay() {
@@ -53,7 +52,7 @@ public enum RoleClass {
 
     /**
      * A method returning an alphanumeric representation of the object.
-     * 
+     *
      * @return the code of the class role code.
      */
     @Override

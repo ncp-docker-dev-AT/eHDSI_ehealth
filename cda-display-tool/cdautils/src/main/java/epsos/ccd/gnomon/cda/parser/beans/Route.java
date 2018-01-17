@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating a medication administration route.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Route extends Code {
 
@@ -19,9 +18,9 @@ public class Route extends Code {
     /**
      * A constructor initializing an administration route.
      *
-     * @param code the code of the route.
-     * @param display the display name of the route.
-     * @param codeSystem the code system.
+     * @param code          the code of the route.
+     * @param display       the display name of the route.
+     * @param codeSystem    the code system.
      * @param codeSysemName the code system name.
      */
     public Route(String code, String display, String codeSystem, String codeSystemName) {

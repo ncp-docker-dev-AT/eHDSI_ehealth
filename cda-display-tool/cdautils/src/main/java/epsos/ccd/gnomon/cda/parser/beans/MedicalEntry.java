@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A abstract class encapsulating a generic medical entry.
  *
  * @author Akis Papadopoulos
- *
  */
 public abstract class MedicalEntry {
 
@@ -39,7 +38,7 @@ public abstract class MedicalEntry {
     /**
      * A constructor initializing a generic medical entry.
      *
-     * @param code the code of the medical entry.
+     * @param code          the code of the medical entry.
      * @param effectiveTime the effective time of the medical entry.
      */
     public MedicalEntry(Code code, Time effectiveTime) {

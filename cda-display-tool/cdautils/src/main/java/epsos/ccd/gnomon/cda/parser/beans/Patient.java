@@ -2,6 +2,7 @@ package epsos.ccd.gnomon.cda.parser.beans;
 
 import epsos.ccd.gnomon.cda.parser.enums.ContactUse;
 import epsos.ccd.gnomon.cda.parser.enums.URLScheme;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,7 +10,6 @@ import java.util.Set;
  * A class encapsulating the demographics of a patient.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Patient {
 
@@ -55,7 +55,7 @@ public class Patient {
         this.id = null;
 
         // Creating an emtpy set of secondary ids
-        secondaries = new HashSet<Identifier>();
+        secondaries = new HashSet<>();
 
         // Setting a null name
         this.name = null;
@@ -70,10 +70,10 @@ public class Patient {
         this.address = null;
 
         // Creating an empty set of phone contacts
-        phones = new HashSet<Contact>();
+        phones = new HashSet<>();
 
         // Creating an empty set of email contacts
-        emails = new HashSet<Contact>();
+        emails = new HashSet<>();
 
         // Setting a nul guardian
         this.guardian = null;
@@ -82,17 +82,17 @@ public class Patient {
     /**
      * A constructor initializing a patient.
      *
-     * @param id the primary id of the patient.
-     * @param name the full name of the patient.
+     * @param id     the primary id of the patient.
+     * @param name   the full name of the patient.
      * @param gender the administrative gender.
-     * @param dob the date of birth.
+     * @param dob    the date of birth.
      */
     public Patient(Identifier id, Name name, Gender gender, Birthdate dob) {
         // Setting the primary id
         this.id = id;
 
         // Creating an emtpy set of secondary ids
-        secondaries = new HashSet<Identifier>();
+        secondaries = new HashSet<>();
 
         // Setting the name
         this.name = name;
@@ -104,10 +104,10 @@ public class Patient {
         this.dob = dob;
 
         // Creating an empty set of phone contacts
-        phones = new HashSet<Contact>();
+        phones = new HashSet<>();
 
         // Creating an empty set of email contacts
-        emails = new HashSet<Contact>();
+        emails = new HashSet<>();
     }
 
     /**
@@ -174,15 +174,6 @@ public class Patient {
     }
 
     /**
-     * A method returning the secondary ids of the patient.
-     *
-     * @return the secondary ids of the patient.
-     */
-    public Set<Identifier> getSecondaries() {
-        return secondaries;
-    }
-
-    /**
      * A method setting an identifier of the patient.
      *
      * @param id the patient identifier.
@@ -195,6 +186,15 @@ public class Patient {
             // Adding the id into the secondary ids
             secondaries.add(id);
         }
+    }
+
+    /**
+     * A method returning the secondary ids of the patient.
+     *
+     * @return the secondary ids of the patient.
+     */
+    public Set<Identifier> getSecondaries() {
+        return secondaries;
     }
 
     /**
@@ -410,7 +410,7 @@ public class Patient {
         }
 
         // Checking if any phone contact is provided
-        if (phones.size() > 0) {
+        if (!phones.isEmpty()) {
             // Iterating through the set of phones
             for (Contact phone : phones) {
                 // Checking for a valid contact element
@@ -422,7 +422,7 @@ public class Patient {
         }
 
         // Checking if any email contact is provided
-        if (emails.size() > 0) {
+        if (!emails.isEmpty()) {
             // Iterating through the email set
             for (Contact email : emails) {
                 // Checking for a valid contact element

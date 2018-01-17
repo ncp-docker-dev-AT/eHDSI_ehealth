@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating a template root element.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Template {
 

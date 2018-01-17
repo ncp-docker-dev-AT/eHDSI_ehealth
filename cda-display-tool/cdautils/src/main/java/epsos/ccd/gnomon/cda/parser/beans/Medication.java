@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating a medication entry.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Medication extends MedicalEntry {
 
@@ -29,7 +28,7 @@ public class Medication extends MedicalEntry {
         super();
 
         // Setting the medication UUID number
-        this.uuid = "med." + String.valueOf(UUID++);
+        this.uuid = "med." + UUID++;
 
         // Setting a null frequency of the medication
         this.frequency = null;
@@ -50,7 +49,7 @@ public class Medication extends MedicalEntry {
     /**
      * A constructor initializing a medication.
      *
-     * @param code the code of the medication product.
+     * @param code          the code of the medication product.
      * @param effectiveTime the effective time of the medication.
      */
     public Medication(Code code, Time effectiveTime) {
@@ -58,7 +57,7 @@ public class Medication extends MedicalEntry {
         super(code, effectiveTime);
 
         // Setting the medication UUID number
-        this.uuid = "med." + String.valueOf(UUID++);
+        this.uuid = "med." + UUID++;
 
         // Setting a null frequency of the medication
         this.frequency = null;

@@ -22,7 +22,7 @@ public class MedicalDevice extends MedicalEntry {
         super();
 
         // Setting a medical device UUID number
-        this.uuid = "dev." + String.valueOf(UUID++);
+        this.uuid = "dev." + UUID++;
     }
 
     /**
@@ -36,7 +36,7 @@ public class MedicalDevice extends MedicalEntry {
         super(code, effectiveTime);
 
         // Setting the medical device UUID number
-        this.uuid = "dev." + String.valueOf(UUID++);
+        this.uuid = "dev." + UUID++;
     }
 
     /**

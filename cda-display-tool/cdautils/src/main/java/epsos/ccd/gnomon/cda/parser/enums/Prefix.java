@@ -2,12 +2,11 @@ package epsos.ccd.gnomon.cda.parser.enums;
 
 /**
  * A basic enum coding the patient's prefixes.
- * 
+ *
  * @author Akis Papadopoulos
- * 
  */
 public enum Prefix {
-    
+
     // Prefix code and display name
     AC("AC", "academic"),
     AD("AD", "adopted"),
@@ -28,11 +27,11 @@ public enum Prefix {
 
     /**
      * A basic constructor initializing the prefix.
-     * 
-     * @param code the code of the prefix.
+     *
+     * @param code    the code of the prefix.
      * @param display the display name of the prefix.
      */
-    private Prefix(String code, String display) {
+    Prefix(String code, String display) {
         // Setting the code of the prefix
         this.code = code;
 
@@ -42,7 +41,7 @@ public enum Prefix {
 
     /**
      * A method returning the code of the prefix.
-     * 
+     *
      * @return the code of the prefix.
      */
     public String getCode() {
@@ -51,7 +50,7 @@ public enum Prefix {
 
     /**
      * A method returning the display name of the prefix.
-     * 
+     *
      * @return the display name of the prefix.
      */
     public String getDisplay() {
@@ -60,7 +59,7 @@ public enum Prefix {
 
     /**
      * A method returning an alphanumeric representation of the object.
-     * 
+     *
      * @return the code of the prefix.
      */
     @Override

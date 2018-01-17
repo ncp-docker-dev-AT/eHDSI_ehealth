@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating a dose of a medication.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Dose {
 
@@ -32,7 +31,7 @@ public class Dose {
     /**
      * A constructor initializing a dose of medication.
      *
-     * @param low the minimum quantity of the dose.
+     * @param low  the minimum quantity of the dose.
      * @param high the maximum quantity of the dose.
      * @param unit the unit measurement of the dose.
      */
@@ -112,7 +111,7 @@ public class Dose {
         StringBuilder context = new StringBuilder();
 
         // Checking for a null flavored dose
-        if (low == null & high == null && unit == null) {
+        if (low == null && high == null && unit == null) {
             // Adding a null flavored dose element
             context.append("<doseQuantity nullFlavor=\"UNK\"/>");
         } else {

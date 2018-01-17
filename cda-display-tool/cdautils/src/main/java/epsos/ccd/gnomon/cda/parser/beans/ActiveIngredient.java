@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating an active ingredient ATC code.
  *
  * @author Akis Papadopoulos
- *
  */
 public class ActiveIngredient extends Code {
 
@@ -19,9 +18,9 @@ public class ActiveIngredient extends Code {
     /**
      * A constructor initializing an active ingredient.
      *
-     * @param code the code.
-     * @param display the display name of code.
-     * @param codeSystem the code system.
+     * @param code          the code.
+     * @param display       the display name of code.
+     * @param codeSystem    the code system.
      * @param codeSysemName the code system name.
      */
     public ActiveIngredient(String code, String display, String codeSystem, String codeSystemName) {

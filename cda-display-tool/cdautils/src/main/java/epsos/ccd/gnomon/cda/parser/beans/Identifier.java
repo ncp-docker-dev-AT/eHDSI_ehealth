@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating a generic identifier.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Identifier {
 
@@ -28,7 +27,7 @@ public class Identifier {
      * A constructor initializing an identifier.
      *
      * @param extension the extension id number.
-     * @param root the template's root number.
+     * @param root      the template's root number.
      */
     public Identifier(String extension, String root) {
         // Setting the extension id number

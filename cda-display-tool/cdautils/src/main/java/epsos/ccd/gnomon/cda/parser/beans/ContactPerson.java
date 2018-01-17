@@ -11,7 +11,6 @@ import java.util.Set;
  * A class encapsulating a participant as a contact person.
  *
  * @author Akis Papadopoulos
- *
  */
 public class ContactPerson extends Participant {
 
@@ -37,10 +36,10 @@ public class ContactPerson extends Participant {
         this.name = null;
 
         // Creating an empty set of phone contacts
-        this.phones = new HashSet<Contact>();
+        this.phones = new HashSet<>();
 
         // Creating an empty set of email contacts
-        this.emails = new HashSet<Contact>();
+        this.emails = new HashSet<>();
 
         // Setting a null address of the participant
         this.address = null;
@@ -52,8 +51,8 @@ public class ContactPerson extends Participant {
     /**
      * A constructor initializing a contact person.
      *
-     * @param role the role class of the participant contact person.
-     * @param name the name of the contact person.
+     * @param role         the role class of the participant contact person.
+     * @param name         the name of the contact person.
      * @param relationship the contact person relationship role.
      */
     public ContactPerson(RoleClass role, Name name, RelationshipRole relationship) {
@@ -64,10 +63,10 @@ public class ContactPerson extends Participant {
         this.name = name;
 
         // Creating an empty set of phone contacts
-        this.phones = new HashSet<Contact>();
+        this.phones = new HashSet<>();
 
         // Creating an empty set of email contacts
-        this.emails = new HashSet<Contact>();
+        this.emails = new HashSet<>();
 
         // Setting a null address of the participant
         this.address = null;
@@ -239,7 +238,7 @@ public class ContactPerson extends Participant {
             // Setting the code system attribute
             context.append(" ")
                     .append("codeSystem=\"")
-                    .append(relationship.CODE_SYSTEM)
+                    .append(RelationshipRole.CODE_SYSTEM)
                     .append("\"");
 
             // Closing the code element
@@ -253,7 +252,7 @@ public class ContactPerson extends Participant {
         }
 
         // Checking if any phone contact is provided
-        if (phones.size() > 0) {
+        if (!phones.isEmpty()) {
             // Iterating through the set of phones
             for (Contact phone : phones) {
                 // Checking for a valid contact element
@@ -265,7 +264,7 @@ public class ContactPerson extends Participant {
         }
 
         // Checking if any email contact is provided
-        if (emails.size() > 0) {
+        if (!emails.isEmpty()) {
             // Iterating through the email set
             for (Contact email : emails) {
                 // Checking for a valid contact element

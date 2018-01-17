@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating an alert agent.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Agent {
 

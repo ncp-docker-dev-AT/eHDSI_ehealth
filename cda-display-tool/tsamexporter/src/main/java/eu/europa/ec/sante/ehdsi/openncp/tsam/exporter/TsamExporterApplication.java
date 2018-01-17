@@ -13,6 +13,7 @@ public class TsamExporterApplication {
     private static final Logger logger = LoggerFactory.getLogger(TsamExporterApplication.class);
 
     public static void main(String[] args) {
+
         ApplicationContext context = SpringApplication.run(TsamExporterApplication.class, args);
 
         logger.info("OS: {} ({}, {})", System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch"));

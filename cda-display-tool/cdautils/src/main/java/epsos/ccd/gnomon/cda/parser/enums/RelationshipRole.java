@@ -2,12 +2,11 @@ package epsos.ccd.gnomon.cda.parser.enums;
 
 /**
  * A basic enum coding relationship role.
- * 
+ *
  * @author Akis Papadopoulos
- * 
  */
 public enum RelationshipRole {
-    
+
     // Relationship role code and display name
     AUNT("AUNT", "aunt"),
     CHILD("CHILD", "child"),
@@ -58,8 +57,8 @@ public enum RelationshipRole {
 
     /**
      * A basic constructor initializing the relationship role.
-     * 
-     * @param code the code of the relationship role.
+     *
+     * @param code    the code of the relationship role.
      * @param display the display name of the relationship role.
      */
     private RelationshipRole(String code, String display) {
@@ -72,7 +71,7 @@ public enum RelationshipRole {
 
     /**
      * A method returning the code of the relationship role.
-     * 
+     *
      * @return the code of the relationship role.
      */
     public String getCode() {
@@ -81,7 +80,7 @@ public enum RelationshipRole {
 
     /**
      * A method returning the display name of the relationship role.
-     * 
+     *
      * @return the display name of the relationship role.
      */
     public String getDisplay() {
@@ -90,7 +89,7 @@ public enum RelationshipRole {
 
     /**
      * A method returning an alphanumeric representation of the object.
-     * 
+     *
      * @return the code of the relationship role.
      */
     @Override

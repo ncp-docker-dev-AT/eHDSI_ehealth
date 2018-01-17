@@ -9,7 +9,6 @@ import java.util.Set;
  * A class encapsulating a generic medical component for medical documents.
  *
  * @author Akis Papadopoulos
- *
  */
 public class MedicalComponent {
 
@@ -34,7 +33,7 @@ public class MedicalComponent {
         this.id = null;
 
         // Creating an empty set of template roots
-        this.roots = new HashSet<String>();
+        this.roots = new HashSet<>();
 
         // Setting a null medical section code
         this.section = null;
@@ -46,21 +45,21 @@ public class MedicalComponent {
         this.text = new NarrativeText();
 
         // Creating an empty set of medical entries
-        this.entries = new HashSet<MedicalEntry>();
+        this.entries = new HashSet<>();
     }
 
     /**
      * A constructor initializing a generic medical component.
      *
      * @param section the medical section code of the component.
-     * @param title the title of the medical component.
+     * @param title   the title of the medical component.
      */
     public MedicalComponent(MedicalSection section, String title) {
         // Setting a null id of the medical component
         this.id = null;
 
         // Creating an empty set of template roots
-        this.roots = new HashSet<String>();
+        this.roots = new HashSet<>();
 
         // Setting the medical section code
         this.section = section;
@@ -72,7 +71,7 @@ public class MedicalComponent {
         this.text = new NarrativeText();
 
         // Creating set of medical entries
-        this.entries = new HashSet<MedicalEntry>();
+        this.entries = new HashSet<>();
     }
 
     /**
@@ -218,7 +217,7 @@ public class MedicalComponent {
         context.append("<section>");
 
         // Checking if the template roots are provided
-        if (roots.size() > 0) {
+        if (!roots.isEmpty()) {
             // Iterating through the set of roots
             for (String root : roots) {
                 // Creating the next template
@@ -262,7 +261,7 @@ public class MedicalComponent {
         }
 
         // Checking if any medical entry provided
-        if (entries.size() > 0) {
+        if (!entries.isEmpty()) {
             // Iterating through medical entries
             for (MedicalEntry entry : entries) {
                 // Checking for a valid entry

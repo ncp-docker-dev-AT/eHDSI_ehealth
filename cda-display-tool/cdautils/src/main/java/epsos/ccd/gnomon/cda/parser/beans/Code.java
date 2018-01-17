@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating an abstract code.
  *
  * @author Akis Papadopoulos
- *
  */
 public abstract class Code {
 
@@ -37,9 +36,9 @@ public abstract class Code {
     /**
      * A constructor initializing an abstract code.
      *
-     * @param code the code.
-     * @param display the display name of code.
-     * @param codeSystem the code system.
+     * @param code          the code.
+     * @param display       the display name of code.
+     * @param codeSystem    the code system.
      * @param codeSysemName the code system name.
      */
     public Code(String code, String display, String codeSystem, String codeSystemName) {
