@@ -20,6 +20,7 @@ public class FailedLogsHandlerImpl implements FailedLogsHandler {
     }
 
     public void run() {
+
         try {
             List<File> files = serializer.listFiles();
             for (File file : files) {
@@ -39,6 +40,7 @@ public class FailedLogsHandlerImpl implements FailedLogsHandler {
     }
 
     private void handleSentMessage(File file) {
+
         if (!file.delete()) {
             LOGGER.error("Unable to delete successfully re-sent log backup ('{}')!", file.getAbsolutePath());
         }

@@ -17,32 +17,31 @@ import java.util.regex.Pattern;
 public class Validator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class);
-    private static final int _CHAR_LOWER_CASE_BEGIN = 97;
-    private static final int _CHAR_LOWER_CASE_END = 122;
-    private static final int _CHAR_UPPER_CASE_BEGIN = 65;
-    private static final int _CHAR_UPPER_CASE_END = 90;
-    private static final int _DIGIT_BEGIN = 48;
-    private static final int _DIGIT_END = 57;
-    private static final char[] _EMAIL_ADDRESS_SPECIAL_CHAR = new char[]{
+    private static final int CHAR_LOWER_CASE_BEGIN = 97;
+    private static final int CHAR_LOWER_CASE_END = 122;
+    private static final int CHAR_UPPER_CASE_BEGIN = 65;
+    private static final int CHAR_UPPER_CASE_END = 90;
+    private static final int DIGIT_BEGIN = 48;
+    private static final int DIGIT_END = 57;
+    private static final char[] EMAIL_ADDRESS_SPECIAL_CHAR = new char[]{
             '.', '!', '#', '$', '%', '&', '\'', '*', '+', '-', '/', '=', '?', '^',
             '_', '`', '{', '|', '}', '~'
     };
-    private static final String _LOCALHOST = "localhost";
-    private static final String _VARIABLE_TERM_BEGIN = "[$";
-    private static final String _VARIABLE_TERM_END = "$]";
-    private static final String _XML_BEGIN = "<?xml";
-    private static final String _XML_EMPTY = "<root />";
-    private static Pattern _emailAddressPattern = Pattern.compile(
+    private static final String VARIABLE_TERM_BEGIN = "[$";
+    private static final String VARIABLE_TERM_END = "$]";
+    private static final String XML_BEGIN = "<?xml";
+    private static final String XML_EMPTY = "<root />";
+    private static Pattern emailAddressPattern = Pattern.compile(
             "[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@" +
                     "(?:[\\w](?:[\\w-]*[\\w])?\\.)+[\\w](?:[\\w-]*[\\w])?");
-    private static Pattern _ipv4AddressPattern = Pattern.compile(
+    private static Pattern ipv4AddressPattern = Pattern.compile(
             "^" +
                     "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
                     "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
                     "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
                     "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" +
                     "$");
-    private static Pattern _variableNamePattern = Pattern.compile(
+    private static Pattern variableNamePattern = Pattern.compile(
             "[_a-zA-Z]+[_a-zA-Z0-9]*");
 
     private Validator() {
@@ -239,8 +238,8 @@ public class Validator {
      */
     public static boolean isChar(char c) {
 
-        return ((c >= _CHAR_LOWER_CASE_BEGIN) && (c <= _CHAR_LOWER_CASE_END)) ||
-                ((c >= _CHAR_UPPER_CASE_BEGIN) && (c <= _CHAR_UPPER_CASE_END));
+        return ((c >= CHAR_LOWER_CASE_BEGIN) && (c <= CHAR_LOWER_CASE_END)) ||
+                ((c >= CHAR_UPPER_CASE_BEGIN) && (c <= CHAR_UPPER_CASE_END));
 
     }
 
@@ -289,7 +288,7 @@ public class Validator {
      */
     public static boolean isDigit(char c) {
 
-        return (c >= _DIGIT_BEGIN) && (c <= _DIGIT_END);
+        return (c >= DIGIT_BEGIN) && (c <= DIGIT_END);
 
     }
 
@@ -323,7 +322,7 @@ public class Validator {
      * <code>false</code> otherwise
      */
     public static boolean isEmailAddress(String emailAddress) {
-        Matcher matcher = _emailAddressPattern.matcher(emailAddress);
+        Matcher matcher = emailAddressPattern.matcher(emailAddress);
 
         return matcher.matches();
     }
@@ -340,7 +339,7 @@ public class Validator {
 
         // LEP-1445
 
-        for (char specialChar : _EMAIL_ADDRESS_SPECIAL_CHAR) {
+        for (char specialChar : EMAIL_ADDRESS_SPECIAL_CHAR) {
             if (c == specialChar) {
                 return true;
             }
@@ -403,14 +402,9 @@ public class Validator {
             return false;
         }
 
-        if (normalizedPath.contains(
+        return !normalizedPath.contains(
                 StringPool.SLASH.concat(
-                        StringPool.DOUBLE_PERIOD).concat(StringPool.SLASH))) {
-
-            return false;
-        }
-
-        return true;
+                        StringPool.DOUBLE_PERIOD).concat(StringPool.SLASH));
     }
 
     /**
@@ -520,7 +514,7 @@ public class Validator {
      * <code>false</code> otherwise
      */
     public static boolean isIPv4Address(String ipAddress) {
-        Matcher matcher = _ipv4AddressPattern.matcher(ipAddress);
+        Matcher matcher = ipv4AddressPattern.matcher(ipAddress);
 
         return matcher.matches();
     }
@@ -658,11 +652,7 @@ public class Validator {
             return isNull((Long) obj);
         } else if (obj instanceof String) {
             return isNull((String) obj);
-        } else if (obj == null) {
-            return true;
-        } else {
-            return false;
-        }
+        } else return obj == null;
     }
 
     /**
@@ -717,10 +707,8 @@ public class Validator {
                     return false;
                 }
             }
-
             counter++;
         }
-
         return (counter == 0) || (counter == 4);
     }
 
@@ -784,7 +772,7 @@ public class Validator {
         if (isNull(variableName)) {
             return false;
         }
-        Matcher matcher = _variableNamePattern.matcher(variableName);
+        Matcher matcher = variableNamePattern.matcher(variableName);
 
         return matcher.matches();
     }
@@ -799,7 +787,7 @@ public class Validator {
      */
     public static boolean isVariableTerm(String s) {
 
-        return s.startsWith(_VARIABLE_TERM_BEGIN) && s.endsWith(_VARIABLE_TERM_END);
+        return s.startsWith(VARIABLE_TERM_BEGIN) && s.endsWith(VARIABLE_TERM_END);
     }
 
     /**
@@ -827,6 +815,6 @@ public class Validator {
      */
     public static boolean isXml(String s) {
 
-        return s.startsWith(_XML_BEGIN) || s.startsWith(_XML_EMPTY);
+        return s.startsWith(XML_BEGIN) || s.startsWith(XML_EMPTY);
     }
 }

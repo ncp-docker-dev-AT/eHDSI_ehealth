@@ -4,7 +4,6 @@ import eu.epsos.util.proxy.CustomProxySelector;
 import eu.epsos.util.proxy.ProxyCredentials;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
@@ -24,9 +23,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-/**
- *
- */
 public class HTTPUtil {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(HTTPUtil.class);
@@ -108,17 +104,22 @@ public class HTTPUtil {
      */
     public static String getSubjectDN(boolean isProvider) {
 
-        FileInputStream inputStream = null;
         Certificate cert;
+        String keystorePath;
+        if (isProvider) {
+            keystorePath = Constants.SP_KEYSTORE_PATH;
+        } else {
+            keystorePath = Constants.SC_KEYSTORE_PATH;
+        }
 
-        try {
+        try (FileInputStream inputStream = new FileInputStream(keystorePath)) {
+
             if (isProvider) {
-                inputStream = new FileInputStream(Constants.SP_KEYSTORE_PATH);
                 KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keystore.load(inputStream, Constants.SP_KEYSTORE_PASSWORD.toCharArray());
                 cert = keystore.getCertificate(Constants.SP_PRIVATEKEY_ALIAS);
             } else {
-                inputStream = new FileInputStream(Constants.SC_KEYSTORE_PATH);
+
                 KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keystore.load(inputStream, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
                 cert = keystore.getCertificate(Constants.SC_PRIVATEKEY_ALIAS);
@@ -130,8 +131,6 @@ public class HTTPUtil {
             }
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
             LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
         }
         return "";
     }
@@ -150,6 +149,7 @@ public class HTTPUtil {
      * @return
      */
     public static ProxyCredentials getProxyCredentials() {
+
         ProxyCredentials credentials = new ProxyCredentials();
         ConfigurationManager configService = ConfigurationManagerFactory.getConfigurationManager();
         credentials.setProxyAuthenticated(Boolean.parseBoolean(configService.getProperty("APP_BEHIND_PROXY")));
@@ -164,7 +164,8 @@ public class HTTPUtil {
      * @return
      */
     public CustomProxySelector setCustomProxyServerForURLConnection() {
-        CustomProxySelector ps = null;
+
+        CustomProxySelector ps;
         if (isProxyAnthenticationMandatory()) {
             ProxyCredentials proxyCredentials = getProxyCredentials();
             ps = new CustomProxySelector(ProxySelector.getDefault(), proxyCredentials);
