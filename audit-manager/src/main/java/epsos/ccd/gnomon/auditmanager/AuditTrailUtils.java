@@ -25,14 +25,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * This class provides methods for constructing the audit message and for sending the syslog message to the repository
+ * This class provides methods for constructing the audit message and for sending the syslog message to the repository.
+ * Instances of the spSOS defined services, as for constructing and sending the syslog message to the repository.
  *
  * @author Kostas Karkaletsis
- * @author Organization: Gnomon
- * @author mail:k.karkaletsis@gnomon.com.gr
- * @version 1.0, 2010, 30 Jun Provides methods for creating AuditMessage
- * instances of the spSOS defined services, as for constructing and
- * sending the syslog message to the repository
  */
 public enum AuditTrailUtils {
 
@@ -43,9 +39,9 @@ public enum AuditTrailUtils {
         return INSTANCE;
     }
 
-    public synchronized static String constructMessage(AuditMessage auditmessage, boolean sign) {
+    public static synchronized String constructMessage(AuditMessage auditmessage, boolean sign) {
 
-        String auditmsg = "";
+        String auditMessage = "";
         LOGGER.info("Constructing message");
         String eventTypeCode = "EventTypeCode(N/A)";
         try {
@@ -56,12 +52,12 @@ public enum AuditTrailUtils {
         }
 
         try {
-            auditmsg = AuditTrailUtils.convertAuditObjectToXML(auditmessage);
+            auditMessage = AuditTrailUtils.convertAuditObjectToXML(auditmessage);
         } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
         }
         LOGGER.info("Message created");
-        INSTANCE.writeTestAudits(auditmessage, auditmsg);
+        INSTANCE.writeTestAudits(auditmessage, auditMessage);
         LOGGER.info("'{}' message constructed", eventTypeCode);
 
         boolean validated = false;
@@ -72,7 +68,7 @@ public enum AuditTrailUtils {
             LOGGER.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error getting xsd url", e);
         }
         try {
-            validated = Utils.validateSchema(auditmsg, url);
+            validated = Utils.validateSchema(auditMessage, url);
             LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Validating Schema");
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -81,7 +77,7 @@ public enum AuditTrailUtils {
         if (!validated) {
             LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message not validated");
             if (!forceWrite) {
-                auditmsg = "";
+                auditMessage = "";
             }
         }
         if (validated || forceWrite) {
@@ -99,22 +95,20 @@ public enum AuditTrailUtils {
                 // validate xml according to xsd
                 LOGGER.debug(auditmessage.getEventIdentification().getEventID().getCode()
                         + " XML stuff: Create Dom From String");
-                Document doc = Utils.createDomFromString(auditmsg);
+                Document doc = Utils.createDomFromString(auditMessage);
                 if (sign) {
                     // Gnomon SecMan
-                    auditmsg = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
+                    auditMessage = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
 
                     LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " message signed");
                 }
             } catch (Exception e) {
-                auditmsg = "";
+                auditMessage = "";
                 LOGGER.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error signing doc"
                         + e.getMessage(), e);
             }
         }
-        // TODO: Audit Message built is not displayed into the logs
-        // LOGGER.info("Audit Message: '{}'", auditmsg);
-        return auditmsg;
+        return auditMessage;
     }
 
     /**
@@ -125,7 +119,7 @@ public enum AuditTrailUtils {
      * @return
      * @throws JAXBException
      */
-    public synchronized static String convertAuditObjectToXML(AuditMessage am) throws JAXBException {
+    public static synchronized String convertAuditObjectToXML(AuditMessage am) throws JAXBException {
 
         LOGGER.info("Converting message - JAXB marshalling the Audit Object");
         StringWriter sw = new StringWriter();
@@ -793,7 +787,6 @@ public enum AuditTrailUtils {
     private AuditMessage addPointOfCare(AuditMessage am, String PC_UserID, String PC_RoleID, boolean UserIsRequestor,
                                         String codeSystem) {
 
-        //if (PC_UserID == null || PC_UserID.equals("")) {
         if (StringUtils.isBlank(PC_UserID)) {
             LOGGER.info("This is service provider and doesn't need Point of Care");
         } else {
@@ -943,7 +936,6 @@ public enum AuditTrailUtils {
      */
     private AuditMessage createAuditTrailForEhealthSMPQuery(EventLog eventLog) {
 
-        //TODO
         AuditMessage am = null;
         try {
             ObjectFactory of = new ObjectFactory();
@@ -972,7 +964,6 @@ public enum AuditTrailUtils {
      */
     private AuditMessage createAuditTrailForEhealthSMPPush(EventLog eventLog) {
 
-        //TODOO
         AuditMessage am = null;
         try {
             ObjectFactory of = new ObjectFactory();
@@ -1320,6 +1311,5 @@ public enum AuditTrailUtils {
             LOGGER.error("JAXBException: {}", e.getMessage(), e);
             return false;
         }
-        //return AuditValidationService.getInstance().validateModel(AuditTrailUtils.constructMessage(am, false), model, ncpSide);
     }
 }

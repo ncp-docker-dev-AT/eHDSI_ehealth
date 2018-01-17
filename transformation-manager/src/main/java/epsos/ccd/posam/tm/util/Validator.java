@@ -55,7 +55,9 @@ public class Validator implements TMConstants {
 
                 // validate the DOM tree
                 LOGGER.info("... Schema Validation ");
-                LOGGER.debug("DOCUMENT: '{}", XMLUtil.prettyPrint(document));
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("DOCUMENT: '{}", XMLUtil.prettyPrint(document));
+                }
                 validator.validate(new DOMSource(document));
                 LOGGER.info("OK , instance document is valid ");
                 return true;
@@ -75,15 +77,8 @@ public class Validator implements TMConstants {
 
     private static boolean isScanneddoc(String docType) {
 
-        if (docType.equals(PATIENT_SUMMARY1) ||
-                docType.equals(EDISPENSATION1) ||
-                docType.equals(EPRESCRIPTION1) ||
-                docType.equals(HCER1) ||
-                docType.equals(MRO1)) {
-
-            return true;
-        }
-        return false;
+        return docType.equals(PATIENT_SUMMARY1) || docType.equals(EDISPENSATION1) || docType.equals(EPRESCRIPTION1)
+                || docType.equals(HCER1) || docType.equals(MRO1);
     }
 
     /**
@@ -94,7 +89,7 @@ public class Validator implements TMConstants {
      *                        eDispensation)
      * @param friendly        - if true validate against friendly scheme, else against pivot
      */
-    public static SchematronResult validateSchematron(Document document, String cdaDocumentType, boolean friendly) throws Exception {
+    public static SchematronResult validateSchematron(Document document, String cdaDocumentType, boolean friendly) {
 
         LOGGER.info("--> method SchematronResult validateSchematron('{}', '{}', '{})", document, cdaDocumentType, friendly);
         SchematronResult result;

@@ -70,7 +70,7 @@ public interface ITransformationService {
      * structure provides information about the operation results,
      * including possible errors and warning.
      */
-    public TMResponseStructure toEpSOSPivot(Document epSOSOriginalData);
+    TMResponseStructure toEpSOSPivot(Document epSOSOriginalData);
 
     /**
      * After having received a translate() request, this component starts to
@@ -120,13 +120,12 @@ public interface ITransformationService {
      * structure provides information about the operation results,
      * including possible errors and warning.
      */
-    public TMResponseStructure translate(Document epSosCDA,
-                                         String targetLanguageCode);
+    TMResponseStructure translate(Document epSosCDA, String targetLanguageCode);
 
     /**
      * Additional method for retrieving the list of all available languages in the LTR
      *
      * @return the list of LTR available languages, as a String list, containing the language codes;
      */
-    public List<String> getLtrLanguages();
+    List<String> getLtrLanguages();
 }

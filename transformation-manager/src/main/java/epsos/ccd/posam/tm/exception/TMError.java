@@ -3,8 +3,7 @@ package epsos.ccd.posam.tm.exception;
 import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 
 /**
- * Enumeration for TM Errors & Warnings codes. Provides get/set methods for code
- * and description
+ * Enumeration for TM Errors & Warnings codes. Provides get/set methods for code and description.
  *
  * @author Frantisek Rudik
  * @author Organization: Posam
@@ -12,6 +11,7 @@ import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
  * @version 1.8, 2010, 20 October
  */
 public enum TMError implements ITMTSAMEror {
+
     // ERRORS
     /**
      * Error; Software processing error (e.g. "out of memory" )<br>
@@ -165,12 +165,12 @@ public enum TMError implements ITMTSAMEror {
     /**
      * Default enum constructor
      *
-     * @param code
-     * @param descripton
+     * @param code        Code of the error raised.
+     * @param description Description of the Error Code.
      */
-    TMError(String code, String descripton) {
+    TMError(String code, String description) {
         this.code = code;
-        this.description = descripton;
+        this.description = description;
     }
 
     /**
@@ -187,10 +187,10 @@ public enum TMError implements ITMTSAMEror {
         return description;
     }
 
-    @Override
-    /**
+    /*
      * @return String in format code:description
      */
+    @Override
     public String toString() {
         return code + ": " + description;
     }
