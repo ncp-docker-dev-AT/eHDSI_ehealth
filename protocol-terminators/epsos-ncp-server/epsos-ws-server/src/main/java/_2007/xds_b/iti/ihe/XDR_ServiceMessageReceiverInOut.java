@@ -205,7 +205,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
                 try {
                     EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                            endTime, "", EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND);
+                            endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND);
                 } catch (Exception e) {
                     LOGGER.error("EADC INVOCATION FAILED: '{}'", e.getMessage(), e);
                 }

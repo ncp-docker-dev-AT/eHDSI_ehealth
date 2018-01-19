@@ -50,9 +50,9 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.opensaml.saml2.core.AuthnStatement;
-import org.opensaml.saml2.core.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tr.com.srdc.epsos.util.OidUtil;
 
 /**
  * This class wraps the EADC invocation. As it gathers several aspects required
@@ -105,15 +105,16 @@ public class EadcUtilWrapper {
                                                         Date endTime, String countryAcode) throws Exception {
 
         TransactionInfo result = new ObjectFactory().createComplexTypeTransactionInfo();
-        result.setAuthentificationLevel(extractAuthenticationMethodFromAssertion(getAssertion(reqMsgContext)));
-        result.setDirection(direction.toString());
-        result.setStartTime(getDateAsRFC822String(startTime));
-        result.setEndTime(getDateAsRFC822String(endTime));
-        result.setDuration(String.valueOf(endTime.getTime() - startTime.getTime()));
+        result.setAuthentificationLevel(reqMsgContext != null ? extractAuthenticationMethodFromAssertion(getAssertion(reqMsgContext)) : null);
+        result.setDirection(direction != null ? direction.toString() : null);
+        result.setStartTime(startTime != null ? getDateAsRFC822String(startTime) : null);
+        result.setEndTime(endTime != null ? getDateAsRFC822String(endTime) : null);
+        result.setDuration(endTime != null && startTime != null ? String.valueOf(endTime.getTime() - startTime.getTime()) : null);
 
         result.setHomeAddress(EventLogClientUtil.getLocalIpAddress());
-        result.setSndISO(Constants.COUNTRY_CODE);
-        result.setSndNCPOID(Constants.HOME_COMM_ID);
+        String sndIso = reqMsgContext != null ? extractSendingCountryIsoFromAssertion(getAssertion(reqMsgContext)) : null;
+        result.setSndISO(sndIso);
+        result.setSndNCPOID(sndIso != null ? OidUtil.getHomeCommunityId(sndIso.toLowerCase()) : null);
 
         if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getFrom() != null && reqMsgContext.getOptions().getFrom().getAddress() != null) {
             result.setHomeHost(reqMsgContext.getOptions().getFrom().getAddress());
@@ -121,20 +122,25 @@ public class EadcUtilWrapper {
 
         /* we cannot get the MessageID from the reqMsgContext, it returns a wrong one. 
         Probably related to how the Axis2 engine sets the MessageID, similar issues 
-        were faced during the Evidence Emitter refactoring */
+        were faced during the Evidence Emitter refactoring. Plus, for the XCA Retrieve request messages, 
+        when comparing this MessageID with the one from the message itself, be sure to compare it with
+        the corect WSA headers, there are duplicated ones, although belonging to different
+        namespaces (the correct one is xmlns = http://www.w3.org/2005/08/addressing) (EHNCP-1141)*/
         result.setSndMsgID(reqMsgContext != null ? getMessageID(reqMsgContext.getEnvelope()) : null);
-        result.setHomeHCID(Constants.HOME_COMM_ID);
+        result.setHomeHCID("");
         result.setHomeISO(Constants.COUNTRY_CODE);
-        result.setHomeNCPOID("");
+        result.setHomeNCPOID(Constants.HOME_COMM_ID);
 
-        result.setHumanRequestor(extractNameIdFromAssertion(getAssertion(reqMsgContext)));
-        result.setUserId(extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xacml:1.0:subject:subject-id"));
+        result.setHumanRequestor(reqMsgContext != null ? extractNameIdFromAssertion(getAssertion(reqMsgContext)) : null);
+        result.setUserId(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xacml:1.0:subject:subject-id") : null);
 
-        result.setPOC(extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
-                      extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type") + ")");
-        result.setPOCID(extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:subject:organization-id"));
+        result.setPOC(reqMsgContext != null ? 
+                      extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
+                      extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type") + ")" : null);
+        result.setPOCID(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:subject:organization-id") : null);
 
         result.setReceivingISO(countryAcode);
+        result.setReceivingNCPOID(countryAcode != null ? OidUtil.getHomeCommunityId(countryAcode.toLowerCase()) : null);
         if (serviceClient != null && serviceClient.getOptions() != null && serviceClient.getOptions().getTo() != null && serviceClient.getOptions().getTo().getAddress() != null) {
             result.setReceivingHost(serviceClient.getOptions().getTo().getAddress());
             result.setReceivingAddr(EventLogClientUtil.getServerIpAddress(serviceClient.getOptions().getTo().getAddress()));
@@ -282,6 +288,19 @@ public class EadcUtilWrapper {
      */
     private static String extractNameIdFromAssertion(Assertion idAssertion) {
         return idAssertion.getSubject().getNameID().getValue();
+    }
+    
+    /**
+     * Extracts the sending country ISO code from Issuer of the given Assertion.
+     * E.g., for this issuer: 
+     * <saml2:Issuer NameQualifier="urn:epsos:wp34:assertions">urn:idp:PT:countryB</saml2:Issuer>
+     * it will extract "PT"
+     *      * 
+     * @param idAssertion
+     * @return string containing the assertion issuer's ISO country code
+     */
+    private static String extractSendingCountryIsoFromAssertion(Assertion idAssertion) {
+        return idAssertion.getIssuer().getValue().split(":")[2];
     }
     
     /**
