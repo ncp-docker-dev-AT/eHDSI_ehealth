@@ -1,20 +1,3 @@
-/*
- *  Copyright 2010 Jerry Dimitriou <jerouris at netsmart.gr>.
- * 
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
-
 package epsos.ccd.netsmart.securitymanager;
 
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
@@ -41,17 +24,17 @@ import static org.junit.Assert.fail;
  */
 public class CertificatePathTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(CertificatePathTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CertificatePathTest.class);
 
     public CertificatePathTest() {
     }
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
     }
 
     @Before
@@ -61,9 +44,6 @@ public class CertificatePathTest {
     @After
     public void tearDown() {
     }
-
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
 
     @Test
     public void TianiCertPathTest() {
@@ -77,7 +57,7 @@ public class CertificatePathTest {
             Certificate cert = ks.getCertificate("server1");
             X509CertSelector target = new X509CertSelector();
             target.setCertificate((X509Certificate) cert);
-            logger.info("Certificate: '{}'", cert);
+            LOGGER.info("Certificate: '{}'", cert);
             PKIXBuilderParameters builderParams = new PKIXBuilderParameters(
                     ksm.getTrustStore(), target);
             builderParams.setRevocationEnabled(false);
@@ -89,12 +69,12 @@ public class CertificatePathTest {
             CertPath cp = build.getCertPath();
 
             List<? extends Certificate> certs = cp.getCertificates();
-            logger.info("--------------------------- Certificates as built ----------------------------");
+            LOGGER.info("--------------------------- Certificates as built ----------------------------");
             for (Certificate crt : certs) {
-                logger.info("Certificate: '{}'", crt);
+                LOGGER.info("Certificate: '{}'", crt);
             }
 
-            logger.info("--------------------------- END ----------------------------------------------");
+            LOGGER.info("--------------------------- END ----------------------------------------------");
 
             CertPathValidator cpv = CertPathValidator.getInstance("PKIX");
             PKIXParameters params = new PKIXParameters(ksm.getTrustStore());
@@ -102,23 +82,10 @@ public class CertificatePathTest {
 
             PKIXCertPathValidatorResult validationResult = (PKIXCertPathValidatorResult) cpv
                     .validate(cp, params);
-            logger.info("PKIXCertPathValidatorResult: '{}'", validationResult);
+            LOGGER.info("PKIXCertPathValidatorResult: '{}'", validationResult);
 
-        } catch (CertPathBuilderException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-        } catch (CertPathValidatorException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-        } catch (InvalidAlgorithmParameterException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-
-        } catch (KeyStoreException ex) {
-            logger.error(null, ex);
+        } catch (CertPathBuilderException | KeyStoreException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | CertPathValidatorException ex) {
+            LOGGER.error(null, ex);
             fail(ex.getMessage());
         }
     }
@@ -147,7 +114,7 @@ public class CertificatePathTest {
             // print each certificate in the path
             List<? extends Certificate> certs = cp.getCertificates();
             for (Certificate cert : certs) {
-                logger.info("Certificate: '{}'", cert);
+                LOGGER.info("Certificate: '{}'", cert);
             }
 
             CertPathValidator cpv = CertPathValidator.getInstance("PKIX");
@@ -160,24 +127,12 @@ public class CertificatePathTest {
 
             PKIXCertPathValidatorResult validationResult = (PKIXCertPathValidatorResult) cpv
                     .validate(cp, params);
-            logger.info("PKIXCertPathValidatorResult: '{}'", validationResult);
+            LOGGER.info("PKIXCertPathValidatorResult: '{}'", validationResult);
 
         } catch (CRLException ex) {
-            logger.error(null, ex);
-        } catch (CertPathValidatorException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-        } catch (InvalidAlgorithmParameterException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-        } catch (CertificateException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-        } catch (KeyStoreException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
+        } catch (CertPathValidatorException | KeyStoreException | CertificateException | NoSuchAlgorithmException | InvalidAlgorithmParameterException ex) {
+            LOGGER.error(null, ex);
             fail(ex.getMessage());
         }
     }
@@ -206,7 +161,7 @@ public class CertificatePathTest {
             // print each certificate in the path
             List<? extends Certificate> certs = cp.getCertificates();
             for (Certificate cert : certs) {
-                logger.info("Certificate: '{}'", cert);
+                LOGGER.info("Certificate: '{}'", cert);
             }
 
             CertPathValidator cpv = CertPathValidator.getInstance("PKIX");
@@ -219,25 +174,16 @@ public class CertificatePathTest {
 
             PKIXCertPathValidatorResult validationResult = (PKIXCertPathValidatorResult) cpv
                     .validate(cp, params);
-            logger.info("PKIXCertPathValidatorResult: '{}'", validationResult);
+            LOGGER.info("PKIXCertPathValidatorResult: '{}'", validationResult);
 
         } catch (CRLException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         } catch (CertPathValidatorException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             assertEquals("Certificate has been revoked, reason: unspecified",
                     ex.getMessage());
-        } catch (InvalidAlgorithmParameterException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-        } catch (CertificateException ex) {
-            logger.error(null, ex);
-            fail(ex.getMessage());
-        } catch (KeyStoreException ex) {
-            logger.error(null, ex);
+        } catch (InvalidAlgorithmParameterException | KeyStoreException | CertificateException | NoSuchAlgorithmException ex) {
+            LOGGER.error(null, ex);
             fail(ex.getMessage());
         }
     }

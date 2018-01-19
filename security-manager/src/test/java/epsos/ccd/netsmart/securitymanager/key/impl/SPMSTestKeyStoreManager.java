@@ -1,23 +1,5 @@
-/*
- *  Copyright 2010 jerouris.
- * 
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
-
 package epsos.ccd.netsmart.securitymanager.key.impl;
 
-import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +15,7 @@ import java.security.cert.CertificateException;
  */
 public class SPMSTestKeyStoreManager implements KeyStoreManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlassfishTestKeyStoreManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlassfishTestKeyStoreManager.class);
 
     private static final String TEST_KEYSTORE_LOCATION = "keystores/spms/pt-server-keystore.jks";
     private static final String TEST_TRUSTSTORE_LOCATION = "keystores/spms/pt-server-truststore.jks";
@@ -72,7 +54,7 @@ public class SPMSTestKeyStoreManager implements KeyStoreManager {
                 return new KeyPair(publicKey, (PrivateKey) key);
             }
         } catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException e) {
-            logger.error(null, e);
+            LOGGER.error(null, e);
         }
         return null;
     }
@@ -87,7 +69,7 @@ public class SPMSTestKeyStoreManager implements KeyStoreManager {
             return keyStore;
 
         } catch (IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
         return null;
     }
@@ -104,6 +86,7 @@ public class SPMSTestKeyStoreManager implements KeyStoreManager {
     }
 
     private KeyStore getTestTrustStore() {
+
         try {
             trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
             InputStream keystoreStream = ClassLoader
@@ -114,32 +97,30 @@ public class SPMSTestKeyStoreManager implements KeyStoreManager {
             return trustStore;
 
         } catch (IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
         return null;
-
     }
 
     @Override
     public Certificate getCertificate(String alias) {
         try {
-            return keyStore
-                    .getCertificate(alias);
+            return keyStore.getCertificate(alias);
+
         } catch (KeyStoreException ex) {
-            logger.error(null,
-                    ex);
+            LOGGER.error(null, ex);
         }
         return null;
     }
 
     @Override
-    public KeyPair getDefaultPrivateKey() throws SMgrException {
+    public KeyPair getDefaultPrivateKey() {
         return getPrivateKey(TEST_PRIVATEKEY_ALIAS,
                 TEST_PRIVATEKEY_PASSWORD.toCharArray());
     }
 
     @Override
-    public Certificate getDefaultCertificate() throws SMgrException {
+    public Certificate getDefaultCertificate() {
         return getCertificate(TEST_PRIVATEKEY_ALIAS);
     }
 }
