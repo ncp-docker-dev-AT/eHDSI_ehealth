@@ -45,8 +45,7 @@
         </patientRole>
     </recordTarget>
     <author>
-        <functionCode code="221" codeSystem="2.16.840.1.113883.2.9.6.2.7" codeSystemName="ISCO" codeSystemVersion="2008"
-                      displayName="Medical doctors">
+        <functionCode code="221" codeSystem="2.16.840.1.113883.2.9.6.2.7" codeSystemName="ISCO" displayName="Medical doctors">
             <translation code="034" codeSystem="1.2.246.537.6.140.2008" codeSystemName="Valvira - Ammattioikeudet"
                          displayName="laillistettu erikoislääkäri"/>
         </functionCode>

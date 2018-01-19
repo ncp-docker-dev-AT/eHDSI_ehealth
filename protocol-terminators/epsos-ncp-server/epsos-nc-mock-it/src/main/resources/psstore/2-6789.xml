@@ -54,7 +54,6 @@
         <functionCode code="221"
                       codeSystem="2.16.840.1.113883.2.9.6.2.7"
                       codeSystemName="ISCO"
-                      codeSystemVersion="2008"
                       displayName="Medical doctors"/>
         <time value="20170918"/>
         <assignedAuthor>
@@ -175,7 +174,6 @@
                 <functionCode code="221"
                               codeSystem="2.16.840.1.113883.2.9.6.2.7"
                               codeSystemName="ISCO"
-                              codeSystemVersion="2008"
                               displayName="Medical doctors"/>
                 <assignedEntity>
                     <id extension="legal.authenticator.gov.mt"
@@ -984,7 +982,6 @@
                                 <functionCode code="221"
                                               codeSystem="2.16.840.1.113883.2.9.6.2.7"
                                               codeSystemName="ISCO"
-                                              codeSystemVersion="2008"
                                               displayName="Medical doctors"/>
                                 <time value="20170918"/>
                                 <assignedAuthor>
@@ -1075,7 +1072,6 @@
                                 <functionCode code="221"
                                               codeSystem="2.16.840.1.113883.2.9.6.2.7"
                                               codeSystemName="ISCO"
-                                              codeSystemVersion="2008"
                                               displayName="Medical doctors"/>
                                 <time value="20170918"/>
                                 <assignedAuthor>
@@ -1171,7 +1167,6 @@
                                 <functionCode code="221"
                                               codeSystem="2.16.840.1.113883.2.9.6.2.7"
                                               codeSystemName="ISCO"
-                                              codeSystemVersion="2008"
                                               displayName="Medical doctors"/>
                                 <time value="20170918"/>
                                 <assignedAuthor>
@@ -1262,7 +1257,6 @@
                                 <functionCode code="221"
                                               codeSystem="2.16.840.1.113883.2.9.6.2.7"
                                               codeSystemName="ISCO"
-                                              codeSystemVersion="2008"
                                               displayName="Medical doctors"/>
                                 <time value="20170918"/>
                                 <assignedAuthor>
@@ -1353,7 +1347,6 @@
                                 <functionCode code="221"
                                               codeSystem="2.16.840.1.113883.2.9.6.2.7"
                                               codeSystemName="ISCO"
-                                              codeSystemVersion="2008"
                                               displayName="Medical doctors"/>
                                 <time value="20170918"/>
                                 <assignedAuthor>
