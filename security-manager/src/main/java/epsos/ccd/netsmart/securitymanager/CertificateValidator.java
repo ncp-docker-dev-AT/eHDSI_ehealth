@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import javax.xml.crypto.*;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
-import java.io.IOException;
 import java.security.*;
 import java.security.cert.*;
 import java.security.cert.Certificate;
@@ -28,22 +27,24 @@ import java.util.Date;
 public final class CertificateValidator extends KeySelector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CertificateValidator.class);
+    @SuppressWarnings("squid:S1313")
     private static final String CRLDP_OID = "2.5.29.31";
     private static final String AIA_OID = "1.3.6.1.5.5.7.1.1";
     private static final String PROP_CHECK_FOR_KEYUSAGE = "secman.cert.validator.checkforkeyusage";
     private final KeyStore trustStore;
-    private boolean CHECK_FOR_KEYUSAGE;
+    private boolean checkForKeyUsage;
     private Certificate cert = null;
     private boolean isRevocationEnabled = false;
 
-    public CertificateValidator(KeyStore _trustStore) throws IOException {
+    public CertificateValidator(KeyStore trustStore) {
 
-        CHECK_FOR_KEYUSAGE = false;
-        trustStore = _trustStore;
+        checkForKeyUsage = false;
+        this.trustStore = trustStore;
 
         if (StringUtils.equalsIgnoreCase(ConfigurationManagerFactory.getConfigurationManager()
                 .getProperty(PROP_CHECK_FOR_KEYUSAGE).trim(), "true")) {
-            CHECK_FOR_KEYUSAGE = true;
+
+            checkForKeyUsage = true;
         }
     }
 
@@ -98,6 +99,19 @@ public final class CertificateValidator extends KeySelector {
         }
     }
 
+    private void checkCertificateValidity(X509Certificate certificate) throws SMgrException {
+
+        try {
+            certificate.checkValidity(new Date());
+        } catch (CertificateExpiredException ex) {
+            LOGGER.error(null, ex);
+            throw new SMgrException("Certificate Expired", ex);
+        } catch (CertificateNotYetValidException ex) {
+            LOGGER.error(null, ex);
+            throw new SMgrException("Certificate Not Valid Yet", ex);
+        }
+    }
+
     /**
      * This method verifies the validity of the given X509 certificate by checking the truststore.
      *
@@ -107,7 +121,8 @@ public final class CertificateValidator extends KeySelector {
     public void validateCertificate(X509Certificate cert) throws SMgrException {
 
         try {
-            if (CHECK_FOR_KEYUSAGE) {
+
+            if (checkForKeyUsage) {
                 LOGGER.info("Key usage available in conf manager");
                 boolean[] keyUsage = cert.getKeyUsage();
 
@@ -116,15 +131,7 @@ public final class CertificateValidator extends KeySelector {
                 }
             }
 
-            try {
-                cert.checkValidity(new Date());
-            } catch (CertificateExpiredException ex) {
-                LOGGER.error(null, ex);
-                throw new SMgrException("Certificate Expired", ex);
-            } catch (CertificateNotYetValidException ex) {
-                LOGGER.error(null, ex);
-                throw new SMgrException("Certificate Not Valid Yet", ex);
-            }
+            checkCertificateValidity(cert);
 
             // Check if the cert supports the CRLDP
             if (cert.getExtensionValue(AIA_OID) != null) {

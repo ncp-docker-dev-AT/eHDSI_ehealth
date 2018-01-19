@@ -9,7 +9,6 @@ import java.util.Set;
  * A class encapsulating the demographics of a patient's guardian.
  *
  * @author Akis Papdopoulos
- *
  */
 public class Guardian {
 
@@ -35,10 +34,10 @@ public class Guardian {
         this.address = null;
 
         // Creating an empty set of phone contacts
-        this.phones = new HashSet<Contact>();
+        this.phones = new HashSet<>();
 
         // Creating an empty set of contacts
-        this.emails = new HashSet<Contact>();
+        this.emails = new HashSet<>();
 
         // Setting a null relationship
         this.relationship = null;
@@ -47,7 +46,7 @@ public class Guardian {
     /**
      * A constructor initializing the guardian.
      *
-     * @param name the name of the guardian.
+     * @param name         the name of the guardian.
      * @param relationship the relationship role of the guardian.
      */
     public Guardian(Name name, Code relationship) {
@@ -58,10 +57,10 @@ public class Guardian {
         this.address = null;
 
         // Creating an empty set of phone contacts
-        this.phones = new HashSet<Contact>();
+        this.phones = new HashSet<>();
 
         // Creating an empty set of contacts
-        this.emails = new HashSet<Contact>();
+        this.emails = new HashSet<>();
 
         // Setting the relationship
         this.relationship = relationship;
@@ -184,7 +183,7 @@ public class Guardian {
         }
 
         // Checking if any phone contact is provided
-        if (phones.size() > 0) {
+        if (!phones.isEmpty()) {
             // Iterating through the set of phones
             for (Contact phone : phones) {
                 // Checking for a valid contact element
@@ -196,7 +195,7 @@ public class Guardian {
         }
 
         // Checking if any email contact is provided
-        if (emails.size() > 0) {
+        if (!emails.isEmpty()) {
             // Iterating through the email set
             for (Contact email : emails) {
                 // Checking for a valid contact element

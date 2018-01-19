@@ -24,6 +24,7 @@ import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import net.ihe.gazelle.medication.NullFlavor;
@@ -350,7 +351,6 @@ public class EpsosHelperService {
         String cleanCDA;
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties props = cleaner.getProperties();
-        // props.setTreatUnknownTagsAsContent(true);
         props.setOmitUnknownTags(true);
         LOGGER.info("Cleaner init");
         TagNode node = cleaner.clean(htmlin);
@@ -805,7 +805,6 @@ public class EpsosHelperService {
                                         && !substituteValue.equals("EC")) {
                                     substitutionPermitted = false;
                                 }
-
                             }
 
                             line.setField1(name);
@@ -847,8 +846,7 @@ public class EpsosHelperService {
         return lines;
     }
 
-    private static void signSAMLAssertion(SignableSAMLObject as, String keyAlias)
-            throws Exception {
+    private static void signSAMLAssertion(SignableSAMLObject as, String keyAlias) throws Exception {
 
         String KEYSTORE_LOCATION = Constants.NCP_SIG_KEYSTORE_PATH;
         String KEY_STORE_PASS = Constants.NCP_SIG_KEYSTORE_PASSWORD;
@@ -863,21 +861,16 @@ public class EpsosHelperService {
         } else {
             KeyStore keyStore = KeyStore.getInstance("JKS");
             File file = new File(KEYSTORE_LOCATION);
-            keyStore.load(new FileInputStream(file),
-                    KEY_STORE_PASS.toCharArray());
-            privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS,
-                    PRIVATE_KEY_PASS.toCharArray());
+            keyStore.load(new FileInputStream(file), KEY_STORE_PASS.toCharArray());
+            privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
             cert = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
 
         org.opensaml.xml.signature.Signature sig = (org.opensaml.xml.signature.Signature) Configuration
                 .getBuilderFactory()
-                .getBuilder(
-                        org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME)
-                .buildObject(
-                        org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME);
-        Credential signingCredential = SecurityHelper.getSimpleCredential(cert,
-                privateKey);
+                .getBuilder(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME)
+                .buildObject(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME);
+        Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
 
         sig.setSigningCredential(signingCredential);
         sig.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
@@ -1247,7 +1240,7 @@ public class EpsosHelperService {
         String ET_ObjectID = "urn:uuid:" + message;
         byte[] ResM_PatricipantObjectDetail = new byte[1];
 
-        AuditService asd = new AuditService();
+        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
@@ -1477,6 +1470,7 @@ public class EpsosHelperService {
     }
 
     public static String getCountriesFromCS() {
+
         LOGGER.debug("get Countries from CS");
         String listOfCountries = "";
         String filename = "InternationalSearch.xml";
@@ -1559,8 +1553,7 @@ public class EpsosHelperService {
         return LiferayUtils.getPortalTranslation(countryCode, lang);
     }
 
-    public static void getCountryListNameFromCS(String lang,
-                                                List<Country> countriesList) {
+    public static void getCountryListNameFromCS(String lang, List<Country> countriesList) {
 
         try {
             for (Country country : countriesList) {
@@ -1577,6 +1570,7 @@ public class EpsosHelperService {
     }
 
     public static String getCountriesLabelsFromCS(String language) {
+
         LOGGER.debug("get Countries labels from CS");
         String listOfCountries = "";
 
@@ -1585,8 +1579,6 @@ public class EpsosHelperService {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             ExternalContext externalContext = facesContext.getExternalContext();
             String wi = Constants.EPSOS_PROPS_PATH;
-            // String path = cl.getResource(".").getPath();
-            // LOGGER.info("#### 1: " + a1);
             String path = wi + "forms" + File.separator + filename;
             File file = new File(path);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -1617,7 +1609,7 @@ public class EpsosHelperService {
     }
 
     public static Vector getCountryIdsFromCS(String country, String portalPath) {
-        String path = "";
+        String path;
         Vector v = new Vector();
         String filename = "InternationalSearch_" + country + ".xml";
         path = getSearchMaskPath() + "forms" + File.separator + filename;
@@ -1670,8 +1662,7 @@ public class EpsosHelperService {
         return identifiers;
     }
 
-    public static List<Demographics> getCountryDemographics(String country,
-                                                            String language, String path, User user) {
+    public static List<Demographics> getCountryDemographics(String country, String language, String path, User user) {
 
         List<Demographics> demographics = new ArrayList<>();
         Vector vec = EpsosHelperService.getCountryDemographicsFromCS(country, path);
@@ -1706,6 +1697,7 @@ public class EpsosHelperService {
     }
 
     public static String getSearchMaskPath() {
+
         return Constants.EPSOS_PROPS_PATH;
     }
 
@@ -1840,24 +1832,21 @@ public class EpsosHelperService {
 
             XPath xpath = XPathFactory.newInstance().newXPath();
             xpath.setNamespaceContext(new CDANameSpaceContext());
-
-            XPathExpression pdfTag = xpath
-                    .compile("//xsi:component/xsi:nonXMLBody/xsi:text[@mediaType='application/pdf']");
+            XPathExpression pdfTag = xpath.compile("//xsi:component/xsi:nonXMLBody/xsi:text[@mediaType='application/pdf']");
             Node pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
             if (pdfNode != null) {
                 String base64EncodedPdfString = pdfNode.getTextContent().trim();
                 LOGGER.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
-                result = base64EncodedPdfString;//decode.decode(base64EncodedPdfString);
+                result = base64EncodedPdfString;
                 result = "data:application/pdf;base64," + result;
             } else {
-                pdfTag = xpath
-                        .compile("//component/nonXMLBody/text[@mediaType='application/pdf']");
+                pdfTag = xpath.compile("//component/nonXMLBody/text[@mediaType='application/pdf']");
                 pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
                 if (pdfNode != null) {
                     String base64EncodedPdfString = pdfNode.getTextContent()
                             .trim();
                     LOGGER.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
-                    result = base64EncodedPdfString;//decode.decode(base64EncodedPdfString.getBytes());
+                    result = base64EncodedPdfString;
                     result = "data:application/pdf;base64," + result;
                 }
 
@@ -1908,6 +1897,7 @@ public class EpsosHelperService {
     }
 
     public static String getSafeString(String arg0) {
+
         String result = "";
         try {
             if (Validator.isNull(arg0)) {
@@ -1923,8 +1913,7 @@ public class EpsosHelperService {
         return result;
     }
 
-    public static void changeNode(Document dom, XPath xpath, String path,
-                                  String nodeName, String value) {
+    public static void changeNode(Document dom, XPath xpath, String path, String nodeName, String value) {
         try {
             XPathExpression salRO = xpath.compile(path + "/" + nodeName);
             NodeList salRONodes = (NodeList) salRO.evaluate(dom,
@@ -1954,19 +1943,21 @@ public class EpsosHelperService {
      * @param attributeName
      * @param attributeValue
      */
-    public static void addAttribute(Document dom, Node node,
-                                    String attributeName, String attributeValue) {
+    public static void addAttribute(Document dom, Node node, String attributeName, String attributeValue) {
+
         Attr rootAttr = dom.createAttribute(attributeName);
         rootAttr.setValue(attributeValue);
         node.getAttributes().setNamedItem(rootAttr);
     }
 
     public static String formatDateHL7(Date date) {
+
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssZ");
         return formatter.format(date);
     }
 
     private static String dateDecorate(String input) {
+
         String result = input;
         if (input != null) {
             try {
@@ -2075,22 +2066,21 @@ public class EpsosHelperService {
         return ConfigurationManagerFactory.getConfigurationManager().getProperty(key);
     }
 
-    public static byte[] getConsentReport(String lang2, String fullname, Patient patient) {
+    public static byte[] getConsentReport(String userLanguage, String fullName, Patient patient) {
+
         byte[] bytes = null;
         try {
             String language = "";
-            String country = "";
+            String country;
             String langFromCountry = "";
             try {
                 country = patient.getCountry();
-                langFromCountry = LocaleUtils.languagesByCountry(country)
-                        .get(0) + "";
+                langFromCountry = LocaleUtils.languagesByCountry(country).get(0) + "";
             } catch (Exception e) {
                 LOGGER.error("Error getting country from patient");
                 LOGGER.error(ExceptionUtils.getStackTrace(e));
             }
 
-            // String patientLang = patient.getLanguage();
             String patientLang = "";
             if (Validator.isNotNull(patientLang)) {
                 language = patientLang;
@@ -2101,103 +2091,93 @@ public class EpsosHelperService {
             if (Validator.isNull(language)) {
                 language = "en_GB";
             }
-            String language2 = lang2;
-            LOGGER.debug("LANGUAGE=" + language + "-" + lang2);
-            Map parameters = new HashMap();
+            String language2 = userLanguage;
+            LOGGER.debug("LANGUAGE=" + language + "-" + userLanguage);
+            Map<String, Object> parameters = new HashMap<>();
             parameters.put("IS_IGNORE_PAGINATION", false);
             String birthDate = patient.getBirthDate();
-            // Date newDate = xgc.toGregorianCalendar().getTime();
             parameters.put("givenname", patient.getFamilyName());
-            parameters.put("givenname_label_lang1", LiferayUtils
-                    .getPortalTranslation("patient.data.givenname", language));
-            parameters.put("givenname_label_lang2", LiferayUtils
-                    .getPortalTranslation("patient.data.givenname", language2));
+            parameters.put("givenname_label_lang1", LiferayUtils.getPortalTranslation("patient.data.givenname", language));
+            parameters.put("givenname_label_lang2", LiferayUtils.getPortalTranslation("patient.data.givenname", language2));
             parameters.put("familyname", patient.getFamilyName());
-            parameters.put("familyname_label_lang1", LiferayUtils
-                    .getPortalTranslation("patient.data.surname", language));
-            parameters.put("familyname_label_lang2", LiferayUtils
-                    .getPortalTranslation("patient.data.surname", language2));
+            parameters.put("familyname_label_lang1", LiferayUtils.getPortalTranslation("patient.data.surname", language));
+            parameters.put("familyname_label_lang2", LiferayUtils.getPortalTranslation("patient.data.surname", language2));
             parameters.put("streetaddress", patient.getAddress());
-            parameters.put("streetaddress_label_lang1", LiferayUtils
-                    .getPortalTranslation("patient.data.street.address",
-                            language));
-            parameters.put("streetaddress_label_lang2", LiferayUtils
-                    .getPortalTranslation("patient.data.street.address",
-                            language2));
+            parameters.put("streetaddress_label_lang1", LiferayUtils.getPortalTranslation("patient.data.street.address", language));
+            parameters.put("streetaddress_label_lang2", LiferayUtils.getPortalTranslation("patient.data.street.address", language2));
             parameters.put("zipcode", patient.getPostalCode());
-            parameters.put("zipcode_label_lang1", LiferayUtils
-                    .getPortalTranslation("patient.data.code", language));
-            parameters.put("zipcode_label_lang2", LiferayUtils
-                    .getPortalTranslation("patient.data.code", language2));
+            parameters.put("zipcode_label_lang1", LiferayUtils.getPortalTranslation("patient.data.code", language));
+            parameters.put("zipcode_label_lang2", LiferayUtils.getPortalTranslation("patient.data.code", language2));
             parameters.put("city", patient.getCity());
-            parameters.put("city_label_lang1", LiferayUtils
-                    .getPortalTranslation("patient.data.city", language));
-            parameters.put("city_label_lang2", LiferayUtils
-                    .getPortalTranslation("patient.data.city", language2));
+            parameters.put("city_label_lang1", LiferayUtils.getPortalTranslation("patient.data.city", language));
+            parameters.put("city_label_lang2", LiferayUtils.getPortalTranslation("patient.data.city", language2));
             parameters.put("country", patient.getCountry());
-            parameters.put("country_label_lang1", LiferayUtils
-                    .getPortalTranslation("patient.data.country", language));
-            parameters.put("country_label_lang2", LiferayUtils
-                    .getPortalTranslation("patient.data.country", language2));
+            parameters.put("country_label_lang1", LiferayUtils.getPortalTranslation("patient.data.country", language));
+            parameters.put("country_label_lang2", LiferayUtils.getPortalTranslation("patient.data.country", language2));
             parameters.put("birthdate", birthDate);
-            parameters.put("birthdate_label_lang1", LiferayUtils
-                    .getPortalTranslation("patient.data.birth.date", language));
-            parameters
-                    .put("birthdate_label_lang2", LiferayUtils
-                            .getPortalTranslation("patient.data.birth.date",
-                                    language2));
+            parameters.put("birthdate_label_lang1", LiferayUtils.getPortalTranslation("patient.data.birth.date", language));
+            parameters.put("birthdate_label_lang2", LiferayUtils.getPortalTranslation("patient.data.birth.date", language2));
+
             String consentText = getConsentText("en_US");
             consentText = getConsentText(language);
             String consentText2 = getConsentText("en_US");
             consentText2 = getConsentText(language2);
+
+            if (StringUtils.isEmpty(consentText) && StringUtils.isEmpty(consentText2)) {
+                consentText = getConsentText("en-GB");
+                consentText2 = getConsentText("en-GB");
+            }
+
             parameters.put("consent_text", consentText);
             parameters.put("consent_text_2", consentText2);
-            parameters.put("printedby", fullname);
+            parameters.put("printedby", fullName);
             parameters.put("lang1", language);
             parameters.put("lang2", language2);
             parameters.put("date", DateUtils.format(new Date(), "yyyy/MM/dd"));
+
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            URL url = cl
-                    .getResource("com/gnomon/epsos/reports/epsosConsent.jasper");
-            String path = url.getPath();
-            LOGGER.debug("PATH IS " + path);
-            bytes = generatePdfReport(LiferayUtils.getCurrentConnection(), path, parameters);
+            URL url = cl.getResource("epsosConsent.jasper");
+            if (url != null) {
+                String path = url.getPath();
+                LOGGER.debug("Path is: '{}'", path);
+                bytes = generatePdfReport(LiferayUtils.getCurrentConnection(), path, parameters);
+            }
         } catch (Exception e) {
-            LOGGER.error("Error creating pin document. " + e.getMessage());
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error creating pin document: '{}'", e.getMessage(), e);
         }
         return bytes;
     }
 
-    public static String getConsentText(String language) {
-        String translation = "";
+    private static String getConsentText(String language) {
+
+        String translation;
         language = language.replaceAll("_", "-");
+
         try {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            URL url = cl.getResource("content/consent/Consent_LegalText_"
-                    + language + ".xml");
-
+            URL url = cl.getResource("content/consent/Consent_LegalText_" + language + ".xml");
+            if (url == null) {
+                LOGGER.error("Error getting consent text for country language: '{}'", language);
+                return "Consent Legal Resource is not available";
+            }
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setValidating(false);
-            dbf.setFeature(
-                    "http://apache.org/xml/features/nonvalidating/load-external-dtd",
-                    false);
+            dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(url.getFile());
             doc.getDocumentElement().normalize();
             XPath xpath = XPathFactory.newInstance().newXPath();
-
             String xpathExpression = "/Consent/LegalText";
-            NodeList nodes = (NodeList) xpath.evaluate(xpathExpression, doc,
-                    XPathConstants.NODESET);
+            NodeList nodes = (NodeList) xpath.evaluate(xpathExpression, doc, XPathConstants.NODESET);
             translation = nodes.item(0).getTextContent();
         } catch (Exception e) {
-            LOGGER.error("Error getting consent text for country " + language);
+            LOGGER.error("Error getting consent text for country language: '{}'", language);
+            return "Consent Legal Resource is not available";
         }
         return translation;
     }
 
-    public static byte[] generatePdfReport(Connection conn, String jasperFilePath, Map parameters) throws JRException, SQLException {
+    private static byte[] generatePdfReport(Connection conn, String jasperFilePath, Map parameters) throws JRException {
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             File reportFile = new File(jasperFilePath);
@@ -2216,7 +2196,7 @@ public class EpsosHelperService {
 
     public static List<Patient> getMockPatients() {
 
-        List<Patient> mockpatients = new ArrayList<>();
+        List<Patient> mockedPatients = new ArrayList<>();
         Patient patient = new Patient();
         patient.setName("Patient name");
         patient.setFamilyName("Patient family name");
@@ -2232,12 +2212,13 @@ public class EpsosHelperService {
         patient.setTelephone("21212121");
         patient.setRoot("root");
         patient.setExtension("extension");
-        // patient.setPatientDemographics(aux);
-        mockpatients.add(patient);
-        return mockpatients;
+        mockedPatients.add(patient);
+
+        return mockedPatients;
     }
 
     public static List<PatientDocument> getMockPSDocuments() {
+
         List<PatientDocument> mockdocs = new ArrayList<>();
 
         String repositoryId = "repID";
@@ -2262,6 +2243,7 @@ public class EpsosHelperService {
     }
 
     public static List<PatientDocument> getMockEPDocuments() {
+
         List<PatientDocument> mockdocs = new ArrayList<>();
 
         GenericDocumentCode formatCode = GenericDocumentCode.Factory.newInstance();
@@ -2479,7 +2461,8 @@ public class EpsosHelperService {
         return patientDocuments;
     }
 
-    public static List<PatientDocument> getEPDocs(Assertion assertion, Assertion trca, String root, String extension, String country) {
+    public static List<PatientDocument> getEPDocs(Assertion assertion, Assertion trca, String root, String extension,
+                                                  String country) {
 
         List<PatientDocument> patientDocuments = null;
         PatientId patientId;
@@ -2643,7 +2626,8 @@ public class EpsosHelperService {
         return patient;
     }
 
-    public static PatientDemographics createPatientDemographicsForQuery(List<Identifier> identifiers, List<Demographics> demographics) {
+    public static PatientDemographics createPatientDemographicsForQuery(List<Identifier> identifiers,
+                                                                        List<Demographics> demographics) {
 
         PatientDemographics pd = PatientDemographics.Factory.newInstance();
         PatientId[] idArray = new PatientId[identifiers.size()];
@@ -2702,8 +2686,9 @@ public class EpsosHelperService {
     }
 
     public static String toString(Node node, boolean omitXmlDeclaration, boolean prettyPrint) {
+
         if (node == null) {
-            //throw new IllegalArgumentException("node is null.");
+
             return "";
         }
 

@@ -2,12 +2,11 @@ package epsos.ccd.gnomon.cda.parser.enums;
 
 /**
  * A basic enum coding the medical section of a medical document.
- * 
+ *
  * @author Akis Papadopoulos
- * 
  */
 public enum MedicalSection {
-    
+
     // Medical section code and display name
     HIST_MEDICATION_USE("10160-0", "History of medication use"),
     HIST_PREGNACIES("10162-6", "History of pregnancies"),
@@ -38,8 +37,8 @@ public enum MedicalSection {
 
     /**
      * A basic constructor initializing the medical section.
-     * 
-     * @param code the code of the medical section.
+     *
+     * @param code    the code of the medical section.
      * @param display the display name of the medical section.
      */
     private MedicalSection(String code, String display) {
@@ -52,7 +51,7 @@ public enum MedicalSection {
 
     /**
      * A method returning the code of the medical section.
-     * 
+     *
      * @return the code of the medical section.
      */
     public String getCode() {
@@ -61,7 +60,7 @@ public enum MedicalSection {
 
     /**
      * A method returning the display name of the medical section.
-     * 
+     *
      * @return the display name of the medical section.
      */
     public String getDisplay() {
@@ -70,7 +69,7 @@ public enum MedicalSection {
 
     /**
      * A method returning an alphanumeric representation of the object.
-     * 
+     *
      * @return the code of the country.
      */
     @Override

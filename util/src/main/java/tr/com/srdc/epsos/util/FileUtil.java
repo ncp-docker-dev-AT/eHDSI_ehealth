@@ -9,6 +9,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +42,9 @@ public class FileUtil {
         boolean fileCreated;
 
         if (file.exists()) {
-            fileDeleted = file.delete();
+
+            Files.delete(Paths.get(filePath));
+            fileDeleted = true;
         }
         fileCreated = file.createNewFile();
         LOGGER.debug("New File result: Folder created: '{}' - Old File Deleted: '{}' - New File Created: '{}'",
@@ -78,7 +82,6 @@ public class FileUtil {
             if (offset < bytes.length) {
                 throw new IOException("Could not completely read file " + file.getName());
             }
-            is.close();
             return bytes;
         }
     }

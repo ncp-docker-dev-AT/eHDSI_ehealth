@@ -30,6 +30,7 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
     private HashMap<String, String> pivotTypes;
 
     public static ModelBasedValidator getInstance() {
+
         if (instance == null) {
             instance = new ModelBasedValidator();
         }
@@ -110,7 +111,7 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
         this.config = config;
     }
 
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
 
         ProjectDependencies.CDA_XSD = config.getMdaCdaXsdPath();
         ProjectDependencies.CDA_EPSOS_XSD = config.getMdaCdaEpsosXsdPath();

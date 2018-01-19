@@ -2,12 +2,11 @@ package epsos.ccd.gnomon.cda.parser.enums;
 
 /**
  * A basic enum coding the professions of an author.
- * 
+ *
  * @author Akis Papadopoulos
- * 
  */
 public enum Profession {
-    
+
     // Profession code and display name
     HP("22", "Health professionals"),
     MD("221", "Medical doctors"),
@@ -58,8 +57,8 @@ public enum Profession {
 
     /**
      * A basic constructor initializing the profession.
-     * 
-     * @param code the code of the profession.
+     *
+     * @param code    the code of the profession.
      * @param display the display name of the profession.
      */
     private Profession(String code, String display) {
@@ -72,7 +71,7 @@ public enum Profession {
 
     /**
      * A method returning the code of the profession.
-     * 
+     *
      * @return the code of the profession.
      */
     public String getCode() {
@@ -81,7 +80,7 @@ public enum Profession {
 
     /**
      * A method returning the display name of the profession.
-     * 
+     *
      * @return the display name of the profession.
      */
     public String getDisplay() {
@@ -90,7 +89,7 @@ public enum Profession {
 
     /**
      * A method returning an alphanumeric representation of the object.
-     * 
+     *
      * @return the code of the contact use.
      */
     @Override

@@ -57,6 +57,8 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
     private Map<String, String> properties = new HashMap<>();
 
     public ConfigurationManagerImpl(SessionFactory sessionFactory) {
+//        Cleanup cleanup = new Cleanup();
+//        cleanup.clean();
         Assert.notNull(sessionFactory, "sessionFactory must not be null!");
         this.sessionFactory = sessionFactory;
     }
@@ -64,14 +66,34 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
     @Override
     public String getProperty(String key) {
         Assert.notNull(key, "key must not be null!");
-        return findProperty(key)
-                .orElseThrow(() -> new PropertyNotFoundException("Property '" + key + "' not found!"));
+        return getProperty(key, true);
+//        return findProperty(key)
+//                .orElseThrow(() -> new PropertyNotFoundException("Property '" + key + "' not found!"));
+    }
+
+    public String getProperty(String key, boolean checkMap) {
+        Assert.notNull(key, "key must not be null!");
+        return findProperty(key, checkMap).orElseThrow(() -> new PropertyNotFoundException("Property '" + key + "' not found!"));
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    @Override
+    public boolean getBooleanProperty(String key) {
+        return Boolean.valueOf(getProperty(key));
+    }
+
+    @Override
+    public int getIntegerProperty(String key) {
+        return Integer.valueOf(getProperty(key));
     }
 
     @Override
     public void setProperty(String key, String value) {
-        Property property = new Property(key, value);
 
+        Property property = new Property(key, value);
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
         session.saveOrUpdate(property);
@@ -92,6 +114,10 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
                 try (FileInputStream fileInputStream = new FileInputStream(file)) {
                     trustStore.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
 
+                    //TODO: Missing Proxy configuration:
+                    //DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance().fetcher(
+                    // new DefaultURLFetcher(new DefaultProxy("127.0.0.1", 8000, "user", "password"))).build();
+
                     DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
                             .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
                             .reader(new DefaultBDXRReader(new DefaultSignatureValidator(trustStore)))
@@ -103,8 +129,8 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
                             PARTICIPANT_IDENTIFIER_SCHEME);
 
                     LOGGER.info("Querying for service metadata");
-                    ServiceMetadata sm = smpClient.getServiceMetadata(participantIdentifier, new DocumentIdentifier(RegisteredService.EHEALTH_107.getUrn(), DOCUMENT_IDENTIFIER_SCHEME));
-                    //ServiceMetadata sm = smpClient.getServiceMetadata(smpClient, participantIdentifierValue, RegisteredService.EHEALTH_107.getUrn());
+                    ServiceMetadata sm = smpClient.getServiceMetadata(participantIdentifier,
+                            new DocumentIdentifier(RegisteredService.EHEALTH_107.getUrn(), DOCUMENT_IDENTIFIER_SCHEME));
 
                     LOGGER.info("DocumentIdentifier: '{}' - '{}'",
                             sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getDocumentIdentifier().getScheme(),
@@ -155,8 +181,12 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         setProperty(ISOCountryCode + "." + ServiceName + ".WSE", URL);
     }
 
-    private Optional<String> findProperty(String key) {
-        String value = properties.get(key);
+    private Optional<String> findProperty(String key, boolean checkMap) {
+
+        String value = null;
+        if (checkMap) {
+            value = properties.get(key);
+        }
         if (value == null) {
             Session session = sessionFactory.getCurrentSession();
             Transaction transaction = session.beginTransaction();

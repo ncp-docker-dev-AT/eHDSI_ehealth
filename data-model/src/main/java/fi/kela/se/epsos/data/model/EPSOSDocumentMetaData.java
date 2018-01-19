@@ -3,29 +3,28 @@ package fi.kela.se.epsos.data.model;
 import java.util.Date;
 
 /**
- * Generic EPSOSDocumentMetaData interface. EPDocumentMetaData and
- * PSDocumentMetaData extends this interface.
- * 
+ * Generic EPSOSDocumentMetaData interface. EPDocumentMetaData and PSDocumentMetaData extends this interface.
+ *
  * @author mimyllyv
  */
 public interface EPSOSDocumentMetaData {
 
-	static final int EPSOSDOCUMENT_FORMAT_XML = 1;
-	static final int EPSOSDOCUMENT_FORMAT_PDF = 2;
+    int EPSOSDOCUMENT_FORMAT_XML = 1;
+    int EPSOSDOCUMENT_FORMAT_PDF = 2;
 
-	String getId();
+    String getId();
 
-	String getPatientId();
+    String getPatientId();
 
-	int getFormat();
+    int getFormat();
 
-	Date getEffectiveTime();
+    Date getEffectiveTime();
 
-	String getClassCode();
+    String getClassCode();
 
-	String getRepositoryId();
+    String getRepositoryId();
 
-	String getTitle();
+    String getTitle();
 
-	String getAuthor();
+    String getAuthor();
 }

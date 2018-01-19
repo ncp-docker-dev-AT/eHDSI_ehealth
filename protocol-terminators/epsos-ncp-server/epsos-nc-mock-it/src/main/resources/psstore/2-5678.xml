@@ -277,6 +277,7 @@
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
                                         <code nullFlavor="NA"/>
                                         <name nullFlavor="NA"/>
+                                        <epsos:formCode nullFlavor="NP"/>
                                         <epsos:ingredient classCode="ACTI" nullFlavor="NA">
                                             <epsos:quantity>
                                                 <epsos:numerator nullFlavor="NA" xsi:type="epsos:PQ"/>

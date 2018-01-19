@@ -11,6 +11,7 @@
 package se.sb.epsos.web.service;
 
 import epsos.ccd.gnomon.auditmanager.*;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
@@ -193,7 +194,7 @@ public class AssertionHandler implements Serializable {
     }
 
     protected AuditService getAuditService() {
-        return new AuditService();
+        return AuditServiceFactory.getInstance();
     }
 
     protected String getPrivateKeyAlias() {
@@ -213,6 +214,7 @@ public class AssertionHandler implements Serializable {
     }
 
     void sendAuditEpsos91(AuthenticatedUser userDetails, Assertion assertion) throws KeyStoreException, CertificateException, NoSuchAlgorithmException {
+
         String KEY_ALIAS = getPrivateKeyAlias();
         LOGGER.debug("KEY_ALIAS: '{}'", KEY_ALIAS);
         String KEYSTORE_LOCATION = getPrivateKeystoreLocation();

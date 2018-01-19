@@ -28,8 +28,8 @@ public class ConfigurationManagerFactory {
         try {
             String path = System.getenv("EPSOS_PROPS_PATH");
             Assert.notNull(path, "Environment variable 'EPSOS_PROPS_PATH' is not set!");
-            return new Configuration().configure(new File(path + "configmanager.cfg.xml")).buildSessionFactory();
-            //return new Configuration().configure(path + "configmanager.cfg.xml").buildSessionFactory();
+            return new Configuration().configure(new File(path, "configmanager.cfg.xml"))
+                    .buildSessionFactory();
         } catch (Exception e) {
             LOGGER.error("SessionFactory creation failed!", e);
             throw new ExceptionInInitializerError(e);

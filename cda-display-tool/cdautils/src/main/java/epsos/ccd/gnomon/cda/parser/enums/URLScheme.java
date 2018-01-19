@@ -2,12 +2,11 @@ package epsos.ccd.gnomon.cda.parser.enums;
 
 /**
  * A basic enum coding the URL schemes of a telecommunication contact.
- * 
+ *
  * @author Akis Papadopoulos
- * 
  */
 public enum URLScheme {
-    
+
     // Communication URL scheme code and display scheme
     FAX("FAX", "fax:"),
     FILE("FILE", "file:"),
@@ -27,11 +26,11 @@ public enum URLScheme {
 
     /**
      * A basic constructor initializing the URL scheme of a contact.
-     * 
-     * @param code the code of the URL scheme.
+     *
+     * @param code    the code of the URL scheme.
      * @param display the display scheme.
      */
-    private URLScheme(String code, String display) {
+    URLScheme(String code, String display) {
         // Setting the code of the URL scheme
         this.code = code;
 
@@ -41,7 +40,7 @@ public enum URLScheme {
 
     /**
      * A method returning the code of the URL scheme.
-     * 
+     *
      * @return the code of the URL scheme.
      */
     public String getCode() {
@@ -50,7 +49,7 @@ public enum URLScheme {
 
     /**
      * A method returning the display scheme.
-     * 
+     *
      * @return the display name of the scheme.
      */
     public String getDisplay() {
@@ -59,7 +58,7 @@ public enum URLScheme {
 
     /**
      * A method returning an alphanumeric representation of the object.
-     * 
+     *
      * @return the display scheme.
      */
     @Override

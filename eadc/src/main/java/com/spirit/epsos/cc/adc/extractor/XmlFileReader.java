@@ -54,7 +54,7 @@ public class XmlFileReader {
      * @return
      * @throws Exception
      */
-    public synchronized static XmlFileReader getInstance() throws Exception {
+    public static synchronized XmlFileReader getInstance() throws Exception {
 
         if (XmlFileReader.singletonInstance == null) {
             try {

@@ -10,8 +10,10 @@ import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidato
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.*;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.util.Assert;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.HashUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +44,7 @@ public class DynamicDiscoveryService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDiscoveryService.class);
 
     /**
-     * Static constants for SMP identifiers
+     * Static constants for SMP identifiers.
      */
     private static final String PARTICIPANT_IDENTIFIER_SCHEME = "ehealth-participantid-qns";
     private static final String PARTICIPANT_IDENTIFIER_VALUE = "urn:ehealth:%2s:ncp-idp";
@@ -70,7 +72,7 @@ public class DynamicDiscoveryService {
         LOGGER.info("sendAuditQuery('{}', '{}','{}','{}','{}','{}','{}','{}','{}','{}')", sc_fullname, sc_email,
                 sp_fullname, sp_email, partid, sourceip, targetip, objectID, "EM_PatricipantObjectID", "EM_PatricipantObjectDetail");
         try {
-            AuditService asd = new AuditService();
+            AuditService asd = AuditServiceFactory.getInstance();
             GregorianCalendar c = new GregorianCalendar();
             c.setTime(new Date());
             XMLGregorianCalendar date2 = null;
@@ -91,7 +93,7 @@ public class DynamicDiscoveryService {
             eventLog1.setEventType(EventType.ehealthSMPQuery);
             // facility = 13 --> log audit | severity = 2 --> Critical: critical
             // conditions
-            // Acording to https://tools.ietf.org/html/rfc5424 (Syslog Protocol)
+            // According to https://tools.ietf.org/html/rfc5424 (Syslog Protocol)
             asd.write(eventLog1, "13", "2");
 
         } catch (Exception e) {
@@ -158,7 +160,9 @@ public class DynamicDiscoveryService {
         try {
 
             String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
-            LOGGER.info("participantIdentifierValue '{}'.", participantIdentifierValue);
+            LOGGER.info("****** participantIdentifierValue '{}'.", participantIdentifierValue);
+            LOGGER.info("****** NAPTR Hash: '{}'", HashUtil.getSHA256HashBase32(participantIdentifierValue));
+            LOGGER.info("****** CNAME Hash: '{}'", StringUtils.lowerCase("b-" + HashUtil.getMD5Hash(participantIdentifierValue)));
             KeyStore ks = KeyStore.getInstance("JKS");
 
             File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH"));

@@ -7,7 +7,6 @@ import epsos.ccd.gnomon.cda.parser.enums.URLScheme;
  * A class encapsulating a generic telecommunication contact.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Contact {
 
@@ -35,9 +34,9 @@ public class Contact {
     /**
      * A constructor initializing a generic contact.
      *
-     * @param use the use of the contact.
+     * @param use    the use of the contact.
      * @param prefix the URL scheme of the contact.
-     * @param value the call value of the contact.
+     * @param value  the call value of the contact.
      */
     public Contact(ContactUse use, URLScheme prefix, String value) {
         // Setting the use of the contact

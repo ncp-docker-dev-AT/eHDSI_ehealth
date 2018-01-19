@@ -64,7 +64,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     private oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
     private DocumentSearchInterface documentSearchService;
 
-    public XCAServiceImpl() throws Exception {
+    public XCAServiceImpl() {
 
         ServiceLoader<DocumentSearchInterface> serviceLoader = ServiceLoader.load(DocumentSearchInterface.class);
         try {
@@ -155,9 +155,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
     }
 
-    private void prepareEventLogForRetrieve(EventLog eventLog, RetrieveDocumentSetRequestType request,
-                                            boolean errorsDiscovered, boolean documentReturned, OMElement registryErrorList,
-                                            Element sh, String classCode) {
+    private void prepareEventLogForRetrieve(EventLog eventLog, RetrieveDocumentSetRequestType request, boolean errorsDiscovered,
+                                            boolean documentReturned, OMElement registryErrorList, Element sh, String classCode) {
 
         LOGGER.info("method prepareEventLogForRetrieve({})", classCode);
         if (classCode == null || classCode.equals(Constants.EP_CLASSCODE)) {
@@ -253,7 +252,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
     /**
      * Extracts repositoryUniqueId from request
      *
-     * @param request
      * @return repositoryUniqueId
      */
     private String getRepositoryUniqueId(RetrieveDocumentSetRequestType request) {
@@ -391,7 +389,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getSlot().add(makeSlot("languageCode", Constants.LANGUAGE_CODE));
 
         // repositoryUniqueId (optional)
-        //eot.getSlot().add(makeSlot("repositoryUniqueId", Constants.HOME_COMM_ID));
         eot.getSlot().add(makeSlot("repositoryUniqueId", repositoryId));
 
         eot.getClassification().add(makeClassification("urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a",
@@ -472,7 +469,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getSlot().add(makeSlot("languageCode", Constants.LANGUAGE_CODE));
 
         // repositoryUniqueId (optional)
-        eot.getSlot().add(makeSlot("repositoryUniqueId", Constants.HOME_COMM_ID));
+        //eot.getSlot().add(makeSlot("repositoryUniqueId", Constants.HOME_COMM_ID));
+        eot.getSlot().add(makeSlot("repositoryUniqueId", document.getRepositoryId()));
 
         eot.getClassification().add(
                 makeClassification(
@@ -509,9 +507,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     "epSOS coded ePrescription"));
         }
         // Healthcare facility code
-        /**
-         * TODO: Get healthcare facility info from national implementaition
-         */
+        // TODO: Get healthcare facility info from national implementaition
+
         eot.getClassification().add(makeClassification(
                 "urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
                 uuid,
@@ -605,12 +602,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     /**
-     * Main part of the XCA query operation implementation, fills the
-     * AdhocQueryResponse with details
-     *
-     * @throws Exception
+     * Main part of the XCA query operation implementation, fills the AdhocQueryResponse with details
      */
-    private void AdhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader sh, EventLog eventLog) throws Exception {
+    private void AdhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader sh,
+                                           EventLog eventLog) throws Exception {
 
         String sigCountryCode = null;
         Element shElement = null;
@@ -679,7 +674,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             rel.getRegistryError().add(createErrorMessage("4202", "Class code missing in XCA query request.", "", false));
         }
 
-//        // Evidence for call to NI for XCA List
+        // Evidence for call to NI for XCA List
         /* Joao: we MUST generate NRO when NCPA sends to NI. This was throwing errors because we were not passing a XML document.
         We're passing data like:
         "SearchCriteria: {patientId = 12445ASD}"
@@ -736,6 +731,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
                         for (DocumentAssociation<EPDocumentMetaData> prescription : prescriptions) {
 
+                            LOGGER.debug("Prescription Repository ID: '{}'", prescription.getXMLDocumentMetaData().getRepositoryId());
                             String xmlUUID;
                             ExtrinsicObjectType eotXML = ofRim.createExtrinsicObjectType();
                             xmlUUID = prepareExtrinsicObjectEP(request, eotXML, prescription.getXMLDocumentMetaData());
@@ -870,7 +866,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         try {
             prepareEventLogForQuery(eventLog, request, response, shElement, classCodeValue);
         } catch (Exception e) {
-            LOGGER.error("Prepare Audit log failed", e);
+            LOGGER.error("Prepare Audit log failed: '{}'", e.getMessage(), e);
             // Is this fatal?
         }
     }
@@ -885,7 +881,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      * @throws Exception
      */
     private Document transformDocument(Document doc, OMElement registryErrorList, OMElement registryResponseElement,
-                                       boolean isTranscode, EventLog eventLog) throws Exception {
+                                       boolean isTranscode, EventLog eventLog) {
 
         LOGGER.debug("Transforming document, isTranscode: '{}'", isTranscode);
 
@@ -1183,8 +1179,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                 // If there is no failure during the process, the CDA document has been attached to the response
                 if (!failure) {
-                    ByteArrayDataSource dataSource = new ByteArrayDataSource(XMLUtils.toOM(doc.getDocumentElement())
-                            .toString().getBytes(), "text/xml;charset=UTF-8");
+                    ByteArrayDataSource dataSource = null;
+                    if (doc != null) {
+                        dataSource = new ByteArrayDataSource(XMLUtils.toOM(doc.getDocumentElement())
+                                .toString().getBytes(), "text/xml;charset=UTF-8");
+                    }
                     DataHandler dataHandler = new DataHandler(dataSource);
                     OMText textData = factory.createOMText(dataHandler, true);
                     textData.setOptimize(true);
@@ -1253,11 +1252,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return onlyWarnings;
     }
 
-    /**
-     * @param request
-     * @param uoe
-     * @return
-     */
     private AdhocQueryResponse handleUnsupportedOpertationException(AdhocQueryRequest request,
                                                                     UnsupportedOperationException uoe) {
 
@@ -1317,8 +1311,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
     /**
      * XCA retrieve operation implementation, returns the particular document requested by the caller.
      * The response is placed in the OMElement
-     *
-     * @throws Exception
      */
     @Override
     public void retrieveDocument(RetrieveDocumentSetRequestType request, SOAPHeader sh, EventLog eventLog,
@@ -1329,9 +1321,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     /**
      * This auxiliary service returns the service name, based on a provided class code.
-     *
-     * @param classCodeValue
-     * @return
      */
     private String getDocumentName(final String classCodeValue) {
 

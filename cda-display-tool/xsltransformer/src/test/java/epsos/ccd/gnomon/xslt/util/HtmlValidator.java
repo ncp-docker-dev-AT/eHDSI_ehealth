@@ -40,13 +40,11 @@ public class HtmlValidator extends AbstractValidator {
 
     @Override
     protected void validatePatientName(XPath xpath, Document cdaDoc, Document resultDoc) throws XPathExpressionException {
-        final String patientNameCda = new StringBuilder()
-                .append((String) xpath.evaluate("/*[local-name()='ClinicalDocument']/*[local-name()='recordTarget']/*[local-name()='patientRole']/*[local-name()='patient']/*[local-name()='name']/*[local-name()='given']/text()",
-                        cdaDoc, XPathConstants.STRING))
-                .append(" ")
-                .append((String) xpath.evaluate("/*[local-name()='ClinicalDocument']/*[local-name()='recordTarget']/*[local-name()='patientRole']/*[local-name()='patient']/*[local-name()='name']/*[local-name()='family']/text()",
-                        cdaDoc, XPathConstants.STRING))
-                .toString();
+        final String patientNameCda = xpath.evaluate("/*[local-name()='ClinicalDocument']/*[local-name()='recordTarget']/*[local-name()='patientRole']/*[local-name()='patient']/*[local-name()='name']/*[local-name()='given']/text()",
+                cdaDoc, XPathConstants.STRING) +
+                " " +
+                xpath.evaluate("/*[local-name()='ClinicalDocument']/*[local-name()='recordTarget']/*[local-name()='patientRole']/*[local-name()='patient']/*[local-name()='name']/*[local-name()='family']/text()",
+                        cdaDoc, XPathConstants.STRING);
         final String patientNameHtml = (String) xpath.evaluate("((/html/body/table[@class='header_table']/tbody/tr)[1]/td)[2]/text()",
                 resultDoc, XPathConstants.STRING);
         Assert.assertEquals(patientNameCda, patientNameHtml);

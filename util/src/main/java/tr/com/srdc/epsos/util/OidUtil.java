@@ -25,7 +25,7 @@ public class OidUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(OidUtil.class);
     // This configuration service is also responsible for accessing country code
     // <-> OID mappings.
-    private static final String pn2oidMapFilePathSubString = "pn-oid.xml";
+    private static final String PN_OID_FILE_NAME = "pn-oid.xml";
     private static HashMap<String, String> oid2CountryCodeMap;
 
     static {
@@ -79,7 +79,7 @@ public class OidUtil {
         Document doc;
 
         oid2CountryCodeMap = new HashMap<>();
-        String mapFilePath = Constants.EPSOS_PROPS_PATH + pn2oidMapFilePathSubString;
+        String mapFilePath = Constants.EPSOS_PROPS_PATH + PN_OID_FILE_NAME;
 
         File mapFile = new File(mapFilePath);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

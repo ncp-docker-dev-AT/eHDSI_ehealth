@@ -27,7 +27,7 @@ public final class DefaultKeyStoreManager implements KeyStoreManager {
     private KeyStore keyStore;
     private KeyStore trustStore;
 
-    public DefaultKeyStoreManager() throws IOException {
+    public DefaultKeyStoreManager() {
 
         // Constants Initialization
         ConfigurationManager cm = ConfigurationManagerFactory.getConfigurationManager();
@@ -92,6 +92,7 @@ public final class DefaultKeyStoreManager implements KeyStoreManager {
 
     @Override
     public Certificate getCertificate(String alias) throws SMgrException {
+
         try {
             return keyStore.getCertificate(alias);
 

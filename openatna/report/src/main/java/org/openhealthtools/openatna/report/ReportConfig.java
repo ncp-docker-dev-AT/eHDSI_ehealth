@@ -56,15 +56,15 @@ public class ReportConfig extends HashMap<String, Object> {
     public static final String ATNA = "ATNA";
     public static final String HTML = "HTML";
     public static final String PDF = "PDF";
-    public static final String[] outputTypes = {
+    protected static final String[] outputTypes = {
             PDF,
             HTML
     };
-    public static final String[] queryLanguages = {
+    protected static final String[] queryLanguages = {
             HQL,
             ATNA
     };
-    public static final String[] targets = {
+    protected static final String[] targets = {
             MESSAGES,
             CODES,
             SOURCES,
@@ -72,6 +72,7 @@ public class ReportConfig extends HashMap<String, Object> {
             OBJECTS,
             NETWORK_ACCESS_POINTS
     };
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportConfig.class);
 
     public ReportConfig() {

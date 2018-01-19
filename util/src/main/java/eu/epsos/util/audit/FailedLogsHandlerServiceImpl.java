@@ -29,6 +29,7 @@ public class FailedLogsHandlerServiceImpl implements FailedLogsHandlerService {
 
     public synchronized void start() {
 
+        LOGGER.info("Starting FailedLogsHandlerService...");
         if (service == null) {
             FailedLogsHandler failedLogsHandlerCommand = new FailedLogsHandlerImpl(listener, type);
             service = new ScheduledThreadPoolExecutor(SCHEDULED_THREAD_POOL_SIZE);

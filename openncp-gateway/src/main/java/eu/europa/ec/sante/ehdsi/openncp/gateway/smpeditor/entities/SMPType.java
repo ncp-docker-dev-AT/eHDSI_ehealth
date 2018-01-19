@@ -19,9 +19,9 @@ public enum SMPType {
     International_Search_Mask("International Search Mask"),
     Redirect("Redirect");
 
-    public static final SMPType[] ALL = {VPN_Gateway_Server, VPN_Gateway_Client, Country_B_Identity_Provider,
-            Patient_Identification_Authentication, Provisioning_of_Data_Provide, Provisioning_of_Data_BPPC, Request_of_Data_Fetch,
-            Request_of_Data_Query, Request_of_Data_Retrieve, International_Search_Mask, Redirect};
+    protected static final SMPType[] ALL = {VPN_Gateway_Server, VPN_Gateway_Client, Country_B_Identity_Provider,
+            Patient_Identification_Authentication, Provisioning_of_Data_Provide, Provisioning_of_Data_BPPC,
+            Request_of_Data_Fetch, Request_of_Data_Query, Request_of_Data_Retrieve, International_Search_Mask, Redirect};
 
     private final String description;
 

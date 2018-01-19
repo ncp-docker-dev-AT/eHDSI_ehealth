@@ -9,7 +9,6 @@ import java.util.Set;
  * A class encapsulating a generic organization entity.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Organization {
 
@@ -47,7 +46,7 @@ public class Organization {
     /**
      * A constructor initializing an organization entity.
      *
-     * @param id the identification number of the organization.
+     * @param id   the identification number of the organization.
      * @param name the name of the organization.
      */
     public Organization(Identifier id, String name) {

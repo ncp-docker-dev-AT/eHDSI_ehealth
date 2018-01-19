@@ -73,7 +73,7 @@ public class EvidenceEmitterTest {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-        DateTime dt = DateUtil.GregorianCalendarToJodaTime(date2);
+        DateTime dt = DateUtil.gregorianCalendarToJodaTime(date2);
     }
 
     @Test

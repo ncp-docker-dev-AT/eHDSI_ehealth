@@ -25,7 +25,6 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.*;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -286,7 +285,7 @@ public class TRCAssertionRequest {
             ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
             return ctx.getSocketFactory();
 
-        } catch (KeyManagementException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException | IOException e) {
+        } catch (KeyManagementException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
             return null;
         }

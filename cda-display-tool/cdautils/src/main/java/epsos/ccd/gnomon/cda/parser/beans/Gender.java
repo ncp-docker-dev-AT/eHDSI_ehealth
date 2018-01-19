@@ -6,7 +6,6 @@ import epsos.ccd.gnomon.cda.parser.enums.Sex;
  * A class encapsulating a administrative gender.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Gender {
 

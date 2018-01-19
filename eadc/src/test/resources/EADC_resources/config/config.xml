@@ -14,9 +14,9 @@
 			<mapping targetColumn="SndAddress" sourceXPath="@SndAddress"/>
 			<mapping targetColumn="SndHost" sourceXPath="@SndHost"/>
 			<mapping targetColumn="SndMsgID" sourceXPath="@SndMsgID"/>
-			<mapping targetColumn="ReceivingISO" sourceXPath="@RecevingISO"/>
-			<mapping targetColumn="ReceivingNCP_OID" sourceXPath="@RecevingNCP_OID"/>
-			<mapping targetColumn="ReceivingHost" sourceXPath="@RecevingHost"/>
+			<mapping targetColumn="ReceivingISO" sourceXPath="@ReceivingISO"/>
+			<mapping targetColumn="ReceivingNCP_OID" sourceXPath="@ReceivingNCP_OID"/>
+			<mapping targetColumn="ReceivingHost" sourceXPath="@ReceivingHost"/>
 			<mapping targetColumn="receivingAddr" sourceXPath="@ReceivingAddr"/>
 			<mapping targetColumn="ReceivingMsgID" sourceXPath="@ReceivingMsgID"/>
 			<mapping targetColumn="TransactionCounter" sourceXPath="@TransactionCounter"/>

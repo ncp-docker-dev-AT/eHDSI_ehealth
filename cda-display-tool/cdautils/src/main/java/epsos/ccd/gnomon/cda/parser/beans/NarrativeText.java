@@ -8,7 +8,6 @@ import java.util.Set;
  * form.
  *
  * @author Akis Papadopoulos
- *
  */
 public class NarrativeText {
 
@@ -20,7 +19,7 @@ public class NarrativeText {
      */
     public NarrativeText() {
         // Creating an empty set of medical entries
-        this.entries = new HashSet<MedicalEntry>();
+        this.entries = new HashSet<>();
     }
 
     /**
@@ -110,7 +109,7 @@ public class NarrativeText {
                     // Checking for a null description
                     if (entry.getCode().getDisplay() != null) {
                         // Setting the medical entry description
-                        context.append(entry.getCode().getDisplay() + "-" + entry.getDescription());
+                        context.append(entry.getCode().getDisplay()).append("-").append(entry.getDescription());
                     } else {
                         // Setting an unknown description
                         context.append("UNK");

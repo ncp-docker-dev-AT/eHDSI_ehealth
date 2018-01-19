@@ -107,7 +107,7 @@ public class SMPUploadFileController {
     public String postUpload(@ModelAttribute("smpupload") SMPHttp smpupload, Model model, final RedirectAttributes redirectAttributes) throws Exception {
         LOGGER.debug("\n==== in postUpload ====");
         model.addAttribute("smpupload", smpupload);
-    
+
         /*Iterate through all chosen files*/
         List<SMPHttp> allItems = new ArrayList<>();
         for (int i = 0; i < smpupload.getUploadFiles().size(); i++) {
@@ -125,23 +125,34 @@ public class SMPUploadFileController {
             }
 
             boolean valid = xmlValidator.validator(convFile.getPath());
+            boolean fileDeleted;
+
             if (valid) {
                 LOGGER.debug("\n****VALID XML File");
             } else {
                 LOGGER.debug("\n****NOT VALID XML File");
                 String message = env.getProperty("error.notsmp"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
-                convFile.delete();
+                fileDeleted = convFile.delete();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+                }
                 return "redirect:/smpeditor/uploadsmpfile";
             }
-            convFile.delete();
+            fileDeleted = convFile.delete();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+            }
 
             ServiceMetadata serviceMetadata = smpconverter.convertFromXml(smpupload.getUploadFiles().get(i));
 
             boolean isSigned = smpconverter.getIsSignedServiceMetadata();
             if (isSigned) {
                 LOGGER.debug("\n****SIGNED SMP File");
-                convFile.delete();
+                fileDeleted = convFile.delete();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+                }
                 String message = env.getProperty("warning.isSigned.sigmenu"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.warning));
                 return "redirect:/smpeditor/uploadsmpfile";
@@ -166,7 +177,7 @@ public class SMPUploadFileController {
                     return "redirect:/smpeditor/uploadsmpfile";
                 }
 
-        /* Check if url of redirect is correct */
+                /* Check if url of redirect is correct */
                 String href = serviceMetadata.getRedirect().getHref();
                 Pattern pattern = Pattern.compile("ehealth-participantid-qns.*");
                 Matcher matcher = pattern.matcher(href);
@@ -330,7 +341,7 @@ public class SMPUploadFileController {
             }
 
             if (!(itemUpload.getStatusCode() == 200 || itemUpload.getStatusCode() == 201)) {
-            /* Get BusinessCode and ErrorDescription from response */
+                /* Get BusinessCode and ErrorDescription from response */
 
                 //Save InputStream of response in ByteArrayOutputStream in order to read it more than once.
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();

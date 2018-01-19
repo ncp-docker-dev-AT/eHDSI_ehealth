@@ -52,6 +52,7 @@ import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XdrValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -111,8 +112,9 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         }
     }
 
-    private String getIPofSender(org.apache.axis2.context.MessageContext msgContext) {
-        return (String) msgContext.getProperty("REMOTE_ADDR");
+    private String getIPofSender(MessageContext messageContext) {
+
+        return (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
     }
 
     private String getMessageID(org.apache.axiom.soap.SOAPEnvelope envelope) {
@@ -181,7 +183,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
-                    AuditService auditService = new AuditService();
+                    AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
                     /* Validate outgoing response */
@@ -203,7 +205,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
                 try {
                     EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                            endTime, "", EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND);
+                            endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND);
                 } catch (Exception e) {
                     LOGGER.error("EADC INVOCATION FAILED: '{}'", e.getMessage(), e);
                 }

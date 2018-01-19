@@ -1,18 +1,14 @@
 package epsos.ccd.gnomon.cda.parser.docs;
 
-import epsos.ccd.gnomon.cda.parser.beans.Code;
-import epsos.ccd.gnomon.cda.parser.beans.Identifier;
-import epsos.ccd.gnomon.cda.parser.beans.MedicalComponent;
-import epsos.ccd.gnomon.cda.parser.beans.RelatedDocument;
-import epsos.ccd.gnomon.cda.parser.beans.Time;
+import epsos.ccd.gnomon.cda.parser.beans.*;
 import epsos.ccd.gnomon.cda.parser.enums.Country;
+
 import java.util.Date;
 
 /**
  * A class encapsulating a health care encounter report clinical document.
  *
  * @author Akis Papadopoulos
- *
  */
 public class HCEReport extends ClinicalDocument {
 
@@ -27,10 +23,10 @@ public class HCEReport extends ClinicalDocument {
     /**
      * A constructor initializing a HCER clinical document.
      *
-     * @param code the class code of the document.
-     * @param id the document identifier.
-     * @param created the creation date of the document.
-     * @param updated the last updated date of the document.
+     * @param code     the class code of the document.
+     * @param id       the document identifier.
+     * @param created  the creation date of the document.
+     * @param updated  the last updated date of the document.
      * @param language the language of the document.
      */
     public HCEReport(Code code, Identifier id, Date created, Date updated, Country language) {
@@ -199,8 +195,8 @@ public class HCEReport extends ClinicalDocument {
         context.append("</documentationOf>");
 
         // Checking if any related document is provided
-        if (relatedDocuments.size() > 0) {
-            // Iterating throught the realted documents
+        if (!relatedDocuments.isEmpty()) {
+            // Iterating through the related documents
             for (RelatedDocument doc : relatedDocuments) {
                 // Checking if the related document is valid
                 if (doc != null) {
@@ -222,7 +218,7 @@ public class HCEReport extends ClinicalDocument {
         context.append("<structuredBody>");
 
         // Checking if any medical component provided
-        if (components.size() > 0) {
+        if (!components.isEmpty()) {
             // Iterate through the medical components
             for (MedicalComponent component : components) {
                 // Checking for a valid medical component

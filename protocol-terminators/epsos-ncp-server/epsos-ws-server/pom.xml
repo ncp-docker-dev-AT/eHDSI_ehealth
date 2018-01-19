@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
         <artifactId>openncp-ncp-server</artifactId>
-        <version>2.5.2</version>
+        <version>2.5.3.RC1</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server</groupId>
@@ -16,14 +16,48 @@
     <name>OpenNCP CC Web Services (IHE XCPD, XCA, XDR)</name>
 
     <properties>
-        <tomcat.home>${CATALINA_HOME}/</tomcat.home>
-        <tomcat.username>username</tomcat.username>
-        <tomcat.password>password</tomcat.password>
+        <!--<tomcat.home>${CATALINA_HOME}/</tomcat.home>-->
+        <!--<tomcat.username>username</tomcat.username>-->
+        <!--<tomcat.password>password</tomcat.password>-->
         <jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
         <skip.deploy>true</skip.deploy>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>net.bull.javamelody</groupId>
+            <artifactId>javamelody-core</artifactId>
+            <version>1.70.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>2.1.7</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bcmail-jdk14</artifactId>
+                    <groupId>bouncycastle</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bcprov-jdk14</artifactId>
+                    <groupId>bouncycastle</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bctsp-jdk14</artifactId>
+                    <groupId>bouncycastle</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jrobin</groupId>
+            <artifactId>jrobin</artifactId>
+            <version>1.5.9</version>
+        </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-defaultpolicymanager</artifactId>
@@ -228,30 +262,30 @@
         </profile>
 
         <!-- This profile bundles the real National Connector implementation -->
-        <profile>
-            <id>national-connector-impl</id>
-            <dependencies>
-                <dependency>
-                    <groupId>${national-connector-impl.groupId}</groupId>
-                    <artifactId>${national-connector-impl.artifactId}</artifactId>
-                    <version>${national-connector-impl.version}</version>
-                    <scope>runtime</scope>
-                </dependency>
-            </dependencies>
-        </profile>
+        <!--<profile>-->
+        <!--<id>national-connector-impl</id>-->
+        <!--<dependencies>-->
+        <!--<dependency>-->
+        <!--<groupId>${national-connector-impl.groupId}</groupId>-->
+        <!--<artifactId>${national-connector-impl.artifactId}</artifactId>-->
+        <!--<version>${national-connector-impl.version}</version>-->
+        <!--<scope>runtime</scope>-->
+        <!--</dependency>-->
+        <!--</dependencies>-->
+        <!--</profile>-->
 
         <!-- This profile bundles the real National Connector implementation for Luxembourg -->
-        <profile>
-            <id>national-connector-lu-impl</id>
-            <dependencies>
-                <dependency>
-                    <groupId>gi9.ccd.gnomon.epsos</groupId>
-                    <artifactId>openncp-nc-lu</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <scope>runtime</scope>
-                </dependency>
-            </dependencies>
-        </profile>
+        <!--<profile>-->
+        <!--<id>national-connector-lu-impl</id>-->
+        <!--<dependencies>-->
+        <!--<dependency>-->
+        <!--<groupId>gi9.ccd.gnomon.epsos</groupId>-->
+        <!--<artifactId>openncp-nc-lu</artifactId>-->
+        <!--<version>1.0.0-SNAPSHOT</version>-->
+        <!--<scope>runtime</scope>-->
+        <!--</dependency>-->
+        <!--</dependencies>-->
+        <!--</profile>-->
 
         <!-- Integreation Tests -->
         <profile>
@@ -298,43 +332,43 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.cargo</groupId>
-                        <artifactId>cargo-maven2-plugin</artifactId>
-                        <version>1.6.1</version>
-                        <configuration>
-                            <container>
-                                <containerId>tomcat7x</containerId>
-                                <type>remote</type>
-                            </container>
-                            <configuration>
-                                <type>runtime</type>
-                                <properties>
-                                    <cargo.hostname>${remote.hostname}</cargo.hostname>
-                                    <cargo.servlet.port>${remote.port}</cargo.servlet.port>
-                                    <cargo.remote.username>${remote.user}</cargo.remote.username>
-                                    <cargo.remote.password>${remote.pass}</cargo.remote.password>
-                                </properties>
-                            </configuration>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>deploy-cargo</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <!--<goal>deploy</goal>-->
-                                    <goal>redeploy</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>undeploy-cargo</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>undeploy</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+                    <!--<plugin>-->
+                    <!--<groupId>org.codehaus.cargo</groupId>-->
+                    <!--<artifactId>cargo-maven2-plugin</artifactId>-->
+                    <!--<version>1.6.1</version>-->
+                    <!--<configuration>-->
+                    <!--<container>-->
+                    <!--<containerId>tomcat7x</containerId>-->
+                    <!--<type>remote</type>-->
+                    <!--</container>-->
+                    <!--<configuration>-->
+                    <!--<type>runtime</type>-->
+                    <!--<properties>-->
+                    <!--<cargo.hostname>${remote.hostname}</cargo.hostname>-->
+                    <!--<cargo.servlet.port>${remote.port}</cargo.servlet.port>-->
+                    <!--<cargo.remote.username>${remote.user}</cargo.remote.username>-->
+                    <!--<cargo.remote.password>${remote.pass}</cargo.remote.password>-->
+                    <!--</properties>-->
+                    <!--</configuration>-->
+                    <!--</configuration>-->
+                    <!--<executions>-->
+                    <!--<execution>-->
+                    <!--<id>deploy-cargo</id>-->
+                    <!--<phase>pre-integration-test</phase>-->
+                    <!--<goals>-->
+                    <!--&lt;!&ndash;<goal>deploy</goal>&ndash;&gt;-->
+                    <!--<goal>redeploy</goal>-->
+                    <!--</goals>-->
+                    <!--</execution>-->
+                    <!--<execution>-->
+                    <!--<id>undeploy-cargo</id>-->
+                    <!--<phase>post-integration-test</phase>-->
+                    <!--<goals>-->
+                    <!--<goal>undeploy</goal>-->
+                    <!--</goals>-->
+                    <!--</execution>-->
+                    <!--</executions>-->
+                    <!--</plugin>-->
 
                     <!-- failsafe -->
                     <plugin>

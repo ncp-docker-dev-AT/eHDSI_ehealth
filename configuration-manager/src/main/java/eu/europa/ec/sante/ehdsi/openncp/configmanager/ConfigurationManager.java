@@ -1,5 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.configmanager;
 
+import java.util.Map;
+
 public interface ConfigurationManager {
 
     /**
@@ -8,33 +10,19 @@ public interface ConfigurationManager {
      */
     String getProperty(String key);
 
+    String getProperty(String key, boolean checkMap);
+
+    Map<String, String> getProperties();
+
+    boolean getBooleanProperty(String key);
+
+    int getIntegerProperty(String key);
+
     /**
      * @param key
      * @param value
      */
     void setProperty(String key, String value);
 
-    /**
-     * @param countryCode
-     * @param service
-     * @return
-     */
-    //String getEndpointUrl(String countryCode, RegisteredService service);
-
-    /**
-     * @param countryCode
-     * @param service
-     * @param refresh
-     * @return
-     */
-    //String getEndpointUrl(String countryCode, RegisteredService service, boolean refresh);
-
     void fetchInternationalSearchMask(String countryCode);
-
-    /**
-     * @param ISOCountryCode
-     * @param ServiceName
-     * @param URL
-     */
-    void setServiceWSE(String ISOCountryCode, String ServiceName, String URL);
 }

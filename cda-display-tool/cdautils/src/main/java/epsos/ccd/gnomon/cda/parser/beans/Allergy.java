@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating an allergy medical entry.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Allergy extends MedicalEntry {
 
@@ -22,8 +21,10 @@ public class Allergy extends MedicalEntry {
         // Calling the constructor of the super class
         super();
 
+        this.setRoot(root);
+
         // Setting the allergy UUID number
-        this.uuid = "allergy." + String.valueOf(UUID++);
+        this.uuid = "allergy." + UUID++;
 
         // Setting a null agent of the alert
         this.agent = null;
@@ -35,17 +36,17 @@ public class Allergy extends MedicalEntry {
     /**
      * A constructor initializing an allergy medical entry.
      *
-     * @param code the code of the allergy.
+     * @param code          the code of the allergy.
      * @param effectiveTime the effective time of the allergy.
-     * @param agent the agent causing the allergy.
-     * @param status the status of the allergy.
+     * @param agent         the agent causing the allergy.
+     * @param status        the status of the allergy.
      */
     public Allergy(Code code, Time effectiveTime, Agent agent, String status) {
         // Calling the constructor of the super class
         super(code, effectiveTime);
 
         // Setting the allergy UUID number
-        this.uuid = "allergy." + String.valueOf(UUID++);
+        this.uuid = "allergy." + UUID++;
 
         // Setting the agent of the alert
         this.agent = agent;

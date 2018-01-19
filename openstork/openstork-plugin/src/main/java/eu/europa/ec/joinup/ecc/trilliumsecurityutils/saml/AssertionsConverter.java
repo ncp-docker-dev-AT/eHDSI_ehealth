@@ -43,11 +43,11 @@ import java.util.*;
 public class AssertionsConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionsConverter.class);
-    public static String PORTAL_DOCTOR_PERMISSIONS = "PORTAL_DOCTOR_PERMISSIONS";
-    public static String PORTAL_PHARMACIST_PERMISSIONS = "PORTAL_PHARMACIST_PERMISSIONS";
-    public static String PORTAL_NURSE_PERMISSIONS = "PORTAL_NURSE_PERMISSIONS";
-    public static String PORTAL_ADMIN_PERMISSIONS = "PORTAL_ADMIN_PERMISSIONS";
-    public static String PORTAL_PATIENT_PERMISSIONS = "PORTAL_PATIENT_PERMISSIONS";
+    private static final String PORTAL_DOCTOR_PERMISSIONS = "PORTAL_DOCTOR_PERMISSIONS";
+    private static final String PORTAL_PHARMACIST_PERMISSIONS = "PORTAL_PHARMACIST_PERMISSIONS";
+    private static final String PORTAL_NURSE_PERMISSIONS = "PORTAL_NURSE_PERMISSIONS";
+    private static final String PORTAL_ADMIN_PERMISSIONS = "PORTAL_ADMIN_PERMISSIONS";
+    private static final String PORTAL_PATIENT_PERMISSIONS = "PORTAL_PATIENT_PERMISSIONS";
 
     private static <T> T create(Class<T> cls, QName qname) {
         return (T) ((XMLObjectBuilder) org.opensaml.Configuration.getBuilderFactory()
@@ -161,7 +161,7 @@ public class AssertionsConverter {
         String poc = "POC";
         // fixed for consent creation AuthorInstitution Validation problem
         String orgId = "TRILLIUMGATEWAY.1";
-        String orgType = "Other";
+        String orgType;
         if (isPharmacist) {
             orgType = "Pharmacy";
         } else {

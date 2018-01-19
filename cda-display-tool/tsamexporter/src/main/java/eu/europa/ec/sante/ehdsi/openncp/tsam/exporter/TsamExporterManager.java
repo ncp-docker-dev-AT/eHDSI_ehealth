@@ -61,12 +61,12 @@ public class TsamExporterManager {
                 List<Concept> concepts = jdbcTemplate.query(
                         // @formatter:off
                         "SELECT c.id, c.code, cs.oid, cs.name " +
-                        "FROM code_system_concept c " +
-                            "INNER JOIN code_system_version csv ON c.code_system_version_id = csv.id " +
-                            "INNER JOIN code_system cs ON csv.code_system_id = cs.id " +
-                            "INNER JOIN x_concept_value_set cvsm ON cvsm.code_system_concept_id = c.id " +
-                            "INNER JOIN value_set_version vsv ON vsv.id = cvsm.value_set_version_id " +
-                        "WHERE vsv.value_set_id = ?", new Object[]{valueSet.getId()},
+                                "FROM code_system_concept c " +
+                                "INNER JOIN code_system_version csv ON c.code_system_version_id = csv.id " +
+                                "INNER JOIN code_system cs ON csv.code_system_id = cs.id " +
+                                "INNER JOIN x_concept_value_set cvsm ON cvsm.code_system_concept_id = c.id " +
+                                "INNER JOIN value_set_version vsv ON vsv.id = cvsm.value_set_version_id " +
+                                "WHERE vsv.value_set_id = ?", new Object[]{valueSet.getId()},
                         // @formatter:on
                         (resultSet, i) -> new Concept(
                                 resultSet.getLong(1),

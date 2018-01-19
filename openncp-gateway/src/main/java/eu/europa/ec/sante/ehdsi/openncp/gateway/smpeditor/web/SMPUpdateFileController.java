@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -111,21 +110,29 @@ public class SMPUpdateFileController {
         } catch (IllegalStateException ex) {
             LOGGER.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
-    
-    /*Validate xml file*/
+
+        /*Validate xml file*/
         boolean valid = xmlValidator.validator(convFile.getPath());
+        boolean fileDeleted;
+
         if (valid) {
             LOGGER.debug("\n****VALID XML File");
         } else {
             LOGGER.debug("\n****NOT VALID XML File");
             String message = env.getProperty("error.notsmp"); //messages.properties
             redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
-            convFile.delete();
+            fileDeleted = convFile.delete();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+            }
             return "redirect:/smpeditor/updatesmpfile";
         }
-        convFile.delete();
-    
-    /*Read data from xml*/
+        fileDeleted = convFile.delete();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+        }
+
+        /*Read data from xml*/
         ServiceMetadata serviceMetadata;
         serviceMetadata = smpconverter.convertFromXml(smpfileupdate.getUpdateFile());
         
@@ -145,7 +152,7 @@ public class SMPUpdateFileController {
       /*
         get participantIdentifier from redirect href
       */
-      /*May change if Participant Identifier specification change*/
+            /*May change if Participant Identifier specification change*/
             String href = serviceMetadata.getRedirect().getHref();
             String participantID;
             Pattern pattern = Pattern.compile(env.getProperty("ParticipantIdentifier.Scheme") + ".*");//SPECIFICATION
@@ -214,7 +221,7 @@ public class SMPUpdateFileController {
                 }
             }
 
-            SMPType[] smptypes = SMPType.ALL;
+            SMPType[] smptypes = SMPType.getALL();
             for (SMPType smptype1 : smptypes) {
                 if (smptype1.name().equals(documentID)) {
                     smpfileupdate.setType(smptype1);
@@ -240,8 +247,8 @@ public class SMPUpdateFileController {
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 return "redirect:/smpeditor/updatesmpfile";
             }
-      
-      /*Builds final file name*/
+
+            /*Builds final file name*/
             String timeStamp = new SimpleDateFormat("yyyyMMdd'T'HHmmss").format(new java.util.Date());
             String fileName = smpfileupdate.getType().name() + "_" + smpfileupdate.getCountry().toUpperCase() + "_" + timeStamp + ".xml";
             smpfileupdate.setFileName(fileName);
@@ -255,9 +262,9 @@ public class SMPUpdateFileController {
             smpfileupdate.setMinimumAutenticationLevel(serviceMetadata.getServiceInformation().getProcessList().getProcesses().get(0).getServiceEndpointList().getEndpoints().get(0).getMinimumAuthenticationLevel());
         }
 
-    /*
-     * Read smpeditor.properties file
-     */
+        /*
+         * Read smpeditor.properties file
+         */
         readProperties.readProperties(smpfileupdate);
 
         smpfields.setUri(readProperties.getUri());
@@ -275,7 +282,7 @@ public class SMPUpdateFileController {
         model.addAttribute("smpfields", smpfields);
 
 
-        if ("ServiceInformation" .equals(type)) {
+        if ("ServiceInformation".equals(type)) {
             EndpointType endpoint = serviceMetadata.getServiceInformation().getProcessList().getProcesses().get(0).getServiceEndpointList().getEndpoints().get(0);
 
             X509Certificate cert = null;
@@ -344,7 +351,7 @@ public class SMPUpdateFileController {
                 }
             }
 
-        } else if ("Redirect" .equals(type)) {
+        } else if ("Redirect".equals(type)) {
             RedirectType redirect = serviceMetadata.getRedirect();
             smpfileupdate.setCertificateUID(redirect.getCertificateUID());
             smpfileupdate.setHref(redirect.getHref());
@@ -464,8 +471,8 @@ public class SMPUpdateFileController {
                 case "Redirect":
                     LOGGER.debug("\n****Type Redirect");
 
-          /*get documentIdentifier from redierct href*/
-          /*May change if Document Identifier specification change*/
+                    /*get documentIdentifier from redierct href*/
+                    /*May change if Document Identifier specification change*/
                     String href = smpfileupdate.getHref();
                     String documentID = "";
                     Pattern pattern = Pattern.compile(env.getProperty("ParticipantIdentifier.Scheme") + ".*"); //SPECIFICATION
@@ -503,8 +510,8 @@ public class SMPUpdateFileController {
                             redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                             return "redirect:/smpeditor/updatesmpfileform";
                         }
-            
-            /*Builds final file name*/
+
+                        /*Builds final file name*/
                         String timeStamp = new SimpleDateFormat("yyyyMMdd'T'HHmmss").format(new java.util.Date());
                         String fileName = smpfileupdate.getType().name() + "_" + smpType + "_" + smpfileupdate.getCountry().toUpperCase() + "_" + timeStamp + ".xml";
                         smpfileupdate.setFileName(fileName);
@@ -535,7 +542,7 @@ public class SMPUpdateFileController {
             return "redirect:/smpeditor/updatesmpfileform";
         }
 
-    /*chosen options sign file in html modal*/
+        /*chosen options sign file in html modal*/
         if (action.equals("sign")) {
             LOGGER.debug("\n****ACTION SIGN");
             return "redirect:saveupdatedsmpfile/sign";

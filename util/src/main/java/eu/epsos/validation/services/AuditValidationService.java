@@ -11,11 +11,14 @@ import net.ihe.gazelle.jaxb.audit.SOAPException_Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.ws.soap.SOAPFaultException;
+
 /**
  * This class represents the wrapper for the Audit messages validation.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
+@Deprecated
 public class AuditValidationService extends ValidationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditValidationService.class);
@@ -52,15 +55,18 @@ public class AuditValidationService extends ValidationService {
             return false;
         }
 
-        try {
-            AuditMessageValidationWSService amService = new AuditMessageValidationWSService();
-            AuditMessageValidationWS amPort = amService.getAuditMessageValidationWSPort();
-            LOGGER.info("Requesting online validation to '{}'", amService.getWSDLDocumentLocation());
-            amXmlDetails = amPort.validateDocument(object, model);
-        } catch (SOAPException_Exception ex) {
-            LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace: '{}'", ex.getMessage(), ex);
+        if(ValidationService.isRemoteValidationOn()) {
+            try {
+                AuditMessageValidationWSService amService = new AuditMessageValidationWSService();
+                AuditMessageValidationWS amPort = amService.getAuditMessageValidationWSPort();
+                LOGGER.info("Requesting online validation to '{}'", amService.getWSDLDocumentLocation());
+                amXmlDetails = amPort.validateDocument(object, model);
+            } catch (SOAPFaultException e) {
+                LOGGER.error("Axis Fault: '{}'", e.getMessage(), e);
+            } catch (SOAPException_Exception ex) {
+                LOGGER.error("An error has occurred during the invocation of remote validation service, please check the stack trace: '{}'", ex.getMessage(), ex);
+            }
         }
-
         // Report generation.
         if (!amXmlDetails.isEmpty()) {
             LOGGER.info("Audit message has been successfully validated through Gazelle endpoint as result");

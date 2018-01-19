@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating a related document element.
  *
  * @author Akis Papadopoulos
- *
  */
 public class RelatedDocument {
 
@@ -28,7 +27,7 @@ public class RelatedDocument {
      * A constructor initializing a related document entity.
      *
      * @param typeCode the type code of the relation.
-     * @param id the id of the document.
+     * @param id       the id of the document.
      */
     public RelatedDocument(String typeCode, Identifier id) {
         // Setting teh type code

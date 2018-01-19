@@ -1,19 +1,3 @@
-/*
- *  Copyright 2010 Jerry Dimitriou <jerouris at netsmart.gr>.
- * 
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
 package epsos.ccd.netsmart.securitymanager;
 
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
@@ -49,7 +33,7 @@ import static org.junit.Assert.fail;
  */
 public class SamlTRCIssuerTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(SamlTRCIssuerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SamlTRCIssuerTest.class);
 
     public SamlTRCIssuerTest() {
     }
@@ -60,7 +44,7 @@ public class SamlTRCIssuerTest {
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
     }
 
     @Before
@@ -79,10 +63,9 @@ public class SamlTRCIssuerTest {
     @Ignore
     @Test
     public void testIssueTrcToken() throws IOException {
+
         try {
-
-            logger.info("issueTrcToken");
-
+            LOGGER.info("issueTrcToken");
             // Get parser pool manager
             BasicParserPool ppMgr = new BasicParserPool();
             ppMgr.setNamespaceAware(true);
@@ -96,12 +79,10 @@ public class SamlTRCIssuerTest {
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(samlasRoot);
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
             Assertion hcpIdentityAssertion = (Assertion) unmarshaller.unmarshall(samlasRoot);
-            logger.info("Name Id Value:{0}", hcpIdentityAssertion.getSubject().getNameID().getValue());
+            LOGGER.info("Name Id Value:{0}", hcpIdentityAssertion.getSubject().getNameID().getValue());
             String patientID = "theID";
-            //List<String> purposeOfUse = Collections.singletonList("TREATMENT");
             List<Attribute> attrValuePair = null;
             SamlTRCIssuer instance = new SamlTRCIssuer();
-            //Assertion expResult = null;
 
             Assertion result = instance.issueTrcToken(hcpIdentityAssertion, patientID, null, attrValuePair);
 
@@ -112,19 +93,13 @@ public class SamlTRCIssuerTest {
 
             XMLUtils.sendXMLtoStream(signedDoc, new FileOutputStream("trc.xml"));
 
-        } catch (FileNotFoundException ex) {
-            logger.error(null, ex);
-        } catch (MarshallingException ex) {
-            logger.error(null, ex);
-        } catch (UnmarshallingException ex) {
-            fail(ex.getMessage());
-        } catch (XMLParserException ex) {
+        } catch (FileNotFoundException | MarshallingException ex) {
+            LOGGER.error(null, ex);
+        } catch (UnmarshallingException | XMLParserException | SMgrException ex) {
             fail(ex.getMessage());
         } catch (ParserConfigurationException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             fail(ex.getMessage());
-        } catch (SMgrException e) {
-            fail(e.getMessage());
         }
     }
 
@@ -136,13 +111,12 @@ public class SamlTRCIssuerTest {
     @Ignore
     @Test
     public void testVerifyTrcToken() throws Exception {
-        logger.info("verifyTrcToken");
 
+        LOGGER.info("verifyTrcToken");
         // Get parser pool manager
         Assertion idas = loadSamlAssertionAsResource("SignedSamlAssertion.xml");
         Assertion trc = null;
         String patientID = "theID";
-        //List<String> purposeOfUse = Collections.singletonList("TREATMENT");
         List<Attribute> attrValuePair = null;
         SamlTRCIssuer instance = new SamlTRCIssuer();
         SignatureManager sm = new SignatureManager();
@@ -195,6 +169,7 @@ public class SamlTRCIssuerTest {
     }
 
     private Assertion loadSamlAssertionAsResource(String filename) {
+
         Assertion hcpIdentityAssertion = null;
         try {
             BasicParserPool ppMgr = new BasicParserPool();
@@ -208,10 +183,8 @@ public class SamlTRCIssuerTest {
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(samlasRoot);
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
             hcpIdentityAssertion = (Assertion) unmarshaller.unmarshall(samlasRoot);
-        } catch (UnmarshallingException ex) {
-            logger.error(null, ex);
-        } catch (XMLParserException ex) {
-            logger.error(null, ex);
+        } catch (UnmarshallingException | XMLParserException ex) {
+            LOGGER.error(null, ex);
         }
 
         return hcpIdentityAssertion;
@@ -219,18 +192,15 @@ public class SamlTRCIssuerTest {
     }
 
     private void writeSAMLObjectToStream(SAMLObject so, String f) {
+
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             Document signedDoc = dbf.newDocumentBuilder().newDocument();
             Configuration.getMarshallerFactory().getMarshaller(so).marshall(so, signedDoc);
             XMLUtils.sendXMLtoStream(signedDoc, new FileOutputStream(f));
-        } catch (FileNotFoundException ex) {
-            logger.error(null, ex);
-        } catch (MarshallingException ex) {
-            logger.error(null, ex);
-        } catch (ParserConfigurationException ex) {
-            logger.error(null, ex);
+        } catch (FileNotFoundException | MarshallingException | ParserConfigurationException ex) {
+            LOGGER.error(null, ex);
         }
     }
 }

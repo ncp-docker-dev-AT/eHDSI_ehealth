@@ -15,20 +15,17 @@ import java.util.HashMap;
 
 /**
  * Coded Element List.<br>
- * Serves as Filter for determining transcoded / translated Coded Elements from
- * input CDA document.<br>
+ * Serves as Filter for determining transcoded / translated Coded Elements from input CDA document.<br>
  * Reads list from xml structure. (Path to Input xml file is configured through property <i>tm.codedelementlist.path</i>)<br>
  * <br>
  * <p>
- * To follow relation between coded element and valueset, configuration file
- * called CodedElementList will be used. It will contain list of all coded
- * elements, and for each of them:<br>
- * <li> name of coded element (xpath),</li> <li> indication, in which pivot
- * document types coded element is used (Patient Summary, ePrescription,
- * eDispensation, and for each of them if it is in CDA level 3 or CDA level 1
- * embedding pdf and whether element is required or optional),</li> <li>
- * related value set (and value set version) [optional],</li> <li> language to
- * which element should be translated [optional].</li>
+ * To follow relation between coded element and valueset, configuration file called CodedElementList will be used. It will contain list of all coded elements, and for each of them:
+ * <br>
+ * <li> name of coded element (xpath),</li> <li> indication, in which pivot document types coded element
+ * is used (Patient Summary, ePrescription, eDispensation, and for each of them if it is in CDA level 3
+ * or CDA level 1 embedding pdf and whether element is required or optional),
+ * </li>
+ * <li> related value set (and value set version) [optional],</li> <li> language to which element should be translated [optional].</li>
  *
  * @author Frantisek Rudik
  * @author Organization: Posam
@@ -64,8 +61,7 @@ public class CodedElementList implements InitializingBean, TMConstants {
      */
     private static Collection<CodedElementListItem> eDispensationl1;
     /**
-     * Collection of Elements contained in header of eDispensation CDA document
-     * (level 1 with pdf)
+     * Collection of Elements contained in header of eDispensation CDA document (level 1 with pdf)
      */
     private static Collection<CodedElementListItem> eDispensationl3;
     private static Collection<CodedElementListItem> hcerl3;
@@ -73,7 +69,7 @@ public class CodedElementList implements InitializingBean, TMConstants {
     private static Collection<CodedElementListItem> mrol3;
     private static Collection<CodedElementListItem> mrol1;
     private static CodedElementList instance = null;
-    private static HashMap<String, Collection<CodedElementListItem>> hmDocAndLists = new HashMap<String, Collection<CodedElementListItem>>();
+    private static HashMap<String, Collection<CodedElementListItem>> hmDocAndLists = new HashMap<>();
     private boolean isInitialized = false;
     /**
      * path to xml file with Coded Element List
@@ -164,46 +160,47 @@ public class CodedElementList implements InitializingBean, TMConstants {
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
                         docTypeElement = (Element) node;
 
-                        if (docTypeElement.getNodeName().equals(
-                                PATIENT_SUMMARY1)) {
-                            patientSummaryl1 = addItem(docTypeElement, codedElement,
-                                    patientSummaryl1);
-                        } else if (docTypeElement.getNodeName().equals(
-                                PATIENT_SUMMARY3)) {
-                            patientSummaryl3 = addItem(docTypeElement, codedElement,
-                                    patientSummaryl3);
-                        } else if (docTypeElement.getNodeName().equals(
-                                EPRESCRIPTION1)) {
-                            ePrescriptionl1 = addItem(docTypeElement, codedElement,
-                                    ePrescriptionl1);
-                        } else if (docTypeElement.getNodeName().equals(
-                                EPRESCRIPTION3)) {
-                            ePrescriptionl3 = addItem(docTypeElement, codedElement,
-                                    ePrescriptionl3);
-                        } else if (docTypeElement.getNodeName().equals(
-                                EDISPENSATION1)) {
-                            eDispensationl1 = addItem(docTypeElement, codedElement,
-                                    eDispensationl1);
-                        } else if (docTypeElement.getNodeName().equals(
-                                EDISPENSATION3)) {
-                            eDispensationl3 = addItem(docTypeElement, codedElement,
-                                    eDispensationl3);
-                        } else if (docTypeElement.getNodeName().equals(
-                                HCER3)) {
-                            hcerl3 = addItem(docTypeElement, codedElement,
-                                    hcerl3);
-                        } else if (docTypeElement.getNodeName().equals(
-                                HCER1)) {
-                            hcerl1 = addItem(docTypeElement, codedElement,
-                                    hcerl1);
-                        } else if (docTypeElement.getNodeName().equals(
-                                MRO3)) {
-                            mrol3 = addItem(docTypeElement, codedElement,
-                                    mrol3);
-                        } else if (docTypeElement.getNodeName().equals(
-                                MRO1)) {
-                            mrol1 = addItem(docTypeElement, codedElement,
-                                    mrol1);
+                        switch (docTypeElement.getNodeName()) {
+                            case PATIENT_SUMMARY1:
+                                patientSummaryl1 = addItem(docTypeElement, codedElement,
+                                        patientSummaryl1);
+                                break;
+                            case PATIENT_SUMMARY3:
+                                patientSummaryl3 = addItem(docTypeElement, codedElement,
+                                        patientSummaryl3);
+                                break;
+                            case EPRESCRIPTION1:
+                                ePrescriptionl1 = addItem(docTypeElement, codedElement,
+                                        ePrescriptionl1);
+                                break;
+                            case EPRESCRIPTION3:
+                                ePrescriptionl3 = addItem(docTypeElement, codedElement,
+                                        ePrescriptionl3);
+                                break;
+                            case EDISPENSATION1:
+                                eDispensationl1 = addItem(docTypeElement, codedElement,
+                                        eDispensationl1);
+                                break;
+                            case EDISPENSATION3:
+                                eDispensationl3 = addItem(docTypeElement, codedElement,
+                                        eDispensationl3);
+                                break;
+                            case HCER3:
+                                hcerl3 = addItem(docTypeElement, codedElement,
+                                        hcerl3);
+                                break;
+                            case HCER1:
+                                hcerl1 = addItem(docTypeElement, codedElement,
+                                        hcerl1);
+                                break;
+                            case MRO3:
+                                mrol3 = addItem(docTypeElement, codedElement,
+                                        mrol3);
+                                break;
+                            case MRO1:
+                                mrol1 = addItem(docTypeElement, codedElement,
+                                        mrol1);
+                                break;
                         }
                     }
                 }
@@ -229,8 +226,8 @@ public class CodedElementList implements InitializingBean, TMConstants {
         }
     }
 
-    private Collection<CodedElementListItem> addItem(Element docTypeElement, Element codedElement,
-                                                     Collection<CodedElementListItem> collection) {
+    private Collection<CodedElementListItem> addItem(Element docTypeElement, Element codedElement, Collection<CodedElementListItem> collection) {
+
         String usage = docTypeElement.getTextContent();
         if (collection == null) {
             collection = new ArrayList<>();
@@ -239,16 +236,10 @@ public class CodedElementList implements InitializingBean, TMConstants {
             if (isNeeded(usage)) {
                 CodedElementListItem item = new CodedElementListItem();
 
-                String xPath = ((Element) codedElement.getElementsByTagName(
-                        ELEMENT_PATH).item(0)).getTextContent();
-                String valueSet = ((Element) codedElement.getElementsByTagName(
-                        VALUE_SET).item(0)).getTextContent();
-                String valueSetVersion = ((Element) codedElement
-                        .getElementsByTagName(VALUE_SET_VERSION).item(0))
-                        .getTextContent();
-                String targetLanguageCode = ((Element) codedElement
-                        .getElementsByTagName(TARGET_LANGUAGE_CODE).item(0))
-                        .getTextContent();
+                String xPath = codedElement.getElementsByTagName(ELEMENT_PATH).item(0).getTextContent();
+                String valueSet = codedElement.getElementsByTagName(VALUE_SET).item(0).getTextContent();
+                String valueSetVersion = codedElement.getElementsByTagName(VALUE_SET_VERSION).item(0).getTextContent();
+                String targetLanguageCode = codedElement.getElementsByTagName(TARGET_LANGUAGE_CODE).item(0).getTextContent();
 
                 item.setxPath(xPath);
                 item.setUsage(usage);
@@ -266,8 +257,7 @@ public class CodedElementList implements InitializingBean, TMConstants {
     }
 
     private boolean isNeeded(String usage) {
-        return (usage != null && usage.length() > 0 && (usage.equals(R)
-                || usage.equals(RNFA) || usage.equals(O)));
+        return (usage != null && usage.length() > 0 && (usage.equals(R) || usage.equals(RNFA) || usage.equals(O)));
     }
 
     /**

@@ -1,19 +1,3 @@
-/*
- *  Copyright 2010 Jerry Dimitriou <jerouris at netsmart.gr>.
- * 
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
 package epsos.ccd.netsmart.securitymanager;
 
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
@@ -73,7 +57,7 @@ import java.util.List;
  */
 public class SignatureManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(SignatureManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SignatureManager.class);
     private static final String SIG_ALG_PROP = "secman.signature.algorithm.default";
     private static final String DGST_ALG_PROP = "secman.digest.algorithm.default";
     private KeyStoreManager keyManager;
@@ -83,28 +67,24 @@ public class SignatureManager {
     public SignatureManager() throws IOException {
 
         //Default constructor now defaults to the test keyStoreManager
-        //TODO: Create a keystore manager to handle official Keystores;
         keyManager = new DefaultKeyStoreManager();
         init();
-
     }
 
-    public SignatureManager(KeyStoreManager keyStoreManager) throws IOException {
+    public SignatureManager(KeyStoreManager keyStoreManager) {
 
         //Constructor for unit testing. Sort of DI
         this.keyManager = keyStoreManager;
         init();
-
     }
 
-    private void init() throws IOException {
+    private void init() {
         ConfigurationManager cm = ConfigurationManagerFactory.getConfigurationManager();
         signatureAlgorithm = cm.getProperty(SIG_ALG_PROP);
 
         // If not defined
         if (signatureAlgorithm.length() == 0) {
             signatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256;
-            //cm.updateProperty(SIG_ALG_PROP, signatureAlgorithm);
         }
 
         digestAlgorithm = cm.getProperty(DGST_ALG_PROP);
@@ -112,7 +92,6 @@ public class SignatureManager {
         // If not defined
         if (digestAlgorithm.length() == 0) {
             digestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA1;
-            //cm.updateProperty(DGST_ALG_PROP, digestAlgorithm);
         }
     }
 
@@ -137,7 +116,7 @@ public class SignatureManager {
                 profileValidator.validate(sig);
             } catch (ValidationException e) {
                 // Indicates signature did not conform to SAML Signature profile
-                logger.error("ValidationException: '{}'", e.getMessage(), e);
+                LOGGER.error("ValidationException: '{}'", e.getMessage(), e);
                 throw new SMgrException("SAML Signature Profile Validation: " + e.getMessage());
             }
 
@@ -146,8 +125,8 @@ public class SignatureManager {
             if (certificates.size() == 1) {
                 cert = certificates.get(0);
                 // Mustafa: When not called through https, we can use the country code of the signature cert
-                String DN = cert.getSubjectDN().getName();
-                sigCountryCode = DN.substring(DN.indexOf("C=") + 2, DN.indexOf("C=") + 4);
+                String certificateDN = cert.getSubjectDN().getName();
+                sigCountryCode = certificateDN.substring(certificateDN.indexOf("C=") + 2, certificateDN.indexOf("C=") + 4);
 
             } else {
                 throw new SMgrException("More than one certificate found in keyinfo");
@@ -160,13 +139,13 @@ public class SignatureManager {
                 sigValidator.validate(sig);
             } catch (ValidationException e) {
                 // Indicates signature was not cryptographically valid, or possibly a processing error
-                logger.error("ValidationException: '{}'", e.getMessage(), e);
+                LOGGER.error("ValidationException: '{}'", e.getMessage(), e);
                 throw new SMgrException("Signature Validation: " + e.getMessage());
             }
             CertificateValidator cv = new CertificateValidator(keyManager.getTrustStore());
             cv.validateCertificate(cert);
         } catch (CertificateException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
         }
 
         return sigCountryCode;
@@ -184,6 +163,7 @@ public class SignatureManager {
      * @throws java.io.IOException
      */
     public void verifyEnvelopedSignature(Document doc) throws SMgrException, IOException {
+
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -210,7 +190,7 @@ public class SignatureManager {
             }
 
         } catch (XMLSignatureException | MarshalException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new SMgrException("Signature Invalid: " + ex.getMessage(), ex);
         }
 
@@ -247,9 +227,7 @@ public class SignatureManager {
 
         Credential signingCredential = SecurityHelper.getSimpleCredential(cert, kp.getPrivate());
 
-        //sig.setCanonicalizationAlgorithm(SignatureConstants.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
         sig.setSigningCredential(signingCredential);
-        // sig.setKeyInfo(SecurityHelper.getKeyInfoGenerator(signingCredential, null, null).generate(signingCredential));
         sig.setSignatureAlgorithm(signatureAlgorithm);
         sig.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_WITH_COMMENTS);
 
@@ -294,10 +272,7 @@ public class SignatureManager {
      * @param keyPassword
      * @throws SMgrException When signing fails
      */
-    public void signXMLWithEnvelopedSig(Document doc, String keyAlias, char[] keyPassword)
-            throws SMgrException {
-
-        Logger logger = LoggerFactory.getLogger(SignatureManager.class.getName());
+    public void signXMLWithEnvelopedSig(Document doc, String keyAlias, char[] keyPassword) throws SMgrException {
 
         KeyPair kp;
         X509Certificate cert;
@@ -343,7 +318,7 @@ public class SignatureManager {
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchAlgorithmException
                 | InvalidAlgorithmParameterException | MarshalException | XMLSignatureException ex) {
-            logger.error(null, ex);
+            LOGGER.error(null, ex);
             throw new SMgrException(ex.getMessage(), ex);
         }
     }

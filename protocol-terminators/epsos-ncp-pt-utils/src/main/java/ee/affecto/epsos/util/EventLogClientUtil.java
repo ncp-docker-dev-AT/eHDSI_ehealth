@@ -19,8 +19,8 @@
 package ee.affecto.epsos.util;
 
 import ee.affecto.epsos.ws.handler.DummyMustUnderstandHandler;
-import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.axis2.description.HandlerDescription;
@@ -201,8 +201,7 @@ public class EventLogClientUtil {
 
     public static void sendEventLog(EventLog eventLog) {
 
-        AuditService auditService = new AuditService();
-        auditService.write(eventLog, "", "1");
+        AuditServiceFactory.getInstance().write(eventLog, "", "1");
     }
 
     public static String appendUrnUuid(String uuid) {

@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating a disease element.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Observation extends Code {
 
@@ -19,9 +18,9 @@ public class Observation extends Code {
     /**
      * A constructor initializing an observation element.
      *
-     * @param code the code of the observation.
-     * @param display the display name of the observation.
-     * @param codeSystem the code system.
+     * @param code          the code of the observation.
+     * @param display       the display name of the observation.
+     * @param codeSystem    the code system.
      * @param codeSysemName the code system name.
      */
     public Observation(String code, String display, String codeSystem, String codeSystemName) {

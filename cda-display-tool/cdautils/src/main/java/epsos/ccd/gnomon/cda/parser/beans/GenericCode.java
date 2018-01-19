@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating a generic code.
  *
  * @author Akis Papadopoulos
- *
  */
 public class GenericCode extends Code {
 
@@ -22,9 +21,9 @@ public class GenericCode extends Code {
     /**
      * A constructor initializing a generic code.
      *
-     * @param code the code.
-     * @param display the display name of code.
-     * @param codeSystem the code system.
+     * @param code          the code.
+     * @param display       the display name of code.
+     * @param codeSystem    the code system.
      * @param codeSysemName the code system name.
      */
     public GenericCode(String code, String display, String codeSystem, String codeSystemName) {

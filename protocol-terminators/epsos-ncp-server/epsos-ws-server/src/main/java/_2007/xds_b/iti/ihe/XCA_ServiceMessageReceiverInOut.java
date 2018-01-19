@@ -87,6 +87,7 @@ import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XcaValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -150,9 +151,9 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         }
     }
 
-    private String getIPofSender(MessageContext msgContext) {
+    private String getIPofSender(MessageContext messageContext) {
 
-        return (String) msgContext.getProperty("REMOTE_ADDR");
+        return (String)messageContext.getProperty(MessageContext.REMOTE_ADDR);
     }
 
     private String getMessageID(SOAPEnvelope envelope) {
@@ -219,12 +220,11 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
                     adhocQueryResponse1 = skel.respondingGateway_CrossGatewayQuery(wrappedParam, sh, eventLog);
-                    envelope = toEnvelope(getSOAPFactory(msgContext),
-                            adhocQueryResponse1, false);
+                    envelope = toEnvelope(getSOAPFactory(msgContext), adhocQueryResponse1, false);
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
 
-                    AuditService auditService = new AuditService();
+                    AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
                     /* Validate outgoing query response */
@@ -256,7 +256,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
 
-                    AuditService auditService = new AuditService();
+                    AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
@@ -282,7 +282,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
                 try {
                     EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null,
-                            EadcUtilWrapper.getCDA(retrieveDocumentSetResponseType), startTime, endTime, "",
+                            EadcUtilWrapper.getCDA(retrieveDocumentSetResponseType), startTime, endTime, tr.com.srdc.epsos.util.Constants.COUNTRY_CODE,
                             EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND);
 
                 } catch (Exception e) {

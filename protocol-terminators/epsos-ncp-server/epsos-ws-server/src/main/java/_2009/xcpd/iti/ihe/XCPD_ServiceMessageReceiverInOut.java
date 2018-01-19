@@ -236,6 +236,7 @@ import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.epsos.validation.services.XcpdValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -292,9 +293,9 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
         }
     }
 
-    private String getIPofSender(MessageContext msgContext) {
+    private String getIPofSender(MessageContext messageContext) {
 
-        return (String) msgContext.getProperty("REMOTE_ADDR");
+        return (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
     }
 
     private String getMessageID(SOAPEnvelope envelope) {
@@ -371,7 +372,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
                     LOGGER.info("EventLog: '{}'", eventLog.getEventType());
-                    AuditService auditService = new AuditService();
+                    AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
                     LOGGER.debug("Outgoing XCPD Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
@@ -388,7 +389,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
                 try {
                     EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                            endTime, "", EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND);
+                            endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCPD, EadcUtil.Direction.INBOUND);
                 } catch (Exception ex) {
                     LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
                 }

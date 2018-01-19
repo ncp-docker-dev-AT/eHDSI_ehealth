@@ -1,19 +1,3 @@
-/*
- *  Copyright 2010 Jerry Dimitriou <jerouris at netsmart.gr>.
- * 
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
 package epsos.ccd.netsmart.securitymanager;
 
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
@@ -36,13 +20,13 @@ import static org.junit.Assert.fail;
  */
 public class MockCertTest {
 
-    protected static final Logger LOG = LoggerFactory.getLogger(MockCertTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MockCertTest.class);
 
     public MockCertTest() {
     }
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
         /*
         try {
             Properties databaseProps;
@@ -56,7 +40,7 @@ public class MockCertTest {
             try {
                 ds.setDriverClass(databaseProps.getProperty("db.driverclass"));
             } catch (PropertyVetoException ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             }
             ds.setJdbcUrl(databaseProps.getProperty("db.jdbcurl"));
             ds.setUser(databaseProps.getProperty("db.user"));
@@ -70,9 +54,9 @@ public class MockCertTest {
             try {
                 builder.activate();
             } catch (IllegalStateException ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             } catch (NamingException ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             }
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -81,7 +65,7 @@ public class MockCertTest {
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
     }
 
     @Before
@@ -92,11 +76,10 @@ public class MockCertTest {
     public void tearDown() {
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
     @Ignore
     @Test
     public void TianiCertTest() throws IOException {
+
         try {
             KeyStoreManager ksm = new TianiTestKeyStoreManager();
             X509Certificate cert = (X509Certificate) ksm.getCertificate("server1");
@@ -106,13 +89,14 @@ public class MockCertTest {
             cv.validateCertificate(cert);
             assertNull(ku);
         } catch (SMgrException ex) {
-            LOG.error(null, ex);
+            LOGGER.error(null, ex);
             fail(ex.getMessage());
         }
     }
 
     @Test
     public void SPMSCertTest() throws IOException {
+
         try {
             KeyStoreManager ksm = new SPMSTestKeyStoreManager();
             X509Certificate cert = (X509Certificate) ksm.getCertificate("ppt.ncp-signature.epsos.spms.pt");
@@ -122,7 +106,7 @@ public class MockCertTest {
             cv.validateCertificate(cert);
             assertNull(ku);
         } catch (SMgrException ex) {
-            LOG.error(null, ex);
+            LOGGER.error(null, ex);
             fail(ex.getMessage());
         }
     }
@@ -130,6 +114,7 @@ public class MockCertTest {
     @Ignore
     @Test
     public void NSCertTest() throws IOException {
+
         try {
             KeyStoreManager ksm = new NSTestKeyStoreManager();
             X509Certificate cert = (X509Certificate) ksm.getCertificate("testncp");
@@ -137,20 +122,19 @@ public class MockCertTest {
             if (ku == null) {
                 fail("Key Usage not Present");
             }
-            LOG.info("Key Usage: '{}'", ku);
+            LOGGER.info("Key Usage: '{}'", ku);
             CertificateValidator cv = new CertificateValidator(ksm.getTrustStore());
             cv.validateCertificate(cert);
         } catch (SMgrException ex) {
-            LOG.error(null, ex);
+            LOGGER.error(null, ex);
             fail(ex.getMessage());
         }
-
-
     }
 
     @Ignore
     @Test
     public void NSCert2Test() throws IOException {
+
         try {
             KeyStoreManager ksm = new NSTestKeyStoreManager();
             X509Certificate cert = (X509Certificate) ksm.getCertificate("testncp2");
@@ -158,11 +142,11 @@ public class MockCertTest {
             if (ku == null) {
                 fail("Key Usage not Present");
             }
-            LOG.info("Key Usage: '{}'", ku);
+            LOGGER.info("Key Usage: '{}'", ku);
             CertificateValidator cv = new CertificateValidator(ksm.getTrustStore());
             cv.validateCertificate(cert);
         } catch (SMgrException ex) {
-            LOG.error(null, ex);
+            LOGGER.error(null, ex);
             fail(ex.getMessage());
         }
     }
@@ -170,6 +154,7 @@ public class MockCertTest {
     @Ignore
     @Test
     public void NSRevokedCertTest() throws IOException {
+
         try {
             KeyStoreManager ksm = new NSTestKeyStoreManager();
             X509Certificate cert = (X509Certificate) ksm.getCertificate("testrevokedncp");
@@ -180,9 +165,9 @@ public class MockCertTest {
             CertificateValidator cv = new CertificateValidator(ksm.getTrustStore());
             cv.validateCertificate(cert);
 
-            LOG.info("Key Usage: '{}'", ku);
+            LOGGER.info("Key Usage: '{}'", ku);
         } catch (SMgrException ex) {
-            LOG.error(null, ex);
+            LOGGER.error(null, ex);
             fail(ex.getMessage());
         }
     }

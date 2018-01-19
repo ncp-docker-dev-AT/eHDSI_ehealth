@@ -7,7 +7,6 @@ import java.util.Set;
  * A class encapsulating a medical problem entry.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Problem extends MedicalEntry {
 
@@ -26,34 +25,34 @@ public class Problem extends MedicalEntry {
         super();
 
         // Setting the problem UUID number
-        this.uuid = "problem." + String.valueOf(UUID++);
+        this.uuid = "problem." + UUID++;
 
         // Setting a null status of the medical problem
         this.status = null;
 
         // Setting a null set of observations related to the problem
-        this.observations = new HashSet<Observation>();
+        this.observations = new HashSet<>();
     }
 
     /**
      * A constructor initializing a medical problem entry.
      *
-     * @param code the code of the allergy.
+     * @param code          the code of the allergy.
      * @param effectiveTime the effective time of the problem.
-     * @param status the status of the medical problem.
+     * @param status        the status of the medical problem.
      */
     public Problem(Code code, Time effectiveTime, String status) {
         // Calling the constructor of the super class
         super(code, effectiveTime);
 
         // Setting the problem UUID number
-        this.uuid = "problem." + String.valueOf(UUID++);
+        this.uuid = "problem." + UUID++;
 
         // Setting the status of the medical problem
         this.status = status;
 
         // Creating an empty set of observations related to the problem
-        this.observations = new HashSet<Observation>();
+        this.observations = new HashSet<>();
     }
 
     /**

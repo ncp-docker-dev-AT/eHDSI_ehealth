@@ -4,7 +4,6 @@ package epsos.ccd.gnomon.cda.parser.beans;
  * A class encapsulating a generic address.
  *
  * @author Akis Papadopoulos
- *
  */
 public class Address {
 
@@ -47,9 +46,9 @@ public class Address {
     /**
      * A constructor initializing an address.
      *
-     * @param street the street line of the address.
-     * @param city the city of the address.
-     * @param postal the postal code of the address.
+     * @param street  the street line of the address.
+     * @param city    the city of the address.
+     * @param postal  the postal code of the address.
      * @param country the country of the address.
      */
     public Address(String street, String city, String postal, String country) {

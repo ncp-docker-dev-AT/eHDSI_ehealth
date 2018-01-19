@@ -38,8 +38,8 @@ import java.util.Properties;
 public class TrilliumBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger log = LoggerFactory.getLogger("TrilliumBean");
-    public static Properties properties;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrilliumBean.class);
+    private static Properties properties;
     private UploadedFile cdafile;
     private byte[] cdafilecontents;
     private String sourcecda;
@@ -50,9 +50,9 @@ public class TrilliumBean implements Serializable {
 
     public TrilliumBean() {
 
-        log.info("Initializing TrilliumBean ...");
+        LOGGER.info("Initializing TrilliumBean ...");
         String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH");
-        log.info("EPSOS PROPS PATH IS: '{}'", epsosPropsPath);
+        LOGGER.info("EPSOS PROPS PATH IS: '{}'", epsosPropsPath);
         if (!Validator.isNull(epsosPropsPath)) {
             ltrlanguages = EpsosHelperService.getLTRLanguages();
             String lang = "en-US";
@@ -60,10 +60,10 @@ public class TrilliumBean implements Serializable {
                 User user = LiferayUtils.getPortalUser();
                 lang = user.getLanguageId().replace("_", "-");
 
-                log.info("#### " + EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS));
+                LOGGER.info("#### " + EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS));
             } catch (Exception e) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error getting user", ""));
-                log.error("Error getting user: '{}'", e.getMessage(), e);
+                LOGGER.error("Error getting user: '{}'", e.getMessage(), e);
             }
 
         } else {
@@ -107,7 +107,7 @@ public class TrilliumBean implements Serializable {
         HttpServletRequest request = com.liferay.portal.util.PortalUtil.getHttpServletRequest(portletRequest);
         String contentType = "";
         InputStream stream = null;
-        log.info("Export file to '{}' for language '{}'", type, ltrlang);
+        LOGGER.info("Export file to '{}' for language '{}'", type, ltrlang);
         byte[] temp = cdafile.getContents();
         if (Validator.isNotNull(temp)) {
             cdafilecontents = temp;
@@ -118,26 +118,26 @@ public class TrilliumBean implements Serializable {
             msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Succesful uploading " + cdafile.getFileName(), cdafile.getFileName() + " is uploaded.");
         } catch (Exception e) {
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Problem uploading " + cdafile.getFileName() + e.getMessage(), cdafile.getFileName() + " is not uploaded.");
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         String decoded = new String(cdafilecontents, StandardCharsets.UTF_8);
-        log.info("#### CDA XML Start");
-        log.debug(decoded.substring(0, 1000));
-        log.info("#### CDA XML End");
-        log.debug("Transform document to '{}'", ltrlang);
+        LOGGER.info("#### CDA XML Start");
+        LOGGER.debug(decoded.substring(0, 1000));
+        LOGGER.info("#### CDA XML End");
+        LOGGER.debug("Transform document to '{}'", ltrlang);
         String lang1 = ltrlang.replace("_", "-");
         lang1 = lang1.replace("en-US", "en");
-        log.info("Transform document to '{}'", lang1);
+        LOGGER.info("Transform document to '{}'", lang1);
         Document doc = Utils.createDomFromString(decoded);
         boolean isCDA = false;
         Document doc1;
         try {
             doc1 = Utils.createDomFromString(decoded);
             isCDA = EpsosHelperService.isCDA(doc1);
-            log.info("### Document created");
-            log.info("########## IS CDA: '{}'", isCDA);
+            LOGGER.info("### Document created");
+            LOGGER.info("########## IS CDA: '{}'", isCDA);
         } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
         transformed = decoded;
@@ -145,7 +145,7 @@ public class TrilliumBean implements Serializable {
         if (StringUtils.equals(type, "html")) {
 
             if (isCDA) {
-                log.info(("The document is EPSOS CDA"));
+                LOGGER.info(("The document is EPSOS CDA"));
                 // translate it
                 convertedcda = Utils.getDocumentAsXml(
                         EpsosHelperService.translateDoc(
@@ -158,7 +158,7 @@ public class TrilliumBean implements Serializable {
                 showhideComponentID("form1:button3", true);
                 return;
             } else {
-                log.info(("The document is CCD"));
+                LOGGER.info(("The document is CCD"));
                 convertedcda = EpsosHelperService.styleDoc(transformed, lang1, true, "");
                 showhideComponentID("form1:p1", true);
                 showhideComponentID("form1:button1", true);
@@ -171,13 +171,13 @@ public class TrilliumBean implements Serializable {
 
         byte[] output;
 
-        log.info("Fontpath: '{}'", fontpath);
+        LOGGER.info("Fontpath: '{}'", fontpath);
         String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
 
         if (StringUtils.equals(type, "pdf")) {
 
             if (isCDA) {
-                log.info(("The document is EPSOS CDA"));
+                LOGGER.info(("The document is EPSOS CDA"));
                 // translate it
                 convertedcda = Utils.getDocumentAsXml(
                         EpsosHelperService.translateDoc(
@@ -185,7 +185,7 @@ public class TrilliumBean implements Serializable {
                 // display it using cda display tool
                 convertedcda = EpsosHelperService.styleDoc(convertedcda, lang1, false, "");
             } else {
-                log.info(("The document is CCD"));
+                LOGGER.info(("The document is CCD"));
                 convertedcda = EpsosHelperService.styleDoc(transformed, lang1, true, "");
             }
 
@@ -194,7 +194,7 @@ public class TrilliumBean implements Serializable {
             filename = filename + ".pdf";
             try (ByteArrayOutputStream baos = EpsosHelperService.ConvertHTMLtoPDF(convertedcda, serviceUrl, fontpath)) {
 
-                log.info("Running pdf");
+                LOGGER.info("Running pdf");
                 output = baos.toByteArray();
                 contentType = "application/pdf";
                 response.setContentType(contentType);
@@ -205,12 +205,12 @@ public class TrilliumBean implements Serializable {
                 OutStream.close();
 
             } catch (Exception ex) {
-                log.error(ExceptionUtils.getStackTrace(ex));
-                log.error(null, ex);
+                LOGGER.error(ExceptionUtils.getStackTrace(ex));
+                LOGGER.error(null, ex);
             }
         } else {
             if (StringUtils.equals(type, "ccd")) {
-                log.info("Exporting as ccd");
+                LOGGER.info("Exporting as ccd");
 
                 if (isCDA) {
                     // convert it

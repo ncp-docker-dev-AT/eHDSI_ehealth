@@ -1,19 +1,3 @@
-/*
- *  Copyright 2010 Jerry Dimitriou <jerouris at netsmart.gr>.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
 package epsos.ccd.netsmart.securitymanager;
 
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
@@ -21,9 +5,7 @@ import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
 import org.opensaml.common.SAMLVersion;
-import org.opensaml.common.impl.SecureRandomIdentifierGenerator;
 import org.opensaml.saml2.core.*;
 import org.opensaml.saml2.core.impl.IssuerBuilder;
 import org.opensaml.xml.Configuration;
@@ -74,7 +56,7 @@ public class SamlTRCIssuer {
      * @return the new OpenSAML object of type T
      */
     public static <T> T create(Class<T> cls, QName qname) {
-        return (T) ((XMLObjectBuilder) Configuration.getBuilderFactory().getBuilder(qname)).buildObject(qname);
+        return (T) Configuration.getBuilderFactory().getBuilder(qname).buildObject(qname);
     }
 
     /**
@@ -93,7 +75,6 @@ public class SamlTRCIssuer {
             //initializing the map
             XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
 
-
             // Create the assertion
             Assertion trc = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
             if (patientID == null) {
@@ -105,12 +86,10 @@ public class SamlTRCIssuer {
 
             trc.setIssueInstant(nowUTC.toDateTime());
             trc.setID("_" + UUID.randomUUID());
-
             trc.setVersion(SAMLVersion.VERSION_20);
 
             // Create and add the Subject
             Subject subject = create(Subject.class, Subject.DEFAULT_ELEMENT_NAME);
-
             trc.setSubject(subject);
             Issuer issuer = new IssuerBuilder().buildObject();
 
@@ -124,7 +103,6 @@ public class SamlTRCIssuer {
             nameid.setValue(doctorId);
 
             trc.getSubject().setNameID(nameid);
-
 
             //Create and add Subject Confirmation
             SubjectConfirmation subjectConf = create(SubjectConfirmation.class, SubjectConfirmation.DEFAULT_ELEMENT_NAME);
@@ -196,9 +174,8 @@ public class SamlTRCIssuer {
             }
             attrStmt.getAttributes().add(attrPoU);
 
-
             return trc;
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             LOGGER.error(null, ex);
             throw new SMgrException(ex.getMessage());
         }
@@ -220,18 +197,15 @@ public class SamlTRCIssuer {
      * @return the SAML TRC Assertion
      * @throws IOException
      */
-    public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID,
-                                   String purposeOfUse,
+    public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
                                    List<Attribute> attrValuePair) throws SMgrException, IOException {
 
         LOGGER.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
                 hcpIdentityAssertion.getID(), patientID, purposeOfUse);
 
-        // try {
         //initializing the map
         auditDataMap.clear();
         XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
-        //SecureRandomIdentifierGenerator randomGen = new SecureRandomIdentifierGenerator();
 
         //Doing an indirect copy so, because when cloning, signatures are lost.
         SignatureManager sman = new SignatureManager(ksm);
@@ -303,7 +277,6 @@ public class SamlTRCIssuer {
         conditions.setNotBefore(nowUTC.toDateTime());
         conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2)); // According to Spec
         trc.setConditions(conditions);
-
 
         //Create and add Advice
         Advice advice = create(Advice.class, Advice.DEFAULT_ELEMENT_NAME);
@@ -391,12 +364,8 @@ public class SamlTRCIssuer {
 
         sman.signSAMLAssertion(trc);
         LOGGER.info("Assertion generated at '{}'", trc.getIssueInstant().toString());
+
         return trc;
-//        }
-//        catch (NoSuchAlgorithmException ex) {
-//            LOGGER.error(null, ex);
-//            throw new SMgrException(ex.getMessage());
-//        }
     }
 
     /**
@@ -412,25 +381,20 @@ public class SamlTRCIssuer {
      * @throws SMgrException when the verification fails.
      * @throws IOException
      */
-    public void verifyTrcToken(Assertion trcAssertion,
-                               Assertion hcpIdentityAssertion,
-                               String patientID)
+    public void verifyTrcToken(Assertion trcAssertion, Assertion hcpIdentityAssertion, String patientID)
             throws SMgrException, IOException {
 
         SignatureManager sm = new SignatureManager(ksm);
-
         sm.verifySAMLAssestion(trcAssertion);
         sm.verifySAMLAssestion(hcpIdentityAssertion);
-
     }
 
     protected Attribute createAttribute(String value, String friendlyName, String nameFormat, String name) {
-        Attribute attr = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
 
+        Attribute attr = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
         attr.setFriendlyName(friendlyName);
         attr.setName(name);
         attr.setNameFormat(nameFormat);
-
 
         XMLObjectBuilder stringBuilder = Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
         XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
@@ -440,6 +404,7 @@ public class SamlTRCIssuer {
     }
 
     protected Attribute findStringInAttributeStatement(List<AttributeStatement> statements, String attrName) {
+
         LOGGER.info("Size:{0}", statements.size());
         for (AttributeStatement stmt : statements) {
             for (Attribute attribute : stmt.getAttributes()) {
@@ -451,7 +416,6 @@ public class SamlTRCIssuer {
                     attr.setName(attribute.getName());
                     attr.setNameFormat(attribute.getNameFormat());
 
-
                     XMLObjectBuilder stringBuilder = Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
                     XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
                     attrVal.setValue(((XSString) attribute.getAttributeValues().get(0)).getValue());
@@ -459,15 +423,13 @@ public class SamlTRCIssuer {
 
                     return attr;
                 }
-
             }
-
         }
-
         return null;
     }
 
     protected Attribute findURIInAttributeStatement(List<AttributeStatement> statements, String attrName) {
+
         LOGGER.info("Size:{0}", statements.size());
         for (AttributeStatement stmt : statements) {
             for (Attribute attribute : stmt.getAttributes()) {
@@ -478,7 +440,6 @@ public class SamlTRCIssuer {
                     attr.setFriendlyName(attribute.getFriendlyName());
                     attr.setName(attribute.getNameFormat());
                     attr.setNameFormat(attribute.getNameFormat());
-
 
                     XMLObjectBuilder uriBuilder = Configuration.getBuilderFactory().getBuilder(XSURI.TYPE_NAME);
                     XSURI attrVal = (XSURI) uriBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSURI.TYPE_NAME);
@@ -493,32 +454,27 @@ public class SamlTRCIssuer {
         return null;
     }
 
-    protected NameID findProperNameID(Subject subject) throws SMgrException {
+    protected NameID findProperNameID(Subject subject) {
 
         String format = subject.getNameID().getFormat();
         LOGGER.info("is email?: {0}", format.equals(NameID.EMAIL));
         LOGGER.info("is x509 subject?: {0}", format.equals(NameID.X509_SUBJECT));
         LOGGER.info("is Unspecified?: {0}", format.equals(NameID.UNSPECIFIED));
-
-        //if (format.equals(NameID.EMAIL) || format.equals(NameID.X509_SUBJECT) || format.equals(NameID.UNSPECIFIED)) {
-        //        LOGGER.info("Compatible NameID found");
         NameID n = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
         n.setFormat(format);
         n.setValue(subject.getNameID().getValue());
-        return n;
 
-        // }
+        return n;
     }
 
     protected NameID getXspaSubjectFromAttributes(List<AttributeStatement> stmts) {
-        Attribute xspaSubjectAttribute = findStringInAttributeStatement(stmts, "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
 
+        Attribute xspaSubjectAttribute = findStringInAttributeStatement(stmts, "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
         NameID n = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
         n.setFormat(NameID.UNSPECIFIED);
         n.setValue(((XSString) xspaSubjectAttribute.getAttributeValues().get(0)).getValue());
 
         return n;
-
     }
 
     public String getPointofCare() {

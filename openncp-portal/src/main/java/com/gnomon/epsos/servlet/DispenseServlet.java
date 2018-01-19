@@ -5,22 +5,18 @@ import com.gnomon.epsos.model.Patient;
 import com.gnomon.epsos.model.ViewResult;
 import com.gnomon.epsos.service.EpsosHelperService;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
-import epsos.ccd.posam.tm.util.XmlUtil;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
 import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentResponse;
 import eu.epsos.util.IheConstants;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,45 +26,40 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import org.w3c.dom.Document;
 
 public class DispenseServlet extends HttpServlet {
 
     private static final long serialVersionUID = -4879064073530149994L;
     private static final Logger LOGGER = LoggerFactory.getLogger(DispenseServlet.class);
 
+    private static final String TEXT_HTML = "text/html";
+    private static final String CACHE_CONTROL = "Cache-Control";
+    private static final String NO_CACHE = "No-Cache";
+    private static final String EXPIRES = "Expires";
+    private static final String PRAGMA = "Pragma";
+
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse res) {
 
         SubmitDocumentResponse resp = null;
-        LOGGER.info("dispensing ...");
+        LOGGER.info("DispenseServlet...");
 
-        HttpSession session = req.getSession();
-        String selectedCountry = (String) session.getAttribute("selectedCountry");
-        Patient patient = (Patient) session.getAttribute("patient");
-        Assertion hcpAssertion = (Assertion) session.getAttribute("hcpAssertion");
-        Assertion trcAssertion = (Assertion) session.getAttribute("trcAssertion");
-        User user = (User) session.getAttribute("user");
-
-        byte[] edBytes = null;
         try (OutputStream outputStream = res.getOutputStream()) {
+
+            HttpSession session = req.getSession();
+            String selectedCountry = (String) session.getAttribute("selectedCountry");
+            Patient patient = (Patient) session.getAttribute("patient");
+            Assertion hcpAssertion = (Assertion) session.getAttribute("hcpAssertion");
+            Assertion trcAssertion = (Assertion) session.getAttribute("trcAssertion");
+            User user = (User) session.getAttribute("user");
+            byte[] edBytes = null;
+
             byte[] epBytes = (byte[]) session.getAttribute("epBytes");
-
             List<ViewResult> lines = EpsosHelperService.parsePrescriptionDocumentForPrescriptionLines(epBytes);
-
             String[] dispensedIds = new String[lines.size()];
 
             for (int i = 0; i < lines.size(); i++) {
                 dispensedIds[i] = req.getParameter("dispensationid_" + i);
-            }
-
-            String language = ParamUtil.getString(req, "language");
-            String fullname = "EPSOS PORTAL";
-
-            try {
-                fullname = user.getFullName();
-            } catch (Exception e1) {
-                LOGGER.error(ExceptionUtils.getStackTrace(e1));
             }
 
             if (dispensedIds != null) {
@@ -78,43 +69,51 @@ public class DispenseServlet extends HttpServlet {
                 for (ViewResult line : lines) {
                     int id = line.getMainid();
 
-                    String measures_id = req.getParameter("measures_" + id);
-                    String dispensed_id = req.getParameter("dispensationid_" + id); //field1
+                    String measuresId = req.getParameter("measures_" + id);
+                    String dispensedId = req.getParameter("dispensationid_" + id); //field1
                     String dispensedProduct = req.getParameter("dispensedProductValue_" + id);
 
                     if (Validator.isNull(dispensedProduct)) {
                         dispensedProduct = line.getField1() + "";
                     }
 
-                    String dispensed_substitute = req.getParameter("dispense_" + id); // field3
-                    boolean substitute = GetterUtil.getBoolean(dispensed_substitute, false);
+                    String dispensedSubstitute = req.getParameter("dispense_" + id); // field3
+                    boolean substitute = GetterUtil.getBoolean(dispensedSubstitute, false);
+                    //  dispenseQuantity replaced by dispensedPackageSize
+                    //  String dispensedQuantity = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
+                    //  if (Validator.isNull(dispensedQuantity)) {
+                    //      dispensedQuantity = line.getField21() + "";
+                    //  }
 
-                    String dispensed_quantity = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
-
-                    if (Validator.isNull(dispensed_quantity)) {
-                        dispensed_quantity = line.getField21() + "";
+                    String dispensedPackageSize = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
+                    if (Validator.isNull(dispensedPackageSize)) {
+                        dispensedPackageSize = line.getField21() + "";
                     }
 
-                    String dispensed_name = dispensedProduct;
-                    String dispensed_strength = line.getField3() + "";
-                    String dispensed_form = line.getField4() + "";
-                    String dispensed_package = line.getField4() + ""; //request.getParameter("packaging2_"+id); // field6
-                    String dispensed_nrOfPacks = line.getField8().toString();
-                    String prescriptionid = line.getField14() + ""; // field9 //lathos
-                    String materialid = line.getField19() + ""; // field10
+                    String dispensedNumberOfPacks = req.getParameter("dispensedNumberOfPackages_" + id);
+                    if (Validator.isNull(dispensedNumberOfPacks)) {
+                        dispensedNumberOfPacks = line.getField8() + "";
+                    }
+
+                    String dispensedName = dispensedProduct;
+                    String dispensedStrength = line.getField3() + "";
+                    String dispensedForm = line.getField4() + "";
+                    String dispensedPackage = line.getField4() + ""; // field6
+                    //  String dispensedNumberOfPacks = line.getField8().toString();
+                    String prescriptionId = line.getField14() + ""; // field9
+                    String materialId = line.getField19() + ""; // field10
                     String activeIngredient = line.getField2().toString();
 
-                    ViewResult d_line = new ViewResult(id, dispensed_id, dispensed_name, substitute, dispensed_strength,
-                            dispensed_form, dispensed_package, dispensed_quantity, dispensed_nrOfPacks, prescriptionid,
-                            materialid, activeIngredient, measures_id);
-
-                    dispensedLines.add(d_line);
+                    ViewResult dispensedResult = new ViewResult(id, dispensedId, dispensedName, substitute, dispensedStrength,
+                            dispensedForm, dispensedPackage, dispensedPackageSize, dispensedNumberOfPacks, prescriptionId,
+                            materialId, activeIngredient, measuresId);
+                    dispensedLines.add(dispensedResult);
                 }
 
-                String eDuuid = java.util.UUID.randomUUID().toString().replaceAll("-", "");
+                String eDUUID = java.util.UUID.randomUUID().toString().replaceAll("-", "");
                 String edOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DISPENSATION_OID);
                 if (!dispensedLines.isEmpty()) {
-                    edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user, eDuuid);
+                    edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user, eDUUID);
                 }
 
                 if (Validator.isNotNull(edBytes)) {
@@ -136,7 +135,7 @@ public class DispenseServlet extends HttpServlet {
                     document.setCreationDate(cal);
                     document.setDescription(Constants.ED_TITLE);
                     document.setTitle(Constants.ED_TITLE);
-                    document.setUuid(edOid + "^" + eDuuid);
+                    document.setUuid(edOid + "^" + eDUUID);
                     document.setSubmissionSetId(EpsosHelperService.getUniqueId());
                     document.setClassCode(classCode);
                     document.setFormatCode(formatCode);
@@ -144,49 +143,43 @@ public class DispenseServlet extends HttpServlet {
 
                     resp = proxy.submitDocument(hcpAssertion, trcAssertion, selectedCountry, document, patient.getPatientDemographics());
 
-                    res.setContentType("text/html");
+                    res.setContentType(TEXT_HTML);
                     String message = "Dispensation successful";
-                    res.setHeader("Cache-Control", "no-cache");
-                    res.setDateHeader("Expires", 0);
-                    res.setHeader("Pragma", "No-cache");
-
+                    res.setHeader(CACHE_CONTROL, NO_CACHE);
+                    res.setDateHeader(EXPIRES, 0);
+                    res.setHeader(PRAGMA, NO_CACHE);
 
                     outputStream.write(message.getBytes());
-                    outputStream.flush();
-                    outputStream.close();
+
                 } else {
                     LOGGER.error("UPLOAD DISP DOC RESPONSE ERROR");
-                    res.setContentType("text/html");
-                    //String message = resp.toString();
+                    res.setContentType(TEXT_HTML);
                     String message = "Cannot upload Dispense message";
-                    res.setHeader("Cache-Control", "no-cache");
-                    res.setDateHeader("Expires", 0);
-                    res.setHeader("Pragma", "No-cache");
+                    res.setHeader(CACHE_CONTROL, NO_CACHE);
+                    res.setDateHeader(EXPIRES, 0);
+                    res.setHeader(PRAGMA, NO_CACHE);
 
                     outputStream.write(message.getBytes());
-                    outputStream.flush();
-                    outputStream.close();
                     req.setAttribute("exception", "UPLOAD DISP DOC RESPONSE ERROR");
                 }
             }
-        } catch (IOException ex) {
+        } catch (Exception ex) {
 
             LOGGER.error("UPLOAD DISP DOC RESPONSE ERROR: '{}'", ex.getMessage(), ex);
-            res.setContentType("text/html");
+            res.setContentType(TEXT_HTML);
             String message;
             if (resp != null) {
                 message = resp.toString();
             } else {
                 message = ex.getLocalizedMessage();
             }
-            res.setHeader("Cache-Control", "no-cache");
-            res.setDateHeader("Expires", 0);
-            res.setHeader("Pragma", "No-cache");
+            res.setHeader(CACHE_CONTROL, NO_CACHE);
+            res.setDateHeader(EXPIRES, 0);
+            res.setHeader(PRAGMA, NO_CACHE);
 
             try (OutputStream outputStream = res.getOutputStream()) {
                 outputStream.write(message.getBytes());
-                outputStream.flush();
-                outputStream.close();
+
             } catch (IOException e) {
                 LOGGER.error("IOException: '{}'", e.getMessage(), e);
             }

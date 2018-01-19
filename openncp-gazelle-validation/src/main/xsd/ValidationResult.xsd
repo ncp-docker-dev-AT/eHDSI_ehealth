@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="detailedResult">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="DocumentValidXSD"/>
+        <xs:element ref="DocumentWellFormed"/>
+        <xs:element ref="MDAValidation"/>
+        <xs:element ref="ValidationResultsOverview"/>
+        <xs:choice>
+          <xs:element ref="TemplateDesc"/>
+          <xs:element ref="nistValidation"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DocumentValidXSD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="XSDMessage"/>
+        <xs:element ref="Result"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="nbOfErrors"/>
+          <xs:element ref="nbOfWarnings"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="XSDMessage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Severity"/>
+        <xs:element ref="Message"/>
+        <xs:element ref="columnNumber"/>
+        <xs:element ref="lineNumber"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Severity" type="xs:NCName"/>
+  <xs:element name="Message" type="xs:string"/>
+  <xs:element name="columnNumber" type="xs:integer"/>
+  <xs:element name="lineNumber" type="xs:integer"/>
+  <xs:element name="nbOfErrors" type="xs:integer"/>
+  <xs:element name="nbOfWarnings" type="xs:integer"/>
+  <xs:element name="DocumentWellFormed">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Result"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MDAValidation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="Error"/>
+          <xs:element ref="Info"/>
+          <xs:element ref="Note"/>
+          <xs:element ref="Warning"/>
+        </xs:choice>
+        <xs:element ref="Result"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Error">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Test"/>
+        <xs:element ref="Location"/>
+        <xs:element ref="Description"/>
+        <xs:element ref="Identifiant"/>
+        <xs:element minOccurs="0" ref="assertion"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Info">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Test"/>
+        <xs:element ref="Location"/>
+        <xs:element ref="Description"/>
+        <xs:element ref="Identifiant"/>
+        <xs:element minOccurs="0" ref="assertion"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Note">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Test"/>
+        <xs:element ref="Location"/>
+        <xs:element ref="Description"/>
+        <xs:element minOccurs="0" ref="Identifiant"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="assertion"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Warning">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Test"/>
+        <xs:element ref="Location"/>
+        <xs:element ref="Description"/>
+        <xs:element ref="Identifiant"/>
+        <xs:element minOccurs="0" ref="assertion"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ValidationResultsOverview">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ValidationDate"/>
+        <xs:element ref="ValidationTime"/>
+        <xs:element ref="ValidationServiceName"/>
+        <xs:element minOccurs="0" ref="ValidationEngine"/>
+        <xs:element ref="ValidationTestResult"/>
+        <xs:element ref="ValidationServiceVersion"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ValidationDate" type="xs:string"/>
+  <xs:element name="ValidationTime" type="xs:time"/>
+  <xs:element name="ValidationServiceName" type="xs:string"/>
+  <xs:element name="ValidationEngine" type="xs:string"/>
+  <xs:element name="ValidationTestResult" type="xs:NCName"/>
+  <xs:element name="ValidationServiceVersion" type="xs:NMTOKEN"/>
+  <xs:element name="TemplateDesc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Template"/>
+      </xs:sequence>
+      <xs:attribute name="validation" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="nistValidation">
+    <xs:complexType>
+      <xs:attribute name="nistVersion" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Result" type="xs:NCName"/>
+  <xs:element name="Test" type="xs:NCName"/>
+  <xs:element name="Location" type="xs:string"/>
+  <xs:element name="Description" type="xs:string"/>
+  <xs:element name="Identifiant" type="xs:NCName"/>
+  <xs:element name="assertion">
+    <xs:complexType>
+      <xs:attribute name="assertionId" use="required" type="xs:anyURI"/>
+      <xs:attribute name="idScheme" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Template">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="Template"/>
+        <xs:element ref="templateId"/>
+      </xs:choice>
+      <xs:attribute name="location" use="required"/>
+      <xs:attribute name="type" use="required" type="xs:NCName"/>
+      <xs:attribute name="validation" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="templateId">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="name"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
+@Deprecated
 public class XdrValidationService extends ValidationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XdrValidationService.class);
@@ -21,6 +22,7 @@ public class XdrValidationService extends ValidationService {
     }
 
     public static XdrValidationService getInstance() {
+
         if (instance == null) {
 
             instance = new XdrValidationService();
@@ -30,6 +32,7 @@ public class XdrValidationService extends ValidationService {
 
     @Override
     public boolean validateModel(String object, String model, NcpSide ncpSide) {
+
         LOGGER.info("[Validation Service Model: '{}' on '{}' side]", model, ncpSide.getName());
         return XcaValidationService.getInstance().validateModel(object, model, ncpSide);
     }

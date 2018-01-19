@@ -16,8 +16,7 @@ import java.io.Serializable;
  * @author Organization: Gnomon
  * @author mail:k.karkaletsis@gnomon.com.gr
  * @version 1.0, 2010, 30 Jun
- * @see net.RFC3881 http://www.rfc3881.net/ generated classes using JAXB Library
- * for populating audit trail entries
+ * @see net.RFC3881 http://www.rfc3881.net/ generated classes using JAXB Library for populating audit trail entries
  */
 public class AuditService implements MessageHandlerListener {
 
@@ -28,11 +27,17 @@ public class AuditService implements MessageHandlerListener {
     private FailedLogsHandlerService failedLogsHandlerService;
     private AuditLogSerializer auditLogSerializer;
 
+    /**
+     * @deprecated use {@link #eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory.getInstance()} instead.
+     */
+    @Deprecated
     public AuditService() {
+
+        LOGGER.debug("Creating Audit Service...");
         initialize();
     }
 
-    protected void initialize() {
+    private void initialize() {
 
         Type type = Type.AUDIT_MANAGER;
         auditLogSerializer = new AuditLogSerializerImpl(type);
