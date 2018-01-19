@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,7 +34,7 @@ public class CDAServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(CDAServlet.class);
 
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) {
 
         try {
             LOGGER.info("Rendering CDA Display view");
@@ -165,6 +164,7 @@ public class CDAServlet extends HttpServlet {
             stream.close();
 
         } catch (Exception ex) {
+            LOGGER.error("{}: '{}'", ex.getClass(), ex.getMessage(), ex);
             res.setContentType("text/html");
             res.setHeader("Cache-Control", "no-cache");
             res.setDateHeader("Expires", 0);
@@ -172,7 +172,6 @@ public class CDAServlet extends HttpServlet {
             try (OutputStream stream = res.getOutputStream()) {
                 stream.write(ex.getMessage().getBytes());
                 stream.flush();
-                stream.close();
             } catch (IOException e) {
                 LOGGER.error(ExceptionUtils.getStackTrace(e));
             }

@@ -129,8 +129,8 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
                             PARTICIPANT_IDENTIFIER_SCHEME);
 
                     LOGGER.info("Querying for service metadata");
-                    ServiceMetadata sm = smpClient.getServiceMetadata(participantIdentifier, new DocumentIdentifier(RegisteredService.EHEALTH_107.getUrn(), DOCUMENT_IDENTIFIER_SCHEME));
-                    //ServiceMetadata sm = smpClient.getServiceMetadata(smpClient, participantIdentifierValue, RegisteredService.EHEALTH_107.getUrn());
+                    ServiceMetadata sm = smpClient.getServiceMetadata(participantIdentifier,
+                            new DocumentIdentifier(RegisteredService.EHEALTH_107.getUrn(), DOCUMENT_IDENTIFIER_SCHEME));
 
                     LOGGER.info("DocumentIdentifier: '{}' - '{}'",
                             sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getDocumentIdentifier().getScheme(),
