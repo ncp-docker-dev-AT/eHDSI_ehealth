@@ -19,15 +19,15 @@ public class ConfigurationAction extends DefaultConfigurationAction {
     @Override
     public void processAction(PortletConfig portletConfig, ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
-        String client_connector_url = ParamUtil.getString(actionRequest, "client_connector_url");
-        String check_permissions = ParamUtil.getString(actionRequest, "check_permissions");
+        String clientConnectorUrl = ParamUtil.getString(actionRequest, "client_connector_url");
+        String checkPermissions = ParamUtil.getString(actionRequest, "check_permissions");
         String portletResource = ParamUtil.getString(actionRequest, "portletResource");
 
         PortletPreferences prefs;
         if ((portletResource != null) && (StringUtils.isNotBlank(portletResource))) {
             prefs = PortletPreferencesFactoryUtil.getPortletSetup(actionRequest, portletResource);
-            prefs.setValue("client_connector_url", client_connector_url);
-            prefs.setValue("check_permissions", check_permissions);
+            prefs.setValue("client_connector_url", clientConnectorUrl);
+            prefs.setValue("check_permissions", checkPermissions);
             prefs.store();
         }
 
