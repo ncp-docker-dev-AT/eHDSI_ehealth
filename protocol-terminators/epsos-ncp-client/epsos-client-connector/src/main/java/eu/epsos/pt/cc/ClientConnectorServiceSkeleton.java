@@ -23,47 +23,40 @@ import java.util.List;
 /**
  * ClientConnectorServiceSkeleton java skeleton for the axisService.
  * <p>
- * This class implements the contact point into the NCP-B, allowing the Portal-B
- * to contact and perform requests in NCP-B.
+ * This class implements the contact point into the NCP-B, allowing the Portal-B to contact and perform requests in NCP-B.
  *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
 public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSkeletonInterface {
 
-    /**
-     * Logger.
-     */
-    private static final Logger LOG = LoggerFactory.getLogger(ClientConnectorServiceSkeleton.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorServiceSkeleton.class);
+
+    private static final String UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION = "Unsupported Class Code scheme: ";
+    private static final String UNSUPPORTED_CLASS_CODE_EXCEPTION = "Unsupported Class Code: ";
 
     /*
      * XCPD
      */
 
     /**
-     * Performs international search for a patient, filtering by a set of
-     * demographics. This method is an adapter for usage of a XCPD client.
+     * Performs international search for a patient, filtering by a set of demographics.
+     * This method is an adapter for usage of a XCPD client.
      *
      * @param queryPatient axis wrapper for element: <code>queryPatient</code>.
      *                     This encapsulates, destination Country Code and Patient's demographics.
      * @return a QueryPatientResponseDocument containing the query response(s).
-     * @throws ParseException
+     * @throws ParseException Exception thrown while the Payload cannot be parsed.
      */
     @Override
     public QueryPatientResponseDocument queryPatient(final QueryPatientDocument queryPatient, Assertion assertion)
             throws NoPatientIdDiscoveredException, ParseException {
 
-        /*
-         * Setup
-         */
         final String methodName = "queryPatient";
-        LoggingSlf4j.start(LOG, methodName);
+        LoggingSlf4j.start(LOGGER, methodName);
 
         QueryPatientResponseDocument result = QueryPatientResponseDocument.Factory.newInstance();
 
-        /*
-         * Body
-         */
         try {
             /* create request */
             List<tr.com.srdc.epsos.data.model.PatientDemographics> xcpdResp;
@@ -71,11 +64,13 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             tr.com.srdc.epsos.data.model.PatientDemographics request;
             QueryPatientRequest arg0 = queryPatient.getQueryPatient().getArg0();
             PatientDemographics pDemographic = arg0.getPatientDemographics();
-            LOG.info("Patient Demographics: '{}', '{}', '{}'", pDemographic.getPatientIdArray()[0],
+            LOGGER.info("Patient Demographics: '{}', '{}', '{}'",
+                    ((pDemographic.getPatientIdArray() == null) ? "N/A" : pDemographic.getPatientIdArray()[0]),
                     pDemographic.getBirthDate(), pDemographic.getGivenName());
             request = eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(pDemographic);
 
-            LOG.info("Patient Demographics Request: '{}', '{}', '{}'", request.getId(), request.getGivenName(), request.getBirthDate());
+            LOGGER.info("Patient Demographics Request: '{}', '{}', '{}'", request.getId(), request.getGivenName(),
+                    request.getBirthDate());
 
             String countryCode = arg0.getCountryCode();
 
@@ -90,12 +85,12 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
 
             result.setQueryPatientResponse(response);
 
-        } catch (RuntimeException ex) {
-            LoggingSlf4j.error(LOG, methodName);
+        } catch (ClientConnectorException ex) {
+            LoggingSlf4j.error(LOGGER, methodName);
             throw ex;
         }
 
-        LoggingSlf4j.end(LOG, methodName);
+        LoggingSlf4j.end(LOGGER, methodName);
         return result;
     }
 
@@ -104,8 +99,9 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
      */
 
     /**
-     * Performs international search for documents. Filtering by patient and
-     * document code. This method is an adapter for the usage of a XCA client.
+     * Performs international search for documents.
+     * Filtering by patient and document code.
+     * This method is an adapter for the usage of a XCA client.
      *
      * @param queryDocuments axis wrapper for * * * * * * *
      *                       element: <code>queryDocuments</code>. This encapsulates, destination
@@ -114,47 +110,46 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
      * response(s).
      */
     @Override
-    public QueryDocumentsResponseDocument queryDocuments(QueryDocumentsDocument queryDocuments, Assertion hcpAssertion, Assertion trcAssertion) throws XCAException {
-        /*
-         * Setup
-         */
+    public QueryDocumentsResponseDocument queryDocuments(QueryDocumentsDocument queryDocuments, Assertion hcpAssertion,
+                                                         Assertion trcAssertion) throws XCAException {
+
         final String methodName = "queryDocuments";
-        LoggingSlf4j.start(LOG, methodName);
+        LoggingSlf4j.start(LOGGER, methodName);
 
         QueryDocumentsResponse result = QueryDocumentsResponse.Factory.newInstance();
 
-        /*
-         * Body
-         */
-
-        /* retrive data from parameters */
+        /* retrieve data from parameters */
         QueryDocuments queryDocuments1 = queryDocuments.getQueryDocuments();
-        QueryDocumentRequest arg0 = queryDocuments1.getArg0();
-        String countryCode = arg0.getCountryCode();
+        QueryDocumentRequest queryDocumentRequest = queryDocuments1.getArg0();
+        String countryCode = queryDocumentRequest.getCountryCode();
 
 
-        PatientId tmp = arg0.getPatientId();
+        PatientId tmp = queryDocumentRequest.getPatientId();
         tr.com.srdc.epsos.data.model.PatientId patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(tmp);
 
-        GenericDocumentCode tmpCode = arg0.getClassCode();
+        GenericDocumentCode tmpCode = queryDocumentRequest.getClassCode();
         tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
 
         if (!documentCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
-            throw new RuntimeException("Unsupported Class Code scheme: " + documentCode.getSchema());
+            throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + documentCode.getSchema());
         }
 
         /* perform the call */
         try {
-            QueryResponse response = null;
+            QueryResponse response;
 
-            if (documentCode.getValue().equals(tr.com.srdc.epsos.util.Constants.PS_CLASSCODE)) {
-                response = PatientService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
-            } else if (documentCode.getValue().equals(tr.com.srdc.epsos.util.Constants.EP_CLASSCODE)) {
-                response = OrderService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
-            } else if (documentCode.getValue().equals(tr.com.srdc.epsos.util.Constants.MRO_CLASSCODE)) {
-                response = MroService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
-            } else {
-                throw new RuntimeException("Unsupported Class Code: " + documentCode.getValue());
+            switch (documentCode.getValue()) {
+                case Constants.PS_CLASSCODE:
+                    response = PatientService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
+                    break;
+                case Constants.EP_CLASSCODE:
+                    response = OrderService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
+                    break;
+                case Constants.MRO_CLASSCODE:
+                    response = MroService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
+                    break;
+                default:
+                    throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + documentCode.getValue());
             }
 
             if (response.getDocumentAssociations() != null && !response.getDocumentAssociations().isEmpty()) {
@@ -162,7 +157,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             }
 
         } catch (RuntimeException ex) {
-            LoggingSlf4j.error(LOG, methodName);
+            LoggingSlf4j.error(LOGGER, methodName);
             throw ex;
         }
 
@@ -171,14 +166,13 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         QueryDocumentsResponseDocument wapper = QueryDocumentsResponseDocument.Factory.newInstance();
         wapper.setQueryDocumentsResponse(result);
 
-
-        LoggingSlf4j.end(LOG, methodName);
+        LoggingSlf4j.end(LOGGER, methodName);
         return wapper;
     }
 
     /**
-     * Performs international search for documents. Filtering by patient and
-     * document code. This method is an adapter for usage of a XCA client.
+     * Performs international search for documents. Filtering by patient and document code.
+     * This method is an adapter for usage of a XCA client.
      * <p>
      * It makes use of the XCA Service Client library.
      *
@@ -188,12 +182,14 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
      * @return the retrieved document.
      */
     @Override
-    public RetrieveDocumentResponseDocument retrieveDocument(RetrieveDocumentDocument1 retrieveDocument, Assertion hcpAssertion, Assertion trcAssertion) throws XCAException {
+    public RetrieveDocumentResponseDocument retrieveDocument(RetrieveDocumentDocument1 retrieveDocument,
+                                                             Assertion hcpAssertion, Assertion trcAssertion)
+            throws XCAException {
         /*
          * Setup
          */
         final String methodName = "retrieveDocument";
-        LoggingSlf4j.start(LOG, methodName);
+        LoggingSlf4j.start(LOGGER, methodName);
 
 
         RetrieveDocumentResponse result;
@@ -211,7 +207,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
 
         if (!documentCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
-            throw new RuntimeException("Unsupported Class Code scheme: " + documentCode.getSchema());
+            throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + documentCode.getSchema());
         }
 
         try {
@@ -219,28 +215,36 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             XDSDocument request = XdsDocumentDts.newInstance(xdsDocument);
             request.setClassCode(documentCode);
 
-            LOG.info("[ClientConnector retrieveDocument()] Document: '{}' homeCommunityId: '{}' targetLanguage: '{}'", request.getDocumentUniqueId(), homeCommunityId, targetLanguage);
-            if (documentCode.getValue().equals(tr.com.srdc.epsos.util.Constants.PS_CLASSCODE)) {
-                response = PatientService.retrieve(request, homeCommunityId, countryCode, targetLanguage, hcpAssertion, trcAssertion);
-            } else if (documentCode.getValue().equals(tr.com.srdc.epsos.util.Constants.EP_CLASSCODE)) {
-                response = OrderService.retrieve(request, homeCommunityId, countryCode, targetLanguage, hcpAssertion, trcAssertion);
-            } else if (documentCode.getValue().equals(tr.com.srdc.epsos.util.Constants.MRO_CLASSCODE)) {
-                response = MroService.retrieve(request, homeCommunityId, countryCode, targetLanguage, hcpAssertion, trcAssertion);
-            } else {
-                throw new RuntimeException("Unsupported Class Code: " + documentCode.getValue());
+            LOGGER.info("[ClientConnector retrieveDocument()] Document: '{}' homeCommunityId: '{}' targetLanguage: '{}'",
+                    request.getDocumentUniqueId(), homeCommunityId, targetLanguage);
+            switch (documentCode.getValue()) {
+                case Constants.PS_CLASSCODE:
+                    response = PatientService.retrieve(request, homeCommunityId, countryCode, targetLanguage,
+                            hcpAssertion, trcAssertion);
+                    break;
+                case Constants.EP_CLASSCODE:
+                    response = OrderService.retrieve(request, homeCommunityId, countryCode, targetLanguage,
+                            hcpAssertion, trcAssertion);
+                    break;
+                case Constants.MRO_CLASSCODE:
+                    response = MroService.retrieve(request, homeCommunityId, countryCode, targetLanguage,
+                            hcpAssertion, trcAssertion);
+                    break;
+                default:
+                    throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + documentCode.getValue());
             }
 
             result = RetrieveDocumentResponseDTS.newInstance(response);
 
-        } catch (RuntimeException ex) {
-            LoggingSlf4j.error(LOG, methodName);
+        } catch (ClientConnectorException ex) {
+            LoggingSlf4j.error(LOGGER, methodName);
             throw ex;
         }
 
         /* create return wrapper */
         RetrieveDocumentResponseDocument wrapper = RetrieveDocumentResponseDocument.Factory.newInstance();
         wrapper.setRetrieveDocumentResponse(result);
-        LoggingSlf4j.end(LOG, methodName);
+        LoggingSlf4j.end(LOGGER, methodName);
         return wrapper;
     }
 
@@ -249,8 +253,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
      */
 
     /**
-     * Submits a document to a foreign country. This method is an adapter for
-     * usage of a XDR client.
+     * Submits a document to a foreign country. This method is an adapter for usage of a XDR client.
      * <p>
      * This method makes use of the XDR Service Client library.
      *
@@ -258,16 +261,15 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
      *                       element: <code>submitDocument</code>. This encapsulates, destination
      *                       Country Code and the document to submit with some Metadata.
      * @return a SubmitDocumentResponseDocument object.
-     * @throws ParseException
+     * @throws ParseException Exception thrown while the Payload cannot be parsed.
      */
     @Override
-    public SubmitDocumentResponseDocument submitDocument(final SubmitDocumentDocument1 submitDocument, Assertion hcpAssertion, Assertion trcAssertion) throws XdrException, ParseException {
+    public SubmitDocumentResponseDocument submitDocument(final SubmitDocumentDocument1 submitDocument,
+                                                         Assertion hcpAssertion, Assertion trcAssertion)
+            throws XdrException, ParseException {
 
-        /*
-         * Setup
-         */
         final String methodName = "submitDocument";
-        LoggingSlf4j.start(LOG, methodName);
+        LoggingSlf4j.start(LOGGER, methodName);
 
         SubmitDocumentResponseDocument result = SubmitDocumentResponseDocument.Factory.newInstance();
 
@@ -282,41 +284,42 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             EpsosDocument1 document = arg0.getDocument();
             PatientDemographics patient = arg0.getPatientDemographics();
 
-            String classCode_node;
+            String classCodeNode;
             GenericDocumentCode classCode = document.getClassCode();
             if (!classCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
-                throw new RuntimeException("Unsupported Class Code scheme: " + classCode.getSchema());
+                throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + classCode.getSchema());
             }
-            classCode_node = classCode.getNodeRepresentation();
+            classCodeNode = classCode.getNodeRepresentation();
 
 
-            if (classCode_node.equals(Constants.CONSENT_CLASSCODE)) {
-                response = ConsentService.put(document, patient, countryCode, hcpAssertion, trcAssertion); // call XDR Client for Consent
+            switch (classCodeNode) {
 
-            } else if (classCode_node.equals(Constants.ED_CLASSCODE)) {
-                response = DispensationService.initialize(document, patient, countryCode, hcpAssertion, trcAssertion); // call XDR Client for eP
-
-            } else if (classCode_node.equals(Constants.HCER_CLASSCODE)) {
-                response = HcerService.submit(document, patient, countryCode, hcpAssertion, trcAssertion); // call XDR Client for HCER
-
-            } else {
-                throw new RuntimeException("Unsupported Class Code: " + classCode_node);
+                // call XDR Client for Consent
+                case Constants.CONSENT_CLASSCODE:
+                    response = ConsentService.put(document, patient, countryCode, hcpAssertion, trcAssertion);
+                    break;
+                // call XDR Client for eP
+                case Constants.ED_CLASSCODE:
+                    response = DispensationService.initialize(document, patient, countryCode, hcpAssertion, trcAssertion);
+                    break;
+                // call XDR Client for HCER
+                case Constants.HCER_CLASSCODE:
+                    response = HcerService.submit(document, patient, countryCode, hcpAssertion, trcAssertion);
+                    break;
+                default:
+                    throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + classCodeNode);
             }
 
             result.setSubmitDocumentResponse(SubmitDocumentResponseDts.newInstance(response));
 
         } catch (RuntimeException ex) {
-            LoggingSlf4j.error(LOG, methodName);
+            LoggingSlf4j.error(LOGGER, methodName);
             throw ex;
         }
 
-        LoggingSlf4j.end(LOG, methodName);
+        LoggingSlf4j.end(LOGGER, methodName);
         return result;
     }
-
-    /*
-     * Auxiliar
-     */
 
     /**
      * Greets someone by saying hello. This is an auxiliary operation for
@@ -329,24 +332,17 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     @Override
     public SayHelloResponseDocument sayHello(SayHelloDocument sayHello) {
 
-        /*
-         * Setup
-         */
         final String methodName = "sayHello";
-        LoggingSlf4j.start(LOG, methodName);
+        LoggingSlf4j.start(LOGGER, methodName);
 
         SayHelloResponseDocument result = SayHelloResponseDocument.Factory.newInstance();
 
-        /*
-         * Body
-         */
-        SayHelloResponse resp;
-        resp = SayHelloResponse.Factory.newInstance();
+        SayHelloResponse resp = SayHelloResponse.Factory.newInstance();
         resp.setReturn("Hello " + sayHello.getSayHello().getArg0());
 
         result.setSayHelloResponse(resp);
 
-        LoggingSlf4j.end(LOG, methodName);
+        LoggingSlf4j.end(LOGGER, methodName);
         return result;
     }
 }
