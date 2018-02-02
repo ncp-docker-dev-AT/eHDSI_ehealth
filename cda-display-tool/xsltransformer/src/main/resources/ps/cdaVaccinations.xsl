@@ -8,9 +8,7 @@
     <xsl:variable name="vaccinationsExist"
                   select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='11369-6']"/>
 
-
     <!--alerts -->
-
     <xsl:template name="vaccinations"
                   match="/n1:ClinicalDocument/n1:component/n1:structuredBody">
 
@@ -32,19 +30,14 @@
         </xsl:choose>
     </xsl:template>
 
-
     <xsl:template name="vaccinationsSection">
-
         <!-- Defing all needed variables -->
-
         <xsl:variable name="vaccinationsSectionTitleCode" select="n1:code/@code"/>
-
 
         <xsl:variable name="vaccinationsSectionTitle"
                       select="n1:code[@code='11369-6']/@displayName"/>
 
         <xsl:variable name="nullEntry" select="n1:entry"/>
-
 
         <xsl:variable name="vacAct" select="n1:entry/n1:substanceAdministration"/>
 
@@ -55,7 +48,6 @@
             <xsl:when test=" ($vaccinationsSectionTitleCode='11369-6')">
                 <span class="sectionTitle">
                     <xsl:value-of select="$vaccinationsSectionTitle"/>
-
                 </span>
                 <br/>
                 <xsl:choose>
@@ -72,43 +64,35 @@
                                 </div>
                             </xsl:when>
                         </xsl:choose>
-
-
                         <table>
                             <tbody>
                                 <tr>
                                     <th>
                                         <!-- Vaccination -->
                                         <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="data" select="'79'"/>
+                                            <xsl:with-param name="code" select="'79'"/>
                                         </xsl:call-template>
                                     </th>
                                     <th>
                                         <!-- BrandName -->
                                         <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="data" select="'9'"/>
+                                            <xsl:with-param name="code" select="'9'"/>
                                         </xsl:call-template>
                                     </th>
                                     <th>
                                         <!-- Vaccination Date -->
                                         <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="data" select="'80'"/>
+                                            <xsl:with-param name="code" select="'80'"/>
                                         </xsl:call-template>
-
                                     </th>
-
                                 </tr>
                                 <xsl:for-each select="n1:entry">
                                     <xsl:call-template name="vaccinationsSectionEntry">
                                     </xsl:call-template>
-
-
                                 </xsl:for-each>
-
                             </tbody>
                         </table>
                     </xsl:when>
-
                     <xsl:otherwise>
                         <xsl:choose>
                             <xsl:when test="$shownarrative='true'">
@@ -123,31 +107,17 @@
                         <xsl:call-template name="show-noneFlavor">
                             <xsl:with-param name="data" select="$vacAct/@nullFlavor"/>
                         </xsl:call-template>
-
                     </xsl:otherwise>
-
-
                 </xsl:choose>
-
             </xsl:when>
-
         </xsl:choose>
-
-
     </xsl:template>
 
-
     <!-- foreach entry of the section -->
-
-
     <xsl:template name="vaccinationsSectionEntry">
-
         <!-- Defing all needed variables -->
-
-
         <xsl:variable name="vaccinationsNode"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:code"/>
-
 
         <xsl:variable name="vaccinations"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:code/@displayName"/>
@@ -155,20 +125,15 @@
         <xsl:variable name="vaccinationsBrandName"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:name"/>
 
-
         <xsl:variable name="vaccinationsDate"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:effectiveTime"/>
 
-
         <xsl:variable name="nullEntry" select="."/>
 
-
         <xsl:variable name="vacAct" select="n1:substanceAdministration"/>
-
         <!-- End definition of variables -->
 
-        <!-- if sectionTitle is not missing for alerts (Exception alerts section
-            is missing) -->
+        <!-- if sectionTitle is not missing for alerts (Exception alerts section is missing) -->
 
         <!-- nullflavored act -->
         <xsl:choose>
@@ -212,7 +177,6 @@
                     </td>
                 </tr>
             </xsl:when>
-
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
@@ -222,12 +186,6 @@
                     </td>
                 </tr>
             </xsl:otherwise>
-
-
         </xsl:choose>
-
-
     </xsl:template>
-
-
 </xsl:stylesheet>
