@@ -104,8 +104,7 @@ public class MyBean implements Serializable {
         LOGGER.info("EPSOS PROPS PATH IS: '{}'", epsosPropsPath);
         if (!Validator.isNull(epsosPropsPath)) {
             try {
-                cdaStylesheet = EpsosHelperService
-                        .getConfigProperty(EpsosHelperService.PORTAL_CDA_STYLESHEET);
+                cdaStylesheet = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CDA_STYLESHEET);
                 consentExists = false;
                 consentOpt = "1";
                 countries = new ArrayList<>();
@@ -171,8 +170,7 @@ public class MyBean implements Serializable {
     public void searchPatientsRequest(ActionEvent event) {
         checkButtonPermissions();
         LOGGER.info("searchPatientORequest ::: Selected country is : '{}'", selectedCountry);
-        String country = (String) event.getComponent().getAttributes()
-                .get("selectedCountry");
+        String country = (String) event.getComponent().getAttributes().get("selectedCountry");
         identifiers = (List<Identifier>) event.getComponent().getAttributes().get("identifiers");
         demographics = (List<Demographics>) event.getComponent().getAttributes().get("demographics");
         if (Validator.isNotNull(country)) {
@@ -182,50 +180,56 @@ public class MyBean implements Serializable {
         searchPatients();
     }
 
-    private void searchPatients(Assertion assertion, List<Identifier> id_, List<Demographics> dem_, String country) {
+    private void searchPatients(Assertion assertion, List<Identifier> identifiers, List<Demographics> demographics, String country) {
 
         LOGGER.info("Search Patients selected country is: '{}'", country);
         String runningMode = MyServletContextListener.getRunningMode();
-        String strMsg = "";
         Assertion ass;
+
         if (StringUtils.equals(runningMode, "demo")) {
             patients = EpsosHelperService.getMockPatients();
             trcAssertion = null;
             trcassertionnotexists = true;
             trcassertionexists = false;
             showPatientList = true;
+
         } else {
+
             try {
                 trcAssertion = null;
                 trcassertionnotexists = true;
                 trcassertionexists = false;
                 patients = new ArrayList<>();
-                String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-                LOGGER.info("CONNECTOR URL IS: '{}'", serviceUrl);
 
-                PatientDemographics pd = EpsosHelperService.createPatientDemographicsForQuery(id_, dem_);
+                String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
+                LOGGER.info("Connector URL: '{}'", serviceUrl);
+
+                PatientDemographics pd = EpsosHelperService.createPatientDemographicsForQuery(identifiers, demographics);
                 ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
                 LOGGER.info("Test Assertions: " + EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS));
                 ass = assertion;
 
-                LOGGER.info("Searching for patients in '{}'", country);
-                LOGGER.info("Assertion id: '{}'", ass.getID());
-                LOGGER.info("PD: '{}'", pd.toString());
-                strMsg = pd.toString();
+                if (LOGGER.isDebugEnabled()) {
+
+                    LOGGER.debug("Searching for patients in '{}'", country);
+                    LOGGER.debug("Assertion id: '{}'", ass.getID());
+                    LOGGER.debug("PatientDemographic: '{}'", pd.toString());
+                }
 
                 List<PatientDemographics> queryPatient = proxy.queryPatient(ass, country, pd);
 
                 for (PatientDemographics aux : queryPatient) {
+
                     Patient patient = EpsosHelperService.populatePatient(aux);
                     patients.add(patient);
                     queryPatientsException = "";
                 }
                 if (queryPatient.isEmpty()) {
-                    queryPatientsException = LiferayUtils
-                            .getPortalTranslation("patient.list.no.patient");
+                    queryPatientsException = LiferayUtils.getPortalTranslation("patient.list.no.patient");
                 }
                 LOGGER.info("Found '{}' patients", patients.size());
                 showPatientList = true;
+
             } catch (Exception ex) {
 
                 LOGGER.error(ExceptionUtils.getStackTrace(ex));
@@ -237,18 +241,19 @@ public class MyBean implements Serializable {
     }
 
     public void searchPatients() {
+
         LOGGER.info("Searching for patients (creating assertions)...");
         Object obj = EpsosHelperService.getUserAssertion();
+
         if (obj instanceof Assertion) {
             hcpAssertion = (Assertion) obj;
         } else if (obj instanceof String) {
             FacesContext.getCurrentInstance().addMessage(
                     null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "ASSERTION",
-                            obj.toString()));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "ASSERTION", obj.toString()));
             errorUserAssertion = (String) obj;
         }
-        LOGGER.info("Searching for patients (deomgraphics) '{}' (Identifiers) '{}'", demographics.size(), identifiers.size());
+        LOGGER.info("Searching for patients (demographics) '{}' (Identifiers) '{}'", demographics.size(), identifiers.size());
         searchPatients(hcpAssertion, identifiers, demographics, selectedCountry);
     }
 
