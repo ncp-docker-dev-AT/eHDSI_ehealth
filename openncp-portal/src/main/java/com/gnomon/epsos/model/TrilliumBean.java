@@ -179,9 +179,7 @@ public class TrilliumBean implements Serializable {
             if (isCDA) {
                 LOGGER.info(("The document is EPSOS CDA"));
                 // translate it
-                convertedcda = Utils.getDocumentAsXml(
-                        EpsosHelperService.translateDoc(
-                                Utils.createDomFromString(transformed), lang1));
+                convertedcda = Utils.getDocumentAsXml(EpsosHelperService.translateDoc(Utils.createDomFromString(transformed), lang1));
                 // display it using cda display tool
                 convertedcda = EpsosHelperService.styleDoc(convertedcda, lang1, false, "");
             } else {
@@ -189,8 +187,8 @@ public class TrilliumBean implements Serializable {
                 convertedcda = EpsosHelperService.styleDoc(transformed, lang1, true, "");
             }
 
-            Utils.WriteXMLToFile(convertedcda, "/home/karkaletsis/dev/css/a1.xml");
-            stream = new ByteArrayInputStream(convertedcda.getBytes("UTF-8"));
+            Utils.writeXMLToFile(convertedcda, "/home/karkaletsis/dev/css/a1.xml");
+            stream = new ByteArrayInputStream(convertedcda.getBytes(StandardCharsets.UTF_8));
             filename = filename + ".pdf";
             try (ByteArrayOutputStream baos = EpsosHelperService.ConvertHTMLtoPDF(convertedcda, serviceUrl, fontpath)) {
 
@@ -199,10 +197,10 @@ public class TrilliumBean implements Serializable {
                 contentType = "application/pdf";
                 response.setContentType(contentType);
                 response.setHeader("Content-disposition", "attachment; filename=\"cda.pdf\"");
-                OutputStream OutStream = response.getOutputStream();
-                OutStream.write(output);
-                OutStream.flush();
-                OutStream.close();
+                OutputStream outputStream = response.getOutputStream();
+                outputStream.write(output);
+                outputStream.flush();
+                outputStream.close();
 
             } catch (Exception ex) {
                 LOGGER.error(ExceptionUtils.getStackTrace(ex));
@@ -233,8 +231,8 @@ public class TrilliumBean implements Serializable {
                 return;
             }
             if (StringUtils.equals(type, "xml")) {
-                stream = new ByteArrayInputStream(transformed.getBytes("UTF-8"));
-                output = transformed.getBytes("UTF-8");
+                stream = new ByteArrayInputStream(transformed.getBytes(StandardCharsets.UTF_8));
+                output = transformed.getBytes(StandardCharsets.UTF_8);
                 filename = filename + ".xml";
                 contentType = "text/xml";
                 response.setHeader("Content-disposition", "attachment; filename=\"cda.xml\"");

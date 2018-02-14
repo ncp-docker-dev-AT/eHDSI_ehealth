@@ -1,24 +1,21 @@
 <?xml version="1.0"  ?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epsos="urn:epsos-org:ep:medication">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xmlns:epsos="urn:epsos-org:ep:medication" version="1.0">
+
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
-
 
     <!-- variable to check that at least one alert section exist -->
     <xsl:variable name="medicalDevicesExist"
                   select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='46264-8']"/>
 
-
     <!--alerts -->
-
     <xsl:template name="medicalDevices" match="/n1:ClinicalDocument/n1:component/n1:structuredBody">
-
         <!-- if we have at least one alert section -->
         <xsl:choose>
             <!-- if we have at least one alert section -->
             <xsl:when test="($medicalDevicesExist)">
-
                 <xsl:for-each select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section">
                     <xsl:call-template name="medicalDevicesSection"/>
                 </xsl:for-each>
@@ -31,7 +28,6 @@
                     <!-- xsl:text>The Medical devices and implants section is missing</xsl:text-->
                     <xsl:choose>
                         <xsl:when test=" ($documentCode='60591-5')">
-
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'74'"/>
                             </xsl:call-template>
@@ -40,33 +36,16 @@
                 </span>
                 <br/>
                 <br/>
-
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
-
     <xsl:template name="medicalDevicesSection">
-
-        <!-- Defing all needed variables -->
-
-        <xsl:variable
-                name="medicalDevicesSectionTitleCode"
-                select="n1:code/@code"/>
-
-
-        <xsl:variable
-                name="medicalDevicesSectionTitle"
-                select="n1:code[@code='46264-8']/@displayName"/>
-
-
-        <xsl:variable
-                name="nullEntry"
-                select="n1:entry"/>
-
-
-        <xsl:variable name="medDevAct"
-                      select="n1:entry/n1:supply"/>
+        <!-- Define all needed variables -->
+        <xsl:variable name="medicalDevicesSectionTitleCode" select="n1:code/@code"/>
+        <xsl:variable name="medicalDevicesSectionTitle" select="n1:code[@code='46264-8']/@displayName"/>
+        <xsl:variable name="nullEntry" select="n1:entry"/>
+        <xsl:variable name="medDevAct" select="n1:entry/n1:supply"/>
 
         <!-- End definition of variables-->
         <xsl:choose>
@@ -74,12 +53,10 @@
             <xsl:when test=" ($medicalDevicesSectionTitleCode='46264-8')">
                 <span class="sectionTitle">
                     <xsl:value-of select="$medicalDevicesSectionTitle"/>
-
                 </span>
                 <br/>
                 <xsl:choose>
                     <xsl:when test="not($medDevAct/@nullFlavor)">
-
                         <xsl:choose>
                             <xsl:when test="$shownarrative='true'">
                                 <a href="javascript: showhide('meddevTr'); self.focus(); void(0);">Show/Hide</a>
@@ -90,8 +67,6 @@
                                 </div>
                             </xsl:when>
                         </xsl:choose>
-
-
                         <table>
                             <tbody>
                                 <tr>
@@ -107,7 +82,6 @@
                                             <xsl:with-param name="code" select="'36'"/>
                                         </xsl:call-template>
                                     </th>
-
                                 </tr>
                                 <xsl:for-each select="n1:entry">
                                     <xsl:call-template name="medicalDevicesSectionEntry">
@@ -117,7 +91,6 @@
                         </table>
                     </xsl:when>
                     <xsl:otherwise>
-
                         <xsl:choose>
                             <xsl:when test="$shownarrative='true'">
                                 <a href="javascript: showhide('meddevTr'); self.focus(); void(0);">Show/Hide</a>
@@ -131,69 +104,34 @@
                         <xsl:call-template name="show-noneFlavor">
                             <xsl:with-param name="data" select="$medDevAct/@nullFlavor"/>
                         </xsl:call-template>
-
-
                     </xsl:otherwise>
-
                 </xsl:choose>
-
             </xsl:when>
         </xsl:choose>
-
-
     </xsl:template>
 
-
     <!--  FOR EACH ENTRY -->
-
-
     <xsl:template name="medicalDevicesSectionEntry">
-
         <!-- Defing all needed variables -->
-
-
-        <xsl:variable
-                name="medDeviceImplantDescriptionNode"
-                select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code"/>
-
-
-        <xsl:variable
-                name="medDeviceImplantDescription"
-                select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code/@displayName"/>
-
-        <xsl:variable
-                name="medDeviceImplantDescriptionTranslation1"
-                select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code/n1:translation/n1:translation/@displayName"/>
-
-        <xsl:variable
-                name="medDeviceImplantDescriptionTranslation2"
-                select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code/n1:translation/@displayName"/>
-
-
-        <xsl:variable
-                name="medDeviceImplantDate"
-                select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:effectiveTime"/>
-
-
-        <xsl:variable
-                name="nullEntry"
-                select="."/>
-
-
-        <xsl:variable name="medDevAct"
-                      select="n1:supply"/>
-
+        <xsl:variable name="medDeviceImplantDescriptionNode"
+                      select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code"/>
+        <xsl:variable name="medDeviceImplantDescription"
+                      select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code/@displayName"/>
+        <xsl:variable name="medDeviceImplantDescriptionTranslation1"
+                      select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code/n1:translation/n1:translation/@displayName"/>
+        <xsl:variable name="medDeviceImplantDescriptionTranslation2"
+                      select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code/n1:translation/@displayName"/>
+        <xsl:variable name="medDeviceImplantDate"
+                      select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:effectiveTime"/>
+        <xsl:variable name="nullEntry" select="."/>
+        <xsl:variable name="medDevAct" select="n1:supply"/>
         <!-- End definition of variables-->
 
-        <!-- nullflavored act -->
+        <!-- null flavor act -->
         <xsl:choose>
             <xsl:when test="not($medDevAct/@nullFlavor)">
-
-
                 <tr>
                     <td>
-
-
                         <xsl:choose>
                             <xsl:when test="not ($medDeviceImplantDescriptionNode/@nullFlavor)">
                                 <xsl:choose>
@@ -210,21 +148,13 @@
                                         </xsl:if>
                                     </xsl:otherwise>
                                 </xsl:choose>
-
-
                             </xsl:when>
-
                             <xsl:otherwise>
-
-
                                 <xsl:call-template name="show-noneFlavor">
                                     <xsl:with-param name="data" select="$medDeviceImplantDescriptionNode/@nullFlavor"/>
                                 </xsl:call-template>
                             </xsl:otherwise>
-
                         </xsl:choose>
-
-
                     </td>
                     <td>
                         <xsl:call-template name="show-time">
@@ -232,10 +162,7 @@
                         </xsl:call-template>&#160;
                     </td>
                 </tr>
-
-
             </xsl:when>
-
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
@@ -245,11 +172,6 @@
                     </td>
                 </tr>
             </xsl:otherwise>
-
         </xsl:choose>
-
-
     </xsl:template>
-
-
 </xsl:stylesheet>

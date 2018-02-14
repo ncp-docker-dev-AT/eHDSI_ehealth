@@ -15,6 +15,7 @@ import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -25,7 +26,10 @@ import java.util.List;
 public final class TMServices {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TMServices.class);
-    private final static String REPOSITORY_INTERNAL_ERROR = "XDSRepositoryError";
+    private static final String REPOSITORY_INTERNAL_ERROR = "XDSRepositoryError";
+
+    private TMServices() {
+    }
 
     /**
      * Encapsulates the TM usage, by accepting the document to translate, and the selected language.
@@ -48,7 +52,7 @@ public final class TMServices {
 
         resultDoc = byteToDocument(document);
 
-        LOGGER.debug("STARTING TRANSLATING DOCUMENT TO: " + language + ".");
+        LOGGER.debug("STARTING TRANSLATING DOCUMENT TO: '{}'", language);
         //  Perform the translation, according to specified language.
         tmResponse = transformationService.translate(resultDoc, language);
 
@@ -62,7 +66,7 @@ public final class TMServices {
             //  Obtain the translated document in the Document type format, only if translation succeeds.
             resultDoc = tmResponse.getResponseCDA();
             //  Obtains a byte array from the translation result.
-            result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes("UTF-8");
+            result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
             throw new DocumentTransformationException(ex);
         }
@@ -105,7 +109,7 @@ public final class TMServices {
             //  Obtain the translated document in the Document type format, only if translation succeeds.
             resultDoc = tmResponse.getResponseCDA();
             //  Obtains a byte array from the translation result.
-            result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes("UTF-8");
+            result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
             throw new DocumentTransformationException(ex);
         }
@@ -123,7 +127,7 @@ public final class TMServices {
 
         try {
             //Convert document byte array into a String.
-            String docString = new String(document, "UTF-8");
+            String docString = new String(document, StandardCharsets.UTF_8);
             //Parse the String into a Document object.
             return XMLUtil.parseContent(docString);
         } catch (ParserConfigurationException | SAXException | IOException ex) {
