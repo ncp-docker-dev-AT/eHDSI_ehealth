@@ -581,7 +581,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             // TODO: enable demographic searches
             if (!receiverHomeCommID.equals(Constants.HOME_COMM_ID)) {
                 fillOutputMessage(outputMessage, "Receiver has wrong Home Community ID.", ERROR_ANSWER_NOT_AVAILABLE);
-            } else if (idList.size() > 0) {
+            } else if (!idList.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
                 List<PatientId> patientIdList = new ArrayList<>();
                 sb.append("<patient>");
