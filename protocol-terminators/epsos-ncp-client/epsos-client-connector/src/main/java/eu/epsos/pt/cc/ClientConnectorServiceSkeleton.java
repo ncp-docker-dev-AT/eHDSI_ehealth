@@ -291,7 +291,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             }
             classCodeNode = classCode.getNodeRepresentation();
 
-
             switch (classCodeNode) {
 
                 // call XDR Client for Consent
