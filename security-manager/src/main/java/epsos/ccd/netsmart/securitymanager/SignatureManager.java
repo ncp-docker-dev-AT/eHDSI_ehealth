@@ -3,7 +3,6 @@ package epsos.ccd.netsmart.securitymanager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml2.core.Assertion;
@@ -37,7 +36,6 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.IOException;
 import java.io.Serializable;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
@@ -64,7 +62,7 @@ public class SignatureManager {
     private String signatureAlgorithm;
     private String digestAlgorithm;
 
-    public SignatureManager() throws IOException {
+    public SignatureManager() {
 
         //Default constructor now defaults to the test keyStoreManager
         keyManager = new DefaultKeyStoreManager();
@@ -79,15 +77,15 @@ public class SignatureManager {
     }
 
     private void init() {
-        ConfigurationManager cm = ConfigurationManagerFactory.getConfigurationManager();
-        signatureAlgorithm = cm.getProperty(SIG_ALG_PROP);
+
+        signatureAlgorithm = ConfigurationManagerFactory.getConfigurationManager().getProperty(SIG_ALG_PROP);
 
         // If not defined
         if (signatureAlgorithm.length() == 0) {
             signatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256;
         }
 
-        digestAlgorithm = cm.getProperty(DGST_ALG_PROP);
+        digestAlgorithm = ConfigurationManagerFactory.getConfigurationManager().getProperty(DGST_ALG_PROP);
 
         // If not defined
         if (digestAlgorithm.length() == 0) {
@@ -105,7 +103,7 @@ public class SignatureManager {
      * @param sa The SAML Assertion that will be validated by the method.
      * @throws SMgrException When the validation of the signature fails
      */
-    public String verifySAMLAssestion(Assertion sa) throws SMgrException, IOException {
+    public String verifySAMLAssestion(Assertion sa) throws SMgrException {
 
         String sigCountryCode = null;
 
@@ -162,7 +160,7 @@ public class SignatureManager {
      * @throws SMgrException       When the validation of the signature fails
      * @throws java.io.IOException
      */
-    public void verifyEnvelopedSignature(Document doc) throws SMgrException, IOException {
+    public void verifyEnvelopedSignature(Document doc) throws SMgrException {
 
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

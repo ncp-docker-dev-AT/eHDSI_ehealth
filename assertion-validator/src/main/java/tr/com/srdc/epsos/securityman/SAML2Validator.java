@@ -274,7 +274,7 @@ public class SAML2Validator {
     private static String checkHCPAssertion(Assertion assertion, String classCode) throws MissingFieldException,
             InvalidFieldException, InsufficientRightsException, SMgrException {
 
-        String sigCountryCode = null;
+        String sigCountryCode;
 
         RequiredFieldValidators.validateVersion(assertion);
         RequiredFieldValidators.validateID(assertion);
@@ -315,8 +315,9 @@ public class SAML2Validator {
         //TODO: Improve Exception management.
         try {
             sigCountryCode = new SignatureManager().verifySAMLAssestion(assertion);
-        } catch (IOException e) {
+        } catch (SMgrException e) {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
+            throw e;
         }
 
         return sigCountryCode;

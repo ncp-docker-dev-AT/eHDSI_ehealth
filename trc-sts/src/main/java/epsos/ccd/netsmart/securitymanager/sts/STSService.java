@@ -213,7 +213,7 @@ public class STSService implements Provider<SOAPMessage> {
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
             return (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
 
-        } catch (ParserConfigurationException | UnmarshallingException | IOException ex) {
+        } catch (ParserConfigurationException | UnmarshallingException ex) {
             LOGGER.error(null, ex);
             throw new WSTrustException("Error Parsing SAML Assertion in Message Header", ex);
         }

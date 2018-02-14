@@ -21,7 +21,7 @@ import java.security.cert.X509Certificate;
  */
 public class SMgrX509KeySelector extends KeySelector {
 
-    static boolean algEquals(String algURI, String algName) {
+    private static boolean algEquals(String algURI, String algName) {
 
         return (algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1))
                 || (algName.equalsIgnoreCase("RSA") && algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1));
@@ -31,18 +31,19 @@ public class SMgrX509KeySelector extends KeySelector {
                                     XMLCryptoContext context) throws KeySelectorException {
 
         for (Object o1 : keyInfo.getContent()) {
+
             XMLStructure info = (XMLStructure) o1;
             if (!(info instanceof X509Data)) {
                 continue;
             }
             X509Data x509Data = (X509Data) info;
             for (Object o : x509Data.getContent()) {
+
                 if (!(o instanceof X509Certificate)) {
                     continue;
                 }
                 final PublicKey key = ((X509Certificate) o).getPublicKey();
-                // Make sure the algorithm is compatible
-                // with the method.
+                // Make sure the algorithm is compatible with the method.
                 if (algEquals(method.getAlgorithm(), key.getAlgorithm())) {
                     return () -> key;
                 }
