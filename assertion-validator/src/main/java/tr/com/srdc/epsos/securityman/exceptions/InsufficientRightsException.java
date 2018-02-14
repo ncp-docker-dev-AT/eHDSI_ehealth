@@ -30,6 +30,7 @@ public class InsufficientRightsException extends Exception {
         this.errorCode = Integer.toString(errorCode);
     }
 
+    @Override
     public String getMessage() {
         return message;
     }
