@@ -896,12 +896,23 @@ public class EpsosHelperService {
         }
     }
 
+    public static Object getUserAssertion(boolean isEmergency) {
+
+        User user = LiferayUtils.getPortalUser();
+        return getUserAssertion(user, isEmergency);
+    }
+
     public static Object getUserAssertion() {
         User user = LiferayUtils.getPortalUser();
         return getUserAssertion(user);
     }
 
     public static Object getUserAssertion(User user) {
+
+        return getUserAssertion(user, false);
+    }
+
+    public static Object getUserAssertion(User user, boolean isEmergency) {
 
         LOGGER.info("User is: '{}'", user.getScreenName());
         Assertion assertion;
@@ -987,8 +998,11 @@ public class EpsosHelperService {
                     orgType = "Hospital";
                 }
             }
-            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType, "TREATMENT",
-                    poc, perms);
+            String purposeOfUse = "TREATMENT";
+            if (isEmergency) {
+                purposeOfUse = "EMERGENCY";
+            }
+            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType, purposeOfUse, poc, perms);
 
             // send Audit message
             // GUI-27

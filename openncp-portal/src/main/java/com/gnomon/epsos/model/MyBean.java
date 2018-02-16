@@ -64,6 +64,7 @@ public class MyBean implements Serializable {
     private PatientDocument selectedDocument;
     private EpsosDocument selectedEpsosDocument;
     private List<PatientDocument> patientPrescriptions;
+    private boolean emergency;
     private boolean showDemographics;
     private boolean showPatientList = true;
     private StreamedContent prescriptionFile;
@@ -243,7 +244,7 @@ public class MyBean implements Serializable {
     public void searchPatients() {
 
         LOGGER.info("Searching for patients (creating assertions)...");
-        Object obj = EpsosHelperService.getUserAssertion();
+        Object obj = EpsosHelperService.getUserAssertion(emergency);
 
         if (obj instanceof Assertion) {
             hcpAssertion = (Assertion) obj;
@@ -254,6 +255,7 @@ public class MyBean implements Serializable {
             errorUserAssertion = (String) obj;
         }
         LOGGER.info("Searching for patients (demographics) '{}' (Identifiers) '{}'", demographics.size(), identifiers.size());
+        LOGGER.info("Jerome: '{}'", emergency);
         searchPatients(hcpAssertion, identifiers, demographics, selectedCountry);
     }
 
@@ -301,6 +303,14 @@ public class MyBean implements Serializable {
 
     public void setPrescriptionHtml(String prescriptionHtml) {
         String prescriptionHtml1 = prescriptionHtml;
+    }
+
+    public boolean isEmergency() {
+        return emergency;
+    }
+
+    public void setEmergency(boolean emergency) {
+        this.emergency = emergency;
     }
 
     public boolean isShowDemographics() {
