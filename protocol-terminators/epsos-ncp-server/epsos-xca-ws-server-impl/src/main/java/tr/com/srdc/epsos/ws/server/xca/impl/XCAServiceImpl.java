@@ -16,6 +16,7 @@ import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.services.CdaValidationService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -201,10 +202,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
             //Include only the first error in the audit log.
             if (re.hasNext()) {
                 OMElement error = re.next();
-                try {
-                    LOGGER.debug("Error to be included in audit: '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(error)));
-                } catch (Exception e) {
-                    LOGGER.debug("Exception: '{}'", e.getMessage(), e);
+                if (LOGGER.isDebugEnabled()) {
+                    try {
+                        LOGGER.debug("Error to be included in audit: '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(error)));
+                    } catch (Exception e) {
+                        LOGGER.debug("Exception: '{}'", e.getMessage(), e);
+                    }
                 }
                 eventLog.setEM_PatricipantObjectID(error.getAttributeValue(new QName("", "errorCode")));
                 eventLog.setEM_PatricipantObjectDetail(error.getAttributeValue(new QName("", "codeContext")).getBytes());
@@ -1251,12 +1254,26 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return onlyWarnings;
     }
 
+    /**
+     * Method responsible of the AdhocQueryResponse message if the operation requested is not supported by the server.
+     * RegistryError shall contain:
+     * errorCode: required.
+     * codeContext: required - Supplies additional detail for the errorCode.
+     * severity: required - Indicates the severity of the error.
+     * Shall be one of:
+     * urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error
+     * urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Warning
+     * location: optional - Supplies the location of the error module name and line number or stack trace if appropriate.
+     *
+     * @param request - original AdhocQueryRequest
+     * @param e       - Exception thrown by the system
+     * @return response - populated with te specific Error Code according the document Class Code.
+     */
     private AdhocQueryResponse handleUnsupportedOpertationException(AdhocQueryRequest request, UnsupportedOperationException e) {
 
         AdhocQueryResponse response = ofQuery.createAdhocQueryResponse();
-
-        RegistryErrorList rel = ofRs.createRegistryErrorList();
-        RegistryError re = ofRs.createRegistryError();
+        RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
+        RegistryError registryError = ofRs.createRegistryError();
 
         // Create Registry Object List
         response.setRegistryObjectList(ofRim.createRegistryObjectListType());
@@ -1264,31 +1281,30 @@ public class XCAServiceImpl implements XCAServiceInterface {
         Writer result = new StringWriter();
         PrintWriter printWriter = new PrintWriter(result);
         e.printStackTrace(printWriter);
-        //TODO: Jerome: review this value during Exception handling
-        re.setLocation("");
-        //re.setLocation(result.toString());
+        registryError.setLocation(result.toString().trim());
 
         String classCode = getDocumentEntryClassCode(request);
+
         if (Constants.EP_CLASSCODE.equals(classCode)) {
-            re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Info");
-            re.setErrorCode("1101");
-            re.setValue("No ePrescriptions are registered for the given patient.");
-            re.setCodeContext("The XDS repository does not contain any ePrescription related to the current patient");
+            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+            registryError.setErrorCode("1101");
+            registryError.setValue("No ePrescriptions are registered for the given patient.");
+            registryError.setCodeContext("The XDS repository does not contain any ePrescription related to the current patient");
         } else if (Constants.PS_CLASSCODE.equals(classCode)) {
-            re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Warning");
-            re.setErrorCode("1102");
-            re.setValue("No patient summary is registered for the given patient.");
-            re.setCodeContext("The XDS repository does not contain any Patient Summary related to the current patient");
+            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+            registryError.setErrorCode("1102");
+            registryError.setValue("No patient summary is registered for the given patient.");
+            registryError.setCodeContext("The XDS repository does not contain any Patient Summary related to the current patient");
         } else {
-            // What should be in the error, if the classCode is not EP_CLASSCODE nor PS_CLASSCODE
-            re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Warning");
-            re.setErrorCode("1100");
-            re.setValue("No documents are registered for the given patient.");
-            re.setCodeContext("The XDS repository does not contain any documents related to the current patient");
+            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+            registryError.setErrorCode("1100");
+            registryError.setValue("No documents are registered for the given patient.");
+            registryError.setCodeContext("The XDS repository does not contain any documents related to the current patient");
         }
 
-        rel.getRegistryError().add(re);
-        response.setRegistryErrorList(rel);
+        registryErrorList.getRegistryError().add(registryError);
+        response.setRegistryErrorList(registryErrorList);
+        // Errors managed are only WARNING so the AdhocQueryResponse is considered as successful.
         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
 
         return response;
