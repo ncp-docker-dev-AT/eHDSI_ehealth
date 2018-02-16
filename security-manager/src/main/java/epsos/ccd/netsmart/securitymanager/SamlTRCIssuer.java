@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +36,8 @@ public class SamlTRCIssuer {
     KeyStoreManager ksm;
     HashMap<String, String> auditDataMap;
 
-    public SamlTRCIssuer() throws IOException {
+    public SamlTRCIssuer() {
+
         ksm = new DefaultKeyStoreManager();
         auditDataMap = new HashMap<>();
     }
@@ -69,7 +69,9 @@ public class SamlTRCIssuer {
      * @param patientID
      * @param purposeOfUse
      */
-    public Assertion issueTrcTokenUnsigned(String purposeOfUse, String patientID, String doctorId, DateTime notBefore, DateTime notOnOrAfter, DateTime authnInstant, DateTime sessionNotOnOrAfter, String idaReference) throws SMgrException {
+    public Assertion issueTrcTokenUnsigned(String purposeOfUse, String patientID, String doctorId, DateTime notBefore,
+                                           DateTime notOnOrAfter, DateTime authnInstant, DateTime sessionNotOnOrAfter,
+                                           String idaReference) throws SMgrException {
 
         try {
             //initializing the map
@@ -182,10 +184,8 @@ public class SamlTRCIssuer {
     }
 
     /**
-     * Issues a SAML TRC Assertion that proves the treatment relationship
-     * between the HCP and the Patient. The Identity of the HCP is provided by
-     * the hcpIdentityAssertion. The identity of the patient is inferred from
-     * the patiendID.
+     * Issues a SAML TRC Assertion that proves the treatment relationship between the HCP and the Patient.
+     * The Identity of the HCP is provided by the hcpIdentityAssertion. The identity of the patient is inferred from the patiendID.
      *
      * @param hcpIdentityAssertion The health care professional Identity SAML
      *                             Assertion. The method validates the assertion using the
@@ -195,10 +195,9 @@ public class SamlTRCIssuer {
      * @param attrValuePair        SAML {@link Attribute} that will be added to the
      *                             assertion
      * @return the SAML TRC Assertion
-     * @throws IOException
      */
     public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
-                                   List<Attribute> attrValuePair) throws SMgrException, IOException {
+                                   List<Attribute> attrValuePair) throws SMgrException {
 
         LOGGER.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
                 hcpIdentityAssertion.getID(), patientID, purposeOfUse);
@@ -369,9 +368,8 @@ public class SamlTRCIssuer {
     }
 
     /**
-     * Verifies the signature of the TRC Assertion. The TRC Assertion should be
-     * signed and will be validated also against both the patient ID and the HCP
-     * Identity that is provided by the IdentityAssertion.
+     * Verifies the signature of the TRC Assertion. The TRC Assertion should be signed and will be validated
+     * also against both the patient ID and the HCP Identity that is provided by the IdentityAssertion.
      *
      * @param trcAssertion         The Assertion that is to be validated.
      * @param hcpIdentityAssertion The health care professional Identity SAML
@@ -379,10 +377,8 @@ public class SamlTRCIssuer {
      *                             {@link SignatureManager#verifySAMLAssestion(org.opensaml.saml2.core.Assertion)}.
      * @param patientID            The Patient Id that is required for the TRC Assertion
      * @throws SMgrException when the verification fails.
-     * @throws IOException
      */
-    public void verifyTrcToken(Assertion trcAssertion, Assertion hcpIdentityAssertion, String patientID)
-            throws SMgrException, IOException {
+    public void verifyTrcToken(Assertion trcAssertion, Assertion hcpIdentityAssertion, String patientID) throws SMgrException {
 
         SignatureManager sm = new SignatureManager(ksm);
         sm.verifySAMLAssestion(trcAssertion);

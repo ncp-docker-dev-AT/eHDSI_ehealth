@@ -55,6 +55,7 @@ public class SAML {
     private DocumentBuilder builder;
     private String issuerURL;
 
+
     /**
      * Initialize JAXP DocumentBuilder instance for later use and reuse.
      */
@@ -63,8 +64,7 @@ public class SAML {
     }
 
     /**
-     * Initialize JAXP DocumentBuilder instance for later use and reuse, and
-     * establishes an issuer URL.
+     * Initialize JAXP DocumentBuilder instance for later use and reuse, and establishes an issuer URL.
      *
      * @param issuerURL This will be used in all generated assertions
      */
@@ -85,20 +85,17 @@ public class SAML {
     }
 
     /**
-     * Parse the command line for a filename to read, and optionally a filename
-     * to write(absent which the application will write to the console).
-     * Reads the given file as an XMLObject, and then dumps using a simple
-     * {@link PrettyPrinterUtil.xml.PrettyPrinter pretty printer}.
+     * Parse the command line for a filename to read, and optionally a filename to write (absent which the application
+     * will write to the console).
+     * Reads the given file as an XMLObject, and then dumps using a simple.
      */
     public static void main(String[] args) throws Exception {
+
         if (args.length == 0) {
-            LOGGER.info
-                    ("Need arguments: <inputFile> [<outputFile>]");
+            LOGGER.info("Need arguments: <inputFile> [<outputFile>]");
             System.exit(-1);
         }
 
-        // Unadvertised, and not used in course exercises;
-        // just some internal testing ...
         String command = args[0];
         if (StringUtils.equals(command, "generate")) {
             String type = args[1];
@@ -106,13 +103,13 @@ public class SAML {
             SAML handler = new SAML("http://saml.r.us/AssertingParty");
 
             switch (type) {
+
                 case "authn":
                     handler.printToFile(handler.createAuthnAssertion(handler.createSubject("harold_dt",
                             null, "sender-vouches"), AuthnContext.PPT_AUTHN_CTX), null);
                     break;
                 case "attr":
-                    Subject subject = handler.createSubject("louisdraper@abc.gov", NameID.EMAIL,
-                            null);
+                    Subject subject = handler.createSubject("louisdraper@abc.gov", NameID.EMAIL, null);
                     Map<String, String> attributes = new HashMap<>();
                     attributes.put("securityClearance", "C2");
                     attributes.put("roles", "editor,reviewer");
@@ -131,8 +128,7 @@ public class SAML {
     /**
      * Helper method to add an XMLObject as a child of a DOM Element.
      */
-    public static Element addToElement(XMLObject object, Element parent) throws IOException, MarshallingException,
-            TransformerException {
+    public static Element addToElement(XMLObject object, Element parent) throws MarshallingException {
 
         Marshaller out = Configuration.getMarshallerFactory().getMarshaller(object);
         return out.marshall(object, parent);
@@ -141,16 +137,15 @@ public class SAML {
     /**
      * Helper method to read an XML object from a DOM element.
      */
-    public static XMLObject fromElement(Element element) throws IOException, UnmarshallingException {
+    public static XMLObject fromElement(Element element) throws UnmarshallingException {
 
         return Configuration.getUnmarshallerFactory().getUnmarshaller(element).unmarshall(element);
     }
 
     /**
-     * <u>Slightly</u> easier way to create objects using OpenSAML's
-     * builder system.
+     * <u>Slightly</u> easier way to create objects using OpenSAML's builder system.
+     * Cast to SAMLObjectBuilder<T> is caller's choice
      */
-    // cast to SAMLObjectBuilder<T> is caller's choice
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> cls, QName qname) {
 
@@ -163,7 +158,7 @@ public class SAML {
     /**
      * Helper method to get an XMLObject as a DOM Document.
      */
-    public Document asDOMDocument(XMLObject object) throws IOException, MarshallingException {
+    public Document asDOMDocument(XMLObject object) throws MarshallingException {
 
         Document document = builder.newDocument();
         Marshaller out = Configuration.getMarshallerFactory().getMarshaller(object);
@@ -243,8 +238,7 @@ public class SAML {
     }
 
     /**
-     * Returns a SAML assertion with generated ID, current timestamp, given
-     * subject, and simple time-based conditions.
+     * Returns a SAML assertion with generated ID, current timestamp, given subject, and simple time-based conditions.
      *
      * @param subject Subject of the assertion
      */
@@ -273,7 +267,7 @@ public class SAML {
     /**
      * Helper method to generate a response, based on a pre-built assertion.
      */
-    public Response createResponse(Assertion assertion) throws IOException, MarshallingException, TransformerException {
+    public Response createResponse(Assertion assertion) {
 
         return createResponse(assertion, null);
     }
@@ -282,8 +276,7 @@ public class SAML {
      * Helper method to generate a shell response with a given status code
      * and query ID.
      */
-    public Response createResponse(String statusCode, String inResponseTo) throws IOException, MarshallingException,
-            TransformerException {
+    public Response createResponse(String statusCode, String inResponseTo) {
 
         return createResponse(statusCode, null, inResponseTo);
     }
@@ -291,8 +284,7 @@ public class SAML {
     /**
      * Helper method to generate a shell response with a given status code, status message, and query ID.
      */
-    public Response createResponse(String statusCode, String message, String inResponseTo) throws IOException,
-            MarshallingException {
+    public Response createResponse(String statusCode, String message, String inResponseTo) {
 
         Response response = create(Response.class, Response.DEFAULT_ELEMENT_NAME);
         response.setID(generator.generateIdentifier());
@@ -317,8 +309,8 @@ public class SAML {
         response.setStatus(status);
 
         if (message != null) {
-            StatusMessage statusMessage = create
-                    (StatusMessage.class, StatusMessage.DEFAULT_ELEMENT_NAME);
+
+            StatusMessage statusMessage = create(StatusMessage.class, StatusMessage.DEFAULT_ELEMENT_NAME);
             statusMessage.setMessage(message);
             status.setStatusMessage(statusMessage);
         }
@@ -327,11 +319,9 @@ public class SAML {
     }
 
     /**
-     * Helper method to generate a response, based on a pre-built assertion
-     * and query ID.
+     * Helper method to generate a response, based on a pre-built assertion and query ID.
      */
-    public Response createResponse(Assertion assertion, String inResponseTo) throws IOException, MarshallingException,
-            TransformerException {
+    public Response createResponse(Assertion assertion, String inResponseTo) {
 
         Response response = createResponse(StatusCode.SUCCESS_URI, inResponseTo);
         response.getAssertions().add(assertion);
@@ -352,12 +342,9 @@ public class SAML {
         AuthnContextClassRef ref = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
         ref.setAuthnContextClassRef(authnCtx);
 
-        // As of this writing, OpenSAML doesn't model the wide range of
-        // authentication context namespaces defined in SAML 2.0.
-        // For a real project we'd probably move on to 
-        //    XSAny objects, setting QNames and values each-by-each
-        //    a JAXB mapping of the required schema
-        //    DOM-building
+        // As of this writing, OpenSAML doesn't model the wide range of authentication context namespaces defined in SAML 2.0.
+        // For a real project we'd probably move on to XSAny objects, setting QNames and values each-by-each a
+        // JAXB mapping of the required schema DOM-building.
         // For classroom purposes the road ends here ...
 
         AuthnContext authnContext = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
@@ -380,11 +367,10 @@ public class SAML {
      */
     public void addAttribute(AttributeStatement statement, String name, String value) {
 
-        // Build attribute values as XMLObjects;
-        //  there is an AttributeValue interface, but it's apparently dead code
-        final XMLObjectBuilder builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+        // Build attribute values as XMLObjects, there is an AttributeValue interface, but it's apparently dead code
+        final XMLObjectBuilder xmlObjectBuilder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
-        XSAny valueElement = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
+        XSAny valueElement = (XSAny) xmlObjectBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
         valueElement.setTextContent(value);
 
         Attribute attribute = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
@@ -401,6 +387,7 @@ public class SAML {
      * @param attributes Attributes to be stated(may be null)
      */
     public Assertion createAttributeAssertion(Subject subject, Map<String, String> attributes) {
+
         Assertion assertion = createAssertion(subject);
 
         AttributeStatement statement = create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);

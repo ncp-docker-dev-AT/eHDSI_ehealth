@@ -30,10 +30,19 @@ public final class IheConstants {
     public static final String FORMAT_CODE_SCHEME = "urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d";
     public static final String TYPE_CODE_SCHEME = "urn:uuid:f0306f51-975f-434e-a61c-c59651d33983";
 
+    /**
+     * @deprecated (use { @ link # eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus.SUCCESS } instead.)
+     */
     @Deprecated
     public static final String REGREP_RESPONSE_SUCCESS = "urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success";
+    /**
+     * @deprecated (use { @ link # eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus.PARTIAL_SUCCESS } instead.))
+     */
     @Deprecated
     public static final String REGREP_RESPONSE_PARTIALSUCCESS = "urn:ihe:iti:2007:ResponseStatusType:PartialSuccess";
+    /**
+     * @deprecated (use { @ link # eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus.FAILURE } instead.))
+     */
     @Deprecated
     public static final String REGREP_RESPONSE_FAILURE = "urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Failure";
     public static final String REGREP_STATUSTYPE_APPROVED = "urn:oasis:names:tc:ebxml-regrep:StatusType:Approved";

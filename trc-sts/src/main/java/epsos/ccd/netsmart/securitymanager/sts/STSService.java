@@ -164,8 +164,7 @@ public class STSService implements Provider<SOAPMessage> {
             }
             return response;
 
-        } catch (SOAPException | WSTrustException | MarshallingException | SMgrException | ParserConfigurationException
-                | IOException ex) {
+        } catch (SOAPException | WSTrustException | MarshallingException | SMgrException | ParserConfigurationException ex) {
             LOGGER.error(null, ex);
             throw new WebServiceException(ex);
         }

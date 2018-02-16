@@ -1172,7 +1172,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     } else {
                         //Otherwise the status is PARTIALSUCCESS
                         registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                                IheConstants.REGREP_RESPONSE_PARTIALSUCCESS));
+                                AdhocQueryResponseStatus.PARTIAL_SUCCESS));
                     }
                 }
 

@@ -25,15 +25,14 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 /**
- * Utility class, with multiple helper methods for assertion extraction and
- * manipulation.
+ * Utility class, with multiple helper methods for assertion extraction and manipulation.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
@@ -51,8 +50,7 @@ public class AssertionUtils {
     }
 
     /**
-     * Extracts a TRC Assertion, from the Security Header of a given SOAP
-     * Header.
+     * Extracts a TRC Assertion, from the Security Header of a given SOAP Header.
      *
      * @param soapHeader - full SOAP Header
      * @return extracted TRC Assertion
@@ -82,7 +80,7 @@ public class AssertionUtils {
                         result = assertion;
                         break;
                     }
-                } catch (IOException | UnmarshallingException ex) {
+                } catch (UnmarshallingException ex) {
                     LOGGER.error("An error has occurred during the assertion extraction.", ex);
                 }
             }
@@ -123,7 +121,7 @@ public class AssertionUtils {
                         result = assertion;
                         break;
                     }
-                } catch (IOException | UnmarshallingException ex) {
+                } catch (UnmarshallingException ex) {
                     LOGGER.error("An error has occurred during the assertion extraction.", ex);
                 }
             }
@@ -133,8 +131,7 @@ public class AssertionUtils {
     }
 
     /**
-     * This method extracts the assertion list from a full SOAP Header, the list
-     * can have the 0..* cardinality.
+     * This method extracts the assertion list from a full SOAP Header, the list can have the 0..* cardinality.
      *
      * @param soapHeader - the full SOAP Header.
      * @return the assertion list.
@@ -194,8 +191,7 @@ public class AssertionUtils {
      * This method checks if a given Assertion is an Identity Assertion.
      *
      * @param assertion - the Assertion to check.
-     * @return a Boolean result, declaring if the assertion is an Identity
-     * assertion.
+     * @return a Boolean result, declaring if the assertion is an Identity assertion.
      */
     public static boolean isIdAssertion(final Assertion assertion) {
 
@@ -213,12 +209,10 @@ public class AssertionUtils {
     }
 
     /**
-     * This method checks if a given Assertion is a Treatment Relationship
-     * Confirmation Assertion.
+     * This method checks if a given Assertion is a Treatment Relationship Confirmation Assertion.
      *
      * @param assertion - the Assertion to check.
-     * @return a Boolean result, declaring if the assertion is a Treatment
-     * Relationship Confirmation Assertion.
+     * @return a Boolean result, declaring if the assertion is a Treatment Relationship Confirmation Assertion.
      */
     public static boolean isTrcAssertion(final Assertion assertion) {
 
@@ -236,8 +230,7 @@ public class AssertionUtils {
     }
 
     @SuppressWarnings("deprecation")
-    public static void signSAMLAssertion(SignableSAMLObject as,
-                                         String keyAlias, char[] keyPassword) throws Exception {
+    public static void signSAMLAssertion(SignableSAMLObject as, String keyAlias, char[] keyPassword) throws Exception {
 
         String KEYSTORE_LOCATION = Constants.NCP_SIG_KEYSTORE_PATH;
         String KEY_STORE_PASS = Constants.NCP_SIG_KEYSTORE_PASSWORD;
@@ -255,12 +248,9 @@ public class AssertionUtils {
             KeyStore keyStore = KeyStore.getInstance("JKS");
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             File file = new File(KEYSTORE_LOCATION);
-            keyStore.load(new FileInputStream(file),
-                    KEY_STORE_PASS.toCharArray());
-            privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS,
-                    PRIVATE_KEY_PASS.toCharArray());
-            X509Certificate cert1 = (X509Certificate) keyStore
-                    .getCertificate(KEY_ALIAS);
+            keyStore.load(new FileInputStream(file), KEY_STORE_PASS.toCharArray());
+            privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
+            X509Certificate cert1 = (X509Certificate) keyStore.getCertificate(KEY_ALIAS);
             publicKey = cert1.getPublicKey();
             cert = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
@@ -309,7 +299,7 @@ public class AssertionUtils {
             }
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omit);
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-            //transformer.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");
+            transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
             // we want to pretty format the XML output
             // note : this is broken in jdk1.5 beta!
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");

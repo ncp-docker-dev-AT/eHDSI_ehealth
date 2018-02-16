@@ -518,12 +518,12 @@ public class CDAUtils {
     }
 
     private static String addDocumentOf(String consentCode, String consentDisplayName, String consentStartDate, String consentEndDate) {
-        String uuid = EpsosHelperService.getUniqueId(); //java.util.UUID.randomUUID().toString();
-        String sb = ("<documentationOf typeCode=\"DOC\">" + "\r\n" + "<serviceEvent classCode=\"ACT\" moodCode=\"EVN\">" + "\r\n" + "<templateId root=\"1.3.6.1.4.1.19376.1.5.3.1.2.6\"/>" + "\r\n" + "<id root=\"") + uuid + "\"/>" + "\r\n" + "<code code=\"" + consentCode + "\" codeSystem=\"1.3.6.1.4.1.12559.11.10.1.3.2.4.1\" " + "codeSystemName=\"Connect-a-thon eventCodeList\" displayName=\"" + consentDisplayName + "\"/>" + "\r\n" + "<effectiveTime>" + "\r\n" + "<low value=\"" + consentStartDate + "\"/>" + "\r\n" + "<high value=\"" + consentEndDate + "\"/>" + "\r\n"
+
+        String uuid = EpsosHelperService.getUniqueId();
+        return ("<documentationOf typeCode=\"DOC\">" + "\r\n" + "<serviceEvent classCode=\"ACT\" moodCode=\"EVN\">" + "\r\n" + "<templateId root=\"1.3.6.1.4.1.19376.1.5.3.1.2.6\"/>" + "\r\n" + "<id root=\"") + uuid + "\"/>" + "\r\n" + "<code code=\"" + consentCode + "\" codeSystem=\"1.3.6.1.4.1.12559.11.10.1.3.2.4.1\" " + "codeSystemName=\"Connect-a-thon eventCodeList\" displayName=\"" + consentDisplayName + "\"/>" + "\r\n" + "<effectiveTime>" + "\r\n" + "<low value=\"" + consentStartDate + "\"/>" + "\r\n" + "<high value=\"" + consentEndDate + "\"/>" + "\r\n"
                 + "</effectiveTime>" + "\r\n"
                 + "</serviceEvent>" + "\r\n"
                 + "</documentationOf>" + "\r\n";
-        return sb;
     }
 
     private static String addCustodian(String custodianOid, String custodianName, String country) {
