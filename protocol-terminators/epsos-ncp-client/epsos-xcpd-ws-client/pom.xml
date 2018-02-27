@@ -49,10 +49,6 @@
             <artifactId>openncp-data-model</artifactId>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-defaultpolicymanager</artifactId>
-        </dependency>
-        <dependency>
             <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
             <artifactId>openncp-ncp-pt-utils</artifactId>
         </dependency>

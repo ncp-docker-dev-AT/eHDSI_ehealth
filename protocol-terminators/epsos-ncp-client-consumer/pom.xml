@@ -18,11 +18,11 @@
     <dependencies>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-assertion-validator</artifactId>
+            <artifactId>openncp-audit-manager</artifactId>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-defaultpolicymanager</artifactId>
+            <artifactId>openncp-assertion-validator</artifactId>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
