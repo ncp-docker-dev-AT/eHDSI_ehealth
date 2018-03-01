@@ -50,7 +50,7 @@
         <!-- End definition of variables -->
 
         <xsl:choose>
-            <!-- if sectionTitle is not missing for medication summary (Exception alerts section is missing) -->
+            <!-- if sectionTitle is not missing for medication summary (Exception medication summary section is missing) -->
             <xsl:when test=" ($medSectionTitleCode='10160-0')">
                 <span class="sectionTitle">
                     <xsl:value-of select="$medSectionTitle"/>
@@ -172,13 +172,13 @@
         <xsl:for-each
                 select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']">
 
-            <xsl:variable name="medActiveIgredientNode" select="epsos:ingredient/epsos:code"/>
-            <xsl:variable name="medActiveIgredient" select="epsos:ingredient/epsos:code/@displayName"/>
-            <xsl:variable name="medActiveIgredientTranslation1"
+            <xsl:variable name="medActiveIngredientNode" select="epsos:ingredient/epsos:code"/>
+            <xsl:variable name="medActiveIngredient" select="epsos:ingredient/epsos:code/@displayName"/>
+            <xsl:variable name="medActiveIngredientTranslation1"
                           select="epsos:ingredient/epsos:code/epsos:translation/epsos:translation/@displayName"/>
-            <xsl:variable name="medActiveIgredientTranslation2"
+            <xsl:variable name="medActiveIngredientTranslation2"
                           select="epsos:ingredient/epsos:code/epsos:translation/@displayName"/>
-            <xsl:variable name="medActiveIgredientID" select="epsos:ingredient/epsos:code/@code"/>
+            <xsl:variable name="medActiveIngredientID" select="epsos:ingredient/epsos:code/@code"/>
             <xsl:variable name="medStrengthValue1" select="epsos:quantity/epsos:numerator/@value"/>
             <xsl:variable name="medStrengthValue2" select="epsos:quantity/epsos:denominator/@value"/>
             <xsl:variable name="medStrengthUnit1" select="epsos:quantity/epsos:numerator/@unit"/>
@@ -206,21 +206,21 @@
                             <tr>
                                 <td>
                                     <xsl:choose>
-                                        <xsl:when test="not ($medActiveIgredientNode/@nullFlavor)">
+                                        <xsl:when test="not ($medActiveIngredientNode/@nullFlavor)">
                                             <xsl:choose>
-                                                <xsl:when test="$medActiveIgredient">
-                                                    <xsl:value-of select="$medActiveIgredient"/>
+                                                <xsl:when test="$medActiveIngredient">
+                                                    <xsl:value-of select="$medActiveIngredient"/>
                                                     <br/>
                                                     (
-                                                    <xsl:value-of select="$medActiveIgredientID"/>
+                                                    <xsl:value-of select="$medActiveIngredientID"/>
                                                     )
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <!-- uncoded element Problem -->
-                                                    <xsl:if test="$medActiveIgredientNode/n1:originalText/n1:reference/@value">
+                                                    <xsl:if test="$medActiveIngredientNode/n1:originalText/n1:reference/@value">
                                                         <xsl:call-template name="show-uncodedElement">
                                                             <xsl:with-param name="data"
-                                                                            select="$medActiveIgredientNode/n1:originalText/n1:reference/@value"/>
+                                                                            select="$medActiveIngredientNode/n1:originalText/n1:reference/@value"/>
                                                         </xsl:call-template>
                                                     </xsl:if>
                                                 </xsl:otherwise>
@@ -229,7 +229,7 @@
                                         <xsl:otherwise>
                                             <xsl:call-template name="show-noneFlavor">
                                                 <xsl:with-param name="data"
-                                                                select="$medActiveIgredientNode/@nullFlavor"/>
+                                                                select="$medActiveIngredientNode/@nullFlavor"/>
                                             </xsl:call-template>
                                         </xsl:otherwise>
                                     </xsl:choose>
