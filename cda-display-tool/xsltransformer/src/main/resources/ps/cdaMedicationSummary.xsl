@@ -196,7 +196,7 @@
                             <tr>
                                 <td coslpan="6">
                                     <span class="tdtext">
-                                        <xsl:value-of select="n1:substanceAdministration/n1:code/@displayName"/>
+                                        <xsl:value-of select="$medDisplay"/>
                                     </span>
                                     <br/>
                                 </td>
