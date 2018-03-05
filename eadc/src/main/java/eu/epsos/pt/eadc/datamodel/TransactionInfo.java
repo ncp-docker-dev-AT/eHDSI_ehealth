@@ -66,7 +66,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="UserId" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="POC" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="POC_ID" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
- *       &lt;attribute name="AuthentificationLevel" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
+ *       &lt;attribute name="AuthenticationLevel" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="RequestAction" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="ResponseAction" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="ServiceType" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
@@ -154,9 +154,9 @@ public class TransactionInfo {
     @XmlAttribute(name = "POC_ID", required = true)
     @XmlSchemaType(name = "anySimpleType")
     protected String pocid;
-    @XmlAttribute(name = "AuthentificationLevel", required = true)
+    @XmlAttribute(name = "AuthenticationLevel", required = true)
     @XmlSchemaType(name = "anySimpleType")
-    protected String authentificationLevel;
+    protected String authenticationLevel;
     @XmlAttribute(name = "RequestAction", required = true)
     @XmlSchemaType(name = "anySimpleType")
     protected String requestAction;
@@ -732,27 +732,27 @@ public class TransactionInfo {
     }
 
     /**
-     * Gets the value of the authentificationLevel property.
+     * Gets the value of the authenticationLevel property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getAuthentificationLevel() {
-        return authentificationLevel;
+    public String getAuthenticationLevel() {
+        return authenticationLevel;
     }
 
     /**
-     * Sets the value of the authentificationLevel property.
+     * Sets the value of the authenticationLevel property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setAuthentificationLevel(String value) {
-        this.authentificationLevel = value;
+    public void setAuthenticationLevel(String value) {
+        this.authenticationLevel = value;
     }
 
     /**

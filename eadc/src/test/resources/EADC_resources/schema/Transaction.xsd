@@ -39,7 +39,7 @@
 		<xs:attribute name="UserId" use="required"/>
 		<xs:attribute name="POC" use="required"/>
 		<xs:attribute name="POC_ID" use="required"/>
-		<xs:attribute name="AuthentificationLevel" use="required"/>
+		<xs:attribute name="AuthenticationLevel" use="required"/>
 		<xs:attribute name="RequestAction" use="required"/>
 		<xs:attribute name="ResponseAction" use="required"/>
 		<xs:attribute name="ServiceType" use="required"/>

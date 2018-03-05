@@ -105,7 +105,7 @@ public class EadcUtilWrapper {
                                                         Date endTime, String countryAcode) throws Exception {
 
         TransactionInfo result = new ObjectFactory().createComplexTypeTransactionInfo();
-        result.setAuthentificationLevel(reqMsgContext != null ? extractAuthenticationMethodFromAssertion(getAssertion(reqMsgContext)) : null);
+        result.setAuthenticationLevel(reqMsgContext != null ? extractAuthenticationMethodFromAssertion(getAssertion(reqMsgContext)) : null);
         result.setDirection(direction != null ? direction.toString() : null);
         result.setStartTime(startTime != null ? getDateAsRFC822String(startTime) : null);
         result.setEndTime(endTime != null ? getDateAsRFC822String(endTime) : null);

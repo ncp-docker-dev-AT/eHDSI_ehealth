@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS eTransaction
 	UserId varchar(500) NULL,
 	POC varchar(500) NULL,
 	POC_ID varchar(500) NULL,
-	AuthentificationLevel varchar(500) NULL,
+	AuthenticationLevel varchar(500) NULL,
 	RequestAction varchar(500) NULL,
 	ResponseAction varchar(500) NULL,
 	ServiceType varchar(500) NULL,
