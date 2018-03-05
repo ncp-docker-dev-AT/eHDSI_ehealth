@@ -17,7 +17,7 @@
 			<mapping targetColumn="ReceivingISO" sourceXPath="@ReceivingISO"/>
 			<mapping targetColumn="ReceivingNCP_OID" sourceXPath="@ReceivingNCP_OID"/>
 			<mapping targetColumn="ReceivingHost" sourceXPath="@ReceivingHost"/>
-			<mapping targetColumn="receivingAddr" sourceXPath="@ReceivingAddr"/>
+			<mapping targetColumn="ReceivingAddr" sourceXPath="@ReceivingAddr"/>
 			<mapping targetColumn="ReceivingMsgID" sourceXPath="@ReceivingMsgID"/>
 			<mapping targetColumn="TransactionCounter" sourceXPath="@TransactionCounter"/>
 			<mapping targetColumn="HumanRequestor" sourceXPath="@HumanRequestor"/>

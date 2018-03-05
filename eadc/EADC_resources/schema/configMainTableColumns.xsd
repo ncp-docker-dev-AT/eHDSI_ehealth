@@ -18,7 +18,7 @@
 			<xs:enumeration value="ReceivingISO"/>
 			<xs:enumeration value="ReceivingNCP_OID"/>
 			<xs:enumeration value="ReceivingHost"/>
-			<xs:enumeration value="receivingAddr"/>
+			<xs:enumeration value="ReceivingAddr"/>
 			<xs:enumeration value="ReceivingMsgID"/>
 			<xs:enumeration value="TransactionCounter"/>
 			<xs:enumeration value="HumanRequestor"/>

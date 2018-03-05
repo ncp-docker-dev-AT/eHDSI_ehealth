@@ -59,7 +59,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="ReceivingISO" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="ReceivingNCP_OID" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="ReceivingHost" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
- *       &lt;attribute name="receivingAddr" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
+ *       &lt;attribute name="ReceivingAddr" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="ReceivingMsgID" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="TransactionCounter" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="HumanRequestor" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
@@ -133,7 +133,7 @@ public class TransactionInfo {
     @XmlAttribute(name = "ReceivingHost")
     @XmlSchemaType(name = "anySimpleType")
     protected String receivingHost;
-    @XmlAttribute
+    @XmlAttribute(name = "ReceivingAddr")
     @XmlSchemaType(name = "anySimpleType")
     protected String receivingAddr;
     @XmlAttribute(name = "ReceivingMsgID")

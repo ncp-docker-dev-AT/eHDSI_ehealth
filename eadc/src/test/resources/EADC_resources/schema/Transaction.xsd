@@ -32,7 +32,7 @@
 		<xs:attribute name="ReceivingISO" use="optional"/>
 		<xs:attribute name="ReceivingNCP_OID" use="optional"/>
 		<xs:attribute name="ReceivingHost" use="optional"/>
-		<xs:attribute name="receivingAddr" use="optional"/>
+		<xs:attribute name="ReceivingAddr" use="optional"/>
 		<xs:attribute name="ReceivingMsgID" use="optional"/>
 		<xs:attribute name="TransactionCounter" use="required"/>
 		<xs:attribute name="HumanRequestor" use="required"/>

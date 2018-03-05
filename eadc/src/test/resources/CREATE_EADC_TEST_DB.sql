@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS eTransaction
 	ReceivingISO varchar(500) NULL,
 	ReceivingNCP_OID varchar(500) NULL,
 	ReceivingHost varchar(500) NULL,
-	receivingAddr varchar(500) NULL,
+	ReceivingAddr varchar(500) NULL,
 	ReceivingMsgID varchar(500) NULL,
 	TransactionCounter varchar(500) NULL,
 	HumanRequestor varchar(500) NULL,

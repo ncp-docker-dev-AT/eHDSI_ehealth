@@ -178,7 +178,7 @@
 					<li>Log in to the target system via ssh</li>
 					<li>Execute the following command (copy&amp;paste):<br/>
 					<textarea cols="150" rows="8">
-mysql -utmed -ptmed -e "select 'Transaction_PK','Direction','HomeISO','HomeNCP_OID','HomeHCID','HomeHost','HomeAddress','SndISO','SndNCP_OID','SndHCID','SndAddress','SndHost','SndMsgID','ReceivingISO','ReceivingNCP_OID','ReceivingHost','receivingAddr','ReceivingMsgID','TransactionCounter','HumanRequestor','UserId','POC','POC_ID','AuthentificationLevel','RequestAction','ResponseAction','ServiceType','ServiceName','StartTime','EndTime','Duration','TransactionData_PK','Transaction_FK','DataType','DataTypeName','DataValue','ValueDisplay','Void0','Void1','Void2','Void3','Void4','Void5','Void6','Void7','Void8','Void9' \
+mysql -utmed -ptmed -e "select 'Transaction_PK','Direction','HomeISO','HomeNCP_OID','HomeHCID','HomeHost','HomeAddress','SndISO','SndNCP_OID','SndHCID','SndAddress','SndHost','SndMsgID','ReceivingISO','ReceivingNCP_OID','ReceivingHost','ReceivingAddr','ReceivingMsgID','TransactionCounter','HumanRequestor','UserId','POC','POC_ID','AuthentificationLevel','RequestAction','ResponseAction','ServiceType','ServiceName','StartTime','EndTime','Duration','TransactionData_PK','Transaction_FK','DataType','DataTypeName','DataValue','ValueDisplay','Void0','Void1','Void2','Void3','Void4','Void5','Void6','Void7','Void8','Void9' \
 union select * INTO OUTFILE '/tmp/etransactiondata_`hostname`_`date +%Y%m%d%H%M%S`' FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\'' LINES TERMINATED BY '\n' \
 from tmed.etransaction left join tmed.etransactiondata on etransaction.Transaction_PK=etransactiondata.Transaction_FK"					
 					</textarea>
