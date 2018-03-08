@@ -144,7 +144,7 @@
                                 </div>
                             </xsl:when>
                         </xsl:choose>
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$medAct/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -209,7 +209,9 @@
                             <tr>
                                 <td coslpan="6">
                                     <span class="tdtext">
-                                        <xsl:value-of select="n1:substanceAdministration/n1:code/@displayName"/>
+                                        <xsl:call-template name="show-codeNoMedication">
+                                            <xsl:with-param name="code" select="$medCode"/>
+                                        </xsl:call-template>
                                     </span>
                                     <br/>
                                 </td>
@@ -240,7 +242,7 @@
                                             </xsl:choose>
                                         </xsl:when>
                                         <xsl:otherwise>
-                                            <xsl:call-template name="show-noneFlavor">
+                                            <xsl:call-template name="show-nullFlavor">
                                                 <xsl:with-param name="data"
                                                                 select="$medActiveIgredientNode/@nullFlavor"/>
                                             </xsl:call-template>
@@ -296,7 +298,7 @@
                 <xsl:otherwise>
                     <tr>
                         <td colspan="5">
-                            <xsl:call-template name="show-noneFlavor">
+                            <xsl:call-template name="show-nullFlavor">
                                 <xsl:with-param name="data" select="$medAct/@nullFlavor"/>
                             </xsl:call-template>
                         </td>

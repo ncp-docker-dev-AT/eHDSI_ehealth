@@ -146,7 +146,7 @@
                                 </div>
                             </xsl:when>
                         </xsl:choose>
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$probAct/@nullFlavor"/>
                         </xsl:call-template>
 
@@ -226,7 +226,7 @@
 
                         <tr>
                             <td colspan="3">
-                                <xsl:call-template name="show-unknownInfo">
+                                <xsl:call-template name="show-unknownInformation">
                                     <xsl:with-param name="code" select="$probObsCode"/>
                                 </xsl:call-template>
 
@@ -258,7 +258,7 @@
                                         </xsl:choose>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:call-template name="show-noneFlavor">
+                                        <xsl:call-template name="show-nullFlavor">
                                             <xsl:with-param name="data" select="$activeProblemNode/@nullFlavor"/>
                                         </xsl:call-template>
                                     </xsl:otherwise>
@@ -281,7 +281,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$probAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

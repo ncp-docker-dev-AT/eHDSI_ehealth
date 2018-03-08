@@ -104,7 +104,7 @@
                                 </div>
                             </xsl:when>
                         </xsl:choose>
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$vacAct/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -159,7 +159,7 @@
                                 </xsl:choose>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:call-template name="show-noneFlavor">
+                                <xsl:call-template name="show-nullFlavor">
                                     <xsl:with-param name="data"
                                                     select="$vaccinationsNode/@nullFlavor"/>
                                 </xsl:call-template>
@@ -180,7 +180,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$vacAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

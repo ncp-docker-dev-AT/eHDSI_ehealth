@@ -135,7 +135,7 @@
                                     <xsl:choose>
                                         <xsl:when
                                                 test="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@nullFlavor">
-                                            <xsl:call-template name="show-noneFlavor">
+                                            <xsl:call-template name="show-nullFlavor">
                                                 <xsl:with-param name="data"
                                                                 select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@nullFlavor"/>
                                             </xsl:call-template>

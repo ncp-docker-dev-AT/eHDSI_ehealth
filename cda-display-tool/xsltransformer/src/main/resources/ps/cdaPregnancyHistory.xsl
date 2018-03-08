@@ -112,7 +112,7 @@
                                 </div>
                             </xsl:when>
                         </xsl:choose>
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$pregHistAct/@nullFlavor"/>
                         </xsl:call-template>
 
@@ -185,7 +185,7 @@
                         </xsl:choose>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$pregnancyExpectedDateNode/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -194,7 +194,7 @@
 
             <xsl:otherwise>
 
-                <xsl:call-template name="show-noneFlavor">
+                <xsl:call-template name="show-nullFlavor">
                     <xsl:with-param name="data" select="$pregHistAct/@nullFlavor"/>
                 </xsl:call-template>
 

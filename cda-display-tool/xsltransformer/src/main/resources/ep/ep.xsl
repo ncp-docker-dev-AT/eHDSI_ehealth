@@ -67,7 +67,7 @@
         <xsl:param name="showValue"/>
         <xsl:choose>
             <xsl:when test="($medPackage/@nullFlavor)">
-                <xsl:call-template name="show-noneFlavor">
+                <xsl:call-template name="show-nullFlavor">
                     <xsl:with-param name="data" select="($medPackage)/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -145,7 +145,7 @@
                         <xsl:value-of select="$parameter/@displayName"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$parameter/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>

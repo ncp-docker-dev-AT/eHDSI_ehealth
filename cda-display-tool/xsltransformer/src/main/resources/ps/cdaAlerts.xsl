@@ -130,7 +130,7 @@
                                 </div>
                             </xsl:when>
                         </xsl:choose>
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$act/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -211,7 +211,7 @@
                         <tr>
                             <td>
                                 <xsl:value-of select="$reactionType"/>
-                                <xsl:call-template name="show-noneFlavor">
+                                <xsl:call-template name="show-nullFlavor">
                                     <xsl:with-param name="data" select="$reactionType/@nullFlavor"/>
                                 </xsl:call-template>
                             </td>
@@ -251,7 +251,7 @@
                                         </xsl:choose>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:call-template name="show-noneFlavor">
+                                        <xsl:call-template name="show-nullFlavor">
                                             <xsl:with-param name="data" select="$agentDescription/@nullFlavor"/>
                                         </xsl:call-template>
                                     </xsl:otherwise>
@@ -270,7 +270,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$act/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

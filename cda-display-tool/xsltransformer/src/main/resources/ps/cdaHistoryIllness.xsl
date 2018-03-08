@@ -103,7 +103,7 @@
                                 </div>
                             </xsl:when>
                         </xsl:choose>
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$historycAct/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -149,7 +149,7 @@
                     <xsl:when
                             test="($historyIllnessClosedProblemID='396782006' or $historyIllnessClosedProblemID='407559004' or $historyIllnessClosedProblemID='160243008' or  $historyIllnessClosedProblemID='160245001' )">
                         <!-- display the relevant code from the v40_unknowInformarion -->
-                        <xsl:call-template name="show-unknownInfo">
+                        <xsl:call-template name="show-unknownInformation">
                             <xsl:with-param name="code" select="$historyIllnessClosedProblemID"/>
                         </xsl:call-template>
                     </xsl:when>
@@ -175,7 +175,7 @@
                                         </xsl:choose>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:call-template name="show-noneFlavor">
+                                        <xsl:call-template name="show-nullFlavor">
                                             <xsl:with-param name="data"
                                                             select="$historyIllnessClosedProblemNode/@nullFlavor"/>
                                         </xsl:call-template>
@@ -199,7 +199,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$historycAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
