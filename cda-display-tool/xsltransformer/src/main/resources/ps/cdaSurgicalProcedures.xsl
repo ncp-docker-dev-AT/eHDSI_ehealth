@@ -108,7 +108,7 @@
                         </xsl:choose>
                         <br/>
                         <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="data" select="$surgProcAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="$surgProcAct/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -157,7 +157,7 @@
                                         <!--  uncoded element only if we don;t have displayName -->
                                         <xsl:if test="$surgicalProcedureNode/n1:originalText/n1:reference/@value">
                                             <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="data"
+                                                <xsl:with-param name="code"
                                                                 select="$surgicalProcedureNode/n1:originalText/n1:reference/@value"/>
                                             </xsl:call-template>
                                         </xsl:if>
@@ -166,7 +166,7 @@
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:call-template name="show-nullFlavor">
-                                    <xsl:with-param name="data" select="$surgicalProcedureNode/@nullFlavor"/>
+                                    <xsl:with-param name="code" select="$surgicalProcedureNode/@nullFlavor"/>
                                 </xsl:call-template>
                             </xsl:otherwise>
                         </xsl:choose>
@@ -192,7 +192,7 @@
                     <td colspan="3">
 
                         <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="data" select="$surgProcAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="$surgProcAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

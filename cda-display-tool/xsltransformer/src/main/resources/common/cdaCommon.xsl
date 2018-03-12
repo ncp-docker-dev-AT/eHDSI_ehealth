@@ -316,7 +316,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="data" select="$datetime/@nullFlavor"/>
+                            <xsl:with-param name="code" select="$datetime/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -787,7 +787,7 @@
             <!-- Den Unit =1 -->
             <xsl:when test="($medStrength1/@nullFlavor)">
                 <xsl:call-template name="show-nullFlavor">
-                    <xsl:with-param name="data" select="$medStrength1/@nullFlavor"/>
+                    <xsl:with-param name="code" select="$medStrength1/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
 
@@ -797,7 +797,7 @@
                 <xsl:value-of select="$medStrengthUnit1"/>
                 /
                 <xsl:call-template name="show-nullFlavor">
-                    <xsl:with-param name="data" select="$medStrength2/@nullFlavor"/>
+                    <xsl:with-param name="code" select="$medStrength2/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:when test="$medStrengthUnit2='1'">
@@ -1012,8 +1012,8 @@
 
     <!-- uncoded element -->
     <xsl:template name="show-uncodedElement">
-        <xsl:param name="data"/>
-        <xsl:variable name="refText" select="$data"/>
+        <xsl:param name="code"/>
+        <xsl:variable name="refText" select="$code"/>
         <xsl:variable name="refAttrText" select="//*[@ID=substring($refText,2)]"/>
         <xsl:variable name="refAttrText1" select="//*[@id=substring($refText,2)]"/>
         <xsl:variable name="refAttrText3" select="//*[@id=$refText]"/>

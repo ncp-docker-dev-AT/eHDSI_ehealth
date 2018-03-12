@@ -72,7 +72,7 @@
                             </xsl:when>
                         </xsl:choose>
                         <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="data" select="$nullEntry/@nullFlavor"/>
+                            <xsl:with-param name="code" select="$nullEntry/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -146,7 +146,7 @@
                     </xsl:when>
                 </xsl:choose>
                 <xsl:call-template name="show-nullFlavor">
-                    <xsl:with-param name="data" select="$nullEntry/@nullFlavor"/>
+                    <xsl:with-param name="code" select="$nullEntry/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>

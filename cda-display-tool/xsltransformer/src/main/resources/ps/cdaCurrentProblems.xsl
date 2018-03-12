@@ -147,7 +147,7 @@
                             </xsl:when>
                         </xsl:choose>
                         <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="data" select="$probAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="$probAct/@nullFlavor"/>
                         </xsl:call-template>
 
                     </xsl:otherwise>
@@ -250,7 +250,7 @@
                                                 <!-- uncoded element Problem -->
                                                 <xsl:if test="$activeProblemNode/n1:originalText/n1:reference/@value">
                                                     <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="data"
+                                                        <xsl:with-param name="code"
                                                                         select="$activeProblemNode/n1:originalText/n1:reference/@value"/>
                                                     </xsl:call-template>
                                                 </xsl:if>
@@ -259,7 +259,7 @@
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:call-template name="show-nullFlavor">
-                                            <xsl:with-param name="data" select="$activeProblemNode/@nullFlavor"/>
+                                            <xsl:with-param name="code" select="$activeProblemNode/@nullFlavor"/>
                                         </xsl:call-template>
                                     </xsl:otherwise>
                                 </xsl:choose>
@@ -282,7 +282,7 @@
                 <tr>
                     <td colspan="3">
                         <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="data" select="$probAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="$probAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

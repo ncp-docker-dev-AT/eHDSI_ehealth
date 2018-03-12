@@ -105,7 +105,7 @@
                             </xsl:when>
                         </xsl:choose>
                         <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="data" select="$vacAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="$vacAct/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -151,7 +151,7 @@
                                         <xsl:if
                                                 test="$vaccinationsNode/n1:originalText/n1:reference/@value">
                                             <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="data"
+                                                <xsl:with-param name="code"
                                                                 select="$vaccinationsNode/n1:originalText/n1:reference/@value"/>
                                             </xsl:call-template>
                                         </xsl:if>
@@ -160,7 +160,7 @@
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:call-template name="show-nullFlavor">
-                                    <xsl:with-param name="data"
+                                    <xsl:with-param name="code"
                                                     select="$vaccinationsNode/@nullFlavor"/>
                                 </xsl:call-template>
                             </xsl:otherwise>
@@ -181,7 +181,7 @@
                 <tr>
                     <td colspan="3">
                         <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="data" select="$vacAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="$vacAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>
