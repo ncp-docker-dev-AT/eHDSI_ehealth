@@ -15,6 +15,7 @@
     <name>openncp-common-components</name>
 
     <modules>
+        <module>openncp-configuration-init</module>
         <module>openncp-configuration-utility</module>
         <module>openncp-discovery-client</module>
     </modules>
