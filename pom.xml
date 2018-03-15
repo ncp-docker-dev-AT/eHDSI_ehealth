@@ -86,6 +86,10 @@
         <sonar.host.url>http://127.0.0.1:9000</sonar.host.url>
         <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
         <sonar.scm.disabled>true</sonar.scm.disabled>
+        <!-- Default Policy Manager -->
+        <openncp.policy-manager.groupId>eu.europa.ec.sante.ehdsi</openncp.policy-manager.groupId>
+        <openncp.policy-manager.artifactId>openncp-defaultpolicymanager</openncp.policy-manager.artifactId>
+        <openncp.policy-manager.version>${project.version}</openncp.policy-manager.version>
         <!-- Dependency Versions -->
         <axiomReleaseVersion>1.2.13</axiomReleaseVersion>
         <axiom-api.version>1.2.13</axiom-api.version>
@@ -442,4 +446,10 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>national-build</id>
+        </profile>
+    </profiles>
 </project>
