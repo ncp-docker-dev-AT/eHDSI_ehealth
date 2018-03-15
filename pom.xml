@@ -447,6 +447,20 @@
         </plugins>
     </build>
 
+    <!-- You might add this profile to your general Maven settings.xml -->
+    <!--<profile>-->
+        <!--<id>national-build</id>-->
+        <!--<properties>-->
+            <!--&lt;!&ndash; Definition of the Member State specific Policy-Manager component &ndash;&gt;-->
+            <!--<openncp.policy-manager.groupId>ms.ehealth.groupId</openncp.policy-manager.groupId>-->
+            <!--<openncp.policy-manager.artifactId>ms.ehealth.policy-manager</openncp.policy-manager.artifactId>-->
+            <!--<openncp.policy-manager.version>1.0.0</openncp.policy-manager.version>-->
+            <!--&lt;!&ndash; Definition of the Member State specific National-Connector component &ndash;&gt;-->
+            <!--<openncp.national-connector.groupId>ms.ehealth.goupId</openncp.national-connector.groupId>-->
+            <!--<openncp.national-connector.artifactId>ms.ehealth.national-connector</openncp.national-connector.artifactId>-->
+            <!--<openncp.national-connector.version>1.0.0</openncp.national-connector.version>-->
+        <!--</properties>-->
+    <!--</profile>-->
     <profiles>
         <profile>
             <id>national-build</id>
