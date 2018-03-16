@@ -131,7 +131,7 @@ public class CDAUtils {
 
             if (substanceNode != null) {
                 LOGGER.info("Source Node: '{}'-'{}'", substanceNode.getNodeName(), substanceNode.getNodeValue());
-                substanceNode.getAttributes().getNamedItem("moodCode").setNodeValue("EVN");
+                substanceNode.getAttributes().getNamedItem("moodCode").setNodeValue("INT");
 
                 XPathExpression subAdmTemplateExpr = xpath.compile("//xsi:substanceAdministration/xsi:templateId");
                 NodeList nodeList = (NodeList) subAdmTemplateExpr.evaluate(epDoc, XPathConstants.NODESET);

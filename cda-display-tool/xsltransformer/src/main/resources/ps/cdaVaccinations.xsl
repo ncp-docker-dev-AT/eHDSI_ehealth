@@ -1,22 +1,20 @@
-<?xml version="1.0"  ?>
+<?xml version="1.0" ?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3" version="1.0">
     <xsl:output method="html" indent="yes" version="4.01"
                 doctype-system="http://www.w3.org/TR/html4/strict.dtd" doctype-public="-//W3C//DTD HTML 4.01//EN"/>
 
-    <!-- variable to check that at least one alert section exist -->
+    <!-- variable to check that at least one vaccination section exist -->
     <xsl:variable name="vaccinationsExist"
                   select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='11369-6']"/>
 
-    <!--alerts -->
+    <!-- vaccinations -->
     <xsl:template name="vaccinations"
                   match="/n1:ClinicalDocument/n1:component/n1:structuredBody">
 
-        <!-- if we have at least one alert section -->
         <xsl:choose>
-            <!-- if we have at least one alert section -->
+            <!-- if we have at least one vaccination section -->
             <xsl:when test="($vaccinationsExist)">
-
                 <xsl:for-each
                         select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section">
                     <xsl:call-template name="vaccinationsSection"/>
@@ -24,9 +22,7 @@
                 <br/>
                 <br/>
             </xsl:when>
-            <!-- else -->
-            <!-- <xsl:otherwise> <span class="sectionTitle"> <xsl:text>The Vaccinations
-                section is missing</xsl:text> </span><br/><br/> </xsl:otherwise> -->
+            <!-- in the case the vaccination section is missing, nothing is displayed -->
         </xsl:choose>
     </xsl:template>
 
@@ -43,27 +39,25 @@
 
         <!-- End definition of variables -->
         <xsl:choose>
-            <!-- if sectionTitle is not missing for alerts (Exception alerts section
-                is missing) -->
+            <!-- if sectionTitle is not missing for alerts (Exception alerts section is missing) -->
             <xsl:when test=" ($vaccinationsSectionTitleCode='11369-6')">
                 <span class="sectionTitle">
                     <xsl:value-of select="$vaccinationsSectionTitle"/>
                 </span>
                 <br/>
                 <xsl:choose>
+                    <xsl:when test="$shownarrative='true'">
+                        <a href="javascript: showhide('vacActTr'); self.focus(); void(0);">Show/Hide</a>
+                        <div id="vacActTr" style="display:block">
+                            <xsl:apply-templates
+                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='11369-6']/../n1:text/*"/>
+                            <br/>
+                        </div>
+                    </xsl:when>
+                </xsl:choose>
+                <xsl:choose>
                     <!-- null flavor entry -->
                     <xsl:when test="not ($vacAct/@nullFlavor)">
-
-                        <xsl:choose>
-                            <xsl:when test="$shownarrative='true'">
-                                <a href="javascript: showhide('vacActTr'); self.focus(); void(0);">Show/Hide</a>
-                                <div id="vacActTr" style="display:block">
-                                    <xsl:apply-templates
-                                            select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='11369-6']/../n1:text/*"/>
-                                    <br/>
-                                </div>
-                            </xsl:when>
-                        </xsl:choose>
                         <table>
                             <tbody>
                                 <tr>
@@ -94,16 +88,6 @@
                         </table>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:choose>
-                            <xsl:when test="$shownarrative='true'">
-                                <a href="javascript: showhide('vacActTr'); self.focus(); void(0);">Show/Hide</a>
-                                <div id="vacActTr" style="display:block">
-                                    <xsl:apply-templates
-                                            select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='47519-4']/../n1:text/*"/>
-                                    <br/>
-                                </div>
-                            </xsl:when>
-                        </xsl:choose>
                         <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="code" select="$vacAct/@nullFlavor"/>
                         </xsl:call-template>
@@ -132,8 +116,6 @@
 
         <xsl:variable name="vacAct" select="n1:substanceAdministration"/>
         <!-- End definition of variables -->
-
-        <!-- if sectionTitle is not missing for alerts (Exception alerts section is missing) -->
 
         <!-- nullflavored act -->
         <xsl:choose>

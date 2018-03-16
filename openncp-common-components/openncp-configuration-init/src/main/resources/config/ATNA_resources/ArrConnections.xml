@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The Audit Record Repository Actor Server Connections -->
+<!-- For IHE Actor -->
+<Configuration>
+    <SecureConnection name="arr-tls">
+        <HostName>127.0.0.1</HostName>
+        <Port>2862</Port>
+        <!-- Trust and Keystore -->
+        <KeyStore>/opt/openncp-configuration/keystore/service-provider-keystore.jks</KeyStore>
+        <KeyPass>password</KeyPass>
+        <TrustStore>/opt/openncp-configuration/keystore/service-consumer-keystore.jks</TrustStore>
+        <TrustPass>password</TrustPass>
+    </SecureConnection>
+    <!-- use IP address instead of localhost for UDP -->
+    <StandardConnection name="arr-udp">
+        <HostName>127.0.0.1</HostName>
+        <Port>2861</Port>
+    </StandardConnection>
+</Configuration>

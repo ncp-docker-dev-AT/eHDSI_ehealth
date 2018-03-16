@@ -6,15 +6,14 @@
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
 
-    <!-- variable to check that at least one alert section exist -->
+    <!-- variable to check that at least one medical device section exists -->
     <xsl:variable name="medicalDevicesExist"
                   select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='46264-8']"/>
 
-    <!--alerts -->
+    <!--medical devices -->
     <xsl:template name="medicalDevices" match="/n1:ClinicalDocument/n1:component/n1:structuredBody">
-        <!-- if we have at least one alert section -->
         <xsl:choose>
-            <!-- if we have at least one alert section -->
+            <!-- if we have at least one medical device section -->
             <xsl:when test="($medicalDevicesExist)">
                 <xsl:for-each select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section">
                     <xsl:call-template name="medicalDevicesSection"/>
@@ -25,7 +24,7 @@
             <!-- else -->
             <xsl:otherwise>
                 <span class="sectionTitle">
-                    <!-- xsl:text>The Medical devices and implants section is missing</xsl:text-->
+                    <!-- The Medical devices and implants section is missing -->
                     <xsl:choose>
                         <xsl:when test=" ($documentCode='60591-5')">
                             <xsl:call-template name="show-displayLabels">
@@ -56,17 +55,17 @@
                 </span>
                 <br/>
                 <xsl:choose>
+                    <xsl:when test="$shownarrative='true'">
+                        <a href="javascript: showhide('meddevTr'); self.focus(); void(0);">Show/Hide</a>
+                        <div id="meddevTr" style="display:block">
+                            <xsl:apply-templates
+                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='46264-8']/../n1:text/*"/>
+                            <br/>
+                        </div>
+                    </xsl:when>
+                </xsl:choose>
+                <xsl:choose>
                     <xsl:when test="not($medDevAct/@nullFlavor)">
-                        <xsl:choose>
-                            <xsl:when test="$shownarrative='true'">
-                                <a href="javascript: showhide('meddevTr'); self.focus(); void(0);">Show/Hide</a>
-                                <div id="meddevTr" style="display:block">
-                                    <xsl:apply-templates
-                                            select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='46264-8']/../n1:text/*"/>
-                                    <br/>
-                                </div>
-                            </xsl:when>
-                        </xsl:choose>
                         <table>
                             <tbody>
                                 <tr>
@@ -91,15 +90,6 @@
                         </table>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:choose>
-                            <xsl:when test="$shownarrative='true'">
-                                <a href="javascript: showhide('meddevTr'); self.focus(); void(0);">Show/Hide</a>
-                                <div id="meddevTr" style="display:block">
-                                    <xsl:apply-templates
-                                            select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='46264-8']/../n1:text/*"/>
-                                </div>
-                            </xsl:when>
-                        </xsl:choose>
                         <br/>
                         <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="code" select="$medDevAct/@nullFlavor"/>
@@ -112,7 +102,7 @@
 
     <!--  FOR EACH ENTRY -->
     <xsl:template name="medicalDevicesSectionEntry">
-        <!-- Defing all needed variables -->
+        <!-- Defining all needed variables -->
         <xsl:variable name="medDeviceImplantDescriptionNode"
                       select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code"/>
         <xsl:variable name="medDeviceImplantDescription"

@@ -1,4 +1,4 @@
-<?xml version="1.0"  ?>
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3" version="1.0">
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
@@ -15,7 +15,7 @@
     <xsl:template name="alerts" match="/n1:ClinicalDocument/n1:component/n1:structuredBody">
         <xsl:choose>
             <!-- if we have at least one alert section -->
-            <xsl:when test=" ($alertsExist)">
+            <xsl:when test="($alertsExist)">
                 <xsl:for-each select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section">
                     <xsl:call-template name="alertSection"/>
                 </xsl:for-each>
@@ -25,8 +25,7 @@
             <!-- else -->
             <xsl:otherwise>
                 <span class="sectionTitle">
-                    <!-- xsl:text>The Allergies, adverse reactions, alerts section is missing !
-                    La sezione Allergie, reazioni avverse ed allarmi non è presente</xsl:text-->
+                    <!-- The Allergies, adverse reactions, alerts section is missing ! -->
                     <xsl:choose>
                         <xsl:when test=" ($documentCode='60591-5')">
                             <xsl:call-template name="show-displayLabels">
@@ -42,70 +41,67 @@
     </xsl:template>
 
     <xsl:template name="alertSection">
-        <!-- Defing all needed variables -->
+        <!-- Defining all needed variables -->
         <xsl:variable
                 name="sectionTitleCode"
                 select="n1:code/@code"/>
-
         <xsl:variable
                 name="sectionTitle"
                 select="n1:code[@code='48765-2']/@displayName"/>
-
         <xsl:variable name="act"
                       select="n1:entry/n1:act"/>
-
         <xsl:variable name="obsCode"
                       select="n1:entry/n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:value/@code"/>
-        <!-- in case of no info scenarion the following displayName will be displayed -->
+        <!-- in case of no info scenario the following displayName will be displayed -->
         <xsl:variable name="obsDisplay"
                       select="n1:entry/n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:value/@displayName"/>
         <!-- End definition of variables-->
 
         <!--- table Display -->
         <xsl:choose>
-            <!-- if sectionTitle is not missing for alerts  (Exception alerts section is missing)-->
+            <!-- If sectionTitle is not missing for alerts  (Exception alerts section is missing)-->
             <xsl:when test=" ($sectionTitleCode='48765-2')">
                 <span class="sectionTitle">
                     <xsl:value-of select="$sectionTitle"/>
                 </span>
                 <br/>
+                <xsl:choose>
+                    <xsl:when test="$shownarrative='true'">
+                        <a href="javascript: showhide('reactionsTr'); self.focus(); void(0);">Show/Hide</a>
+                        <div id="reactionsTr" style="display:block">
+                            <xsl:apply-templates
+                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='48765-2']/../n1:text/*"/>
+                            <br/>
+                        </div>
+                    </xsl:when>
+                </xsl:choose>
                 <!-- nullflavored act -->
                 <xsl:choose>
                     <xsl:when test="not($act/@nullFlavor)">
-                        <xsl:choose>
-                            <xsl:when test="$shownarrative='true'">
-                                <a href="javascript: showhide('reactionsTr'); self.focus(); void(0);">Show/Hide</a>
-                                <div id="reactionsTr" style="display:block">
-                                    <xsl:apply-templates
-                                            select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='48765-2']/../n1:text/*"/>
-                                    <br/>
-                                </div>
-                            </xsl:when>
-                        </xsl:choose>
                         <table>
                             <tbody>
-                                <xsl:if test="	not ($obsCode='160244002' or $obsCode='409137002')">
+                                <xsl:if test="not ($obsCode='716186003' or $obsCode='409137002')">
                                     <tr>
                                         <th>
-                                            <!-- xsl:text>Reaction Type </xsl:text -->
+                                            <!-- Reaction Type -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'65'"/>
                                             </xsl:call-template>
                                         </th>
                                         <th>
-                                            <!-- xsl:text>Clinical Manifestation </xsl:text -->
+                                            <!-- Clinical Manifestation -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'10'"/>
                                             </xsl:call-template>
                                         </th>
                                         <th>
-                                            <!-- xsl:text>Agent </xsl:text-->
+                                            <!-- Agent -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'5'"/>
                                             </xsl:call-template>
                                         </th>
                                         <th>
-                                            <!-- xsl:text>OnSet Date </xsl:text-->
+                                            <!-- OnSet Date -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'45'"/>
                                             </xsl:call-template>
@@ -120,18 +116,8 @@
                         </table>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:choose>
-                            <xsl:when test="$shownarrative='true'">
-                                <a href="javascript: showhide('reactionsTr'); self.focus(); void(0);">Show/Hide</a>
-                                <div id="reactionsTr" style="display:block">
-                                    <xsl:apply-templates
-                                            select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='48765-2']/../n1:text/*"/>
-                                    <br/>
-                                </div>
-                            </xsl:when>
-                        </xsl:choose>
-                        <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="code" select="$act/@nullFlavor"/>
+                        <xsl:call-template name="show-noneFlavor">
+                            <xsl:with-param name="data" select="$act/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -141,7 +127,7 @@
     <!-- alert section entry -->
 
     <xsl:template name="alertSectionEntry">
-        <!-- Defing all needed variables -->
+        <!-- Defining all needed variables -->
         <xsl:variable
                 name="reactionTypeTranslation1"
                 select="n1:act/n1:templateId[@root= '2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:code/n1:translation/n1:translation/@displayName"/>
@@ -179,27 +165,24 @@
         <!-- not sure if we have to filter with root and template ids-->
         <!---
         answer by Giorgio for checking the no info scenario
-
         entry/act[templateId/@root= ‘2.16.840.1.113883.10.20.1.27’]/entryRelationship[@typeCode=’SUBJ’]/observation[templateId/@root=’1.3.6.1.4.1.19376.1.5.3.1.4.6’]/code/@ displayName -->
 
         <xsl:variable name="obsCode"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:value/@code"/>
-        <!-- in case of no info scenarion the following displayName will be displayed -->
+        <!-- in case of no info scenario the following displayName will be displayed -->
         <xsl:variable name="obsDisplay"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:value/@displayName"/>
 
         <xsl:variable name="act" select="n1:act"/>
         <!-- End definition of variables-->
 
-        <!--- table Display -->
-        <!-- nullflavored act -->
         <xsl:choose>
             <xsl:when test="not($act/@nullFlavor)">
                 <!-- No info Scenario... observation.value@code is one of the two values -->
                 <xsl:choose>
-                    <xsl:when test="($obsCode='160244002' or $obsCode='409137002')">
+                    <xsl:when test="($obsCode='716186003' or $obsCode='409137002')">
                         <tr>
-                            <td coslpan="4">
+                            <td colspan="4">
                                 <span class="tdtext">
                                     <xsl:value-of select="$obsDisplay"/>
                                 </span>

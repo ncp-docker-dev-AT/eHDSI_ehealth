@@ -583,28 +583,23 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- Present DateTime according to ISO 8601 specification -->
     <xsl:template name="formatDateTime">
         <xsl:param name="date"/>
-        <!-- day -->
-        <xsl:choose>
-            <xsl:when test="substring ($date, 7, 1)=&quot;0&quot;">
-                <xsl:value-of select="substring ($date, 8, 1)"/>
-                <xsl:text>/</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="substring ($date, 7, 2)"/>
-                <xsl:text>/</xsl:text>
-            </xsl:otherwise>
-        </xsl:choose>
+        <!-- year -->
+        <xsl:variable name="year" select="substring ($date, 1, 4)"/>
+        <xsl:value-of select="$year"/>
+        <xsl:text>-</xsl:text>
         <!-- month -->
         <xsl:variable name="month" select="substring ($date, 5, 2)"/>
         <xsl:value-of select="$month"/>
-        <xsl:text>/</xsl:text>
-        <!-- year -->
-        <xsl:value-of select="substring ($date, 1, 4)"/>
-        <!-- time and US timezone -->
+        <xsl:text>-</xsl:text>
+        <!-- day -->
+        <xsl:variable name="day" select="substring ($date, 7, 2)"/>
+        <xsl:value-of select="$day"/>
+
         <xsl:if test="string-length($date) &gt; 8">
-            <xsl:text>, </xsl:text>
+            <xsl:text>T</xsl:text>
             <!-- time -->
             <xsl:variable name="time">
                 <xsl:value-of select="substring($date,9,6)"/>
@@ -636,11 +631,15 @@
                 <xsl:choose>
                     <xsl:when test="contains($date,'+')">
                         <xsl:text>+</xsl:text>
-                        <xsl:value-of select="substring-after($date, '+')"/>
+                        <xsl:value-of select="substring(substring-after($date, '+'),1,2)"/>
+                        <xsl:text>:</xsl:text>
+                        <xsl:value-of select="substring(substring-after($date, '+'),3,2)"/>
                     </xsl:when>
                     <xsl:when test="contains($date,'-')">
                         <xsl:text>-</xsl:text>
-                        <xsl:value-of select="substring-after($date, '-')"/>
+                        <xsl:value-of select="substring(substring-after($date, '-'),1,2)"/>
+                        <xsl:text>:</xsl:text>
+                        <xsl:value-of select="substring(substring-after($date, '-'),3,2)"/>
                     </xsl:when>
                 </xsl:choose>
             </xsl:variable>
