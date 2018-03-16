@@ -85,8 +85,8 @@
                         </table>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$historyAct/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$historyAct/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -132,7 +132,7 @@
                     <xsl:when
                             test="($historyIllnessClosedProblemID='396782006' or $historyIllnessClosedProblemID='407559004' or $historyIllnessClosedProblemID='160243008' or  $historyIllnessClosedProblemID='160245001' )">
                         <!-- display the relevant code from the v40_unknowInformarion -->
-                        <xsl:call-template name="show-unknownInfo">
+                        <xsl:call-template name="show-unknownInformation">
                             <xsl:with-param name="code" select="$historyIllnessClosedProblemID"/>
                         </xsl:call-template>
                     </xsl:when>
@@ -149,7 +149,7 @@
                                                 <!-- uncoded element Problem -->
                                                 <xsl:if test="$historyIllnessClosedProblemNode/n1:originalText/n1:reference/@value">
                                                     <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="data"
+                                                        <xsl:with-param name="code"
                                                                         select="$historyIllnessClosedProblemNode/n1:originalText/n1:reference/@value"/>
                                                     </xsl:call-template>
                                                 </xsl:if>
@@ -157,8 +157,8 @@
                                         </xsl:choose>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:call-template name="show-noneFlavor">
-                                            <xsl:with-param name="data"
+                                        <xsl:call-template name="show-nullFlavor">
+                                            <xsl:with-param name="code"
                                                             select="$historyIllnessClosedProblemNode/@nullFlavor"/>
                                         </xsl:call-template>
                                     </xsl:otherwise>
@@ -181,8 +181,8 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$historyAct/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$historycAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

@@ -194,8 +194,8 @@
                         <tr>
                             <td>
                                 <xsl:value-of select="$reactionType"/>
-                                <xsl:call-template name="show-noneFlavor">
-                                    <xsl:with-param name="data" select="$reactionType/@nullFlavor"/>
+                                <xsl:call-template name="show-nullFlavor">
+                                    <xsl:with-param name="code" select="$reactionType/@nullFlavor"/>
                                 </xsl:call-template>
                             </td>
                             <td>
@@ -207,7 +207,7 @@
                                         <!-- uncoded element Problem -->
                                         <xsl:if test="$clinicalManifestationNode/n1:originalText/n1:reference/@value">
                                             <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="data"
+                                                <xsl:with-param name="code"
                                                                 select="$clinicalManifestationNode/n1:originalText/n1:reference/@value"/>
                                             </xsl:call-template>
                                         </xsl:if>
@@ -226,7 +226,7 @@
                                                 <!--  uncoded element -->
                                                 <xsl:if test="$agentDescription/n1:originalText/n1:reference/@value">
                                                     <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="data"
+                                                        <xsl:with-param name="code"
                                                                         select="$agentDescription/n1:originalText/n1:reference/@value"/>
                                                     </xsl:call-template>
                                                 </xsl:if>
@@ -234,8 +234,8 @@
                                         </xsl:choose>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:call-template name="show-noneFlavor">
-                                            <xsl:with-param name="data" select="$agentDescription/@nullFlavor"/>
+                                        <xsl:call-template name="show-nullFlavor">
+                                            <xsl:with-param name="code" select="$agentDescription/@nullFlavor"/>
                                         </xsl:call-template>
                                     </xsl:otherwise>
                                 </xsl:choose>
@@ -253,8 +253,8 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$act/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$act/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

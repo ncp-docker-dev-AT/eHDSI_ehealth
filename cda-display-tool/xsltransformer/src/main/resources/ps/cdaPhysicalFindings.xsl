@@ -89,8 +89,8 @@
                         </table>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$physAct/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$physAct/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -153,7 +153,7 @@
                                         <!-- uncoded element Problem -->
                                         <xsl:if test="$systolicBNode/n1:originalText/n1:reference/@value">
                                             <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="data"
+                                                <xsl:with-param name="code"
                                                                 select="$systolicBNode/n1:originalText/n1:reference/@value"/>
                                             </xsl:call-template>
                                         </xsl:if>
@@ -161,8 +161,8 @@
                                 </xsl:choose>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:call-template name="show-noneFlavor">
-                                    <xsl:with-param name="data" select="$systolicBNode/@nullFlavor"/>
+                                <xsl:call-template name="show-nullFlavor">
+                                    <xsl:with-param name="code" select="$systolicBNode/@nullFlavor"/>
                                 </xsl:call-template>
                             </xsl:otherwise>
                         </xsl:choose>
@@ -175,8 +175,8 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$physAct/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$physAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

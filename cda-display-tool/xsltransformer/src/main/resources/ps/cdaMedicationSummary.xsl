@@ -131,8 +131,8 @@
                         </table>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$medAct/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$medAct/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -196,7 +196,9 @@
                             <tr>
                                 <td coslpan="6">
                                     <span class="tdtext">
-                                        <xsl:value-of select="$medDisplay"/>
+                                        <xsl:call-template name="show-codeNoMedication">
+                                            <xsl:with-param name="code" select="$medCode"/>
+                                        </xsl:call-template>
                                     </span>
                                     <br/>
                                 </td>
@@ -219,7 +221,7 @@
                                                     <!-- uncoded element Problem -->
                                                     <xsl:if test="$medActiveIngredientNode/n1:originalText/n1:reference/@value">
                                                         <xsl:call-template name="show-uncodedElement">
-                                                            <xsl:with-param name="data"
+                                                            <xsl:with-param name="code"
                                                                             select="$medActiveIngredientNode/n1:originalText/n1:reference/@value"/>
                                                         </xsl:call-template>
                                                     </xsl:if>
@@ -227,9 +229,9 @@
                                             </xsl:choose>
                                         </xsl:when>
                                         <xsl:otherwise>
-                                            <xsl:call-template name="show-noneFlavor">
-                                                <xsl:with-param name="data"
-                                                                select="$medActiveIngredientNode/@nullFlavor"/>
+                                            <xsl:call-template name="show-nullFlavor">
+                                                <xsl:with-param name="code"
+                                                                select="$medActiveIgredientNode/@nullFlavor"/>
                                             </xsl:call-template>
                                         </xsl:otherwise>
                                     </xsl:choose>
@@ -283,8 +285,8 @@
                 <xsl:otherwise>
                     <tr>
                         <td colspan="5">
-                            <xsl:call-template name="show-noneFlavor">
-                                <xsl:with-param name="data" select="$medAct/@nullFlavor"/>
+                            <xsl:call-template name="show-nullFlavor">
+                                <xsl:with-param name="code" select="$medAct/@nullFlavor"/>
                             </xsl:call-template>
                         </td>
                     </tr>

@@ -67,8 +67,8 @@
         <xsl:param name="showValue"/>
         <xsl:choose>
             <xsl:when test="($medPackage/@nullFlavor)">
-                <xsl:call-template name="show-noneFlavor">
-                    <xsl:with-param name="data" select="($medPackage)/@nullFlavor"/>
+                <xsl:call-template name="show-nullFlavor">
+                    <xsl:with-param name="code" select="($medPackage)/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -136,7 +136,7 @@
             <xsl:when
                     test="$parameter/n1:originalText/n1:reference/@value">
                 <xsl:call-template name="show-uncodedElement">
-                    <xsl:with-param name="data" select="$parameter/n1:originalText/n1:reference/@value"/>
+                    <xsl:with-param name="code" select="$parameter/n1:originalText/n1:reference/@value"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -145,8 +145,8 @@
                         <xsl:value-of select="$parameter/@displayName"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$parameter/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$parameter/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>

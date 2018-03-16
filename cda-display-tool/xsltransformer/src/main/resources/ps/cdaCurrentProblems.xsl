@@ -103,7 +103,7 @@
                         </table>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-noneFlavor">
+                        <xsl:call-template name="show-nullFlavor">
                             <xsl:with-param name="data" select="$probAct/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -162,7 +162,7 @@
                         <!-- display the relevant code from the v40_unknowInformarion -->
                         <tr>
                             <td colspan="3">
-                                <xsl:call-template name="show-unknownInfo">
+                                <xsl:call-template name="show-unknownInformation">
                                     <xsl:with-param name="code" select="$probObsCode"/>
                                 </xsl:call-template>
                             </td>
@@ -183,7 +183,7 @@
                                                 <!-- uncoded element Problem -->
                                                 <xsl:if test="$activeProblemNode/n1:originalText/n1:reference/@value">
                                                     <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="data"
+                                                        <xsl:with-param name="code"
                                                                         select="$activeProblemNode/n1:originalText/n1:reference/@value"/>
                                                     </xsl:call-template>
                                                 </xsl:if>
@@ -191,8 +191,8 @@
                                         </xsl:choose>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:call-template name="show-noneFlavor">
-                                            <xsl:with-param name="data" select="$activeProblemNode/@nullFlavor"/>
+                                        <xsl:call-template name="show-nullFlavor">
+                                            <xsl:with-param name="code" select="$activeProblemNode/@nullFlavor"/>
                                         </xsl:call-template>
                                     </xsl:otherwise>
                                 </xsl:choose>
@@ -212,8 +212,8 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$probAct/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$probAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

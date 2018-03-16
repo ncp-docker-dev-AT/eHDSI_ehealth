@@ -315,8 +315,8 @@
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$datetime/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$datetime/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -694,30 +694,44 @@
         </xsl:if>
     </xsl:template>
 
-    <!-- show-noneFlavor -->
-    <xsl:template name="show-noneFlavor">
-        <xsl:param name="data"/>
-        <xsl:variable name="dirFile" select="concat($epsosLangDir,'/1.3.6.1.4.1.12559.11.10.1.3.1.42.37.xml')"/>
-        <xsl:variable name="foundKey"
-                      select="document(concat('file://', $dirFile))/ValueSet/concept[@code=$data and @codeSystem='2.16.840.1.113883.5.1008']"/>
-        <xsl:variable name="foundKeyLang" select="$foundKey/designation[@lang=$userLang]"/>
-        <xsl:variable name="defFoundKeyLang" select="$foundKey/designation[@lang=$defaultUserLang]"/>
-        <xsl:choose>
-            <xsl:when test="not ($foundKeyLang)">
-                <xsl:value-of select="$defFoundKeyLang"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$foundKeyLang"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <!--- display v40_unknownInfo -->
-    <xsl:template name="show-unknownInfo" match="/n1:ValueSet/n1:concept">
+    <!-- epSOSNullFlavor -->
+    <xsl:template name="show-nullFlavor">
         <xsl:param name="code"/>
-        <xsl:variable name="dirFile" select="concat($epsosLangDir,'/1.3.6.1.4.1.12559.11.10.1.3.1.42.17.xml')"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.37.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1008'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- epSOSCodeNoMedication -->
+    <xsl:template name="show-codeNoMedication">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.22.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- epSOSUnknownInformation -->
+    <xsl:template name="show-unknownInformation">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.17.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- display translated code value -->
+    <xsl:template name="show-code-value" match="/n1:ValueSet/n1:concept">
+        <xsl:param name="code"/>
+        <xsl:param name="xmlFile"/>
+        <xsl:param name="codeSystem"/>
+        <xsl:variable name="dirFile" select="concat($epsosLangDir,'/',$xmlFile)"/>
         <xsl:variable name="foundKey"
-                      select="document(concat('file://', $dirFile))/ValueSet/concept[@code=$code and @codeSystem='2.16.840.1.113883.6.96']"/>
+                      select="document(concat('file://', $dirFile))/ValueSet/concept[@code=$code and @codeSystem=$codeSystem]"/>
         <xsl:variable name="foundKeyLang" select="$foundKey/designation[@lang=$userLang]"/>
         <xsl:variable name="defFoundKeyLang" select="$foundKey/designation[@lang=$defaultUserLang]"/>
         <xsl:choose>
@@ -730,7 +744,7 @@
         </xsl:choose>
     </xsl:template>
 
-    <!-- display Labels -->
+    <!-- epSOSDisplayLabel -->
     <xsl:template name="show-displayLabels">
         <xsl:param name="code"/>
         <xsl:variable name="dirFile"
@@ -771,8 +785,8 @@
         <xsl:choose>
             <!-- Den Unit =1 -->
             <xsl:when test="($medStrength1/@nullFlavor)">
-                <xsl:call-template name="show-noneFlavor">
-                    <xsl:with-param name="data" select="$medStrength1/@nullFlavor"/>
+                <xsl:call-template name="show-nullFlavor">
+                    <xsl:with-param name="code" select="$medStrength1/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
 
@@ -781,8 +795,8 @@
                 &#160;
                 <xsl:value-of select="$medStrengthUnit1"/>
                 /
-                <xsl:call-template name="show-noneFlavor">
-                    <xsl:with-param name="data" select="$medStrength2/@nullFlavor"/>
+                <xsl:call-template name="show-nullFlavor">
+                    <xsl:with-param name="code" select="$medStrength2/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:when test="$medStrengthUnit2='1'">
@@ -997,8 +1011,8 @@
 
     <!-- uncoded element -->
     <xsl:template name="show-uncodedElement">
-        <xsl:param name="data"/>
-        <xsl:variable name="refText" select="$data"/>
+        <xsl:param name="code"/>
+        <xsl:variable name="refText" select="$code"/>
         <xsl:variable name="refAttrText" select="//*[@ID=substring($refText,2)]"/>
         <xsl:variable name="refAttrText1" select="//*[@id=substring($refText,2)]"/>
         <xsl:variable name="refAttrText3" select="//*[@id=$refText]"/>
