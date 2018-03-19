@@ -13,7 +13,7 @@
         <xsl:param name="telecomParam"/>
         <xsl:choose>
             <xsl:when test="$telecomParam/@nullFlavor">
-                <xsl:call-template name="show-noneFlavor">
+                <xsl:call-template name="show-nullFlavor">
                     <xsl:with-param name="data" select="$telecomParam/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -27,7 +27,7 @@
         <xsl:param name="name"/>
         <xsl:choose>
             <xsl:when test="$name/@nullFlavor">
-                <xsl:call-template name="show-noneFlavor">
+                <xsl:call-template name="show-nullFlavor">
                     <xsl:with-param name="data" select="$name/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -41,7 +41,7 @@
         <xsl:param name="id"/>
         <xsl:choose>
             <xsl:when test="$id/@nullFlavor">
-                <xsl:call-template name="show-noneFlavor">
+                <xsl:call-template name="show-nullFlavor">
                     <xsl:with-param name="data" select="$id/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -55,7 +55,7 @@
         <xsl:param name="name"/>
         <xsl:choose>
             <xsl:when test="$name/@nullFlavor">
-                <xsl:call-template name="show-noneFlavor">
+                <xsl:call-template name="show-nullFlavor">
                     <xsl:with-param name="data" select="$name/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -69,7 +69,7 @@
         <xsl:param name="name"/>
         <xsl:choose>
             <xsl:when test="$name/@nullFlavor">
-                <xsl:call-template name="show-noneFlavor">
+                <xsl:call-template name="show-nullFlavor">
                     <xsl:with-param name="data" select="$name/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>

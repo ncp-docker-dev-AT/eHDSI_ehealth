@@ -154,7 +154,7 @@
                     <xsl:otherwise>
                         <xsl:choose>
                             <xsl:when test="not($name)">
-                                <xsl:call-template name="show-noneFlavor">
+                                <xsl:call-template name="show-nullFlavor">
                                     <xsl:with-param name="data" select="code/@nullFlavor"/>
                                 </xsl:call-template>
                             </xsl:when>
@@ -311,7 +311,7 @@
                         </xsl:variable>
                         <xsl:choose>
                             <xsl:when test="$hasPackage = 'false'">
-                                <xsl:call-template name="show-noneFlavor">
+                                <xsl:call-template name="show-nullFlavor">
                                     <xsl:with-param name="data"
                                                     select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@nullFlavor"/>
                                 </xsl:call-template>
@@ -397,7 +397,7 @@
 
                         <xsl:choose>
                             <xsl:when test="$intakesFrequency = 'false'">
-                                <xsl:call-template name="show-noneFlavor">
+                                <xsl:call-template name="show-nullFlavor">
                                     <xsl:with-param name="data" select="n1:effectiveTime[2]/@nullFlavor"/>
                                 </xsl:call-template>
 
@@ -405,7 +405,7 @@
                             <xsl:otherwise>
                                 <xsl:choose>
                                     <xsl:when test="$hasFrequency = 'false'">
-                                        <xsl:call-template name="show-noneFlavor">
+                                        <xsl:call-template name="show-nullFlavor">
                                             <xsl:with-param name="data"
                                                             select="n1:effectiveTime[2]/n1:period/@nullFlavor"/>
                                         </xsl:call-template>
@@ -426,7 +426,7 @@
                         </xsl:variable>
                         <xsl:choose>
                             <xsl:when test="$hasIntakes = 'false'">
-                                <xsl:call-template name="show-noneFlavor">
+                                <xsl:call-template name="show-nullFlavor">
                                     <xsl:with-param name="data" select="n1:doseQuantity/@nullFlavor"/>
                                 </xsl:call-template>
                             </xsl:when>

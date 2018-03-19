@@ -1,4 +1,4 @@
-<?xml version="1.0"  encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 version="1.0">
@@ -839,66 +839,61 @@
 
     <!-- Number of Unit per Intake -->
     <xsl:template name="show-numberUnitIntake">
+        <xsl:param name="medUnitIntake"/>
         <xsl:param name="medUnitIntakeLow"/>
         <xsl:param name="medUnitIntakeHigh"/>
+        <xsl:param name="medUnitIntakeUnit"/>
         <xsl:param name="medUnitIntakeUnitLow"/>
         <xsl:param name="medUnitIntakeUnitHigh"/>
         <xsl:choose>
-            <xsl:when test="not($medUnitIntakeLow) and not($medUnitIntakeHigh)">
-                <xsl:text>-</xsl:text>
-            </xsl:when>
-            <xsl:when
-                    test="($medUnitIntakeLow) and (not($medUnitIntakeHigh) or $medUnitIntakeHigh/@nullFlavor)">
-                <xsl:if test="$medUnitIntakeUnitLow">
-                    <xsl:value-of select="$medUnitIntakeLow"/>
-                    [
-                    <xsl:value-of select="$medUnitIntakeUnitLow"/>
-                    ]-
-                </xsl:if>
-            </xsl:when>
-            <xsl:when
-                    test="(not($medUnitIntakeLow) or $medUnitIntakeLow/@nullFlavor) and ($medUnitIntakeHigh)">
-                -
-                <xsl:value-of select="$medUnitIntakeHigh"/>
-                <xsl:if test="$medUnitIntakeUnitHigh">
-                    [
-                    <xsl:value-of select="$medUnitIntakeUnitHigh"/>
-                    ]-
-                </xsl:if>
-            </xsl:when>
-            <xsl:when test="$medUnitIntakeLow=$medUnitIntakeHigh">
+            <xsl:when test="$medUnitIntakeLow or $medUnitIntakeHigh">
                 <xsl:choose>
-                    <xsl:when
-                            test="$medUnitIntakeUnitHigh='1' and $medUnitIntakeUnitLow='1'">
-                        <xsl:value-of select="$medUnitIntakeLow"/>
-                        <xsl:text> </xsl:text>
-                        <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="code" select="'77'"/>
-                        </xsl:call-template>
+                    <xsl:when test="$medUnitIntakeLow=$medUnitIntakeHigh">
+                        <xsl:choose>
+                            <xsl:when test="$medUnitIntakeUnitHigh='1' and $medUnitIntakeUnitLow='1'">
+                                <xsl:value-of select="$medUnitIntakeLow"/>
+                                <xsl:text> </xsl:text>
+                                <xsl:call-template name="show-displayLabels">
+                                    <xsl:with-param name="code" select="'77'"/>
+                                </xsl:call-template>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$medUnitIntakeLow"/>
+                                <xsl:if test="$medUnitIntakeUnitLow">
+                                    [
+                                    <xsl:value-of select="$medUnitIntakeUnitLow"/>
+                                    ]
+                                </xsl:if>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="$medUnitIntakeLow"/>
-                        <xsl:if test="$medUnitIntakeUnitLow">
+                        <xsl:if test="$medUnitIntakeLow and not($medUnitIntakeLow/@nullFlavor) and $medUnitIntakeUnitLow">
+                            <xsl:value-of select="$medUnitIntakeLow"/>
                             [
                             <xsl:value-of select="$medUnitIntakeUnitLow"/>
+                            ]
+                        </xsl:if>
+                        -
+                        <xsl:if test="$medUnitIntakeHigh and not($medUnitIntakeHigh/@nullFlavor) and $medUnitIntakeUnitHigh">
+                            <xsl:value-of select="$medUnitIntakeHigh"/>
+                            [
+                            <xsl:value-of select="$medUnitIntakeUnitHigh"/>
                             ]
                         </xsl:if>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$medUnitIntakeLow"/>
-                <xsl:if test="$medUnitIntakeUnitLow">
+            <xsl:when test="$medUnitIntake">
+                <xsl:if test="$medUnitIntakeUnit">
+                    <xsl:value-of select="$medUnitIntake"/>
                     [
-                    <xsl:value-of select="$medUnitIntakeUnitLow"/>
-                    ] -
-                </xsl:if>
-                <xsl:value-of select="$medUnitIntakeHigh"/>
-                <xsl:if test="$medUnitIntakeUnitHigh">
-                    [
-                    <xsl:value-of select="$medUnitIntakeUnitHigh"/>
+                    <xsl:value-of select="$medUnitIntakeUnit"/>
                     ]
                 </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>-</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -1074,8 +1069,8 @@
                 </xsl:otherwise>
             </xsl:choose>
             <xsl:text disable-output-escaping="yes">
-					&#60;/option&#62;
-				</xsl:text>
+                &#60;/option&#62;
+            </xsl:text>
         </xsl:for-each>
     </xsl:template>
 
