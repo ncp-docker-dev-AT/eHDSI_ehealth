@@ -1,22 +1,3 @@
-/*
-* Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
-* Tic. Ltd. Sti. epsos@srdc.com.tr
-*
-* This file is part of SRDC epSOS NCP.
-*
-* SRDC epSOS NCP is free software: you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by the Free
-* Software Foundation, either version 3 of the License, or (at your option) any
-* later version.
-*
-* SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-* details.
-*
-* You should have received a copy of the GNU General Public License along with
-* SRDC epSOS NCP. If not, see http://www.gnu.org/licenses/.
-*/
 package tr.com.srdc.epsos.ws.xca.client;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
@@ -30,7 +11,6 @@ import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.epsos.validation.services.XcaValidationService;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -52,6 +32,7 @@ import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import java.util.Date;
 import java.util.Locale;
@@ -62,18 +43,20 @@ import java.util.UUID;
  */
 public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RespondingGateway_ServiceStub.class);
-    //http://localhost:8080/axis2/services/RespondingGateway_Soap12
+    private static final Logger LOGGER = LoggerFactory.getLogger(RespondingGateway_ServiceStub.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
+
     private static final javax.xml.bind.JAXBContext wsContext;
     private static int counter = 0;
 
     static {
-        LOG.debug("Loading the WS-Security init libraries in RespondingGateway_ServiceStub xca");
 
-        org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
+        LOGGER.debug("Loading the WS-Security init libraries in RespondingGateway_ServiceStub xca");
+        org.apache.xml.security.Init.init();
     }
 
     static {
+
         javax.xml.bind.JAXBContext jc;
         jc = null;
         try {
@@ -83,8 +66,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     RetrieveDocumentSetRequestType.class,
                     RetrieveDocumentSetResponseType.class);
         } catch (javax.xml.bind.JAXBException ex) {
-            LOG.error(XCAConstants.EXCEPTIONS.UNABLE_CREATE_JAXB_CONTEXT + " " + ex.getMessage());
-            ex.printStackTrace(System.err);
+            LOGGER.error(XCAConstants.EXCEPTIONS.UNABLE_CREATE_JAXB_CONTEXT + " " + ex.getMessage(), ex);
             Runtime.getRuntime().exit(-1);
         } finally {
             wsContext = jc;
@@ -170,7 +152,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         this.countryCode = countryCode;
     }
 
-    private void populateAxisService() throws org.apache.axis2.AxisFault {
+    private void populateAxisService() {
         //creating the Service with a unique name
         _service = new org.apache.axis2.description.AxisService(XCAConstants.RESPONDING_GATEWAY_SERVICE + getUniqueSuffix());
         addAnonymousOperations();
@@ -270,7 +252,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 security.addChild(XMLUtils.toOM(idAssertion.getDOM()));
                 _serviceClient.addHeader(security);
             } catch (Exception ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             }
 
             _serviceClient.addHeadersToEnvelope(env);
@@ -284,11 +266,15 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             /* Log soap request */
             String logRequestBody;
             try {
-                String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
-                LOG.debug(XCAConstants.LOG.OUTGOING_XCA_QUERY_MESSAGE
-                        + System.getProperty("line.separator") + logRequestMsg);
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
+                    LOGGER_CLINICAL.debug("{}\n{}", XCAConstants.LOG.OUTGOING_XCA_QUERY_MESSAGE, logRequestMsg);
+                }
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
-                // NRO
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+            // NRO
 //                try {
 //                    EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
 //                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
@@ -299,17 +285,13 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 //                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
 //                            "NCPB_XCA_LIST_REQ");
 //                } catch (Exception e) {
-//                    LOG.error(ExceptionUtils.getStackTrace(e));
+//                    LOGGER.error(ExceptionUtils.getStackTrace(e));
 //                }
-
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
 
             // TMP
             // XCA List response end time
             long end = System.currentTimeMillis();
-            LOG.info("XCA LIST REQUEST-RESPONSE TIME: " + (end - start) / 1000.0);
+            LOGGER.info("XCA LIST REQUEST-RESPONSE TIME: '{}' ms", (end - start) / 1000.0);
 
             // TMP
             // Validation start time
@@ -321,7 +303,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // Transaction end time
             end = System.currentTimeMillis();
-            LOG.info("XCA LIST VALIDATION REQ TIME: '{}'", (end - start) / 1000.0);
+            LOGGER.info("XCA LIST VALIDATION REQ TIME: '{}' ms", (end - start) / 1000.0);
 
             // TMP
             // Transaction start time
@@ -334,10 +316,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 _operationClient.execute(true);
             } catch (AxisFault e) {
-                LOG.error("Axis Fault error: " + e.getMessage());
-                LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
+                LOGGER.error("Axis Fault error: " + e.getMessage());
+                LOGGER.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
                 String endpoint = null;
-                LOG.debug("ClassCode: " + classCode);
+                LOGGER.debug("ClassCode: " + classCode);
                 DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
                 switch (classCode) {
                     case Constants.PS_CLASSCODE:
@@ -356,7 +338,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
-                    LOG.debug("Retrying the request with the new configurations: [{}]", endpoint);
+                    LOGGER.debug("Retrying the request with the new configurations: [{}]", endpoint);
                     _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(endpoint));
 
                     /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
@@ -406,10 +388,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     _operationClient = newOperationClient;
                     _messageContext = newMessageContext;
                     env = newEnv;
-                    LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
+                    LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOG.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
+                    LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
                     throw e;
                 }
             }
@@ -421,7 +403,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // Transaction end time
             end = System.currentTimeMillis();
-            LOG.info("XCA LIST TRANSACTION TIME: '{}'", (end - start) / 1000.0);
+            LOGGER.info("XCA LIST TRANSACTION TIME: '{}'", (end - start) / 1000.0);
 
             // TMP
             // Transaction start time
@@ -430,9 +412,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             /* Log soap response */
             String logResponseBody;
             try {
-                String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv));
-                LOG.debug(XCAConstants.LOG.INCOMING_XCA_QUERY_MESSAGE
-                        + System.getProperty("line.separator") + logResponseMsg);
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv));
+                    LOGGER_CLINICAL.debug("{}\n{}", XCAConstants.LOG.INCOMING_XCA_QUERY_MESSAGE, logResponseMsg);
+                }
                 logResponseBody = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv.getBody().getFirstElement()));
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -444,7 +427,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // Validation end time
             end = System.currentTimeMillis();
-            LOG.info("XCA LIST VALIDATION RES TIME: '{}'", (end - start) / 1000);
+            LOGGER.info("XCA LIST VALIDATION RES TIME: '{}'", (end - start) / 1000);
 
             // TMP
             // eADC start time
@@ -461,7 +444,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 //                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
 //                        "NCPB_XCA_LIST_RES");
 //            } catch (Exception e) {
-//                LOG.error(ExceptionUtils.getStackTrace(e));
+//                LOGGER.error(ExceptionUtils.getStackTrace(e));
 //            }
 
             /*
@@ -477,16 +460,14 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         this.countryCode, // Country A ISO Code
                         EadcEntry.DsTypes.XCA, // Data source type
                         Direction.OUTBOUND); // Transaction direction
-            } catch (ParserConfigurationException ex) {
-                LOG.error("EADC INVOCATION FAILED!", ex);
             } catch (Exception ex) {
-                LOG.error("EADC INVOCATION FAILED!", ex);
+                LOGGER.error("EADC INVOCATION FAILED!", ex);
             }
 
             // TMP
             // eADC end time
             end = System.currentTimeMillis();
-            LOG.info("XCA LIST eADC TIME: " + (end - start) / 1000.0);
+            LOGGER.info("XCA LIST eADC TIME: '{}' ms", (end - start) / 1000.0);
 
             // TMP
             // Audit start time
@@ -506,7 +487,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             // TMP
             // Audit end time
             end = System.currentTimeMillis();
-            LOG.info("XCA LIST AUDIT TIME: " + (end - start) / 1000.0);
+            LOGGER.info("XCA LIST AUDIT TIME: '{}' ms", (end - start) / 1000.0);
 
             return adhocQueryResponse;
 
@@ -634,7 +615,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 security.addChild(XMLUtils.toOM(assertion1));
                 _serviceClient.addHeader(security);
             } catch (Exception ex) {
-                LOG.error(ex.getLocalizedMessage(), ex);
+                LOGGER.error(ex.getLocalizedMessage(), ex);
             }
 
             _serviceClient.addHeadersToEnvelope(env);
@@ -648,9 +629,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             /* Log soap request */
             String logRequestBody;
             try {
-                String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
-                LOG.debug(XCAConstants.LOG.OUTGOING_XCA_RETRIEVE_MESSAGE
-                        + System.getProperty("line.separator") + logRequestMsg);
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
+                    LOGGER_CLINICAL.debug("{}\n{}", XCAConstants.LOG.OUTGOING_XCA_RETRIEVE_MESSAGE, logRequestMsg);
+                }
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
                 // NRO
 //                try {
@@ -663,7 +645,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 //                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
 //                            "NCPB_XCA_RETRIEVE_REQ");
 //                } catch (Exception e) {
-//                    LOG.error(ExceptionUtils.getStackTrace(e));
+//                    LOGGER.error(ExceptionUtils.getStackTrace(e));
 //                }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -680,11 +662,11 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 _operationClient.execute(true);
             } catch (AxisFault e) {
-                LOG.error("Axis Fault error: " + e.getMessage());
-                LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
+                LOGGER.error("Axis Fault error: " + e.getMessage());
+                LOGGER.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
 
                 String endpoint = null;
-                LOG.debug("ClassCode: " + classCode);
+                LOGGER.debug("ClassCode: " + classCode);
                 DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
                 switch (classCode) {
                     case Constants.PS_CLASSCODE:
@@ -702,7 +684,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
-                    LOG.debug("Retrying the request with the new configurations: [{}]", endpoint);
+                    LOGGER.debug("Retrying the request with the new configurations: [{}]", endpoint);
                     _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(endpoint));
 
                     /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
@@ -756,10 +738,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     _operationClient = newOperationClient;
                     _messageContext = newMessageContext;
                     env = newEnv;
-                    LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
+                    LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOG.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
+                    LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
                     throw e;
                 }
             }
@@ -771,9 +753,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             /* Log soap response */
             String logResponseBody;
             try {
-                String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv));
-                LOG.debug(XCAConstants.LOG.INCOMING_XCA_RETRIEVE_MESSAGE
-                        + System.getProperty("line.separator") + logResponseMsg);
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv));
+                    LOGGER_CLINICAL.debug("{}\n{}", XCAConstants.LOG.INCOMING_XCA_RETRIEVE_MESSAGE, logResponseMsg);
+                }
                 logResponseBody = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv.getBody().getFirstElement()));
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -791,7 +774,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     getEnvelopeNamespaces(returnEnv));
             retrieveDocumentSetResponse = (RetrieveDocumentSetResponseType) object;
 
-            LOG.info("XCA Retrieve Request received. EVIDENCE NRR");
+            LOGGER.info("XCA Retrieve Request received. EVIDENCE NRR");
 
 //            // NRR
 //            try {
@@ -804,7 +787,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 //                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
 //                        "NCPB_XCA_RETRIEVE_RES");
 //            } catch (Exception e) {
-//                LOG.error(ExceptionUtils.getStackTrace(e));
+//                LOGGER.error(ExceptionUtils.getStackTrace(e));
 //            }
 
             /*
@@ -827,9 +810,9 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         EadcEntry.DsTypes.XCA, // Data source type
                         Direction.OUTBOUND); // Transaction direction
             } catch (ParserConfigurationException ex) {
-                LOG.error("EADC INVOCATION FAILED!", ex);
+                LOGGER.error("EADC INVOCATION FAILED!", ex);
             } catch (Exception ex) {
-                LOG.error("EADC INVOCATION FAILED!", ex);
+                LOGGER.error("EADC INVOCATION FAILED!", ex);
             }
 
             /*
@@ -883,6 +866,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
      * A utility method that copies the namepaces from the SOAPEnvelope
      */
     private java.util.Map getEnvelopeNamespaces(org.apache.axiom.soap.SOAPEnvelope env) {
+
         java.util.Map returnMap = new java.util.HashMap();
         java.util.Iterator namespaceIterator = env.getAllDeclaredNamespaces();
         while (namespaceIterator.hasNext()) {
@@ -897,8 +881,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         if (opNameArray == null) {
             return false;
         }
-        for (int i = 0; i < opNameArray.length; i++) {
-            if (opName.equals(opNameArray[i])) {
+        for (QName anOpNameArray : opNameArray) {
+            if (opName.equals(anOpNameArray)) {
                 return true;
             }
         }
@@ -908,8 +892,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     private org.apache.axiom.om.OMElement toOM(oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
         try {
-            javax.xml.bind.JAXBContext context = wsContext;
-            javax.xml.bind.Marshaller marshaller = context.createMarshaller();
+
+            javax.xml.bind.Marshaller marshaller = wsContext.createMarshaller();
             marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
             org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
@@ -929,6 +913,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
+
         org.apache.axiom.soap.SOAPEnvelope envelope = factory.getDefaultEnvelope();
         envelope.getBody().addChild(toOM(param, optimizeContent));
         return envelope;
@@ -937,8 +922,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     private org.apache.axiom.om.OMElement toOM(oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
         try {
-            javax.xml.bind.JAXBContext context = wsContext;
-            javax.xml.bind.Marshaller marshaller = context.createMarshaller();
+
+            javax.xml.bind.Marshaller marshaller = wsContext.createMarshaller();
             marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
             org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
@@ -967,8 +952,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     private org.apache.axiom.om.OMElement toOM(RetrieveDocumentSetRequestType param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
         try {
-            javax.xml.bind.JAXBContext context = wsContext;
-            javax.xml.bind.Marshaller marshaller = context.createMarshaller();
+
+            javax.xml.bind.Marshaller marshaller = wsContext.createMarshaller();
             marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
             org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
@@ -988,6 +973,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, RetrieveDocumentSetRequestType param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
+
         org.apache.axiom.soap.SOAPEnvelope envelope = factory.getDefaultEnvelope();
         envelope.getBody().addChild(toOM(param, optimizeContent));
         return envelope;
@@ -996,8 +982,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     private org.apache.axiom.om.OMElement toOM(RetrieveDocumentSetResponseType param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
         try {
-            javax.xml.bind.JAXBContext context = wsContext;
-            javax.xml.bind.Marshaller marshaller = context.createMarshaller();
+
+            javax.xml.bind.Marshaller marshaller = wsContext.createMarshaller();
             marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
             org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
@@ -1144,10 +1130,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
         @SuppressWarnings("unchecked")
         public javax.xml.stream.XMLStreamReader getReader() throws javax.xml.stream.XMLStreamException {
+
             try {
-                javax.xml.bind.JAXBContext context = wsContext;
                 org.apache.axiom.om.impl.builder.SAXOMBuilder builder = new org.apache.axiom.om.impl.builder.SAXOMBuilder();
-                javax.xml.bind.Marshaller marshaller = context.createMarshaller();
+                javax.xml.bind.Marshaller marshaller = wsContext.createMarshaller();
                 marshaller.marshal(new javax.xml.bind.JAXBElement(
                         new javax.xml.namespace.QName(nsuri, name), outObject.getClass(), outObject), builder);
 

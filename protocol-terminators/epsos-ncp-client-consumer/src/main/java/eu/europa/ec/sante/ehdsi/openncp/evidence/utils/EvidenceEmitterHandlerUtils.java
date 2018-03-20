@@ -4,6 +4,7 @@ import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,8 @@ import java.util.*;
  */
 public class EvidenceEmitterHandlerUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EvidenceEmitterHandlerUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EvidenceEmitterHandlerUtils.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
 
     private static final String CLIENT_CONNECTOR_XML_NAMESPACE = "http://clientconnector.protocolterminator.openncp.epsos/";
     private static final String CLIENT_CONNECTOR_SUBMIT_DOCUMENT_REQUEST = "submitDocument";
@@ -41,6 +43,7 @@ public class EvidenceEmitterHandlerUtils {
     private static final Map<String, String> transactionNames;
 
     static {
+
         List<String> list = new ArrayList<>();
         list.add(CLIENT_CONNECTOR_SUBMIT_DOCUMENT_REQUEST);
         list.add(CLIENT_CONNECTOR_SUBMIT_DOCUMENT_RESPONSE);
@@ -54,6 +57,7 @@ public class EvidenceEmitterHandlerUtils {
     }
 
     static {
+
         Map<String, String> map = new HashMap<>();
         // Portal-NCP interactions
         map.put(CLIENT_CONNECTOR_SUBMIT_DOCUMENT_REQUEST, "NI_XDR_REQ");
@@ -68,6 +72,7 @@ public class EvidenceEmitterHandlerUtils {
     }
 
     static {
+
         Map<String, String> map = new HashMap<>();
         // Portal-NCP interactions
         map.put(CLIENT_CONNECTOR_SUBMIT_DOCUMENT_REQUEST, "NI_XDR_REQ_SENT");
@@ -85,14 +90,16 @@ public class EvidenceEmitterHandlerUtils {
     }
 
     public String getEventTypeFromMessage(SOAPBody soapBody) {
+
         String messageElement = soapBody.getFirstElementLocalName();
-        LOG.debug("Message body element: " + messageElement);
+        LOGGER.debug("Message body element: '{}'", messageElement);
         return events.get(messageElement);
     }
 
     public String getTransactionNameFromMessage(SOAPBody soapBody) {
+
         String messageElement = soapBody.getFirstElementLocalName();
-        LOG.debug("Message body element: " + messageElement);
+        LOGGER.debug("Message body element: '{}'", messageElement);
         return transactionNames.get(messageElement);
     }
 
@@ -101,6 +108,7 @@ public class EvidenceEmitterHandlerUtils {
     }
 
     public String getMsgUUID(SOAPHeader soapHeader, SOAPBody soapBody) throws Exception {
+
         String msguuid = null;
         Element elemSoapHeader = XMLUtils.toDOM(soapHeader);
         String operation = soapBody.getFirstElementLocalName();
@@ -127,7 +135,9 @@ public class EvidenceEmitterHandlerUtils {
 
         Element envAsDom = XMLUtils.toDOM(env);
         Document envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
-        LOG.debug("Pretty printing canonicalized: \n" + XMLUtil.prettyPrint(envCanonicalized));
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.debug("Pretty printing canonicalized:\n{}", XMLUtil.prettyPrint(envCanonicalized));
+        }
         return envCanonicalized;
     }
 }

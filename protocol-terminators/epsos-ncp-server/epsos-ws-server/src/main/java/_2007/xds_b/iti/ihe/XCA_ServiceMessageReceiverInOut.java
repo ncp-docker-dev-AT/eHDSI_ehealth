@@ -128,6 +128,8 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCA_ServiceMessageReceiverInOut.class);
 
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
+
     private static final JAXBContext wsContext;
 
     static {
@@ -153,7 +155,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
     private String getIPofSender(MessageContext messageContext) {
 
-        return (String)messageContext.getProperty(MessageContext.REMOTE_ADDR);
+        return (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
     }
 
     private String getMessageID(SOAPEnvelope envelope) {
@@ -205,9 +207,9 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 eventLog.setSC_UserID(clientDN);
 
                 eventLog.setTargetip(req.getServerName());
-
-                LOGGER.debug("Incoming XCA Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
-
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    LOGGER_CLINICAL.debug("Incoming XCA Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
+                }
                 if (StringUtils.equals("respondingGateway_CrossGatewayQuery", methodName)) {
 
                     /* Validate incoming query request */
@@ -231,8 +233,10 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     String responseMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
                     XcaValidationService.getInstance().validateModel(responseMessage, XdModel.obtainModelXca(responseMessage).toString(), NcpSide.NCP_A);
 
-                    LOGGER.debug("Response Header:\n{}", envelope.getHeader().toString());
-                    LOGGER.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
+                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                        LOGGER_CLINICAL.debug("Response Header:\n{}", envelope.getHeader().toString());
+                        LOGGER_CLINICAL.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
+                    }
 
                 } else if (StringUtils.equals("respondingGateway_CrossGatewayRetrieve", methodName)) {
 
@@ -258,8 +262,8 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
+                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                        LOGGER_CLINICAL.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
 
                     Options options = new Options();

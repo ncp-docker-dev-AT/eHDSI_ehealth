@@ -30,6 +30,7 @@ import java.util.TimeZone;
 public class ReportBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportBuilder.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
     private static final String REPORT_FILES_FOLDER = "validation";
     private static final String[] XML_DECLARATION = {"<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"};
     private static final String[] XML_REPLACE = {"", ""};
@@ -85,7 +86,9 @@ public class ReportBuilder {
 
         if (checkReportDir(reportDirName)) {
 
-            LOGGER.info("Writing validation report in: '{}'", reportFileName);
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.info("Writing validation report in: '{}'", reportFileName);
+            }
             reportFile = new File(reportFileName);
 
             if (!reportFile.exists()) {
@@ -110,7 +113,9 @@ public class ReportBuilder {
                 }
                 //  Validation Service Model
                 String object = StringUtils.replaceEach(validationObject, XML_DECLARATION, XML_REPLACE);
-                LOGGER.info("[Report Builder]\n{}", object);
+                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    LOGGER_CLINICAL.info("[Report Builder]\n{}", object);
+                }
                 if (EnumUtils.isValidEnum(CdaModel.class, model)) {
                     Node objectNode = XMLUtil.stringToNode(object);
                     try {

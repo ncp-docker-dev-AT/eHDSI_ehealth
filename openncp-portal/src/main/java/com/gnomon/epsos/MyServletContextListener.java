@@ -95,7 +95,7 @@ public class MyServletContextListener implements ServletContextListener {
             LOGGER.error("#### ERROR INITIALIZING TM ####", e);
         }
         try {
-            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);            //serviceUrl = LiferayUtils.getFromPrefs("client_connector_url");
+            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
             LOGGER.info("SERVICE URL IS '{}'", serviceUrl);
             clientConnectorConsumer = new ClientConnectorConsumer(serviceUrl);
         } catch (Exception e) {

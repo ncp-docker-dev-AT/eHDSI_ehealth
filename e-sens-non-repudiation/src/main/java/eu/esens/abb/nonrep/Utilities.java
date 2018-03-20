@@ -1,6 +1,7 @@
 package eu.esens.abb.nonrep;
 
 import com.sun.xml.messaging.saaj.soap.ver1_2.SOAPMessageFactory1_2Impl;
+import org.apache.commons.lang.StringUtils;
 import org.opensaml.Configuration;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 public class Utilities {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utilities.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
 
     private Utilities() {
     }
@@ -100,7 +102,9 @@ public class Utilities {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         serialize(request, outputStream);
-        LOGGER.debug("Stream: '{}'", outputStream.toString());
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.debug("Stream: '{}'", outputStream.toString());
+        }
     }
 
     /**
@@ -133,7 +137,7 @@ public class Utilities {
      * @return
      * @throws SOAPException
      */
-    public synchronized static SOAPMessage toSoap(Document doc, MimeHeaders requestMimeHeaders) throws SOAPException {
+    public static synchronized SOAPMessage toSoap(Document doc, MimeHeaders requestMimeHeaders) throws SOAPException {
 
         MessageFactory messageFactory = new SOAPMessageFactory1_2Impl();
         SOAPMessage message = messageFactory.createMessage();
@@ -149,13 +153,11 @@ public class Utilities {
             LOGGER.info("Now adding the ones requested");
             Iterator<?> it = requestMimeHeaders.getAllHeaders();
             while (it.hasNext()) {
+
                 MimeHeader mimeItem = (MimeHeader) it.next();
-
                 String retValue = mimeItem.getValue().replace("Multipart/Related", "multipart/related");
-
                 LOGGER.info("ADDING MIME: '{}' : '{}'", mimeItem.getName(), retValue);
                 message.getMimeHeaders().addHeader(mimeItem.getName(), retValue);
-
             }
 
             message.saveChanges();
