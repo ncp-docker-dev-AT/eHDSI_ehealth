@@ -126,9 +126,9 @@ public class MessageSender extends Thread {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Set the security properties");
             LOGGER.debug(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEYSTORE_FILE));
-            LOGGER.debug(ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue()));
+            LOGGER.debug(StringUtils.isNotBlank(ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue())) ? "******" : "N/A");
             LOGGER.debug(ConfigurationManagerFactory.getConfigurationManager().getProperty(TRUSTSTORE));
-            LOGGER.debug(ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE_PWD.getValue()));
+            LOGGER.debug(StringUtils.isNotBlank(ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE_PWD.getValue())) ? "******" : "N/A");
             LOGGER.debug(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS));
         }
 
