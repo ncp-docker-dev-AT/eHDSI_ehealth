@@ -56,6 +56,11 @@
                 <artifactId>openncp-data-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!--<dependency>-->
+                <!--<groupId>${openncp.policy-manager.groupId}</groupId>-->
+                <!--<artifactId>${openncp.policy-manager.artifactId}</artifactId>-->
+                <!--<version>${openncp.policy-manager.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>${openncp.policy-manager.groupId}</groupId>
                 <artifactId>${openncp.policy-manager.artifactId}</artifactId>

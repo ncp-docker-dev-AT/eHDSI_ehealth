@@ -23,4 +23,11 @@
         <module>epsos-nc-mock-it</module>
         <module>epsos-ws-server</module>
     </modules>
+
+    <!--<properties>-->
+        <!--&lt;!&ndash; Default Policy Manager &ndash;&gt;-->
+        <!--<openncp.policy-manager.groupId>eu.europa.ec.sante.ehdsi</openncp.policy-manager.groupId>-->
+        <!--<openncp.policy-manager.artifactId>openncp-defaultpolicymanager</openncp.policy-manager.artifactId>-->
+        <!--<openncp.policy-manager.version>${project.version}</openncp.policy-manager.version>-->
+    <!--</properties>-->
 </project>

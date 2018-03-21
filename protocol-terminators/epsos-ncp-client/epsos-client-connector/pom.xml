@@ -65,10 +65,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
-            <artifactId>openncp-integration-test</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>-->
+            <!--<artifactId>openncp-integration-test</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client</groupId>
             <artifactId>openncp-xcpd-ws-client</artifactId>
