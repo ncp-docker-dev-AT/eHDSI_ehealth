@@ -1,13 +1,3 @@
-/*    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
- *
- *    This file is part of epSOS-WEB.
- *
- *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
- */
 package se.sb.epsos.web.service;
 
 import epsos.ccd.gnomon.auditmanager.*;
@@ -15,7 +5,7 @@ import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensaml.Configuration;
@@ -55,7 +45,6 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.*;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
@@ -82,7 +71,7 @@ public class AssertionHandler implements Serializable {
         LOGGER.info("NotOnOrAfter: '{}'", nowUTC.toDateTime().plusHours(2));
     }
 
-    Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws ConfigurationException, AssertionException {
+    Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws ConfigurationException {
 
         LOGGER.debug("################################################");
         LOGGER.debug("# createSAMLAssertion() - start                #");
@@ -213,14 +202,14 @@ public class AssertionHandler implements Serializable {
         return ConfigurationManagerFactory.getConfigurationManager();
     }
 
-    void sendAuditEpsos91(AuthenticatedUser userDetails, Assertion assertion) throws KeyStoreException, CertificateException, NoSuchAlgorithmException {
+    void sendAuditEpsos91(AuthenticatedUser userDetails, Assertion assertion) {
 
         String KEY_ALIAS = getPrivateKeyAlias();
         LOGGER.debug("KEY_ALIAS: '{}'", KEY_ALIAS);
         String KEYSTORE_LOCATION = getPrivateKeystoreLocation();
         LOGGER.debug("KEYSTORE_LOCATION: '{}'", KEYSTORE_LOCATION);
         String KEY_STORE_PASS = getPrivateKeyPassword();
-        LOGGER.debug("KEY_STORE_PASS: '{}'", KEY_STORE_PASS);
+        LOGGER.debug("KEY_STORE_PASS: '{}'", StringUtils.isNotBlank(KEY_STORE_PASS) ? "******" : "N/A");
 
         final ConfigurationManager configurationManager = getConfigurationManager();
 
@@ -239,7 +228,7 @@ public class AssertionHandler implements Serializable {
 
             // List the aliases
             Enumeration<String> enum1 = keystore.aliases();
-            for (; enum1.hasMoreElements(); ) {
+            while (enum1.hasMoreElements()) {
                 String alias = enum1.nextElement();
 
                 if (cert instanceof X509Certificate) {
