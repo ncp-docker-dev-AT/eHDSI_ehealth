@@ -13,11 +13,12 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.xmlbeans.XmlBeansXMLReader;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.opensaml.saml2.core.Assertion;
@@ -38,6 +39,7 @@ import java.util.Map;
 public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorServiceMessageReceiverInOut.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("FILE_CLINICAL");
 
     static {
         LOGGER.debug("Loading the WS-Security init libraries in ClientConnectorServiceMessageReceiverInOut 2009");
@@ -53,13 +55,14 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         /*
          * Log soap request
          */
-        try {
-            String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv));
-            LOGGER.debug("Incoming " + operationName + " request message from portal:"
-                    + System.getProperty("line.separator") + logRequestMsg);
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            try {
+                String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv));
+                LOGGER_CLINICAL.debug("Incoming '{}' request message from portal:\n{}", operationName, logRequestMsg);
 
-        } catch (Exception ex) {
-            LOGGER.debug(ex.getLocalizedMessage(), ex);
+            } catch (Exception ex) {
+                LOGGER.debug(ex.getLocalizedMessage(), ex);
+            }
         }
 
         /*
@@ -76,7 +79,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
             SOAPEnvelope envelope;
 
             /* Find the axisOperation that has been set by the Dispatch phase. */
-            org.apache.axis2.description.AxisOperation op = msgContext.getOperationContext().getAxisOperation();
+            AxisOperation op = msgContext.getOperationContext().getAxisOperation();
             if (op == null) {
                 throw new AxisFault("Operation is not located,"
                         + " if this is doclit style the SOAP-ACTION "
@@ -120,8 +123,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                     SubmitDocumentResponseDocument submitDocumentResponse11;
                     SubmitDocumentDocument1 wrappedParam;
                     wrappedParam = (SubmitDocumentDocument1) fromOM(reqEnv.getBody().getFirstElement(),
-                            SubmitDocumentDocument1.class,
-                            getEnvelopeNamespaces(reqEnv));
+                            SubmitDocumentDocument1.class, getEnvelopeNamespaces(reqEnv));
                     submitDocumentResponse11 = skel.submitDocument(wrappedParam, hcpAssertion, trcAssertion);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), submitDocumentResponse11);
@@ -240,13 +242,14 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 /*
                  * Log soap request
                  */
-                try {
-                    String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope));
-                    LOGGER.debug("Outgoing " + operationName + " response message to portal:"
-                            + System.getProperty("line.separator") + logRequestMsg);
+                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    try {
+                        String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope));
+                        LOGGER_CLINICAL.debug("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);
 
-                } catch (Exception ex) {
-                    LOGGER.debug(ex.getLocalizedMessage(), ex);
+                    } catch (Exception ex) {
+                        LOGGER.debug(ex.getLocalizedMessage(), ex);
+                    }
                 }
                 newMsgContext.setEnvelope(envelope);
             }

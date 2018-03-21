@@ -14,11 +14,23 @@
         </encoder>
     </appender>
 
+    <appender name="FILE_CLINICAL" class="ch.qos.logback.core.FileAppender">
+        <file>${catalina.base}/logs/openncp-client-connector-clinical.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%class{0}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
         <connectionSource class="ch.qos.logback.core.db.JNDIConnectionSource">
             <jndiLocation>java:comp/env/jdbc/LOGS</jndiLocation>
         </connectionSource>
     </appender>
+
+    <logger name="LOGGER_CLINICAL" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE_CLINICAL"/>
+    </logger>
 
     <logger name="org.apache.http.client" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>

@@ -272,22 +272,23 @@ import java.util.*;
 public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
-        LOGGER.debug("Loading the WS-Security init libraries in XCPD_ServiceMessageReceiverInOut xcpd 2009");
 
-        org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
+        LOGGER.debug("Loading the WS-Security init libraries in XCPD_ServiceMessageReceiverInOut xcpd 2009");
+        org.apache.xml.security.Init.init();
     }
 
     static {
+
         JAXBContext jc = null;
         try {
             jc = JAXBContext.newInstance(org.hl7.v3.PRPAIN201305UV02.class, org.hl7.v3.PRPAIN201306UV02.class);
         } catch (javax.xml.bind.JAXBException ex) {
             LOGGER.error("Unable to create JAXBContext: '{}'", ex.getMessage(), ex);
-            // Runtime.getRuntime().exit(-1);
         } finally {
             wsContext = jc;
         }
@@ -330,7 +331,9 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             eventLog.setSC_UserID(clientDN);
             eventLog.setTargetip(req.getServerName());
 
-            LOGGER.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
+            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
+            }
 
             /* Validate incoming request message */
             XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(
@@ -375,7 +378,9 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
-                    LOGGER.debug("Outgoing XCPD Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
+                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                        LOGGER_CLINICAL.debug("Outgoing XCPD Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
+                    }
 
                 } else {
                     LOGGER.error("Method not Found: '{}'", methodName);

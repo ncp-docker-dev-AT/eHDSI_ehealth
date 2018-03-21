@@ -37,6 +37,7 @@ import java.util.*;
 public class TransformationService implements ITransformationService, TMConstants, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransformationService.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private ITerminologyService tsamApi = null;
     private HashMap<String, String> level1Type;
@@ -47,9 +48,9 @@ public class TransformationService implements ITransformationService, TMConstant
 
         LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [START]");
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
-        if (LOGGER.isDebugEnabled()) {
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             try {
-                LOGGER.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
+                LOGGER_CLINICAL.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {
                 LOGGER.error("Exception: '{}'", e.getMessage(), e);
             }
@@ -62,9 +63,9 @@ public class TransformationService implements ITransformationService, TMConstant
 
         LOGGER.info("Translating OpenNCP CDA Document [START]");
         TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
-        if (LOGGER.isDebugEnabled()) {
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             try {
-                LOGGER.debug("Translate CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
+                LOGGER_CLINICAL.debug("Translate CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {
                 LOGGER.error("Exception: '{}'", e.getMessage(), e);
             }

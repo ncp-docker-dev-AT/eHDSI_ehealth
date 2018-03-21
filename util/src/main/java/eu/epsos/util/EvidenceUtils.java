@@ -187,10 +187,7 @@ public class EvidenceUtils {
                                             String issuerCertAlias, String senderKeyStorePath, String senderKeyPassword,
                                             String senderCertAlias, String recipientKeyStorePath, String recipientKeyPassword,
                                             String recipientCertAlias, String eventType, DateTime submissionTime, String status,
-                                            String title)
-            throws IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException,
-            TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException,
-            UnrecoverableKeyException {
+                                            String title) throws Exception {
 
         MessageType messageType = null;
         String msguuid;
@@ -215,14 +212,12 @@ public class EvidenceUtils {
                                             String issuerCertAlias, String senderKeyStorePath, String senderKeyPassword,
                                             String senderCertAlias, String recipientKeyStorePath, String recipientKeyPassword,
                                             String recipientCertAlias, String eventType, DateTime submissionTime,
-                                            String status, String title, String msguuid)
-            throws IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException,
-            TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException,
-            UnrecoverableKeyException {
+                                            String status, String title, String msguuid) throws Exception {
 
         LOGGER.info("createEvidenceREMNRO('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')", issuerKeyStorePath,
-                issuerKeyPassword, issuerCertAlias, senderKeyStorePath, senderKeyPassword, senderCertAlias,
-                recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType);
+                StringUtils.isNotBlank(issuerKeyPassword) ? "******" : "N/A", issuerCertAlias, senderKeyStorePath,
+                StringUtils.isNotBlank(senderKeyPassword) ? "******" : "N/A", senderCertAlias, recipientKeyStorePath,
+                StringUtils.isNotBlank(recipientKeyPassword) ? "******" : "N/A", recipientCertAlias, eventType);
 
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
@@ -355,7 +350,7 @@ public class EvidenceUtils {
     private static X509Certificate getCertificate(String keyStorePath, String keyPassword, String certAlias)
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
 
-        LOGGER.debug("X509Certificate getCertificate('{}', '{}', '{}", keyStorePath, keyPassword, certAlias);
+        LOGGER.debug("X509Certificate getCertificate('{}', '{}', '{}", keyStorePath, StringUtils.isNotBlank(keyPassword) ? "******" : "N/A", certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
         ks.load(keyStream, keyPassword.toCharArray());
@@ -365,7 +360,7 @@ public class EvidenceUtils {
     private static PrivateKey getSigningKey(String keyStorePath, String keyPassword, String certAlias)
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
-        LOGGER.debug("PrivateKey getSigningKey('{}', '{}', '{}", keyStorePath, keyPassword, certAlias);
+        LOGGER.debug("PrivateKey getSigningKey('{}', '{}', '{}", keyStorePath, StringUtils.isNotBlank(keyPassword) ? "******" : "N/A", certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
         ks.load(keyStream, keyPassword.toCharArray());

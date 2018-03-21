@@ -1,5 +1,7 @@
 package eu.epsos.pt.cc;
 
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
@@ -25,7 +27,11 @@ public class ClientConnectorInit extends HttpServlet {
 
         LOGGER.info("Initiating Client Connector");
         super.init();
-
+        String serverMode = System.getProperty("server.ehealth.mode");
+        LOGGER.info("Server Mode: '{}'", serverMode);
+        if (StringUtils.isNotBlank(serverMode)) {
+            ConfigurationManagerFactory.getConfigurationManager().setProperty("SERVER_MODE", serverMode);
+        }
         System.setProperty("javax.net.ssl.keyStore", Constants.SC_KEYSTORE_PATH);
         System.setProperty("javax.net.ssl.keyStorePassword", Constants.SC_KEYSTORE_PASSWORD);
         System.setProperty("javax.net.ssl.key.alias", Constants.SC_PRIVATEKEY_ALIAS);

@@ -6,10 +6,10 @@ import epsos.ccd.gnomon.utils.SerializableMessage;
 import epsos.ccd.gnomon.utils.Utils;
 import eu.epsos.util.audit.AuditLogSerializer;
 import eu.europa.ec.sante.ehdsi.openncp.audit.Configuration;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import net.RFC3881.AuditMessage;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +37,8 @@ import java.util.TimeZone;
 public class MessageSender extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSender.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+
     private static String[] enabledProtocols = {"TLSv1"};
     private static String AUDIT_REPOSITORY_URL = "audit.repository.url";
     private static String AUDIT_REPOSITORY_PORT = "audit.repository.port";
@@ -58,6 +60,7 @@ public class MessageSender extends Thread {
         this.severity = severity;
     }
 
+    @Override
     public void run() {
 
         boolean sent = false;
@@ -65,7 +68,9 @@ public class MessageSender extends Thread {
         try {
             LOGGER.info(auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() + " Try to construct the message");
             String auditmsg = AuditTrailUtils.constructMessage(auditmessage, true);
-            LOGGER.debug(auditmsg);
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.debug("Audit Message sent:\n{}", auditmsg);
+            }
 
             if (!Utils.isEmpty(auditmsg)) {
                 long timeout = Long.parseLong(Utils.getProperty("audit.time.to.try", "60000", true));
@@ -115,17 +120,16 @@ public class MessageSender extends Thread {
 
         boolean sent = false;
         String facsev = facility + severity;
-        ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
 
-        String host = configurationManager.getProperty(AUDIT_REPOSITORY_URL);
-        int port = Integer.parseInt(configurationManager.getProperty(AUDIT_REPOSITORY_PORT));
+        String host = ConfigurationManagerFactory.getConfigurationManager().getProperty(AUDIT_REPOSITORY_URL);
+        int port = Integer.parseInt(ConfigurationManagerFactory.getConfigurationManager().getProperty(AUDIT_REPOSITORY_PORT));
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Set the security properties");
-            LOGGER.debug(configurationManager.getProperty(KEYSTORE_FILE));
-            LOGGER.debug(configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()));
-            LOGGER.debug(configurationManager.getProperty(TRUSTSTORE));
-            LOGGER.debug(configurationManager.getProperty(Configuration.TRUSTSTORE_PWD.getValue()));
-            LOGGER.debug(configurationManager.getProperty(KEY_ALIAS));
+            LOGGER.debug(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEYSTORE_FILE));
+            LOGGER.debug(StringUtils.isNotBlank(ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue())) ? "******" : "N/A");
+            LOGGER.debug(ConfigurationManagerFactory.getConfigurationManager().getProperty(TRUSTSTORE));
+            LOGGER.debug(StringUtils.isNotBlank(ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE_PWD.getValue())) ? "******" : "N/A");
+            LOGGER.debug(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS));
         }
 
         if (LOGGER.isTraceEnabled()) {
@@ -133,12 +137,13 @@ public class MessageSender extends Thread {
             InputStream stream = null;
             try {
                 KeyStore ks = KeyStore.getInstance("JKS");
-                ks.load(Utils.fullStream(configurationManager.getProperty(KEYSTORE_FILE)), configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()).toCharArray());
-                X509Certificate cert = (X509Certificate) ks.getCertificate(configurationManager.getProperty(KEY_ALIAS));
+                ks.load(Utils.fullStream(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEYSTORE_FILE)),
+                        ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue()).toCharArray());
+                X509Certificate cert = (X509Certificate) ks.getCertificate(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS));
                 LOGGER.debug("KEYSTORE: {}", cert.toString());
                 KeyStore ks1 = KeyStore.getInstance("JKS");
-                stream = Utils.fullStream(configurationManager.getProperty(TRUSTSTORE));
-                ks1.load(stream, configurationManager.getProperty(Configuration.TRUSTSTORE_PWD.getValue()).toCharArray());
+                stream = Utils.fullStream(ConfigurationManagerFactory.getConfigurationManager().getProperty(TRUSTSTORE));
+                ks1.load(stream, ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE_PWD.getValue()).toCharArray());
                 Enumeration<String> enu = ks1.aliases();
                 int i = 0;
                 while (enu.hasMoreElements()) {
@@ -158,12 +163,12 @@ public class MessageSender extends Thread {
         SSLSocket sslsocket = null;
         try {
             LOGGER.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Initialize the SSL socket");
-            File u = new File(configurationManager.getProperty(TRUSTSTORE));
-            KeystoreDetails trust = new KeystoreDetails(u.toString(), configurationManager.getProperty(Configuration.TRUSTSTORE_PWD.getValue()),
-                    configurationManager.getProperty(KEY_ALIAS));
-            File uu = new File(configurationManager.getProperty(KEYSTORE_FILE));
-            KeystoreDetails key = new KeystoreDetails(uu.toString(), configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()),
-                    configurationManager.getProperty(KEY_ALIAS), configurationManager.getProperty(Configuration.KEYSTORE_PWD.getValue()));
+            File u = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty(TRUSTSTORE));
+            KeystoreDetails trust = new KeystoreDetails(u.toString(), ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE_PWD.getValue()),
+                    ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS));
+            File uu = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEYSTORE_FILE));
+            KeystoreDetails key = new KeystoreDetails(uu.toString(), ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue()),
+                    ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS), ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue()));
             AuthSSLSocketFactory f = new AuthSSLSocketFactory(key, trust);
             LOGGER.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Create socket");
 
