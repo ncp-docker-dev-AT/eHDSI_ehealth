@@ -57,9 +57,9 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>eu.europa.ec.sante.ehdsi</groupId>
-                <artifactId>openncp-defaultpolicymanager</artifactId>
-                <version>${project.version}</version>
+                <groupId>${openncp.policy-manager.groupId}</groupId>
+                <artifactId>${openncp.policy-manager.artifactId}</artifactId>
+                <version>${openncp.policy-manager.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>

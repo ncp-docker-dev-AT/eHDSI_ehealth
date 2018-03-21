@@ -1,11 +1,11 @@
 package eu.epsos.protocolterminators.ws.server.xca.impl;
 
-import eu.epsos.protocolterminators.integrationtest.cda.CdaUtils;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.common.ResourceList;
 import eu.epsos.protocolterminators.ws.server.common.ResourceLoader;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
+import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;

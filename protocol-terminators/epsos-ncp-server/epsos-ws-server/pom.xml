@@ -59,8 +59,9 @@
             <version>1.5.9</version>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-defaultpolicymanager</artifactId>
+            <groupId>${openncp.policy-manager.groupId}</groupId>
+            <artifactId>${openncp.policy-manager.artifactId}</artifactId>
+            <version>${openncp.policy-manager.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>bcprov-jdk15</artifactId>
@@ -71,6 +72,7 @@
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
             <artifactId>openncp-integration-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
@@ -252,7 +254,7 @@
     <profiles>
         <profile>
             <!-- This profile bundles the mock National Connector implementation -->
-            <id>national-connector-mock-impl</id>
+            <id>national-connector-mock</id>
             <dependencies>
                 <dependency>
                     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server</groupId>
@@ -262,31 +264,17 @@
             </dependencies>
         </profile>
 
-        <!-- This profile bundles the real National Connector implementation -->
-        <!--<profile>-->
-        <!--<id>national-connector-impl</id>-->
-        <!--<dependencies>-->
-        <!--<dependency>-->
-        <!--<groupId>${national-connector-impl.groupId}</groupId>-->
-        <!--<artifactId>${national-connector-impl.artifactId}</artifactId>-->
-        <!--<version>${national-connector-impl.version}</version>-->
-        <!--<scope>runtime</scope>-->
-        <!--</dependency>-->
-        <!--</dependencies>-->
-        <!--</profile>-->
-
-        <!-- This profile bundles the real National Connector implementation for Luxembourg -->
-        <!--<profile>-->
-        <!--<id>national-connector-lu-impl</id>-->
-        <!--<dependencies>-->
-        <!--<dependency>-->
-        <!--<groupId>gi9.ccd.gnomon.epsos</groupId>-->
-        <!--<artifactId>openncp-nc-lu</artifactId>-->
-        <!--<version>1.0.0-SNAPSHOT</version>-->
-        <!--<scope>runtime</scope>-->
-        <!--</dependency>-->
-        <!--</dependencies>-->
-        <!--</profile>-->
+        <profile>
+            <id>national-build</id>
+            <dependencies>
+                <dependency>
+                    <groupId>${openncp.national-connector.groupId}</groupId>
+                    <artifactId>${openncp.national-connector.artifactId}</artifactId>
+                    <version>${openncp.national-connector.version}</version>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+        </profile>
 
         <!-- Integreation Tests -->
         <profile>
@@ -309,6 +297,7 @@
                 <dependency>
                     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
                     <artifactId>openncp-integration-test</artifactId>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
 

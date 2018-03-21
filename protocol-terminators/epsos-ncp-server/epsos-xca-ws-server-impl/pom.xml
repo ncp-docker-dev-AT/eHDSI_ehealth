@@ -21,8 +21,9 @@
             <artifactId>openncp-assertion-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-defaultpolicymanager</artifactId>
+            <groupId>${openncp.policy-manager.groupId}</groupId>
+            <artifactId>${openncp.policy-manager.artifactId}</artifactId>
+            <version>${openncp.policy-manager.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server</groupId>
