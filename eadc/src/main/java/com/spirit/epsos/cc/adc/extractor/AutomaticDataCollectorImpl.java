@@ -30,7 +30,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
 
     // Logger object for logging to log4j
     private static final Logger LOGGER = LoggerFactory.getLogger(AutomaticDataCollector.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     // Path to the factory.xslt
     private static final String pathToFactoryXslt = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator

@@ -37,7 +37,7 @@ import java.util.Iterator;
 public class Utilities {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utilities.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private Utilities() {
     }

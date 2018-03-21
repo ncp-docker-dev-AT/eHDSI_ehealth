@@ -128,7 +128,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCA_ServiceMessageReceiverInOut.class);
 
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final JAXBContext wsContext;
 

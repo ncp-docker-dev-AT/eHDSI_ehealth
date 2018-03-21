@@ -30,7 +30,7 @@ import java.util.TimeZone;
 public class ReportBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportBuilder.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final String REPORT_FILES_FOLDER = "validation";
     private static final String[] XML_DECLARATION = {"<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"};
     private static final String[] XML_REPLACE = {"", ""};

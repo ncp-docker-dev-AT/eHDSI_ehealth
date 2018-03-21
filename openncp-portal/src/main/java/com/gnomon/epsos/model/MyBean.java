@@ -51,7 +51,7 @@ import java.util.List;
 public class MyBean implements Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MyBean.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final long serialVersionUID = 1L;
     private List<Country> countries;
     private String selectedCountry;

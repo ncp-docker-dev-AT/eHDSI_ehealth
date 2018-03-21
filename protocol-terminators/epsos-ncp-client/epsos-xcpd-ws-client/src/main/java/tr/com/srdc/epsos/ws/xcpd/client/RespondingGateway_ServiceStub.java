@@ -67,7 +67,7 @@ import java.util.UUID;
 public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RespondingGateway_ServiceStub.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final javax.xml.bind.JAXBContext wsContext;
     private static int counter = 0;
 

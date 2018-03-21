@@ -37,7 +37,7 @@ import java.util.TimeZone;
 public class MessageSender extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSender.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("GDPR_CLINICAL");
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static String[] enabledProtocols = {"TLSv1"};
     private static String AUDIT_REPOSITORY_URL = "audit.repository.url";
