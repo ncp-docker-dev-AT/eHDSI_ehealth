@@ -19,7 +19,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -42,7 +41,8 @@ public class EvidenceEmitterTest {
     }
 
     @BeforeClass
-    public static void setUpClass() throws KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+    public static void setUpClass() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
+            UnrecoverableKeyException {
 
         ClassLoader loader;
         loader = EvidenceEmitterTest.class.getClassLoader();
@@ -89,7 +89,7 @@ public class EvidenceEmitterTest {
         LOGGER.info(a1);
         //org.w3c.dom.Document incomingMsg = XMLUtil.newDocumentFromInputStream(inputStream);
         EvidenceUtils.createEvidenceREMNRR(
-        		incomingMsg,
+                incomingMsg,
                 keyStoreFile.getAbsolutePath(),
                 "spirit",
                 "server1",
@@ -107,7 +107,7 @@ public class EvidenceEmitterTest {
     }
 
     @Test
-    public void testCreateEvidenceREMNRO() throws MalformedMIMEMessageException, MalformedIHESOAPException, SOAPException, ParserConfigurationException, SAXException, IOException, URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+    public void testCreateEvidenceREMNRO() throws Exception {
         ClassLoader loader;
         loader = EvidenceEmitterTest.class.getClassLoader();
         InputStream inputStream = loader.getResourceAsStream("testData//sample.xml");
