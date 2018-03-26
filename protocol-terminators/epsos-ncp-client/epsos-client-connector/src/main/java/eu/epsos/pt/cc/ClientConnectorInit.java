@@ -12,8 +12,7 @@ import javax.servlet.http.HttpServlet;
 /**
  * ClientConnectorInit servlet.
  * <p>
- * This servlet is called at startup and set the environment
- * for security
+ * This servlet is called at startup and set the environment for security.
  *
  * @author Ivo Pinheiro<code> - ivo.pinheiro@iuz.pt</code>
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
