@@ -22,6 +22,18 @@
 
     <dependencies>
         <dependency>
+            <groupId>${openncp.policy-manager.groupId}</groupId>
+            <artifactId>${openncp.policy-manager.artifactId}</artifactId>
+            <version>${openncp.policy-manager.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bcprov-jdk15</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                </exclusion>
+            </exclusions>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>net.bull.javamelody</groupId>
             <artifactId>javamelody-core</artifactId>
             <version>1.70.0</version>
