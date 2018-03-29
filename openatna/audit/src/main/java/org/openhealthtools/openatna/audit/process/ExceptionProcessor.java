@@ -33,7 +33,7 @@ import org.openhealthtools.openatna.syslog.SyslogException;
 
 public class ExceptionProcessor implements AtnaProcessor {
 
-    public void process(ProcessContext context) throws Exception {
+    public void process(ProcessContext context) {
     }
 
     public void error(ProcessContext context) {

@@ -222,7 +222,7 @@ public class AssertionHandler implements Serializable {
         try (FileInputStream is = new FileInputStream(KEYSTORE_LOCATION)) {
 
             KeyStore keystore = KeyStore.getInstance("JKS");
-            keystore.load(is, KEY_STORE_PASS.toCharArray());
+            keystore.load(is, KEY_STORE_PASS == null ? null : KEY_STORE_PASS.toCharArray());
             // Get certificate
             cert = keystore.getCertificate(KEY_ALIAS);
 

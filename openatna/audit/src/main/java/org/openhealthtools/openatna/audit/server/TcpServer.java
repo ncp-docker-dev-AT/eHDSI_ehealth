@@ -88,6 +88,7 @@ public class TcpServer implements Server {
             this.server = server;
         }
 
+        @Override
         public void run() {
             if (server == null) {
                 log.info("Server socket is null. Cannot start server.");
@@ -133,6 +134,7 @@ public class TcpServer implements Server {
             this.socket = socket;
         }
 
+        @Override
         public void run() {
             try {
                 InputStream in = socket.getInputStream();

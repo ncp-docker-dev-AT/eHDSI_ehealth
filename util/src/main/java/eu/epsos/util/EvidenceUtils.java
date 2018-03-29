@@ -281,12 +281,10 @@ public class EvidenceUtils {
          * The policy has been deployed in the setupBeforeClass.
          */
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
-
         enforcePolicy.decide(request);
+
         Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
-
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
-
         Context context = new Context();
         context.setIncomingMsg(incomingSoap);
 
@@ -353,7 +351,7 @@ public class EvidenceUtils {
         LOGGER.debug("X509Certificate getCertificate('{}', '{}', '{}", keyStorePath, StringUtils.isNotBlank(keyPassword) ? "******" : "N/A", certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
-        ks.load(keyStream, keyPassword.toCharArray());
+        ks.load(keyStream, keyPassword == null ? null : keyPassword.toCharArray());
         return (X509Certificate) ks.getCertificate(certAlias);
     }
 
@@ -363,7 +361,7 @@ public class EvidenceUtils {
         LOGGER.debug("PrivateKey getSigningKey('{}', '{}', '{}", keyStorePath, StringUtils.isNotBlank(keyPassword) ? "******" : "N/A", certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
-        ks.load(keyStream, keyPassword.toCharArray());
-        return (PrivateKey) ks.getKey(certAlias, keyPassword.toCharArray());
+        ks.load(keyStream, keyPassword == null ? null : keyPassword.toCharArray());
+        return (PrivateKey) ks.getKey(certAlias, keyPassword == null ? null : keyPassword.toCharArray());
     }
 }
