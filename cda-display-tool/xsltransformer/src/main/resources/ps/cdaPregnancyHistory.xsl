@@ -77,10 +77,10 @@
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </th>
-                                </tr>
                                 <xsl:for-each select="$pregnancyHistoryObservation">
                                     <xsl:call-template name="pregnancyHistorySectionEntry"/>
                                 </xsl:for-each>
+                                </tr>
                             </tbody>
                         </table>
                     </xsl:when>
@@ -119,7 +119,6 @@
         <!-- nullflavored act -->
         <xsl:choose>
             <xsl:when test="not($pregHistAct/@nullFlavor)">
-                <tr>
                     <td>
                         <xsl:choose>
                             <xsl:when test="not ($pregnancyExpectedDateNode/@nullFlavor)">
@@ -134,7 +133,6 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </td>
-                </tr>
             </xsl:when>
             <xsl:otherwise>
                 <tr>
