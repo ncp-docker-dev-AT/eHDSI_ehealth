@@ -697,6 +697,8 @@
     <!-- epSOSNullFlavor -->
     <xsl:template name="show-nullFlavor">
         <xsl:param name="code"/>
+        <i class="fas fa-exclamation-circle" style="color:#000066" aria-hidden="true"/>
+        <xsl:text> </xsl:text>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.37.xml'"/>
