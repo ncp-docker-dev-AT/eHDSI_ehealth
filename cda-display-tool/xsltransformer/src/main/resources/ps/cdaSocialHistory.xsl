@@ -46,69 +46,88 @@
         <xsl:choose>
             <!-- if sectionTitle is not missing for alerts  (Exception alerts section is missing)-->
             <xsl:when test=" ($socialHistorySectionTitleCode='29762-2')">
-                <span class="sectionTitle">
-                    <xsl:value-of select="$socialHistorySectionTitle"/>
-
-                </span>
-                <br/>
-                <xsl:choose>
-                    <xsl:when test="$shownarrative='true'">
-                        <a href="javascript: showhide('socHistTr'); self.focus(); void(0);">Show/Hide</a>
-                        <div id="socHistTr" style="display:block">
-                            <xsl:apply-templates
-                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='29762-2']/../n1:text/*"/>
+                <div class="wrap-collabsible">
+                    <input id="collapsible-social-history-section-original" class="toggle" type="checkbox" checked="true" />
+                    <label for="collapsible-social-history-section-original" class="lbl-toggle-title">
+                        <xsl:value-of select="$socialHistorySectionTitle"/>
+                    </label>
+                    <div class="collapsible-content-title">
+                        <div class="content-inner-title">
+                            <xsl:choose>
+                                <xsl:when test="$shownarrative='true'">
+                                    <div class="wrap-collabsible">
+                                        <input id="collapsible-social-history-original" class="toggle" type="checkbox"/>
+                                        <label for="collapsible-social-history-original" class="lbl-toggle">Original</label>
+                                        <div class="collapsible-content">
+                                            <div class="content-inner">
+                                                <xsl:apply-templates
+                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='29762-2']/../n1:text/*"/>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </xsl:when>
+                            </xsl:choose>
                             <br/>
-                        </div>
-                    </xsl:when>
-                </xsl:choose>
-                <xsl:choose>
-                    <xsl:when test="not($socHistAct/@nullFlavor)">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <th>
-                                        <!-- Observation Type -->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'44'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <th>
-                                        <!-- Date From  -->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'85'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <th>
-                                        <!-- Date To -->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'18'"/>
-                                        </xsl:call-template>
+                            <div class="wrap-collabsible">
+                                <input id="collapsible-social-history-translated" class="toggle" type="checkbox" checked="true"/>
+                                <label for="collapsible-social-history-translated" class="lbl-toggle">Translated</label>
+                                <div class="collapsible-content">
+                                    <div class="content-inner">
+                                        <xsl:choose>
+                                            <xsl:when test="not($socHistAct/@nullFlavor)">
+                                                <table class="translation_table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>
+                                                                <!-- Observation Type -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'44'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                            <th>
+                                                                <!-- Date From  -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'85'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                            <th>
+                                                                <!-- Date To -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'18'"/>
+                                                                </xsl:call-template>
 
-                                    </th>
-                                    <th>
-                                        <!--  Observation Value -->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'84'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                </tr>
-                                <xsl:for-each select="n1:entry">
-                                    <xsl:call-template name="socialHistorySectionEntry">
-                                    </xsl:call-template>
-                                </xsl:for-each>
-                            </tbody>
-                        </table>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <tr>
-                            <td colspan="3">
-                                <xsl:call-template name="show-nullFlavor">
-                                    <xsl:with-param name="code" select="$socHistAct/@nullFlavor"/>
-                                </xsl:call-template>
-                            </td>
-                        </tr>
-                    </xsl:otherwise>
-                </xsl:choose>
+                                                            </th>
+                                                            <th>
+                                                                <!--  Observation Value -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'84'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                        </tr>
+                                                        <xsl:for-each select="n1:entry">
+                                                            <xsl:call-template name="socialHistorySectionEntry">
+                                                            </xsl:call-template>
+                                                        </xsl:for-each>
+                                                    </tbody>
+                                                </table>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <tr>
+                                                    <td colspan="3">
+                                                        <xsl:call-template name="show-nullFlavor">
+                                                            <xsl:with-param name="code" select="$socHistAct/@nullFlavor"/>
+                                                        </xsl:call-template>
+                                                    </td>
+                                                </tr>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </xsl:when>
         </xsl:choose>
     </xsl:template>

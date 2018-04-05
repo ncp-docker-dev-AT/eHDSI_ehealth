@@ -27,7 +27,7 @@
     </xsl:template>
 
     <xsl:template name="vaccinationsSection">
-        <!-- Defing all needed variables -->
+        <!-- Defining all needed variables -->
         <xsl:variable name="vaccinationsSectionTitleCode" select="n1:code/@code"/>
 
         <xsl:variable name="vaccinationsSectionTitle"
@@ -41,58 +41,78 @@
         <xsl:choose>
             <!-- if sectionTitle is not missing for alerts (Exception alerts section is missing) -->
             <xsl:when test=" ($vaccinationsSectionTitleCode='11369-6')">
-                <span class="sectionTitle">
-                    <xsl:value-of select="$vaccinationsSectionTitle"/>
-                </span>
-                <br/>
-                <xsl:choose>
-                    <xsl:when test="$shownarrative='true'">
-                        <a href="javascript: showhide('vacActTr'); self.focus(); void(0);">Show/Hide</a>
-                        <div id="vacActTr" style="display:block">
-                            <xsl:apply-templates
-                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='11369-6']/../n1:text/*"/>
+                <div class="wrap-collabsible">
+                    <input id="collapsible-vaccinations-section-original" class="toggle" type="checkbox" checked="true" />
+                    <label for="collapsible-vaccinations-section-original" class="lbl-toggle-title">
+                        <xsl:value-of select="$vaccinationsSectionTitle"/>
+                    </label>
+                    <div class="collapsible-content-title">
+                        <div class="content-inner-title">
+                            <xsl:choose>
+                                <xsl:when test="$shownarrative='true'">
+                                    <div class="wrap-collabsible">
+                                        <input id="collapsible-vaccinations-original" class="toggle" type="checkbox"/>
+                                        <label for="collapsible-vaccinations-original" class="lbl-toggle">Original</label>
+                                        <div class="collapsible-content">
+                                            <div class="content-inner">
+                                                <xsl:apply-templates
+                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='11369-6']/../n1:text/*"/>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </xsl:when>
+                            </xsl:choose>
                             <br/>
+                            <!-- nullflavored act -->
+                            <div class="wrap-collabsible">
+                                <input id="collapsible-vaccinations-translated" class="toggle" type="checkbox" checked="true"/>
+                                <label for="collapsible-vaccinations-translated" class="lbl-toggle">Translated</label>
+                                <div class="collapsible-content">
+                                    <div class="content-inner">
+                                        <xsl:choose>
+                                            <xsl:when test="not ($vacAct/@nullFlavor)">
+                                                <table class="translation_table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>
+                                                                <!-- Vaccination -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'79'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                            <th>
+                                                                <!-- BrandName -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'9'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                            <th>
+                                                                <!-- Vaccination Date -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'80'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                        </tr>
+                                                        <xsl:for-each select="n1:entry">
+                                                            <xsl:call-template name="vaccinationsSectionEntry">
+                                                            </xsl:call-template>
+                                                        </xsl:for-each>
+                                                    </tbody>
+                                                </table>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:call-template name="show-nullFlavor">
+                                                    <xsl:with-param name="code" select="$vacAct/@nullFlavor"/>
+                                                </xsl:call-template>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </xsl:when>
-                </xsl:choose>
-                <xsl:choose>
-                    <!-- null flavor entry -->
-                    <xsl:when test="not ($vacAct/@nullFlavor)">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <th>
-                                        <!-- Vaccination -->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'79'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <th>
-                                        <!-- BrandName -->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'9'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <th>
-                                        <!-- Vaccination Date -->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'80'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                </tr>
-                                <xsl:for-each select="n1:entry">
-                                    <xsl:call-template name="vaccinationsSectionEntry">
-                                    </xsl:call-template>
-                                </xsl:for-each>
-                            </tbody>
-                        </table>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="code" select="$vacAct/@nullFlavor"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
+                    </div>
+                </div>
             </xsl:when>
         </xsl:choose>
     </xsl:template>

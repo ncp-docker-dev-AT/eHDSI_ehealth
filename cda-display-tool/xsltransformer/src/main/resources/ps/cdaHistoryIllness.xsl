@@ -38,58 +38,78 @@
         <xsl:choose>
             <!-- if sectionTitle is not missing for history illness  (Exception history illness section is missing)-->
             <xsl:when test=" ($historyIllnessSectionTitleCode='11348-0')">
-                <span class="sectionTitle">
-                    <xsl:value-of select="$historyIllnessSectionTitle"/>
-                </span>
-                <br/>
-                <xsl:choose>
-                    <xsl:when test="$shownarrative='true'">
-                        <a href="javascript: showhide('illnessTr'); self.focus(); void(0);">Show/Hide</a>
-                        <div id="illnessTr" style="display:block">
-                            <xsl:apply-templates
-                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='11348-0']/../n1:text/*"/>
+                <div class="wrap-collabsible">
+                    <input id="collapsible-history-illness-section-original" class="toggle" type="checkbox" checked="true" />
+                    <label for="collapsible-history-illness-section-original" class="lbl-toggle-title">
+                        <xsl:value-of select="$historyIllnessSectionTitle"/>
+                    </label>
+                    <div class="collapsible-content-title">
+                        <div class="content-inner-title">
+                            <xsl:choose>
+                                <xsl:when test="$shownarrative='true'">
+                                    <div class="wrap-collabsible">
+                                        <input id="collapsible-history-illness-original" class="toggle" type="checkbox"/>
+                                        <label for="collapsible-history-illness-original" class="lbl-toggle">Original</label>
+                                        <div class="collapsible-content">
+                                            <div class="content-inner">
+                                                <xsl:apply-templates
+                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='11348-0']/../n1:text/*"/>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </xsl:when>
+                            </xsl:choose>
                             <br/>
+                            <!-- nullflavored act -->
+                            <div class="wrap-collabsible">
+                                <input id="collapsible-history-illness-translated" class="toggle" type="checkbox" checked="true"/>
+                                <label for="collapsible-history-illness-translated" class="lbl-toggle">Translated</label>
+                                <div class="collapsible-content">
+                                    <div class="content-inner">
+                                        <xsl:choose>
+                                            <xsl:when test="not($historyAct/@nullFlavor)">
+                                                <table class="translation_table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>
+                                                                <!-- xsl:text>Closed Inactive Problem</xsl:text-->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'11'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                            <th>
+                                                                <!-- xsl:text>Onset Date</xsl:text-->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'45'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                            <th>
+                                                                <!-- xsl:text>End Date</xsl:text-->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'26'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                        </tr>
+                                                        <xsl:for-each select="n1:entry">
+                                                            <xsl:call-template name="historyIllnessSectionEntry">
+                                                            </xsl:call-template>
+                                                        </xsl:for-each>
+                                                    </tbody>
+                                                </table>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:call-template name="show-nullFlavor">
+                                                    <xsl:with-param name="code" select="$historyAct/@nullFlavor"/>
+                                                </xsl:call-template>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </xsl:when>
-                </xsl:choose>
-                <!-- nullflavored act -->
-                <xsl:choose>
-                    <xsl:when test="not($historyAct/@nullFlavor)">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <th>
-                                        <!-- xsl:text>Closed Inactive Problem</xsl:text-->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'11'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <th>
-                                        <!-- xsl:text>Onset Date</xsl:text-->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'45'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <th>
-                                        <!-- xsl:text>End Date</xsl:text-->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'26'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                </tr>
-                                <xsl:for-each select="n1:entry">
-                                    <xsl:call-template name="historyIllnessSectionEntry">
-                                    </xsl:call-template>
-                                </xsl:for-each>
-                            </tbody>
-                        </table>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="code" select="$historyAct/@nullFlavor"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
+                    </div>
+                </div>
             </xsl:when>
         </xsl:choose>
     </xsl:template>
@@ -182,7 +202,7 @@
                 <tr>
                     <td colspan="3">
                         <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="code" select="$historycAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="$historyAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

@@ -48,52 +48,72 @@
         <xsl:choose>
             <!-- if sectionTitle is not missing for physical findings  (Exception physical findings section is missing)-->
             <xsl:when test=" ($physicalFindingsSectionTitleCode='8716-3')">
-                <span class="sectionTitle">
-                    <xsl:value-of select="$physicalFindingsSectionTitle"/>
-                </span>
-                <br/>
-                <xsl:choose>
-                    <xsl:when test="$shownarrative='true'">
-                        <a href="javascript: showhide('physActTr'); self.focus(); void(0);">Show/Hide</a>
-                        <div id="physActTr" style="display:block">
-                            <xsl:apply-templates
-                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='8716-3']/../n1:text/*"/>
+                <div class="wrap-collabsible">
+                    <input id="collapsible-physical-findings-section-original" class="toggle" type="checkbox" checked="true" />
+                    <label for="collapsible-physical-findings-section-original" class="lbl-toggle-title">
+                        <xsl:value-of select="$physicalFindingsSectionTitle"/>
+                    </label>
+                    <div class="collapsible-content-title">
+                        <div class="content-inner-title">
+                            <xsl:choose>
+                                <xsl:when test="$shownarrative='true'">
+                                    <div class="wrap-collabsible">
+                                        <input id="collapsible-physical-findings-original" class="toggle" type="checkbox"/>
+                                        <label for="collapsible-physical-findings-original" class="lbl-toggle">Original</label>
+                                        <div class="collapsible-content">
+                                            <div class="content-inner">
+                                                <xsl:apply-templates
+                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='8716-3']/../n1:text/*"/>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </xsl:when>
+                            </xsl:choose>
                             <br/>
+                            <!-- nullflavored act -->
+                            <div class="wrap-collabsible">
+                                <input id="collapsible-physical-findings-translated" class="toggle" type="checkbox" checked="true"/>
+                                <label for="collapsible-physical-findings-translated" class="lbl-toggle">Translated</label>
+                                <div class="collapsible-content">
+                                    <div class="content-inner">
+                                        <xsl:choose>
+                                            <xsl:when test="not($physAct/@nullFlavor)">
+                                                <table class="translation_table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>
+                                                                <!--  Date -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'17'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                            <th>
+                                                                <xsl:value-of select="$systolicBLabel"/>
+                                                            </th>
+                                                            <th>
+                                                                <xsl:value-of select="$diastolicBLabel"/>
+                                                            </th>
+                                                        </tr>
+                                                        <xsl:for-each select="n1:entry">
+                                                            <xsl:call-template name="physicalFindingsSectionEntry">
+                                                            </xsl:call-template>
+                                                        </xsl:for-each>
+                                                    </tbody>
+                                                </table>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:call-template name="show-nullFlavor">
+                                                    <xsl:with-param name="code" select="$physAct/@nullFlavor"/>
+                                                </xsl:call-template>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </xsl:when>
-                </xsl:choose>
-                <!-- nullflavored act -->
-                <xsl:choose>
-                    <xsl:when test="not($physAct/@nullFlavor)">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <th>
-                                        <!--  Date -->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'17'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <th>
-                                        <xsl:value-of select="$systolicBLabel"/>
-                                    </th>
-                                    <th>
-                                        <xsl:value-of select="$diastolicBLabel"/>
-                                    </th>
-                                </tr>
-                                <xsl:for-each select="n1:entry">
-                                    <xsl:call-template name="physicalFindingsSectionEntry">
-                                    </xsl:call-template>
-                                </xsl:for-each>
-                            </tbody>
-                        </table>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="code" select="$physAct/@nullFlavor"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
+                    </div>
+                </div>
             </xsl:when>
         </xsl:choose>
     </xsl:template>
