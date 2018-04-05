@@ -44,7 +44,7 @@
         <!-- End definition of variables-->
 
         <xsl:choose>
-            <!-- if sectionTitle is not missing for alerts  (Exception alerts section is missing)-->
+            <!-- if sectionTitle is not missing for social history  (Exception social history section is missing)-->
             <xsl:when test=" ($socialHistorySectionTitleCode='29762-2')">
                 <span class="sectionTitle">
                     <xsl:value-of select="$socialHistorySectionTitle"/>
@@ -204,11 +204,6 @@
                     </td>
                 </tr>
             </xsl:otherwise>
-
         </xsl:choose>
-
-
     </xsl:template>
-
-
 </xsl:stylesheet>

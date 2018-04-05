@@ -116,8 +116,8 @@
                         </table>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$act/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$act/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
