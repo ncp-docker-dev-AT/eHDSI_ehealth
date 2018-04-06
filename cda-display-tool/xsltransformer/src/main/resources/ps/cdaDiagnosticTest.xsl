@@ -14,8 +14,6 @@
             <xsl:for-each select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section">
                 <xsl:call-template name="diagnosticSection"/>
             </xsl:for-each>
-            <br/>
-            <br/>
         </xsl:if>
     </xsl:template>
 
@@ -54,10 +52,18 @@
                 </xsl:choose>
                 <xsl:choose>
                     <xsl:when test="not($nullEntry/@nullFlavor)">
-                        <xsl:for-each select="n1:entry">
-                            <xsl:call-template name="diagnosticSectionEntry"/>
-                            <br/>
-                        </xsl:for-each>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <!-- TODO These values have to be added to the epsosDisplayLabel value set -->
+                                    <th>Diagnostic Date</th>
+                                    <th>Blood Group</th>
+                                </tr>
+                                <xsl:for-each select="n1:entry">
+                                    <xsl:call-template name="diagnosticSectionEntry"/>
+                                </xsl:for-each>
+                            </tbody>
+                        </table>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:call-template name="show-nullFlavor">
@@ -72,14 +78,6 @@
     <!-- FOR EACH ENTRY -->
     <xsl:template name="diagnosticSectionEntry">
         <!-- Defining all needed variables -->
-        <!--
-            <xsl:variable
-            name="diagnosticDate"
-            select="n1:observation/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.13.6']/../n1:code[@code='34530-6']/../n1:effectiveTime"/>
-        <xsl:variable
-            name="bloodGroup"
-            select="n1:observation/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.13.6']/../n1:code[@code='34530-6']/../n1:value/@displayName"/>
-         -->
         <!--  release constraint with no root templateid -->
         <xsl:variable
                 name="diagnosticDate"
@@ -88,12 +86,6 @@
                 name="bloodGroup"
                 select="n1:observation/n1:code[@code='34530-6']/../n1:value/@displayName"/>
         <xsl:variable
-                name="bloodGroupTranslation1"
-                select="n1:observation/n1:code[@code='34530-6']/../n1:value/n1:translation/n1:translation/@displayName"/>
-        <xsl:variable
-                name="bloodGroupTranslation2"
-                select="n1:observation/n1:code[@code='34530-6']/../n1:value/n1:translation/@displayName"/>
-        <xsl:variable
                 name="nullEntry"
                 select="."/>
         <!-- End definition of variables-->
@@ -101,18 +93,25 @@
         <xsl:choose>
             <!-- if sectionTitle is not missing for diagnostics  (Exception diagnostics section is missing)-->
             <xsl:when test="not($nullEntry/@nullFlavor)">
-                <span>
-                    <xsl:call-template name="show-time">
-                        <xsl:with-param name="datetime" select="$diagnosticDate"/>
-                    </xsl:call-template>&#160;:
-                    <xsl:value-of select="$bloodGroup"/>
-                </span>
-                <br/>
+                <tr>
+                    <td>
+                        <xsl:call-template name="show-time">
+                            <xsl:with-param name="datetime" select="$diagnosticDate"/>
+                        </xsl:call-template>
+                    </td>
+                    <td>
+                        <xsl:value-of select="$bloodGroup"/>
+                    </td>
+                </tr>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="show-nullFlavor">
-                    <xsl:with-param name="code" select="$nullEntry/@nullFlavor"/>
-                </xsl:call-template>
+                <tr>
+                    <td colspan="2">
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$nullEntry/@nullFlavor"/>
+                        </xsl:call-template>
+                    </td>
+                </tr>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

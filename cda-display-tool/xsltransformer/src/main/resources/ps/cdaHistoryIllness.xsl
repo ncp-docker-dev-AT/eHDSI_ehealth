@@ -182,7 +182,7 @@
                 <tr>
                     <td colspan="3">
                         <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="code" select="$historycAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="$historyAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>
