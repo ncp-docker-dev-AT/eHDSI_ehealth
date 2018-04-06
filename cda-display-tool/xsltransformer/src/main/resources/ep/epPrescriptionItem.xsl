@@ -255,12 +255,14 @@
     </xsl:template>
 
     <xsl:template name="epPrescriptionItemDetails">
+        <xsl:variable name="manufacturedMaterialStrength"
+                      select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:desc"/>
         <xsl:attribute name="id">
             <xsl:text>mytable</xsl:text>
             <xsl:value-of select="position()"/>
         </xsl:attribute>
         <table>
-            <colgroup>
+        <colgroup>
                 <col span="1" style="width: 20%;"/>
                 <col span="1" style="width: 15%;"/>
                 <col span="1" style="width: 10%;"/>
@@ -268,6 +270,11 @@
                 <col span="1" style="width: 20%;"/>
                 <col span="1" style="width: 20%;"/>
             </colgroup>
+        <table>
+            <xsl:attribute name="id">
+                <xsl:text>mytable</xsl:text>
+                <xsl:value-of select="position()"/>
+            </xsl:attribute>
             <form name="DISPENSE_FORM" method="post">
                 <xsl:attribute name="action">
                     <xsl:value-of select="$actionpath"/>
