@@ -64,7 +64,6 @@ td {
 	border-style:solid;
 	vertical-align: top;
 	text-align: left;
-/*	color:green;*/
 	font-weight: normal;
 }
 th {
@@ -99,6 +98,16 @@ th {
 	color:#039;
 	font-size:12px;
 }
+.ingredients_table{
+	border-bottom:0px solid #666;
+}
+.ingredients_table th {
+	border:0;
+	background-color:#B8B8B8;
+}
+.ingredients_table td {
+	font-size:12px;
+}
 .tdtext {
 	color:#666;
 }
@@ -112,6 +121,13 @@ th {
 }
 .narrow_table {
 	width: 35%;
+}
+.codeSystem {
+    background-color:#9FBFDF;
+    margin-top:20px;
+    padding-left:10px;
+    padding-right:10px;
+    border-radius:10px 10px 10px 10px;
 }
                     </xsl:text>
                 </style>
