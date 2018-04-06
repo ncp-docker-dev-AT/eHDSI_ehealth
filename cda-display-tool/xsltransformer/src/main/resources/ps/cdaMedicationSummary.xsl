@@ -231,7 +231,7 @@
                                         <xsl:otherwise>
                                             <xsl:call-template name="show-nullFlavor">
                                                 <xsl:with-param name="code"
-                                                                select="$medActiveIgredientNode/@nullFlavor"/>
+                                                                select="$medActiveIngredientNode/@nullFlavor"/>
                                             </xsl:call-template>
                                         </xsl:otherwise>
                                     </xsl:choose>
