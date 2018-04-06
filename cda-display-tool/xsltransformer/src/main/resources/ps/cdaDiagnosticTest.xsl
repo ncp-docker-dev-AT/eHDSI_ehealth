@@ -36,6 +36,53 @@
         <xsl:choose>
             <!-- if sectionTitle is not missing for relevant diagnostic test (Exception relevant diagnostic test section is missing) -->
             <xsl:when test=" ($diagSectionTitleCode='30954-2')">
+                <div class="wrap-collabsible">
+                    <input id="collapsible-diagnostic-test-section-original" class="toggle" type="checkbox" checked="true" />
+                    <label for="collapsible-diagnostic-test-section-original" class="lbl-toggle-title">
+                        <xsl:value-of select="$diagSectionTitle"/>
+                    </label>
+                    <div class="collapsible-content-title">
+                        <div class="content-inner-title">
+                            <xsl:choose>
+                                <xsl:when test="$shownarrative='true'">
+                                    <div class="wrap-collabsible">
+                                        <input id="collapsible-diagnostic-test-original" class="toggle" type="checkbox"/>
+                                        <label for="collapsible-diagnostic-test-original" class="lbl-toggle">Original</label>
+                                        <div class="collapsible-content">
+                                            <div class="content-inner">
+                                                <xsl:apply-templates
+                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='30954-2']/../n1:text/*"/>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </xsl:when>
+                            </xsl:choose>
+                            <br/>
+                            <div class="wrap-collabsible">
+                                <input id="collapsible-diagnostic-test-translated" class="toggle" type="checkbox" checked="true"/>
+                                <label for="collapsible-diagnostic-test-translated" class="lbl-toggle">Translated</label>
+                                <div class="collapsible-content">
+                                    <div class="content-inner">
+                                        <xsl:choose>
+                                            <xsl:when test="not($nullEntry/@nullFlavor)">
+                                                <xsl:for-each select="n1:entry">
+                                                    <xsl:call-template name="diagnosticSectionEntry"/>
+                                                    <br/>
+                                                </xsl:for-each>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:call-template name="show-nullFlavor">
+                                                    <xsl:with-param name="code" select="$nullEntry/@nullFlavor"/>
+                                                </xsl:call-template>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <span class="sectionTitle">
                     <xsl:value-of select="$diagSectionTitle"/>&#160;&#160;
                 </span>

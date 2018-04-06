@@ -39,61 +39,57 @@
         <!-- End definition of variables-->
 
         <xsl:choose>
-            <!-- if sectionTitle is not missing for pregnancy history (Exception pregnancy history section is missing)-->
+            <!-- if sectionTitle is not missing for alerts  (Exception alerts section is missing)-->
             <xsl:when test="($pregnancyHistorySectionTitleCode='10162-6')">
-                <span class="sectionTitle">
-                    <xsl:value-of select="$pregnancyHistorySectionTitle"/>
-                </span>
-                <br/>
-                <xsl:choose>
-                    <xsl:when test="$shownarrative='true'">
-                        <a href="javascript: showhide('pregHistTr'); self.focus(); void(0);">Show/Hide</a>
-                        <div id="pregHistTr" style="display:block">
-                            <xsl:apply-templates
-                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='10162-6']/../n1:text/*"/>
+                <div class="wrap-collabsible">
+                    <input id="collapsible-pregnancy-history-section-original" class="toggle" type="checkbox" checked="true" />
+                    <label for="collapsible-pregnancy-history-section-original" class="lbl-toggle-title">
+                        <xsl:value-of select="$pregnancyHistorySectionTitle"/>
+                    </label>
+                    <div class="collapsible-content-title">
+                        <div class="content-inner-title">
+                            <xsl:choose>
+                                <xsl:when test="$shownarrative='true'">
+                                    <div class="wrap-collabsible">
+                                        <input id="collapsible-pregnancy-history-original" class="toggle" type="checkbox"/>
+                                        <label for="collapsible-pregnancy-history-original" class="lbl-toggle">Original</label>
+                                        <div class="collapsible-content">
+                                            <div class="content-inner">
+                                                <xsl:apply-templates
+                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='10162-6']/../n1:text/*"/>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </xsl:when>
+                            </xsl:choose>
                             <br/>
-                        </div>
-                    </xsl:when>
-                </xsl:choose>
-                <xsl:choose>
-                    <xsl:when test="not($pregnancyHistoryObservation/@nullFlavor)">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <th>
+                            <div class="wrap-collabsible">
+                                <input id="collapsible-pregnancy-history-translated" class="toggle" type="checkbox" checked="true"/>
+                                <label for="collapsible-pregnancy-history-translated" class="lbl-toggle">Translated</label>
+                                <div class="collapsible-content">
+                                    <div class="content-inner">
+                                        <!-- nullflavored act -->
                                         <xsl:choose>
-                                            <xsl:when test="$pregnancyHistoryObservation/n1:code/@displayName">
-                                                <!-- TODO this has to become a value in the epsosDisplayLabel value set -->
-                                                <xsl:value-of select="$pregnancyHistoryObservation/n1:code/@displayName"/>
+                                            <xsl:when test="not($pregHistAct/@nullFlavor)">
+                                                <xsl:for-each select="n1:entry">
+                                                    <xsl:call-template name="pregnancyHistorySectionEntry">
+                                                    </xsl:call-template>
+                                                    <br/>
+                                                </xsl:for-each>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <!-- uncoded element Problem -->
-                                                <xsl:if test="$pregnancyHistoryObservation/n1:value/n1:originalText/n1:reference/@value">
-                                                    <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="code"
-                                                                        select="$pregnancyHistoryObservation/n1:value/n1:originalText/n1:reference/@value"/>
-                                                    </xsl:call-template>
-                                                </xsl:if>
+                                                <xsl:call-template name="show-nullFlavor">
+                                                    <xsl:with-param name="code" select="$pregHistAct/@nullFlavor"/>
+                                                </xsl:call-template>
                                             </xsl:otherwise>
                                         </xsl:choose>
-                                    </th>
-                                <xsl:for-each select="$pregnancyHistoryObservation">
-                                    <xsl:call-template name="pregnancyHistorySectionEntry"/>
-                                </xsl:for-each>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <tr>
-                            <td>
-                                <xsl:call-template name="show-nullFlavor">
-                                    <xsl:with-param name="code" select="$pregnancyHistoryObservation/@nullFlavor"/>
-                                </xsl:call-template>
-                            </td>
-                        </tr>
-                    </xsl:otherwise>
-                </xsl:choose>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </xsl:when>
         </xsl:choose>
     </xsl:template>
