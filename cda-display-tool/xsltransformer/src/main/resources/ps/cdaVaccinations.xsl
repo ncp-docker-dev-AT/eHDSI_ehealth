@@ -27,7 +27,7 @@
     </xsl:template>
 
     <xsl:template name="vaccinationsSection">
-        <!-- Defing all needed variables -->
+        <!-- Defining all needed variables -->
         <xsl:variable name="vaccinationsSectionTitleCode" select="n1:code/@code"/>
 
         <xsl:variable name="vaccinationsSectionTitle"
@@ -99,7 +99,7 @@
 
     <!-- foreach entry of the section -->
     <xsl:template name="vaccinationsSectionEntry">
-        <!-- Defing all needed variables -->
+        <!-- Defining all needed variables -->
         <xsl:variable name="vaccinationsNode"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:code"/>
 

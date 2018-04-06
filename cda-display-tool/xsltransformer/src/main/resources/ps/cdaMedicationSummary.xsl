@@ -74,54 +74,58 @@
                                 <xsl:if
                                         test="	not ($medCode='182849000' or $medCode='408350003' or $medCode='182904002')">
                                     <tr>
-                                        <th>
+                                        <th rowspan="2">
                                             <!-- Active ingredient -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'1'"/>
                                             </xsl:call-template>
                                         </th>
-                                        <th>
+                                        <th rowspan="2">
                                             <!-- Strength -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'70'"/>
                                             </xsl:call-template>
                                         </th>
-                                        <th>
+                                        <th rowspan="2">
                                             <!-- Dose form -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'25'"/>
                                             </xsl:call-template>
                                         </th>
-                                        <th>
+                                        <th colspan="2">
                                             <!-- Units per intake -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'78'"/>
                                             </xsl:call-template>
                                         </th>
-                                        <th>
+                                        <th rowspan="2">
                                             <!-- Frequency of intakes -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'32'"/>
                                             </xsl:call-template>
                                         </th>
-                                        <th>
+                                        <th rowspan="2">
                                             <!-- Route of Administration -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'67'"/>
                                             </xsl:call-template>
                                         </th>
-                                        <th>
+                                        <th rowspan="2">
                                             <!-- Onset Date -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'45'"/>
                                             </xsl:call-template>
                                         </th>
-                                        <th>
+                                        <th rowspan="2">
                                             <!-- End Date -->
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'26'"/>
                                             </xsl:call-template>
                                         </th>
+                                    </tr>
+                                    <tr>
+                                        <th>Low</th>
+                                        <th>High</th>
                                     </tr>
                                 </xsl:if>
                                 <xsl:for-each select="n1:entry">
@@ -143,14 +147,8 @@
     <xsl:template name="medicationSummarySectionEntry">
         <xsl:variable name="medDose"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:formCode/@displayName"/>
-        <xsl:variable name="medUnitIntakeLow"
-                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:doseQuantity/n1:low/@value"/>
-        <xsl:variable name="medUnitIntakeHigh"
-                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:doseQuantity/n1:high/@value"/>
-        <xsl:variable name="medUnitIntakeUnitLow"
-                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:doseQuantity/n1:low/@unit"/>
-        <xsl:variable name="medUnitIntakeUnitHigh"
-                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:doseQuantity/n1:high/@unit"/>
+        <xsl:variable name="medUnitIntake"
+                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:doseQuantity"/>
         <xsl:variable name="medFrequencyIntake"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[2]"/>
         <xsl:variable name="medFrequencyIntakeType"
@@ -250,11 +248,13 @@
                                     <xsl:value-of select="$medDose"/>
                                 </td>
                                 <td>
-                                    <xsl:call-template name="show-numberUnitIntake">
-                                        <xsl:with-param name="medUnitIntakeLow" select="$medUnitIntakeLow"/>
-                                        <xsl:with-param name="medUnitIntakeHigh" select="$medUnitIntakeHigh"/>
-                                        <xsl:with-param name="medUnitIntakeUnitLow" select="$medUnitIntakeUnitLow"/>
-                                        <xsl:with-param name="medUnitIntakeUnitHigh" select="$medUnitIntakeUnitHigh"/>
+                                    <xsl:call-template name="show-numberUnitIntakeLow">
+                                        <xsl:with-param name="medUnitIntake" select="$medUnitIntake"/>
+                                    </xsl:call-template>
+                                </td>
+                                <td>
+                                    <xsl:call-template name="show-numberUnitIntakeHigh">
+                                        <xsl:with-param name="medUnitIntake" select="$medUnitIntake"/>
                                     </xsl:call-template>
                                 </td>
                                 <td>
