@@ -88,54 +88,59 @@
                                                         <xsl:if
                                                                 test="	not ($medCode='182849000' or $medCode='408350003' or $medCode='182904002')">
                                                             <tr>
-                                                                <th>
+                                                                <th rowspan="2">
                                                                     <!-- Active ingredient -->
                                                                     <xsl:call-template name="show-displayLabels">
                                                                         <xsl:with-param name="code" select="'1'"/>
                                                                     </xsl:call-template>
                                                                 </th>
-                                                                <th>
+                                                                <th rowspan="2">
                                                                     <!-- Strength -->
                                                                     <xsl:call-template name="show-displayLabels">
                                                                         <xsl:with-param name="code" select="'70'"/>
                                                                     </xsl:call-template>
                                                                 </th>
-                                                                <th>
+                                                                <th rowspan="2">
                                                                     <!-- Dose form -->
                                                                     <xsl:call-template name="show-displayLabels">
                                                                         <xsl:with-param name="code" select="'25'"/>
                                                                     </xsl:call-template>
                                                                 </th>
-                                                                <th>
+                                                                <th colspan="2">
                                                                     <!-- Units per intake -->
                                                                     <xsl:call-template name="show-displayLabels">
                                                                         <xsl:with-param name="code" select="'78'"/>
                                                                     </xsl:call-template>
                                                                 </th>
-                                                                <th>
+                                                                <th rowspan="2">
                                                                     <!-- Frequency of intakes -->
                                                                     <xsl:call-template name="show-displayLabels">
                                                                         <xsl:with-param name="code" select="'32'"/>
                                                                     </xsl:call-template>
                                                                 </th>
-                                                                <th>
+                                                                <th rowspan="2">
                                                                     <!-- Route of Administration -->
                                                                     <xsl:call-template name="show-displayLabels">
                                                                         <xsl:with-param name="code" select="'67'"/>
                                                                     </xsl:call-template>
                                                                 </th>
-                                                                <th>
+                                                                <th rowspan="2">
                                                                     <!-- Onset Date -->
                                                                     <xsl:call-template name="show-displayLabels">
                                                                         <xsl:with-param name="code" select="'45'"/>
                                                                     </xsl:call-template>
                                                                 </th>
-                                                                <th>
+                                                                <th rowspan="2">
                                                                     <!-- End Date -->
                                                                     <xsl:call-template name="show-displayLabels">
                                                                         <xsl:with-param name="code" select="'26'"/>
                                                                     </xsl:call-template>
                                                                 </th>
+                                                            </tr>
+                                                            <tr>
+                                                                <!-- TODO these values should be added to the epsosDisplayLabel valueSet -->
+                                                                <th>Min</th>
+                                                                <th>Max</th>
                                                             </tr>
                                                         </xsl:if>
                                                         <xsl:for-each select="n1:entry">
@@ -208,7 +213,7 @@
                         <xsl:when
                                 test="($medCode='182849000' or $medCode='408350003' or $medCode='182904002')">
                             <tr>
-                                <td coslpan="6">
+                                <td colspan="6">
                                     <span class="tdtext">
                                         <xsl:call-template name="show-codeNoMedication">
                                             <xsl:with-param name="code" select="$medCode"/>
@@ -286,7 +291,6 @@
                                     <xsl:call-template name="show-time">
                                         <xsl:with-param name="datetime" select="$medOnSetDate"/>
                                     </xsl:call-template>
-                                    &#160;
                                 </td>
                                 <td>
                                     <xsl:call-template name="show-time">
