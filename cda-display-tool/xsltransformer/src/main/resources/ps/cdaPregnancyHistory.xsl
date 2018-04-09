@@ -19,6 +19,7 @@
                     <xsl:call-template name="pregnancyHistorySection"/>
                 </xsl:for-each>
                 <br/>
+                <br/>
             </xsl:when>
             <!-- in the case the social history section is missing, nothing is displayed -->
         </xsl:choose>
@@ -71,17 +72,42 @@
                                     <div class="content-inner">
                                         <!-- nullflavored act -->
                                         <xsl:choose>
-                                            <xsl:when test="not($pregHistAct/@nullFlavor)">
-                                                <xsl:for-each select="n1:entry">
-                                                    <xsl:call-template name="pregnancyHistorySectionEntry">
-                                                    </xsl:call-template>
-                                                    <br/>
-                                                </xsl:for-each>
+                                            <xsl:when test="not($pregnancyHistoryObservation/@nullFlavor)">
+                                                <table class="translation_table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>
+                                                                <xsl:choose>
+                                                                    <xsl:when test="$pregnancyHistoryObservation/n1:code/@displayName">
+                                                                        <!-- TODO this has to become a value in the epsosDisplayLabel value set -->
+                                                                        <xsl:value-of select="$pregnancyHistoryObservation/n1:code/@displayName"/>
+                                                                    </xsl:when>
+                                                                    <xsl:otherwise>
+                                                                        <!-- uncoded element Problem -->
+                                                                        <xsl:if test="$pregnancyHistoryObservation/n1:value/n1:originalText/n1:reference/@value">
+                                                                            <xsl:call-template name="show-uncodedElement">
+                                                                                <xsl:with-param name="code"
+                                                                                                select="$pregnancyHistoryObservation/n1:value/n1:originalText/n1:reference/@value"/>
+                                                                            </xsl:call-template>
+                                                                        </xsl:if>
+                                                                    </xsl:otherwise>
+                                                                </xsl:choose>
+                                                            </th>
+                                                            <xsl:for-each select="$pregnancyHistoryObservation">
+                                                                <xsl:call-template name="pregnancyHistorySectionEntry"/>
+                                                            </xsl:for-each>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-nullFlavor">
-                                                    <xsl:with-param name="code" select="$pregHistAct/@nullFlavor"/>
-                                                </xsl:call-template>
+                                                <tr>
+                                                    <td>
+                                                        <xsl:call-template name="show-nullFlavor">
+                                                            <xsl:with-param name="code" select="$pregnancyHistoryObservation/@nullFlavor"/>
+                                                        </xsl:call-template>
+                                                    </td>
+                                                </tr>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </div>
@@ -99,9 +125,6 @@
 
         <!-- Defining all needed variables -->
         <xsl:variable
-                name="pregnancyTypeDate"
-                select="n1:code/@displayName"/>
-        <xsl:variable
                 name="pregnancyExpectedDate"
                 select="n1:value[@xsi:type='TS' or substring-after(@xsi:type, ':')='TS']"/>
         <xsl:variable
@@ -115,20 +138,20 @@
         <!-- nullflavored act -->
         <xsl:choose>
             <xsl:when test="not($pregHistAct/@nullFlavor)">
-                    <td>
-                        <xsl:choose>
-                            <xsl:when test="not ($pregnancyExpectedDateNode/@nullFlavor)">
-                                <xsl:call-template name="show-time">
-                                    <xsl:with-param name="datetime" select="$pregnancyExpectedDate"/>
-                                </xsl:call-template>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:call-template name="show-nullFlavor">
-                                    <xsl:with-param name="code" select="$pregnancyExpectedDateNode/@nullFlavor"/>
-                                </xsl:call-template>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </td>
+                <td>
+                    <xsl:choose>
+                        <xsl:when test="not ($pregnancyExpectedDateNode/@nullFlavor)">
+                            <xsl:call-template name="show-time">
+                                <xsl:with-param name="datetime" select="$pregnancyExpectedDate"/>
+                            </xsl:call-template>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:call-template name="show-nullFlavor">
+                                <xsl:with-param name="code" select="$pregnancyExpectedDateNode/@nullFlavor"/>
+                            </xsl:call-template>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </td>
             </xsl:when>
             <xsl:otherwise>
                 <tr>

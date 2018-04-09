@@ -589,79 +589,83 @@
         <!-- year -->
         <xsl:variable name="year" select="substring ($date, 1, 4)"/>
         <xsl:value-of select="$year"/>
-        <xsl:text>-</xsl:text>
-        <!-- month -->
-        <xsl:variable name="month" select="substring ($date, 5, 2)"/>
-        <xsl:value-of select="$month"/>
-        <xsl:text>-</xsl:text>
-        <!-- day -->
-        <xsl:variable name="day" select="substring ($date, 7, 2)"/>
-        <xsl:value-of select="$day"/>
+        <xsl:if test="string-length($date) &gt; 4">
+            <xsl:text>-</xsl:text>
+            <!-- month -->
+            <xsl:variable name="month" select="substring ($date, 5, 2)"/>
+            <xsl:value-of select="$month"/>
+            <xsl:if test="string-length($date) &gt; 6">
+                <xsl:text>-</xsl:text>
+                <!-- day -->
+                <xsl:variable name="day" select="substring ($date, 7, 2)"/>
+                <xsl:value-of select="$day"/>
 
-        <xsl:if test="string-length($date) &gt; 8">
-            <xsl:text>T</xsl:text>
-            <!-- time -->
-            <xsl:variable name="time">
-                <xsl:value-of select="substring($date,9,6)"/>
-            </xsl:variable>
-            <xsl:variable name="hh">
-                <xsl:value-of select="substring($time,1,2)"/>
-            </xsl:variable>
-            <xsl:variable name="mm">
-                <xsl:value-of select="substring($time,3,2)"/>
-            </xsl:variable>
-            <xsl:variable name="ss">
-                <xsl:value-of select="substring($time,5,2)"/>
-            </xsl:variable>
-            <xsl:if test="string-length($hh)&gt;1">
-                <xsl:value-of select="$hh"/>
-                <xsl:if
-                        test="string-length($mm)&gt;1 and not(contains($mm,'-')) and not (contains($mm,'+'))">
-                    <xsl:text>:</xsl:text>
-                    <xsl:value-of select="$mm"/>
-                    <xsl:if
-                            test="string-length($ss)&gt;1 and not(contains($ss,'-')) and not (contains($ss,'+'))">
-                        <xsl:text>:</xsl:text>
-                        <xsl:value-of select="$ss"/>
+                <xsl:if test="string-length($date) &gt; 8">
+                    <xsl:text>T</xsl:text>
+                    <!-- time -->
+                    <xsl:variable name="time">
+                        <xsl:value-of select="substring($date,9,6)"/>
+                    </xsl:variable>
+                    <xsl:variable name="hh">
+                        <xsl:value-of select="substring($time,1,2)"/>
+                    </xsl:variable>
+                    <xsl:variable name="mm">
+                        <xsl:value-of select="substring($time,3,2)"/>
+                    </xsl:variable>
+                    <xsl:variable name="ss">
+                        <xsl:value-of select="substring($time,5,2)"/>
+                    </xsl:variable>
+                    <xsl:if test="string-length($hh)&gt;1">
+                        <xsl:value-of select="$hh"/>
+                        <xsl:if
+                                test="string-length($mm)&gt;1 and not(contains($mm,'-')) and not (contains($mm,'+'))">
+                            <xsl:text>:</xsl:text>
+                            <xsl:value-of select="$mm"/>
+                            <xsl:if
+                                    test="string-length($ss)&gt;1 and not(contains($ss,'-')) and not (contains($ss,'+'))">
+                                <xsl:text>:</xsl:text>
+                                <xsl:value-of select="$ss"/>
+                            </xsl:if>
+                        </xsl:if>
                     </xsl:if>
+                    <!-- time zone -->
+                    <xsl:variable name="tzon">
+                        <xsl:choose>
+                            <xsl:when test="contains($date,'+')">
+                                <xsl:text>+</xsl:text>
+                                <xsl:value-of select="substring(substring-after($date, '+'),1,2)"/>
+                                <xsl:text>:</xsl:text>
+                                <xsl:value-of select="substring(substring-after($date, '+'),3,2)"/>
+                            </xsl:when>
+                            <xsl:when test="contains($date,'-')">
+                                <xsl:text>-</xsl:text>
+                                <xsl:value-of select="substring(substring-after($date, '-'),1,2)"/>
+                                <xsl:text>:</xsl:text>
+                                <xsl:value-of select="substring(substring-after($date, '-'),3,2)"/>
+                            </xsl:when>
+                        </xsl:choose>
+                    </xsl:variable>
+                    <xsl:choose>
+                        <!-- reference: http://www.timeanddate.com/library/abbreviations/timezones/na/ -->
+                        <xsl:when test="$tzon = '-0500' ">
+                            <xsl:text>, EST</xsl:text>
+                        </xsl:when>
+                        <xsl:when test="$tzon = '-0600' ">
+                            <xsl:text>, CST</xsl:text>
+                        </xsl:when>
+                        <xsl:when test="$tzon = '-0700' ">
+                            <xsl:text>, MST</xsl:text>
+                        </xsl:when>
+                        <xsl:when test="$tzon = '-0800' ">
+                            <xsl:text>, PST</xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text> </xsl:text>
+                            <xsl:value-of select="$tzon"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:if>
             </xsl:if>
-            <!-- time zone -->
-            <xsl:variable name="tzon">
-                <xsl:choose>
-                    <xsl:when test="contains($date,'+')">
-                        <xsl:text>+</xsl:text>
-                        <xsl:value-of select="substring(substring-after($date, '+'),1,2)"/>
-                        <xsl:text>:</xsl:text>
-                        <xsl:value-of select="substring(substring-after($date, '+'),3,2)"/>
-                    </xsl:when>
-                    <xsl:when test="contains($date,'-')">
-                        <xsl:text>-</xsl:text>
-                        <xsl:value-of select="substring(substring-after($date, '-'),1,2)"/>
-                        <xsl:text>:</xsl:text>
-                        <xsl:value-of select="substring(substring-after($date, '-'),3,2)"/>
-                    </xsl:when>
-                </xsl:choose>
-            </xsl:variable>
-            <xsl:choose>
-                <!-- reference: http://www.timeanddate.com/library/abbreviations/timezones/na/ -->
-                <xsl:when test="$tzon = '-0500' ">
-                    <xsl:text>, EST</xsl:text>
-                </xsl:when>
-                <xsl:when test="$tzon = '-0600' ">
-                    <xsl:text>, CST</xsl:text>
-                </xsl:when>
-                <xsl:when test="$tzon = '-0700' ">
-                    <xsl:text>, MST</xsl:text>
-                </xsl:when>
-                <xsl:when test="$tzon = '-0800' ">
-                    <xsl:text>, PST</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="$tzon"/>
-                </xsl:otherwise>
-            </xsl:choose>
         </xsl:if>
     </xsl:template>
 

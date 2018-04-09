@@ -14,6 +14,8 @@
             <xsl:for-each select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section">
                 <xsl:call-template name="diagnosticSection"/>
             </xsl:for-each>
+            <br/>
+            <br/>
         </xsl:if>
     </xsl:template>
 
@@ -66,10 +68,18 @@
                                     <div class="content-inner">
                                         <xsl:choose>
                                             <xsl:when test="not($nullEntry/@nullFlavor)">
-                                                <xsl:for-each select="n1:entry">
-                                                    <xsl:call-template name="diagnosticSectionEntry"/>
-                                                    <br/>
-                                                </xsl:for-each>
+                                                <table class="translation_table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <!-- TODO These values have to be added to the epsosDisplayLabel value set -->
+                                                            <th>Diagnostic Date</th>
+                                                            <th>Blood Group</th>
+                                                        </tr>
+                                                        <xsl:for-each select="n1:entry">
+                                                            <xsl:call-template name="diagnosticSectionEntry"/>
+                                                        </xsl:for-each>
+                                                    </tbody>
+                                                </table>
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <xsl:call-template name="show-nullFlavor">
@@ -83,41 +93,6 @@
                         </div>
                     </div>
                 </div>
-                <span class="sectionTitle">
-                    <xsl:value-of select="$diagSectionTitle"/>&#160;&#160;
-                </span>
-                <br/>
-                <xsl:choose>
-                    <xsl:when test="$shownarrative='true'">
-                        <a href="javascript: showhide('diagTr'); self.focus(); void(0);">Show/Hide</a>
-                        <div id="diagTr" style="display:block">
-                            <xsl:apply-templates
-                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='30954-2']/../n1:text"/>
-                            <br/>
-                        </div>
-                    </xsl:when>
-                </xsl:choose>
-                <xsl:choose>
-                    <xsl:when test="not($nullEntry/@nullFlavor)">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <!-- TODO These values have to be added to the epsosDisplayLabel value set -->
-                                    <th>Diagnostic Date</th>
-                                    <th>Blood Group</th>
-                                </tr>
-                                <xsl:for-each select="n1:entry">
-                                    <xsl:call-template name="diagnosticSectionEntry"/>
-                                </xsl:for-each>
-                            </tbody>
-                        </table>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="code" select="$nullEntry/@nullFlavor"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
             </xsl:when>
         </xsl:choose>
     </xsl:template>
