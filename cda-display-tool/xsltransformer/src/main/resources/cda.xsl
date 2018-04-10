@@ -379,7 +379,7 @@ input[type='checkbox'] {
 
 
 .codeSystem {
-    background-color:#9FBFDF;
+    background-color:#666;
     margin-top:20px;
     padding-left:10px;
     padding-right:10px;
