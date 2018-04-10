@@ -816,8 +816,8 @@
             <colgroup>
                 <col span="1" style="width: 15%;"/>
                 <col span="1" style="width: 10%;"/>
-                <col span="1" style="width: 55%;"/>
-                <col span="1" style="width: 20%;"/>
+                <col span="1" style="width: 45%;"/>
+                <col span="1" style="width: 30%;"/>
             </colgroup>
 
             <tbody>
@@ -847,56 +847,34 @@
     </xsl:template>
 
     <xsl:template name="epPrescriptionItem">
-        <script>
-            <xsl:attribute name="type">
-                <xsl:text>text/javascript</xsl:text>
-            </xsl:attribute>
-            <xsl:text>i=0;</xsl:text>
-        </script>
-        <table class="narr_table">
-            <xsl:for-each select="$entryNode">
-                <tr>
-                    <th>
-                        <countNo><xsl:value-of select="position()"/>.
-                        </countNo>
-                        <xsl:call-template name="pharmaceuticalSubstanceHeader"/>
-                        <a>
-                            <xsl:attribute name="href">
-                                <xsl:text disable-output-escaping="yes">javascript:void();</xsl:text>
-                            </xsl:attribute>
-                            <xsl:attribute name="onclick">
-                                <xsl:text disable-output-escaping="yes">showhide(&apos;mytable</xsl:text>
-                                <xsl:value-of select="position()"/>
-                                <xsl:text disable-output-escaping="yes">&apos;)</xsl:text>
-                            </xsl:attribute>
-                            <xsl:text>Show/Hide</xsl:text>
-                        </a>
-                    </th>
-                </tr>
-                <table>
-                    <tr>
-                        <td>
-                            <xsl:call-template name="epPrescriptionItemDetails"/>
-                        </td>
-                    </tr>
-                </table>
+        <xsl:for-each select="$entryNode">
+            <div class="wrap-collabsible">
+                <input id="collapsible-prescriptionItem-header" class="toggle" type="checkbox" checked="true"/>
+                <label for="collapsible-prescriptionItem-header" class="lbl-toggle-title">
+                    <countNo><xsl:value-of select="position()"/>.
+                    </countNo>
+                    <xsl:call-template name="pharmaceuticalSubstanceHeader"/>
+                </label>
+                <div class="collapsible-content-title">
+                    <div class="content-inner-title">
+                        <table>
+                            <tr>
+                                <td>
+                                    <xsl:call-template name="epPrescriptionItemDetails"/>
+                                </td>
+                            </tr>
+                        </table>
 
-                <script>
-                    <xsl:attribute name="type">
-                        <xsl:text>text/javascript</xsl:text>
-                    </xsl:attribute>
-                    <xsl:text>i++;</xsl:text>
-                </script>
-            </xsl:for-each>
-        </table>
-        <script>
-            <xsl:attribute name="type">
-                <xsl:text>text/javascript</xsl:text>
-            </xsl:attribute>
-            <xsl:text disable-output-escaping="yes">if(i>1){</xsl:text>
-            <xsl:text disable-output-escaping="yes">showhide(&apos;mytable1&apos;);</xsl:text>
-            <xsl:text disable-output-escaping="yes">};</xsl:text>
-        </script>
+                        <script>
+                            <xsl:attribute name="type">
+                                <xsl:text>text/javascript</xsl:text>
+                            </xsl:attribute>
+                            <xsl:text>i++;</xsl:text>
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </xsl:for-each>
     </xsl:template>
 
     <xsl:template name="pharmaceuticalSubstanceHeader">
