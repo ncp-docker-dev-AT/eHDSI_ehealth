@@ -47,8 +47,7 @@ public class PDFServlet extends HttpServlet {
             EpsosDocument selectedEpsosDocument = new EpsosDocument();
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
 
-            ClientConnectorConsumer clientConectorConsumer = new ClientConnectorConsumer(
-                    serviceUrl);
+            ClientConnectorConsumer clientConnectorConsumer = new ClientConnectorConsumer(serviceUrl);
 
             HttpSession session = req.getSession();
 
@@ -101,7 +100,7 @@ public class PDFServlet extends HttpServlet {
 
             LOGGER.info("Portal language is : '{} - {}'", lang, lang1);
 
-            EpsosDocument1 eps = clientConectorConsumer.retrieveDocument(hcpAssertion, trcAssertion, selectedCountry,
+            EpsosDocument1 eps = clientConnectorConsumer.retrieveDocument(hcpAssertion, trcAssertion, selectedCountry,
                     documentId, hcid, classCode, lang1);
 
             selectedEpsosDocument.setAuthor(eps.getAuthor() + "");
@@ -132,7 +131,6 @@ public class PDFServlet extends HttpServlet {
             LOGGER.info("##########3 Serve pdf file");
             stream.write(bytes);
             stream.flush();
-            stream.close();
         } catch (IOException e) {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
             response.setContentType("text/html");
