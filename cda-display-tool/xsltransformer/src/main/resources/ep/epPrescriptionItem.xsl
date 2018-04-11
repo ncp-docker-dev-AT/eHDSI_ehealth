@@ -178,10 +178,13 @@
                                 </xsl:call-template>
                             </xsl:when>
                             <xsl:otherwise>
-                                <font color="blue">
-                                    <xsl:value-of select="$name"/>
-                                </font>
-                                <xsl:text>&#10;</xsl:text>
+                                <div class="tooltip">
+                                    <font color="blue">
+                                        <xsl:value-of select="$name"/>
+                                    </font>
+                                    <xsl:text>&#10;</xsl:text>
+                                    <span class="tooltiptext">Narrative text</span>
+                                </div>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:otherwise>

@@ -81,14 +81,14 @@
 
     <xsl:template name="epPrescriberDetails">
         <div class="wrap-collabsible">
-            <input id="collapsible-prescriber-header" class="toggle" type="checkbox"/>
-            <label for="collapsible-prescriber-header" class="lbl-toggle-title">
+            <input id="collapsible-prescriber-header" class="toggle" type="checkbox" checked="true"/>
+            <label for="collapsible-prescriber-header" class="lbl-toggle-prescriber">
                 <!-- Prescriber -->
                 <!-- TODO This value should be specified in the epsosDisplayLabel value set -->
                 Prescriber
             </label>
-            <div class="collapsible-content-title">
-                <div class="content-inner-title">
+            <div class="collapsible-content-prescriber">
+                <div class="content-inner-prescriber">
                     <table class="header_table">
                         <xsl:attribute name="id">
                             <xsl:text>prescriberTable</xsl:text>
@@ -111,13 +111,13 @@
                             <td>
                                 <xsl:call-template name="authorName">
                                     <xsl:with-param name="authorLocation"
-                                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author"/>
+                                                    select="/n1:ClinicalDocument/n1:author"/>
                                 </xsl:call-template>
                             </td>
                             <td>
                                 <xsl:call-template name="show-formCode">
                                     <xsl:with-param name="parameter"
-                                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:functionCode"/>
+                                                    select="/n1:ClinicalDocument/n1:author/n1:functionCode"/>
                                 </xsl:call-template>
                             </td>
                         </tr>

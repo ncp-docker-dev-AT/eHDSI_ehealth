@@ -171,15 +171,15 @@
     <xsl:template name="epCda">
         <xsl:call-template name="epPatientDetails"/>
         <br/>
-        <xsl:call-template name="epInformation"/>
-        <br/>
         <xsl:call-template name="epPrescriberDetails"/>
+        <br/>
+        <xsl:call-template name="epInformation"/>
         <br/>
         <xsl:call-template name="epPrescriptionItem"/>
     </xsl:template>
 
     <xsl:template name="epPatientDetails">
-        <div class="wrap-collabsible">
+        <div class="wrap-collabsible" >
             <input id="collapsible-patient-header" class="toggle" type="checkbox" checked="true"/>
             <label for="collapsible-patient-header" class="lbl-toggle-patient">
                 <!-- Patient-->
@@ -219,37 +219,6 @@
                         <span class="tdtext">
                             <xsl:call-template name="show-time">
                                 <xsl:with-param name="datetime" select="/n1:ClinicalDocument/n1:author/n1:time"/>
-                            </xsl:call-template>
-                        </span>
-                    </th>
-                </tr>
-            </tbody>
-        </table>
-
-        <table class="header_table">
-            <tbody>
-                <tr class="td_creation_date">
-                    <th class="td_creation_date">
-                        <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="code" select="'7'"/>
-                        </xsl:call-template>
-                        :
-                        <span class="tdtext">
-                            <xsl:call-template name="authorName">
-                                <xsl:with-param name="authorLocation" select="/n1:ClinicalDocument/n1:author"/>
-                            </xsl:call-template>
-                        </span>
-                    </th>
-                    <th class="td_creation_date">
-                        <span class="td_label">
-                            <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="code" select="'64' "/>
-                            </xsl:call-template>
-                        </span>
-                        :
-                        <span class="tdtext">
-                            <xsl:call-template name="show-formCode">
-                                <xsl:with-param name="parameter" select="/n1:ClinicalDocument/n1:author/n1:functionCode"/>
                             </xsl:call-template>
                         </span>
                     </th>

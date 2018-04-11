@@ -378,6 +378,136 @@ input[type='checkbox'] {
   padding: .5rem 1rem;
 }
 
+<!-- collapsible panel for patient block -->
+.lbl-toggle-patient {
+  display: block;
+
+  font-weight: bold;
+  color: #000066;
+  font-size: 15px;
+  text-align: left;
+
+  padding: 0.5rem;
+
+  background: #9FBFDF;
+
+  cursor: pointer;
+
+  border-radius: 3px;
+  transition: all 0.25s ease-out;
+}
+
+.lbl-toggle-patient:hover {
+  color: white;
+}
+
+.lbl-toggle-patient::before {
+  content: ' ';
+  display: inline-block;
+
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+
+  transition: transform .2s ease-out;
+}
+
+.toggle:checked + .lbl-toggle-patient::before {
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.collapsible-content-patient {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .25s ease-in-out;
+}
+
+.toggle:checked + .lbl-toggle-patient + .collapsible-content-patient {
+  max-height: none;
+}
+
+.toggle:checked + .lbl-toggle-patient {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.collapsible-content-patient .content-inner-patient {
+  background: #80DFFF;
+  border-bottom: 2px solid #9FBFDF;
+  border-left: 2px solid #9FBFDF;
+  border-right: 2px solid #9FBFDF;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: .5rem 1rem;
+}
+
+<!-- collapsible panel for prescriber block -->
+.lbl-toggle-prescriber {
+  display: block;
+
+  font-weight: bold;
+  color: #000066;
+  font-size: 15px;
+  text-align: left;
+
+  padding: 0.5rem;
+
+  background: #9FBFDF;
+
+  cursor: pointer;
+
+  border-radius: 3px;
+  transition: all 0.25s ease-out;
+}
+
+.lbl-toggle-prescriber:hover {
+  color: white;
+}
+
+.lbl-toggle-prescriber::before {
+  content: ' ';
+  display: inline-block;
+
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+
+  transition: transform .2s ease-out;
+}
+
+.toggle:checked + .lbl-toggle-prescriber::before {
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.collapsible-content-prescriber {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .25s ease-in-out;
+}
+
+.toggle:checked + .lbl-toggle-prescriber + .collapsible-content-prescriber {
+  max-height: none;
+}
+
+.toggle:checked + .lbl-toggle-prescriber {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.collapsible-content-prescriber .content-inner-prescriber {
+  border-bottom: 2px solid #9FBFDF;
+  border-left: 2px solid #9FBFDF;
+  border-right: 2px solid #9FBFDF;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: .5rem 1rem;
+}
 
 .codeSystem {
     background-color:#666;
@@ -386,6 +516,45 @@ input[type='checkbox'] {
     padding-right:10px;
     border-radius:10px 10px 10px 10px;
 }
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
                     </xsl:text>
                 </style>
                 <script language="javascript">
