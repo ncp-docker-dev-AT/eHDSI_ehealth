@@ -72,17 +72,7 @@ public class DisplayTest {
 
     @Test
     public void runFile() throws Exception {
-        // Vaccination
-        // fileTest("samples/cda_xml_157.xml");
-        // fileTest("samples/epSOS_MRO_test_full.xml");
-        // fileTest("samples/epSOS_RTD_PS_EU_Pivot_CDA_Paolo.xml");
-        // fileTest("samples/es_ps_pivot.xml");
-
-        // Frequency
-        //fileTest("samples/multiingredient.xml", TRANSFORMATION.WithOutputAndUserHomePath);
-        //fileTest("samples/2-4567.xml", TRANSFORMATION.WithOutputAndUserHomePath);
-        fileTest("samples/1-5678.xml", TRANSFORMATION.WithOutputAndUserHomePath);
-
+        fileTest("cda-display-tool/xsltransformer/samples/pt_ps_friendly.xml", TRANSFORMATION.WithOutputAndDefinedPath);
     }
 
     @Test

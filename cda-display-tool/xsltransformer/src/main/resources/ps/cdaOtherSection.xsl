@@ -12,7 +12,6 @@
         <xsl:choose>
             <!-- if we have at least one other section -->
             <xsl:when test="($otherExist)">
-
                 <xsl:for-each select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section">
                     <xsl:call-template name="otherSection"/>
                 </xsl:for-each>

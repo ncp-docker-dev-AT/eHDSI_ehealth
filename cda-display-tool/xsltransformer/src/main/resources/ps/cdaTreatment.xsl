@@ -39,20 +39,31 @@
         <xsl:choose>
             <!-- if sectionTitle is not missing for treatments  (Exception treatments section is missing)-->
             <xsl:when test=" ($treatmentSectionTitleCode='18776-5')">
-                <span class="sectionTitle">
-                    <xsl:value-of select="$treatmentSectionTitle"/>
-                </span>
-                <br/>
-                <xsl:choose>
-                    <xsl:when test="$shownarrative='true'">
-                        <a href="javascript: showhide('treatmentTr'); self.focus(); void(0);">Show/Hide</a>
-                        <div id="treatmentTr" style="display:block">
-                            <xsl:apply-templates
-                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='18776-5']/../n1:text/*"/>
-                            <br/>
+                <div class="wrap-collabsible">
+                    <input id="collapsible-treatment-section-original" class="toggle" type="checkbox" checked="true" />
+                    <label for="collapsible-treatment-section-original" class="lbl-toggle-title">
+                        <xsl:value-of select="$treatmentSectionTitle"/>
+                    </label>
+                    <div class="collapsible-content-title">
+                        <div class="content-inner-title">
+                            <xsl:choose>
+                                <xsl:when test="$shownarrative='true'">
+                                    <div class="wrap-collabsible">
+                                        <input id="collapsible-treatment-original" class="toggle" type="checkbox"/>
+                                        <label for="collapsible-treatment-original" class="lbl-toggle">Original</label>
+                                        <div class="collapsible-content">
+                                            <div class="content-inner">
+                                                <xsl:apply-templates
+                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='18776-5']/../n1:text/*"/>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </xsl:when>
+                            </xsl:choose>
                         </div>
-                    </xsl:when>
-                </xsl:choose>
+                    </div>
+                </div>
             </xsl:when>
         </xsl:choose>
 

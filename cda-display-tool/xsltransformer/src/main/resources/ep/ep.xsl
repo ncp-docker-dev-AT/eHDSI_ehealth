@@ -130,6 +130,20 @@
         </xsl:choose>
     </xsl:template>
 
+    <xsl:template name="show-manufacturedMaterialStrength">
+        <xsl:param name="parameter"/>
+        <xsl:choose>
+            <xsl:when test="not($parameter/@nullFlavor)">
+                <xsl:value-of select="$parameter"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="show-nullFlavor">
+                    <xsl:with-param name="code" select="$parameter/@nullFlavor"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template name="show-formCode">
         <xsl:param name="parameter"/>
         <xsl:choose>

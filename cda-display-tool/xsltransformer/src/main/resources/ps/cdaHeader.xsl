@@ -51,15 +51,23 @@
                             </xsl:call-template>
                         </span>
                     </th>
-                </tr>
-                <tr>
-                    <th colspan="3">
-                        <!-- Patient-->
-                        <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="code" select="'51'"/>
-                        </xsl:call-template>
+                    <th class="td_creation_date">
+                        <!-- Language:-->
+                        Language
+                        :
+                        <span class="tdtext">
+                            <xsl:value-of select="$userLang"/>
+                        </span>
                     </th>
                 </tr>
+            </tbody>
+
+        </table>
+    </xsl:template>
+
+    <xsl:template name="patientBlock">
+        <table class="header_table">
+            <tbody>
                 <tr>
                     <table class="header_table">
                         <tbody>

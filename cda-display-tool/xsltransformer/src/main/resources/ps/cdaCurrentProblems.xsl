@@ -60,54 +60,74 @@
         <xsl:choose>
             <!-- if sectionTitle is not missing for alerts  (Exception alerts section is missing)-->
             <xsl:when test=" ($probSectionTitleCode='11450-4')">
-                <span class="sectionTitle">
-                    <xsl:value-of select="$probSectionTitle"/>
-                </span>
-                <br/>
-                <xsl:choose>
-                    <xsl:when test="$shownarrative='true'">
-                        <a href="javascript: showhide('problemsTr'); self.focus(); void(0);">Show/Hide</a>
-                        <div id="problemsTr" style="display:block">
-                            <xsl:apply-templates
-                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='11450-4']/../n1:text/*"/>
+                <div class="wrap-collabsible">
+                    <input id="collapsible-current-problems-section-original" class="toggle" type="checkbox" checked="true" />
+                    <label for="collapsible-current-problems-section-original" class="lbl-toggle-title">
+                        <xsl:value-of select="$probSectionTitle"/>
+                    </label>
+                    <div class="collapsible-content-title">
+                        <div class="content-inner-title">
+                            <xsl:choose>
+                                <xsl:when test="$shownarrative='true'">
+                                    <div class="wrap-collabsible">
+                                        <input id="collapsible-current-problems-original" class="toggle" type="checkbox"/>
+                                        <label for="collapsible-current-problems-original" class="lbl-toggle">Original</label>
+                                        <div class="collapsible-content">
+                                            <div class="content-inner">
+                                                <xsl:apply-templates
+                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='11450-4']/../n1:text/*"/>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </xsl:when>
+                            </xsl:choose>
                             <br/>
-                        </div>
-                    </xsl:when>
-                </xsl:choose>
-                <!-- nullflavored act -->
-                <xsl:choose>
-                    <xsl:when test="not($probAct/@nullFlavor)">
-                        <table>
-                            <tbody>
-                                <xsl:if test="not ($probObsCode='396782006' or $probObsCode='407559004' or $probObsCode='160243008' or $probObsCode='160245001')">
-                                    <tr>
-                                        <th>
-                                            <!-- Active Problem -->
-                                            <xsl:call-template name="show-displayLabels">
-                                                <xsl:with-param name="code" select="'2'"/>
-                                            </xsl:call-template>
-                                        </th>
+                            <!-- nullflavored act -->
+                            <div class="wrap-collabsible">
+                                <input id="collapsible-current-problems-translated" class="toggle" type="checkbox" checked="true"/>
+                                <label for="collapsible-current-problems-translated" class="lbl-toggle">Translated</label>
+                                <div class="collapsible-content">
+                                    <div class="content-inner">
+                                        <xsl:choose>
+                                            <xsl:when test="not($probAct/@nullFlavor)">
+                                                <table class="translation_table">
+                                                    <tbody>
+                                                        <xsl:if test="not ($probObsCode='396782006' or $probObsCode='407559004' or $probObsCode='160243008' or $probObsCode='160245001')">
+                                                            <tr>
+                                                                <th>
+                                                                    <!-- Active Problem -->
+                                                                    <xsl:call-template name="show-displayLabels">
+                                                                        <xsl:with-param name="code" select="'2'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
 
-                                        <th>
-                                            <!-- OnSet Date -->
-                                            <xsl:call-template name="show-displayLabels">
-                                                <xsl:with-param name="code" select="'45'"/>
-                                            </xsl:call-template>
-                                        </th>
-                                    </tr>
-                                </xsl:if>
-                                <xsl:for-each select="n1:entry">
-                                    <xsl:call-template name="currentProblemsSectionEntry"/>
-                                </xsl:for-each>
-                            </tbody>
-                        </table>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:call-template name="show-nullFlavor">
-                            <xsl:with-param name="data" select="$probAct/@nullFlavor"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
+                                                                <th>
+                                                                    <!-- OnSet Date -->
+                                                                    <xsl:call-template name="show-displayLabels">
+                                                                        <xsl:with-param name="code" select="'45'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                            </tr>
+                                                        </xsl:if>
+                                                        <xsl:for-each select="n1:entry">
+                                                            <xsl:call-template name="currentProblemsSectionEntry"/>
+                                                        </xsl:for-each>
+                                                    </tbody>
+                                                </table>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:call-template name="show-nullFlavor">
+                                                    <xsl:with-param name="data" select="$probAct/@nullFlavor"/>
+                                                </xsl:call-template>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </xsl:when>
         </xsl:choose>
     </xsl:template>

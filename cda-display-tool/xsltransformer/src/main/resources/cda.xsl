@@ -36,6 +36,7 @@
     <xsl:template match="n1:ClinicalDocument">
         <html>
             <head>
+                <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1" crossorigin="anonymous"/>
                 <xsl:comment>Do NOT edit this HTML directly: it was generated via an XSLT transformation from a CDA
                     Release 2 XML document.
                 </xsl:comment>
@@ -63,7 +64,6 @@ td {
 	border-style:solid;
 	vertical-align: top;
 	text-align: left;
-/*	color:green;*/
 	font-weight: normal;
 }
 th {
@@ -91,15 +91,26 @@ th {
 }
 .header_table th {
 	border:0;
-	background-color:#9FBFDF;
+	background-color:#000066;
 	color:#FFF;
 }
 .header_table td {
 	color:#039;
 	font-size:12px;
+    font-weight: bold;
+}
+.ingredients_table{
+	border-bottom:0px solid #666;
+}
+.ingredients_table th {
+	border:0;
+	background-color:#B8B8B8;
+}
+.ingredients_table td {
+	font-size:12px;
 }
 .tdtext {
-	color:#666;
+	color:#9FBFDF;
 }
 .sectionTitle{
 	color:#3871A9;
@@ -111,6 +122,268 @@ th {
 }
 .narrow_table {
 	width: 35%;
+}
+
+.table_caption {
+	border-bottom:0px solid #666;
+    width: 100%;
+}
+
+.table_caption th {
+	background-color:#9FBFDF;
+	color:#4A4A4A;
+	font-size:13px;
+	padding:6px;
+	border-bottom-width:2px;
+	border-bottom-color:#4A4A4A;
+	border-bottom-style:solid;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 6px 6px 0px 0px;
+    border-radius: 6px 6px 0px 0px;
+	vertical-align: top;
+	text-align:left;
+    vertical-align:middle;
+}
+
+.translation_table{
+}
+
+.translation_table th {
+	border:0;
+    border-bottom-width:2px;
+	border-bottom-color:#4A4A4A;
+	border-bottom-style:solid;
+	background-color:#C3D9EF;
+}
+
+.translation_table td {
+	background-color:#E6F2FF;
+	font-size:12px;
+}
+
+.nullFlavor {
+  display: inline;
+  text-align: center;
+  vertical-align: middle;
+  border-radius: 50%;
+  background: yellow;
+  font-weight: bold;
+  padding:5px;
+}
+
+.wrap-collabsible {
+  margin-bottom: 1.2rem 0;
+  width: 100%;
+}
+
+input[type='checkbox'] {
+  display: none;
+}
+
+<!-- collapsible panel -->
+.lbl-toggle {
+  display: block;
+
+  font-weight: bold;
+  font-size: 13px;
+  text-align: left;
+
+  padding: 0.5rem;
+
+  background: #9FBFDF;
+
+  cursor: pointer;
+
+  border-radius: 3px;
+  transition: all 0.25s ease-out;
+}
+
+.lbl-toggle:hover {
+  color: #7C5A0B;
+}
+
+.lbl-toggle::before {
+  content: ' ';
+  display: inline-block;
+
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+
+  transition: transform .2s ease-out;
+}
+
+.toggle:checked + .lbl-toggle::before {
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.collapsible-content {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .25s ease-in-out;
+}
+
+.toggle:checked + .lbl-toggle + .collapsible-content {
+  max-height: none;
+}
+
+.toggle:checked + .lbl-toggle {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.collapsible-content .content-inner {
+  background: white;
+  border-bottom: 2px solid #9FBFDF;
+  border-left: 2px solid #9FBFDF;
+  border-right: 2px solid #9FBFDF;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: .5rem 1rem;
+}
+
+<!-- collapsible panel for section titles -->
+.lbl-toggle-title {
+  display: block;
+
+  font-weight: bold;
+  color: white;
+  font-size: 15px;
+  text-align: left;
+
+  padding: 0.5rem;
+
+  background: #000066;
+
+  cursor: pointer;
+
+  border-radius: 3px;
+  transition: all 0.25s ease-out;
+}
+
+.lbl-toggle-title:hover {
+  color: #9FBFDF;
+}
+
+.lbl-toggle-title::before {
+  content: ' ';
+  display: inline-block;
+
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+
+  transition: transform .2s ease-out;
+}
+
+.toggle:checked + .lbl-toggle-title::before {
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.collapsible-content-title {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .25s ease-in-out;
+}
+
+.toggle:checked + .lbl-toggle-title + .collapsible-content-title {
+  max-height: none;
+}
+
+.toggle:checked + .lbl-toggle-title {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.collapsible-content-title .content-inner-title {
+  background: white;
+  border-bottom: 2px solid #000066;
+  border-left: 2px solid #000066;
+  border-right: 2px solid #000066;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: .5rem 1rem;
+}
+
+<!-- collapsible panel for patient block -->
+.lbl-toggle-patient {
+  display: block;
+
+  font-weight: bold;
+  color: #000066;
+  font-size: 15px;
+  text-align: left;
+
+  padding: 0.5rem;
+
+  background: #9FBFDF;
+
+  cursor: pointer;
+
+  border-radius: 3px;
+  transition: all 0.25s ease-out;
+}
+
+.lbl-toggle-patient:hover {
+  color: white;
+}
+
+.lbl-toggle-patient::before {
+  content: ' ';
+  display: inline-block;
+
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+
+  transition: transform .2s ease-out;
+}
+
+.toggle:checked + .lbl-toggle-patient::before {
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.collapsible-content-patient {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .25s ease-in-out;
+}
+
+.toggle:checked + .lbl-toggle-patient + .collapsible-content-patient {
+  max-height: none;
+}
+
+.toggle:checked + .lbl-toggle-patient {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.collapsible-content-patient .content-inner-patient {
+  background: #80DFFF;
+  border-bottom: 2px solid #9FBFDF;
+  border-left: 2px solid #9FBFDF;
+  border-right: 2px solid #9FBFDF;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: .5rem 1rem;
+}
+
+
+.codeSystem {
+    background-color:#9FBFDF;
+    margin-top:20px;
+    padding-left:10px;
+    padding-right:10px;
+    border-radius:10px 10px 10px 10px;
 }
                     </xsl:text>
                 </style>
