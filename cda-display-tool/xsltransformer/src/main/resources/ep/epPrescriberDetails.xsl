@@ -89,147 +89,166 @@
             </label>
             <div class="collapsible-content-title">
                 <div class="content-inner-title">
-                    <table>
+                    <table class="header_table">
                         <xsl:attribute name="id">
                             <xsl:text>prescriberTable</xsl:text>
                         </xsl:attribute>
                         <tr>
+                            <th>
+                                <!--  Prescriber: -->
+                                <xsl:call-template name="show-displayLabels">
+                                    <xsl:with-param name="code" select="'56'"/>
+                                </xsl:call-template>
+                            </th>
+                            <th>
+                                <!--  Profession: -->
+                                <xsl:call-template name="show-displayLabels">
+                                    <xsl:with-param name="code" select="'64'"/>
+                                </xsl:call-template>
+                            </th>
+                        </tr>
+                        <tr>
                             <td>
-                                <span class="tdtext">
-                                    <!--  Prescriber: -->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'56'"/>
-                                    </xsl:call-template>
-                                </span>
-                                &#160;
                                 <xsl:call-template name="authorName">
                                     <xsl:with-param name="authorLocation"
                                                     select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author"/>
                                 </xsl:call-template>
                             </td>
                             <td>
-                                <span class="tdtext">
-                                    <!--  Profession: -->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'64'"/>
-                                    </xsl:call-template>
-                                </span>
-                                &#160;
                                 <xsl:call-template name="show-formCode">
                                     <xsl:with-param name="parameter"
                                                     select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:functionCode"/>
                                 </xsl:call-template>
                             </td>
-                            <td>
-                                <span class="tdtext">
-                                    <!--  Specialty: -->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'69'"/>
-                                    </xsl:call-template>
-                                </span>
-                                &#160;
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <span class="tdtext">
-                                    <!--  Contact Information: -->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'12'"/>
-                                    </xsl:call-template>
-                                </span>
-                                &#160;
-                                <xsl:call-template name="telecom">
-                                    <xsl:with-param name="telecomParam"
-                                                    select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:telecom"/>
-                                </xsl:call-template>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="tdtext">
-                                    <!-- Facility Name:-->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'29'"/>
-                                    </xsl:call-template>
-                                </span>
-                                &#160;
-                                <xsl:call-template name="facilityName">
-                                    <xsl:with-param name="name"
-                                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
-                                </xsl:call-template>
-                            </td>
-                            <td>
-                                <span class="tdtext">
-                                    <!--  Facility ID: -->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'28'"/>
-                                    </xsl:call-template>
-                                </span>
-                                &#160;
-                                <xsl:call-template name="facilityId">
-                                    <xsl:with-param name="id"
-                                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:id"/>
-                                </xsl:call-template>
-                            </td>
-                            <td>
-                                <span class="tdtext">
-                                    <!-- Country: -->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'13'"/>
-                                    </xsl:call-template>
-                                </span>
-                                &#160;
-                                <xsl:call-template name="country">
-                                    <xsl:with-param name="name"
-                                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr/n1:country"/>
-                                </xsl:call-template>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <span class="tdtext">
-                                    <!--  Address: -->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'3'"/>
-                                    </xsl:call-template>
-                                </span>
-                                &#160;
-                                <xsl:call-template name="country">
-                                    <xsl:with-param name="name"
-                                                    select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr"/>
-                                </xsl:call-template>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="tdtext">
-                                    <!--  Organisation Name: -->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'47'"/>
-                                    </xsl:call-template>
-                                </span>
-                                &#160;
-                                <xsl:call-template name="organization">
-                                    <xsl:with-param name="name"
-                                                    select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:scopingEntity[@classCode='ORG']/n1:desc"/>
-                                </xsl:call-template>
-                            </td>
-                            <td colspan="2">
-                                <span class="tdtext">
-                                    <!--  Organisation Identifier: -->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'46'"/>
-                                    </xsl:call-template>
-                                </span>
-                                &#160;
-                                <xsl:call-template name="organization">
-                                    <xsl:with-param name="name"
-                                                    select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:scopingEntity[@classCode='ORG']/n1:id"/>
-                                </xsl:call-template>
-                            </td>
                         </tr>
                     </table>
+                    <br/>
+                    <div class="wrap-collabsible">
+                        <input id="collapsible-extended-prescriber" class="toggle" type="checkbox"/>
+                        <label for="collapsible-extended-prescriber" class="lbl-toggle">
+                            <xsl:call-template name="show-displayLabels">
+                                <xsl:with-param name="code" select="'68'"/>
+                            </xsl:call-template>
+                        </label>
+                        <div class="collapsible-content">
+                            <div class="content-inner">
+                                <div id="extendedCdaHeader">
+                                    <table class="header_table" width="100%">
+                                        <colgroup>
+                                            <col span="1" style="width: 10%;"/>
+                                            <col span="1" style="width: 25%;"/>
+                                            <col span="1" style="width: 10%;"/>
+                                            <col span="1" style="width: 25%;"/>
+                                            <col span="1" style="width: 10%;"/>
+                                            <col span="1" style="width: 20%;"/>
+                                        </colgroup>
+
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    <!--  Specialty: -->
+                                                    <xsl:call-template name="show-displayLabels">
+                                                        <xsl:with-param name="code" select="'69'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td></td>
+                                                <th>
+                                                    <!--  Contact Information: -->
+                                                    <xsl:call-template name="show-displayLabels">
+                                                        <xsl:with-param name="code" select="'12'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="telecom">
+                                                        <xsl:with-param name="telecomParam"
+                                                                        select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:telecom"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    <!-- Facility ID -->
+                                                    <xsl:call-template name="show-displayLabels">
+                                                        <xsl:with-param name="code" select="'28'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="facilityId">
+                                                        <xsl:with-param name="id"
+                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:id"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                                <th>
+                                                    <!-- Facility Name:-->
+                                                    <xsl:call-template name="show-displayLabels">
+                                                        <xsl:with-param name="code" select="'29'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="facilityName">
+                                                        <xsl:with-param name="name"
+                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    <!-- Country: -->
+                                                    <xsl:call-template name="show-displayLabels">
+                                                        <xsl:with-param name="code" select="'13'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="country">
+                                                        <xsl:with-param name="name"
+                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr/n1:country"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                                <th>
+                                                    <!--  Address: -->
+                                                    <xsl:call-template name="show-displayLabels">
+                                                        <xsl:with-param name="code" select="'3'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="country">
+                                                        <xsl:with-param name="name"
+                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    <!--  Organisation Name: -->
+                                                    <xsl:call-template name="show-displayLabels">
+                                                        <xsl:with-param name="code" select="'47'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="organization">
+                                                        <xsl:with-param name="name"
+                                                                        select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:scopingEntity[@classCode='ORG']/n1:desc"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                                <th>
+                                                    <!--  Organisation Identifier: -->
+                                                    <xsl:call-template name="show-displayLabels">
+                                                        <xsl:with-param name="code" select="'46'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="organization">
+                                                        <xsl:with-param name="name"
+                                                                        select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:scopingEntity[@classCode='ORG']/n1:id"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

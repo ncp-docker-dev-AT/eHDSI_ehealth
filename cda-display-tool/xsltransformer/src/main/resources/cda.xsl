@@ -111,6 +111,7 @@ th {
 }
 .tdtext {
 	color:#9FBFDF;
+    font-weight: bold;
 }
 .sectionTitle{
 	color:#3871A9;
