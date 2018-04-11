@@ -171,6 +171,8 @@
     <xsl:template name="epCda">
         <xsl:call-template name="epPatientDetails"/>
         <br/>
+        <xsl:call-template name="epInformation"/>
+        <br/>
         <xsl:call-template name="epPrescriberDetails"/>
         <br/>
         <xsl:call-template name="epPrescriptionItem"/>
@@ -188,48 +190,71 @@
             <div class="collapsible-content-patient">
                 <div class="content-inner-patient">
                     <xsl:call-template name="epHeader"/>
-                    <table class="narr_table">
-                        <tr>
-                            <td class="narrow_table">
-                                <xsl:call-template name="show-displayLabels">
-                                    <xsl:with-param name="code" select="'7'"/>
-                                </xsl:call-template>
-                                <xsl:call-template name="authorName">
-                                    <xsl:with-param name="authorLocation" select="/n1:ClinicalDocument/n1:author"/>
-                                </xsl:call-template>
-                            </td>
-                            <td>
-                                <xsl:call-template name="show-displayLabels">
-                                    <xsl:with-param name="code" select="'64' "/>
-                                </xsl:call-template>
-                                <xsl:call-template name="show-formCode">
-                                    <xsl:with-param name="parameter" select="/n1:ClinicalDocument/n1:author/n1:functionCode"/>
-                                </xsl:call-template>
-                            </td>
-                        </tr>
-                    </table>
-                    <table class="narr_table">
-                        <tr>
-                            <td class="narrow_table">
-                                <xsl:call-template name="show-displayLabels">
-                                    <xsl:with-param name="code" select="'58'"/>
-                                </xsl:call-template>
-                                <xsl:value-of select="$prescriptionID"/>
-                            </td>
-                            <td>
-                                <span class="td_label">
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'20'"/>
-                                    </xsl:call-template>
-                                </span>
-                                <xsl:call-template name="show-time">
-                                    <xsl:with-param name="datetime" select="/n1:ClinicalDocument/n1:author/n1:time"/>
-                                </xsl:call-template>
-                            </td>
-                        </tr>
-                    </table>
                 </div>
             </div>
+            <br/>
         </div>
+    </xsl:template>
+
+    <xsl:template name="epInformation">
+        <table class="header_table">
+            <tbody>
+                <tr class="td_creation_date">
+                    <th class="td_creation_date">
+                        <xsl:call-template name="show-displayLabels">
+                            <xsl:with-param name="code" select="'58'"/>
+                        </xsl:call-template>
+                        :
+                        <span class="tdtext">
+                            <xsl:value-of select="$prescriptionID"/>
+                        </span>
+                    </th>
+                    <th class="td_creation_date">
+                        <span class="td_label">
+                            <xsl:call-template name="show-displayLabels">
+                                <xsl:with-param name="code" select="'20'"/>
+                            </xsl:call-template>
+                        </span>
+                        :
+                        <span class="tdtext">
+                            <xsl:call-template name="show-time">
+                                <xsl:with-param name="datetime" select="/n1:ClinicalDocument/n1:author/n1:time"/>
+                            </xsl:call-template>
+                        </span>
+                    </th>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="header_table">
+            <tbody>
+                <tr class="td_creation_date">
+                    <th class="td_creation_date">
+                        <xsl:call-template name="show-displayLabels">
+                            <xsl:with-param name="code" select="'7'"/>
+                        </xsl:call-template>
+                        :
+                        <span class="tdtext">
+                            <xsl:call-template name="authorName">
+                                <xsl:with-param name="authorLocation" select="/n1:ClinicalDocument/n1:author"/>
+                            </xsl:call-template>
+                        </span>
+                    </th>
+                    <th class="td_creation_date">
+                        <span class="td_label">
+                            <xsl:call-template name="show-displayLabels">
+                                <xsl:with-param name="code" select="'64' "/>
+                            </xsl:call-template>
+                        </span>
+                        :
+                        <span class="tdtext">
+                            <xsl:call-template name="show-formCode">
+                                <xsl:with-param name="parameter" select="/n1:ClinicalDocument/n1:author/n1:functionCode"/>
+                            </xsl:call-template>
+                        </span>
+                    </th>
+                </tr>
+            </tbody>
+        </table>
     </xsl:template>
 </xsl:stylesheet>
