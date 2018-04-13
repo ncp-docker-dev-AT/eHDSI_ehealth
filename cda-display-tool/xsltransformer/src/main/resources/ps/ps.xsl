@@ -63,35 +63,45 @@
             <!--- BASIC HEADER INFORMATION -->
             <xsl:call-template name="basicCdaHeader"/>
             <br/>
-            <!-- Alerts -->
-            <xsl:call-template name="alerts"/>
-            <!-- Diagnostic Tests -->
-            <xsl:call-template name="diagnosticTests"/>
-            <!-- Current Problems -->
-            <xsl:call-template name="currentProblems"/>
-            <!-- Medication Summary -->
-            <xsl:call-template name="medicationSummary"/>
-            <!-- Medical Devices Summary -->
-            <xsl:call-template name="medicalDevices"/>
-            <!-- Surgical Procedures-->
-            <xsl:call-template name="surgicalProcedures"/>
-            <!-- History Illness-->
-            <xsl:call-template name="historyIllness"/>
-            <!-- Vaccination-->
-            <xsl:call-template name="vaccinations"/>
-            <!-- Treatments-->
-            <xsl:call-template name="treatment"/>
-            <!-- Autonomy-->
-            <xsl:call-template name="autonomy"/>
-            <!-- Social History-->
-            <xsl:call-template name="socialHistory"/>
-            <!-- Pregnancy History-->
-            <xsl:call-template name="pregnancyHistory"/>
-            <!-- Physical Findings-->
-            <xsl:call-template name="physicalFindings"/>
-            <!-- All other sections-->
-            <xsl:call-template name="otherSections"/>
+            <div class="wrap-collabsible">
+                <input id="collapsible-clinical-sections" class="toggle" type="checkbox" checked="true"/>
+                <label for="collapsible-clinical-sections" class="lbl-toggle-patient">
+                    Clinical sections
+                </label>
+                <div class="collapsible-content-patient">
+                    <div class="content-inner-patient">
+                        <!-- Alerts -->
+                        <xsl:call-template name="alerts"/>
+                        <!-- Diagnostic Tests -->
+                        <xsl:call-template name="diagnosticTests"/>
+                        <!-- Current Problems -->
+                        <xsl:call-template name="currentProblems"/>
+                        <!-- Medication Summary -->
+                        <xsl:call-template name="medicationSummary"/>
+                        <!-- Medical Devices Summary -->
+                        <xsl:call-template name="medicalDevices"/>
+                        <!-- Surgical Procedures-->
+                        <xsl:call-template name="surgicalProcedures"/>
+                        <!-- History Illness-->
+                        <xsl:call-template name="historyIllness"/>
+                        <!-- Vaccination-->
+                        <xsl:call-template name="vaccinations"/>
+                        <!-- Treatments-->
+                        <xsl:call-template name="treatment"/>
+                        <!-- Autonomy-->
+                        <xsl:call-template name="autonomy"/>
+                        <!-- Social History-->
+                        <xsl:call-template name="socialHistory"/>
+                        <!-- Pregnancy History-->
+                        <xsl:call-template name="pregnancyHistory"/>
+                        <!-- Physical Findings-->
+                        <xsl:call-template name="physicalFindings"/>
+                        <!-- All other sections-->
+                        <xsl:call-template name="otherSections"/>
+                    </div>
+                </div>
+            </div>
         </div>
-        </xsl:template>
-        <!-- generate table of contents -->
-        </xsl:stylesheet>
+    </xsl:template>
+    <!-- generate table of contents -->
+</xsl:stylesheet>

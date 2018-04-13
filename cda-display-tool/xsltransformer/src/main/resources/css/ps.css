@@ -1,0 +1,21 @@
+<root><![CDATA[
+
+/* Translation table - table containing the coded translations */
+.translation_table{
+}
+.translation_table th {
+    background-color:#E6F2FF;
+    color:#4A4A4A;
+    font-size:13px;
+    padding:6px;
+    vertical-align: top;
+    text-align: left;
+    border-bottom: 1px solid #009fd1
+}
+.translation_table td {
+    background-color:#E6F2FF;
+    vertical-align: top;
+    text-align: left;
+}
+
+]]></root>
