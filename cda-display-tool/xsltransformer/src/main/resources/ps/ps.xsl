@@ -17,6 +17,9 @@
     <xsl:import href="cdaPhysicalFindings.xsl"/>
     <xsl:import href="cdaOtherSection.xsl"/>
 
+    <xsl:variable name="originalNarrativeTableTitle" select="'Original narrative'"/>
+    <xsl:variable name="translatedCodedTableTitle" select="'Translated coded'"/>
+
     <!-- xsl:output method="html" indent="yes" version="4.01"   doctype-system="http://www.w3.org/TR/html4/strict.dtd" doctype-public="-//W3C//DTD HTML 4.01//EN"/ -->
     <xsl:template name="psCda">
         <!-- Main -->

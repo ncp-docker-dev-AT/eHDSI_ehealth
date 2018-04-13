@@ -57,7 +57,9 @@
                                 <xsl:when test="$shownarrative='true'">
                                     <div class="wrap-collabsible">
                                         <input id="collapsible-social-history-original" class="toggle" type="checkbox"/>
-                                        <label for="collapsible-social-history-original" class="lbl-toggle">Original</label>
+                                        <label for="collapsible-social-history-original" class="lbl-toggle">
+                                            <xsl:value-of select="$originalNarrativeTableTitle"/>
+                                        </label>
                                         <div class="collapsible-content">
                                             <div class="content-inner">
                                                 <xsl:apply-templates
@@ -71,7 +73,9 @@
                             <br/>
                             <div class="wrap-collabsible">
                                 <input id="collapsible-social-history-translated" class="toggle" type="checkbox" checked="true"/>
-                                <label for="collapsible-social-history-translated" class="lbl-toggle">Translated</label>
+                                <label for="collapsible-social-history-translated" class="lbl-toggle">
+                                    <xsl:value-of select="$translatedCodedTableTitle"/>
+                                </label>
                                 <div class="collapsible-content">
                                     <div class="content-inner">
                                         <xsl:choose>
