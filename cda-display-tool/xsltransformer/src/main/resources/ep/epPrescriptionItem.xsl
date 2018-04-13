@@ -865,11 +865,11 @@
     <xsl:template name="epPrescriptionItem">
         <div class="wrap-collabsible">
             <input id="collapsible-medicine-list" class="toggle" type="checkbox" checked="true"/>
-            <label for="collapsible-medicine-list" class="lbl-toggle-patient">
+            <label for="collapsible-medicine-list" class="lbl-toggle-main">
                 Medicine list
             </label>
-            <div class="collapsible-content-patient">
-                <div class="content-inner-patient">
+            <div class="collapsible-content-main">
+                <div class="content-inner-main">
                     <xsl:for-each select="$entryNode">
                         <div class="wrap-collabsible">
                             <input id="collapsible-prescriptionItem-header" class="toggle" type="checkbox" checked="true"/>

@@ -181,14 +181,14 @@
     <xsl:template name="epPatientDetails">
         <div class="wrap-collabsible" >
             <input id="collapsible-patient-header" class="toggle" type="checkbox" checked="true"/>
-            <label for="collapsible-patient-header" class="lbl-toggle-patient">
+            <label for="collapsible-patient-header" class="lbl-toggle-main">
                 <!-- Patient-->
                 <xsl:call-template name="show-displayLabels">
                     <xsl:with-param name="code" select="'51'"/>
                 </xsl:call-template>
             </label>
-            <div class="collapsible-content-patient">
-                <div class="content-inner-patient">
+            <div class="collapsible-content-main">
+                <div class="content-inner-main">
                     <xsl:call-template name="epHeader"/>
                 </div>
             </div>

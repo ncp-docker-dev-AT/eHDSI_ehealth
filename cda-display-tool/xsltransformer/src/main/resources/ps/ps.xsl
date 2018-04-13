@@ -29,14 +29,14 @@
         <div class="patient">
             <div class="wrap-collabsible">
                 <input id="collapsible-patient-header" class="toggle" type="checkbox" checked="true"/>
-                <label for="collapsible-patient-header" class="lbl-toggle-patient">
+                <label for="collapsible-patient-header" class="lbl-toggle-main">
                     <!-- Patient-->
                     <xsl:call-template name="show-displayLabels">
                         <xsl:with-param name="code" select="'51'"/>
                     </xsl:call-template>
                 </label>
-                <div class="collapsible-content-patient">
-                    <div class="content-inner-patient">
+                <div class="collapsible-content-main">
+                    <div class="content-inner-main">
                         <div>
                             <xsl:call-template name="patientBlock"/>
                             <br/>
@@ -68,11 +68,11 @@
             <br/>
             <div class="wrap-collabsible">
                 <input id="collapsible-clinical-sections" class="toggle" type="checkbox" checked="true"/>
-                <label for="collapsible-clinical-sections" class="lbl-toggle-patient">
+                <label for="collapsible-clinical-sections" class="lbl-toggle-main">
                     Clinical sections
                 </label>
-                <div class="collapsible-content-patient">
-                    <div class="content-inner-patient">
+                <div class="collapsible-content-main">
+                    <div class="content-inner-main">
                         <!-- Alerts -->
                         <xsl:call-template name="alerts"/>
                         <!-- Diagnostic Tests -->
