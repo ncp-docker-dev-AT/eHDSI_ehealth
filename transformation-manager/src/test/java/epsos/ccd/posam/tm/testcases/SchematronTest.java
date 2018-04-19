@@ -38,11 +38,7 @@ public class SchematronTest extends TBase {
             StringBuilder sb = new StringBuilder();
             for (File doc : docs) {
 
-                if (doc.getName().contains("friendly")) {
-                    friendly = true;
-                } else {
-                    friendly = false;
-                }
+                friendly = doc.getName().contains("friendly");
 
                 xmlDoc = getDocument(doc);
                 SchematronResult result = Validator.validateSchematron(xmlDoc, tm.getCDADocumentType(xmlDoc), friendly);
