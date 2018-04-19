@@ -1,21 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012 Affecto EE
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
 package ee.affecto.epsos.util;
 
 import ee.affecto.epsos.ws.handler.DummyMustUnderstandHandler;
@@ -23,6 +5,8 @@ import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Phase;
@@ -55,6 +39,7 @@ public class EventLogClientUtil {
     }
 
     public static void createDummyMustUnderstandHandler(org.apache.axis2.client.Stub stub) {
+
         HandlerDescription description = new HandlerDescription("DummyMustUnderstandHandler");
         description.setHandler(new DummyMustUnderstandHandler());
         AxisConfiguration axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext()
@@ -124,7 +109,7 @@ public class EventLogClientUtil {
         return ipAddress;
     }
 
-    public static EventLog prepareEventLog(org.apache.axis2.context.MessageContext msgContext, org.apache.axiom.soap.SOAPEnvelope _returnEnv, String address) {
+    public static EventLog prepareEventLog(MessageContext msgContext, SOAPEnvelope soapEnvelope, String address) {
 
         EventLog eventLog = new EventLog();
 
@@ -160,9 +145,9 @@ public class EventLogClientUtil {
         eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
 
         // Set Participant Object: ResponseMessage
-        String rspMessageId = appendUrnUuid(EventLogUtil.getMessageID(_returnEnv));
+        String rspMessageId = appendUrnUuid(EventLogUtil.getMessageID(soapEnvelope));
         eventLog.setResM_ParticipantObjectID(rspMessageId);
-        eventLog.setResM_PatricipantObjectDetail(_returnEnv.getHeader().toString().getBytes());
+        eventLog.setResM_PatricipantObjectDetail(soapEnvelope.getHeader().toString().getBytes());
 
         return eventLog;
     }

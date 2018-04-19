@@ -142,7 +142,7 @@ public class CDAServlet extends HttpServlet {
 
             if (StringUtils.equals(exportType, "pdf")) {
                 String fontpath = getServletContext().getRealPath("/") + "/WEB-INF/fonts/";
-                baos = EpsosHelperService.ConvertHTMLtoPDF(convertedCda, serviceUrl, fontpath);
+                baos = EpsosHelperService.convertHTMLtoPDF(convertedCda, serviceUrl, fontpath);
                 output = baos.toByteArray();
                 res.setContentType("application/pdf");
                 res.setHeader("Content-Disposition", "attachment; filename=cda.pdf");

@@ -3,9 +3,8 @@ package epsos.ccd.posam.tsam.util;
 import org.w3c.dom.Element;
 
 /**
- * Data transfer class Encapsulates XML presentation of Coded Concept for
- * transcoding or translation. Provides get method for simple access for code,
- * codesystem, ...
+ * Data transfer class Encapsulates XML presentation of Coded Concept for transcoding or translation.
+ * Provides get method for simple access for code, codesystem, ...
  *
  * @author Roman Repiscak
  * @author Organization: Posam
@@ -13,9 +12,11 @@ import org.w3c.dom.Element;
  * @version 1.0, 2010, 11 August
  */
 public class CodedElement {
+
     private Element originalXMlElement;
 
     private String code;
+
     /**
      * codeSystemName
      */
@@ -45,6 +46,7 @@ public class CodedElement {
     private String displayName;
 
     public CodedElement(Element originalXMlElement) {
+
         this.originalXMlElement = originalXMlElement;
 
         code = ((originalXMlElement.getAttribute("code") == null || originalXMlElement
@@ -71,8 +73,8 @@ public class CodedElement {
      * @param codeSystem
      * @param vsOid
      */
-    public CodedElement(String code, String codeSystem, String oid,
-                        String version, String vsOid) {
+    public CodedElement(String code, String codeSystem, String oid, String version, String vsOid) {
+
         super();
         this.code = code;
         this.codeSystem = codeSystem;
@@ -81,8 +83,8 @@ public class CodedElement {
         this.vsOid = vsOid;
     }
 
-    public CodedElement(String code, String codeSystem, String oid,
-                        String version, String vsOid, String vsVersion) {
+    public CodedElement(String code, String codeSystem, String oid, String version, String vsOid, String vsVersion) {
+
         super();
         this.code = code;
         this.codeSystem = codeSystem;
@@ -133,6 +135,7 @@ public class CodedElement {
     }
 
     public String toString() {
+
         StringBuilder builder = new StringBuilder();
         builder.append("CodedElement [");
         if (code != null) {
@@ -164,7 +167,6 @@ public class CodedElement {
             builder.append("valueSetVersion=");
             builder.append(valueSetVersion);
         }
-
         builder.append("]");
         return builder.toString();
     }
