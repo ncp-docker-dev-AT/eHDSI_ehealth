@@ -48,18 +48,18 @@
                     <xsl:value-of select="document('css/ps.css')" disable-output-escaping="yes" />
                     <xsl:value-of select="document('css/ep.css')" disable-output-escaping="yes" />
                 </style>
-                <script language="javascript">
-                    function showhide(id){
-                    if (document.getElementById){
-                    obj = document.getElementById(id);
-                    if (obj.style.display == "none"){
-                    obj.style.display = "";
-                    } else {
-                    obj.style.display = "none";
-                    }
-                    }
-                    }
-                </script>
+                <!--<script language="javascript">-->
+                    <!--function showhide(id){-->
+                    <!--if (document.getElementById){-->
+                    <!--obj = document.getElementById(id);-->
+                    <!--if (obj.style.display == "none"){-->
+                    <!--obj.style.display = "";-->
+                    <!--} else {-->
+                    <!--obj.style.display = "none";-->
+                    <!--}-->
+                    <!--}-->
+                    <!--}-->
+                <!--</script>-->
             </head>
             <body>
                 <h1 class="h1center">
@@ -89,8 +89,6 @@
                     <!--<br/>-->
                     <!--</xsl:when>-->
                 </xsl:choose>
-                <br/>
-                <br/>
             </body>
         </html>
     </xsl:template>

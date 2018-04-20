@@ -2,18 +2,21 @@
 
 /* Translation table - table containing the coded translations */
 .translation_table{
+    width: 100%;
+    table-layout: fixed;
 }
 .translation_table th {
     background-color:#E6F2FF;
     color:#4A4A4A;
-    font-size:13px;
+    font-size:.75em;
     padding:6px;
     vertical-align: top;
     text-align: left;
-    border-bottom: 1px solid #009fd1
+    border-bottom: 1px solid #009fd1;
 }
 .translation_table td {
     background-color:#E6F2FF;
+    font-size:.75em;
     vertical-align: top;
     text-align: left;
 }

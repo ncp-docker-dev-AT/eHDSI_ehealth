@@ -317,6 +317,13 @@
             <artifactId>dom4j</artifactId>
             <version>1.6.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>html2pdf</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
         <dependency>
             <groupId>org.allcolor.yahp.converter</groupId>
             <artifactId>yahp</artifactId>
