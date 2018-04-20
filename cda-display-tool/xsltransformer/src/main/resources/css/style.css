@@ -5,6 +5,7 @@
 
 body {
     font-family: Arial;
+    font-size: 12px;
     margin: 0;
     padding: 1rem 5rem;
     /*text-rendering: optimizeLegibility;*/
@@ -16,14 +17,14 @@ table {
 }
 tr {}
 td {
-    font-size:.75em;
+    font-size:12px;
     padding:5px;
     vertical-align: top;
     text-align: left;
 }
 th {
     color:#4A4A4A;
-    font-size:.75em;
+    font-size:13px;
     padding:6px;
     vertical-align: top;
     text-align: left;
@@ -44,11 +45,11 @@ th {
 }
 .header_table th {
     color:#009fd1;
-    font-size: .75em;
+    font-size: 12px;
     border-bottom: 1px solid #009fd1
 }
 .header_table td {
-    font-size: .75em;
+    font-size: 12px;
 }
 .sectionTitle{
     color:#3871A9;
