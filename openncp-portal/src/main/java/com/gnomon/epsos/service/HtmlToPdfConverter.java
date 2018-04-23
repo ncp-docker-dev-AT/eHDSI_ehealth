@@ -5,6 +5,16 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.html2pdf.attach.ITagWorker;
+import com.itextpdf.html2pdf.attach.ProcessorContext;
+import com.itextpdf.html2pdf.attach.impl.DefaultTagWorkerFactory;
+import com.itextpdf.html2pdf.attach.impl.tags.DivTagWorker;
+import com.itextpdf.html2pdf.css.CssConstants;
+import com.itextpdf.html2pdf.css.apply.ICssApplier;
+import com.itextpdf.html2pdf.css.apply.impl.BlockCssApplier;
+import com.itextpdf.html2pdf.css.apply.impl.DefaultCssApplierFactory;
+import com.itextpdf.html2pdf.html.TagConstants;
+import com.itextpdf.html2pdf.html.node.IElementNode;
 import com.itextpdf.html2pdf.resolver.font.DefaultFontProvider;
 import com.itextpdf.kernel.events.Event;
 import com.itextpdf.kernel.events.IEventHandler;
@@ -62,6 +72,9 @@ public class HtmlToPdfConverter {
             ConverterProperties props = new ConverterProperties();
             FontProvider dfp = new DefaultFontProvider(true, false, false);
 
+            /* Temporary fix for display issue with blocks (in current html2pdf version (2.0.1) */
+            props.setTagWorkerFactory(new LabelBlockTagWorkerFactory());
+            props.setCssApplierFactory(new LabelBlockCssApplierFactory());
             props.setFontProvider(dfp);
 
             HtmlConverter.convertToDocument(html, pdfDoc, props);
@@ -111,7 +124,7 @@ public class HtmlToPdfConverter {
         protected float x = 300;
         protected float y = 25;
         protected float space = 4.5f;
-        protected float descent = 3;
+        protected float descent = 2;
         public PageXofY(PdfDocument pdf) {
             placeholder =
                     new PdfFormXObject(new Rectangle(0, 0, side, side));
@@ -138,6 +151,43 @@ public class HtmlToPdfConverter {
             canvas.setFontSize(8f);
             canvas.showTextAligned(String.valueOf(pdf.getNumberOfPages()),
                     0, descent, TextAlignment.LEFT);
+        }
+    }
+
+    /* Temporary fix for display issue with blocks (in current html2pdf version (2.0.1) */
+    private static class LabelBlockTagWorkerFactory extends DefaultTagWorkerFactory {
+        @Override
+        public ITagWorker getCustomTagWorker(IElementNode tag, ProcessorContext context) {
+            if (!TagConstants.LABEL.equals(tag.name())) {
+                return null;
+            }
+            String display;
+            if (tag.getStyles() == null || (display = tag.getStyles().get(CssConstants.DISPLAY)) == null) {
+                return null;
+            }
+            if (CssConstants.BLOCK.equals(display)) {
+                return new DivTagWorker(tag, context);
+            }
+            return null;
+        }
+
+    }
+
+    /* Temporary fix for display issue with blocks (in current html2pdf version (2.0.1) */
+    private static class LabelBlockCssApplierFactory extends DefaultCssApplierFactory {
+        @Override
+        public ICssApplier getCustomCssApplier(IElementNode tag) {
+            if (!TagConstants.LABEL.equals(tag.name())) {
+                return null;
+            }
+            String display;
+            if (tag.getStyles() == null || (display = tag.getStyles().get(CssConstants.DISPLAY)) == null) {
+                return null;
+            }
+            if (CssConstants.BLOCK.equals(display)) {
+                return new BlockCssApplier();
+            }
+            return null;
         }
     }
 }

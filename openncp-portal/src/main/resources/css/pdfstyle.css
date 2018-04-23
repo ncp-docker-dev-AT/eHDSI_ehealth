@@ -4,6 +4,7 @@
 
 body {
     font-family: Arial;
+    font-size:.6em;
     margin: 0;
     padding: 1rem 5rem;
     /*text-rendering: optimizeLegibility;*/
@@ -15,14 +16,14 @@ table {
 }
 tr {}
 td {
-    font-size:.5em;
+    font-size:.6em;
     padding:5px;
     vertical-align: top;
     text-align: left;
 }
 th {
     color:#4A4A4A;
-    font-size:.5em;
+    font-size:.6em;
     padding:6px;
     vertical-align: top;
     text-align: left;
@@ -43,16 +44,16 @@ th {
 }
 .header_table th {
     color:#009fd1;
-    font-size: .6em;
+    font-size: .7em;
     border-bottom: 1px solid #009fd1
 }
 .header_table td {
-    font-size: .6em;
+    font-size: .7em;
 }
 .sectionTitle{
     color:#3871A9;
     font-weight: bold;
-    font-size:.6em;
+    font-size:.7em;
 }
 
 .table_caption {
@@ -63,7 +64,7 @@ th {
 .table_caption th {
     background-color:#9FBFDF;
     color:#4A4A4A;
-    font-size:.6em;
+    font-size:.7em;
     padding:6px;
     border-bottom: 2px solid #4A4A4A;
     -moz-border-radius: 0;
@@ -98,10 +99,10 @@ input[type='checkbox'] {
 /* Default collapsible panel */
 /*****************************/
 .lbl-toggle {
-    display: inline-block;
+    display: block;
 
     font-weight: bold;
-    font-size: .6em;
+    font-size: .8em;
     text-align: left;
 
     padding: 0.5rem;
@@ -166,11 +167,11 @@ input[type='checkbox'] {
 /*    - substances in eP                               */
 /*******************************************************/
 .lbl-toggle-title {
-    display: inline-block;
+    display: block;
 
     font-weight: bold;
     color: white;
-    font-size: .6em;
+    font-size: .8em;
     text-align: left;
 
     padding: 0.5rem;
@@ -238,7 +239,7 @@ input[type='checkbox'] {
 
     font-weight: bold;
     color: #009fd1;
-    font-size: .6em;
+    font-size: .8em;
     text-align: left;
 
     padding: 0.5rem;
@@ -352,7 +353,7 @@ input[type='checkbox'] {
 .translation_table th {
     background-color:#E6F2FF;
     color:#4A4A4A;
-    font-size:.5em;
+    font-size:.6em;
     padding:6px;
     vertical-align: top;
     text-align: left;
@@ -360,7 +361,7 @@ input[type='checkbox'] {
 }
 .translation_table td {
     background-color:#E6F2FF;
-    font-size:.5em;
+    font-size:.6em;
     vertical-align: top;
     text-align: left;
 }
