@@ -50,7 +50,9 @@
                                 <xsl:when test="$shownarrative='true'">
                                     <div class="wrap-collabsible">
                                         <input id="collapsible-treatment-original" class="toggle" type="checkbox"/>
-                                        <label for="collapsible-treatment-original" class="lbl-toggle">Original</label>
+                                        <label for="collapsible-treatment-original" class="lbl-toggle">
+                                            <xsl:value-of select="$originalNarrativeTableTitle"/>
+                                        </label>
                                         <div class="collapsible-content">
                                             <div class="content-inner">
                                                 <xsl:apply-templates

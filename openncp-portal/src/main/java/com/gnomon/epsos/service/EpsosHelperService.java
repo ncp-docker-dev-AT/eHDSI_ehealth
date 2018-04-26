@@ -348,6 +348,9 @@ public class EpsosHelperService {
         return edDoc.getBytes();
     }
 
+    /**
+     * @deprecated use {@link HtmlToPdfConverter} instead.
+     */
     public static ByteArrayOutputStream ConvertHTMLtoPDF(String htmlin, String uri, String fontpath) {
 
         String cleanCDA;
