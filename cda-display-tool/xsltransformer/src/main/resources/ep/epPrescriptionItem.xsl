@@ -178,10 +178,13 @@
                                 </xsl:call-template>
                             </xsl:when>
                             <xsl:otherwise>
-                                <font color="blue">
-                                    <xsl:value-of select="$name"/>
-                                </font>
-                                <xsl:text>&#10;</xsl:text>
+                                <div class="tooltip">
+                                    <span class="narrative">
+                                        <xsl:value-of select="$name"/>
+                                    </span>
+                                    <xsl:text>&#10;</xsl:text>
+                                    <span class="tooltiptext">Narrative text</span>
+                                </div>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:otherwise>
@@ -258,12 +261,12 @@
             </xsl:attribute>
             <table>
                 <colgroup>
-                    <col span="1" style="width: 20%;"/>
+                    <col span="1" style="width: 30%;"/>
                     <col span="1" style="width: 15%;"/>
                     <col span="1" style="width: 10%;"/>
                     <col span="1" style="width: 15%;"/>
-                    <col span="1" style="width: 20%;"/>
-                    <col span="1" style="width: 20%;"/>
+                    <col span="1" style="width: 15%;"/>
+                    <col span="1" style="width: 15%;"/>
                 </colgroup>
                 <tbody>
                     <tr>
@@ -273,12 +276,20 @@
                                 <xsl:with-param name="code" select="'1'"/>
                             </xsl:call-template>
                         </th>
-                        <th>
+                        <th colspan="{2-count($manufacturedMaterialStrength)}">
                             <!-- Number of Packages -->
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'43'"/>
                             </xsl:call-template>
                         </th>
+                        <xsl:if test="$manufacturedMaterialStrength">
+                            <th>
+                                <!-- Strength -->
+                                <xsl:call-template name="show-displayLabels">
+                                    <xsl:with-param name="code" select="'70'"/>
+                                </xsl:call-template>
+                            </th>
+                        </xsl:if>
                         <th>
                             <!-- Package Size -->
                             <xsl:call-template name="show-displayLabels">
@@ -302,11 +313,19 @@
                         <td colspan="2">
                             <xsl:call-template name="show-active-ingredients"/>
                         </td>
-                        <td>
+                        <td colspan="{2-count($manufacturedMaterialStrength)}">
                             <xsl:call-template name="number-of-packages">
                                 <xsl:with-param name="supply" select="n1:entryRelationship[@typeCode='COMP']"/>
                             </xsl:call-template>
                         </td>
+                        <xsl:if test="$manufacturedMaterialStrength">
+                            <td>
+                                <xsl:call-template name="show-manufacturedMaterialStrength">
+                                    <xsl:with-param name="parameter"
+                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:desc"/>
+                                </xsl:call-template>
+                            </td>
+                        </xsl:if>
                         <td>
                             <xsl:variable name="hasPackage">
                                 <xsl:call-template name="check-Parameter">
@@ -343,7 +362,7 @@
                                 <xsl:with-param name="code" select="'67'"/>
                             </xsl:call-template>
                         </th>
-                        <th>
+                        <th colspan="2">
                             <!-- Onset Date -->
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'45'"/>
@@ -375,7 +394,7 @@
                                 <xsl:with-param name="parameter" select="n1:routeCode"/>
                             </xsl:call-template>
                         </td>
-                        <td>
+                        <td colspan="2">
                             <xsl:call-template name="show-time">
                                 <xsl:with-param name="datetime"
                                                 select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:low"/>
@@ -441,14 +460,12 @@
                         </td>
                     </tr>
                     <tr>
-                        <th colspan="6">
+                        <th colspan="2">
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'38'"/>
                             </xsl:call-template>
                         </th>
-                    </tr>
-                    <tr>
-                        <td colspan="6">
+                        <td colspan="5">
                             <xsl:call-template name="substitution-code"/>
                         </td>
                     </tr>
@@ -461,7 +478,7 @@
                                 </xsl:call-template>
                             </span>
                         </th>
-                        <td colspan="4">
+                        <td colspan="5">
                             <xsl:call-template name="show-text">
                                 <xsl:with-param name="txt"
                                                 select="n1:entryRelationship[@typeCode='SUBJ']/n1:act[n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.3'] ]/n1:text"/>
@@ -477,7 +494,7 @@
                                 </xsl:call-template>
                             </span>
                         </th>
-                        <td colspan="4">
+                        <td colspan="5">
                             <xsl:call-template name="show-text">
                                 <xsl:with-param name="txt"
                                                 select="n1:entryRelationship[@typeCode='SUBJ']/n1:act[n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.3.1'] ]/n1:text"/>
@@ -493,20 +510,19 @@
                                 *
                             </span>
                         </th>
-                        <td colspan="4">
+                        <td colspan="5">
                             <xsl:variable name="substitutionValue">
                                 <xsl:call-template name="pure-substitution-code"/>
                             </xsl:variable>
-                            <input type="checkbox">
+                            <input type="checkbox" style="display:inline">
                                 <xsl:choose>
                                     <xsl:when test="$substitutionValue !='Yes'">
                                         <xsl:attribute name="disabled"/>
                                     </xsl:when>
                                 </xsl:choose>
                             </input>
-                            <br/>
                             <!--  Substitution help text:-->
-                            <!-- HOTFIX - Has to be replaced with a value from the epSOSDisplayLabel value set -->
+                            <!-- TODO Has to be replaced with a value from the epSOSDisplayLabel value set -->
                             Mark the checkbox if brand name (when allowed) has been substituted.
                             <!--<xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'202'"/>
@@ -514,7 +530,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="3" rowspan="3"/>
+                        <td colspan="4" rowspan="3"/>
                         <th>
                             <!--  Dispensed Product:-->
                             <span class="td_label">
@@ -524,7 +540,7 @@
                             </span>
                         </th>
                         <td colspan="2">
-                            <input type="text">
+                            <input type="text" size="50">
                                 <xsl:attribute name="id">
                                     <xsl:text>dispensedProductValue_</xsl:text>
                                     <xsl:value-of select="position()-1"/>
@@ -550,7 +566,7 @@
                             </span>
                         </th>
                         <td colspan="2">
-                            <input type="text">
+                            <input type="text" size="50">
                                 <xsl:attribute name="id">
                                     <xsl:text>dispensedPackageSize_</xsl:text>
                                     <xsl:value-of select="position()-1"/>
@@ -580,7 +596,7 @@
                             </span>
                         </th>
                         <td colspan="2">
-                            <input type="text">
+                            <input type="text" size="50">
                                 <xsl:attribute name="id">
                                     <xsl:text>dispensedNumberOfPackages_</xsl:text>
                                     <xsl:value-of select="position()-1"/>
@@ -598,7 +614,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="background-color:#ffffcc" colspan="5">
+                        <td style="background-color:#ffffcc" colspan="{5+count($manufacturedMaterialStrength)}">
                             <!-- HOTFIX - Has to be replaced with a value from the epSOSDisplayLabel value set -->
                             *  If substitution of brand name is marked as not allowed, pharmacists may still consider dispensing the national equivalent even though the brand name might be slightly different.<br/>
                             &#160;&#160;This is a known situation: the same pharmaceutical company is marketing the same medicinal product in different countries with slightly different names due to marketing reasons.<br/>
@@ -608,7 +624,7 @@
                             <!--  Dispense -->
                             <xsl:choose>
                                 <xsl:when test="$allowDispense='true'">
-                                    <input type="submit">
+                                    <input type="submit" class="button">
                                         <xsl:attribute name="value">
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'22'"/>
@@ -816,8 +832,8 @@
             <colgroup>
                 <col span="1" style="width: 15%;"/>
                 <col span="1" style="width: 10%;"/>
-                <col span="1" style="width: 55%;"/>
-                <col span="1" style="width: 20%;"/>
+                <col span="1" style="width: 45%;"/>
+                <col span="1" style="width: 30%;"/>
             </colgroup>
 
             <tbody>
@@ -847,56 +863,44 @@
     </xsl:template>
 
     <xsl:template name="epPrescriptionItem">
-        <script>
-            <xsl:attribute name="type">
-                <xsl:text>text/javascript</xsl:text>
-            </xsl:attribute>
-            <xsl:text>i=0;</xsl:text>
-        </script>
-        <table class="narr_table">
-            <xsl:for-each select="$entryNode">
-                <tr>
-                    <th>
-                        <countNo><xsl:value-of select="position()"/>.
-                        </countNo>
-                        <xsl:call-template name="pharmaceuticalSubstanceHeader"/>
-                        <a>
-                            <xsl:attribute name="href">
-                                <xsl:text disable-output-escaping="yes">javascript:void();</xsl:text>
-                            </xsl:attribute>
-                            <xsl:attribute name="onclick">
-                                <xsl:text disable-output-escaping="yes">showhide(&apos;mytable</xsl:text>
-                                <xsl:value-of select="position()"/>
-                                <xsl:text disable-output-escaping="yes">&apos;)</xsl:text>
-                            </xsl:attribute>
-                            <xsl:text>Show/Hide</xsl:text>
-                        </a>
-                    </th>
-                </tr>
-                <table>
-                    <tr>
-                        <td>
-                            <xsl:call-template name="epPrescriptionItemDetails"/>
-                        </td>
-                    </tr>
-                </table>
+        <div class="wrap-collabsible">
+            <input id="collapsible-medicine-list" class="toggle" type="checkbox" checked="true"/>
+            <label for="collapsible-medicine-list" class="lbl-toggle-main">
+                Medicine list
+            </label>
+            <div class="collapsible-content-main">
+                <div class="content-inner-main">
+                    <xsl:for-each select="$entryNode">
+                        <div class="wrap-collabsible">
+                            <input id="collapsible-prescriptionItem-header" class="toggle" type="checkbox" checked="true"/>
+                            <label for="collapsible-prescriptionItem-header" class="lbl-toggle-title">
+                                <countNo><xsl:value-of select="position()"/>.
+                                </countNo>
+                                <xsl:call-template name="pharmaceuticalSubstanceHeader"/>
+                            </label>
+                            <div class="collapsible-content-title">
+                                <div class="content-inner-title">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <xsl:call-template name="epPrescriptionItemDetails"/>
+                                            </td>
+                                        </tr>
+                                    </table>
 
-                <script>
-                    <xsl:attribute name="type">
-                        <xsl:text>text/javascript</xsl:text>
-                    </xsl:attribute>
-                    <xsl:text>i++;</xsl:text>
-                </script>
-            </xsl:for-each>
-        </table>
-        <script>
-            <xsl:attribute name="type">
-                <xsl:text>text/javascript</xsl:text>
-            </xsl:attribute>
-            <xsl:text disable-output-escaping="yes">if(i>1){</xsl:text>
-            <xsl:text disable-output-escaping="yes">showhide(&apos;mytable1&apos;);</xsl:text>
-            <xsl:text disable-output-escaping="yes">};</xsl:text>
-        </script>
+                                    <script>
+                                        <xsl:attribute name="type">
+                                            <xsl:text>text/javascript</xsl:text>
+                                        </xsl:attribute>
+                                        <xsl:text>i++;</xsl:text>
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </xsl:for-each>
+                </div>
+            </div>
+        </div>
     </xsl:template>
 
     <xsl:template name="pharmaceuticalSubstanceHeader">

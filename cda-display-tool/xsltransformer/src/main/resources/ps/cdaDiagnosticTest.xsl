@@ -49,7 +49,9 @@
                                 <xsl:when test="$shownarrative='true'">
                                     <div class="wrap-collabsible">
                                         <input id="collapsible-diagnostic-test-original" class="toggle" type="checkbox"/>
-                                        <label for="collapsible-diagnostic-test-original" class="lbl-toggle">Original</label>
+                                        <label for="collapsible-diagnostic-test-original" class="lbl-toggle">
+                                            <xsl:value-of select="$originalNarrativeTableTitle"/>
+                                        </label>
                                         <div class="collapsible-content">
                                             <div class="content-inner">
                                                 <xsl:apply-templates
@@ -63,7 +65,9 @@
                             <br/>
                             <div class="wrap-collabsible">
                                 <input id="collapsible-diagnostic-test-translated" class="toggle" type="checkbox" checked="true"/>
-                                <label for="collapsible-diagnostic-test-translated" class="lbl-toggle">Translated</label>
+                                <label for="collapsible-diagnostic-test-translated" class="lbl-toggle">
+                                    <xsl:value-of select="$translatedCodedTableTitle"/>
+                                </label>
                                 <div class="collapsible-content">
                                     <div class="content-inner">
                                         <xsl:choose>

@@ -701,7 +701,10 @@
     <!-- epSOSNullFlavor -->
     <xsl:template name="show-nullFlavor">
         <xsl:param name="code"/>
-        <i class="fas fa-exclamation-circle" style="color:#000066" aria-hidden="true"/>
+        <div class="tooltip">
+            <i class="fas fa-exclamation-circle" style="color:#085a9f" aria-hidden="true"/>
+            <span class="tooltiptext">Missing information</span>
+        </div>
         <xsl:text> </xsl:text>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>

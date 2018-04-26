@@ -4,6 +4,7 @@ import com.gnomon.epsos.MyServletContextListener;
 import com.gnomon.epsos.model.EpsosDocument;
 import com.gnomon.epsos.model.cda.Utils;
 import com.gnomon.epsos.service.EpsosHelperService;
+import com.gnomon.epsos.service.HtmlToPdfConverter;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
@@ -52,7 +53,6 @@ public class CDAServlet extends HttpServlet {
             LOGGER.info("hcid: '{}'", hcid);
 
             EpsosDocument selectedEpsosDocument = new EpsosDocument();
-            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
             ClientConnectorConsumer clientConnectorConsumer = MyServletContextListener.getClientConnectorConsumer();
 
             HttpSession session = req.getSession();
@@ -140,21 +140,20 @@ public class CDAServlet extends HttpServlet {
 
             ByteArrayOutputStream baos;
 
-            if (StringUtils.equals(exportType, "pdf")) {
-                String fontpath = getServletContext().getRealPath("/") + "/WEB-INF/fonts/";
-                baos = EpsosHelperService.convertHTMLtoPDF(convertedCda, serviceUrl, fontpath);
-                output = baos.toByteArray();
-                res.setContentType("application/pdf");
-                res.setHeader("Content-Disposition", "attachment; filename=cda.pdf");
-
-            } else if (StringUtils.equals(exportType, "xml")) {
-                res.setHeader("Content-Disposition", "attachment; filename=cda.xml");
-                res.setContentType("text/xml");
-
-            } else {
-                res.setContentType("text/html");
+            switch (exportType) {
+                case "pdf":
+                    baos = HtmlToPdfConverter.createPdf(convertedCda);
+                    output = baos.toByteArray();
+                    res.setContentType("application/pdf");
+                    res.setHeader("Content-Disposition", "attachment; filename=cda.pdf");
+                    break;
+                case "xml":
+                    res.setHeader("Content-Disposition", "attachment; filename=cda.xml");
+                    res.setContentType("text/xml");
+                    break;
+                default:
+                    res.setContentType("text/html");
             }
-
             res.setHeader("Cache-Control", "no-cache");
             res.setDateHeader("Expires", 0);
             res.setHeader("Pragma", "No-cache");
@@ -162,7 +161,6 @@ public class CDAServlet extends HttpServlet {
             stream.write(output);
             stream.flush();
             stream.close();
-
         } catch (Exception ex) {
             LOGGER.error("{}: '{}'", ex.getClass(), ex.getMessage(), ex);
             res.setContentType("text/html");
