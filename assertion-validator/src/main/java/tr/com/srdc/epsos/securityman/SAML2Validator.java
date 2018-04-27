@@ -316,7 +316,7 @@ public class SAML2Validator {
         // Konstantin: committed changes to security manager, in order to provide better support XCA and XDR implementations
         //TODO: Improve Exception management.
         try {
-            sigCountryCode = new SignatureManager().verifySAMLAssestion(assertion);
+            sigCountryCode = new SignatureManager().verifySAMLAssertion(assertion);
         } catch (SMgrException e) {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
             throw e;
@@ -394,7 +394,7 @@ public class SAML2Validator {
                 throw (new MissingFieldException("HCP Assertion element is required."));
             }
 
-            sigCountryCode = new SignatureManager().verifySAMLAssestion(hcpAssertion);
+            sigCountryCode = new SignatureManager().verifySAMLAssertion(hcpAssertion);
 
 
         } catch (IOException | UnmarshallingException e) {

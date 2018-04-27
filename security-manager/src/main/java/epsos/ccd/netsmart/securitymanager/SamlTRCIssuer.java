@@ -189,7 +189,7 @@ public class SamlTRCIssuer {
      *
      * @param hcpIdentityAssertion The health care professional Identity SAML
      *                             Assertion. The method validates the assertion using the
-     *                             {@link SignatureManager#verifySAMLAssestion(org.opensaml.saml2.core.Assertion)}.
+     *                             {@link SignatureManager#verifySAMLAssertion(org.opensaml.saml2.core.Assertion)}.
      * @param patientID            The Patient Id that is required for the TRC Assertion
      * @param purposeOfUse         Purpose of use Variables (e.g. TREATMENT)
      * @param attrValuePair        SAML {@link Attribute} that will be added to the
@@ -210,7 +210,7 @@ public class SamlTRCIssuer {
         SignatureManager sman = new SignatureManager(ksm);
 
         try {
-            sman.verifySAMLAssestion(hcpIdentityAssertion);
+            sman.verifySAMLAssertion(hcpIdentityAssertion);
         } catch (SMgrException ex) {
             LOGGER.error(null, ex);
             throw new SMgrException("SAML Assertion Validation Failed: " + ex.getMessage());
@@ -374,15 +374,15 @@ public class SamlTRCIssuer {
      * @param trcAssertion         The Assertion that is to be validated.
      * @param hcpIdentityAssertion The health care professional Identity SAML
      *                             Assertion. The method validates the assertion using the
-     *                             {@link SignatureManager#verifySAMLAssestion(org.opensaml.saml2.core.Assertion)}.
+     *                             {@link SignatureManager#verifySAMLAssertion(org.opensaml.saml2.core.Assertion)}.
      * @param patientID            The Patient Id that is required for the TRC Assertion
      * @throws SMgrException when the verification fails.
      */
     public void verifyTrcToken(Assertion trcAssertion, Assertion hcpIdentityAssertion, String patientID) throws SMgrException {
 
         SignatureManager sm = new SignatureManager(ksm);
-        sm.verifySAMLAssestion(trcAssertion);
-        sm.verifySAMLAssestion(hcpIdentityAssertion);
+        sm.verifySAMLAssertion(trcAssertion);
+        sm.verifySAMLAssertion(hcpIdentityAssertion);
     }
 
     protected Attribute createAttribute(String value, String friendlyName, String nameFormat, String name) {
