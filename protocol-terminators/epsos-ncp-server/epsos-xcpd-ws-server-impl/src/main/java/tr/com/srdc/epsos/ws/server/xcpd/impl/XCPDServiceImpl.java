@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * <p>
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- */
 package tr.com.srdc.epsos.ws.server.xcpd.impl;
 
 import epsos.ccd.gnomon.auditmanager.*;
@@ -58,7 +39,6 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-
 public class XCPDServiceImpl implements XCPDServiceInterface {
 
     private static final String ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED = "DemographicsQueryNotAllowed";
@@ -69,7 +49,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     private ServiceLoader<PatientSearchInterface> serviceLoader;
     private PatientSearchInterface patientSearchService;
 
-    public XCPDServiceImpl() throws Exception {
+    public XCPDServiceImpl() {
         of = new ObjectFactory();
         serviceLoader = ServiceLoader.load(PatientSearchInterface.class);
         try {
@@ -237,8 +217,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         TS result = of.createTS();
         Date date = pd.getBirthDate();
         SimpleDateFormat dateformatYYYYMMDD = new SimpleDateFormat("yyyyMMdd");
-        StringBuilder dateString = new StringBuilder(dateformatYYYYMMDD.format(date));
-        result.setValue(dateString.toString());
+        result.setValue(dateformatYYYYMMDD.format(date));
         return result;
     }
 
@@ -383,7 +362,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 // Administrative gender
                 try {
                     List<PRPAMT201306UV02LivingSubjectAdministrativeGender> genders = pl.getLivingSubjectAdministrativeGender();
-                    if (genders != null && genders.size() > 0) {
+                    if (genders != null && !genders.isEmpty()) {
                         PRPAMT201306UV02LivingSubjectAdministrativeGender gender = genders.get(0);
                         pd.setAdministrativeGender(PatientDemographics.Gender.parseGender(gender.getValue().get(0).getCode()));
                     }
@@ -394,7 +373,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 // BirthDate
                 try {
                     List<PRPAMT201306UV02LivingSubjectBirthTime> bds = pl.getLivingSubjectBirthTime();
-                    if (bds != null && bds.size() > 0) {
+                    if (bds != null && !bds.isEmpty()) {
                         PRPAMT201306UV02LivingSubjectBirthTime bd = bds.get(0);
                         String sbd = bd.getValue().get(0).getValue();
                         pd.setBirthDate(DateUtil.parseDateFromString(sbd, "yyyyMMdd"));
@@ -406,7 +385,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 // City, street name, country, postal code
                 try {
                     List<PRPAMT201306UV02PatientAddress> pas = pl.getPatientAddress();
-                    if (pas != null && pas.size() > 0) {
+                    if (pas != null && !pas.isEmpty()) {
                         PRPAMT201306UV02PatientAddress pa = pas.get(0);
                         List<Serializable> content = pa.getValue().get(0).getContent();
                         for (Serializable s : content) {
@@ -436,7 +415,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 // Given name, family name
                 try {
                     List<PRPAMT201306UV02LivingSubjectName> sns = pl.getLivingSubjectName();
-                    if (sns != null && sns.size() > 0) {
+                    if (sns != null && !sns.isEmpty()) {
                         PRPAMT201306UV02LivingSubjectName sn = sns.get(0);
                         List<Serializable> content = sn.getValue().get(0).getContent();
                         for (Serializable s : content) {
@@ -460,7 +439,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 // Id
                 try {
                     List<PRPAMT201306UV02LivingSubjectId> ids = pl.getLivingSubjectId();
-                    if (ids != null && ids.size() > 0) {
+                    if (ids != null && !ids.isEmpty()) {
                         PRPAMT201306UV02LivingSubjectId id = ids.get(0);
                         pd.setId(id.getValue().get(0).getExtension());
                     }
@@ -581,7 +560,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             // TODO: enable demographic searches
             if (!receiverHomeCommID.equals(Constants.HOME_COMM_ID)) {
                 fillOutputMessage(outputMessage, "Receiver has wrong Home Community ID.", ERROR_ANSWER_NOT_AVAILABLE);
-            } else if (idList.size() > 0) {
+            } else if (!idList.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
                 List<PatientId> patientIdList = new ArrayList<>();
                 sb.append("<patient>");
@@ -644,7 +623,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 //                } catch (Exception e) {
 //                    LOGGER.error(ExceptionUtils.getStackTrace(e));
 //                }
-                if (pdList.size() == 0) {
+                if (pdList.isEmpty()) {
                     // Preparing answer not available error
                     fillOutputMessage(outputMessage, "No patient found.", ERROR_ANSWER_NOT_AVAILABLE, "NF");
                     outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AA");
@@ -660,7 +639,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     // ships within the HCP assertion
                     // TODO: Might be necessary to remove later, although it does no harm in reality!
                     else {
-                        LOGGER.info("Could not get client country code from the service consumer certificate. The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
+                        LOGGER.info("Could not get client country code from the service consumer certificate. " +
+                                "The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
                         if (sigCountryCode != null) {
                             LOGGER.info("Found the client country code via the signature certificate.");
                             countryCode = sigCountryCode;

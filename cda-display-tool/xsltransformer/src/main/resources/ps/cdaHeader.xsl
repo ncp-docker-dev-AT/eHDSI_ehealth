@@ -27,39 +27,43 @@
         <table class="header_table">
             <tbody>
                 <tr class="td_creation_date">
-                    <th class="td_creation_date">
+                    <th>
                         <!-- Creation Date: -->
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'15'"/>
                         </xsl:call-template>
-                        :
-                        <span class="tdtext">
-                            <xsl:call-template name="show-time">
-                                <xsl:with-param name="datetime" select="$creationDate"/>
-                            </xsl:call-template>
-                        </span>
                     </th>
-                    <th class="td_creation_date">
+                    <td>
+                        <xsl:call-template name="show-time">
+                            <xsl:with-param name="datetime" select="$creationDate"/>
+                        </xsl:call-template>
+                    </td>
+                    <th>
                         <!-- Last Update:-->
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'39'"/>
                         </xsl:call-template>
-                        :
-                        <span class="tdtext">
-                            <xsl:call-template name="show-time">
-                                <xsl:with-param name="datetime" select="$lastUpdate"/>
-                            </xsl:call-template>
-                        </span>
                     </th>
-                </tr>
-                <tr>
-                    <th colspan="3">
-                        <!-- Patient-->
-                        <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="code" select="'51'"/>
+                    <td>
+                        <xsl:call-template name="show-time">
+                            <xsl:with-param name="datetime" select="$lastUpdate"/>
                         </xsl:call-template>
+                    </td>
+                    <th>
+                        <!-- Language:-->
+                        Language
                     </th>
+                    <td>
+                        <xsl:value-of select="$userLang"/>
+                    </td>
                 </tr>
+            </tbody>
+        </table>
+    </xsl:template>
+
+    <xsl:template name="patientBlock">
+        <table class="header_table">
+            <tbody>
                 <tr>
                     <table class="header_table">
                         <tbody>
@@ -115,7 +119,7 @@
                                 <td>
                                     <xsl:call-template name="show-id">
                                         <xsl:with-param name="id" select="$secondaryPatientId"/>
-                                    </xsl:call-template>&#160;
+                                    </xsl:call-template>
                                 </td>
                             </tr>
                         </tbody>
@@ -135,8 +139,8 @@
                                     <xsl:choose>
                                         <xsl:when
                                                 test="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@nullFlavor">
-                                            <xsl:call-template name="show-noneFlavor">
-                                                <xsl:with-param name="data"
+                                            <xsl:call-template name="show-nullFlavor">
+                                                <xsl:with-param name="code"
                                                                 select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@nullFlavor"/>
                                             </xsl:call-template>
                                         </xsl:when>

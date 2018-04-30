@@ -4,6 +4,7 @@ import com.ibatis.common.jdbc.ScriptRunner;
 import com.spirit.epsos.cc.adc.db.EadcDbConnect;
 import eu.epsos.pt.eadc.util.EadcFactory;
 import eu.epsos.pt.eadc.util.EadcUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -27,6 +28,10 @@ import java.util.TreeMap;
  */
 public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
 
+    // Logger object for logging to log4j
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutomaticDataCollector.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+
     // Path to the factory.xslt
     private static final String pathToFactoryXslt = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
             + "EADC_resources"
@@ -41,8 +46,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
             + "config"
             + File.separator
             + "config.xml";
-    // Logger object for logging to log4j
-    private static final Logger LOGGER = LoggerFactory.getLogger(AutomaticDataCollector.class);
+
     // map with one intermediaTransformer per CDA-classcode
     private TreeMap<String, EasyXsltTransformer> intermediaTransformerList;
     // DOM structure for caching the factory.xslt
@@ -81,7 +85,9 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
 
         LOGGER.info("Processing a transaction object");
         String sqlInsertStatementList = this.extractDataAndCreateAccordingSqlInserts(transaction);
-        LOGGER.info("Insert the following sql-queries:\n'{}'", sqlInsertStatementList);
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.info("Insert the following sql-queries:\n'{}'", sqlInsertStatementList);
+        }
         this.runSqlScript(dataSourceName, sqlInsertStatementList);
     }
 

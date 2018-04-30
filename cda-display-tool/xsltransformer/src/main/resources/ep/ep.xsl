@@ -67,8 +67,8 @@
         <xsl:param name="showValue"/>
         <xsl:choose>
             <xsl:when test="($medPackage/@nullFlavor)">
-                <xsl:call-template name="show-noneFlavor">
-                    <xsl:with-param name="data" select="($medPackage)/@nullFlavor"/>
+                <xsl:call-template name="show-nullFlavor">
+                    <xsl:with-param name="code" select="($medPackage)/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -130,13 +130,27 @@
         </xsl:choose>
     </xsl:template>
 
+    <xsl:template name="show-manufacturedMaterialStrength">
+        <xsl:param name="parameter"/>
+        <xsl:choose>
+            <xsl:when test="not($parameter/@nullFlavor)">
+                <xsl:value-of select="$parameter"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="show-nullFlavor">
+                    <xsl:with-param name="code" select="$parameter/@nullFlavor"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template name="show-formCode">
         <xsl:param name="parameter"/>
         <xsl:choose>
             <xsl:when
                     test="$parameter/n1:originalText/n1:reference/@value">
                 <xsl:call-template name="show-uncodedElement">
-                    <xsl:with-param name="data" select="$parameter/n1:originalText/n1:reference/@value"/>
+                    <xsl:with-param name="code" select="$parameter/n1:originalText/n1:reference/@value"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -145,8 +159,8 @@
                         <xsl:value-of select="$parameter/@displayName"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$parameter/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$parameter/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -155,62 +169,57 @@
     </xsl:template>
 
     <xsl:template name="epCda">
-        <xsl:call-template name="firstRow"/>
+        <xsl:call-template name="epPatientDetails"/>
+        <br/>
+        <xsl:call-template name="epPrescriberDetails"/>
+        <br/>
+        <xsl:call-template name="epInformation"/>
+        <br/>
+        <xsl:call-template name="epPrescriptionItem"/>
     </xsl:template>
 
-    <xsl:template name="firstRow">
-        <table>
-            <tr>
-                <td>
-                    <xsl:call-template name="prefixCell"/>
-                </td>
-            </tr>
-        </table>
+    <xsl:template name="epPatientDetails">
+        <div class="wrap-collabsible" >
+            <input id="collapsible-patient-header" class="toggle" type="checkbox" checked="true"/>
+            <label for="collapsible-patient-header" class="lbl-toggle-main">
+                <!-- Patient-->
+                <xsl:call-template name="show-displayLabels">
+                    <xsl:with-param name="code" select="'51'"/>
+                </xsl:call-template>
+            </label>
+            <div class="collapsible-content-main">
+                <div class="content-inner-main">
+                    <xsl:call-template name="epHeader"/>
+                </div>
+            </div>
+            <br/>
+        </div>
     </xsl:template>
 
-    <xsl:template name="prefixCell">
-        <xsl:call-template name="epHeader"/>
-        <table class="narr_table">
-            <tr>
-                <td class="narrow_table">
-                    <xsl:call-template name="show-displayLabels">
-                        <xsl:with-param name="code" select="'7'"/>
-                    </xsl:call-template>
-                    <xsl:call-template name="authorName">
-                        <xsl:with-param name="authorLocation" select="/n1:ClinicalDocument/n1:author"/>
-                    </xsl:call-template>
-                </td>
-                <td>
-                    <xsl:call-template name="show-displayLabels">
-                        <xsl:with-param name="code" select="'64' "/>
-                    </xsl:call-template>
-                    <xsl:call-template name="show-formCode">
-                        <xsl:with-param name="parameter" select="/n1:ClinicalDocument/n1:author/n1:functionCode"/>
-                    </xsl:call-template>
-                </td>
-            </tr>
-        </table>
-        <table class="narr_table">
-            <tr>
-                <td class="narrow_table">
-                    <xsl:call-template name="show-displayLabels">
-                        <xsl:with-param name="code" select="'58'"/>
-                    </xsl:call-template>
-                    <xsl:value-of select="$prescriptionID"/>
-                </td>
-                <td>
-                    <span class="td_label">
+    <xsl:template name="epInformation">
+        <table class="header_table">
+            <tbody>
+                <tr class="td_creation_date">
+                    <th>
+                        <xsl:call-template name="show-displayLabels">
+                            <xsl:with-param name="code" select="'58'"/>
+                        </xsl:call-template>
+                    </th>
+                    <td>
+                        <xsl:value-of select="$prescriptionID"/>
+                    </td>
+                    <th>
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'20'"/>
                         </xsl:call-template>
-                    </span>
-                    <xsl:call-template name="show-time">
-                        <xsl:with-param name="datetime" select="/n1:ClinicalDocument/n1:author/n1:time"/>
-                    </xsl:call-template>
-                </td>
-            </tr>
+                    </th>
+                    <td>
+                        <xsl:call-template name="show-time">
+                            <xsl:with-param name="datetime" select="/n1:ClinicalDocument/n1:author/n1:time"/>
+                        </xsl:call-template>
+                    </td>
+                </tr>
+            </tbody>
         </table>
-        <xsl:call-template name="epPrescriberDetails"/>
-        <xsl:call-template name="epPrescriptionItem"/>
     </xsl:template>
 </xsl:stylesheet>

@@ -5,7 +5,7 @@
 
     <groupId>eu.europa.ec.sante.ehdsi</groupId>
     <artifactId>openncp</artifactId>
-    <version>2.5.3.RC1</version>
+    <version>2.5.3.RC2</version>
     <packaging>pom</packaging>
 
     <name>OpenNCP Reference Implementation</name>
@@ -86,6 +86,10 @@
         <sonar.host.url>http://127.0.0.1:9000</sonar.host.url>
         <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
         <sonar.scm.disabled>true</sonar.scm.disabled>
+        <!-- Default Policy Manager -->
+        <openncp.policy-manager.groupId>eu.europa.ec.sante.ehdsi</openncp.policy-manager.groupId>
+        <openncp.policy-manager.artifactId>openncp-defaultpolicymanager</openncp.policy-manager.artifactId>
+        <openncp.policy-manager.version>${project.version}</openncp.policy-manager.version>
         <!-- Dependency Versions -->
         <axiomReleaseVersion>1.2.13</axiomReleaseVersion>
         <axiom-api.version>1.2.13</axiom-api.version>
@@ -99,7 +103,7 @@
         <commons-io.version>2.5</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
         <commons-lang3.version>3.5</commons-lang3.version>
-        <dynamic-discovery-client.version>1.4</dynamic-discovery-client.version>
+        <dynamic-discovery-client.version>1.5</dynamic-discovery-client.version>
         <esapi.version>2.0.1</esapi.version>
         <ibatis-sqlmap.version>2.3.4.726</ibatis-sqlmap.version>
         <h2database.version>1.2.142</h2database.version>
@@ -442,4 +446,11 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- You might add this profile to your general Maven settings.xml -->
+    <profiles>
+        <profile>
+            <id>national-build</id>
+        </profile>
+    </profiles>
 </project>

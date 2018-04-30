@@ -17,14 +17,14 @@
 			<mapping targetColumn="ReceivingISO" sourceXPath="@ReceivingISO"/>
 			<mapping targetColumn="ReceivingNCP_OID" sourceXPath="@ReceivingNCP_OID"/>
 			<mapping targetColumn="ReceivingHost" sourceXPath="@ReceivingHost"/>
-			<mapping targetColumn="receivingAddr" sourceXPath="@ReceivingAddr"/>
+			<mapping targetColumn="ReceivingAddr" sourceXPath="@ReceivingAddr"/>
 			<mapping targetColumn="ReceivingMsgID" sourceXPath="@ReceivingMsgID"/>
 			<mapping targetColumn="TransactionCounter" sourceXPath="@TransactionCounter"/>
 			<mapping targetColumn="HumanRequestor" sourceXPath="@HumanRequestor"/>
 			<mapping targetColumn="UserId" sourceXPath="@UserId"/>
 			<mapping targetColumn="POC" sourceXPath="@POC"/>
 			<mapping targetColumn="POC_ID" sourceXPath="@POC_ID"/>
-			<mapping targetColumn="AuthentificationLevel" sourceXPath="@AuthentificationLevel"/>
+			<mapping targetColumn="AuthenticationLevel" sourceXPath="@AuthenticationLevel"/>
 			<mapping targetColumn="RequestAction" sourceXPath="@RequestAction"/>
 			<mapping targetColumn="ResponseAction" sourceXPath="@ResponseAction"/>
 			<mapping targetColumn="ServiceType" sourceXPath="@ServiceType"/>

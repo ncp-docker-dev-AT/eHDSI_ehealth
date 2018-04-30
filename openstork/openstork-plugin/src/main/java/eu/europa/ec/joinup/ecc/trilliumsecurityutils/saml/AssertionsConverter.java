@@ -31,7 +31,6 @@ import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
 import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.namespace.QName;
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
@@ -54,7 +53,7 @@ public class AssertionsConverter {
                 .getBuilder(qname)).buildObject(qname);
     }
 
-    public static Assertion createPlainTRCA(String purpose, Assertion idAs, String patientId) throws SMgrException, IOException {
+    public static Assertion createPlainTRCA(String purpose, Assertion idAs, String patientId) throws SMgrException {
 
         Assertion trc;
         SamlTRCIssuer issuer = new SamlTRCIssuer();
@@ -197,7 +196,7 @@ public class AssertionsConverter {
     }
 
     public static Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
-                                          List<Attribute> attrValuePair) throws SMgrException, IOException {
+                                          List<Attribute> attrValuePair) throws SMgrException {
 
         KeyStoreManager ksm;
         HashMap<String, String> auditDataMap;
@@ -215,7 +214,7 @@ public class AssertionsConverter {
             SignatureManager sman = new SignatureManager(ksm);
 
             try {
-                sman.verifySAMLAssestion(hcpIdentityAssertion);
+                sman.verifySAMLAssertion(hcpIdentityAssertion);
             } catch (SMgrException ex) {
                 LOGGER.error("SMgrException: '{}'", ex);
                 throw new SMgrException("SAML Assertion Validation Failed: " + ex.getMessage());

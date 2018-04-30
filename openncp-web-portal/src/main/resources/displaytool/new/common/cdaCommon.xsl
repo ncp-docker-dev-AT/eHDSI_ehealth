@@ -2,12 +2,12 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<xsl:output method="html" indent="yes" version="4.01"   doctype-system="http://www.w3.org/TR/html4/strict.dtd" doctype-public="-//W3C//DTD HTML 4.01//EN"/>
-	<xsl:param name="userLang" select="'en'"/>	
+	<xsl:param name="userLang" select="'en'"/>
 	<xsl:param name="epsosLangDir" select="'../EpsosRepository'"/>
-	<xsl:param name="defaultUserLang" select="'en'"/>	
-	<xsl:param name="actionpath" select="''"/>	
+	<xsl:param name="defaultUserLang" select="'en'"/>
+	<xsl:param name="actionpath" select="''"/>
 
-	
+
 	<!-- show-signature -->
 	<xsl:template name="show-sig">
 		<xsl:param name="sig"/>
@@ -89,7 +89,7 @@
 		<xsl:call-template name="show-address">
 			<xsl:with-param name="address" select="$contact/n1:addr"/>
 		</xsl:call-template>
-		
+
 		<xsl:for-each select="$contact/n1:telecom">
 			<xsl:call-template name="show-telecom">
 				<xsl:with-param name="telecom" select="."/>
@@ -278,31 +278,31 @@
 	<!-- show time -->
 	<xsl:template name="show-time">
 		<xsl:param name="datetime"/>
-		
-				<xsl:choose>
-					<xsl:when test="not($datetime)">
-						<!--<xsl:call-template name="formatDateTime">
-							<xsl:with-param name="date" select="@value"/>
-						</xsl:call-template>-->
-						<xsl:text> </xsl:text>
-				</xsl:when>
+
+		<xsl:choose>
+			<xsl:when test="not($datetime)">
+				<!--<xsl:call-template name="formatDateTime">
+                    <xsl:with-param name="date" select="@value"/>
+                </xsl:call-template>-->
+				<xsl:text> </xsl:text>
+			</xsl:when>
 			<xsl:otherwise>
-			<xsl:choose>
+				<xsl:choose>
 					<xsl:when test="not($datetime/@nullFlavor)and $datetime/@value">
 						<xsl:call-template name="formatDateTime">
 							<xsl:with-param name="date" select="$datetime/@value"/>
 						</xsl:call-template>
 					</xsl:when>
 					<xsl:otherwise>
-					<xsl:call-template name="show-noneFlavor">
+						<xsl:call-template name="show-noneFlavor">
 							<xsl:with-param name="data" select="$datetime/@nullFlavor"/>
-					</xsl:call-template>
+						</xsl:call-template>
 					</xsl:otherwise>
-			</xsl:choose>
+				</xsl:choose>
 			</xsl:otherwise>
-			
+
 		</xsl:choose>
-		
+
 	</xsl:template>
 	<!-- show assignedEntity -->
 	<xsl:template name="show-assignedEntity">
@@ -562,7 +562,7 @@
 	</xsl:template>
 	<xsl:template name="formatDateTime">
 		<xsl:param name="date"/>
-		
+
 		<!-- day -->
 		<xsl:choose>
 			<xsl:when test="substring ($date, 7, 1)=&quot;0&quot;">
@@ -574,50 +574,50 @@
 				<xsl:text>/</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
-		
+
 		<!-- month -->
 		<xsl:variable name="month" select="substring ($date, 5, 2)"/>
 		<xsl:value-of select="$month"/>
-				<xsl:text>/</xsl:text>
-	<!--	<xsl:choose>
-			<xsl:when test="$month='01'">
-				<xsl:text>January </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='02'">
-				<xsl:text>February </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='03'">
-				<xsl:text>March </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='04'">
-				<xsl:text>April </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='05'">
-				<xsl:text>May </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='06'">
-				<xsl:text>June </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='07'">
-				<xsl:text>July </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='08'">
-				<xsl:text>August </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='09'">
-				<xsl:text>September </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='10'">
-				<xsl:text>October </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='11'">
-				<xsl:text>November </xsl:text>
-			</xsl:when>
-			<xsl:when test="$month='12'">
-				<xsl:text>December </xsl:text>
-			</xsl:when>
-		</xsl:choose>
-		-->
+		<xsl:text>/</xsl:text>
+		<!--	<xsl:choose>
+                <xsl:when test="$month='01'">
+                    <xsl:text>January </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='02'">
+                    <xsl:text>February </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='03'">
+                    <xsl:text>March </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='04'">
+                    <xsl:text>April </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='05'">
+                    <xsl:text>May </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='06'">
+                    <xsl:text>June </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='07'">
+                    <xsl:text>July </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='08'">
+                    <xsl:text>August </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='09'">
+                    <xsl:text>September </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='10'">
+                    <xsl:text>October </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='11'">
+                    <xsl:text>November </xsl:text>
+                </xsl:when>
+                <xsl:when test="$month='12'">
+                    <xsl:text>December </xsl:text>
+                </xsl:when>
+            </xsl:choose>
+            -->
 		<!-- year -->
 		<xsl:value-of select="substring ($date, 1, 4)"/>
 		<!-- time and US timezone -->
@@ -706,371 +706,62 @@
 		</xsl:if>
 	</xsl:template>
 	<!-- show-noneFlavor -->
-	
-	<xsl:template name="show-noneFlavor">   
-	<xsl:param name="data"/>
-			<xsl:variable name="dirFile" select="concat($epsosLangDir,'/NullFlavor.xml')"/>
-			<xsl:variable name="foundKey" select="document($dirFile)/NullFlavorInformation/NullFlavorEntry[@code=$data]"/>
-			<xsl:variable name="foundKeyLang" select="$foundKey/displayName[@lang=$userLang]"/>
-			<xsl:variable name="defFoundKeyLang" select="$foundKey/displayName[@lang=$defaultUserLang]"/>
-			<xsl:choose>
-				<xsl:when  test="not ($foundKeyLang)">
-					<xsl:value-of select="$defFoundKeyLang"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="$foundKeyLang"/>
-				</xsl:otherwise>
-			</xsl:choose>
-			
-			
-	
-		
-	</xsl:template>
-	
-	<!--- display v40_unknownInfo -->
-	
-	<xsl:template name="show-unknownInfo" match="/n1:SNOMEDCTInformation/n1:SNOMEDCTEntry">   
-		<xsl:param name="data"/>
-			<xsl:variable name="dirFile" select="concat($epsosLangDir,'/SNOMEDCT.xml')"/>
-			<xsl:variable name="foundKey" select="document($dirFile)/SNOMEDCTInformation/SNOMEDCTEntry[@code=$data]"/>
-			<xsl:variable name="foundKeyLang" select="$foundKey/displayName[@lang=$userLang]"/>
-			<xsl:variable name="defFoundKeyLang" select="$foundKey/displayName[@lang=$defaultUserLang]"/>
-			<xsl:choose>
-				<xsl:when  test="not ($foundKeyLang)">
-					<xsl:value-of select="$defFoundKeyLang"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="$foundKeyLang"/>
-				</xsl:otherwise>
-			</xsl:choose>
-			
-			
-			
-		
-	</xsl:template>
-	
-	<!--  display Labels -->
-	<xsl:template name="show-displayLabels" >   
-		<xsl:param name="data"/>
-			<xsl:variable name="dirFile" select="concat($epsosLangDir,'/epSOSDisplayLabels.xml')"/>
-			<xsl:variable name="foundKey" select="document($dirFile)/epSOSDisplayLabelsInformation/epSOSDisplayLabelsEntry[@code=$data]"/>
-			<xsl:variable name="foundKeyLang" select="$foundKey/displayName[@lang=$userLang]"/>
-			<xsl:variable name="defFoundKeyLang" select="$foundKey/displayName[@lang=$defaultUserLang]"/>
-				<xsl:choose>
-				<xsl:when  test="not ($foundKey)">
-				<!--  if the key is not found then display the key itself -->
-				<xsl:value-of select="$data"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:choose>
-						<xsl:when  test="not ($foundKeyLang)">
-							<xsl:value-of select="$defFoundKeyLang"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="$foundKeyLang"/>
-						</xsl:otherwise>
-					</xsl:choose>
-			
-				</xsl:otherwise>
-			</xsl:choose>
-		<!-- <xsl:text disable-output-escaping="yes">&#160;</xsl:text>   -->
-		<xsl:text> </xsl:text>
-		
-	</xsl:template>
-	
-	
-		<xsl:template name="show-strength" >   
-			<xsl:param name="medStrengthUnit1"/>
-			<xsl:param name="medStrengthUnit2"/>
-			<xsl:param name="medStrengthValue1"/>
-			<xsl:param name="medStrengthValue2"/>
-			<xsl:param name="medStrength1"/>
-			<xsl:param name="medStrength2"/>
-					
-					
-            				<xsl:choose>
-            					<!-- Den Unit =1 -->
-            						<xsl:when test="($medStrength1/@nullFlavor)">
-            							<xsl:call-template name="show-noneFlavor">
-											<xsl:with-param name="data" select="$medStrength1/@nullFlavor"/>
-										</xsl:call-template>
-            						</xsl:when>
-            						
-            						<xsl:when test="($medStrength2/@nullFlavor)">
-            							<xsl:value-of select="$medStrengthValue1"/>&#160;<xsl:value-of select="$medStrengthUnit1"/> / <xsl:call-template name="show-noneFlavor">
-											<xsl:with-param name="data" select="$medStrength2/@nullFlavor"/>
-										</xsl:call-template>
-            						</xsl:when>
-            						<xsl:when test="$medStrengthUnit2='1'">
-            							<xsl:value-of select="$medStrengthValue1"/>&#160;<xsl:value-of select="$medStrengthUnit1"/>&#160;
-            							<xsl:call-template name="show-displayLabels">
-            								<xsl:with-param name="data" select="'53'"/>
-            							</xsl:call-template>
-            						</xsl:when>
-            						<!-- Den Unit !=1 and Denominator = 1-->
-            						<xsl:when test="not($medStrengthUnit2='1') and ($medStrengthValue2='1')">
-            							<xsl:value-of select="$medStrengthValue1"/>&#160;<xsl:value-of select="$medStrengthUnit1"/>/<xsl:value-of select="$medStrengthUnit2"/> 
-            						</xsl:when>
-            							           						
-            						
-            						<xsl:when test="not($medStrengthValue2)">
-            							<xsl:value-of select="$medStrengthValue1"/>&#160; <xsl:value-of select="$medStrengthUnit1"/> /
-            						</xsl:when>
-            						
-            						<xsl:when test="not($medStrengthValue2) and not($medStrengthValue2)">
-            							/
-            						</xsl:when>
-            						
-            						<xsl:otherwise>
-            								<xsl:value-of select="$medStrengthValue1"/>&#160; <xsl:value-of select="$medStrengthUnit1"/> / <xsl:value-of select="$medStrengthValue2"/>&#160; <xsl:value-of select="$medStrengthUnit2"/> 
-            						</xsl:otherwise>
-            					</xsl:choose>
-	</xsl:template>
-	
-	
-	
-	<!-- Number of Unit per Intake -->
-	
-		<xsl:template name="show-numberUnitIntake" >   
-		
-			<xsl:param name="medUnitIntakeLow"/>
-			<xsl:param name="medUnitIntakeHigh"/>
-			<xsl:param name="medUnitIntakeUnitLow"/>
-			<xsl:param name="medUnitIntakeUnitHigh"/>
-			
-			
-			
-		<xsl:choose>
-            					<xsl:when test="not($medUnitIntakeLow) and not($medUnitIntakeHigh)">
-            					<xsl:text>-</xsl:text>
-            					</xsl:when>
-            					<xsl:when test="($medUnitIntakeLow) and (not($medUnitIntakeHigh) or $medUnitIntakeHigh/@nullFlavor)">
-		            					<xsl:value-of select="$medUnitIntakeLow"/> [<xsl:value-of select="$medUnitIntakeUnitLow"/>]-
-            					</xsl:when>
-            					<xsl:when test="(not($medUnitIntakeLow) or $medUnitIntakeLow/@nullFlavor) and ($medUnitIntakeHigh)">
-            					     -<xsl:value-of select="$medUnitIntakeHigh"/> [<xsl:value-of select="$medUnitIntakeUnitHigh"/>]-
-            						
-            					</xsl:when>
-            					<xsl:when test="$medUnitIntakeLow=$medUnitIntakeHigh">
-            						<xsl:choose>
-            							<xsl:when test="$medUnitIntakeUnitHigh='1' and $medUnitIntakeUnitLow='1'">
-            								<xsl:value-of select="$medUnitIntakeLow"/><xsl:text> </xsl:text>
-            					<xsl:call-template  name="show-displayLabels">
-									<xsl:with-param name="data" select="'77'"/>
-								</xsl:call-template>								
-            							</xsl:when>
-            							<xsl:otherwise>            							
-            							<xsl:value-of select="$medUnitIntakeLow"/> [<xsl:value-of select="$medUnitIntakeUnitLow"/>]
-            							</xsl:otherwise>
-            						</xsl:choose>
-            					
-            					</xsl:when>
-            					<xsl:otherwise>
-            						<xsl:value-of select="$medUnitIntakeLow"/> [<xsl:value-of select="$medUnitIntakeUnitLow"/>] -
-            							<xsl:value-of select="$medUnitIntakeHigh"/> [<xsl:value-of select="$medUnitIntakeUnitHigh"/>]
-            					</xsl:otherwise>
-            					</xsl:choose>
-            					
-		
-		
-		</xsl:template>   
-		
-		
-		<!-- Frequency of Intake -->
-	
-		<xsl:template name="show-frequencyIntake" >   
-			<xsl:param name="medFrequencyIntakeType"/>
-			<xsl:param name="medFrequencyIntake"/>
-		
-		<xsl:choose>
-            							<xsl:when test="$medFrequencyIntakeType='TS'"> 
-            							<!-- a point in time just one value -->
-            								<xsl:call-template name="show-time">
-            													<xsl:with-param name="datetime" select="$medFrequencyIntake"/>
-																	</xsl:call-template>&#160;
-            							</xsl:when>
-            							
-            							
-            							<xsl:when test="$medFrequencyIntakeType='IVL_TS'">
-            							<!-- time interval -->
-            							<xsl:call-template name="show-time">
-            													<xsl:with-param name="datetime" select="$medFrequencyIntake/n1:low"/>
-																	</xsl:call-template>&#160;-
-																	<xsl:call-template name="show-time">
-            													<xsl:with-param name="datetime" select="$medFrequencyIntake/n1:high"/>
-																	</xsl:call-template>&#160;
-            							</xsl:when>
-            							
-            							<xsl:when test="$medFrequencyIntakeType='PIVL_TS'">
-            								<xsl:variable name="medPhase" select="$medFrequencyIntake/n1:phase"/>
-            								<xsl:variable name="medPeriod" select="$medFrequencyIntake/n1:period"/>
-            								<xsl:variable name="medPhaseWidth" select="$medFrequencyIntake/n1:phase/n1:width"/>
-            								<xsl:variable name="medPhaseLow" select="$medFrequencyIntake/n1:phase/n1:low"/>
-            								
-            								<xsl:call-template  name="show-displayLabels">
-													<xsl:with-param name="data" select="'27'"/>
-											</xsl:call-template>
-            								<xsl:value-of select="$medPeriod/@value"/> [<xsl:value-of select="$medPeriod/@unit"/>] 
-            								<!-- if phase.width exists -->
-            								<xsl:if test="$medPhaseWidth"> 
-            											<xsl:text>&#160;</xsl:text> 
-            											<!--for-->
-            											<xsl:call-template  name="show-displayLabels">
-															<xsl:with-param name="data" select="'31'"/>
-														</xsl:call-template>
-            											<xsl:text>&#160;</xsl:text> <xsl:value-of select="$medPhaseWidth/@value"/>&#160; <xsl:value-of select="$medPhaseWidth/@unit"/> 
-            								</xsl:if>
-            									<xsl:if test="$medPhaseLow"> 
-            											<!-- xsl:text> at </xsl:text-->
-            											
-            												<xsl:call-template  name="show-displayLabels">
-																<xsl:with-param name="data" select="'6'"/>
-															</xsl:call-template>
-            											
-            											 
-            											<xsl:call-template name="show-time">
-            													<xsl:with-param name="datetime" select="$medPhaseLow"/>
-																	</xsl:call-template>&#160;
-            								</xsl:if>
-            								
-            	
-            							</xsl:when>
-            								<xsl:when test="$medFrequencyIntakeType='EIVL_TS'">
-            								
-            								
-            								<xsl:variable name="medOffset" select="$medFrequencyIntake/n1:offset"/>
-            								<xsl:variable name="medOffsetWidth" select="$medFrequencyIntake/n1:offset/n1:width"/>
-            								<xsl:variable name="medOffsetLow" select="$medFrequencyIntake/n1:offset/n1:low"/>
-            								
-            								
-            								<xsl:if test="$medOffsetLow"> 
-            												<xsl:value-of select="$medOffsetLow/@value"/>&#160;
-            											  <xsl:value-of select="$medOffsetLow/@unit"/> &#160;
-            								</xsl:if>
-            										<!--xsl:value-of select="$medFrequencyIntake/n1:event/@code"/-->
-            										<xsl:value-of select="$medFrequencyIntake/n1:event/@displayName"/>
-            						
-            								<xsl:if test="$medOffsetWidth"> 
-            											<xsl:text>&#160; </xsl:text>
-            											<xsl:call-template  name="show-displayLabels">
-															<xsl:with-param name="data" select="'31'"/>
-														</xsl:call-template>
-														<xsl:text> &#160;</xsl:text>            											
-            											 <xsl:value-of select="$medOffsetWidth/@value"/>&#160;
-            											  <xsl:value-of select="$medOffsetWidth/@unit"/> 
-            								</xsl:if>
-            								
-            							</xsl:when>
-            								<xsl:when test="$medFrequencyIntakeType='SXPR_TS'">
-            								<!-- composite -->
-            								<xsl:for-each select="$medFrequencyIntake/n1:comp">
-            								
-															<xsl:call-template name="frequencyComp"/>
-														
-														</xsl:for-each>
 
-            							</xsl:when>
-            						
-            						</xsl:choose>	
-            				
-            						
-	</xsl:template>
-	
-	
-	<xsl:template name="frequencyComp">
-	
-		<xsl:variable name="compType" select="./@xsi:type"/>
-    <xsl:variable name="comp" select="."/>
-  
-  	<xsl:call-template name="show-frequencyIntake">
-			<xsl:with-param name="medFrequencyIntakeType" select="$compType"/>
-    	<xsl:with-param name="medFrequencyIntake" select="$comp"/>
-		</xsl:call-template><br/>
-	
-
-	
-	</xsl:template>
-	
-	
-	
-	<!-- uncoded element-->
-	<xsl:template name="show-uncodedElement">
+	<xsl:template name="show-noneFlavor">
 		<xsl:param name="data"/>
-		
-		
-	<xsl:variable name="refText" select="$data"/>
-    <xsl:variable name="refAttrText" select="//*[@ID=substring($refText,2)]"/>
-    <xsl:variable name="refAttrText1" select="//*[@id=substring($refText,2)]"/>
-    <xsl:variable name="refAttrText3" select="//*[@id=$refText]"/>
-    <xsl:variable name="refAttrText4" select="//*[@ID=$refText]"/>
-    
-    <xsl:choose>
-    	<xsl:when test="$refAttrText">
-    		<xsl:value-of select="$refAttrText/."/>
-    	</xsl:when>
-    	<xsl:when test="$refAttrText1">
-    		<xsl:value-of select="$refAttrText1/."/>
-    	</xsl:when>
-    	<xsl:when test="$refAttrText3">
-    		<xsl:value-of select="$refAttrText3/."/>
-    	</xsl:when>
-    	<xsl:when test="$refAttrText4">
-    		<xsl:value-of select="$refAttrText4/."/>
-    	</xsl:when>
-    </xsl:choose>	
-    		
-    
-  </xsl:template>
-  
-  
-  
-  <!-- show one of two elemenets-->
-	<xsl:template name="show-OrgOrPersonData">
-		<xsl:param name="orgData"/>
-		<xsl:param name="personData"/>
-		
+		<xsl:variable name="dirFile" select="concat($epsosLangDir,'/NullFlavor.xml')"/>
+		<xsl:variable name="foundKey" select="document($dirFile)/NullFlavorInformation/NullFlavorEntry[@code=$data]"/>
+		<xsl:variable name="foundKeyLang" select="$foundKey/displayName[@lang=$userLang]"/>
+		<xsl:variable name="defFoundKeyLang" select="$foundKey/displayName[@lang=$defaultUserLang]"/>
 		<xsl:choose>
-			<xsl:when test="not ($personData)">
-			  <xsl:value-of select="$orgData"/>
+			<xsl:when  test="not ($foundKeyLang)">
+				<xsl:value-of select="$defFoundKeyLang"/>
 			</xsl:when>
 			<xsl:otherwise>
-			  <xsl:value-of select="$personData"/>
+				<xsl:value-of select="$foundKeyLang"/>
 			</xsl:otherwise>
-			
-	</xsl:choose>			
-	
-  
-    
-    
-  </xsl:template>
-  
-  
-  
-  <!--- display measure of unit -->
-	
-	<xsl:template name="show-unitMeasures" >   
-		<xsl:param name="val"/>
-			<xsl:variable name="dirFile" select="concat($epsosLangDir,'/UCUMUnifiedCodeforUnitsofMeasure.xml')"/>
-			<xsl:variable name="unitInfo" select="document($dirFile)/UCUMUnifiedCodeforUnitsofMeasureInformation"/>
-			<xsl:for-each select="$unitInfo/UCUMUnifiedCodeforUnitsofMeasureEntry">
-<!-- 				<xsl:variable name="foundKeyLang" select="./displayName[@lang=$userLang]"/> -->
-<!-- 				<xsl:variable name="defFoundKeyLang" select="./displayName[@lang=$defaultUserLang]"/> -->
-				<xsl:variable name="foundKeyLang" select="./@code"/>
-				<xsl:variable name="defFoundKeyLang" select="./@code"/>
-				<xsl:text disable-output-escaping="yes">&lt;option value=&quot;</xsl:text>
-				<xsl:value-of select="./@code"></xsl:value-of>
-				<xsl:text disable-output-escaping="yes">&quot; </xsl:text>
-				
-				
+		</xsl:choose>
 
-				<xsl:choose>
-					<xsl:when test="$foundKeyLang = $val">
-						<xsl:text disable-output-escaping="yes">selected=&quot;selected&quot;</xsl:text>
-					</xsl:when>
-				</xsl:choose>		
 
-				<xsl:text disable-output-escaping="yes">&gt;</xsl:text>
-				
+
+
+	</xsl:template>
+
+	<!--- display v40_unknownInfo -->
+
+	<xsl:template name="show-unknownInfo" match="/n1:SNOMEDCTInformation/n1:SNOMEDCTEntry">
+		<xsl:param name="data"/>
+		<xsl:variable name="dirFile" select="concat($epsosLangDir,'/SNOMEDCT.xml')"/>
+		<xsl:variable name="foundKey" select="document($dirFile)/SNOMEDCTInformation/SNOMEDCTEntry[@code=$data]"/>
+		<xsl:variable name="foundKeyLang" select="$foundKey/displayName[@lang=$userLang]"/>
+		<xsl:variable name="defFoundKeyLang" select="$foundKey/displayName[@lang=$defaultUserLang]"/>
+		<xsl:choose>
+			<xsl:when  test="not ($foundKeyLang)">
+				<xsl:value-of select="$defFoundKeyLang"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$foundKeyLang"/>
+			</xsl:otherwise>
+		</xsl:choose>
+
+
+
+
+	</xsl:template>
+
+	<!--  display Labels -->
+	<xsl:template name="show-displayLabels" >
+		<xsl:param name="data"/>
+		<xsl:variable name="dirFile" select="concat($epsosLangDir,'/epSOSDisplayLabels.xml')"/>
+		<xsl:variable name="foundKey" select="document($dirFile)/epSOSDisplayLabelsInformation/epSOSDisplayLabelsEntry[@code=$data]"/>
+		<xsl:variable name="foundKeyLang" select="$foundKey/displayName[@lang=$userLang]"/>
+		<xsl:variable name="defFoundKeyLang" select="$foundKey/displayName[@lang=$defaultUserLang]"/>
+		<xsl:choose>
+			<xsl:when  test="not ($foundKey)">
+				<!--  if the key is not found then display the key itself -->
+				<xsl:value-of select="$data"/>
+			</xsl:when>
+			<xsl:otherwise>
 				<xsl:choose>
 					<xsl:when  test="not ($foundKeyLang)">
 						<xsl:value-of select="$defFoundKeyLang"/>
@@ -1080,31 +771,340 @@
 					</xsl:otherwise>
 				</xsl:choose>
 
-				<xsl:text disable-output-escaping="yes">
+			</xsl:otherwise>
+		</xsl:choose>
+		<!-- <xsl:text disable-output-escaping="yes">&#160;</xsl:text>   -->
+		<xsl:text> </xsl:text>
+
+	</xsl:template>
+
+
+	<xsl:template name="show-strength" >
+		<xsl:param name="medStrengthUnit1"/>
+		<xsl:param name="medStrengthUnit2"/>
+		<xsl:param name="medStrengthValue1"/>
+		<xsl:param name="medStrengthValue2"/>
+		<xsl:param name="medStrength1"/>
+		<xsl:param name="medStrength2"/>
+
+
+		<xsl:choose>
+			<!-- Den Unit =1 -->
+			<xsl:when test="($medStrength1/@nullFlavor)">
+				<xsl:call-template name="show-noneFlavor">
+					<xsl:with-param name="data" select="$medStrength1/@nullFlavor"/>
+				</xsl:call-template>
+			</xsl:when>
+
+			<xsl:when test="($medStrength2/@nullFlavor)">
+				<xsl:value-of select="$medStrengthValue1"/>&#160;<xsl:value-of select="$medStrengthUnit1"/> / <xsl:call-template name="show-noneFlavor">
+				<xsl:with-param name="data" select="$medStrength2/@nullFlavor"/>
+			</xsl:call-template>
+			</xsl:when>
+			<xsl:when test="$medStrengthUnit2='1'">
+				<xsl:value-of select="$medStrengthValue1"/>&#160;<xsl:value-of select="$medStrengthUnit1"/>&#160;
+				<xsl:call-template name="show-displayLabels">
+					<xsl:with-param name="data" select="'53'"/>
+				</xsl:call-template>
+			</xsl:when>
+			<!-- Den Unit !=1 and Denominator = 1-->
+			<xsl:when test="not($medStrengthUnit2='1') and ($medStrengthValue2='1')">
+				<xsl:value-of select="$medStrengthValue1"/>&#160;<xsl:value-of select="$medStrengthUnit1"/>/<xsl:value-of select="$medStrengthUnit2"/>
+			</xsl:when>
+
+
+			<xsl:when test="not($medStrengthValue2)">
+				<xsl:value-of select="$medStrengthValue1"/>&#160; <xsl:value-of select="$medStrengthUnit1"/> /
+			</xsl:when>
+
+			<xsl:when test="not($medStrengthValue2) and not($medStrengthValue2)">
+				/
+			</xsl:when>
+
+			<xsl:otherwise>
+				<xsl:value-of select="$medStrengthValue1"/>&#160; <xsl:value-of select="$medStrengthUnit1"/> / <xsl:value-of select="$medStrengthValue2"/>&#160; <xsl:value-of select="$medStrengthUnit2"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+
+
+	<!-- Number of Unit per Intake -->
+
+	<xsl:template name="show-numberUnitIntake" >
+
+		<xsl:param name="medUnitIntakeLow"/>
+		<xsl:param name="medUnitIntakeHigh"/>
+		<xsl:param name="medUnitIntakeUnitLow"/>
+		<xsl:param name="medUnitIntakeUnitHigh"/>
+
+
+
+		<xsl:choose>
+			<xsl:when test="not($medUnitIntakeLow) and not($medUnitIntakeHigh)">
+				<xsl:text>-</xsl:text>
+			</xsl:when>
+			<xsl:when test="($medUnitIntakeLow) and (not($medUnitIntakeHigh) or $medUnitIntakeHigh/@nullFlavor)">
+				<xsl:value-of select="$medUnitIntakeLow"/> [<xsl:value-of select="$medUnitIntakeUnitLow"/>]-
+			</xsl:when>
+			<xsl:when test="(not($medUnitIntakeLow) or $medUnitIntakeLow/@nullFlavor) and ($medUnitIntakeHigh)">
+				-<xsl:value-of select="$medUnitIntakeHigh"/> [<xsl:value-of select="$medUnitIntakeUnitHigh"/>]-
+
+			</xsl:when>
+			<xsl:when test="$medUnitIntakeLow=$medUnitIntakeHigh">
+				<xsl:choose>
+					<xsl:when test="$medUnitIntakeUnitHigh='1' and $medUnitIntakeUnitLow='1'">
+						<xsl:value-of select="$medUnitIntakeLow"/><xsl:text> </xsl:text>
+						<xsl:call-template  name="show-displayLabels">
+							<xsl:with-param name="data" select="'77'"/>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$medUnitIntakeLow"/> [<xsl:value-of select="$medUnitIntakeUnitLow"/>]
+					</xsl:otherwise>
+				</xsl:choose>
+
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$medUnitIntakeLow"/> [<xsl:value-of select="$medUnitIntakeUnitLow"/>] -
+				<xsl:value-of select="$medUnitIntakeHigh"/> [<xsl:value-of select="$medUnitIntakeUnitHigh"/>]
+			</xsl:otherwise>
+		</xsl:choose>
+
+
+
+	</xsl:template>
+
+
+	<!-- Frequency of Intake -->
+
+	<xsl:template name="show-frequencyIntake" >
+		<xsl:param name="medFrequencyIntakeType"/>
+		<xsl:param name="medFrequencyIntake"/>
+
+		<xsl:choose>
+			<xsl:when test="$medFrequencyIntakeType='TS'">
+				<!-- a point in time just one value -->
+				<xsl:call-template name="show-time">
+					<xsl:with-param name="datetime" select="$medFrequencyIntake"/>
+				</xsl:call-template>&#160;
+			</xsl:when>
+
+
+			<xsl:when test="$medFrequencyIntakeType='IVL_TS'">
+				<!-- time interval -->
+				<xsl:call-template name="show-time">
+					<xsl:with-param name="datetime" select="$medFrequencyIntake/n1:low"/>
+				</xsl:call-template>&#160;-
+				<xsl:call-template name="show-time">
+					<xsl:with-param name="datetime" select="$medFrequencyIntake/n1:high"/>
+				</xsl:call-template>&#160;
+			</xsl:when>
+
+			<xsl:when test="$medFrequencyIntakeType='PIVL_TS'">
+				<xsl:variable name="medPhase" select="$medFrequencyIntake/n1:phase"/>
+				<xsl:variable name="medPeriod" select="$medFrequencyIntake/n1:period"/>
+				<xsl:variable name="medPhaseWidth" select="$medFrequencyIntake/n1:phase/n1:width"/>
+				<xsl:variable name="medPhaseLow" select="$medFrequencyIntake/n1:phase/n1:low"/>
+
+				<xsl:call-template  name="show-displayLabels">
+					<xsl:with-param name="data" select="'27'"/>
+				</xsl:call-template>
+				<xsl:value-of select="$medPeriod/@value"/> [<xsl:value-of select="$medPeriod/@unit"/>]
+				<!-- if phase.width exists -->
+				<xsl:if test="$medPhaseWidth">
+					<xsl:text>&#160;</xsl:text>
+					<!--for-->
+					<xsl:call-template  name="show-displayLabels">
+						<xsl:with-param name="data" select="'31'"/>
+					</xsl:call-template>
+					<xsl:text>&#160;</xsl:text> <xsl:value-of select="$medPhaseWidth/@value"/>&#160; <xsl:value-of select="$medPhaseWidth/@unit"/>
+				</xsl:if>
+				<xsl:if test="$medPhaseLow">
+					<!-- xsl:text> at </xsl:text-->
+
+					<xsl:call-template  name="show-displayLabels">
+						<xsl:with-param name="data" select="'6'"/>
+					</xsl:call-template>
+
+
+					<xsl:call-template name="show-time">
+						<xsl:with-param name="datetime" select="$medPhaseLow"/>
+					</xsl:call-template>&#160;
+				</xsl:if>
+
+
+			</xsl:when>
+			<xsl:when test="$medFrequencyIntakeType='EIVL_TS'">
+
+
+				<xsl:variable name="medOffset" select="$medFrequencyIntake/n1:offset"/>
+				<xsl:variable name="medOffsetWidth" select="$medFrequencyIntake/n1:offset/n1:width"/>
+				<xsl:variable name="medOffsetLow" select="$medFrequencyIntake/n1:offset/n1:low"/>
+
+
+				<xsl:if test="$medOffsetLow">
+					<xsl:value-of select="$medOffsetLow/@value"/>&#160;
+					<xsl:value-of select="$medOffsetLow/@unit"/> &#160;
+				</xsl:if>
+				<!--xsl:value-of select="$medFrequencyIntake/n1:event/@code"/-->
+				<xsl:value-of select="$medFrequencyIntake/n1:event/@displayName"/>
+
+				<xsl:if test="$medOffsetWidth">
+					<xsl:text>&#160; </xsl:text>
+					<xsl:call-template  name="show-displayLabels">
+						<xsl:with-param name="data" select="'31'"/>
+					</xsl:call-template>
+					<xsl:text> &#160;</xsl:text>
+					<xsl:value-of select="$medOffsetWidth/@value"/>&#160;
+					<xsl:value-of select="$medOffsetWidth/@unit"/>
+				</xsl:if>
+
+			</xsl:when>
+			<xsl:when test="$medFrequencyIntakeType='SXPR_TS'">
+				<!-- composite -->
+				<xsl:for-each select="$medFrequencyIntake/n1:comp">
+
+					<xsl:call-template name="frequencyComp"/>
+
+				</xsl:for-each>
+
+			</xsl:when>
+
+		</xsl:choose>
+
+
+	</xsl:template>
+
+
+	<xsl:template name="frequencyComp">
+
+		<xsl:variable name="compType" select="./@xsi:type"/>
+		<xsl:variable name="comp" select="."/>
+
+		<xsl:call-template name="show-frequencyIntake">
+			<xsl:with-param name="medFrequencyIntakeType" select="$compType"/>
+			<xsl:with-param name="medFrequencyIntake" select="$comp"/>
+		</xsl:call-template><br/>
+
+
+
+	</xsl:template>
+
+
+
+	<!-- uncoded element-->
+	<xsl:template name="show-uncodedElement">
+		<xsl:param name="data"/>
+
+
+		<xsl:variable name="refText" select="$data"/>
+		<xsl:variable name="refAttrText" select="//*[@ID=substring($refText,2)]"/>
+		<xsl:variable name="refAttrText1" select="//*[@id=substring($refText,2)]"/>
+		<xsl:variable name="refAttrText3" select="//*[@id=$refText]"/>
+		<xsl:variable name="refAttrText4" select="//*[@ID=$refText]"/>
+
+		<xsl:choose>
+			<xsl:when test="$refAttrText">
+				<xsl:value-of select="$refAttrText/."/>
+			</xsl:when>
+			<xsl:when test="$refAttrText1">
+				<xsl:value-of select="$refAttrText1/."/>
+			</xsl:when>
+			<xsl:when test="$refAttrText3">
+				<xsl:value-of select="$refAttrText3/."/>
+			</xsl:when>
+			<xsl:when test="$refAttrText4">
+				<xsl:value-of select="$refAttrText4/."/>
+			</xsl:when>
+		</xsl:choose>
+
+
+	</xsl:template>
+
+
+
+	<!-- show one of two elemenets-->
+	<xsl:template name="show-OrgOrPersonData">
+		<xsl:param name="orgData"/>
+		<xsl:param name="personData"/>
+
+		<xsl:choose>
+			<xsl:when test="not ($personData)">
+				<xsl:value-of select="$orgData"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$personData"/>
+			</xsl:otherwise>
+
+		</xsl:choose>
+
+
+
+
+	</xsl:template>
+
+
+
+	<!--- display measure of unit -->
+
+	<xsl:template name="show-unitMeasures" >
+		<xsl:param name="val"/>
+		<xsl:variable name="dirFile" select="concat($epsosLangDir,'/UCUMUnifiedCodeforUnitsofMeasure.xml')"/>
+		<xsl:variable name="unitInfo" select="document($dirFile)/UCUMUnifiedCodeforUnitsofMeasureInformation"/>
+		<xsl:for-each select="$unitInfo/UCUMUnifiedCodeforUnitsofMeasureEntry">
+			<!-- 				<xsl:variable name="foundKeyLang" select="./displayName[@lang=$userLang]"/> -->
+			<!-- 				<xsl:variable name="defFoundKeyLang" select="./displayName[@lang=$defaultUserLang]"/> -->
+			<xsl:variable name="foundKeyLang" select="./@code"/>
+			<xsl:variable name="defFoundKeyLang" select="./@code"/>
+			<xsl:text disable-output-escaping="yes">&lt;option value=&quot;</xsl:text>
+			<xsl:value-of select="./@code"></xsl:value-of>
+			<xsl:text disable-output-escaping="yes">&quot; </xsl:text>
+
+
+
+			<xsl:choose>
+				<xsl:when test="$foundKeyLang = $val">
+					<xsl:text disable-output-escaping="yes">selected=&quot;selected&quot;</xsl:text>
+				</xsl:when>
+			</xsl:choose>
+
+			<xsl:text disable-output-escaping="yes">&gt;</xsl:text>
+
+			<xsl:choose>
+				<xsl:when  test="not ($foundKeyLang)">
+					<xsl:value-of select="$defFoundKeyLang"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$foundKeyLang"/>
+				</xsl:otherwise>
+			</xsl:choose>
+
+			<xsl:text disable-output-escaping="yes">
 					&#60;/option&#62;
 				</xsl:text>
 
-			</xsl:for-each>
-		
+		</xsl:for-each>
+
 	</xsl:template>
-  
-<!--   	Check if a unit measure exists  -->
-  <xsl:template name="check-unitMeasures" >   
+
+	<!--   	Check if a unit measure exists  -->
+	<xsl:template name="check-unitMeasures" >
 		<xsl:param name="val"/>
-			<xsl:value-of select="''"/>
-			<xsl:variable name="dirFile" select="concat($epsosLangDir,'/UCUMUnifiedCodeforUnitsofMeasure.xml')"/>
-			<xsl:variable name="unitInfo" select="document($dirFile)/UCUMUnifiedCodeforUnitsofMeasureInformation"/>
-			<xsl:for-each select="$unitInfo/UCUMUnifiedCodeforUnitsofMeasureEntry">
-				<xsl:variable name="foundKeyLang" select="./@code"/>
-				<xsl:variable name="defFoundKeyLang" select="./@code"/>
-				
-				<xsl:choose>
-					<xsl:when test="$foundKeyLang = $val">
-						<xsl:value-of select="'true'"/>
-					</xsl:when>
-				</xsl:choose>
-				
-			</xsl:for-each>
+		<xsl:value-of select="''"/>
+		<xsl:variable name="dirFile" select="concat($epsosLangDir,'/UCUMUnifiedCodeforUnitsofMeasure.xml')"/>
+		<xsl:variable name="unitInfo" select="document($dirFile)/UCUMUnifiedCodeforUnitsofMeasureInformation"/>
+		<xsl:for-each select="$unitInfo/UCUMUnifiedCodeforUnitsofMeasureEntry">
+			<xsl:variable name="foundKeyLang" select="./@code"/>
+			<xsl:variable name="defFoundKeyLang" select="./@code"/>
+
+			<xsl:choose>
+				<xsl:when test="$foundKeyLang = $val">
+					<xsl:value-of select="'true'"/>
+				</xsl:when>
+			</xsl:choose>
+
+		</xsl:for-each>
 	</xsl:template>
-  
+
 </xsl:stylesheet>

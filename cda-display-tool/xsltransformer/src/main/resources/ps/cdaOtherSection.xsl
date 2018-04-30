@@ -3,17 +3,15 @@
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
 
-    <!-- variable to check that at least one alert section exist -->
+    <!-- variable to check that at least one other section section exist -->
     <xsl:variable name="otherExist"
                   select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code!='48765-2'][@code!='47420-5'][@code!='11450-4'][@code!='30954-2'][@code!='11348-0'][@code!='46264-8'][@code!='10160-0'][@code!='8716-3'][@code!='10162-6'][@code!='29762-2'][@code!='47519-4'][@code!='18776-5'][@code!='11369-6']"/>
 
-    <!--alerts -->
+    <!-- other sections -->
     <xsl:template name="otherSections" match="/n1:ClinicalDocument/n1:component/n1:structuredBody">
-        <!-- if we have at least one alert section -->
         <xsl:choose>
-            <!-- if we have at least one alert section -->
+            <!-- if we have at least one other section -->
             <xsl:when test="($otherExist)">
-
                 <xsl:for-each select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section">
                     <xsl:call-template name="otherSection"/>
                 </xsl:for-each>
@@ -25,7 +23,7 @@
     </xsl:template>
 
     <xsl:template name="otherSection">
-        <!-- Defing all needed variables -->
+        <!-- Defining all needed variables -->
         <xsl:variable
                 name="otherSectionTitleCode"
                 select="n1:code/@code"/>
@@ -39,7 +37,7 @@
         <xsl:choose>
             <!-- if sectionTitle is not missing for alerts  (Exception alerts section is missing)-->
             <xsl:when
-                    test=" ($otherSectionTitleCode!='48765-2' and $otherSectionTitleCode!='47420-5' and $otherSectionTitleCode!='11450-4' and $otherSectionTitleCode!='30954-2' and $otherSectionTitleCode!='11348-0' and $otherSectionTitleCode!='46264-8' and $otherSectionTitleCode!='10160-0' and $otherSectionTitleCode!='8716-3' and $otherSectionTitleCode!='10162-6' and $otherSectionTitleCode!='29762-2' and $otherSectionTitleCode!='47519-4' and $otherSectionTitleCode!='18776-5' and $otherSectionTitleCode!='11369-6')">
+                    test="($otherSectionTitleCode!='48765-2' and $otherSectionTitleCode!='47420-5' and $otherSectionTitleCode!='11450-4' and $otherSectionTitleCode!='30954-2' and $otherSectionTitleCode!='11348-0' and $otherSectionTitleCode!='46264-8' and $otherSectionTitleCode!='10160-0' and $otherSectionTitleCode!='8716-3' and $otherSectionTitleCode!='10162-6' and $otherSectionTitleCode!='29762-2' and $otherSectionTitleCode!='47519-4' and $otherSectionTitleCode!='18776-5' and $otherSectionTitleCode!='11369-6')">
                 <span class="sectionTitle">
                     <xsl:value-of select="$otherSectionTitle"/>
                 </span>

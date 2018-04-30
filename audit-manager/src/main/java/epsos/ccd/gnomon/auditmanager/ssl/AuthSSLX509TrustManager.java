@@ -93,7 +93,9 @@ public class AuthSSLX509TrustManager implements X509TrustManager {
         try {
             if (defaultTrustManager != null) {
                 defaultTrustManager.checkServerTrusted(certificates, authType);
-                LOGGER.info("Default Trust Manager validated: '{}'", defaultTrustManager.toString());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Default Trust Manager validated: '{}'", defaultTrustManager.toString());
+                }
             }
         } catch (CertificateException e) {
             LOGGER.warn("Default Trust Manager does not contain ROOT CA: '{}'", e.getMessage());

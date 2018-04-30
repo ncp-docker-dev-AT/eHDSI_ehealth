@@ -53,6 +53,9 @@ public final class XCAConstants {
         /* XDSDocumentEntryClassCode Slot */
         public static final String XDS_DOCUMENT_ENTRY_CLASSCODE_SLOT_NAME = "$XDSDocumentEntryClassCode";
         public static final String XDS_DOCUMENT_ENTRY_CLASSCODE_SLOT_VALUE = "('60591-5^^2.16.840.1.113883.6.1')";
+
+        private AdHocQueryRequest() {
+        }
     }
 
     public final class SOAP_HEADERS {
@@ -62,6 +65,9 @@ public final class XCAConstants {
         public static final String ADDRESSING_NAMESPACE = "http://www.w3.org/2005/08/addressing/anonymous";
         public static final String SECURITY_XSD = IheConstants.SOAP_HEADERS.SECURITY_XSD;
 
+        private SOAP_HEADERS() {
+        }
+
         public final class QUERY {
 
             /* Mixed */
@@ -69,6 +75,9 @@ public final class XCAConstants {
             public static final String OM_NAMESPACE = "http://www.w3.org/2005/08/addressing";
             /* Request */
             public static final String NAMESPACE_REQUEST_LOCAL_PART = "respondingGateway_CrossGatewayQuery";
+
+            private QUERY() {
+            }
         }
 
         public final class RETRIEVE {
@@ -76,6 +85,9 @@ public final class XCAConstants {
             public static final String REQUEST_ACTION = "urn:ihe:iti:2007:CrossGatewayRetrieve";
             /* Request */
             public static final String NAMESPACE_REQUEST_LOCAL_PART = "respondingGateway_CrossGatewayRetrieve";
+
+            private RETRIEVE() {
+            }
         }
     }
 
@@ -87,15 +99,24 @@ public final class XCAConstants {
         /* Retrieve */
         public static final String OUTGOING_XCA_RETRIEVE_MESSAGE = "Outgoing XCA-Retrieve request message to NCP-A:";
         public static final String INCOMING_XCA_RETRIEVE_MESSAGE = "Incoming XCA-Retrieve response message from NCP-A:";
+
+        private LOG() {
+        }
     }
 
     public final class EXCEPTIONS {
 
         public static final String ERROR_JAXB_MARSHALLING = "Error in JAXB marshalling";
         public static final String UNABLE_CREATE_JAXB_CONTEXT = "Unable to create JAXBContext:";
+
+        private EXCEPTIONS() {
+        }
     }
 
     public final class EXTRINSIC_OBJECT {
+
+        private EXTRINSIC_OBJECT() {
+        }
 
         /* Format Code */
         public final class FormatCode {
@@ -110,6 +131,9 @@ public final class XCAConstants {
                     public static final String DISPLAY_NAME = "epSOS coded Patient Summary";
                     public static final String NODE_REPRESENTATION = "urn:epSOS:ps:ps:2010";
                     public static final String CODING_SCHEME = "epSOS formatCodes";
+
+                    private EpsosPivotCoded() {
+                    }
                 }
 
                 public final class PdfSourceCoded {
@@ -117,6 +141,9 @@ public final class XCAConstants {
                     public static final String DISPLAY_NAME = "PDF/A coded document";
                     public static final String NODE_REPRESENTATION = "urn:ihe:iti:xds-sd:pdf:2008";
                     public static final String CODING_SCHEME = "epSOS formatCodes";
+
+                    private PdfSourceCoded() {
+                    }
                 }
             }
 
@@ -127,6 +154,9 @@ public final class XCAConstants {
                     public static final String DISPLAY_NAME = "epSOS coded ePrescription";
                     public static final String NODE_REPRESENTATION = "urn:epsos:ep:pre:2010";
                     public static final String CODING_SCHEME = "epSOS formatCodes";
+
+                    private EpsosPivotCoded() {
+                    }
                 }
 
                 public final class PdfSourceCoded {
@@ -134,6 +164,9 @@ public final class XCAConstants {
                     public static final String DISPLAY_NAME = "PDF/A coded document";
                     public static final String NODE_REPRESENTATION = "urn:ihe:iti:xds-sd:pdf:2008";
                     public static final String CODING_SCHEME = "epSOS formatCodes";
+
+                    private PdfSourceCoded() {
+                    }
                 }
             }
 
@@ -144,6 +177,9 @@ public final class XCAConstants {
                     public static final String DISPLAY_NAME = "epSOS Coded MRO";
                     public static final String NODE_REPRESENTATION = "urn:epSOS:mro:mro:2013";
                     public static final String CODING_SCHEME = "epSOS formatCodes";
+
+                    private EpsosPivotCoded() {
+                    }
                 }
 
                 public final class PdfSourceCoded {
@@ -151,6 +187,9 @@ public final class XCAConstants {
                     public static final String DISPLAY_NAME = "PDF/A coded document";
                     public static final String NODE_REPRESENTATION = "urn:ihe:iti:xds-sd:pdf:2008";
                     public static final String CODING_SCHEME = "epSOS formatCodes";
+
+                    private PdfSourceCoded() {
+                    }
                 }
             }
         }

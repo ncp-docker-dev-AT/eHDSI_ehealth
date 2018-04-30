@@ -1,25 +1,3 @@
-/**
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * <p>
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- * <p>
- * XDR service implementation for ePrescription by Kela (The Social Insurance
- * Institution of Finland) GNU General Public License v3
- */
 package tr.com.srdc.epsos.ws.server.xdr;
 
 import epsos.ccd.gnomon.auditmanager.*;
@@ -31,10 +9,10 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.EvidenceUtils;
-import eu.epsos.util.IheConstants;
 import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.services.CdaValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import fi.kela.se.epsos.data.model.DocumentFactory;
 import fi.kela.se.epsos.data.model.EPSOSDocument;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
@@ -125,7 +103,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
                                                          ProvideAndRegisterDocumentSetRequestType request,
                                                          RegistryResponseType response, Element sh) {
 
-        //ConfigurationManagerFactory.getConfigurationManager();
         eventLog.setEventType(EventType.epsosDispensationServiceInitialize);
         eventLog.setEI_TransactionName(TransactionName.epsosDispensationServiceInitialize);
         eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
@@ -242,67 +219,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
         LOGGER.debug("Event log prepared");
     }
 
-    /**
-     * Prepare audit log for the HCER service, put() operation
-     *
-     * @throws DatatypeConfigurationException
-     */ /* HCER audit not wanted?
-     public void prepareEventLogForHCERPut(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request,
-     RegistryResponseType response, Element sh) throws DatatypeConfigurationException {
-     eventLog.setEventType(EventType.epsosHCERServicePut);
-     eventLog.setEI_TransactionName(TransactionName.epsosHCERServicePut);
-     eventLog.setEI_EventActionCode(EventActionCode.READ);
-     eventLog.setEI_EventDateTime(new XMLGregorianCalendarImpl(new GregorianCalendar()));
-
-     if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
-     for (int i = 0; i < request.getSubmitObjectsRequest()
-     .getRegistryObjectList().getIdentifiable().size(); i++) {
-     if (!(request.getSubmitObjectsRequest().getRegistryObjectList()
-     .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
-     continue;
-     }
-     ExtrinsicObjectType eot = (ExtrinsicObjectType) request
-     .getSubmitObjectsRequest().getRegistryObjectList()
-     .getIdentifiable().get(i).getValue();
-     String documentId = "";
-     for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
-     if (eit.getIdentificationScheme().equals(
-     "urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab")) {
-     documentId = eit.getValue();
-     }
-     }
-     eventLog.setET_ObjectID(documentId);
-     break;
-     }
-     }
-
-     if (response.getRegistryErrorList() != null) {
-     eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
-     } else {
-     eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
-     }
-
-     eventLog.setHR_UserID(Helper.getUserID(sh));
-     eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
-     eventLog.setHR_RoleID(Helper.getRoleID(sh));
-
-     eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-
-     eventLog.setPS_PatricipantObjectID(getDocumentEntryPatientId(request));
-
-     eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
-
-     if (response.getRegistryErrorList() != null) {
-     RegistryError re = response.getRegistryErrorList()
-     .getRegistryError().get(0);
-     eventLog.setEM_PatricipantObjectID(re.getErrorCode());
-     eventLog.setEM_PatricipantObjectDetail(re.getCodeContext()
-     .getBytes());
-     }
-
-     LOGGER.debug("Event log prepared");
-     }
-     */
     private String getDocumentEntryPatientId(ProvideAndRegisterDocumentSetRequestType request) {
 
         String patientId = "";
@@ -313,8 +229,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
                 continue;
             }
-            ExtrinsicObjectType eot = (ExtrinsicObjectType) request
-                    .getSubmitObjectsRequest().getRegistryObjectList()
+            ExtrinsicObjectType eot = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
                     .getIdentifiable().get(i).getValue();
             // Traverse all Classification blocks in the ExtrinsicObject
             // selected
@@ -397,7 +312,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         }
         if (!rel.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(rel);
-            response.setStatus("urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Failure");
+            response.setStatus(AdhocQueryResponseStatus.FAILURE);
         } else {
             try {
                 shElement = XMLUtils.toDOM(sh);
@@ -413,18 +328,15 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 try {
 
                     /* Validate CDA epSOS Pivot */
-                    cdaValidationService.validateModel(
-                            new String(doc.getValue(), StandardCharsets.UTF_8.name()),
-                            CdaModel.obtainCdaModel(obtainClassCode(request), true),
-                            NcpSide.NCP_A);
+                    cdaValidationService.validateModel(new String(doc.getValue(), StandardCharsets.UTF_8.name()),
+                            CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
 
-                    docBytes = TMServices.transformDocument(docBytes, Constants.LANGUAGE_CODE); //Resets the response document to a translated version.
+                    //Resets the response document to a translated version.
+                    docBytes = TMServices.transformDocument(docBytes, Constants.LANGUAGE_CODE);
 
                     /* Validate CDA epSOS Pivot */
-                    cdaValidationService.validateModel(
-                            new String(docBytes, StandardCharsets.UTF_8.name()),
-                            CdaModel.obtainCdaModel(obtainClassCode(request), true),
-                            NcpSide.NCP_A);
+                    cdaValidationService.validateModel(new String(docBytes, StandardCharsets.UTF_8),
+                            CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
 
                 } catch (DocumentTransformationException ex) {
                     LOGGER.error(ex.getLocalizedMessage(), ex);
@@ -453,7 +365,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     } catch (Exception e) {
                         LOGGER.error(ExceptionUtils.getStackTrace(e));
                     }
+                    // Call to National Connector
                     documentSubmitService.submitDispensation(epsosDocument);
+
                     // Evidence for response from NI for XDR submit (dispensation)
                     /* Joao: the NRR is being generated based on the request message (submitted document). The interface for document submission does not return
                     any response for the submit service. This NRR is optional as per the CP. Left commented for now. */
@@ -480,13 +394,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
             }
             if (!rel.getRegistryError().isEmpty()) {
                 response.setRegistryErrorList(rel);
-                response.setStatus("urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Failure");
+                response.setStatus(AdhocQueryResponseStatus.FAILURE);
             } else {
-                response.setStatus("urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success");
+                response.setStatus(AdhocQueryResponseStatus.SUCCESS);
             }
         }
-        prepareEventLogForDispensationInitialize(eventLog, request, response,
-                shElement);
+        prepareEventLogForDispensationInitialize(eventLog, request, response, shElement);
+
         return response;
     }
 
@@ -559,7 +473,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
             rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
         }
 
-        //  String documentId = request.getDocument().get(0).getId();
         String patientId = getPatientId(request);
         LOGGER.info("Received a consent document for patient: '{}'", patientId);
         /*
@@ -579,18 +492,15 @@ public class XDRServiceImpl implements XDRServiceInterface {
             try {
 
                 /* Validate CDA epSOS Pivot */
-                cdaValidationService.validateModel(
-                        new String(doc.getValue(), StandardCharsets.UTF_8.name()),
-                        CdaModel.obtainCdaModel(obtainClassCode(request), true),
-                        NcpSide.NCP_A);
+                cdaValidationService.validateModel(new String(doc.getValue(), StandardCharsets.UTF_8.name()),
+                        CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
 
-                docBytes = TMServices.transformDocument(docBytes, Constants.LANGUAGE_CODE); //Resets the response document to a translated version.
+                //Resets the response document to a translated version.
+                docBytes = TMServices.transformDocument(docBytes, Constants.LANGUAGE_CODE);
 
                 /* Validate CDA epSOS Pivot */
-                cdaValidationService.validateModel(
-                        new String(docBytes, StandardCharsets.UTF_8.name()),
-                        CdaModel.obtainCdaModel(obtainClassCode(request), true),
-                        NcpSide.NCP_A);
+                cdaValidationService.validateModel(new String(docBytes, StandardCharsets.UTF_8.name()),
+                        CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
 
             } catch (DocumentTransformationException ex) {
                 LOGGER.error(ex.getLocalizedMessage(), ex);
@@ -651,9 +561,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         }
         if (!rel.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(rel);
-            response.setStatus("urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Failure");
+            response.setStatus(AdhocQueryResponseStatus.FAILURE);
         } else {
-            response.setStatus("urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success");
+            response.setStatus(AdhocQueryResponseStatus.SUCCESS);
         }
 
         try {
@@ -739,9 +649,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         }
         if (!rel.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(rel);
-            response.setStatus(IheConstants.REGREP_RESPONSE_FAILURE);
+            response.setStatus(AdhocQueryResponseStatus.FAILURE);
         } else {
-            response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
+            response.setStatus(AdhocQueryResponseStatus.SUCCESS);
         }
         /* HCER audit not wanted?
          try {
@@ -764,7 +674,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         error.setErrorCode("4202");
         error.setCodeContext("Unknown document");
         response.getRegistryErrorList().getRegistryError().add(error);
-        response.setStatus("urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Failure");
+        response.setStatus(AdhocQueryResponseStatus.FAILURE);
 
         return response;
     }

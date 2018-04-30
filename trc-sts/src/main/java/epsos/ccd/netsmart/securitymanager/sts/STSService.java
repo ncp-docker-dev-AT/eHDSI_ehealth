@@ -77,6 +77,8 @@ public class STSService implements Provider<SOAPMessage> {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Incoming SOAP Message request: '{}'", source.toString());
             log(source);
+            String value = System.getProperty("javax.net.ssl.key.alias");
+            LOGGER.debug("Certificate Alias: '{}'", value);
         }
 
         SOAPBody body;
@@ -164,8 +166,7 @@ public class STSService implements Provider<SOAPMessage> {
             }
             return response;
 
-        } catch (SOAPException | WSTrustException | MarshallingException | SMgrException | ParserConfigurationException
-                | IOException ex) {
+        } catch (SOAPException | WSTrustException | MarshallingException | SMgrException | ParserConfigurationException ex) {
             LOGGER.error(null, ex);
             throw new WebServiceException(ex);
         }
@@ -213,7 +214,7 @@ public class STSService implements Provider<SOAPMessage> {
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
             return (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
 
-        } catch (ParserConfigurationException | UnmarshallingException | IOException ex) {
+        } catch (ParserConfigurationException | UnmarshallingException ex) {
             LOGGER.error(null, ex);
             throw new WSTrustException("Error Parsing SAML Assertion in Message Header", ex);
         }

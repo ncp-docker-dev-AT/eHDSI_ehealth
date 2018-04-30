@@ -29,6 +29,7 @@ import org.springframework.core.io.Resource;
  */
 public class OpenAtnaPropertiesLoader extends PropertyPlaceholderConfigurer {
 
+    @Override
     public void setLocation(Resource location) {
         String loc = AtnaFactory.getPropertiesLocation();
         if (loc != null && loc.length() > 0) {

@@ -30,7 +30,10 @@ import java.util.TimeZone;
 public class ReportBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportBuilder.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final String REPORT_FILES_FOLDER = "validation";
+    private static final String[] XML_DECLARATION = {"<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"};
+    private static final String[] XML_REPLACE = {"", ""};
 
     private ReportBuilder() {
     }
@@ -83,7 +86,9 @@ public class ReportBuilder {
 
         if (checkReportDir(reportDirName)) {
 
-            LOGGER.info("Writing validation report in: '{}'", reportFileName);
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.info("Writing validation report in: '{}'", reportFileName);
+            }
             reportFile = new File(reportFileName);
 
             if (!reportFile.exists()) {
@@ -107,9 +112,10 @@ public class ReportBuilder {
                     bw.write("<validatedObject>");
                 }
                 //  Validation Service Model
-                String object = validationObject.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
-
-                LOGGER.info("[Report Builder]\n{}", object);
+                String object = StringUtils.replaceEach(validationObject, XML_DECLARATION, XML_REPLACE);
+                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    LOGGER_CLINICAL.info("[Report Builder]\n{}", object);
+                }
                 if (EnumUtils.isValidEnum(CdaModel.class, model)) {
                     Node objectNode = XMLUtil.stringToNode(object);
                     try {
@@ -128,17 +134,13 @@ public class ReportBuilder {
                 if (ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.remote")) {
                     bw.write("</validatedObject>");
                     bw.write("\n");
-                }
-                if (ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.remote")) {
                     bw.write("<validationResult>");
                     bw.write(validationBody);
                     bw.write("</validationResult>");
-                }
-                bw.write("\n");
-                if (ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation.remote")) {
+                    bw.write("\n");
                     bw.write("</validationReport>");
                 }
-
+                bw.write("\n");
                 LOGGER.info("Validation report written with success");
                 return true;
 

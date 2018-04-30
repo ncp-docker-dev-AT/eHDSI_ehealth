@@ -15,6 +15,8 @@ import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.services.CdaValidationService;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -200,10 +202,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
             //Include only the first error in the audit log.
             if (re.hasNext()) {
                 OMElement error = re.next();
-                try {
-                    LOGGER.debug("Error to be included in audit: '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(error)));
-                } catch (Exception e) {
-                    LOGGER.debug("Exception: '{}'", e.getMessage(), e);
+                if (LOGGER.isDebugEnabled()) {
+                    try {
+                        LOGGER.debug("Error to be included in audit: '{}'", XMLUtil.prettyPrint(XMLUtils.toDOM(error)));
+                    } catch (Exception e) {
+                        LOGGER.debug("Exception: '{}'", e.getMessage(), e);
+                    }
                 }
                 eventLog.setEM_PatricipantObjectID(error.getAttributeValue(new QName("", "errorCode")));
                 eventLog.setEM_PatricipantObjectDetail(error.getAttributeValue(new QName("", "codeContext")).getBytes());
@@ -330,24 +334,21 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         switch (docType) {
 
-            case PATIENT_SUMMARY: {
+            case PATIENT_SUMMARY:
                 title = Constants.PS_TITLE;
                 classCode = Constants.PS_CLASSCODE;
                 nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.PatientSummary.EpsosPivotCoded.NODE_REPRESENTATION;
                 displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.PatientSummary.EpsosPivotCoded.DISPLAY_NAME;
                 break;
-            }
-            case MRO: {
+            case MRO:
                 title = Constants.MRO_TITLE;
                 classCode = Constants.MRO_CLASSCODE;
                 nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.Mro.EpsosPivotCoded.NODE_REPRESENTATION;
                 displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.Mro.EpsosPivotCoded.DISPLAY_NAME;
                 break;
-            }
-            default: {
-                LOGGER.error("Unsupported document for query in epSOS. Requested document type: " + docType.name());
+            default:
+                LOGGER.error("Unsupported document for query in OpenNCP. Requested document type: {}", docType.name());
                 return "";
-            }
         }
 
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
@@ -370,9 +371,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.setDescription(ofRim.createInternationalStringType());
         eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
         if (isPDF) {
-            eot.getDescription().getLocalizedString().get(0).setValue("The " + title + " document (CDA L1 / PDF body) for patient " + getEpSOSPatientId(request));
+            eot.getDescription().getLocalizedString().get(0)
+                    .setValue("The " + title + " document (CDA L1 / PDF body) for patient " + getEpSOSPatientId(request));
         } else {
-            eot.getDescription().getLocalizedString().get(0).setValue("The " + title + " document (CDA L3 / Structured body) for patient " + getEpSOSPatientId(request));
+            eot.getDescription().getLocalizedString().get(0)
+                    .setValue("The " + title + " document (CDA L3 / Structured body) for patient " + getEpSOSPatientId(request));
         }
 
         // Version Info
@@ -469,7 +472,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getSlot().add(makeSlot("languageCode", Constants.LANGUAGE_CODE));
 
         // repositoryUniqueId (optional)
-        //eot.getSlot().add(makeSlot("repositoryUniqueId", Constants.HOME_COMM_ID));
         eot.getSlot().add(makeSlot("repositoryUniqueId", document.getRepositoryId()));
 
         eot.getClassification().add(
@@ -701,7 +703,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         if (!rel.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(rel);
-            response.setStatus(IheConstants.REGREP_RESPONSE_FAILURE);
+            response.setStatus(AdhocQueryResponseStatus.FAILURE);
 
         } else {
 
@@ -719,16 +721,16 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                         rel.getRegistryError().add(createErrorMessage("4103", "ePrescription registry could not be accessed.", "", true));
                         response.setRegistryErrorList(rel);
-                        response.setStatus(IheConstants.REGREP_RESPONSE_FAILURE);
+                        response.setStatus(AdhocQueryResponseStatus.FAILURE);
                     } else if (prescriptions.isEmpty()) {
 
                         rel.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
                         response.setRegistryErrorList(rel);
-                        response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
+                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
                     } else {
 
                         // Multiple prescriptions mean multiple PDF and XML files, multiple ExtrinsicObjects and associations
-                        response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
+                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
                         for (DocumentAssociation<EPDocumentMetaData> prescription : prescriptions) {
 
                             LOGGER.debug("Prescription Repository ID: '{}'", prescription.getXMLDocumentMetaData().getRepositoryId());
@@ -757,12 +759,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                         rel.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
                         response.setRegistryErrorList(rel);
-                        response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
+                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
                     } else {
 
                         PSDocumentMetaData docPdf = psDoc.getPDFDocumentMetaData();
                         PSDocumentMetaData docXml = psDoc.getXMLDocumentMetaData();
-                        response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
+                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
 
                         String xmlUUID = "";
                         if (docXml != null) {
@@ -789,13 +791,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                         rel.getRegistryError().add(createErrorMessage("1100", "No MRO summary is registered for the given patient.", "", true));
                         response.setRegistryErrorList(rel);
-                        response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
+                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
                     } else {
 
                         MroDocumentMetaData docPdf = mro.getPDFDocumentMetaData();
                         MroDocumentMetaData docXml = mro.getXMLDocumentMetaData();
 
-                        response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
+                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
 
                         String xmlUUID = "";
                         if (docXml != null) {
@@ -859,7 +861,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                 rel.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
                 response.setRegistryErrorList(rel);
-                response.setStatus(IheConstants.REGREP_RESPONSE_FAILURE);
+                response.setStatus(AdhocQueryResponseStatus.FAILURE);
             }
         }
 
@@ -1161,19 +1163,19 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 // If the registryErrorList is empty or contains only Warning, the status of the request is SUCCESS
                 if (!registryErrorList.getChildElements().hasNext()) {
                     registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                            IheConstants.REGREP_RESPONSE_SUCCESS));
+                            AdhocQueryResponseStatus.SUCCESS));
                 } else {
                     if (checkIfOnlyWarnings(registryErrorList)) {
                         registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                                IheConstants.REGREP_RESPONSE_SUCCESS));
+                                AdhocQueryResponseStatus.SUCCESS));
                     } else if (failure) {
                         // If there is a failure during the request process, the status is FAILURE
                         registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                                IheConstants.REGREP_RESPONSE_FAILURE));
+                                AdhocQueryResponseStatus.FAILURE));
                     } else {
                         //Otherwise the status is PARTIALSUCCESS
                         registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                                IheConstants.REGREP_RESPONSE_PARTIALSUCCESS));
+                                AdhocQueryResponseStatus.PARTIAL_SUCCESS));
                     }
                 }
 
@@ -1195,7 +1197,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 }
             } catch (Exception e) {
                 LOGGER.error("Exception: '{}'", e.getMessage(), e);
-                registryResponse.addAttribute(factory.createOMAttribute("status", null, IheConstants.REGREP_RESPONSE_FAILURE));
+                registryResponse.addAttribute(factory.createOMAttribute("status", null, AdhocQueryResponseStatus.FAILURE));
                 registryErrorList.addChild(createErrorOMMessage(ns, "", e.getMessage(), "", false));
             }
         }
@@ -1252,41 +1254,58 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return onlyWarnings;
     }
 
-    private AdhocQueryResponse handleUnsupportedOpertationException(AdhocQueryRequest request,
-                                                                    UnsupportedOperationException uoe) {
+    /**
+     * Method responsible of the AdhocQueryResponse message if the operation requested is not supported by the server.
+     * RegistryError shall contain:
+     * errorCode: required.
+     * codeContext: required - Supplies additional detail for the errorCode.
+     * severity: required - Indicates the severity of the error.
+     * Shall be one of:
+     * urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error
+     * urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Warning
+     * location: optional - Supplies the location of the error module name and line number or stack trace if appropriate.
+     *
+     * @param request - original AdhocQueryRequest
+     * @param e       - Exception thrown by the system
+     * @return response - populated with te specific Error Code according the document Class Code.
+     */
+    private AdhocQueryResponse handleUnsupportedOpertationException(AdhocQueryRequest request, UnsupportedOperationException e) {
 
         AdhocQueryResponse response = ofQuery.createAdhocQueryResponse();
-
-        RegistryErrorList rel = ofRs.createRegistryErrorList();
-        RegistryError re = ofRs.createRegistryError();
+        RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
+        RegistryError registryError = ofRs.createRegistryError();
 
         // Create Registry Object List
         response.setRegistryObjectList(ofRim.createRegistryObjectListType());
 
         Writer result = new StringWriter();
         PrintWriter printWriter = new PrintWriter(result);
-        uoe.printStackTrace(printWriter);
-        re.setLocation(result.toString());
+        e.printStackTrace(printWriter);
+        registryError.setLocation(result.toString().trim());
 
         String classCode = getDocumentEntryClassCode(request);
+
         if (Constants.EP_CLASSCODE.equals(classCode)) {
-            re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Info");
-            re.setErrorCode("1102");
-            re.setValue("1102 There is no ePrescription data registered for the given patient (INFO)");
+            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+            registryError.setErrorCode("1101");
+            registryError.setValue("No ePrescriptions are registered for the given patient.");
+            registryError.setCodeContext("The XDS repository does not contain any ePrescription related to the current patient");
         } else if (Constants.PS_CLASSCODE.equals(classCode)) {
-            re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Warning");
-            re.setErrorCode("1102");
-            re.setValue("1102 No patient summary is registered for the given patient (WARNING)");
+            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+            registryError.setErrorCode("1102");
+            registryError.setValue("No patient summary is registered for the given patient.");
+            registryError.setCodeContext("The XDS repository does not contain any Patient Summary related to the current patient");
         } else {
-            // What should be in the error, if the classCode is not EP_CLASSCODE nor PS_CLASSCODE
-            re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Warning");
-            re.setErrorCode("1102");
-            re.setValue("1102 No patient summary is registered for the given patient (WARNING)");
+            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+            registryError.setErrorCode("1100");
+            registryError.setValue("No documents are registered for the given patient.");
+            registryError.setCodeContext("The XDS repository does not contain any documents related to the current patient");
         }
 
-        rel.getRegistryError().add(re);
-        response.setRegistryErrorList(rel);
-        response.setStatus(IheConstants.REGREP_RESPONSE_SUCCESS);
+        registryErrorList.getRegistryError().add(registryError);
+        response.setRegistryErrorList(registryErrorList);
+        // Errors managed are only WARNING so the AdhocQueryResponse is considered as successful.
+        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
 
         return response;
     }

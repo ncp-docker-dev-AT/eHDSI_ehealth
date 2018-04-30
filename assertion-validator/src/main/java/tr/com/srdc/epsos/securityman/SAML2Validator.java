@@ -44,7 +44,9 @@ public class SAML2Validator {
     private SAML2Validator() {
     }
 
-    public static String validateXCPDHeader(Element sh) throws MissingFieldException, InsufficientRightsException, InvalidFieldException, XSDValidationException, SMgrException {
+    public static String validateXCPDHeader(Element sh) throws MissingFieldException, InsufficientRightsException,
+            InvalidFieldException, XSDValidationException, SMgrException {
+
         String sigCountryCode = null;
 
         NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
@@ -274,7 +276,7 @@ public class SAML2Validator {
     private static String checkHCPAssertion(Assertion assertion, String classCode) throws MissingFieldException,
             InvalidFieldException, InsufficientRightsException, SMgrException {
 
-        String sigCountryCode = null;
+        String sigCountryCode;
 
         RequiredFieldValidators.validateVersion(assertion);
         RequiredFieldValidators.validateID(assertion);
@@ -314,9 +316,10 @@ public class SAML2Validator {
         // Konstantin: committed changes to security manager, in order to provide better support XCA and XDR implementations
         //TODO: Improve Exception management.
         try {
-            sigCountryCode = new SignatureManager().verifySAMLAssestion(assertion);
-        } catch (IOException e) {
+            sigCountryCode = new SignatureManager().verifySAMLAssertion(assertion);
+        } catch (SMgrException e) {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
+            throw e;
         }
 
         return sigCountryCode;
@@ -359,8 +362,7 @@ public class SAML2Validator {
     }
 
 
-    public static String getCountryCodeFromHCPAssertion(Element sh) throws MissingFieldException,
-            InvalidFieldException, XSDValidationException, SMgrException {
+    public static String getCountryCodeFromHCPAssertion(Element sh) throws MissingFieldException, XSDValidationException, SMgrException {
 
         String sigCountryCode = null;
 
@@ -392,7 +394,7 @@ public class SAML2Validator {
                 throw (new MissingFieldException("HCP Assertion element is required."));
             }
 
-            sigCountryCode = new SignatureManager().verifySAMLAssestion(hcpAssertion);
+            sigCountryCode = new SignatureManager().verifySAMLAssertion(hcpAssertion);
 
 
         } catch (IOException | UnmarshallingException e) {

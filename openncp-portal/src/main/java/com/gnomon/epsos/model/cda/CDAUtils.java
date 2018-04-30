@@ -5,8 +5,8 @@ import com.gnomon.epsos.service.EpsosHelperService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.portal.DispenseException;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.h2.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -35,40 +35,40 @@ public class CDAUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CDAUtils.class);
 
-    private final static String XML_LOINC_SYSTEM = "LOINC",
-            XML_LOINC_CODESYSTEM = "2.16.840.1.113883.6.1",
-            XML_PRESCRIPTION_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.1.1",
-            XML_PRESCRIPTION_ENTRY_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.2.1",
-            XML_DISPENSATION_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.1.2",
-            XML_DISPENSATION_LOINC_CODE = "60593-1",
-            XML_DISPENSATION_LOINC_CODESYSTEMNAME = "LOINC",
-            XML_DISPENSATION_LOINC_CODESYSTEM = "2.16.840.1.113883.6.1",
-            XML_CONSENT_TITLE = "Consent to Share Information",
-            XML_DISPENSATION_TITLE = "Medication dispensed",
-            XML_DISPENSATION_ENTRY_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.2.2",
-            XML_DISPENSATION_ENTRY_PARENT_TEMPLATEID = "2.16.840.1.113883.10.20.1.8",
-            XML_DISPENSTATION_ENTRY_REFERENCEID = "1.3.6.1.4.1.12559.11.10.1.3.1.3.2",
-            XML_DISPENSATION_ENTRY_SUPPLY_TEMPLATE1 = "2.16.840.1.113883.10.20.1.34",
-            XML_DISPENSATION_ENTRY_SUPPLY_TEMPLATE2 = "1.3.6.1.4.1.19376.1.5.3.1.4.7.3",
-            XML_DISPENSATION_ENTRY_SUPPLY_TEMPLATE3 = "1.3.6.1.4.1.12559.11.10.1.3.1.3.3",
-            XML_DISPENSATION_ENTRY_SUPPLY_ID_ROOT = "2.16.840.1.113883.2.19.40.5.410286.10.11",
-            XML_DISPENSATION_PERFORMER_ID_ROOT = "1.3.6.1.4.1.19376.1.5.3.1.2.3",
-            XML_DISPENSATION_PRODUCT_EPSOSNS = "urn:epsos-org:ep:medication",
-            XML_DISPENSATION_PRODUCT_CLASSCODE = "MANU",
-            XML_DISPENSATION_PRODUCT_TEMPLATE1 = "1.3.6.1.4.1.19376.1.5.3.1.4.7.2",
-            XML_DISPENSATION_PRODUCT_TEMPLATE2 = "2.16.840.1.113883.10.20.1.53",
-            XML_DISPENSATION_PRODUCT_MATERIAL_CLASSCODE = "MMAT",
-            XML_DISPENSATION_PRODUCT_MATERIAL_CONTENT_CLASSCODE = "CONT",
-            XML_DISPENSATION_PRODUCT_MATERIAL_DETERMINERCODE = "KIND",
-            XML_DISPENSATION_PRODUCT_MATERIAL_CONTAINER_DETERMINERCODE = "INSTANCE",
-            XML_DISPENSATION_PRODUCT_MATERIAL_TEMPLATE = "1.3.6.1.4.1.12559.11.10.1.3.1.3.1",
-            XML_DISPENSATION_PRODUCT_MATERIAL_FORMCODE_SYSTEM = "1.3.6.1.4.1.12559.11.10.1.3.1.42.2",
-            XML_DISPENSATION_PRODUCT_MATERIAL_CONTAINER_FORMCODE_SYSTEM = "1.3.6.1.4.1.12559.11.10.1.3.1.42.3";
+    private static final String XML_LOINC_SYSTEM = "LOINC";
+    private static final String XML_LOINC_CODESYSTEM = "2.16.840.1.113883.6.1";
+    private static final String XML_PRESCRIPTION_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.1.1";
+    private static final String XML_PRESCRIPTION_ENTRY_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.2.1";
+    private static final String XML_DISPENSATION_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.1.2";
+    private static final String XML_DISPENSATION_LOINC_CODE = "60593-1";
+    private static final String XML_DISPENSATION_LOINC_CODESYSTEMNAME = "LOINC";
+    private static final String XML_DISPENSATION_LOINC_CODESYSTEM = "2.16.840.1.113883.6.1";
+    private static final String XML_CONSENT_TITLE = "Consent to Share Information";
+    private static final String XML_DISPENSATION_TITLE = "Medication dispensed";
+    private static final String XML_DISPENSATION_ENTRY_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.2.2";
+    private static final String XML_DISPENSATION_ENTRY_PARENT_TEMPLATEID = "2.16.840.1.113883.10.20.1.8";
+    private static final String XML_DISPENSTATION_ENTRY_REFERENCEID = "1.3.6.1.4.1.12559.11.10.1.3.1.3.2";
+    private static final String XML_DISPENSATION_ENTRY_SUPPLY_TEMPLATE1 = "2.16.840.1.113883.10.20.1.34";
+    private static final String XML_DISPENSATION_ENTRY_SUPPLY_TEMPLATE2 = "1.3.6.1.4.1.19376.1.5.3.1.4.7.3";
+    private static final String XML_DISPENSATION_ENTRY_SUPPLY_TEMPLATE3 = "1.3.6.1.4.1.12559.11.10.1.3.1.3.3";
+    private static final String XML_DISPENSATION_ENTRY_SUPPLY_ID_ROOT = "2.16.840.1.113883.2.19.40.5.410286.10.11";
+    private static final String XML_DISPENSATION_PERFORMER_ID_ROOT = "1.3.6.1.4.1.19376.1.5.3.1.2.3";
+    private static final String XML_DISPENSATION_PRODUCT_EPSOSNS = "urn:epsos-org:ep:medication";
+    private static final String XML_DISPENSATION_PRODUCT_CLASSCODE = "MANU";
+    private static final String XML_DISPENSATION_PRODUCT_TEMPLATE1 = "1.3.6.1.4.1.19376.1.5.3.1.4.7.2";
+    private static final String XML_DISPENSATION_PRODUCT_TEMPLATE2 = "2.16.840.1.113883.10.20.1.53";
+    private static final String XML_DISPENSATION_PRODUCT_MATERIAL_CLASSCODE = "MMAT";
+    private static final String XML_DISPENSATION_PRODUCT_MATERIAL_CONTENT_CLASSCODE = "CONT";
+    private static final String XML_DISPENSATION_PRODUCT_MATERIAL_DETERMINERCODE = "KIND";
+    private static final String XML_DISPENSATION_PRODUCT_MATERIAL_CONTAINER_DETERMINERCODE = "INSTANCE";
+    private static final String XML_DISPENSATION_PRODUCT_MATERIAL_TEMPLATE = "1.3.6.1.4.1.12559.11.10.1.3.1.3.1";
+    private static final String XML_DISPENSATION_PRODUCT_MATERIAL_FORMCODE_SYSTEM = "1.3.6.1.4.1.12559.11.10.1.3.1.42.2";
+    private static final String XML_DISPENSATION_PRODUCT_MATERIAL_CONTAINER_FORMCODE_SYSTEM = "1.3.6.1.4.1.12559.11.10.1.3.1.42.3";
 
     private CDAUtils() {
     }
 
-    public static String createDispensation(Document epDoc, CDAHeader cda, String eDuuid) throws ParserConfigurationException, SAXException, IOException {
+    public static String createDispensation(Document epDoc, CDAHeader cda, String eDuuid) {
 
         return CDAModelToEDXML(epDoc, cda, eDuuid);
     }
@@ -121,33 +121,34 @@ public class CDAUtils {
 
     private static String getRelativePrescriptionLineFromEP(Document epDoc, String id) {
 
-        Node nl;
-        String nodeString = "";
+        LOGGER.debug("Converting eP SubstanceAdministration [{}] to eD format", id);
+
         try {
-            //Document doc = epDoc;
+
             XPath xpath = getXPathFactory();
-            XPathExpression xPathExpression = xpath.compile("//xsi:substanceAdministration");
+            XPathExpression xPathExpression = xpath.compile("//xsi:substanceAdministration[xsi:id/@extension='" + id + "']");
             Node substanceNode = (Node) xPathExpression.evaluate(epDoc, XPathConstants.NODE);
+
             if (substanceNode != null) {
                 LOGGER.info("Source Node: '{}'-'{}'", substanceNode.getNodeName(), substanceNode.getNodeValue());
-                substanceNode.getAttributes().getNamedItem("moodCode").setNodeValue("EVN");
-                NodeList nodeList = substanceNode.getChildNodes();
+                substanceNode.getAttributes().getNamedItem("moodCode").setNodeValue("INT");
+
+                XPathExpression subAdmTemplateExpr = xpath.compile("//xsi:substanceAdministration/xsi:templateId");
+                NodeList nodeList = (NodeList) subAdmTemplateExpr.evaluate(epDoc, XPathConstants.NODESET);
+
                 for (int i = 0; i < nodeList.getLength(); i++) {
-                    LOGGER.info("Node: '{}'", nodeList.item(i).getNodeName());
-                    if (StringUtils.equals(nodeList.item(i).getNodeName(), "templateId")) {
-                        substanceNode.removeChild(nodeList.item(i));
-                    }
+
+                    substanceNode.removeChild(nodeList.item(i));
                 }
+                return Utils.nodeToString(substanceNode);
+            } else {
+                throw new DispenseException("Substance Administration to dispense not found");
             }
 
-            XPathExpression epExpr = xpath.compile("//xsi:substanceAdministration[xsi:id/@extension='" + id + "']");
-            nl = (Node) epExpr.evaluate(epDoc, XPathConstants.NODE);
-            nodeString = Utils.nodeToString(nl);
-            LOGGER.info("********************* AFTER {}", nodeString);
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
+            throw new DispenseException(e.getMessage(), e);
         }
-        return nodeString;
     }
 
     private static String getRelativeProductLineFromEP(Document epDoc, String id) {
@@ -517,13 +518,12 @@ public class CDAUtils {
     }
 
     private static String addDocumentOf(String consentCode, String consentDisplayName, String consentStartDate, String consentEndDate) {
-        String uuid = EpsosHelperService.getUniqueId(); //java.util.UUID.randomUUID().toString();
-        StringBuilder sb = new StringBuilder();
-        sb.append("<documentationOf typeCode=\"DOC\">" + "\r\n" + "<serviceEvent classCode=\"ACT\" moodCode=\"EVN\">" + "\r\n" + "<templateId root=\"1.3.6.1.4.1.19376.1.5.3.1.2.6\"/>" + "\r\n" + "<id root=\"").append(uuid).append("\"/>" + "\r\n" + "<code code=\"").append(consentCode).append("\" codeSystem=\"1.3.6.1.4.1.12559.11.10.1.3.2.4.1\" " + "codeSystemName=\"Connect-a-thon eventCodeList\" displayName=\"").append(consentDisplayName).append("\"/>" + "\r\n" + "<effectiveTime>" + "\r\n" + "<low value=\"").append(consentStartDate).append("\"/>" + "\r\n" + "<high value=\"").append(consentEndDate).append("\"/>" + "\r\n"
+
+        String uuid = EpsosHelperService.getUniqueId();
+        return ("<documentationOf typeCode=\"DOC\">" + "\r\n" + "<serviceEvent classCode=\"ACT\" moodCode=\"EVN\">" + "\r\n" + "<templateId root=\"1.3.6.1.4.1.19376.1.5.3.1.2.6\"/>" + "\r\n" + "<id root=\"") + uuid + "\"/>" + "\r\n" + "<code code=\"" + consentCode + "\" codeSystem=\"1.3.6.1.4.1.12559.11.10.1.3.2.4.1\" " + "codeSystemName=\"Connect-a-thon eventCodeList\" displayName=\"" + consentDisplayName + "\"/>" + "\r\n" + "<effectiveTime>" + "\r\n" + "<low value=\"" + consentStartDate + "\"/>" + "\r\n" + "<high value=\"" + consentEndDate + "\"/>" + "\r\n"
                 + "</effectiveTime>" + "\r\n"
                 + "</serviceEvent>" + "\r\n"
-                + "</documentationOf>" + "\r\n");
-        return sb.toString();
+                + "</documentationOf>" + "\r\n";
     }
 
     private static String addCustodian(String custodianOid, String custodianName, String country) {
@@ -730,7 +730,7 @@ public class CDAUtils {
                 String product = detail.getMedicineCommercialName();
                 String unit = detail.getDispensedQuantityUnit(); //Even in a substitution we getting null
                 String quantity = detail.getDispensedQuantity();
-                LOGGER.info("************************* EDDetails: {}", detail.toString());
+                LOGGER.info("### EDDetails: {}", detail.toString());
                 //Adding the relative product line updated with the substituted data, if any
                 sb.append(getSubstitutedRelativeProductLineFromEP(clone, id, product, unit, quantity));
 

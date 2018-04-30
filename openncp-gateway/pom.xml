@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>2.5.3.RC1</version>
+        <version>2.5.3.RC2</version>
     </parent>
 
     <artifactId>openncp-gateway</artifactId>
@@ -148,10 +148,10 @@
         Specific JEE dependency needed by MOXy to parse dates
         http://stackoverflow.com/questions/22022994/moxy-2-5-1-dependency-on-javaee-causes-noclassdeffounderror-in-javase -->
         <!--<dependency>-->
-            <!--<groupId>org.eclipse.persistence</groupId>-->
-            <!--<artifactId>org.eclipse.persistence.moxy</artifactId>-->
-            <!--<version>2.5.3-RC1</version>-->
-            <!--<scope>runtime</scope>-->
+        <!--<groupId>org.eclipse.persistence</groupId>-->
+        <!--<artifactId>org.eclipse.persistence.moxy</artifactId>-->
+        <!--<version>2.5.3-RC1</version>-->
+        <!--<scope>runtime</scope>-->
         <!--</dependency>-->
         <dependency>
             <groupId>javax.mail</groupId>
@@ -168,6 +168,45 @@
             <artifactId>Saxon-HE</artifactId>
             <version>${saxon-he.version}</version>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bull.javamelody</groupId>
+            <artifactId>javamelody-core</artifactId>
+            <version>1.71.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>2.1.7</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bcmail-jdk14</artifactId>
+                    <groupId>bouncycastle</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bcprov-jdk14</artifactId>
+                    <groupId>bouncycastle</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bctsp-jdk14</artifactId>
+                    <groupId>bouncycastle</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jrobin</groupId>
+            <artifactId>jrobin</artifactId>
+            <version>1.5.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.matthewcasperson</groupId>
+            <artifactId>parameter_validation_filter</artifactId>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

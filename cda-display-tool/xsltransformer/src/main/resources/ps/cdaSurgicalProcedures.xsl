@@ -1,17 +1,16 @@
-<?xml version="1.0"  ?>
+<?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3" version="1.0">
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
 
-    <!-- variable to check that at least one alert section exist -->
+    <!-- variable to check that at least one surgical procedure section exist -->
     <xsl:variable name="surgicalProceduresExist"
                   select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='47519-4']"/>
 
-    <!--alerts -->
+    <!--surgical procedures -->
     <xsl:template name="surgicalProcedures" match="/n1:ClinicalDocument/n1:component/n1:structuredBody">
-        <!-- if we have at least one alert section -->
         <xsl:choose>
-            <!-- if we have at least one alert section -->
+            <!-- if we have at least one surgical procedure section -->
             <xsl:when test="($surgicalProceduresExist)">
 
                 <xsl:for-each select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section">
@@ -20,10 +19,9 @@
                 <br/>
                 <br/>
             </xsl:when>
-            <!-- else -->
             <xsl:otherwise>
                 <span class="sectionTitle">
-                    <!--  The Procedures section is missing -->
+                    <!-- The Procedures section is missing! -->
                     <xsl:choose>
                         <xsl:when test=" ($documentCode='60591-5')">
                             <xsl:call-template name="show-displayLabels">
@@ -39,7 +37,7 @@
     </xsl:template>
 
     <xsl:template name="surgicalProceduresSection">
-        <!-- Defing all needed variables -->
+        <!-- Defining all needed variables -->
         <xsl:variable
                 name="surgicalProceduresSectionTitleCode"
                 select="n1:code/@code"/>
@@ -55,70 +53,84 @@
         <xsl:choose>
             <!-- if sectionTitle is not missing for alerts  (Exception alerts section is missing)-->
             <xsl:when test=" ($surgicalProceduresSectionTitleCode='47519-4')">
-                <span class="sectionTitle">
-                    <xsl:value-of select="$surgicalProceduresSectionTitle"/>
-                </span>
-                <br/>
-                <!-- nullflavored act -->
-                <xsl:choose>
-                    <xsl:when test="not($surgProcAct/@nullFlavor)">
-                        <xsl:choose>
-                            <xsl:when test="$shownarrative='true'">
-                                <a href="javascript: showhide('surgProcActTr'); self.focus(); void(0);">Show/Hide</a>
-                                <div id="surgProcActTr" style="display:block">
-                                    <xsl:apply-templates
-                                            select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='47519-4']/../n1:text/*"/>
-                                    <br/>
+                <div class="wrap-collabsible">
+                    <input id="collapsible-surgical-procedures-section-original" class="toggle" type="checkbox" checked="true" />
+                    <label for="collapsible-surgical-procedures-section-original" class="lbl-toggle-title">
+                        <xsl:value-of select="$surgicalProceduresSectionTitle"/>
+                    </label>
+                    <div class="collapsible-content-title">
+                        <div class="content-inner-title">
+                            <xsl:choose>
+                                <xsl:when test="$shownarrative='true'">
+                                    <div class="wrap-collabsible">
+                                        <input id="collapsible-surgical-procedures-original" class="toggle" type="checkbox"/>
+                                        <label for="collapsible-surgical-procedures-original" class="lbl-toggle">
+                                            <xsl:value-of select="$originalNarrativeTableTitle"/>
+                                        </label>
+                                        <div class="collapsible-content">
+                                            <div class="content-inner">
+                                                <xsl:apply-templates
+                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='47519-4']/../n1:text/*"/>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </xsl:when>
+                            </xsl:choose>
+                            <br/>
+                            <!-- nullflavored act -->
+                            <div class="wrap-collabsible">
+                                <input id="collapsible-surgical-procedures-translated" class="toggle" type="checkbox" checked="true"/>
+                                <label for="collapsible-surgical-procedures-translated" class="lbl-toggle">
+                                    <xsl:value-of select="$translatedCodedTableTitle"/>
+                                </label>
+                                <div class="collapsible-content">
+                                    <div class="content-inner">
+                                        <xsl:choose>
+                                            <xsl:when test="not($surgProcAct/@nullFlavor)">
+                                                <table class="translation_table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>
+                                                                <!--  Procedure -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'62'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                            <th>
+                                                                <!--  Procedure Date -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'63'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                        </tr>
+                                                        <xsl:for-each select="n1:entry">
+                                                            <xsl:call-template name="surgicalProceduresSectionEntry">
+                                                            </xsl:call-template>
+                                                        </xsl:for-each>
+                                                    </tbody>
+                                                </table>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <br/>
+                                                <xsl:call-template name="show-nullFlavor">
+                                                    <xsl:with-param name="code" select="$surgProcAct/@nullFlavor"/>
+                                                </xsl:call-template>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </div>
                                 </div>
-                            </xsl:when>
-                        </xsl:choose>
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <th>
-                                        <!--  Procedure -->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'62'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <th>
-                                        <!--  Procedure Date -->
-                                        <xsl:call-template name="show-displayLabels">
-                                            <xsl:with-param name="code" select="'63'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                </tr>
-                                <xsl:for-each select="n1:entry">
-                                    <xsl:call-template name="surgicalProceduresSectionEntry">
-                                    </xsl:call-template>
-                                </xsl:for-each>
-                            </tbody>
-                        </table>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:choose>
-                            <xsl:when test="$shownarrative='true'">
-                                <a href="javascript: showhide('surgProcActTr'); self.focus(); void(0);">Show/Hide</a>
-                                <div id="surgProcActTr" style="display:block">
-                                    <xsl:apply-templates
-                                            select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='47519-4']/../n1:text/*"/>
-                                    <br/>
-                                </div>
-                            </xsl:when>
-                        </xsl:choose>
-                        <br/>
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$surgProcAct/@nullFlavor"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </xsl:when>
         </xsl:choose>
     </xsl:template>
 
     <!-- FOR EACH ENTRY -->
     <xsl:template name="surgicalProceduresSectionEntry">
-        <!-- Defing all needed variables -->
+        <!-- Defining all needed variables -->
         <xsl:variable
                 name="surgicalProcedureNode"
                 select="n1:procedure/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.19']/../n1:code"/>
@@ -157,7 +169,7 @@
                                         <!--  uncoded element only if we don;t have displayName -->
                                         <xsl:if test="$surgicalProcedureNode/n1:originalText/n1:reference/@value">
                                             <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="data"
+                                                <xsl:with-param name="code"
                                                                 select="$surgicalProcedureNode/n1:originalText/n1:reference/@value"/>
                                             </xsl:call-template>
                                         </xsl:if>
@@ -165,8 +177,8 @@
                                 </xsl:choose>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:call-template name="show-noneFlavor">
-                                    <xsl:with-param name="data" select="$surgicalProcedureNode/@nullFlavor"/>
+                                <xsl:call-template name="show-nullFlavor">
+                                    <xsl:with-param name="code" select="$surgicalProcedureNode/@nullFlavor"/>
                                 </xsl:call-template>
                             </xsl:otherwise>
                         </xsl:choose>
@@ -190,9 +202,8 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-
-                        <xsl:call-template name="show-noneFlavor">
-                            <xsl:with-param name="data" select="$surgProcAct/@nullFlavor"/>
+                        <xsl:call-template name="show-nullFlavor">
+                            <xsl:with-param name="code" select="$surgProcAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

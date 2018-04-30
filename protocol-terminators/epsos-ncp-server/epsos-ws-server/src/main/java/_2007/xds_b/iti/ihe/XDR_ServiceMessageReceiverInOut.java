@@ -91,15 +91,18 @@ import java.util.UUID;
 public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XDR_ServiceMessageReceiverInOut.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
+
         LOGGER.debug("Loading the WS-Security init libraries in XDR 2007");
         org.apache.xml.security.Init.init();
     }
 
     static {
+
         JAXBContext jc = null;
 
         try {
@@ -163,7 +166,9 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 eventLog.setSC_UserID(clientDN);
                 eventLog.setTargetip(req.getServerName());
 
-                LOGGER.debug("Incoming XDR Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    LOGGER_CLINICAL.debug("Incoming XDR Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
+                }
 
                 if (StringUtils.equals("documentRecipient_ProvideAndRegisterDocumentSetB", methodName)) {
 
@@ -190,8 +195,10 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     String responseMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
                     XdrValidationService.getInstance().validateModel(responseMessage, XdModel.obtainModelXdr(responseMessage).toString(), NcpSide.NCP_A);
 
-                    LOGGER.debug("Response Header:\n{}", envelope.getHeader().toString());
-                    LOGGER.debug("Outgoing XDR Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
+                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                        LOGGER_CLINICAL.debug("Response Header:\n{}", envelope.getHeader().toString());
+                        LOGGER_CLINICAL.debug("Outgoing XDR Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
+                    }
 
                 } else {
                     LOGGER.error("Method not found: '{}'", methodName);

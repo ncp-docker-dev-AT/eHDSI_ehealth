@@ -14,7 +14,6 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.StringWriter;
 
 /**
@@ -114,8 +113,8 @@ public class NoXACMLEvidenceEmitter implements EvidenceEmitter {
     }
 
 
-    private Element sign(Document doc) throws SMgrException, IOException {
-        
+    private Element sign(Document doc) throws SMgrException {
+
         SignatureManager m = new SignatureManager(ks);
         m.signXMLWithEnvelopedSig(doc);
         return doc.getDocumentElement();

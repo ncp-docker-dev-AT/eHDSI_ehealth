@@ -9,7 +9,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import tr.com.srdc.epsos.util.Constants;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -58,51 +57,36 @@ public class MyServletContextListener implements ServletContextListener {
     // -------------------------------------------------------
     // ServletContextListener implementation
     // -------------------------------------------------------
-    public void contextInitialized(ServletContextEvent sce) {
-        LOGGER.info("Context Listener > Initialized");
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
+
+        LOGGER.info("Initiating OpenNCP Portal");
+
         try {
             runningMode = GetterUtil.get(PropsUtil.get("running.mode"), "live");
             encryptionKey = PropsUtil.get("ehealthpass.encryption.key");
+            LOGGER.info("Context Listener --> Initialized");
 
         } catch (Exception e) {
             runningMode = "live";
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
-        LOGGER.info("Initiating OpenNCP Portal");
-        try {
-            System.setProperty("javax.net.ssl.keyStore", Constants.NCP_SIG_KEYSTORE_PATH);
-            System.setProperty("javax.net.ssl.keyStorePassword", Constants.NCP_SIG_KEYSTORE_PASSWORD);
-            System.setProperty("javax.net.ssl.key.alias", Constants.NCP_SIG_PRIVATEKEY_ALIAS);
-            System.setProperty("javax.net.ssl.privateKeyPassword", Constants.NCP_SIG_PRIVATEKEY_PASSWORD);
-            //  EHNCP-1293 OpenNCP Portal - Certificate initialization
-            // System.setProperty("javax.net.ssl.keyStore", Constants.SC_KEYSTORE_PATH);
-            // System.setProperty("javax.net.ssl.keyStorePassword", Constants.SC_KEYSTORE_PASSWORD);
-            // System.setProperty("javax.net.ssl.key.alias", Constants.SC_PRIVATEKEY_ALIAS);
-            // System.setProperty("javax.net.ssl.privateKeyPassword", Constants.SC_PRIVATEKEY_PASSWORD);
-            //EHNCP-1293 OpenNCP Portal - Certificate initialization
-            System.setProperty("javax.net.ssl.trustStore", Constants.TRUSTSTORE_PATH);
-            System.setProperty("javax.net.ssl.trustStorePassword", Constants.TRUSTSTORE_PASSWORD);
-        } catch (Exception e) {
-            LOGGER.error("#### ERROR INITIALIZING KEYSTORE/TRUSTSTORE #### - '{}'", e.getMessage(), e);
-        }
-
-        LOGGER.info("Initializing TM component");
         try {
             ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("ctx_tm.xml");
             tService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
+            LOGGER.info("Transformation Manager --> Initialized");
         } catch (Exception e) {
             LOGGER.error("#### ERROR INITIALIZING TM ####", e);
         }
         try {
-            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);            //serviceUrl = LiferayUtils.getFromPrefs("client_connector_url");
-            LOGGER.info("SERVICE URL IS '{}'", serviceUrl);
+            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
             clientConnectorConsumer = new ClientConnectorConsumer(serviceUrl);
+            LOGGER.info("ClientConnector --> Initialized to: '{}'", serviceUrl);
         } catch (Exception e) {
             LOGGER.error("ERROR INITIALIZING CLIENT CONNECTOR PROXY - '{}'", e.getMessage(), e);
         }
 
-        LOGGER.info("Running Mode: '{}'", runningMode);
+        LOGGER.info("[Portal] Running Mode: '{}'", runningMode);
     }
 
     public void contextDestroyed(ServletContextEvent sce) {

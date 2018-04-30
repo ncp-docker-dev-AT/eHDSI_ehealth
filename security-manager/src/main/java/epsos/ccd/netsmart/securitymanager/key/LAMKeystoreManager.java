@@ -70,5 +70,4 @@ public class LAMKeystoreManager implements KeyStoreManager {
     public KeyStore getTrustStore() {
         return this.trustStore;
     }
-
 }

@@ -1,25 +1,4 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.cc.stub;
-
-import java.text.ParseException;
 
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
@@ -30,16 +9,20 @@ import org.opensaml.saml2.core.Assertion;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 import tr.com.srdc.epsos.data.model.XdrResponse;
 
+import java.text.ParseException;
+
 /**
- *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class DispensationService {
 
+    private DispensationService() {
+    }
+
     /**
      * Notify the patient’s country of affiliation on a successful dispensation
      * of an ePrescription.
-     *
+     * <p>
      * <br/> <dl> <dt><b>Preconditions: </b> <dd>Service consumer and service
      * provider share a common identifier for the patient <dd>The patient has
      * given consent to the use of epSOS <dd>The service consumer has previously
@@ -62,14 +45,14 @@ public class DispensationService {
      * </b> <dd>eDispensation data is not processed by the patient’s country of
      * affiliation </dl>
      *
-     * @param document document to be submitted
-     * @param patient patient's demographic data
+     * @param document     document to be submitted
+     * @param patient      patient's demographic data
      * @param hcpAssertion HCP Assertion
      * @param trcAssertion TRC Assertion
      * @throws ParseException
      */
-    public static /* InitializeResponse */ XdrResponse initialize(final EpsosDocument1 document, final PatientDemographics patient, final String countryCode,
-                                                                                        final Assertion hcpAssertion, final Assertion trcAssertion) throws XdrException, ParseException {
+    public static XdrResponse initialize(final EpsosDocument1 document, final PatientDemographics patient, final String countryCode,
+                                         final Assertion hcpAssertion, final Assertion trcAssertion) throws XdrException, ParseException {
         XdrRequest request;
         request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
         return XdrDocumentSource.initialize(request, countryCode);
@@ -79,7 +62,7 @@ public class DispensationService {
      * Notify the patient’s country of affiliation on an erroneous eDispensation
      * notification, in order to allow it to roll back any changes made on its
      * internal data that were triggered by the erroneous notification.
-     *
+     * <p>
      * <br/> <dl> <dt><b>Preconditions: </b> <dd>Service consumer and service
      * provider share a common identifier for the patient <dd>The service
      * consumer has previously retrieved the list of the patient’s available
@@ -93,12 +76,8 @@ public class DispensationService {
      * Conditions: </b> <dd>eDispensation data is not processed by the country
      * of affiliation <dd>eDispensations are not rolled back automatically by
      * the country of affiliation </dl>
-     *
      */
-    public static /* InitializeResponse */ XdrResponse discard(/* Initialize */) {
+    public static XdrResponse discard() {
         throw new UnsupportedOperationException("Operation not supported.");
-    }
-
-    private DispensationService() {
     }
 }

@@ -3,6 +3,7 @@ package eu.epsos.pt.ws.client.xca;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import eu.epsos.dts.xds.AdhocQueryRequestCreator;
 import eu.epsos.dts.xds.AdhocQueryResponseConverter;
+import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.validation.datamodel.cda.CdaModel;
@@ -40,8 +41,8 @@ import java.util.Locale;
 /**
  * XCA Initiating Gateway
  * <p>
- * This is an implementation of a IHE XCA Initiation Gateway. This class
- * provides the necessary operations to query and retrieve documents.
+ * This is an implementation of a IHE XCA Initiation Gateway.
+ * This class provides the necessary operations to query and retrieve documents.
  *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
@@ -73,14 +74,13 @@ public class XcaInitGateway {
             /* Stub */
             RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub();
             DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
-            //String epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), service);
             String epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
             stub.setAddr(epr);
             stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
             EventLogClientUtil.createDummyMustUnderstandHandler(stub);
             stub.setCountryCode(countryCode);
 
-            /* queryRespose */
+            /* queryResponse */
             AdhocQueryResponse queryResponse = stub.respondingGateway_CrossGatewayQuery(queryRequest, idAssertion, trcAssertion, documentCode.getValue());   // Request
             processRegistryErrors(queryResponse.getRegistryErrorList());
 
@@ -119,9 +119,10 @@ public class XcaInitGateway {
             DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
             String epr;
             if (service.equals(Constants.MroService)) {
+
                 epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE);
             } else {
-                //epr = ConfigurationManagerService.getInstance().getServiceWSE(countryCode.toLowerCase(Locale.ENGLISH), service);
+
                 epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
             }
             stub.setAddr(epr);
@@ -142,9 +143,10 @@ public class XcaInitGateway {
             }
 
             /* Request */
-            queryResponse = stub.respondingGateway_CrossGatewayRetrieve(queryRequest, idAssertion, trcAssertion, classCode); // Request
+            queryResponse = stub.respondingGateway_CrossGatewayRetrieve(queryRequest, idAssertion, trcAssertion, classCode);
 
             if (queryResponse.getRegistryResponse() != null) {
+
                 RegistryErrorList registryErrorList = queryResponse.getRegistryResponse().getRegistryErrorList();
                 processRegistryErrors(registryErrorList);
             }
@@ -161,6 +163,7 @@ public class XcaInitGateway {
                 LOGGER.error("More than one documents where retrieved for the current request with parameters document ID: '{}' " +
                         "- homeCommunityId: '{}' - registry: ", document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
             }
+            //TODO: review this try - catch - finally mechanism and the transformation/translation mechanism.
             try {
                 CdaValidationService cdaValidationService = CdaValidationService.getInstance();
 
@@ -169,21 +172,25 @@ public class XcaInitGateway {
                 elementNormalize.normalize();
                 cdaValidationService.validateModel(XMLUtils.toOM(elementNormalize).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
 
+                //Resets the response document to a translated version.
                 queryResponse.getDocumentResponse().get(0).setDocument(TMServices.transformDocument(
-                        queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage)); //Resets the response document to a translated version.
+                        queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage));
 
                 /* Validate CDA epSOS Friendly-B */
                 cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(
                         queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
                         CdaModel.obtainCdaModel(document.getClassCode().getValue(), false), NcpSide.NCP_B);
 
-            } catch (Exception ex) {
-                LOGGER.error(ex.getLocalizedMessage(), ex);
+            } catch (DocumentTransformationException e) {
+                LOGGER.warn("DocumentTransformationException: document cannot be translated:\n{}", e.getMessage());
+            } catch (Exception e) {
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
             } finally {
-                result = queryResponse.getDocumentResponse().get(0); //Returns the original document, even if the translation process fails.
+                LOGGER.debug("[XCA Init Gateway] Returns Original Document");
+                //  Returns the original document, even if the translation process fails.
+                result = queryResponse.getDocumentResponse().get(0);
             }
         }
-
         return result;
     }
 
@@ -197,7 +204,7 @@ public class XcaInitGateway {
      *                   "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error" type.
      */
     private static void processRegistryErrors(RegistryErrorList registryErrorList) throws XCAException {
-        // A.R. ++ Error processing. For retrive. Is it needed?
+        // A.R. ++ Error processing. For retrieve. Is it needed?
         // We don't want to break on TSAM errors anyway...
 
         if (registryErrorList != null) {

@@ -1,5 +1,6 @@
 package tr.com.srdc.epsos.ws.xca.client.example;
 
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
@@ -52,7 +53,7 @@ public class RespondingGateway_ServiceStub_Mock {
 
         AdhocQueryResponse mockResponse = new AdhocQueryResponse();
 
-        mockResponse.setStatus("urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success");
+        mockResponse.setStatus(AdhocQueryResponseStatus.SUCCESS);
         // Create Registry Object List
         mockResponse.setRegistryObjectList(ofRim.createRegistryObjectListType());
         String xmlUUID = "";
@@ -102,8 +103,8 @@ public class RespondingGateway_ServiceStub_Mock {
 
             Document doc = XMLUtil.parseContent(DummyCDA.CDA);
 
-            mockResponse.getRegistryResponse().setStatus("urn:ihe:iti:2007:ResponseStatusType:PartialSuccess");
-            registryResponse.addAttribute(factory.createOMAttribute("status", null, "urn:ihe:iti:2007:ResponseStatusType:PartialSuccess"));
+            mockResponse.getRegistryResponse().setStatus(AdhocQueryResponseStatus.PARTIAL_SUCCESS);
+            registryResponse.addAttribute(factory.createOMAttribute("status", null, AdhocQueryResponseStatus.PARTIAL_SUCCESS));
 
 
             ByteArrayDataSource dataSource = new ByteArrayDataSource(XMLUtils.toOM(doc.getDocumentElement()).toString().getBytes(), "text/xml;charset=UTF-8");

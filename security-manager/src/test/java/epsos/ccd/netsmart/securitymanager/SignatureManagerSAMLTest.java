@@ -114,7 +114,7 @@ public class SignatureManagerSAMLTest {
             }
 
             //Verify the Signed SAML Assertion
-            instance.verifySAMLAssestion(as);
+            instance.verifySAMLAssertion(as);
 
             try {
 
@@ -128,7 +128,7 @@ public class SignatureManagerSAMLTest {
             Assertion as2 = (Assertion) unmarshaller2.unmarshall(signedDoc.getDocumentElement());
 
             try {
-                instance.verifySAMLAssestion(as2);
+                instance.verifySAMLAssertion(as2);
             } catch (SMgrException ex) {
                 fail(ex.getMessage());
 

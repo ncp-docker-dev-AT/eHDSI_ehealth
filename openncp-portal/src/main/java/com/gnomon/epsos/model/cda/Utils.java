@@ -14,7 +14,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -34,6 +33,7 @@ import java.util.zip.ZipInputStream;
 public class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
+    private static final int BUFFER_SIZE = 4096;
 
     private Utils() {
     }
@@ -184,9 +184,6 @@ public class Utils {
                     case '€':
                         sb.append("&euro;");
                         break;
-                    // be carefull with this one (non-breaking whitee space)
-                    //case ' ': sb.append("&nbsp;");break;
-
                     default:
                         sb.append(c);
                         break;
@@ -252,7 +249,7 @@ public class Utils {
         return sw.toString();
     }
 
-    public static org.w3c.dom.Document ResultsetToXML(java.sql.ResultSet rs) {
+    public static org.w3c.dom.Document resultSetToXML(java.sql.ResultSet rs) {
 
         org.w3c.dom.Document doc = null;
         try {
@@ -294,7 +291,7 @@ public class Utils {
         return doc;
     }
 
-    public static InputStream StringToStream(String text) {
+    public static InputStream stringToStream(String text) {
 
         InputStream is = null;
         try {
@@ -312,9 +309,8 @@ public class Utils {
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             dbFactory.setNamespaceAware(true);
-            doc = dbFactory
-                    .newDocumentBuilder()
-                    .parse(StringToStream(inputFile));
+            doc = dbFactory.newDocumentBuilder().parse(stringToStream(inputFile));
+
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
@@ -332,9 +328,8 @@ public class Utils {
      </CodeSystem>
      *
      */
-    public static org.w3c.dom.Document ResultsetToXMLWithAttr(Document doc, Element elem, java.sql.ResultSet rs,
-                                                              String oid, String displayName)
-            throws SQLException, ParserConfigurationException {
+    public static org.w3c.dom.Document resultSetToXMLWithAttr(Document doc, Element elem, java.sql.ResultSet rs,
+                                                              String oid, String displayName) throws SQLException {
 
         ResultSetMetaData rsmd = rs.getMetaData();
         int colCount = rsmd.getColumnCount();
@@ -364,7 +359,7 @@ public class Utils {
         return doc;
     }
 
-    public static void WriteXMLToFile(String xml, String filename) {
+    public static void writeXMLToFile(String xml, String filename) {
 
         try (FileWriter fstream = new FileWriter(filename)) {
             // Create file
@@ -372,7 +367,7 @@ public class Utils {
             out.write(xml);
             //Close the output stream
             out.close();
-            fstream.close();
+
         } catch (Exception e) {//Catch exception if any
             LOGGER.error("Error: '{}'", e.getMessage(), e);
         }
@@ -411,7 +406,7 @@ public class Utils {
     public static String getCDA(String base64String) throws IOException {
 
         ByteArrayOutputStream bazip = new ByteArrayOutputStream();
-        int BUFFER_SIZE = 4096;
+
         byte[] buffer = new byte[BUFFER_SIZE];
         InputStream input = new Base64InputStream(new ByteArrayInputStream(base64String.getBytes()));
         int n = input.read(buffer, 0, BUFFER_SIZE);
@@ -425,17 +420,15 @@ public class Utils {
         try {
             ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bazip.toByteArray()));
             while ((zis.getNextEntry()) != null) {
-                int size;
+
                 byte[] buf = new byte[4096];
                 int len;
-                int totalLen = 0;
 
                 while ((len = zis.read(buf)) > 0) {
                     contents.write(buf, 0, len);
-                    totalLen += len;
                 }
 
-            }//while
+            }
             zis.close();
 
         } catch (IOException e) {
@@ -450,10 +443,10 @@ public class Utils {
 
         try (InputStream inputStream = req.getInputStream()) {
 
-            OutputStream out = new FileOutputStream(new File("/home/karkaletsis/newfile.zip"));
+            OutputStream out = new FileOutputStream(new File("/home/newfile.zip"));
             IOUtils.copy(inputStream, out);
             ByteArrayOutputStream contents = new ByteArrayOutputStream();
-            byte buf1[] = new byte[1024];
+            byte[] buf1 = new byte[1024];
             int letti;
 
             while ((letti = inputStream.read(buf1)) > 0) {
@@ -466,11 +459,9 @@ public class Utils {
 
                     byte[] buf = new byte[4096];
                     int len;
-                    int totalLen = 0;
 
                     while ((len = zis.read(buf)) > 0) {
                         contents.write(buf, 0, len);
-                        totalLen += len;
                     }
                 }//while
 
