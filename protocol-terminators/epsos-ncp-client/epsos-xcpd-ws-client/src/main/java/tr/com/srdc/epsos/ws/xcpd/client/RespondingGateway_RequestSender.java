@@ -21,12 +21,13 @@ package tr.com.srdc.epsos.ws.xcpd.client;
 
 import ee.affecto.epsos.util.EventLogClientUtil;
 import eu.epsos.dts.xcpd.PRPAIN201305UV022DTS;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml2.core.Assertion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.util.OidUtil;
 
@@ -42,6 +43,8 @@ import java.util.Locale;
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public final class RespondingGateway_RequestSender {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RespondingGateway_RequestSender.class);
 
     private RespondingGateway_RequestSender() {
     }
@@ -69,6 +72,8 @@ public final class RespondingGateway_RequestSender {
         PRPAIN201305UV02 hl7Request;
         String dstHomeCommunityId = OidUtil.getHomeCommunityId(countryCode.toLowerCase(Locale.ENGLISH));
         hl7Request = PRPAIN201305UV022DTS.newInstance(pd, dstHomeCommunityId);
+        LOGGER.debug("ClientConnector is trying to contact remote NCP-A:\nEndpoint: '{}'\nHomeCommunityId: '{}'",
+                epr, dstHomeCommunityId);
 
         return sendRequest(epr, hl7Request, idAssertion, countryCode);
     }
@@ -80,12 +85,11 @@ public final class RespondingGateway_RequestSender {
      * @param countryCode
      * @return
      */
-    private static PRPAIN201306UV02 sendRequest(String epr,
-                                                PRPAIN201305UV02 pRPAIN201305UV022,
-                                                Assertion idAssertion, final String countryCode) {
-        RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub(epr);
+    private static PRPAIN201306UV02 sendRequest(String epr, PRPAIN201305UV02 pRPAIN201305UV022, Assertion idAssertion, final String countryCode) {
 
-        EventLogClientUtil.createDummyMustUnderstandHandler(stub);  // Dummy handler for any mustUnderstand
+        RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub(epr);
+        // Dummy handler for any mustUnderstand
+        EventLogClientUtil.createDummyMustUnderstandHandler(stub);
         stub.setCountryCode(countryCode);
 
         return stub.respondingGateway_PRPA_IN201305UV02(pRPAIN201305UV022, idAssertion);
