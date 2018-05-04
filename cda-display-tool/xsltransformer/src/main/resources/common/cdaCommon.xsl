@@ -908,7 +908,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:text> </xsl:text>
-                <xsl:value-of select="$medUnitIntakeUnit"/>
+                <xsl:value-of select="substring-before(substring-after($medUnitIntakeUnit, ' {'), '}')"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
