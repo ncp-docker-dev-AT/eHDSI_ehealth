@@ -178,7 +178,7 @@
         <xsl:variable name="medFrequencyIntakeType"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[2]/@xsi:type"/>
         <xsl:variable name="medRouteAdministration"
-                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:routeCode/@displayName"/>
+                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:routeCode"/>
 
         <xsl:variable name="medOnSetDate"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:low"/>
@@ -281,7 +281,20 @@
                                     </xsl:call-template>
                                 </td>
                                 <td>
-                                    <xsl:value-of select="$medRouteAdministration"/>
+                                    <xsl:choose>
+                                        <xsl:when test="$medRouteAdministration/@nullFlavor">
+                                            <xsl:call-template name="show-nullFlavor">
+                                                <xsl:with-param name="code"
+                                                                select="$medRouteAdministration/@nullFlavor"/>
+                                            </xsl:call-template>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:call-template name="show-routeOfAdministration">
+                                                <xsl:with-param name="code"
+                                                                select="$medRouteAdministration/@code"/>
+                                            </xsl:call-template>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </td>
                                 <td>
                                     <xsl:call-template name="show-time">
