@@ -13,21 +13,30 @@
     <xsl:param name="allowDispense" select="'false'"/>
     <xsl:param name="shownarrative" select="''"/>
 
+    <!-- TODO these values should be added to the epsosDisplayLabel valueSet -->
+    <xsl:variable name="min" select="'Min'"/>
+    <xsl:variable name="max" select="'Max'"/>
+    <xsl:variable name="activeIngredientCodeSystem" select="'Code System'"/>
+    <xsl:variable name="activeIngredientCode" select="'Code'"/>
+    <xsl:variable name="activeIngredientName" select="'Name'"/>
+    <xsl:variable name="dispensedNumberOfPackages" select="'Dispensed Number of packages'"/>
+
     <!-- show-signature -->
-    <xsl:template name="show-sig">
-        <xsl:param name="sig"/>
-        <xsl:choose>
-            <xsl:when test="$sig/@code ='S'">
-                <xsl:text>signed</xsl:text>
-            </xsl:when>
-            <xsl:when test="$sig/@code='I'">
-                <xsl:text>intended</xsl:text>
-            </xsl:when>
-            <xsl:when test="$sig/@code='X'">
-                <xsl:text>signature required</xsl:text>
-            </xsl:when>
-        </xsl:choose>
-    </xsl:template>
+    <!-- DEPRECATED - Nowhere used -->
+    <!--<xsl:template name="show-sig">-->
+        <!--<xsl:param name="sig"/>-->
+        <!--<xsl:choose>-->
+            <!--<xsl:when test="$sig/@code ='S'">-->
+                <!--<xsl:text>signed</xsl:text>-->
+            <!--</xsl:when>-->
+            <!--<xsl:when test="$sig/@code='I'">-->
+                <!--<xsl:text>intended</xsl:text>-->
+            <!--</xsl:when>-->
+            <!--<xsl:when test="$sig/@code='X'">-->
+                <!--<xsl:text>signature required</xsl:text>-->
+            <!--</xsl:when>-->
+        <!--</xsl:choose>-->
+    <!--</xsl:template>-->
 
     <!-- show-id -->
     <xsl:template name="show-id">
@@ -75,35 +84,6 @@
                 <xsl:value-of select="$name"/>
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:template>
-
-    <!-- show-gender -->
-    <xsl:template name="show-gender">
-        <xsl:param name="data"/>
-        <xsl:variable name="dirFile" select="concat($epsosLangDir,'/1.3.6.1.4.1.12559.11.10.1.3.1.42.34.xml')"/>
-        <xsl:variable name="foundKey"
-                      select="document(concat('file://', $dirFile))/ValueSet/concept[@code=$data and @codeSystem='2.16.840.1.113883.5.1']"/>
-        <xsl:variable name="foundKeyLang" select="$foundKey/designation[@lang=$userLang]"/>
-        <xsl:variable name="defFoundKeyLang" select="$foundKey/designation[@lang=$defaultUserLang]"/>
-        <xsl:choose>
-            <xsl:when test="not ($foundKeyLang)">
-                <xsl:value-of select="$defFoundKeyLang"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$foundKeyLang"/>
-            </xsl:otherwise>
-        </xsl:choose>
-        <!--<xsl:choose>-->
-        <!--<xsl:when test="@code   = 'M'">-->
-        <!--<xsl:text>Male</xsl:text>-->
-        <!--</xsl:when>-->
-        <!--<xsl:when test="@code  = 'F'">-->
-        <!--<xsl:text>Female</xsl:text>-->
-        <!--</xsl:when>-->
-        <!--<xsl:when test="@code  = 'U'">-->
-        <!--<xsl:text>Undifferentiated</xsl:text>-->
-        <!--</xsl:when>-->
-        <!--</xsl:choose>-->
     </xsl:template>
 
     <!-- show-contactInfo -->
@@ -733,6 +713,16 @@
         </xsl:call-template>
     </xsl:template>
 
+    <!-- epSOSAdministrativeGender -->
+    <xsl:template name="show-gender">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.34.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1'"/>
+        </xsl:call-template>
+    </xsl:template>
+
     <!-- display translated code value -->
     <xsl:template name="show-code-value" match="/n1:ValueSet/n1:concept">
         <xsl:param name="code"/>
@@ -785,63 +775,64 @@
     </xsl:template>
 
     <xsl:template name="show-strength">
-        <xsl:param name="medStrengthUnit1"/>
-        <xsl:param name="medStrengthUnit2"/>
-        <xsl:param name="medStrengthValue1"/>
-        <xsl:param name="medStrengthValue2"/>
-        <xsl:param name="medStrength1"/>
-        <xsl:param name="medStrength2"/>
-        <xsl:choose>
-            <!-- Den Unit =1 -->
-            <xsl:when test="($medStrength1/@nullFlavor)">
-                <xsl:call-template name="show-nullFlavor">
-                    <xsl:with-param name="code" select="$medStrength1/@nullFlavor"/>
-                </xsl:call-template>
-            </xsl:when>
+        <xsl:param name="medStrengthNumerator"/>
+        <xsl:param name="medStrengthDenominator"/>
 
-            <xsl:when test="($medStrength2/@nullFlavor)">
-                <xsl:value-of select="$medStrengthValue1"/>
-                &#160;
-                <xsl:value-of select="$medStrengthUnit1"/>
-                /
+        <xsl:variable name="numeratorValue" select="$medStrengthNumerator/@value"/>
+        <xsl:variable name="numeratorUnit" select="$medStrengthNumerator/@unit"/>
+        <xsl:variable name="denominatorValue" select="$medStrengthDenominator/@value"/>
+        <xsl:variable name="denominatorUnit">
+            <xsl:call-template name="supportUCUMAnnotations">
+                <xsl:with-param name="value" select="$medStrengthDenominator/@value"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:choose>
+            <xsl:when test="($medStrengthNumerator/@nullFlavor)">
                 <xsl:call-template name="show-nullFlavor">
-                    <xsl:with-param name="code" select="$medStrength2/@nullFlavor"/>
+                    <xsl:with-param name="code" select="$medStrengthNumerator/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
-            <xsl:when test="$medStrengthUnit2='1'">
-                <xsl:value-of select="$medStrengthValue1"/>
-                &#160;
-                <xsl:value-of select="$medStrengthUnit1"/>
-                &#160;
+            <xsl:when test="($medStrengthDenominator/@nullFlavor)">
+                <xsl:value-of select="$numeratorValue"/>
+                <xsl:text> </xsl:text>
+                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:text> </xsl:text>
+                /
+                <xsl:text> </xsl:text>
+                <xsl:call-template name="show-nullFlavor">
+                    <xsl:with-param name="code" select="$medStrengthDenominator/@nullFlavor"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="$denominatorUnit='1'">
+                <xsl:value-of select="$numeratorValue"/>
+                <xsl:text> </xsl:text>
+                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:text> </xsl:text>
                 <xsl:call-template name="show-displayLabels">
                     <xsl:with-param name="code" select="'53'"/>
                 </xsl:call-template>
             </xsl:when>
-            <!-- Den Unit !=1 and Denominator = 1 -->
-            <xsl:when test="not($medStrengthUnit2='1') and ($medStrengthValue2='1')">
-                <xsl:value-of select="$medStrengthValue1"/>
-                &#160;
-                <xsl:value-of select="$medStrengthUnit1"/>
-                /
-                <xsl:value-of select="$medStrengthUnit2"/>
-            </xsl:when>
-            <xsl:when test="not($medStrengthValue2)">
-                <xsl:value-of select="$medStrengthValue1"/>
-                &#160;
-                <xsl:value-of select="$medStrengthUnit1"/>
+            <xsl:when test="not($denominatorValue)">
+                <xsl:value-of select="$numeratorValue"/>
+                <xsl:text> </xsl:text>
+                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:text> </xsl:text>
                 /
             </xsl:when>
-            <xsl:when test="not($medStrengthValue2) and not($medStrengthValue2)">
+            <xsl:when test="not($numeratorValue) and not($denominatorValue)">
                 /
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="$medStrengthValue1"/>
-                &#160;
-                <xsl:value-of select="$medStrengthUnit1"/>
+                <xsl:value-of select="$numeratorValue"/>
+                <xsl:text> </xsl:text>
+                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:text> </xsl:text>
                 /
-                <xsl:value-of select="$medStrengthValue2"/>
-                &#160;
-                <xsl:value-of select="$medStrengthUnit2"/>
+                <xsl:text> </xsl:text>
+                <xsl:value-of select="$denominatorValue"/>
+                <xsl:text> </xsl:text>
+                [<xsl:value-of select="$denominatorUnit"/>]
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -894,6 +885,23 @@
         </xsl:choose>
     </xsl:template>
 
+    <!--Support the usage of UCUM annotations (e.g. {tablet})-->
+    <xsl:template name="supportUCUMAnnotations">
+        <xsl:param name="value"/>
+        <xsl:choose>
+            <xsl:when test="contains($value, '{')">
+                <xsl:value-of select="substring-before(substring-after($value, '{'), '}')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$value"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <xsl:variable name="denominatorUnit">
+        
+    </xsl:variable>
+    
     <!-- Number of Unit per Intake -->
     <xsl:template name="show-numberUnitIntake">
         <xsl:param name="medUnitIntake"/>
@@ -908,7 +916,9 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:text> </xsl:text>
-                <xsl:value-of select="substring-before(substring-after($medUnitIntakeUnit, ' {'), '}')"/>
+                <xsl:call-template name="supportUCUMAnnotations">
+                    <xsl:with-param name="value" select="$medUnitIntakeUnit"/>
+                </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
