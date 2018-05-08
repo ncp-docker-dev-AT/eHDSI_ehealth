@@ -70,20 +70,7 @@
                             </xsl:call-template>
                         </td>
                         <td>
-                            <xsl:choose>
-                                <xsl:when test="n1:patient/n1:administrativeGenderCode/@nullFlavor">
-                                    <xsl:call-template name="show-nullFlavor">
-                                        <xsl:with-param name="code"
-                                                        select="n1:patient/n1:administrativeGenderCode/@nullFlavor"/>
-                                    </xsl:call-template>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:call-template name="show-gender">
-                                        <xsl:with-param name="code"
-                                                        select="n1:patient/n1:administrativeGenderCode/@code"/>
-                                    </xsl:call-template>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                            <xsl:value-of select="n1:patient/n1:administrativeGenderCode/@displayName"/>
                         </td>
                         <td>
                             <xsl:value-of select="n1:id[1]/@extension"/>

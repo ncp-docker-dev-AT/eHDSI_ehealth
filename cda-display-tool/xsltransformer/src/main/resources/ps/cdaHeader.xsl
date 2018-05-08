@@ -136,20 +136,7 @@
                                     </xsl:call-template>
                                 </th>
                                 <td>
-                                    <xsl:choose>
-                                        <xsl:when test="$gender/@nullFlavor">
-                                            <xsl:call-template name="show-nullFlavor">
-                                                <xsl:with-param name="code"
-                                                                select="$gender/@nullFlavor"/>
-                                            </xsl:call-template>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:call-template name="show-gender">
-                                                <xsl:with-param name="code"
-                                                                select="$gender/@code"/>
-                                            </xsl:call-template>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
+                                    <xsl:value-of select="$gender/@displayName"/>
                                 </td>
                                 <th style="width:100px;">
                                     <!-- Date Of Birth-->
