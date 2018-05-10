@@ -1,20 +1,3 @@
-/***Licensed to the Apache Software Foundation (ASF) under one
- *or more contributor license agreements.  See the NOTICE file
- *distributed with this work for additional information
- *regarding copyright ownership.  The ASF licenses this file
- *to you under the Apache License, Version 2.0 (the
- *"License"); you may not use this file except in compliance
- *with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- *Unless required by applicable law or agreed to in writing,
- *software distributed under the License is distributed on an
- *"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *KIND, either express or implied.  See the License for the
- *specific language governing permissions and limitations
- *under the License.
- **/
 package epsos.ccd.gnomon.utils;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
@@ -123,13 +106,15 @@ public class SecurityMgr {
                 PublicKey publicKey = cert.getPublicKey();
 
                 // Create a Reference to the enveloped document
-                Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(DigestMethod.SHA1, null),
+                Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(DigestMethod.SHA256, null),
                         transforms, null, null);
 
                 // Create the SignedInfo
                 SignedInfo signedInfo = sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
-                        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
-                        .newSignatureMethod(SignatureMethod.RSA_SHA1, null), Collections.singletonList(ref));
+                        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null),
+                        //sigFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null)
+                        sigFactory.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null),
+                        Collections.singletonList(ref));
 
                 // Create a KeyValue containing the RSA PublicKey
                 KeyInfoFactory keyInfoFactory = sigFactory.getKeyInfoFactory();
@@ -138,8 +123,7 @@ public class SecurityMgr {
                 // Create a KeyInfo and add the KeyValue to it
                 KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(keyValue));
 
-                // Create a DOMSignContext and specify the RSA PrivateKey and
-                // location of the resulting XMLSignature's parent element
+                // Create a DOMSignContext and specify the RSA PrivateKey and location of the resulting XMLSignature's parent element
                 DOMSignContext dsc = new DOMSignContext(privateKey, sigParent);
 
                 // Create the XMLSignature (but don't sign it yet)
