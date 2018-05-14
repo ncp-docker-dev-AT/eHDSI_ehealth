@@ -64,7 +64,7 @@ public class StorkAutoLogin implements AutoLogin {
     private String HCPInfo;
     private HcpRole hcpRole;
 
-    private void getSAMLAttributes(HttpServletRequest request) throws UnsupportedEncodingException {
+    private void getSAMLAttributes(HttpServletRequest request) {
 
         LOGGER.info("Getting saml attributes");
         providerName = PropsUtil.get("provider.name");
@@ -111,12 +111,7 @@ public class StorkAutoLogin implements AutoLogin {
     public String[] login(HttpServletRequest req, HttpServletResponse res) throws AutoLoginException {
 
         LOGGER.info("############### STORK AUTO LOGIN ###############");
-        try {
-            getSAMLAttributes(req);
-        } catch (UnsupportedEncodingException ex) {
-
-            LOGGER.error(null, ex);
-        }
+        getSAMLAttributes(req);
         LOGGER.info("#### USER IS " + getSurname() + " " + getEmailAddress());
         User user;
         String[] credentials;
@@ -134,12 +129,12 @@ public class StorkAutoLogin implements AutoLogin {
             LOGGER.info("Stork Autologin [modified 1]");
 
             if (!Util.isEnabled(companyId)) {
-                return null;
+                return new String[]{};
             }
 
             user = loginFromSession(companyId, req);
             if (user == null) {
-                return null;
+                return new String[]{};
             }
 
             credentials = new String[3];
@@ -154,7 +149,7 @@ public class StorkAutoLogin implements AutoLogin {
             logError(e);
             throw new AutoLoginException(e);
         }
-        return null;
+        return new String[]{};
     }
 
     private User loginFromSession(long companyId, HttpServletRequest request) throws Exception {
@@ -170,7 +165,7 @@ public class StorkAutoLogin implements AutoLogin {
             return null;
         }
         if (login.contains("@")) {
-            login = login.substring(0, login.indexOf("@"));
+            login = login.substring(0, login.indexOf('@'));
         }
 
         Util.getAuthType(companyId);
@@ -184,7 +179,7 @@ public class StorkAutoLogin implements AutoLogin {
         } catch (NoSuchUserException e) {
             LOGGER.error("NoSuchUserException: '{}'", e.getMessage(), e);
             user = createUserFromSession(companyId);
-            LOGGER.error("Created user with ID: " + user.getUserId());
+            LOGGER.error("Created user with ID: ", user != null ? user.getUserId() : "N/A (User null)");
         }
 
         return user;
@@ -192,7 +187,7 @@ public class StorkAutoLogin implements AutoLogin {
 
     private User createUserFromSession(long companyId) throws Exception {
 
-        User user = null;
+        User user;
 
         String screenName = (getSurname() + getGivenName()).toLowerCase();
 
@@ -293,7 +288,8 @@ public class StorkAutoLogin implements AutoLogin {
             Map.Entry pairs = (Map.Entry) o;
             LOGGER.info("$$$$ " + pairs.getKey() + " = " + pairs.getValue());
             try {
-                String attrName = pairs.getValue().toString(); //"2.16.470.1.100.1.1.1000.990.1";
+                //OID: 2.16.470.1.100.1.1.1000.990.1
+                String attrName = pairs.getValue().toString();
                 String storkKey = pairs.getKey().toString();
                 String value = getSamlValue(storkKey);
                 if (StringUtils.equalsIgnoreCase(storkKey, "eIdentifier")) {

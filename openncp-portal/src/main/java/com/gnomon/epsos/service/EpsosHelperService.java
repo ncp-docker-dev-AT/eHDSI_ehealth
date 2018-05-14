@@ -62,7 +62,6 @@ import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.XSURI;
 import org.opensaml.xml.security.BasicSecurityConfiguration;
-import org.opensaml.xml.security.SecurityConfiguration;
 import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.security.credential.Credential;
 import org.opensaml.xml.signature.SignatureConstants;
@@ -1552,7 +1551,7 @@ public class EpsosHelperService {
                 Element link = (Element) nodeLst.item(s);
                 String countryCode = link.getAttribute("code");
                 String countryName = EpsosHelperService.getCountryName(countryCode, lang);
-                LOGGER.debug("Lang is: '{}' and Country code: '{}' name is: '{}'", lang, countryCode + countryName);
+                LOGGER.debug("Lang is: '{}' and Country code: '{}' name is: '{}'", lang, countryCode, countryName);
                 Country country = new Country(countryName, countryCode);
                 listOfCountries.add(country);
             }
