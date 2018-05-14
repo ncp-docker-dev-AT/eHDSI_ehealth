@@ -112,7 +112,6 @@ public class SecurityMgr {
                 // Create the SignedInfo
                 SignedInfo signedInfo = sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
                         CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null),
-                        //sigFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null)
                         sigFactory.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null),
                         Collections.singletonList(ref));
 
@@ -168,17 +167,17 @@ public class SecurityMgr {
                 PublicKey publicKey = cert.getPublicKey();
 
                 // Create a Reference to the enveloped document
-                Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(DigestMethod.SHA1, null),
+                Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(DigestMethod.SHA256, null),
                         transforms, null, null);
 
                 // Create the SignedInfo
                 SignedInfo signedInfo = sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
                         CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
-                        .newSignatureMethod(SignatureMethod.RSA_SHA1, null), Collections.singletonList(ref));
+                        .newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null), Collections.singletonList(ref));
 
                 sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
                         CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
-                        .newSignatureMethod(SignatureMethod.DSA_SHA1, null), Collections.singletonList(ref));
+                        .newSignatureMethod("http://www.w3.org/2009/xmldsig11#dsa-sha256", null), Collections.singletonList(ref));
 
                 // Create a KeyValue containing the RSA PublicKey
                 KeyInfoFactory keyInfoFactory = sigFactory.getKeyInfoFactory();

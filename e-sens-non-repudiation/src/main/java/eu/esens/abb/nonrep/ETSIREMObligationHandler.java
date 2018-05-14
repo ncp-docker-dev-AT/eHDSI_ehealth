@@ -5,7 +5,6 @@ import eu.esens.abb.nonrep.etsi.rem.*;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.utils.Constants;
 import org.herasaf.xacml.core.policy.impl.AttributeAssignmentType;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -44,7 +43,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
     private static final String REM_NRR_PREFIX = "urn:eSENS:obligations:nrr:ETSIREM";
     private static final String REM_NRO_PREFIX = "urn:eSENS:obligations:nro:ETSIREM";
     private static final String REM_NRD_PREFIX = "urn:eSENS:obligations:nrd:ETSIREM";
-    private Logger LOGGER = LoggerFactory.getLogger(ETSIREMObligationHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ETSIREMObligationHandler.class);
     private List<ESensObligation> obligations;
     private Document audit = null;
     private Context context;
@@ -347,8 +346,8 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
     private void sign(Document doc, X509Certificate cert, PrivateKey key) throws XMLSecurityException {
 
-        String BaseURI = "./";
-        XMLSignature sig = new XMLSignature(doc, BaseURI, XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256);
+        String baseURI = "./";
+        XMLSignature sig = new XMLSignature(doc, baseURI, XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256);
         doc.getDocumentElement().appendChild(sig.getElement());
         doc.appendChild(doc.createComment(" Comment after "));
 
@@ -356,7 +355,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
         transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
 
-        sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
+        sig.addDocument("", transforms, javax.xml.crypto.dsig.DigestMethod.SHA256);
         sig.addKeyInfo(cert);
         sig.addKeyInfo(cert.getPublicKey());
         sig.sign(key);

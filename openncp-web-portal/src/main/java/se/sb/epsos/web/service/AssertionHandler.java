@@ -366,7 +366,7 @@ public class AssertionHandler implements Serializable {
                 .buildObject(Signature.DEFAULT_ELEMENT_NAME);
         Credential signingCredential = SecurityHelper.getSimpleCredential(certificate, privateKey);
         signature.setSigningCredential(signingCredential);
-        signature.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+        signature.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         signature.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
 
         SecurityConfiguration securityConfiguration = Configuration.getGlobalSecurityConfiguration();

@@ -111,7 +111,7 @@ public class Signer {
 
         SignedInfo signedInfo = sigFactory.newSignedInfo(
                 sigFactory.newCanonicalizationMethod(c14nMethod, (C14NMethodParameterSpec) null),
-                sigFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
+                sigFactory.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null),
                 Collections.singletonList(ref));
 
         DOMSignContext signContext = new DOMSignContext(privateKeyEntry.getPrivateKey(), xtPointer);

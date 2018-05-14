@@ -226,9 +226,9 @@ public class X509KeySelector extends KeySelector {
      * signature algorithm URI.
      */
     private String getPKAlgorithmOID(String algURI) {
-        if (algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1)) {
+        if (algURI.equalsIgnoreCase("http://www.w3.org/2009/xmldsig11#dsa-sha256")) {
             return "1.2.840.10040.4.1";
-        } else if (algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1)) {
+        } else if (algURI.equalsIgnoreCase("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256")) {
             return "1.2.840.113549.1.1";
         } else {
             return null;
@@ -241,8 +241,8 @@ public class X509KeySelector extends KeySelector {
      */
     private boolean algEquals(String algURI, String algName) {
 
-        return algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1)
-                || algName.equalsIgnoreCase("RSA") && algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1);
+        return algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase("http://www.w3.org/2009/xmldsig11#dsa-sha256")
+                || algName.equalsIgnoreCase("RSA") && algURI.equalsIgnoreCase("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
     }
 
     /**

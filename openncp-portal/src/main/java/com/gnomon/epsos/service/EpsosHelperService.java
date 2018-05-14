@@ -876,14 +876,11 @@ public class EpsosHelperService {
         Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
 
         sig.setSigningCredential(signingCredential);
-        //sig.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
         sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         sig.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
 
         BasicSecurityConfiguration secConfig = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
         secConfig.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
-//        BasicSecurityConfiguration config = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-//        config.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
 
         try {
             SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);

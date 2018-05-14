@@ -122,8 +122,7 @@ public class HCPIAssertionCreator {
             att.setName("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("physician the");
@@ -255,12 +254,10 @@ public class HCPIAssertionCreator {
             att.setName("urn:epsos:names:wp3.4:subject:healthcare-facility-type");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("Resident Physician");
-
             attVal.getNamespaceManager().registerNamespace(ns1);
             attVal.getNamespaceManager().registerNamespace(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
@@ -371,7 +368,6 @@ public class HCPIAssertionCreator {
             try (FileInputStream is = new FileInputStream(Constants.SC_KEYSTORE_PATH)) {
                 keyStore = KeyStore.getInstance("JKS");
                 keyStore.load(is, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
-                is.close();
             }
             PasswordProtection pp = new PasswordProtection(Constants.SC_PRIVATEKEY_PASSWORD.toCharArray());
             PrivateKeyEntry entry = (PrivateKeyEntry) keyStore.getEntry(Constants.SC_PRIVATEKEY_ALIAS, pp);
@@ -385,18 +381,17 @@ public class HCPIAssertionCreator {
                     (Collections.singletonList(entry.getCertificate()))));
 
             // Create Signature/SignedInfo/Reference
-            List<Transform> lst = new ArrayList<Transform>();
+            List<Transform> lst = new ArrayList<>();
             lst.add(factory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
             lst.add(factory.newTransform(CanonicalizationMethod.EXCLUSIVE, (TransformParameterSpec) null));
             Reference ref = factory.newReference("#" + assertion.getID(),
-                    factory.newDigestMethod(DigestMethod.SHA1, null),
-                    lst, null, null);
+                    factory.newDigestMethod(DigestMethod.SHA256, null), lst, null, null);
 
             // Set Signature/SignedInfo
             SignedInfo signedInfo = factory.newSignedInfo(factory.newCanonicalizationMethod
                     (CanonicalizationMethod.EXCLUSIVE,
                             (C14NMethodParameterSpec) null), factory.newSignatureMethod
-                    (SignatureMethod.RSA_SHA1, null), Collections.singletonList(ref));
+                    ("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null), Collections.singletonList(ref));
 
             // Sign Assertion
             XMLSignature signature = factory.newXMLSignature(signedInfo, keyInfo);
