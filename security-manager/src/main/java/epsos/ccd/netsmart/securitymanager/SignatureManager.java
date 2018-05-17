@@ -9,7 +9,7 @@ import org.opensaml.saml2.core.Assertion;
 import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.security.SecurityConfiguration;
+import org.opensaml.xml.security.BasicSecurityConfiguration;
 import org.opensaml.xml.security.SecurityException;
 import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.security.credential.Credential;
@@ -56,8 +56,8 @@ import java.util.List;
 public class SignatureManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SignatureManager.class);
-    private static final String SIG_ALG_PROP = "secman.signature.algorithm.default";
-    private static final String DGST_ALG_PROP = "secman.digest.algorithm.default";
+    private static final String NCP_ALGO_SIGNATURE = "secman.signature.algorithm.default";
+    private static final String NCP_ALGO_DIGEST = "secman.digest.algorithm.default";
     private KeyStoreManager keyManager;
     private String signatureAlgorithm;
     private String digestAlgorithm;
@@ -78,38 +78,37 @@ public class SignatureManager {
 
     private void init() {
 
-        signatureAlgorithm = ConfigurationManagerFactory.getConfigurationManager().getProperty(SIG_ALG_PROP);
+        signatureAlgorithm = ConfigurationManagerFactory.getConfigurationManager().getProperty(NCP_ALGO_SIGNATURE);
 
         // If not defined
         if (signatureAlgorithm.length() == 0) {
             signatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256;
         }
 
-        digestAlgorithm = ConfigurationManagerFactory.getConfigurationManager().getProperty(DGST_ALG_PROP);
+        digestAlgorithm = ConfigurationManagerFactory.getConfigurationManager().getProperty(NCP_ALGO_DIGEST);
 
         // If not defined
         if (digestAlgorithm.length() == 0) {
-            digestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA1;
+            digestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA256;
         }
     }
 
     /**
-     * Verifies the enveloped SAML signature and checks that the Assertion is
-     * signed against that signature. This method returns nothing when the
-     * signature is valid. When the signature is not valid though, it throws an
-     * SMgrException with the Error Message that caused the signature to fail
-     * validation.
+     * Verifies the enveloped SAML signature and checks that the Assertion is signed against that signature.
+     * This method returns nothing when the signature is valid.
+     * When the signature is not valid though, it throws an SMgrException with the Error Message that caused
+     * the signature to fail validation.
      *
-     * @param sa The SAML Assertion that will be validated by the method.
+     * @param assertion The SAML Assertion that will be validated by the method.
      * @throws SMgrException When the validation of the signature fails
      */
-    public String verifySAMLAssestion(Assertion sa) throws SMgrException {
+    public String verifySAMLAssertion(Assertion assertion) throws SMgrException {
 
         String sigCountryCode = null;
 
         try {
             SAMLSignatureProfileValidator profileValidator = new SAMLSignatureProfileValidator();
-            Signature sig = sa.getSignature();
+            Signature sig = assertion.getSignature();
             try {
                 profileValidator.validate(sig);
             } catch (ValidationException e) {
@@ -150,15 +149,12 @@ public class SignatureManager {
     }
 
     /**
-     * Verifies the enveloped XML signature and checks that the XML Document is
-     * signed against that signature. This method returns nothing when the
-     * signature is valid. When the signature is not valid though, it throws an
-     * SMgrException with the Error Message that caused the signature to fail
-     * validation.
+     * Verifies the enveloped XML signature and checks that the XML Document is signed against that signature.
+     * This method returns nothing when the signature is valid. When the signature is not valid though,
+     * it throws an SMgrException with the Error Message that caused the signature to fail validation.
      *
      * @param doc The XML Document that will be validated.
-     * @throws SMgrException       When the validation of the signature fails
-     * @throws java.io.IOException
+     * @throws SMgrException When the validation of the signature fails
      */
     public void verifyEnvelopedSignature(Document doc) throws SMgrException {
 
@@ -179,12 +175,12 @@ public class SignatureManager {
 
             // Unmarshal the XMLSignature.
             XMLSignature signature = fac.unmarshalXMLSignature(valContext);
-            // Validate the XMLSignature.
 
+            // Validate the XMLSignature.
             boolean coreValidity = signature.validate(valContext);
 
             if (!coreValidity) {
-                throw new SMgrException("Invalid Signature: Mathematic check failed");
+                throw new SMgrException("Invalid Signature: Mathematical check failed");
             }
 
         } catch (XMLSignatureException | MarshalException ex) {
@@ -195,19 +191,16 @@ public class SignatureManager {
     }
 
     /**
-     * Signs a Signable SAML Object using the private key with alias
-     * <i>keyAlias</i>. Uses the opesaml2 library
+     * Signs a Signable SAML Object using the private key with alias <i>keyAlias</i>.
+     * Uses the OpenSAML2 library.
      *
-     * @param as          The Signable SAML Object that is going to be signed. Usually a
-     *                    SAML Assertion
-     * @param keyAlias    The NCP Trust Store Key Alias of the private key that
-     *                    will be used for signing.
-     * @param keyPassword
+     * @param as          The Signable SAML Object that is going to be signed. Usually a SAML Assertion
+     * @param keyAlias    The NCP Trust Store Key Alias of the private key that will be used for signing.
+     * @param keyPassword Password of the Signature certificate Key.
      * @throws SMgrException When signing fails
      * @see org.opensaml.common.SignableSAMLObject
      */
-    public void signSAMLAssertion(SignableSAMLObject as, String keyAlias, char[] keyPassword)
-            throws SMgrException {
+    public void signSAMLAssertion(SignableSAMLObject as, String keyAlias, char[] keyPassword) throws SMgrException {
 
         KeyPair kp;
         X509Certificate cert;
@@ -221,7 +214,8 @@ public class SignatureManager {
             cert = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
 
-        Signature sig = (Signature) Configuration.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
+        Signature sig = (Signature) Configuration.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME)
+                .buildObject(Signature.DEFAULT_ELEMENT_NAME);
 
         Credential signingCredential = SecurityHelper.getSimpleCredential(cert, kp.getPrivate());
 
@@ -229,9 +223,10 @@ public class SignatureManager {
         sig.setSignatureAlgorithm(signatureAlgorithm);
         sig.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_WITH_COMMENTS);
 
-        SecurityConfiguration secConfig = Configuration.getGlobalSecurityConfiguration();
+        BasicSecurityConfiguration securityConfiguration = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
+        securityConfiguration.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
         try {
-            SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
+            SecurityHelper.prepareSignatureParams(sig, signingCredential, securityConfiguration, null);
         } catch (SecurityException e) {
             throw new SMgrException(e.getMessage(), e);
         }
@@ -250,8 +245,8 @@ public class SignatureManager {
     }
 
     /**
-     * Signs an XML document using the default private key as it is configured
-     * in the Configuration Manager. Uses enveloped XML Signatures
+     * Signs an XML document using the default private key as it is configured in the Configuration Manager.
+     * Uses enveloped XML Signatures
      *
      * @param doc The Document that is going to be signed. be used for signing.
      * @throws SMgrException When signing fails
@@ -285,17 +280,12 @@ public class SignatureManager {
         }
 
         try {
-            String providerName = System.getProperty("jsr105Provider",
-                    "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+            String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
 
-            XMLSignatureFactory fac = XMLSignatureFactory
-                    .getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
+            XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
 
-            Reference ref
-                    = fac.newReference("", fac.newDigestMethod(digestAlgorithm, null),
-                    Collections.singletonList(
-                            fac.newTransform(Transform.ENVELOPED, (XMLStructure) null)),
-                    null, null);
+            Reference ref = fac.newReference("", fac.newDigestMethod(digestAlgorithm, null), Collections.singletonList(
+                    fac.newTransform(Transform.ENVELOPED, (XMLStructure) null)), null, null);
 
             SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
                     (C14NMethodParameterSpec) null), fac.newSignatureMethod(signatureAlgorithm, null),
@@ -322,11 +312,10 @@ public class SignatureManager {
     }
 
     /**
-     * Signs a Signable SAML Object using the default key that is configured in
-     * the Configuration Manager. Uses the opesaml2 library
+     * Signs a Signable SAML Object using the default key that is configured in the Configuration Manager.
+     * Uses the OpenSAML2 library.
      *
-     * @param trc The Signable SAML Object that is going to be signed. Usually a
-     *            SAML Assertion
+     * @param trc The Signable SAML Object that is going to be signed. Usually a SAML Assertion.
      * @throws SMgrException When signing fails
      * @see org.opensaml.common.SignableSAMLObject
      */

@@ -142,9 +142,8 @@
                                                                 </th>
                                                             </tr>
                                                             <tr>
-                                                                <!-- TODO these values should be added to the epsosDisplayLabel valueSet -->
-                                                                <th>Min</th>
-                                                                <th>Max</th>
+                                                                <th><xsl:value-of select="$min"/></th>
+                                                                <th><xsl:value-of select="$max"/></th>
                                                             </tr>
                                                         </xsl:if>
                                                         <xsl:for-each select="n1:entry">
@@ -179,7 +178,7 @@
         <xsl:variable name="medFrequencyIntakeType"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[2]/@xsi:type"/>
         <xsl:variable name="medRouteAdministration"
-                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:routeCode/@displayName"/>
+                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:routeCode"/>
 
         <xsl:variable name="medOnSetDate"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:low"/>
@@ -202,12 +201,9 @@
             <xsl:variable name="medActiveIngredientTranslation2"
                           select="epsos:ingredient/epsos:code/epsos:translation/@displayName"/>
             <xsl:variable name="medActiveIngredientID" select="epsos:ingredient/epsos:code/@code"/>
-            <xsl:variable name="medStrengthValue1" select="epsos:quantity/epsos:numerator/@value"/>
-            <xsl:variable name="medStrengthValue2" select="epsos:quantity/epsos:denominator/@value"/>
-            <xsl:variable name="medStrengthUnit1" select="epsos:quantity/epsos:numerator/@unit"/>
-            <xsl:variable name="medStrengthUnit2" select="epsos:quantity/epsos:denominator/@unit"/>
-            <xsl:variable name="medStrength1" select="epsos:quantity/epsos:numerator"/>
-            <xsl:variable name="medStrength2" select="epsos:quantity/epsos:denominator"/>
+
+            <xsl:variable name="medStrengthNumerator" select="epsos:quantity/epsos:numerator"/>
+            <xsl:variable name="medStrengthDenominator" select="epsos:quantity/epsos:denominator"/>
 
             <!-- nullflavored act -->
             <xsl:choose>
@@ -261,12 +257,8 @@
                                 </td>
                                 <td>
                                     <xsl:call-template name="show-strength">
-                                        <xsl:with-param name="medStrengthUnit1" select="$medStrengthUnit1"/>
-                                        <xsl:with-param name="medStrengthUnit2" select="$medStrengthUnit2"/>
-                                        <xsl:with-param name="medStrengthValue1" select="$medStrengthValue1"/>
-                                        <xsl:with-param name="medStrengthValue2" select="$medStrengthValue2"/>
-                                        <xsl:with-param name="medStrength1" select="$medStrength1"/>
-                                        <xsl:with-param name="medStrength2" select="$medStrength2"/>
+                                        <xsl:with-param name="medStrengthNumerator" select="$medStrengthNumerator"/>
+                                        <xsl:with-param name="medStrengthDenominator" select="$medStrengthDenominator"/>
                                     </xsl:call-template>
                                 </td>
                                 <td>
@@ -289,7 +281,7 @@
                                     </xsl:call-template>
                                 </td>
                                 <td>
-                                    <xsl:value-of select="$medRouteAdministration"/>
+                                    <xsl:value-of select="$medRouteAdministration/@displayName"/>
                                 </td>
                                 <td>
                                     <xsl:call-template name="show-time">

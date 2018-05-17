@@ -33,6 +33,9 @@ public class XmlUtil implements TMConstants {
 
     private static final Logger log = LoggerFactory.getLogger(XmlUtil.class);
 
+    private XmlUtil() {
+    }
+
     /**
      * Simply prints Node as String (useful for logging/testing purpose)
      *
@@ -40,15 +43,14 @@ public class XmlUtil implements TMConstants {
      * @return String
      */
     public static String xmlToString(Node node) {
+
         try {
             Source source = new DOMSource(node);
             StringWriter stringWriter = new StringWriter();
             Result result = new StreamResult(stringWriter);
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer transformer = factory.newTransformer();
-            // FIX: https://ec.europa.eu/cefdigital/tracker/browse/EHNCP-1342
             transformer.setOutputProperty(OutputKeys.INDENT, "no");
-            //transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.transform(source, result);
             return stringWriter.getBuffer().toString();
         } catch (TransformerException e) {
@@ -87,13 +89,12 @@ public class XmlUtil implements TMConstants {
      * @return Document
      */
     public static Document getDocument(File file, boolean namespaceAware) {
+
         Document document = null;
         try {
             // parse an XML document into a DOM tree
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
             documentFactory.setNamespaceAware(namespaceAware);
-            // documentFactory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaLanguage",
-            // "http://www.w3.org/2001/XMLSchema");
             DocumentBuilder parser = documentFactory.newDocumentBuilder();
 
             document = parser.parse(file);
@@ -133,6 +134,7 @@ public class XmlUtil implements TMConstants {
      * @return ByteArray
      */
     public static byte[] doc2bytes(Node node) {
+
         try {
             Source source = new DOMSource(node);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -144,7 +146,7 @@ public class XmlUtil implements TMConstants {
         } catch (TransformerException e) {
             log.error("doc2bytes error: ", e);
         }
-        return null;
+        return new byte[]{};
     }
 
     /**
@@ -180,13 +182,14 @@ public class XmlUtil implements TMConstants {
      * @return NodeList
      */
     public static List<Node> getNodeList(Node node, String xpathexpression) {
+
         List<Node> result;
         try {
             NoNsXpath xpath = new NoNsXpath(xpathexpression);
             result = xpath.selectNodes(node);
         } catch (JaxenException e) {
             log.error("xpath: " + xpathexpression + ", node: " + node, e);
-            return new ArrayList<Node>();
+            return new ArrayList<>();
         }
         return result;
     }
@@ -238,7 +241,6 @@ public class XmlUtil implements TMConstants {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Result outputTarget = new StreamResult(outputStream);
         Transformer t = TransformerFactory.newInstance().newTransformer();
-        // t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         t.transform(new DOMSource(node), outputTarget);
         return new ByteArrayInputStream(outputStream.toByteArray());
     }
@@ -305,11 +307,11 @@ public class XmlUtil implements TMConstants {
 
 class CdaNameSpaceContext implements NamespaceContext {
 
-    private static final String NsCda = "urn:hl7-org:v3";
+    private static final String NS_CDA = "urn:hl7-org:v3";
 
     public String getNamespaceURI(String prefix) {
         if ("nsCda".equals(prefix)) {
-            return NsCda;
+            return NS_CDA;
         }
         return null;
     }

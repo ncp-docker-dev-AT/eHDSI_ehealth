@@ -50,7 +50,7 @@ public class TerminologyService implements ITerminologyService {
             CodeSystem system = dao.getCodeSystem(csOid);
             checkCodeSystemName(system, csName, response);
 
-            // optain CodeSystemVersion
+            // obtain CodeSystemVersion
             CodeSystemVersion codeSystemVersion = dao.getVersion(version, system);
 
             // obtain Concept
@@ -70,19 +70,19 @@ public class TerminologyService implements ITerminologyService {
 
         } catch (TSAMException e) {
             response.addError(e.getReason(), epSOSRefConcept.toString());
-            LOGGER.warn(epSOSRefConcept + ", " + e.toString(), e);
+            LOGGER.warn(epSOSRefConcept + ", " + e.toString());
         } catch (Exception e) {
             response.addError(TSAMError.ERROR_PROCESSING_ERROR, epSOSRefConcept.toString());
             LOGGER.error(epSOSRefConcept.toString(), e);
         }
-        LOGGER.debug("getEpSOSConceptByCode END");
+        LOGGER.debug("getDesignationByEpSOSConcept END");
         return response;
     }
 
     public TSAMResponseStructure getEpSOSConceptByCode(CodedElement localConcept) {
 
         LOGGER.debug("getEpSOSConceptByCode BEGIN ('{}')", localConcept);
-        DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
+        DebugUtils.showTransactionStatus("getEpSOSConceptByCode()");
         TSAMResponseStructure response = new TSAMResponseStructure(localConcept);
 
         try {
@@ -135,8 +135,7 @@ public class TerminologyService implements ITerminologyService {
 
                 checkValueSet(concept, vsOid, vsVersion, response);
                 checkManyDesignations(response, designations);
-            }
-            else {
+            } else {
                 //TODO: Review this method
             }
         } catch (TSAMException e) {
@@ -147,7 +146,7 @@ public class TerminologyService implements ITerminologyService {
             LOGGER.error(localConcept.toString(), e);
         }
 
-        LOGGER.debug("getDesignationByEpSOSConcept END");
+        LOGGER.debug("getEpSOSConceptByCode END");
         return response;
     }
 

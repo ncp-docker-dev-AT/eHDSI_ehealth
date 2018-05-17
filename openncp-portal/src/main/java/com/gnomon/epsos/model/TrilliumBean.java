@@ -115,7 +115,7 @@ public class TrilliumBean implements Serializable {
         // if (type.equals("html"))
         FacesMessage msg = new FacesMessage("Successful", "");
         try {
-            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Succesful uploading " + cdafile.getFileName(), cdafile.getFileName() + " is uploaded.");
+            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Successful uploading " + cdafile.getFileName(), cdafile.getFileName() + " is uploaded.");
         } catch (Exception e) {
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Problem uploading " + cdafile.getFileName() + e.getMessage(), cdafile.getFileName() + " is not uploaded.");
             LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -190,7 +190,7 @@ public class TrilliumBean implements Serializable {
             Utils.writeXMLToFile(convertedcda, "/home/karkaletsis/dev/css/a1.xml");
             stream = new ByteArrayInputStream(convertedcda.getBytes(StandardCharsets.UTF_8));
             filename = filename + ".pdf";
-            try (ByteArrayOutputStream baos = EpsosHelperService.ConvertHTMLtoPDF(convertedcda, serviceUrl, fontpath)) {
+            try (ByteArrayOutputStream baos = EpsosHelperService.convertHTMLtoPDF(convertedcda, serviceUrl, fontpath)) {
 
                 LOGGER.info("Running pdf");
                 output = baos.toByteArray();

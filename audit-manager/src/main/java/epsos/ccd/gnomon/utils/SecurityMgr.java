@@ -17,7 +17,6 @@
  **/
 package epsos.ccd.gnomon.utils;
 
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,9 +56,7 @@ import java.util.List;
 
 public class SecurityMgr {
 
-    public static final String ENCODING = "UTF-8";
-
-    private static Logger log = LoggerFactory.getLogger(SecurityMgr.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityMgr.class);
 
     private static String KEY_STORE_TYPE = "JKS";
     private static String KEY_STORE_NAME = "C://mesa//test_keystore_server1.jks";
@@ -67,16 +64,20 @@ public class SecurityMgr {
     private static String PRIVATE_KEY_PASS = "spirit";
     private static String KEY_ALIAS = "server1";
 
+    private SecurityMgr() {
+    }
+
     public static void init_variables() {
-        ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
-        KEY_STORE_NAME = configurationManager.getProperty("NCP_SIG_KEYSTORE_PATH");
-        KEY_STORE_PASS = configurationManager.getProperty("NCP_SIG_KEYSTORE_PASSWORD");
-        PRIVATE_KEY_PASS = configurationManager.getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
-        KEY_ALIAS = configurationManager.getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
+
+        KEY_STORE_NAME = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PATH");
+        KEY_STORE_PASS = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
+        PRIVATE_KEY_PASS = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
+        KEY_ALIAS = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
     }
 
     public static String getSignedDocumentAsString(Document doc) {
-        ByteArrayOutputStream bas = null;
+
+        ByteArrayOutputStream bas;
         String signed = "";
         try {
             bas = new ByteArrayOutputStream();
@@ -84,7 +85,7 @@ public class SecurityMgr {
             trans.transform(new DOMSource(doc), new StreamResult(bas));
             signed = bas.toString();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         return signed;
     }
@@ -93,7 +94,7 @@ public class SecurityMgr {
      * This method signs the input Document
      *
      * @param doc the document we want to be signed
-     * @return the same docuement signed
+     * @return the same document signed
      */
     public static Document signDocumentEnveloped(Document doc) {
         try {
@@ -105,12 +106,11 @@ public class SecurityMgr {
             final XMLSignatureFactory sigFactory = XMLSignatureFactory.getInstance("DOM",
                     (Provider) Class.forName(providerName).newInstance());
 
-            Node sigParent = null;
-            List<Transform> transforms = null;
+            Node sigParent;
+            List<Transform> transforms;
 
             sigParent = doc.getDocumentElement();
-            transforms = Collections.singletonList(sigFactory.newTransform(Transform.ENVELOPED,
-                    (TransformParameterSpec) null));
+            transforms = Collections.singletonList(sigFactory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
 
             // Retrieve signing key
             KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
@@ -149,20 +149,20 @@ public class SecurityMgr {
                 signature.sign(dsc);
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         return doc;
     }
 
     public static String signDocumentDetached(String inputFile) {
-        ByteArrayOutputStream bas = null;
+
+        ByteArrayOutputStream bas;
         String signed = "";
         try {
             init_variables();
             // Instantiate the document to be signed
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             dbFactory.setNamespaceAware(true);
-
             Document doc = dbFactory.newDocumentBuilder().newDocument();
 
             // prepare signature factory
@@ -170,10 +170,8 @@ public class SecurityMgr {
             final XMLSignatureFactory sigFactory = XMLSignatureFactory.getInstance("DOM",
                     (Provider) Class.forName(providerName).newInstance());
 
-            List<Transform> transforms = null;
-
-            transforms = Collections.singletonList(sigFactory.newTransform(Transform.ENVELOPED,
-                    (TransformParameterSpec) null));
+            List<Transform> transforms;
+            transforms = Collections.singletonList(sigFactory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
 
             // Retrieve signing key
             KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
@@ -223,16 +221,14 @@ public class SecurityMgr {
                 signature.sign(signContext);
 
                 // output the resulting document
-                // FileOutputStream os = new FileOutputStream(outputFile);
                 bas = new ByteArrayOutputStream();
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.transform(new DOMSource(doc), new StreamResult(bas));
                 signed = bas.toString();
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
-
         return signed;
     }
 }

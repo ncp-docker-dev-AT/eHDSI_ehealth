@@ -123,14 +123,14 @@ public class SamlTRCIssuerTest {
 
         try {
 
-            sm.verifySAMLAssestion(idas);
+            sm.verifySAMLAssertion(idas);
         } catch (SMgrException e) {
             fail("IdAssert SigVal: " + e.getMessage());
         }
 
         try {
 
-            sm.verifySAMLAssestion(idas);
+            sm.verifySAMLAssertion(idas);
         } catch (SMgrException e) {
             fail("IdAssert2 SigVal: " + e.getMessage());
         }
@@ -154,14 +154,14 @@ public class SamlTRCIssuerTest {
         }
         try {
 
-            sm.verifySAMLAssestion(idas);
+            sm.verifySAMLAssertion(idas);
         } catch (SMgrException e) {
             fail("IdAssert SigVal: " + e.getMessage());
         }
 
         try {
 
-            sm.verifySAMLAssestion(trc);
+            sm.verifySAMLAssertion(trc);
         } catch (SMgrException e) {
             fail("TRC SigVal: " + e.getMessage());
         }

@@ -70,11 +70,7 @@
                             </xsl:call-template>
                         </td>
                         <td>
-                            <xsl:for-each select="n1:patient/n1:administrativeGenderCode">
-                                <xsl:call-template name="show-gender">
-                                    <xsl:with-param name="data" select="@code"/>
-                                </xsl:call-template>
-                            </xsl:for-each>
+                            <xsl:value-of select="n1:patient/n1:administrativeGenderCode/@displayName"/>
                         </td>
                         <td>
                             <xsl:value-of select="n1:id[1]/@extension"/>

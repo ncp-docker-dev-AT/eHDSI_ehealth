@@ -131,7 +131,7 @@ public class CodedElementList implements InitializingBean, TMConstants {
         return eDispensationl3;
     }
 
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
 
         // read xml file (coded_element_list.xml)
         if (configurableElementIdentification && !isInitialized) {
@@ -162,44 +162,34 @@ public class CodedElementList implements InitializingBean, TMConstants {
 
                         switch (docTypeElement.getNodeName()) {
                             case PATIENT_SUMMARY1:
-                                patientSummaryl1 = addItem(docTypeElement, codedElement,
-                                        patientSummaryl1);
+                                patientSummaryl1 = addItem(docTypeElement, codedElement, patientSummaryl1);
                                 break;
                             case PATIENT_SUMMARY3:
-                                patientSummaryl3 = addItem(docTypeElement, codedElement,
-                                        patientSummaryl3);
+                                patientSummaryl3 = addItem(docTypeElement, codedElement, patientSummaryl3);
                                 break;
                             case EPRESCRIPTION1:
-                                ePrescriptionl1 = addItem(docTypeElement, codedElement,
-                                        ePrescriptionl1);
+                                ePrescriptionl1 = addItem(docTypeElement, codedElement, ePrescriptionl1);
                                 break;
                             case EPRESCRIPTION3:
-                                ePrescriptionl3 = addItem(docTypeElement, codedElement,
-                                        ePrescriptionl3);
+                                ePrescriptionl3 = addItem(docTypeElement, codedElement, ePrescriptionl3);
                                 break;
                             case EDISPENSATION1:
-                                eDispensationl1 = addItem(docTypeElement, codedElement,
-                                        eDispensationl1);
+                                eDispensationl1 = addItem(docTypeElement, codedElement, eDispensationl1);
                                 break;
                             case EDISPENSATION3:
-                                eDispensationl3 = addItem(docTypeElement, codedElement,
-                                        eDispensationl3);
+                                eDispensationl3 = addItem(docTypeElement, codedElement, eDispensationl3);
                                 break;
                             case HCER3:
-                                hcerl3 = addItem(docTypeElement, codedElement,
-                                        hcerl3);
+                                hcerl3 = addItem(docTypeElement, codedElement, hcerl3);
                                 break;
                             case HCER1:
-                                hcerl1 = addItem(docTypeElement, codedElement,
-                                        hcerl1);
+                                hcerl1 = addItem(docTypeElement, codedElement, hcerl1);
                                 break;
                             case MRO3:
-                                mrol3 = addItem(docTypeElement, codedElement,
-                                        mrol3);
+                                mrol3 = addItem(docTypeElement, codedElement, mrol3);
                                 break;
                             case MRO1:
-                                mrol1 = addItem(docTypeElement, codedElement,
-                                        mrol1);
+                                mrol1 = addItem(docTypeElement, codedElement, mrol1);
                                 break;
                         }
                     }
