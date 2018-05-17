@@ -62,7 +62,6 @@ import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.XSURI;
 import org.opensaml.xml.security.BasicSecurityConfiguration;
-import org.opensaml.xml.security.SecurityConfiguration;
 import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.security.credential.Credential;
 import org.opensaml.xml.signature.SignatureConstants;
@@ -877,14 +876,11 @@ public class EpsosHelperService {
         Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
 
         sig.setSigningCredential(signingCredential);
-        //sig.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
         sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         sig.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
 
         BasicSecurityConfiguration secConfig = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
         secConfig.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
-//        BasicSecurityConfiguration config = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-//        config.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
 
         try {
             SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
@@ -1552,7 +1548,7 @@ public class EpsosHelperService {
                 Element link = (Element) nodeLst.item(s);
                 String countryCode = link.getAttribute("code");
                 String countryName = EpsosHelperService.getCountryName(countryCode, lang);
-                LOGGER.debug("Lang is: '{}' and Country code: '{}' name is: '{}'", lang, countryCode + countryName);
+                LOGGER.debug("Lang is: '{}' and Country code: '{}' name is: '{}'", lang, countryCode, countryName);
                 Country country = new Country(countryName, countryCode);
                 listOfCountries.add(country);
             }

@@ -9,7 +9,7 @@
  * Date: @DATE
  */
 
-(function( jQuery, undefined ){
+(function( jQuery, notdefined ){
 	var stepHooks = "backgroundColor borderBottomColor borderLeftColor borderRightColor borderTopColor color outlineColor".split(" "),
 
 		// plusequals test for += 100 -= 100
@@ -218,13 +218,13 @@
 	color.fn = color.prototype = {
 		constructor: color,
 		parse: function( red, green, blue, alpha ) {
-			if ( red === undefined ) {
+			if ( red === notdefined ) {
 				this._rgba = [ null, null, null, null ];
 				return this;
 			}
 			if ( red instanceof jQuery || red.nodeType ) {
 				red = red instanceof jQuery ? red.css( green ) : jQuery( red ).css( green );
-				green = undefined;
+				green = notdefined;
 			}
 
 			var inst = this,
@@ -233,7 +233,7 @@
 				source;
 
 			// more than 1 argument specified - assume ( red, green, blue, alpha )
-			if ( green !== undefined ) {
+			if ( green !== notdefined ) {
 				red = [ red, green, blue, alpha ];
 				type = "array";
 			}
@@ -500,7 +500,7 @@
 			if ( to && !this[ cache ] ) {
 				this[ cache ] = to( this._rgba );
 			}
-			if ( value === undefined ) {
+			if ( value === notdefined ) {
 				return this[ cache ].slice();
 			}
 

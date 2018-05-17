@@ -377,15 +377,13 @@ public class ePtoeDMapper {
                 && packedMedicine.getFormCode().getDisplayName() != null
                 && packedMedicine.getFormCode().getCode().length() != 0) {
             eD_Document_material.getAsContent().getContainerPackagedMedicine().getFormCode()
-                    .setCodeSystem("1.3.6.1.4.1.12559.11.10.1.3.1.44.1");
-            eD_Document_material.getAsContent().getContainerPackagedMedicine().getFormCode().setCodeSystemName("EDQM");
-            eD_Document_material.getAsContent().getContainerPackagedMedicine().getFormCode()
                     .setCode(packedMedicine.getFormCode().getCode());
             eD_Document_material.getAsContent().getContainerPackagedMedicine().getFormCode()
                     .setDisplayName(packedMedicine.getFormCode().getDisplayName());
         } else {
-            eD_Document_material.getAsContent().getContainerPackagedMedicine().getFormCode()
-                    .setNullFlavor(NULLFLAVOR_NI);
+        	epsosOrgEpMedication.CE nullFlavoredFormCode = epsosOrgEpMedication.CE.Factory.newInstance();
+        	nullFlavoredFormCode.setNullFlavor(NULLFLAVOR_NI);
+        	eD_Document_material.getAsContent().getContainerPackagedMedicine().setFormCode(nullFlavoredFormCode);
         }
 
         try {

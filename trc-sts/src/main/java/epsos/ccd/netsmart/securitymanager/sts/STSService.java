@@ -10,6 +10,7 @@ import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensaml.DefaultBootstrap;
@@ -53,6 +54,7 @@ import java.util.UUID;
 public class STSService implements Provider<SOAPMessage> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(STSService.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final QName Messaging_To = new QName("http://www.w3.org/2005/08/addressing", "To");
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion"; // What
@@ -160,8 +162,8 @@ public class STSService implements Provider<SOAPMessage> {
                     Base64.encodeBase64(strReqHeader.getBytes()), getMessageIdFromHeader(response.getSOAPHeader()),
                     Base64.encodeBase64(strRespHeader.getBytes()));
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Outgoing SOAP Message response: '{}'", response.toString());
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.debug("Outgoing SOAP Message response: '{}'", response.toString());
                 log(response);
             }
             return response;
@@ -324,10 +326,10 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             message.writeTo(out);
         } catch (IOException | SOAPException e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER_CLINICAL.error("Exception: '{}'", e.getMessage(), e);
         }
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("SOAPMessage:\n{}", out.toString());
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.info("SOAPMessage:\n{}", out.toString());
         }
     }
 }

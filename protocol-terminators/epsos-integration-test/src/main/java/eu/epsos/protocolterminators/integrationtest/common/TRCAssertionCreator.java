@@ -179,12 +179,12 @@ public class TRCAssertionCreator {
             List<Transform> lst = new ArrayList<Transform>();
             lst.add(factory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
             lst.add(factory.newTransform(CanonicalizationMethod.EXCLUSIVE, (TransformParameterSpec) null));
-            Reference ref = factory.newReference("#" + assertion.getID(), factory.newDigestMethod(DigestMethod.SHA1, null), lst, null, null);
+            Reference ref = factory.newReference("#" + assertion.getID(), factory.newDigestMethod(DigestMethod.SHA256, null), lst, null, null);
 
             // Set Signature/SignedInfo
             SignedInfo signedInfo = factory.newSignedInfo(
                     factory.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null),
-                    factory.newSignatureMethod(SignatureMethod.RSA_SHA1, null), Collections.singletonList(ref));
+                    factory.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null), Collections.singletonList(ref));
 
             // Sign Assertion
             XMLSignature signature = factory.newXMLSignature(signedInfo, keyInfo);

@@ -1,231 +1,3 @@
-/**
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * <p>
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * XCPD_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- */
 package _2009.xcpd.iti.ihe;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
@@ -250,6 +22,8 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.XMLUtils;
 import org.h2.util.StringUtils;
+import org.hl7.v3.PRPAIN201305UV02;
+import org.hl7.v3.PRPAIN201306UV02;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
@@ -357,10 +131,9 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
 
                 if (StringUtils.equals("respondingGateway_PRPA_IN201305UV02", methodName)) {
 
-                    org.hl7.v3.PRPAIN201306UV02 pRPA_IN201306UV021;
-                    org.hl7.v3.PRPAIN201305UV02 wrappedParam = (org.hl7.v3.PRPAIN201305UV02) fromOM(
-                            msgContext.getEnvelope().getBody().getFirstElement(), org.hl7.v3.PRPAIN201305UV02.class,
-                            getEnvelopeNamespaces(msgContext.getEnvelope()));
+                    PRPAIN201306UV02 pRPA_IN201306UV021;
+                    PRPAIN201305UV02 wrappedParam = (PRPAIN201305UV02) fromOM(msgContext.getEnvelope().getBody().getFirstElement(),
+                            PRPAIN201305UV02.class, getEnvelopeNamespaces(msgContext.getEnvelope()));
 
                     pRPA_IN201306UV021 = skel.respondingGateway_PRPA_IN201305UV02(wrappedParam, sh, eventLog);
 
@@ -400,6 +173,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                 }
             }
         } catch (Exception e) {
+
             LOGGER.error(e.getMessage(), e);
             throw AxisFault.makeFault(e);
         }
@@ -414,7 +188,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
 
             OMFactory factory = OMAbstractFactory.getOMFactory();
 
-            JaxbRIDataSource source = new JaxbRIDataSource(org.hl7.v3.PRPAIN201305UV02.class, param, marshaller,
+            JaxbRIDataSource source = new JaxbRIDataSource(PRPAIN201305UV02.class, param, marshaller,
                     "urn:hl7-org:v3", "PRPA_IN201305UV02");
             OMNamespace namespace = factory.createOMNamespace("urn:hl7-org:v3", null);
 
@@ -433,7 +207,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
         return envelope;
     }
 
-    private OMElement toOM(org.hl7.v3.PRPAIN201306UV02 param, boolean optimizeContent) throws AxisFault {
+    private OMElement toOM(PRPAIN201306UV02 param, boolean optimizeContent) throws AxisFault {
 
         try {
 
@@ -441,7 +215,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
             OMFactory factory = OMAbstractFactory.getOMFactory();
-            JaxbRIDataSource source = new JaxbRIDataSource(org.hl7.v3.PRPAIN201306UV02.class, param, marshaller, "urn:hl7-org:v3", "PRPA_IN201306UV02");
+            JaxbRIDataSource source = new JaxbRIDataSource(PRPAIN201306UV02.class, param, marshaller, "urn:hl7-org:v3", "PRPA_IN201306UV02");
             OMNamespace namespace = factory.createOMNamespace("urn:hl7-org:v3", null);
 
             return factory.createOMElement(source, "PRPA_IN201306UV02", namespace);
@@ -451,7 +225,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
         }
     }
 
-    private SOAPEnvelope toEnvelope(SOAPFactory factory, org.hl7.v3.PRPAIN201306UV02 param, boolean optimizeContent) throws AxisFault {
+    private SOAPEnvelope toEnvelope(SOAPFactory factory, PRPAIN201306UV02 param, boolean optimizeContent) throws AxisFault {
 
         SOAPEnvelope envelope = factory.getDefaultEnvelope();
         envelope.getBody().addChild(toOM(param, optimizeContent));

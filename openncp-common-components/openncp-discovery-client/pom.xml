@@ -34,7 +34,7 @@
         <dependency>
             <groupId>eu.europa.ec.dynamic-discovery</groupId>
             <artifactId>dynamic-discovery-client</artifactId>
-            <version>1.4</version>
+            <version>${dynamic-discovery-client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
