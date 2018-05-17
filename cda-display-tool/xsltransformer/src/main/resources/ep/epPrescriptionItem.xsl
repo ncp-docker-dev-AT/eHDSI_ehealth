@@ -179,9 +179,9 @@
                             </xsl:when>
                             <xsl:otherwise>
                                 <div class="tooltip">
-                                    <font color="blue">
+                                    <span class="narrative">
                                         <xsl:value-of select="$name"/>
-                                    </font>
+                                    </span>
                                     <xsl:text>&#10;</xsl:text>
                                     <span class="tooltiptext">Narrative text</span>
                                 </div>
@@ -460,14 +460,12 @@
                         </td>
                     </tr>
                     <tr>
-                        <th colspan="7">
+                        <th colspan="2">
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'38'"/>
                             </xsl:call-template>
                         </th>
-                    </tr>
-                    <tr>
-                        <td colspan="7">
+                        <td colspan="5">
                             <xsl:call-template name="substitution-code"/>
                         </td>
                     </tr>
@@ -523,7 +521,6 @@
                                     </xsl:when>
                                 </xsl:choose>
                             </input>
-                            <br/>
                             <!--  Substitution help text:-->
                             <!-- TODO Has to be replaced with a value from the epSOSDisplayLabel value set -->
                             Mark the checkbox if brand name (when allowed) has been substituted.
@@ -617,7 +614,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="background-color:#ffffcc" colspan="6">
+                        <td style="background-color:#ffffcc" colspan="{5+count($manufacturedMaterialStrength)}">
                             <!-- HOTFIX - Has to be replaced with a value from the epSOSDisplayLabel value set -->
                             *  If substitution of brand name is marked as not allowed, pharmacists may still consider dispensing the national equivalent even though the brand name might be slightly different.<br/>
                             &#160;&#160;This is a known situation: the same pharmaceutical company is marketing the same medicinal product in different countries with slightly different names due to marketing reasons.<br/>
@@ -627,7 +624,7 @@
                             <!--  Dispense -->
                             <xsl:choose>
                                 <xsl:when test="$allowDispense='true'">
-                                    <input type="submit">
+                                    <input type="submit" class="button">
                                         <xsl:attribute name="value">
                                             <xsl:call-template name="show-displayLabels">
                                                 <xsl:with-param name="code" select="'22'"/>
@@ -866,34 +863,44 @@
     </xsl:template>
 
     <xsl:template name="epPrescriptionItem">
-        <xsl:for-each select="$entryNode">
-            <div class="wrap-collabsible">
-                <input id="collapsible-prescriptionItem-header" class="toggle" type="checkbox" checked="true"/>
-                <label for="collapsible-prescriptionItem-header" class="lbl-toggle-title">
-                    <countNo><xsl:value-of select="position()"/>.
-                    </countNo>
-                    <xsl:call-template name="pharmaceuticalSubstanceHeader"/>
-                </label>
-                <div class="collapsible-content-title">
-                    <div class="content-inner-title">
-                        <table>
-                            <tr>
-                                <td>
-                                    <xsl:call-template name="epPrescriptionItemDetails"/>
-                                </td>
-                            </tr>
-                        </table>
+        <div class="wrap-collabsible">
+            <input id="collapsible-medicine-list" class="toggle" type="checkbox" checked="true"/>
+            <label for="collapsible-medicine-list" class="lbl-toggle-main">
+                Medicine list
+            </label>
+            <div class="collapsible-content-main">
+                <div class="content-inner-main">
+                    <xsl:for-each select="$entryNode">
+                        <div class="wrap-collabsible">
+                            <input id="collapsible-prescriptionItem-header" class="toggle" type="checkbox" checked="true"/>
+                            <label for="collapsible-prescriptionItem-header" class="lbl-toggle-title">
+                                <countNo><xsl:value-of select="position()"/>.
+                                </countNo>
+                                <xsl:call-template name="pharmaceuticalSubstanceHeader"/>
+                            </label>
+                            <div class="collapsible-content-title">
+                                <div class="content-inner-title">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <xsl:call-template name="epPrescriptionItemDetails"/>
+                                            </td>
+                                        </tr>
+                                    </table>
 
-                        <script>
-                            <xsl:attribute name="type">
-                                <xsl:text>text/javascript</xsl:text>
-                            </xsl:attribute>
-                            <xsl:text>i++;</xsl:text>
-                        </script>
-                    </div>
+                                    <script>
+                                        <xsl:attribute name="type">
+                                            <xsl:text>text/javascript</xsl:text>
+                                        </xsl:attribute>
+                                        <xsl:text>i++;</xsl:text>
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </xsl:for-each>
                 </div>
             </div>
-        </xsl:for-each>
+        </div>
     </xsl:template>
 
     <xsl:template name="pharmaceuticalSubstanceHeader">

@@ -77,6 +77,8 @@ public class STSService implements Provider<SOAPMessage> {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Incoming SOAP Message request: '{}'", source.toString());
             log(source);
+            String value = System.getProperty("javax.net.ssl.key.alias");
+            LOGGER.debug("Certificate Alias: '{}'", value);
         }
 
         SOAPBody body;

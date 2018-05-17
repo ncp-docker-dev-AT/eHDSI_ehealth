@@ -142,7 +142,6 @@ public class CCDServlet extends HttpServlet {
 
             outputStream.write(output);
             outputStream.flush();
-            outputStream.close();
 
         } catch (IOException ex) {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
@@ -154,7 +153,6 @@ public class CCDServlet extends HttpServlet {
             try (OutputStream outputStream = res.getOutputStream()) {
                 outputStream.write(ex.getMessage().getBytes());
                 outputStream.flush();
-                outputStream.close();
             } catch (IOException e) {
                 LOGGER.error(ExceptionUtils.getStackTrace(e));
             }

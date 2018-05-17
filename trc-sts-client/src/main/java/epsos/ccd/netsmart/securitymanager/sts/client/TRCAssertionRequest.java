@@ -35,9 +35,8 @@ import java.security.UnrecoverableKeyException;
 import java.util.UUID;
 
 /**
- * The TRC STS client. It can be used as a reference implementation for requesting a TRC Assertion from
- * the TRC-STS Service. It uses the Builder Design Pattern to create the request, in order to create a immutable final
- * object.
+ * The TRC STS client. It can be used as a reference implementation for requesting a TRC Assertion from TRC-STS Service.
+ * It uses the Builder Design Pattern to create the request, in order to create a immutable final object.
  *
  * @author Jerry Dimitriou <jerouris at netsmart.gr>
  */
@@ -57,6 +56,7 @@ public class TRCAssertionRequest {
     private static final String CHECK_FOR_HOSTNAME;
 
     static {
+
         if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url").length() == 0) {
             ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.url", "https://localhost:8443/TRC-STS/SecurityTokenService");
         }
@@ -184,8 +184,7 @@ public class TRCAssertionRequest {
     /**
      * Sends the request to the TRC STS Service.
      *
-     * @return the TRC Assertion that was received from the STS, if the request
-     * was successful.
+     * @return the TRC Assertion that was received from the STS, if the request was successful.
      * @throws Exception if the request failed.
      */
     public Assertion request() throws Exception {
@@ -208,8 +207,10 @@ public class TRCAssertionRequest {
                             (hostname, sslSession) -> true);
             }
 
+            String value = System.getProperty("javax.net.ssl.key.alias");
+
             //Write and send the SOAP message
-            LOGGER.info("Sending SOAP request");
+            LOGGER.info("Sending SOAP request - Default Key Alias: '{}'", StringUtils.isNotBlank(value) ? value : "N/A");
             rstMsg.writeTo(httpConnection.getOutputStream());
             SOAPMessage response = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL)
                     .createMessage(new MimeHeaders(), httpConnection.getInputStream());

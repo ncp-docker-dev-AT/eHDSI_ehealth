@@ -44,7 +44,9 @@ public class SAML2Validator {
     private SAML2Validator() {
     }
 
-    public static String validateXCPDHeader(Element sh) throws MissingFieldException, InsufficientRightsException, InvalidFieldException, XSDValidationException, SMgrException {
+    public static String validateXCPDHeader(Element sh) throws MissingFieldException, InsufficientRightsException,
+            InvalidFieldException, XSDValidationException, SMgrException {
+
         String sigCountryCode = null;
 
         NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
@@ -360,8 +362,7 @@ public class SAML2Validator {
     }
 
 
-    public static String getCountryCodeFromHCPAssertion(Element sh) throws MissingFieldException,
-            InvalidFieldException, XSDValidationException, SMgrException {
+    public static String getCountryCodeFromHCPAssertion(Element sh) throws MissingFieldException, XSDValidationException, SMgrException {
 
         String sigCountryCode = null;
 

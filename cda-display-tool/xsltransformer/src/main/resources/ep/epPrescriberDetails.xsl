@@ -81,14 +81,14 @@
 
     <xsl:template name="epPrescriberDetails">
         <div class="wrap-collabsible">
-            <input id="collapsible-prescriber-header" class="toggle" type="checkbox" checked="true"/>
-            <label for="collapsible-prescriber-header" class="lbl-toggle-prescriber">
+            <input id="collapsible-prescriber-header" class="toggle" type="checkbox"/>
+            <label for="collapsible-prescriber-header" class="lbl-toggle-main">
                 <!-- Prescriber -->
                 <!-- TODO This value should be specified in the epsosDisplayLabel value set -->
                 Prescriber
             </label>
-            <div class="collapsible-content-prescriber">
-                <div class="content-inner-prescriber">
+            <div class="collapsible-content-main">
+                <div class="content-inner-main">
                     <table class="header_table">
                         <xsl:attribute name="id">
                             <xsl:text>prescriberTable</xsl:text>

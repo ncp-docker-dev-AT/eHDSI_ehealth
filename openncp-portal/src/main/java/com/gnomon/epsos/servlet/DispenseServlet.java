@@ -80,11 +80,6 @@ public class DispenseServlet extends HttpServlet {
                     String dispensedSubstitute = req.getParameter("dispense_" + id); // field3
                     boolean substitute = GetterUtil.getBoolean(dispensedSubstitute, false);
                     //  dispenseQuantity replaced by dispensedPackageSize
-                    //  String dispensedQuantity = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
-                    //  if (Validator.isNull(dispensedQuantity)) {
-                    //      dispensedQuantity = line.getField21() + "";
-                    //  }
-
                     String dispensedPackageSize = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
                     if (Validator.isNull(dispensedPackageSize)) {
                         dispensedPackageSize = line.getField21() + "";
@@ -99,7 +94,6 @@ public class DispenseServlet extends HttpServlet {
                     String dispensedStrength = line.getField3() + "";
                     String dispensedForm = line.getField4() + "";
                     String dispensedPackage = line.getField4() + ""; // field6
-                    //  String dispensedNumberOfPacks = line.getField8().toString();
                     String prescriptionId = line.getField14() + ""; // field9
                     String materialId = line.getField19() + ""; // field10
                     String activeIngredient = line.getField2().toString();

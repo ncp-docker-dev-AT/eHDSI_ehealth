@@ -181,14 +181,14 @@
     <xsl:template name="epPatientDetails">
         <div class="wrap-collabsible" >
             <input id="collapsible-patient-header" class="toggle" type="checkbox" checked="true"/>
-            <label for="collapsible-patient-header" class="lbl-toggle-patient">
+            <label for="collapsible-patient-header" class="lbl-toggle-main">
                 <!-- Patient-->
                 <xsl:call-template name="show-displayLabels">
                     <xsl:with-param name="code" select="'51'"/>
                 </xsl:call-template>
             </label>
-            <div class="collapsible-content-patient">
-                <div class="content-inner-patient">
+            <div class="collapsible-content-main">
+                <div class="content-inner-main">
                     <xsl:call-template name="epHeader"/>
                 </div>
             </div>
@@ -200,28 +200,24 @@
         <table class="header_table">
             <tbody>
                 <tr class="td_creation_date">
-                    <th class="td_creation_date">
+                    <th>
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'58'"/>
                         </xsl:call-template>
-                        :
-                        <span class="tdtext">
-                            <xsl:value-of select="$prescriptionID"/>
-                        </span>
                     </th>
-                    <th class="td_creation_date">
-                        <span class="td_label">
-                            <xsl:call-template name="show-displayLabels">
-                                <xsl:with-param name="code" select="'20'"/>
-                            </xsl:call-template>
-                        </span>
-                        :
-                        <span class="tdtext">
-                            <xsl:call-template name="show-time">
-                                <xsl:with-param name="datetime" select="/n1:ClinicalDocument/n1:author/n1:time"/>
-                            </xsl:call-template>
-                        </span>
+                    <td>
+                        <xsl:value-of select="$prescriptionID"/>
+                    </td>
+                    <th>
+                        <xsl:call-template name="show-displayLabels">
+                            <xsl:with-param name="code" select="'20'"/>
+                        </xsl:call-template>
                     </th>
+                    <td>
+                        <xsl:call-template name="show-time">
+                            <xsl:with-param name="datetime" select="/n1:ClinicalDocument/n1:author/n1:time"/>
+                        </xsl:call-template>
+                    </td>
                 </tr>
             </tbody>
         </table>

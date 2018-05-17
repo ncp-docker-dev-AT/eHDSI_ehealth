@@ -27,7 +27,7 @@ public class ClientConnectorConsumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorConsumer.class.getName());
 
-    // Three minutes
+    // Default timeout set to Three minutes.
     private static final long TIMEOUT = 180000;
 
     private static final String EXCEPTION_FORMATTER = "{}: {}";
@@ -36,13 +36,6 @@ public class ClientConnectorConsumer {
 
     public ClientConnectorConsumer(String epr) {
 
-        //TODO: Review this SSL Context initialization
-        // EHNCP-1293 OpenNCP Portal - Certificate initialization
-        // System.setProperty("javax.net.ssl.keyStore", Constants.SC_KEYSTORE_PATH);
-        // System.setProperty("javax.net.ssl.keyStorePassword", Constants.SC_KEYSTORE_PASSWORD);
-        // System.setProperty("javax.net.ssl.key.alias", Constants.SC_PRIVATEKEY_ALIAS);
-        // System.setProperty("javax.net.ssl.privateKeyPassword", Constants.SC_PRIVATEKEY_PASSWORD);
-        // EHNCP-1293 OpenNCP Portal - Certificate initialization
         this.epr = epr;
     }
 
@@ -102,7 +95,7 @@ public class ClientConnectorConsumer {
             return Arrays.asList(docArray);
         } catch (Exception ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
-            throw new RuntimeException(ex);
+            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
     }
 
@@ -126,12 +119,12 @@ public class ClientConnectorConsumer {
             return Arrays.asList(pdArray);
         } catch (Exception ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
-            throw new RuntimeException(ex);
+            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
     }
 
     /**
-     * Auto generated test method
+     * Default Webservice test method available mainly for configuration purpose.
      */
     public String sayHello(Assertion idAssertion, String name) {
 
@@ -146,7 +139,7 @@ public class ClientConnectorConsumer {
             return sayHelloResponseDocument.getSayHelloResponse().getReturn();
         } catch (Exception ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
-            throw new RuntimeException(ex);
+            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
     }
 
@@ -172,10 +165,13 @@ public class ClientConnectorConsumer {
             return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
         } catch (Exception ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
-            throw new RuntimeException(ex);
+            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
     }
 
+    /**
+     * @deprecated Method has been deprecated in favor of the implementation of retrieveDocument() with language parameter.
+     */
     @Deprecated
     public EpsosDocument1 retrieveDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode,
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) {
@@ -205,7 +201,7 @@ public class ClientConnectorConsumer {
             return stub.submitDocument(submitDocumentDoc).getSubmitDocumentResponse();
         } catch (Exception ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
-            throw new RuntimeException(ex);
+            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
     }
 
@@ -220,7 +216,7 @@ public class ClientConnectorConsumer {
             return stub;
         } catch (AxisFault ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
-            throw new RuntimeException(ex);
+            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
     }
 }
