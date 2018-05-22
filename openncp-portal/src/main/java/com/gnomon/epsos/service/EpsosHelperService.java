@@ -1236,11 +1236,9 @@ public class EpsosHelperService {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
-        LOGGER.info("##########");
         String secHead = "No security header provided";
-        String basedSecHead = Base64.encodeBase64String(secHead.getBytes());
-        String reqm_participantObjectID = "urn:uuid:00000000-0000-0000-0000-000000000000";
-        String resm_participantObjectID = "urn:uuid:00000000-0000-0000-0000-000000000000";
+        String reqm_participantObjectID = "urn:uuid:" + message;
+        String resm_participantObjectID = "urn:uuid:" + message;
 
         InetAddress sourceIP = null;
         try {
@@ -1278,19 +1276,18 @@ public class EpsosHelperService {
         }
         eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
-                SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID, basedSecHead.getBytes(),
+                SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
                 resm_participantObjectID, ResM_PatricipantObjectDetail, hostSource, "N/A");
-
 
         LOGGER.info("The audit has been prepared");
         eventLog1.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog1, "13", "2");
     }
 
-    private static Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String FriendlyName, String oasisName) {
+    private static Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String friendlyName, String oasisName) {
 
         Attribute attrPID = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
-        attrPID.setFriendlyName(FriendlyName);
+        attrPID.setFriendlyName(friendlyName);
         attrPID.setName(oasisName);
         attrPID.setNameFormat(Attribute.URI_REFERENCE);
         return attrPID;
@@ -1348,8 +1345,8 @@ public class EpsosHelperService {
                 xspaLocality, permissions, null);
     }
 
-    private static Assertion createStorkAssertion(String username, String fullName, String email, String role,
-                                                  String organization, String organizationId, String facilityType,
+    private static Assertion createStorkAssertion(String username, String fullName, String email, String role, String organization,
+                                                  String organizationId, String facilityType,
                                                   String purposeOfUse, String xspaLocality,
                                                   Vector permissions, String onBehalfId) {
         // assertion

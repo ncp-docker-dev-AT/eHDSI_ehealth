@@ -9,7 +9,6 @@ import epsos.ccd.netsmart.securitymanager.sts.util.STSUtils;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -41,6 +40,7 @@ import javax.xml.ws.Service.Mode;
 import javax.xml.ws.handler.MessageContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
@@ -159,8 +159,9 @@ public class STSService implements Provider<SOAPMessage> {
             audit(samlTRCIssuer.getPointofCare(), samlTRCIssuer.getHumanRequestorNameId(),
                     samlTRCIssuer.getHumanRequestorSubjectId(), samlTRCIssuer.getHRRole(), patientID,
                     samlTRCIssuer.getFacilityType(), trc.getID(), tls_cn, mid,
-                    Base64.encodeBase64(strReqHeader.getBytes()), getMessageIdFromHeader(response.getSOAPHeader()),
-                    Base64.encodeBase64(strRespHeader.getBytes()));
+                    strReqHeader.getBytes(StandardCharsets.UTF_8),
+                    getMessageIdFromHeader(response.getSOAPHeader()),
+                    strRespHeader.getBytes(StandardCharsets.UTF_8));
 
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                 LOGGER_CLINICAL.debug("Outgoing SOAP Message response: '{}'", response.toString());
@@ -290,7 +291,7 @@ public class STSService implements Provider<SOAPMessage> {
                        String humanRequestorRole, String patientID, String facilityType, String assertionId,
                        String tls_cn, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
 
-        AuditService asd = AuditServiceFactory.getInstance();
+        AuditService auditService = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
@@ -310,7 +311,7 @@ public class STSService implements Provider<SOAPMessage> {
                 STSUtils.getServerIP(), getClientIP());
 
         evLogTRC.setEventType(EventType.epsosTRCAssertion);
-        asd.write(evLogTRC, "13", "2");
+        auditService.write(evLogTRC, "13", "2");
     }
 
     private String getClientIP() {
