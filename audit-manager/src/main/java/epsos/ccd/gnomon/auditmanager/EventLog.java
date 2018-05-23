@@ -215,13 +215,11 @@ public class EventLog {
      *                                     encoded security header.
      * @param targetip                     The IP Address of the target Gateway
      */
-    public static EventLog createEventLogPivotTranslation(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
-                                                          String SP_UserID, String ET_ObjectID_in,
-                                                          String ET_ObjectID_out,
-                                                          String ReqM_ParticipantObjectID,
-                                                          byte[] ReqM_PatricipantObjectDetail,
-                                                          String ResM_ParticipantObjectID,
-                                                          byte[] ResM_PatricipantObjectDetail,
+    public static EventLog createEventLogPivotTranslation(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode,
+                                                          XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
+                                                          String SP_UserID, String ET_ObjectID_in, String ET_ObjectID_out,
+                                                          String ReqM_ParticipantObjectID, byte[] ReqM_PatricipantObjectDetail,
+                                                          String ResM_ParticipantObjectID, byte[] ResM_PatricipantObjectDetail,
                                                           String targetip) {
         EventLog el = new EventLog();
         // Set Audit Source

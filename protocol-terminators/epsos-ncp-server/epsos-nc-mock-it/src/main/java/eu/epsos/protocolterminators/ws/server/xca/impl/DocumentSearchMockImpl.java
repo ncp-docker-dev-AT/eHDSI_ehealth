@@ -3,7 +3,6 @@ package eu.epsos.protocolterminators.ws.server.xca.impl;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.common.ResourceList;
 import eu.epsos.protocolterminators.ws.server.common.ResourceLoader;
-import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
 import fi.kela.se.epsos.data.model.*;
@@ -18,7 +17,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
@@ -88,7 +86,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
 
         // Mocked Patient Summaries fill up
-
         documentlist = ResourceList.getResources(Pattern.compile(PATTERN_PS));
 
         for (String xmlFilename : documentlist) {
@@ -125,7 +122,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
 
         // Mocked MROs fill up
-
         documentlist = ResourceList.getResources(Pattern.compile(PATTERN_MRO));
 
         for (String xmlFilename : documentlist) {
@@ -163,6 +159,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     }
 
     private static Document loadCDADocument(String content) throws ParserConfigurationException, SAXException, IOException {
+
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(false);
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
@@ -172,7 +169,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     }
 
     @Override
-    public DocumentAssociation<PSDocumentMetaData> getPSDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException {
+    public DocumentAssociation<PSDocumentMetaData> getPSDocumentList(SearchCriteria searchCriteria) {
+
         LOGGER.info("getPSDocumentList(SearchCriteria searchCriteria): '{}'", searchCriteria.toString());
         for (DocumentAssociation<PSDocumentMetaData> da : psDocumentMetaDatas) {
             LOGGER.info("loop: '{}'", da.toString());
@@ -187,7 +185,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     }
 
     @Override
-    public List<DocumentAssociation<EPDocumentMetaData>> getEPDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException {
+    public List<DocumentAssociation<EPDocumentMetaData>> getEPDocumentList(SearchCriteria searchCriteria) {
 
         LOGGER.info("getEPDocumentList(SearchCriteria searchCriteria)");
         List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
@@ -203,7 +201,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     }
 
     @Override
-    public EPSOSDocument getDocument(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException {
+    public EPSOSDocument getDocument(SearchCriteria searchCriteria) {
+
         LOGGER.info("getDocument(SearchCriteria searchCriteria)");
         for (EPSOSDocument doc : documents) {
             if (doc.matchesCriteria(searchCriteria)) {
@@ -216,7 +215,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     }
 
     @Override
-    public DocumentAssociation<MroDocumentMetaData> getMroDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException {
+    public DocumentAssociation<MroDocumentMetaData> getMroDocumentList(SearchCriteria searchCriteria) {
 
         LOGGER.info("getMroDocumentList(SearchCriteria searchCriteria): '{}'", searchCriteria.toString());
         for (DocumentAssociation<MroDocumentMetaData> da : mroDocumentMetaDatas) {
@@ -246,6 +245,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     }
 
     private String getTitleFromDocument(Document doc) {
+
         if (doc.getElementsByTagName("epsos:name").getLength() > 0) {
             Node titleNode = doc.getElementsByTagName("epsos:name").item(0);
             return titleNode.getTextContent();
@@ -261,7 +261,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         Node oldComponent = doc.getElementsByTagName("component").item(0);
 
         Element newComponent = doc.createElementNS("urn:hl7-org:v3", "component");
-        //doc.createElement("component").setAttributeNS();
 
         // Add new component element
         Element nonXMLBody = doc.createElementNS("urn:hl7-org:v3", "nonXMLBody");
@@ -278,13 +277,12 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         LOGGER.info("Adding PDF document. Removing old component node and adding a new.");
         LOGGER.info("Old Namespace: '{}'", oldComponent.getNamespaceURI());
         LOGGER.info("New Namespace: '{}'", newComponent.getNamespaceURI());
-//        rootNode.removeChild(oldComponent);
-//        rootNode.appendChild(newComponent);
         rootNode.replaceChild(newComponent, oldComponent);
         LOGGER.info("PDF document added.");
     }
 
     private void addFormatToOID(Document doc, int format) {
+
         if (doc.getElementsByTagName("id").getLength() > 0) {
             Element id = (Element) doc.getElementsByTagName("id").item(0);
             if (id.hasAttribute("extension")) {

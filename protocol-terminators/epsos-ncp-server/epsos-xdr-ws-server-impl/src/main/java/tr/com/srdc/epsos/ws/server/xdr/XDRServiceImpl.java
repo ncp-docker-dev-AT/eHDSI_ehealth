@@ -54,7 +54,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
     private ServiceLoader<DocumentSubmitInterface> serviceLoader;
     private DocumentSubmitInterface documentSubmitService;
 
-    public XDRServiceImpl() throws Exception {
+    public XDRServiceImpl() {
+
         serviceLoader = ServiceLoader.load(DocumentSubmitInterface.class);
         try {
             LOGGER.info("Loading National implementation of DocumentSubmitInterface...");

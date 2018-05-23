@@ -42,6 +42,7 @@ public class HtmlToPdfConverter {
     public static ByteArrayOutputStream createPdf(String html) throws IOException {
         ByteArrayOutputStream baos = null;
         html = replaceStylesheet(html);
+        html = removeExternalStylesheetReferences(html);
         try {
             baos = new ByteArrayOutputStream();
             WriterProperties writerProperties = new WriterProperties();
@@ -93,6 +94,11 @@ public class HtmlToPdfConverter {
                 "<style type=\"text/css\">" + css + "</style>");
     }
 
+    private static String removeExternalStylesheetReferences(String html) throws IOException {
+        return html.replaceAll("(?s)<link rel=\"stylesheet\" href=\"http[^>]*>.*?>\r?\n",
+                "");
+    }
+
     //Header event handler
     protected static class Header implements IEventHandler {
         String header;
@@ -119,13 +125,13 @@ public class HtmlToPdfConverter {
 
     //page X of Y
     protected static class PageXofY implements IEventHandler {
-        protected PdfFormXObject placeholder;
-        protected float side = 20;
-        protected float x = 300;
+        PdfFormXObject placeholder;
+        float side = 20;
+        float x = 300;
         protected float y = 25;
         protected float space = 4.5f;
-        protected float descent = 2;
-        public PageXofY(PdfDocument pdf) {
+        float descent = 2;
+        PageXofY(PdfDocument pdf) {
             placeholder =
                     new PdfFormXObject(new Rectangle(0, 0, side, side));
         }
@@ -146,7 +152,7 @@ public class HtmlToPdfConverter {
             pdfCanvas.addXObject(placeholder, x + space, y - descent);
             pdfCanvas.release();
         }
-        public void writeTotal(PdfDocument pdf) {
+        void writeTotal(PdfDocument pdf) {
             Canvas canvas = new Canvas(placeholder, pdf);
             canvas.setFontSize(8f);
             canvas.showTextAligned(String.valueOf(pdf.getNumberOfPages()),
@@ -170,7 +176,6 @@ public class HtmlToPdfConverter {
             }
             return null;
         }
-
     }
 
     /* Temporary fix for display issue with blocks (in current html2pdf version (2.0.1) */
