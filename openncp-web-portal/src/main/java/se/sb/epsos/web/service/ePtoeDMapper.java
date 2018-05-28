@@ -242,12 +242,12 @@ public class ePtoeDMapper {
         POCDMT000040Material eD_Document_material = eD_Document_section.getEntryArray(0).getSupply().getProduct()
                 .getManufacturedProduct().getManufacturedMaterial();
 
-        ArrayList<String> refTargetsToPreserve = new ArrayList<String>();
+        ArrayList<String> refTargetsToPreserve = new ArrayList<>();
 
         for (DispensationRow dispRow : dispensation.getRows()) {
-        	if(dispRow == null) {
-        		continue;
-        	}
+            if (dispRow == null) {
+                continue;
+            }
             eD_Document_section.getText().getTableArray(0).getTbodyArray(0).addNewTr();
             for (int i = 0; i <= 9; i++) {
                 eD_Document_section.getText().getTableArray(0).getTbodyArray(0).getTrArray(0).addNewTd();
@@ -257,9 +257,11 @@ public class ePtoeDMapper {
             eD_Document_Tr.getTdArray(0).newCursor().setTextValue(dispRow.getProductId());
             eD_Document_Tr.getTdArray(1).newCursor().setTextValue(dispRow.getProductName());
             eD_Document_Tr.getTdArray(1).setID("dispensedProduct");
-            if(dispRow.getPrescriptionRow() != null && dispRow.getPrescriptionRow().getIngredient() != null && dispRow.getPrescriptionRow().getIngredient().size() > 0 && dispRow.getPrescriptionRow().getIngredient().get(0) != null) {
-            	eD_Document_Tr.getTdArray(2).newCursor()
-                    .setTextValue(dispRow.getPrescriptionRow().getIngredient().get(0).getStrength());
+            if (dispRow.getPrescriptionRow() != null && dispRow.getPrescriptionRow().getIngredient() != null
+                    && !dispRow.getPrescriptionRow().getIngredient().isEmpty() && dispRow.getPrescriptionRow().getIngredient().get(0) != null) {
+
+                eD_Document_Tr.getTdArray(2).newCursor()
+                        .setTextValue(dispRow.getPrescriptionRow().getIngredient().get(0).getStrength());
             }
             eD_Document_Tr.getTdArray(3).newCursor().setTextValue(dispRow.getPrescriptionRow().getFormCode());
             eD_Document_Tr.getTdArray(4).newCursor().setTextValue(dispRow.getPrescriptionRow().getTypeOfPackage());
@@ -381,13 +383,13 @@ public class ePtoeDMapper {
             eD_Document_material.getAsContent().getContainerPackagedMedicine().getFormCode()
                     .setDisplayName(packedMedicine.getFormCode().getDisplayName());
         } else {
-        	epsosOrgEpMedication.CE nullFlavoredFormCode = epsosOrgEpMedication.CE.Factory.newInstance();
-        	nullFlavoredFormCode.setNullFlavor(NULLFLAVOR_NI);
-        	eD_Document_material.getAsContent().getContainerPackagedMedicine().setFormCode(nullFlavoredFormCode);
+            epsosOrgEpMedication.CE nullFlavoredFormCode = epsosOrgEpMedication.CE.Factory.newInstance();
+            nullFlavoredFormCode.setNullFlavor(NULLFLAVOR_NI);
+            eD_Document_material.getAsContent().getContainerPackagedMedicine().setFormCode(nullFlavoredFormCode);
         }
 
         try {
-            
+
             eD_Document_material.getIngredientArray(0)
                     .setQuantity(eP_Document.getClinicalDocument().getComponent().getStructuredBody().getComponentArray(0)
                             .getSection().getEntryArray(0).getSubstanceAdministration().getConsumable()
@@ -414,11 +416,9 @@ public class ePtoeDMapper {
                             .getManufacturedProduct().getManufacturedMaterial().getIngredientArray(0).getIngredient()
                             .getNameArray(0).newCursor().getTextValue());
 
-        }
-        catch (NullPointerException npe) {
+        } catch (NullPointerException npe) {
             LOGGER.trace("Optional element (or part of its path) resulted in npe.", npe);
-        }
-        catch (IndexOutOfBoundsException aie) {
+        } catch (IndexOutOfBoundsException aie) {
             LOGGER.trace("Optional element (or part of its path) resulted in index out bounds.", aie);
         }
         // Update references
