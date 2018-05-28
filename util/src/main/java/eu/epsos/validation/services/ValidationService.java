@@ -16,6 +16,7 @@ import javax.xml.bind.DatatypeConverter;
 import javax.xml.ws.soap.SOAPFaultException;
 
 /**
+ * @deprecated
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
 @Deprecated
