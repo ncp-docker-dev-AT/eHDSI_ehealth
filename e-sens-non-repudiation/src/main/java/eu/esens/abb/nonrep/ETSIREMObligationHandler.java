@@ -272,6 +272,10 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         type.setRecipientsDetails(rd);
 
         // Evidence Issuer Details is the C field of the ISO token
+        LOGGER.debug("Context Details: Issuer:'{}', Recipient:'{}', Sender:'{}'", context.getIssuerCertificate() != null ? context.getIssuerCertificate().getSerialNumber() : "N/A",
+                context.getRecipientCertificate() != null ? context.getRecipientCertificate().getSerialNumber() : "N/A",
+                context.getSenderCertificate() != null ? context.getSenderCertificate().getSerialNumber() : "N/A");
+
         EntityDetailsType edt = new EntityDetailsType();
         CertificateDetails cd = new CertificateDetails();
         edt.setCertificateDetails(cd);
