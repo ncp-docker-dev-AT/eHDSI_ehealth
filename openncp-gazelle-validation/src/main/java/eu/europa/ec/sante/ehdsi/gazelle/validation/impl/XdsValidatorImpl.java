@@ -23,6 +23,7 @@ import java.io.InputStream;
 
 public class XdsValidatorImpl extends AbstractValidator implements XdsValidator {
 
+    private static final String MSG_ERROR_XDR_VALIDATION = "An error occurred during validation process of the XdsValidator. Please check the stack trace for more details.";
     private final Logger logger = LoggerFactory.getLogger(XdsValidatorImpl.class);
 
     XdsValidatorImpl(WebServiceTemplate webServiceTemplate) {
@@ -40,7 +41,7 @@ public class XdsValidatorImpl extends AbstractValidator implements XdsValidator 
             ValidateDocumentResponse response = (ValidateDocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
             return StringUtils.hasText(response.getDetailedResult());
         } catch (WebServiceClientException e) {
-            logger.error("An error occurred during validation process of the XdsValidator. Please check the stack trace for more details.", e);
+            logger.error(MSG_ERROR_XDR_VALIDATION, e);
             return false;
         }
     }
@@ -60,13 +61,15 @@ public class XdsValidatorImpl extends AbstractValidator implements XdsValidator 
             }
 
             DetailedResult detailedResult = unmarshal(response.getDetailedResult());
-            logger.info("DetailedResult: '{}'", org.apache.commons.lang3.StringUtils.isNotBlank(detailedResult.getValidationResultsOverview().getValidationServiceName()) ? detailedResult.getValidationResultsOverview().getValidationServiceName() : "Detailed Result Empty");
+            if (detailedResult != null) {
+                logger.info("DetailedResult: '{}'", org.apache.commons.lang3.StringUtils.isNotBlank(detailedResult.getValidationResultsOverview().getValidationServiceName()) ? detailedResult.getValidationResultsOverview().getValidationServiceName() : "Detailed Result Empty");
+            }
             String model = XdModel.checkModel(validator).getObjectType().toString();
             logger.info("XDS Object Type: '{}'", model);
             ReportBuilder.build(validator, model, document, detailedResult, response.getDetailedResult(), ncpSide);
             return StringUtils.hasText(response.getDetailedResult());
         } catch (WebServiceClientException e) {
-            logger.error("An error occurred during validation process of the XdsValidator. Please check the stack trace for more details.", e);
+            logger.error(MSG_ERROR_XDR_VALIDATION, e);
             return false;
         }
     }
@@ -82,7 +85,7 @@ public class XdsValidatorImpl extends AbstractValidator implements XdsValidator 
             ValidateBase64DocumentResponse response = (ValidateBase64DocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
             return StringUtils.hasText(response.getDetailedResult());
         } catch (WebServiceClientException e) {
-            logger.error("An error occurred during validation process of the XdsValidator. Please check the stack trace for more details.", e);
+            logger.error(MSG_ERROR_XDR_VALIDATION, e);
             return false;
         }
     }
