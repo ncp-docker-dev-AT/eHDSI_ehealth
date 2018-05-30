@@ -39,7 +39,7 @@ public enum EpsosService {
     private String name;
     private int objectNumber;
 
-    private EpsosService(String s, int objectNumber) {
+    EpsosService(String s, int objectNumber) {
         name = s;
         this.objectNumber = objectNumber;
 
