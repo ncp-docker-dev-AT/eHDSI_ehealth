@@ -36,6 +36,10 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-gazelle-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-util</artifactId>
             <exclusions>
                 <exclusion>

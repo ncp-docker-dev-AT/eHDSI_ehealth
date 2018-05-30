@@ -30,6 +30,10 @@
             <artifactId>openncp-interface</artifactId>
         </dependency>
         <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-gazelle-validation</artifactId>
+        </dependency>
+        <dependency>
             <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
             <artifactId>openncp-ncp-pt-utils</artifactId>
         </dependency>

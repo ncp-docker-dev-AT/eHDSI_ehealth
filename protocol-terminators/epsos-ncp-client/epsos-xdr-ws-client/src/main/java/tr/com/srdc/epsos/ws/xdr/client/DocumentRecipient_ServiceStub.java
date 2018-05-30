@@ -10,7 +10,7 @@ import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
-import eu.epsos.validation.services.XdrValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
@@ -264,8 +264,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 //            }
 
             /* Perform validation of request message */
-            XdrValidationService.getInstance().validateModel(requestLogMsg, XdModel.obtainModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
-
+            //XdrValidationService.getInstance().validateModel(requestLogMsg, XdModel.obtainModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
+            OpenNCPValidation.validateXDRMessage(requestLogMsg, XdModel.obtainModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
             /*
              * Execute Operation
              */
@@ -378,7 +378,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             }
 
             /* Perform validation of response message */
-            XdrValidationService.getInstance().validateModel(responseLogMsg, XdModel.obtainResponseModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
+            //XdrValidationService.getInstance().validateModel(responseLogMsg, XdModel.obtainResponseModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
+            OpenNCPValidation.validateXDRMessage(responseLogMsg, XdModel.obtainModelXdr(responseLogMsg).toString(), NcpSide.NCP_B);
             /*
              * Return
              */
@@ -541,6 +542,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
         EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
         EventLogUtil.prepareXDRCommonLog(eventLog, request, rel);
+        eventLog.setNcpSide(NcpSide.NCP_B);
         EventLogClientUtil.sendEventLog(eventLog);
         return eventLog;
     }

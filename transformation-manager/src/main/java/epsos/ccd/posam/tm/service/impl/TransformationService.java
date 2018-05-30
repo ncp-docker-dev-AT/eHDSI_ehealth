@@ -11,6 +11,7 @@ import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -274,9 +275,12 @@ public class TransformationService implements ITransformationService, TMConstant
         return tsamApi.getLtrLanguages();
     }
 
+    /**
+     * @param responseStructure
+     */
     private void writeAuditTrail(TMResponseStructure responseStructure) {
 
-        LOGGER.debug("Audit trail BEGIN");
+        LOGGER.debug("[Transformation Service] Audit trail BEGIN");
 
         if (responseStructure != null) {
             if (config.isAuditTrailEnabled()) {
@@ -285,13 +289,15 @@ public class TransformationService implements ITransformationService, TMConstant
                     GregorianCalendar calendar = new GregorianCalendar();
                     calendar.setTime(new Date());
                     // TODO this is not final/correct version
-                    EventLog logg = EventLog.createEventLogPivotTranslation(
+                    EventLog eventLog = EventLog.createEventLogPivotTranslation(
                             TransactionName.epsosPivotTranslation, // Possible values according to D4.5.6 are E,R,U,D
                             EventActionCode.EXECUTE,
                             DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar),
                             responseStructure.getStatus().equals(STATUS_SUCCESS) ? EventOutcomeIndicator.FULL_SUCCESS : EventOutcomeIndicator.PERMANENT_FAILURE,
-                            HTTPUtil.getSubjectDN(false), // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
-                            getOIDFromDocument(responseStructure.getDocument()), // Identifier that allows to univocally identify the SOURCE document or source data entries. (UUID Format)
+                            // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
+                            HTTPUtil.getSubjectDN(false),
+                            // Identifier that allows to unequivocally identify the SOURCE document or source data entries. (UUID Format)
+                            getOIDFromDocument(responseStructure.getDocument()),
                             getOIDFromDocument(responseStructure.getResponseCDA()), // Identifier that allows to univocally identify the TARGET document. (UUID Format)
                             Constants.UUID_PREFIX + "", // The value MUST contain the base64 encoded security header
                             new byte[0], // ReqM_PatricipantObjectDetail - The value MUST contain the base64 encoded security header
@@ -299,15 +305,17 @@ public class TransformationService implements ITransformationService, TMConstant
                             new byte[0], // ResM_PatricipantObjectDetail - The value MUST contain the base64 encoded security header
                             ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP") // The IP Address of the target Gateway
                     );
-                    logg.setEventType(EventType.epsosPivotTranslation);
-                    LOGGER.info("Write AuditTrail: '{}'", logg.getEventType());
-                    AuditServiceFactory.getInstance().write(logg, config.getAuditTrailFacility(), config.getAuditTrailSeverity());
+                    eventLog.setEventType(EventType.epsosPivotTranslation);
+                    eventLog.setNcpSide(NcpSide.valueOf(config.getNcpSide()));
+
+                    LOGGER.info("Write AuditTrail: '{}'", eventLog.getEventType());
+                    AuditServiceFactory.getInstance().write(eventLog, config.getAuditTrailFacility(), config.getAuditTrailSeverity());
                 } catch (Exception e) {
                     LOGGER.error("Audit trail ERROR! ", e);
                 }
-                LOGGER.debug("Audit trail END");
+                LOGGER.debug("[Transformation Service] Audit trail END");
             } else {
-                LOGGER.debug("Audit trail DISABLED");
+                LOGGER.debug("[Transformation Service] Audit trail DISABLED");
             }
         } else {
             LOGGER.error("Write AuditTrail Error: Cannot process Transformation Manager response");

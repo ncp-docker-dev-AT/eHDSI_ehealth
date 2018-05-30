@@ -5,10 +5,11 @@ import epsos.ccd.gnomon.utils.Utils;
 import eu.epsos.util.audit.AuditLogSerializer;
 import eu.epsos.validation.datamodel.audit.AuditModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.services.AuditValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import net.RFC3881.*;
 import net.RFC3881.AuditMessage.ActiveParticipant;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -223,45 +224,92 @@ public enum AuditTrailUtils {
         return am;
     }
 
-    public AuditMessage addNonRepudiationSection(AuditMessage auditMessage, String ReqM_ParticipantObjectID,
-                                                 byte[] ReqM_PatricipantObjectDetail, String ResM_ParticipantObjectID,
-                                                 byte[] ResM_PatricipantObjectDetail) {
+    /**
+     * @param auditMessage
+     * @param participantObjectIDRequest
+     * @param participantObjectDetailRequest
+     * @param participantObjectIDResponse
+     * @param participantObjectDetailResponse
+     * @return
+     */
+    public AuditMessage addNonRepudiationSection(AuditMessage auditMessage, String participantObjectIDRequest,
+                                                 byte[] participantObjectDetailRequest, String participantObjectIDResponse,
+                                                 byte[] participantObjectDetailResponse) {
 
+        //TODO: Based on the current guidelines and functional specifications, this is not clear enough if an evidence
+        // has to be generated including the Non-Repudiation section (Type Value pair attributes - security header)
+        // while the Audit Message has been considering NCP internal actions.
         // Request
-        ParticipantObjectIdentificationType poit = new ParticipantObjectIdentificationType();
-        poit.setParticipantObjectID(ReqM_ParticipantObjectID);
-        poit.setParticipantObjectTypeCode(new Short("4"));
-        CodedValueType PS_object = new CodedValueType();
-        PS_object.setCode("req");
-        PS_object.setCodeSystemName("epSOS Msg");
-        PS_object.setDisplayName("Request Message");
-        poit.setParticipantObjectIDTypeCode(PS_object);
-        if (ReqM_PatricipantObjectDetail != null) {
-            TypeValuePairType pod = new TypeValuePairType();
-            pod.setType("securityheader");
-            pod.setValue(ReqM_PatricipantObjectDetail);
-            poit.getParticipantObjectDetail().add(pod);
-        }
-        auditMessage.getParticipantObjectIdentification().add(poit);
+        ParticipantObjectIdentificationType poiRequest = createParticipantObjectIdentification("req",
+                participantObjectIDRequest, participantObjectDetailRequest);
+        auditMessage.getParticipantObjectIdentification().add(poiRequest);
+
+        //        poit.setParticipantObjectID(ReqM_ParticipantObjectID);
+        //        poit.setParticipantObjectTypeCode(new Short("4"));
+        //        CodedValueType PS_object = new CodedValueType();
+        //        PS_object.setCode("req");
+        //        PS_object.setCodeSystemName("epSOS Msg");
+        //        PS_object.setDisplayName("Request Message");
+        //        poit.setParticipantObjectIDTypeCode(PS_object);
+        //        if (ReqM_PatricipantObjectDetail != null) {
+        //            TypeValuePairType pod = new TypeValuePairType();
+        //            pod.setType("securityheader");
+        //            pod.setValue(ReqM_PatricipantObjectDetail);
+        //            poit.getParticipantObjectDetail().add(pod);
+        //        }
 
         // Response
-        ParticipantObjectIdentificationType poit1 = new ParticipantObjectIdentificationType();
-        poit1.setParticipantObjectID(ResM_ParticipantObjectID);
-        poit1.setParticipantObjectTypeCode(new Short("4"));
-        CodedValueType PS_object1 = new CodedValueType();
-        PS_object1.setCode("rsp");
-        PS_object1.setCodeSystemName("epSOS Msg");
-        PS_object1.setDisplayName("Response Message");
-        poit1.setParticipantObjectIDTypeCode(PS_object1);
-        if (ResM_PatricipantObjectDetail != null) {
-            TypeValuePairType pod1 = new TypeValuePairType();
-            pod1.setType("securityheader");
-            pod1.setValue(ResM_PatricipantObjectDetail);
-            poit1.getParticipantObjectDetail().add(pod1);
-        }
-        auditMessage.getParticipantObjectIdentification().add(poit1);
+        ParticipantObjectIdentificationType poiResponse = createParticipantObjectIdentification("rsp",
+                participantObjectIDResponse, participantObjectDetailResponse);
+        auditMessage.getParticipantObjectIdentification().add(poiResponse);
+        //poit1 = new ParticipantObjectIdentificationType();
+        //poit1.setParticipantObjectID(ResM_ParticipantObjectID);
+        //poit1.setParticipantObjectTypeCode(new Short("4"));
+        //CodedValueType PS_object1 = new CodedValueType();
+        //PS_object1.setCode("rsp");
+        //PS_object1.setCodeSystemName("epSOS Msg");
+        //PS_object1.setDisplayName("Response Message");
+        //poit1.setParticipantObjectIDTypeCode(PS_object1);
+//        if (ResM_PatricipantObjectDetail != null) {
+//            TypeValuePairType pod1 = new TypeValuePairType();
+//            pod1.setType("securityheader");
+//            pod1.setValue(ResM_PatricipantObjectDetail);
+//            poit1.getParticipantObjectDetail().add(pod1);
+//        }
 
         return auditMessage;
+    }
+
+    /**
+     * @param action
+     * @param participantObjectId
+     * @param participantObjectDetail
+     * @return
+     */
+    private ParticipantObjectIdentificationType createParticipantObjectIdentification(String action, String participantObjectId,
+                                                                                      byte[] participantObjectDetail) {
+
+        ParticipantObjectIdentificationType participantObjectIdentification = new ParticipantObjectIdentificationType();
+        participantObjectIdentification.setParticipantObjectID(participantObjectId);
+        participantObjectIdentification.setParticipantObjectTypeCode(new Short("4"));
+
+        CodedValueType codedValue = new CodedValueType();
+        codedValue.setCode(action);
+        codedValue.setCodeSystemName("epSOS Msg");
+        if (StringUtils.equals("rsp", action)) {
+            codedValue.setDisplayName("Response Message");
+        } else {
+            codedValue.setDisplayName("Request Message");
+        }
+        participantObjectIdentification.setParticipantObjectIDTypeCode(codedValue);
+
+        if (ArrayUtils.isNotEmpty(participantObjectDetail)) {
+            TypeValuePairType typeValuePairType = new TypeValuePairType();
+            typeValuePairType.setType("securityheader");
+            typeValuePairType.setValue(participantObjectDetail);
+            participantObjectIdentification.getParticipantObjectDetail().add(typeValuePairType);
+        }
+        return participantObjectIdentification;
     }
 
     /**
@@ -1254,11 +1302,13 @@ public enum AuditTrailUtils {
         String model = "";
         NcpSide ncpSide;
 
-        if (StringUtils.isBlank(eventLog.getPC_UserID())) {
-            ncpSide = NcpSide.NCP_A;
-        } else {
-            ncpSide = NcpSide.NCP_B;
-        }
+        ncpSide = eventLog.getNcpSide();
+
+//        if (StringUtils.isBlank(eventLog.getPC_UserID())) {
+//            ncpSide = NcpSide.NCP_A;
+//        } else {
+//            ncpSide = NcpSide.NCP_B;
+//        }
 
         if (StringUtils.equals(eventLog.getEventType(), "epsos-cf")) {
             throw new UnsupportedOperationException("EventCode not supported.");
@@ -1306,7 +1356,8 @@ public enum AuditTrailUtils {
             }
         }
         try {
-            return AuditValidationService.getInstance().validateModel(convertAuditObjectToXML(am), model, ncpSide);
+            //return AuditValidationService.getInstance().validateModel(convertAuditObjectToXML(am), model, ncpSide);
+            return OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(am), model, ncpSide);
         } catch (JAXBException e) {
             LOGGER.error("JAXBException: {}", e.getMessage(), e);
             return false;

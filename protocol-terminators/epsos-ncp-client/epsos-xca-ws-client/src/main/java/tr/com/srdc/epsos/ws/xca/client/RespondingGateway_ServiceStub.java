@@ -10,7 +10,7 @@ import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
-import eu.epsos.validation.services.XcaValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -298,7 +298,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             start = System.currentTimeMillis();
 
             /* Validate Request Message */
-            XcaValidationService.getInstance().validateModel(logRequestBody, XdModel.obtainModelXca(logRequestBody).toString(), NcpSide.NCP_B);
+            //XcaValidationService.getInstance().validateModel(logRequestBody, XdModel.obtainModelXca(logRequestBody).toString(), NcpSide.NCP_B);
+            OpenNCPValidation.validateCrossCommunityAccess(logRequestBody, XdModel.obtainModelXca(logRequestBody).toString(), NcpSide.NCP_B);
 
             // TMP
             // Transaction end time
@@ -422,7 +423,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             }
 
             /* Validate Response Message */
-            XcaValidationService.getInstance().validateModel(logResponseBody, XdModel.obtainModelXca(logResponseBody).toString(), NcpSide.NCP_B);
+            //XcaValidationService.getInstance().validateModel(logResponseBody, XdModel.obtainModelXca(logResponseBody).toString(), NcpSide.NCP_B);
+            OpenNCPValidation.validateCrossCommunityAccess(logResponseBody, XdModel.obtainModelXca(logResponseBody).toString(), NcpSide.NCP_B);
 
             // TMP
             // Validation end time
@@ -652,7 +654,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             }
 
             /* Validate Request Message */
-            XcaValidationService.getInstance().validateModel(logRequestBody, XdModel.obtainModelXca(logRequestBody).toString(), NcpSide.NCP_B);
+            //XcaValidationService.getInstance().validateModel(logRequestBody, XdModel.obtainModelXca(logRequestBody).toString(), NcpSide.NCP_B);
+            OpenNCPValidation.validateCrossCommunityAccess(logRequestBody, XdModel.obtainModelXca(logRequestBody).toString(), NcpSide.NCP_B);
 
             /*
              * Execute Operation
@@ -763,7 +766,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             }
 
             /* Validate Response Message */
-            XcaValidationService.getInstance().validateModel(logResponseBody, XdModel.obtainModelXca(logResponseBody).toString(), NcpSide.NCP_B);
+            //XcaValidationService.getInstance().validateModel(logResponseBody, XdModel.obtainModelXca(logResponseBody).toString(), NcpSide.NCP_B);
+            OpenNCPValidation.validateCrossCommunityAccess(logResponseBody, XdModel.obtainModelXca(logResponseBody).toString(), NcpSide.NCP_B);
 
             /*
              * Return
@@ -1042,6 +1046,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
         EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
         EventLogUtil.prepareXCACommonLogQuery(eventLog, request, response, classCode);
+        eventLog.setNcpSide(NcpSide.NCP_B);
         EventLogClientUtil.sendEventLog(eventLog);
         return eventLog;
     }
@@ -1056,6 +1061,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
         EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
         EventLogUtil.prepareXCACommonLogRetrieve(eventLog, request, response, classCode);
+        eventLog.setNcpSide(NcpSide.NCP_B);
         EventLogClientUtil.sendEventLog(eventLog);
         return eventLog;
     }

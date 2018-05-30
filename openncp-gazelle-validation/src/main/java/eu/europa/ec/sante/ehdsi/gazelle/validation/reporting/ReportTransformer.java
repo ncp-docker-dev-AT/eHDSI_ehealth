@@ -22,6 +22,7 @@ public class ReportTransformer {
     private String validatedObject;
 
     public ReportTransformer(String validationResult, String validatedObject) {
+
         this.validationResult = validationResult;
         this.validatedObject = validatedObject;
     }
