@@ -49,6 +49,7 @@ public enum AuditModel {
     }
 
     public static AuditModel checkModel(String model) {
+
         for (AuditModel m : AuditModel.values()) {
             if (model.equals(m.toString())) {
                 return m;
