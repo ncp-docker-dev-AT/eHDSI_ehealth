@@ -1,8 +1,9 @@
 package org.openhealthtools.openatna.audit.persistence.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.Arrays;
-
 
 @Entity
 @Table(name = "object_details")
@@ -23,9 +24,9 @@ public class ObjectDetailEntity extends PersistentEntity {
         this.value = value;
     }
 
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+    @GenericGenerator(name = "native", strategy = "native")
     public Long getId() {
         return id;
     }
@@ -33,7 +34,6 @@ public class ObjectDetailEntity extends PersistentEntity {
     public void setId(Long id) {
         this.id = id;
     }
-
 
     /**
      * Gets the value of the type property.
@@ -83,11 +83,7 @@ public class ObjectDetailEntity extends PersistentEntity {
         if (type != null ? !type.equals(that.type) : that.type != null) {
             return false;
         }
-        if (value != null ? !Arrays.equals(value, that.value) : that.value != null) {
-            return false;
-        }
-
-        return true;
+        return value != null ? Arrays.equals(value, that.value) : that.value == null;
     }
 
     @Override
@@ -98,13 +94,6 @@ public class ObjectDetailEntity extends PersistentEntity {
     }
 
     public String toString() {
-        return "[" + getClass().getName() +
-                " id=" +
-                getId() +
-                ", type=" +
-                getType() +
-                ", value=" +
-                new String(getValue()) +
-                "]";
+        return "[" + getClass().getName() + " id=" + getId() + ", type=" + getType() + ", value=" + new String(getValue()) + "]";
     }
 }

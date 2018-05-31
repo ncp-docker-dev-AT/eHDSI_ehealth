@@ -447,11 +447,7 @@ public class Query implements Serializable {
             if (paths != null ? !paths.equals(that.paths) : that.paths != null) {
                 return false;
             }
-            if (target != null ? !target.equals(that.target) : that.target != null) {
-                return false;
-            }
-
-            return true;
+            return target != null ? target.equals(that.target) : that.target == null;
         }
 
         @Override
@@ -505,11 +501,7 @@ public class Query implements Serializable {
             if (target != that.target) {
                 return false;
             }
-            if (value != null ? !value.equals(that.value) : that.value != null) {
-                return false;
-            }
-
-            return true;
+            return value != null ? value.equals(that.value) : that.value == null;
         }
 
         @Override
