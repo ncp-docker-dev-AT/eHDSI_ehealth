@@ -8,7 +8,7 @@ import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.services.CdaValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
@@ -112,15 +112,18 @@ public class XDSbRepositoryServiceInvoker {
         xdrDocument.setId(uuid);
 
         byte[] cdaBytes = null;
-        CdaValidationService cdaValidationService = CdaValidationService.getInstance();
+        //CdaValidationService cdaValidationService = CdaValidationService.getInstance();
         try {
             cdaBytes = request.getCda().getBytes(StandardCharsets.UTF_8);
 
             /* Validate CDA epSOS Friendly */
-            cdaValidationService.validateModel(
-                    XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(cdaBytes).getDocumentElement()).toString(),
-                    CdaModel.obtainCdaModel(docClassCode, false),
-                    NcpSide.NCP_B);
+//            cdaValidationService.validateModel(
+//                    XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(cdaBytes).getDocumentElement()).toString(),
+//                    CdaModel.obtainCdaModel(docClassCode, false),
+//                    NcpSide.NCP_B);
+            String cdaModel = CdaModel.obtainCdaModel(docClassCode, false);
+            OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(cdaBytes).getDocumentElement()).toString(),
+                    cdaModel, NcpSide.NCP_B);
 
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
@@ -132,10 +135,14 @@ public class XDSbRepositoryServiceInvoker {
             xdrDocument.setValue(transformedCda);
 
             /* Validate CDA epSOS Pivot */
-            cdaValidationService.validateModel(
-                    XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(transformedCda).getDocumentElement()).toString(),
-                    CdaModel.obtainCdaModel(docClassCode, true),
-                    NcpSide.NCP_B);
+//            cdaValidationService.validateModel(
+//                    XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(transformedCda).getDocumentElement()).toString(),
+//                    CdaModel.obtainCdaModel(docClassCode, true),
+//                    NcpSide.NCP_B);
+            String cdaModel = CdaModel.obtainCdaModel(docClassCode, true);
+            OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(transformedCda).getDocumentElement()).toString(),
+                    cdaModel, NcpSide.NCP_B);
+
         } catch (DocumentTransformationException ex) {
             LOGGER.error(ex.getLocalizedMessage(), ex);
             xdrDocument.setValue(cdaBytes);

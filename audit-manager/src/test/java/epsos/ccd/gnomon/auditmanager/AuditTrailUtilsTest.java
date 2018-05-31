@@ -1,5 +1,6 @@
 package epsos.ccd.gnomon.auditmanager;
 
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import org.junit.*;
 import org.slf4j.Logger;
@@ -392,7 +393,7 @@ public class AuditTrailUtilsTest {
 
                 "ssasa",
 
-                "aa", new byte[1], "aaa", new byte[1], "AA", "AA");
+                "aa", new byte[1], "aaa", new byte[1], "AA", "AA", NcpSide.NCP_B);
 
         // EventLog eventLog2= EventLog.createEventNonRepudiation("a1", null,
         // "a2", null);
@@ -430,7 +431,7 @@ public class AuditTrailUtilsTest {
 
                 "PS_PatricipantObjectID", "ET_ObjectID^^^",
 
-                "11", new byte[1], "22", new byte[1], "194.219.31.2", "222.33.33.3");
+                "11", new byte[1], "22", new byte[1], "194.219.31.2", "222.33.33.3", NcpSide.NCP_B);
 
         // EventLog eventLog2= EventLog.createEventNonRepudiation("a1", null,
         // "a2", null);

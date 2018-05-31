@@ -78,7 +78,7 @@ public class AuditService implements MessageHandlerListener {
     @Override
     public boolean handleMessage(Serializable message) {
 
-        if (message != null && message instanceof SerializableMessage) {
+        if (message instanceof SerializableMessage) {
             SerializableMessage sm = (SerializableMessage) message;
             boolean ok = write(sm.getMessage(), sm.getFacility(), sm.getSeverity());
             LOGGER.info("Attempt to write message to OpenATNA server. Result '{}'", ok);

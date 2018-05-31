@@ -252,7 +252,7 @@ public class SMPUploadFileController {
             }
 
             StringEntity entityPut = new StringEntity(content, ContentType.create("application/xml", "UTF-8"));
-            LOGGER.debug("Entity that will be put on the SMP server : " + IOUtils.toString(entityPut.getContent(), StandardCharsets.UTF_8));
+            LOGGER.debug("Entity that will be put on the SMP server : '{}'", IOUtils.toString(entityPut.getContent(), StandardCharsets.UTF_8));
 
             ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
 

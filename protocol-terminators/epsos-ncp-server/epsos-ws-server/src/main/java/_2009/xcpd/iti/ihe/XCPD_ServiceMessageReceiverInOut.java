@@ -7,7 +7,7 @@ import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
-import eu.epsos.validation.services.XcpdValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.SAXOMBuilder;
@@ -110,9 +110,11 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             }
 
             /* Validate incoming request message */
-            XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(
-                    XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement())),
+            OpenNCPValidation.validatePatientDemographic(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement())),
                     Hl7v3Schematron.EPSOS_ID_SERVICE_REQUEST.toString(), NcpSide.NCP_A);
+//            XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(
+//                    XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement())),
+//                    Hl7v3Schematron.EPSOS_ID_SERVICE_REQUEST.toString(), NcpSide.NCP_A);
 
             XCPD_ServiceSkeleton skel = (XCPD_ServiceSkeleton) obj;
             // Out Envelop
@@ -140,13 +142,17 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     envelope = toEnvelope(getSOAPFactory(msgContext), pRPA_IN201306UV021, false);
 
                     /* Validate response message */
-                    XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(XMLUtils.toDOM(
+//                    XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(XMLUtils.toDOM(
+//                            envelope.getBody().getFirstElement())),
+//                            Hl7v3Schematron.EPSOS_ID_SERVICE_RESPONSE.toString(),
+//                            NcpSide.NCP_A);
+                    OpenNCPValidation.validatePatientDemographic(XMLUtil.prettyPrint(XMLUtils.toDOM(
                             envelope.getBody().getFirstElement())),
-                            Hl7v3Schematron.EPSOS_ID_SERVICE_RESPONSE.toString(),
-                            NcpSide.NCP_A);
+                            Hl7v3Schematron.EPSOS_ID_SERVICE_RESPONSE.toString(), NcpSide.NCP_A);
 
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
+                    eventLog.setNcpSide(NcpSide.NCP_A);
                     LOGGER.info("EventLog: '{}'", eventLog.getEventType());
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");

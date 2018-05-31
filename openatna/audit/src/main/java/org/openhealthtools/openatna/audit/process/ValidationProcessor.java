@@ -7,10 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-
 /**
  * Does some basic validation on message contents
- * <p/>
  *
  * @author Andrew Harrison
  * @version $Revision:$
@@ -59,59 +57,55 @@ public class ValidationProcessor implements AtnaProcessor {
 
     };
 
-    private static String[] personIds = {
-            "1", "2", "3", "4", "5", "6", "7", "11"
-    };
+    private static String[] personIds = {"1", "2", "3", "4", "5", "6", "7", "11"};
 
-    private static String[] systemObjectIds = {
-            "8", "9", "10", "11", "12"
-    };
+    private static String[] systemObjectIds = {"8", "9", "10", "11", "12"};
 
-    private static String[] organisationIds = {
-            "6", "7"
-    };
-
+    private static String[] organisationIds = {"6", "7"};
 
     public void process(ProcessContext context) throws Exception {
+
         validate(context);
         context.setState(ProcessContext.State.VALIDATED);
     }
 
     public void error(ProcessContext context) {
+        // Processing Error messages not implemented
     }
 
 
     protected void validate(ProcessContext context) throws AtnaException {
+
         AtnaMessage message = context.getMessage();
         if (message == null) {
-            throw new AtnaException("null message", AtnaException.AtnaError.NO_MESSAGE);
+            throw new AtnaException("Null message", AtnaException.AtnaError.NO_MESSAGE);
         }
         AtnaCode evt = message.getEventCode();
         if (evt == null || evt.getCode() == null) {
-            throw new AtnaException("invalid event code", AtnaException.AtnaError.NO_EVENT_CODE);
+            throw new AtnaException("Invalid event code", AtnaException.AtnaError.NO_EVENT_CODE);
         }
         if (message.getEventOutcome() == null) {
-            throw new AtnaException("invalid event outcome", AtnaException.AtnaError.NO_EVENT_OUTCOME);
+            throw new AtnaException("Invalid event outcome", AtnaException.AtnaError.NO_EVENT_OUTCOME);
         }
         if (message.getEventDateTime() == null) {
-            throw new AtnaException("invalid time stamp", AtnaException.AtnaError.INVALID_EVENT_TIMESTAMP);
+            throw new AtnaException("Invalid time stamp", AtnaException.AtnaError.INVALID_EVENT_TIMESTAMP);
         }
         List<AtnaCode> codes = message.getEventTypeCodes();
         for (AtnaCode code : codes) {
             if (code.getCode() == null) {
-                throw new AtnaException("no code defined", AtnaException.AtnaError.INVALID_CODE);
+                throw new AtnaException("No code defined", AtnaException.AtnaError.INVALID_CODE);
             }
         }
         List<AtnaSource> sources = message.getSources();
         if (sources.isEmpty()) {
-            throw new AtnaException("no audit source defined", AtnaException.AtnaError.NO_AUDIT_SOURCE);
+            throw new AtnaException("No audit source defined", AtnaException.AtnaError.NO_AUDIT_SOURCE);
         }
         for (AtnaSource source : sources) {
             validateSource(source, context.getPolicies());
         }
         List<AtnaMessageParticipant> participants = message.getParticipants();
         if (participants.isEmpty()) {
-            throw new AtnaException("no participants defined", AtnaException.AtnaError.NO_ACTIVE_PARTICIPANT);
+            throw new AtnaException("No participants defined", AtnaException.AtnaError.NO_ACTIVE_PARTICIPANT);
         }
         for (AtnaMessageParticipant participant : participants) {
             validateParticipant(participant, context.getPolicies());
@@ -124,58 +118,47 @@ public class ValidationProcessor implements AtnaProcessor {
     }
 
     private void validateParticipant(AtnaMessageParticipant participant, PersistencePolicies policies) throws AtnaException {
+
         if (participant.getParticipant() == null) {
-            throw new AtnaException("no active participant defined",
-                    AtnaException.AtnaError.NO_ACTIVE_PARTICIPANT);
+            throw new AtnaException("No active participant defined", AtnaException.AtnaError.NO_ACTIVE_PARTICIPANT);
         }
         if (participant.getParticipant().getUserId() == null) {
-            throw new AtnaException("no active participant user id defined",
-                    AtnaException.AtnaError.NO_ACTIVE_PARTICIPANT_ID);
+            throw new AtnaException("No active participant user id defined", AtnaException.AtnaError.NO_ACTIVE_PARTICIPANT_ID);
         }
         List<AtnaCode> codes = participant.getParticipant().getRoleIDCodes();
         for (AtnaCode code : codes) {
             if (code.getCode() == null) {
-                throw new AtnaException("no code defined", AtnaException.AtnaError.INVALID_CODE);
+                throw new AtnaException("No code defined", AtnaException.AtnaError.INVALID_CODE);
             }
         }
-        /*NetworkAccessPoint nap = participant.getNetworkAccessPointType();
-        String napId = participant.getNetworkAccessPointId();
-        if (nap != null && napId == null) {
-            throw new AtnaException("no network access point id defined",
-                    AtnaException.AtnaError.NO_NETWORK_ACCESS_POINT_ID);
-        }
-        if (nap == null && napId != null) {
-            throw new AtnaException("no network access point type defined",
-                    AtnaException.AtnaError.NO_NETWORK_ACCESS_POINT_TYPE);
-        }*/
     }
 
     private void validateSource(AtnaSource source, PersistencePolicies policies) throws AtnaException {
+
         if (source.getSourceId() == null) {
-            throw new AtnaException("no audit source id defined",
-                    AtnaException.AtnaError.NO_AUDIT_SOURCE_ID);
+            throw new AtnaException("No audit source id defined", AtnaException.AtnaError.NO_AUDIT_SOURCE_ID);
         }
         List<AtnaCode> codes = source.getSourceTypeCodes();
         for (AtnaCode code : codes) {
             if (code.getCode() == null) {
-                throw new AtnaException("no code defined", AtnaException.AtnaError.INVALID_CODE);
+                throw new AtnaException("No code defined", AtnaException.AtnaError.INVALID_CODE);
             }
         }
     }
 
     private void validateObject(AtnaMessageObject object, PersistencePolicies policies) throws AtnaException {
+
         if (object.getObject() == null) {
-            throw new AtnaException("no participant object defined",
-                    AtnaException.AtnaError.NO_PARTICIPANT_OBJECT);
+            throw new AtnaException("No participant object defined", AtnaException.AtnaError.NO_PARTICIPANT_OBJECT);
         }
         AtnaObject obj = object.getObject();
         if (obj.getObjectId() == null) {
-            //throw new AtnaException("no participant object id defined",
-            //      AtnaException.AtnaError.NO_PARTICIPANT_OBJECT_ID);
+            LOGGER.error("ATNA Error: ATNAObject does not contain ID - TOTO: Review implementation");
+            //TODO: Review this Error management
+            //throw new AtnaException("no participant object id defined",AtnaException.AtnaError.NO_PARTICIPANT_OBJECT_ID);
         }
         if (obj.getObjectIdTypeCode() == null || obj.getObjectIdTypeCode().getCode() == null) {
-            throw new AtnaException("no object id type code",
-                    AtnaException.AtnaError.NO_PARTICIPANT_OBJECT_ID_TYPE_CODE);
+            throw new AtnaException("No object id type code", AtnaException.AtnaError.NO_PARTICIPANT_OBJECT_ID_TYPE_CODE);
         }
         if (obj.getObjectTypeCode() != null) {
             validateObjectIdTypeCode(obj.getObjectIdTypeCode(), obj.getObjectTypeCode());
@@ -190,13 +173,13 @@ public class ValidationProcessor implements AtnaProcessor {
                 LOGGER.info("AtnaObjectDetail: '{}'", detail.toString());
             }
             if (detail.getType() == null || detail.getValue() == null || detail.getValue().length == 0) {
-                throw new AtnaException("invalid object detail",
-                        AtnaException.AtnaError.INVALID_OBJECT_DETAIL);
+                throw new AtnaException("Invalid object detail", AtnaException.AtnaError.INVALID_OBJECT_DETAIL);
             }
         }
     }
 
     private boolean isInArray(ObjectTypeCodeRole role, ObjectTypeCodeRole[] arr) {
+
         for (ObjectTypeCodeRole codeRole : arr) {
             if (codeRole == role) {
                 return true;
@@ -206,6 +189,7 @@ public class ValidationProcessor implements AtnaProcessor {
     }
 
     private boolean isInArray(String role, String[] arr) {
+
         for (String codeRole : arr) {
             if (codeRole.equals(role)) {
                 return true;
@@ -216,6 +200,7 @@ public class ValidationProcessor implements AtnaProcessor {
 
 
     private void validateObjectTypeCodeRole(ObjectTypeCodeRole role, ObjectType type) throws AtnaException {
+
         switch (type) {
             case PERSON:
                 if (!isInArray(role, persons)) {
@@ -229,8 +214,8 @@ public class ValidationProcessor implements AtnaProcessor {
                 break;
             case SYSTEM_OBJECT:
                 if (!isInArray(role, systemObjects)) {
-                    // [Mustafa: May 15, 2012]: We had to remove this control, since epSOS specs need role: resource and type: system object together
-                    LOGGER.warn("Invalid combination of role and type. Role:" + role + " type:" + type + ". But we had to skip to be compliant with the epSOS specs.");
+                    //TODO: We had to remove this control, since epSOS specs need role: resource and type: system object together
+                    LOGGER.warn("Invalid combination of role and type. Role: '{}' type: '{}'. But we had to skip to be compliant with the specifications.", role, type);
                     //throw new AtnaException("Invalid combination of role and type. Role:" + role + " type:" + type);
                 }
                 break;
@@ -238,14 +223,16 @@ public class ValidationProcessor implements AtnaProcessor {
 
                 break;
             default:
-                throw new AtnaException("unknown Object type.");
+                throw new AtnaException("Unknown Object type.");
         }
 
     }
 
     private void validateObjectIdTypeCode(AtnaCode code, ObjectType type) throws AtnaException {
-        if (code.getCodeType().equals(AtnaCode.OBJECT_ID_TYPE)
-                && code.getCodeSystemName() != null && code.getCodeSystemName().equalsIgnoreCase("RFC-3881")) {
+
+        if (code.getCodeType().equals(AtnaCode.OBJECT_ID_TYPE) && code.getCodeSystemName() != null
+                && code.getCodeSystemName().equalsIgnoreCase("RFC-3881")) {
+
             String s = code.getCode();
             switch (type) {
                 case PERSON:
@@ -270,11 +257,8 @@ public class ValidationProcessor implements AtnaProcessor {
 
                     break;
                 default:
-                    throw new AtnaException("unknown Object type.");
+                    throw new AtnaException("Unknown Object type.");
             }
         }
-
     }
-
-
 }

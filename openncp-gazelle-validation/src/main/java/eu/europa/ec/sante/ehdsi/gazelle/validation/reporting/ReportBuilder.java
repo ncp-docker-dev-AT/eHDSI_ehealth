@@ -2,16 +2,21 @@ package eu.europa.ec.sante.ehdsi.gazelle.validation.reporting;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
 import net.ihe.gazelle.jaxb.result.sante.DetailedResult;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
-import tr.com.srdc.epsos.util.DateUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
@@ -38,7 +43,14 @@ public class ReportBuilder {
     public static boolean build(final String model, final String objectType, final String validationObject,
                                 final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
 
-        LOGGER.info("Build report for '{}' Model for '{}' side", objectType, ncpSide.getName());
+        String sideFolder;
+        if (ncpSide == null || StringUtils.isEmpty(ncpSide.getName())) {
+            sideFolder = "NCP-X";
+        } else {
+            sideFolder = ncpSide.getName();
+        }
+
+        LOGGER.info("Build report for '{}' Model for '{}' side", objectType, sideFolder);
         String reportFileName;
         String reportDirName;
         String validationTestResult;
@@ -69,8 +81,9 @@ public class ReportBuilder {
             validationBody = validationResponse.replace("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>", "");
         }
 
-        reportDirName = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + "/" + ncpSide.getName();
-        reportFileName = reportDirName + "/" + buildReportFileName(model, objectType, validationTestResult);
+
+        reportDirName = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + "/" + sideFolder;
+        reportFileName = reportDirName + File.separator + buildReportFileName(model, objectType, validationTestResult);
 
         if (checkReportDir(reportDirName)) {
 
@@ -88,6 +101,18 @@ public class ReportBuilder {
                     return false;
                 }
             }
+
+
+            LOGGER.info("Validation report written with success");
+            File repostHtmlFile = new File(StringUtils.replace(reportFileName, ".xml", ".html"));
+            try (BufferedWriter htmlReport = new BufferedWriter(new FileWriter(repostHtmlFile.getAbsoluteFile()))) {
+                ReportTransformer reportTransformer = new ReportTransformer(validationBody, (Base64.isBase64(validationObject) ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) : validationObject));
+                LOGGER.info("HTML:\n{}", reportTransformer.getHtmlReport());
+                htmlReport.write(reportTransformer.getHtmlReport());
+            } catch (IOException e) {
+                LOGGER.error("An I/O error has occurred while writting the HTML report file, please check the stack trace for more information.", e);
+            }
+
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(reportFile.getAbsoluteFile()))) {
 
                 bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
@@ -95,16 +120,15 @@ public class ReportBuilder {
                 bw.write("<validationReport>");
                 bw.write("\n");
                 bw.write("<validatedObject>");
-                bw.write(validationObject.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""));
+                bw.write("<![CDATA[\"" + (Base64.isBase64(validationObject) ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) : validationObject) + "\"]]>");
                 bw.write("</validatedObject>");
                 bw.write("\n");
                 bw.write("<validationResult>");
-                bw.write(validationBody);
+                bw.write("<![CDATA[\"" + validationBody + "\"]]>");
                 bw.write("</validationResult>");
                 bw.write("\n");
                 bw.write("</validationReport>");
 
-                LOGGER.info("Validation report written with success");
                 return true;
 
             } catch (IOException ex) {
@@ -123,7 +147,6 @@ public class ReportBuilder {
      * @param validationTestResult the validation result object.
      * @return a report file name.
      */
-
     private static String buildReportFileName(final String model, final String objectType, final String validationTestResult) {
 
         final String SEPARATOR = "_";
@@ -131,8 +154,7 @@ public class ReportBuilder {
         final String modelNormalized = model.replace(" ", "-");
 
         StringBuilder fileName = new StringBuilder();
-
-        fileName.append(DateUtil.getCurrentTimeLocal());
+        fileName.append(formatDate());
 
         if (objectType != null && !objectType.isEmpty()) {
             fileName.append(SEPARATOR);
@@ -147,6 +169,9 @@ public class ReportBuilder {
         if (validationTestResult != null && !validationTestResult.isEmpty()) {
             fileName.append(SEPARATOR);
             fileName.append(validationTestResult.toUpperCase());
+        } else {
+            fileName.append(SEPARATOR);
+            fileName.append("NOT-TESTED");
         }
 
         fileName.append(FILE_EXTENSION);
@@ -174,5 +199,14 @@ public class ReportBuilder {
             }
         }
         return true;
+    }
+
+    private static String formatDate() {
+
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        //ISO 8601 format: 2017-11-25T10:59:53Z
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        df.setTimeZone(tz);
+        return df.format(new Date());
     }
 }

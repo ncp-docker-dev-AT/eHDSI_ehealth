@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
  * This class represents the wrapper for the XDR messages validation.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @deprecated
  */
 @Deprecated
 public class XdrValidationService extends ValidationService {

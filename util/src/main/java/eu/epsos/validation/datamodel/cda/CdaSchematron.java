@@ -43,6 +43,10 @@ public enum CdaSchematron {
     EP_PIVOT("ePrescription - Pivot");
     private String name;
 
+    CdaSchematron(String s) {
+        name = s;
+    }
+
     public static CdaSchematron checkSchematron(String schematron) {
         for (CdaSchematron m : CdaSchematron.values()) {
             if (schematron.equals(m.toString())) {
@@ -52,26 +56,13 @@ public enum CdaSchematron {
         return null;
     }
 
-    private CdaSchematron(String s) {
-        name = s;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    public ObjectType getObjectType() {
-        return ObjectType.CDA;
-    }
-
     /**
      * This helper method will return a specific CDA Schematron based on a
      * document class code (also choosing between friendly or pivot documents).
      *
-     * @param classCode The document class code.
+     * @param classCode  The document class code.
      * @param isFriendly The boolean flag stating if the document is pivot or
-     * not.
+     *                   not.
      * @return the correspondent CDA model.
      */
     public static String obtainCdaSchematron(String classCode, boolean isPivot) {
@@ -112,7 +103,7 @@ public enum CdaSchematron {
                 return CdaSchematron.ED_FRIENDLY.toString();
             }
             if (classCode.equals(Constants.HCER_CLASSCODE)) {
-               throw new UnsupportedOperationException("There is no avaliable schematron for the supplied CLASSCODE: " + classCode);
+                throw new UnsupportedOperationException("There is no avaliable schematron for the supplied CLASSCODE: " + classCode);
             }
             if (classCode.equals(Constants.CONSENT_CLASSCODE)) {
                 throw new UnsupportedOperationException("There is no avaliable schematron for the supplied CLASSCODE: " + classCode);
@@ -120,5 +111,14 @@ public enum CdaSchematron {
         }
 
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public ObjectType getObjectType() {
+        return ObjectType.CDA;
     }
 }

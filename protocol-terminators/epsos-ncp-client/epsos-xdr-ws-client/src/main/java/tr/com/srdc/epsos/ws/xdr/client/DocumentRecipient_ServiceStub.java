@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. epsos@srdc.com.tr
- *
- * This file is part of SRDC epSOS NCP.
- *
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- *
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see http://www.gnu.org/licenses/.
- */
 package tr.com.srdc.epsos.ws.xdr.client;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
@@ -29,8 +10,7 @@ import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.xd.XdModel;
-import eu.epsos.validation.services.XdrValidationService;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
@@ -38,6 +18,7 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.*;
+import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
@@ -53,7 +34,12 @@ import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.activation.DataHandler;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -61,13 +47,14 @@ import java.util.UUID;
 
 public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DocumentRecipient_ServiceStub.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentRecipient_ServiceStub.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     // http://servicelocation/DocumentRecipient_Service
     private static final javax.xml.bind.JAXBContext wsContext;
     private static int counter = 0;
 
     static {
-        LOG.debug("Loading the WS-Security init libraries in DocumentRecipient_ServiceStub");
+        LOGGER.debug("Loading the WS-Security init libraries in DocumentRecipient_ServiceStub");
         org.apache.xml.security.Init.init(); // Massi added 3/1/2017.
     }
 
@@ -78,8 +65,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             jc = javax.xml.bind.JAXBContext.newInstance(ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class, RegistryResponseType.class);
 
         } catch (javax.xml.bind.JAXBException ex) {
-            LOG.error("Unable to create JAXBContext: " + ex.getMessage());
-            LOG.error(ex.getLocalizedMessage(), ex);
+            LOGGER.error("Unable to create JAXBContext: " + ex.getMessage());
+            LOGGER.error(ex.getLocalizedMessage(), ex);
 
             Runtime.getRuntime().exit(-1);
 
@@ -231,7 +218,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                 _serviceClient.addHeader(security);
 
             } catch (Exception e) {
-                LOG.error(e.getLocalizedMessage(), e);
+                LOGGER.error(e.getLocalizedMessage(), e);
             }
 
             /* The WSA To header is not being manually added, it's added by the client-connector axis2.xml configurations
@@ -247,14 +234,16 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
              * Prepare request
              */
             _messageContext.setEnvelope(env);   // set the message context with that soap envelope
-            _operationClient.addMessageContext(_messageContext);    // add the message contxt to the operation client
+            _operationClient.addMessageContext(_messageContext);    // add the message context to the operation client
 
             /* Log soap request */
             String requestLogMsg;
             try {
                 String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
-                LOG.debug("{} {} '{}'", XDRConstants.LOG.OUTGOING_XDR_PROVIDEANDREGISTER_MESSAGE,
-                        System.getProperty("line.separator"), logRequestMsg);
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    LOGGER_CLINICAL.debug("{} {} '{}'", XDRConstants.LOG.OUTGOING_XDR_PROVIDEANDREGISTER_MESSAGE,
+                            System.getProperty("line.separator"), logRequestMsg);
+                }
                 requestLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody()));
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -268,15 +257,15 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 //                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
 //                        EventType.epsosDispensationServiceInitialize.getCode(),
 //                        new DateTime(),
-//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+//                        EventOutcomeIndicatorIncoming XDR response message from NCP-A.FULL_SUCCESS.getCode().toString(),
 //                        "NCPB_XDR_SUBMIT_REQ");
 //            } catch (Exception e) {
-//                LOG.error(ExceptionUtils.getStackTrace(e));
+//                LOGGER.error(ExceptionUtils.getStackTrace(e));
 //            }
 
             /* Perform validation of request message */
-            XdrValidationService.getInstance().validateModel(requestLogMsg, XdModel.obtainModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
-
+            //XdrValidationService.getInstance().validateModel(requestLogMsg, XdModel.obtainModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
+            OpenNCPValidation.validateXDRMessage(requestLogMsg, XdModel.obtainModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
             /*
              * Execute Operation
              */
@@ -285,11 +274,11 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 _operationClient.execute(true);
             } catch (AxisFault e) {
-                LOG.error("Axis Fault error: '{}'", e.getMessage());
-                LOG.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
+                LOGGER.error("Axis Fault error: '{}'", e.getMessage());
+                LOGGER.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
                 String endpoint = null;
 
-                LOG.debug("ClassCode: '{}'", this.classCode);
+                LOGGER.debug("ClassCode: '{}'", this.classCode);
                 DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
                 switch (classCode) {
                     case tr.com.srdc.epsos.util.Constants.ED_CLASSCODE:
@@ -308,7 +297,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
-                    LOG.debug("Retrying the request with the new configurations: [{}]", endpoint);
+                    LOGGER.debug("Retrying the request with the new configurations: [{}]", endpoint);
                     _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(endpoint));
 
                     /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
@@ -345,10 +334,10 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                     _operationClient = newOperationClient;
                     _messageContext = newMessageContext;
                     env = newEnv;
-                    LOG.debug("Successfully retried the request! Proceeding with the normal workflow...");
+                    LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOG.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
+                    LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
                     throw e;
                 }
             }
@@ -372,22 +361,25 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                         EadcEntry.DsTypes.XDR, // Data source type
                         EadcUtil.Direction.OUTBOUND); // Transaction direction
             } catch (Exception ex) {
-                LOG.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
+                LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
             }
 
             /* Log soap response */
             String responseLogMsg;
             try {
-                String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv));
-                LOG.debug("{} {} '{}'", XDRConstants.LOG.INCOMING_XDR_PROVIDEANDREGISTER_MESSAGE,
-                        System.getProperty("line.separator"), logResponseMsg);
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv));
+                    LOGGER_CLINICAL.debug("{} {} '{}'", XDRConstants.LOG.INCOMING_XDR_PROVIDEANDREGISTER_MESSAGE,
+                            System.getProperty("line.separator"), logResponseMsg);
+                }
                 responseLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv.getBody()));
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
 
             /* Perform validation of response message */
-            XdrValidationService.getInstance().validateModel(responseLogMsg, XdModel.obtainResponseModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
+            //XdrValidationService.getInstance().validateModel(responseLogMsg, XdModel.obtainResponseModelXdr(requestLogMsg).toString(), NcpSide.NCP_B);
+            OpenNCPValidation.validateXDRMessage(responseLogMsg, XdModel.obtainModelXdr(responseLogMsg).toString(), NcpSide.NCP_B);
             /*
              * Return
              */
@@ -408,7 +400,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 //                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
 //                        "NCPB_XDR_SUBMIT_RES");
 //            } catch (Exception e) {
-//                LOG.error(ExceptionUtils.getStackTrace(e));
+//                LOGGER.error(ExceptionUtils.getStackTrace(e));
 //            }
 
             return registryResponse;
@@ -550,11 +542,12 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
         EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
         EventLogUtil.prepareXDRCommonLog(eventLog, request, rel);
+        eventLog.setNcpSide(NcpSide.NCP_B);
         EventLogClientUtil.sendEventLog(eventLog);
         return eventLog;
     }
 
-    private void populateAxisService() throws AxisFault {
+    private void populateAxisService() {
 
         // creating the Service with a unique name
         _service = new org.apache.axis2.description.AxisService(XDRConstants.DOCUMENT_RECIPIENT_SERVICE_STR + getUniqueSuffix());
@@ -642,26 +635,24 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             }
         }
 
-        public void serialize(javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
+        public void serialize(XMLStreamWriter xmlWriter) throws XMLStreamException {
 
             try {
-                marshaller.marshal(new javax.xml.bind.JAXBElement(
-                        new javax.xml.namespace.QName(nsuri, name), outObject
-                        .getClass(), outObject), xmlWriter);
+                marshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), xmlWriter);
+
             } catch (javax.xml.bind.JAXBException e) {
                 throw new javax.xml.stream.XMLStreamException(
                         XDRConstants.EXCEPTIONS.ERROR_JAXB_MARSHALLING, e);
             }
         }
 
-        public javax.xml.stream.XMLStreamReader getReader() throws javax.xml.stream.XMLStreamException {
+        public XMLStreamReader getReader() throws XMLStreamException {
 
             try {
-                javax.xml.bind.JAXBContext context = wsContext;
-                org.apache.axiom.om.impl.builder.SAXOMBuilder builder = new org.apache.axiom.om.impl.builder.SAXOMBuilder();
-                javax.xml.bind.Marshaller marshaller = context.createMarshaller();
-                marshaller.marshal(new javax.xml.bind.JAXBElement(
-                        new javax.xml.namespace.QName(nsuri, name), outObject.getClass(), outObject), builder);
+
+                SAXOMBuilder builder = new SAXOMBuilder();
+                Marshaller contextMarshaller = wsContext.createMarshaller();
+                contextMarshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
 
                 return builder.getRootElement().getXMLStreamReader();
 

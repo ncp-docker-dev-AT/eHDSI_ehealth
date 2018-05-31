@@ -41,6 +41,10 @@ public enum AuditSchematron {
     EPSOS_IMPORT_NCP_TRUSTED_LIST("epSOS - Import NCP Trusted Service List");
     private String name;
 
+    AuditSchematron(String s) {
+        name = s;
+    }
+
     public static AuditSchematron checkSchematron(String model) {
         for (AuditSchematron s : AuditSchematron.values()) {
             if (model.equals(s.toString())) {
@@ -48,10 +52,6 @@ public enum AuditSchematron {
             }
         }
         return null;
-    }
-
-    private AuditSchematron(String s) {
-        name = s;
     }
 
     @Override

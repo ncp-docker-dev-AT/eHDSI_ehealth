@@ -24,6 +24,7 @@ import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
@@ -346,7 +347,7 @@ public class EpsosHelperService {
             LOGGER.error("error creating disp doc");
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
-        return edDoc.getBytes();
+        return edDoc.getBytes(StandardCharsets.UTF_8);
     }
 
     /**
@@ -1277,7 +1278,7 @@ public class EpsosHelperService {
         eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                resm_participantObjectID, ResM_PatricipantObjectDetail, hostSource, "N/A");
+                resm_participantObjectID, ResM_PatricipantObjectDetail, hostSource, "N/A", NcpSide.NCP_B);
 
         LOGGER.info("The audit has been prepared");
         eventLog1.setEventType(EventType.epsosHcpAuthentication);

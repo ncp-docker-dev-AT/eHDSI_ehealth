@@ -1,6 +1,7 @@
 package se.sb.epsos.web.service;
 
 import epsos.ccd.gnomon.auditmanager.*;
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
@@ -293,7 +294,7 @@ public class AssertionHandler implements Serializable {
                 SP_UserID, AS_AuditSourceId, ET_ObjectID,
                 reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
                 resm_participantObjectID, ResM_PatricipantObjectDetail,
-                sourceHost, "N/A");
+                sourceHost, "N/A", NcpSide.NCP_B);
         eventLog.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog, "13", "2");
         LOGGER.debug("################################################");

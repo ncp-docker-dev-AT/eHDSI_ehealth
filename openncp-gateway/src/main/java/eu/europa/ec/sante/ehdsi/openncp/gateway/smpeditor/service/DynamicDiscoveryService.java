@@ -32,6 +32,9 @@ import java.security.cert.CertificateException;
 
 public final class DynamicDiscoveryService {
 
+    private DynamicDiscoveryService() {
+    }
+
     public static DynamicDiscovery initDynamicDiscovery() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, TechnicalException {
 
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());

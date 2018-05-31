@@ -42,6 +42,7 @@ public class EvidenceUtils {
 
     public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
     private static final Logger LOGGER = LoggerFactory.getLogger(EvidenceUtils.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
     private static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
 
@@ -61,6 +62,13 @@ public class EvidenceUtils {
             TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException,
             UnrecoverableKeyException {
 
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
+                            "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'",
+                    XMLUtil.DocumentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
+                    senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
+                    submissionTime, status, title);
+        }
         MessageType messageType = null;
         String msguuid;
         try {
@@ -87,6 +95,13 @@ public class EvidenceUtils {
             ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException,
             NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
+                            "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
+                    XMLUtil.DocumentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
+                    senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
+                    submissionTime, status, title, msguuid);
+        }
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
             statusmsg = "success";
@@ -189,6 +204,12 @@ public class EvidenceUtils {
                                             String recipientCertAlias, String eventType, DateTime submissionTime, String status,
                                             String title) throws Exception {
 
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRO()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
+                            "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'",
+                    XMLUtil.DocumentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
+                    senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType, submissionTime, status, title);
+        }
         MessageType messageType = null;
         String msguuid;
         try {
@@ -214,10 +235,13 @@ public class EvidenceUtils {
                                             String recipientCertAlias, String eventType, DateTime submissionTime,
                                             String status, String title, String msguuid) throws Exception {
 
-        LOGGER.info("createEvidenceREMNRO('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')", issuerKeyStorePath,
-                StringUtils.isNotBlank(issuerKeyPassword) ? "******" : "N/A", issuerCertAlias, senderKeyStorePath,
-                StringUtils.isNotBlank(senderKeyPassword) ? "******" : "N/A", senderCertAlias, recipientKeyStorePath,
-                StringUtils.isNotBlank(recipientKeyPassword) ? "******" : "N/A", recipientCertAlias, eventType);
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRO()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
+                            "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
+                    XMLUtil.DocumentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
+                    senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
+                    submissionTime, status, title, msguuid);
+        }
 
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
@@ -348,7 +372,7 @@ public class EvidenceUtils {
     private static X509Certificate getCertificate(String keyStorePath, String keyPassword, String certAlias)
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
 
-        LOGGER.debug("X509Certificate getCertificate('{}', '{}', '{}", keyStorePath, StringUtils.isNotBlank(keyPassword) ? "******" : "N/A", certAlias);
+        LOGGER.debug("X509Certificate getCertificate('{}', '{}', '{}')", keyStorePath, StringUtils.isNotBlank(keyPassword) ? "******" : "N/A", certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
         ks.load(keyStream, keyPassword == null ? null : keyPassword.toCharArray());
@@ -358,7 +382,7 @@ public class EvidenceUtils {
     private static PrivateKey getSigningKey(String keyStorePath, String keyPassword, String certAlias)
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
-        LOGGER.debug("PrivateKey getSigningKey('{}', '{}', '{}", keyStorePath, StringUtils.isNotBlank(keyPassword) ? "******" : "N/A", certAlias);
+        LOGGER.debug("PrivateKey getSigningKey('{}', '{}', '{}')", keyStorePath, StringUtils.isNotBlank(keyPassword) ? "******" : "N/A", certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
         ks.load(keyStream, keyPassword == null ? null : keyPassword.toCharArray());

@@ -9,7 +9,7 @@ import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
-import eu.epsos.validation.services.XcpdValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import org.apache.axiom.om.*;
@@ -278,8 +278,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             start = System.currentTimeMillis();
 
             /* Validate Request Messages */
-            XcpdValidationService.getInstance().validateSchematron(logRequestBody, Hl7v3Schematron.EPSOS_ID_SERVICE_REQUEST.toString(), NcpSide.NCP_B);
-
+            //XcpdValidationService.getInstance().validateSchematron(logRequestBody, Hl7v3Schematron.EPSOS_ID_SERVICE_REQUEST.toString(), NcpSide.NCP_B);
+            OpenNCPValidation.validatePatientDemographic(logRequestBody, Hl7v3Schematron.EPSOS_ID_SERVICE_REQUEST.toString(), NcpSide.NCP_B);
             // TMP
             // Transaction end time
             end = System.currentTimeMillis();
@@ -375,9 +375,9 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             }
 
             /* Validate Response Messages */
-            XcpdValidationService.getInstance().validateSchematron(logResponseBody, Hl7v3Schematron.EPSOS_ID_SERVICE_RESPONSE.toString(), NcpSide.NCP_B);
-
-            Object object = fromOM(_returnEnv.getBody().getFirstElement(), org.hl7.v3.PRPAIN201306UV02.class, getEnvelopeNamespaces(_returnEnv));
+            //XcpdValidationService.getInstance().validateSchematron(logResponseBody, Hl7v3Schematron.EPSOS_ID_SERVICE_RESPONSE.toString(), NcpSide.NCP_B);
+            OpenNCPValidation.validatePatientDemographic(logResponseBody, Hl7v3Schematron.EPSOS_ID_SERVICE_RESPONSE.toString(), NcpSide.NCP_B);
+            Object object = fromOM(_returnEnv.getBody().getFirstElement(), PRPAIN201306UV02.class, getEnvelopeNamespaces(_returnEnv));
 
             // TMP
             // Validation end time
@@ -594,6 +594,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                                            SOAPEnvelope _returnEnv, SOAPEnvelope env, Assertion idAssertion, String address) {
 
         EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
+        eventLog.setNcpSide(NcpSide.NCP_B);
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
         EventLogUtil.prepareXCPDCommonLog(eventLog, sended, received);
         EventLogClientUtil.sendEventLog(eventLog);

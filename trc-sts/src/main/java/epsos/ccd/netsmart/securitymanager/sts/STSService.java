@@ -6,6 +6,7 @@ import epsos.ccd.netsmart.securitymanager.SamlTRCIssuer;
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.sts.util.STSUtils;
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
@@ -308,7 +309,7 @@ public class STSService implements Provider<SOAPMessage> {
                         + "<" + humanRequestorNameID + "@" + cms.getProperty("ncp.country") + ">", humanRequestorRole,
                 humanRequestorSubjectID, tls_cn, STSUtils.getServerIP(), cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
                 patientID, "urn:uuid:" + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
-                STSUtils.getServerIP(), getClientIP());
+                STSUtils.getServerIP(), getClientIP(), NcpSide.NCP_B);
 
         evLogTRC.setEventType(EventType.epsosTRCAssertion);
         auditService.write(evLogTRC, "13", "2");

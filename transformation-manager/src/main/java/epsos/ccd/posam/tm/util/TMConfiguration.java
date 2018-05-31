@@ -8,7 +8,7 @@ import java.util.Collection;
 
 /**
  * Class/Singleton stores configurable parameters for TM module
- * Parameters are writen in tm.properties file
+ * Parameters are written in tm.properties file
  *
  * @author Frantisek Rudik
  * @author Organization: Posam
@@ -60,6 +60,8 @@ public class TMConfiguration implements InitializingBean {
     private String auditTrailFacility;
     private String auditTrailSeverity;
     private Collection<String> docTypesCollection;
+
+    private String ncpSide;
 
     private TMConfiguration() {
     }
@@ -242,6 +244,14 @@ public class TMConfiguration implements InitializingBean {
 
     public void setAuditTrailSeverity(String auditTrailSeverity) {
         this.auditTrailSeverity = auditTrailSeverity;
+    }
+
+    public String getNcpSide() {
+        return ncpSide;
+    }
+
+    public void setNcpSide(String ncpSide) {
+        this.ncpSide = ncpSide;
     }
 
     /**
