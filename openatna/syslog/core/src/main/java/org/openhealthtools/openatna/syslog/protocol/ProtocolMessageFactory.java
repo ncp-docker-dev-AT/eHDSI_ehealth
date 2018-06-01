@@ -1,23 +1,3 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
-
 package org.openhealthtools.openatna.syslog.protocol;
 
 import org.openhealthtools.openatna.syslog.*;
@@ -36,7 +16,6 @@ import java.util.regex.Pattern;
  * generates RFC 5424 messages from a stream.
  *
  * @author Andrew Harrison
- * @version $Revision:$
  */
 public class ProtocolMessageFactory extends SyslogMessageFactory {
 
@@ -53,6 +32,7 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
      * @return The created java.util.Date
      */
     public static Date createDate(String date) throws SyslogException {
+
         Matcher m = DATE.matcher(date);
         if (m.find()) {
 
@@ -61,7 +41,9 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
                     m.group(7) + "}{" + m.group(8) + "}{" + m.group(9) + "}{" +
                     m.group(10) + "}{" + m.group(11) + "}{" + m.group(12) + "}");
             Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-            int hoff = 0, moff = 0, doff = -1;
+            int hoff = 0;
+            int moff = 0;
+            int doff;
             if (m.group(9) != null) {
                 doff = m.group(9).equals("-") ? 1 : -1;
                 hoff = doff * (m.group(10) != null ? Integer.parseInt(m.group(10)) : 0);
@@ -231,7 +213,7 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
                 if (c == ' ') {
                     count++;
                     String currHeader = new String(buff.array(), 0, buff.position(), Constants.ENC_UTF8);
-                    LOGGER.info("CurrHeader :" + currHeader);
+                    LOGGER.info("CurrHeader: '{}'", currHeader);
                     buff.clear();
                     switch (count) {
                         case 1:
@@ -259,7 +241,7 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
             }
 
             c = (byte) pin.read();
-            List<StructuredElement> els = new ArrayList<StructuredElement>();
+            List<StructuredElement> els = new ArrayList<>();
             if (c == '-') {
                 c = (byte) pin.read();
                 if (c != ' ') {
@@ -287,5 +269,4 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
             throw new SyslogException(e);
         }
     }
-
 }

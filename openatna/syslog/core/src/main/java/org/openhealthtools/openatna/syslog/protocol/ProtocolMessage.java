@@ -18,7 +18,6 @@ import java.util.List;
  * RFC 5424 Syslog message format implementation.
  *
  * @author Andrew Harrison
- * @version $Revision:$
  */
 public class ProtocolMessage<M> extends SyslogMessage {
 
@@ -73,22 +72,22 @@ public class ProtocolMessage<M> extends SyslogMessage {
     }
 
     private String getHeader() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<").append(getFacility() * 8 + getSeverity()).append(">")
-                .append(ProtocolMessageFactory.VERSION_CHAR).append(" ")
-                .append(getTimestamp()).append(" ")
-                .append(getHostName()).append(" ")
-                .append(appName).append(" ")
-                .append(procId).append(" ")
-                .append(messageId).append(" ");
-        return sb.toString();
+
+        return "<" + (getFacility() * 8 + getSeverity()) + ">" +
+                ProtocolMessageFactory.VERSION_CHAR + " " +
+                getTimestamp() + " " +
+                getHostName() + " " +
+                appName + " " +
+                procId + " " +
+                messageId + " ";
     }
 
     public void write(OutputStream out) throws SyslogException {
+
         try {
             OutputStreamWriter writer = new OutputStreamWriter(out, Constants.ENC_UTF8);
             writer.write(getHeader());
-            if (structuredElement.size() > 0) {
+            if (!structuredElement.isEmpty()) {
                 for (StructuredElement element : structuredElement) {
                     writer.write(element.toString());
                 }
@@ -105,6 +104,7 @@ public class ProtocolMessage<M> extends SyslogMessage {
     }
 
     public byte[] toByteArray() throws SyslogException {
+
         try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             getMessage().write(bout);
@@ -117,11 +117,11 @@ public class ProtocolMessage<M> extends SyslogMessage {
         }
     }
 
-
     public String toString() {
+
         StringBuilder sb = new StringBuilder();
         sb.append(getHeader());
-        if (structuredElement.size() > 0) {
+        if (!structuredElement.isEmpty()) {
             for (StructuredElement element : structuredElement) {
                 sb.append(element.toString());
             }
@@ -142,6 +142,4 @@ public class ProtocolMessage<M> extends SyslogMessage {
         }
         return sb.toString();
     }
-
-
 }

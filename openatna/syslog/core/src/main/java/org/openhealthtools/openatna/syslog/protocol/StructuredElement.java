@@ -16,11 +16,10 @@ import java.util.Set;
  * A structured element as defined by RFC 5424
  *
  * @author Andrew Harrison
- * @version $Revision:$
  */
 public class StructuredElement implements Serializable {
 
-    protected static final int docEnterpriseNumber = 32473;
+    protected static final int DOC_ENTERPRISE_NUMBER = 32473;
     /**
      * timeQuality parameters
      */
@@ -47,12 +46,12 @@ public class StructuredElement implements Serializable {
     private String id;
 
     public StructuredElement(String id, List<SdParam> params) {
-
         this.id = id;
         this.params.addAll(params);
     }
 
     public static String unescape(String param) {
+
         boolean afterBaskslash = false;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < param.length(); i++) {
@@ -283,7 +282,7 @@ public class StructuredElement implements Serializable {
 
     private static void verifyName(String name) throws SyslogException {
 
-        if (StringUtils.equals(name, String.valueOf(docEnterpriseNumber))) {
+        if (StringUtils.equals(name, String.valueOf(DOC_ENTERPRISE_NUMBER))) {
             throw new SyslogException("documentation enterprise number not allowed");
         }
     }
@@ -321,6 +320,7 @@ public class StructuredElement implements Serializable {
 
     @Override
     public boolean equals(Object o) {
+
         if (this == o) {
             return true;
         }
@@ -333,15 +333,12 @@ public class StructuredElement implements Serializable {
         if (id != null ? !id.equals(that.id) : that.id != null) {
             return false;
         }
-        if (params != null ? !params.equals(that.params) : that.params != null) {
-            return false;
-        }
-
-        return true;
+        return params != null ? params.equals(that.params) : that.params == null;
     }
 
     @Override
     public int hashCode() {
+
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (params != null ? params.hashCode() : 0);
         return result;
