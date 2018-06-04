@@ -20,6 +20,7 @@
 
 package org.openhealthtools.openatna.audit.persistence.model.codes;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.openhealthtools.openatna.audit.persistence.model.PersistentEntity;
 
 import javax.persistence.*;
@@ -97,7 +98,9 @@ public abstract class CodeEntity extends PersistentEntity {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.AUTO,generator="native")
+    //@GenericGenerator(name = "native",strategy = "native")
     public Long getId() {
         return id;
     }

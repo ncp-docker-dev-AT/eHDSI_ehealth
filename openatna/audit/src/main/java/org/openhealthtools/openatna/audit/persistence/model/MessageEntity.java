@@ -1,5 +1,6 @@
 package org.openhealthtools.openatna.audit.persistence.model;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.openhealthtools.openatna.audit.persistence.model.codes.EventIdCodeEntity;
 import org.openhealthtools.openatna.audit.persistence.model.codes.EventTypeCodeEntity;
 
@@ -41,7 +42,9 @@ public class MessageEntity extends PersistentEntity {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+    //@GenericGenerator(name = "native", strategy = "native")
     public Long getId() {
         return id;
     }
@@ -190,12 +193,7 @@ public class MessageEntity extends PersistentEntity {
                 : that.getMessageParticipants() != null) {
             return false;
         }
-        if (getMessageSources() != null ? !getMessageSources().equals(that.getMessageSources())
-                : that.getMessageSources() != null) {
-            return false;
-        }
-
-        return true;
+        return getMessageSources() != null ? getMessageSources().equals(that.getMessageSources()) : that.getMessageSources() == null;
     }
 
     @Override
