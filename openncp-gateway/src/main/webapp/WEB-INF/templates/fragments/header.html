@@ -14,6 +14,11 @@
                 <span th:text="${#authentication.name}">John Smith</span>
             </a>
         </li>
-        <li><a href="#"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a></li>
+        <li>
+            <a href="#" th:href="@{/logout}">
+                <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+                <span th:text="Sign-out"/>
+            </a>
+        </li>
     </ul>
 </div>

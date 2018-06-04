@@ -1,6 +1,5 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.cfg;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -24,8 +23,10 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableWebMvc
-@EnableAutoConfiguration
-@ComponentScan({"eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.*", "eu.europa.ec.sante.ehdsi.openncp.gateway.web"})
+@ComponentScan(basePackages = {
+        "eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor",
+        "eu.europa.ec.sante.ehdsi.openncp.gateway.web",
+        "eu.europa.ec.sante.ehdsi.openncp.gateway.domain"})
 @PropertySources({
         @PropertySource("messages/messages.properties"),
         @PropertySource("WEB-INF/classes/src/main/resources/smpeditor/smpeditor.properties")
