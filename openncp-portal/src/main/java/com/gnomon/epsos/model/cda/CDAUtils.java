@@ -529,7 +529,7 @@ public class CDAUtils {
     private static String addCustodian(String custodianOid, String custodianName, String country) {
 
         return ("<custodian typeCode=\"CST\">" + "\r\n" + "<assignedCustodian classCode=\"ASSIGNED\">" + "\r\n" +
-                "<representedCustodianOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\">" + "\r\n" + "<id root=\"") + custodianOid + "\"/>" + "\r\n" + "<name>" + custodianName + "</name>" + "\r\n" + "<telecom nullFlavor=\"UNK\"/>" + "\r\n" + "<addr>" + "\r\n" + "<country>" + country + "</country>" + "\r\n"
+                "<representedCustodianOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\">" + "\r\n" + "<id root=\"") + custodianOid + "\"/>" + "\r\n" + "<name>" + custodianName + "</name>" + "\r\n" + "<telecom nullFlavor=\"NI\"/>" + "\r\n" + "<addr>" + "\r\n" + "<country>" + country + "</country>" + "\r\n"
                 + "</addr>" + "\r\n"
                 + "</representedCustodianOrganization>" + "\r\n"
                 + "</assignedCustodian></custodian>" + "\r\n";
@@ -553,7 +553,7 @@ public class CDAUtils {
                 legalauthenticatorlastname + "</given>" + "\r\n" + "</name>" + "\r\n"
                 + "</assignedPerson>" + "\r\n" + "<representedOrganization classCode=\"ORG\" determinerCode=\"INSTANCE\">"
                 + "\r\n" + "<id root=\"" +
-                legalOrgOid + "\"/>" + "\r\n" + "<name>Kansaneläkelaitos</name><telecom nullFlavor=\"UNK\"/>"
+                legalOrgOid + "\"/>" + "\r\n" + "<name>Kansaneläkelaitos</name><telecom nullFlavor=\"NI\"/>"
                 + "\r\n" + "<addr use=\"PST\">" + "\r\n" + "<streetAddressLine>N/A</streetAddressLine>" + "\r\n" + "<city>" +
                 legalauthenticatorcity + "</city>" + "\r\n" + "<postalCode>" + legalauthenticatorpostalcode +
                 "</postalCode>" + "\r\n" + "<state nullFlavor=\"UNK\"/>" + "\r\n" + "<country>" + edCountry + "</country>" + "\r\n"
