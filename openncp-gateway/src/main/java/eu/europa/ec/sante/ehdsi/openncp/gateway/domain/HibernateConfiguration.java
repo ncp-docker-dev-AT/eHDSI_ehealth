@@ -43,7 +43,7 @@ public class HibernateConfiguration {
         return entityManagerFactory;
     }
 
-    @Bean
+    @Bean(destroyMethod="")
     public DataSource dataSource() {
 
         JndiDataSourceLookup lookup = new JndiDataSourceLookup();
