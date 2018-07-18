@@ -1,12 +1,5 @@
-package eu.epsos.validation.datamodel.common;
+package eu.europa.ec.sante.ehdsi.gazelle.validation.util;
 
-/**
- * This enumerator represents multiple object/messages types.
- *
- * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
- * @deprecated
- */
-@Deprecated
 public enum ObjectType {
 
     ASSERTION("ASSERTION"),

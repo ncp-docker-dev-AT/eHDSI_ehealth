@@ -2,7 +2,6 @@ package eu.europa.ec.sante.ehdsi.gazelle.validation.impl;
 
 import eu.europa.ec.sante.ehdsi.gazelle.validation.*;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -21,31 +20,31 @@ import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
 public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory {
 
-    public static final String GAZELLE_ASSERTION_VALIDATOR_URI = ConfigurationManagerFactory.getConfigurationManager()
+    public static final String GAZELLE_ASSERTION_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
             .getProperty("GAZELLE_ASSERTION_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS";
+    //"https://gazelle.ehdsi.eu/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    public static final String GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI = ConfigurationManagerFactory.getConfigurationManager()
+    public static final String GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
             .getProperty("GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS";
+    //"https://gazelle.ehdsi.eu/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS";
 
-    public static final String GAZELLE_CDA_VALIDATOR_URI = ConfigurationManagerFactory.getConfigurationManager()
+    public static final String GAZELLE_CDA_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
             .getProperty("GAZELLE_CDA_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
+    //"https://gazelle.ehdsi.eu/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    public static final String GAZELLE_CERTIFICATE_VALIDATOR_URI = ConfigurationManagerFactory.getConfigurationManager()
+    public static final String GAZELLE_CERTIFICATE_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
             .getProperty("GAZELLE_CERTIFICATE_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator";
+    //"https://gazelle.ehdsi.eu/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator";
 
-    public static final String GAZELLE_SCHEMATRON_VALIDATOR_URI = ConfigurationManagerFactory.getConfigurationManager()
+    public static final String GAZELLE_SCHEMATRON_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
             .getProperty("GAZELLE_SCHEMATRON_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator";
+    //"https://gazelle.ehdsi.eu/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator";
 
-    public static final String GAZELLE_XDS_VALIDATOR_URI = ConfigurationManagerFactory.getConfigurationManager()
+    public static final String GAZELLE_XDS_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
             .getProperty("GAZELLE_XDS_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
+    //"https://gazelle.ehdsi.eu/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultGazelleValidatorFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(DefaultGazelleValidatorFactory.class);
 
     private final ConfigurationManager configurationManager;
 
@@ -100,7 +99,6 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
     public XdsValidator getXdsValidator() {
 
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        //marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.xsd.sante");
         marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.xds.sante");
 
         return new XdsValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_XDS_VALIDATOR_URI));
@@ -108,20 +106,20 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
 
     private WebServiceTemplate createWebServiceTemplate(Marshaller marshaller, String defaultUri) {
 
-        LOGGER.debug("Configuring WebServiceTemplate ...");
+        logger.debug("Configuring WebServiceTemplate ...");
 
         HttpClientBuilder httpClientBuilder = HttpClients.custom()
                 .addInterceptorFirst(new HttpComponentsMessageSender.RemoveSoapHeadersInterceptor());
 
         boolean isBehindProxy = configurationManager.getBooleanProperty(StandardProperties.HTTP_PROXY_USED);
-        LOGGER.info("NCP Node is behind a proxy: '{}'", isBehindProxy);
+        logger.info("NCP Node is behind a proxy: '{}'", isBehindProxy);
         if (isBehindProxy) {
 
             String hostname = configurationManager.getProperty(StandardProperties.HTTP_PROXY_HOST);
             int port = configurationManager.getIntegerProperty(StandardProperties.HTTP_PROXY_PORT);
 
             httpClientBuilder.setProxy(new HttpHost(hostname, port));
-            LOGGER.info("NCP Proxy is secured by Credentials: '{}'", configurationManager.getBooleanProperty(StandardProperties.HTTP_PROXY_AUTHENTICATED));
+            logger.info("NCP Proxy is secured by Credentials: '{}'", configurationManager.getBooleanProperty(StandardProperties.HTTP_PROXY_AUTHENTICATED));
 
             if (configurationManager.getBooleanProperty(StandardProperties.HTTP_PROXY_AUTHENTICATED)) {
 

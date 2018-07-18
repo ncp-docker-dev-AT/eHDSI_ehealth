@@ -54,7 +54,6 @@ public class ValidationProcessor implements AtnaProcessor {
             ObjectTypeCodeRole.GUARANTOR,
             ObjectTypeCodeRole.PROVIDER,
             ObjectTypeCodeRole.CUSTOMER,
-
     };
 
     private static String[] personIds = {"1", "2", "3", "4", "5", "6", "7", "11"};
@@ -114,7 +113,6 @@ public class ValidationProcessor implements AtnaProcessor {
         for (AtnaMessageObject object : objects) {
             validateObject(object, context.getPolicies());
         }
-
     }
 
     private void validateParticipant(AtnaMessageParticipant participant, PersistencePolicies policies) throws AtnaException {
@@ -169,9 +167,7 @@ public class ValidationProcessor implements AtnaProcessor {
 
         List<AtnaObjectDetail> details = object.getObjectDetails();
         for (AtnaObjectDetail detail : details) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("AtnaObjectDetail: '{}'", detail.toString());
-            }
+
             if (detail.getType() == null || detail.getValue() == null || detail.getValue().length == 0) {
                 throw new AtnaException("Invalid object detail", AtnaException.AtnaError.INVALID_OBJECT_DETAIL);
             }

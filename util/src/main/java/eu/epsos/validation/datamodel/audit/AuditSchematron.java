@@ -22,8 +22,7 @@ package eu.epsos.validation.datamodel.audit;
 import eu.epsos.validation.datamodel.common.ObjectType;
 
 /**
- * This enumerator gathers all the schematrons used in the Audit Messages Validator
- * at EVS Client.
+ * This enumerator gathers all the schematrons used in the Audit Messages Validator at EVS Client.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */

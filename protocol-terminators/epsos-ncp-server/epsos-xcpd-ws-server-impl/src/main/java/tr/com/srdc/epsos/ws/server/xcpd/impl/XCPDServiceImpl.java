@@ -126,8 +126,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         return result;
     }
 
-    private PRPAIN201306UV02MFMIMT700711UV01Subject1 getSubjectByPatientDemographic(
-            PatientDemographics pd) {
+    private PRPAIN201306UV02MFMIMT700711UV01Subject1 getSubjectByPatientDemographic(PatientDemographics pd) {
+
         PRPAIN201306UV02MFMIMT700711UV01Subject1 response = of.createPRPAIN201306UV02MFMIMT700711UV01Subject1();
         response.getTypeCode().add("SUBJ");
 
@@ -184,7 +184,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation().getCode().setCodeSystem("2.16.840.1.113883.1.11.19914");
 
         INT matchInt = of.createINT();
-        matchInt.setValue(new BigInteger("100"));
+        matchInt.setValue(BigInteger.valueOf(100));
         response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation().setValue(matchInt);
 
         // Set registrationEvent/custodian
@@ -605,6 +605,11 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     LOGGER.error(ExceptionUtils.getStackTrace(e));
                 }
                 List<PatientDemographics> pdList = patientSearchService.getPatientDemographics(patientIdList);
+//                PatientDemographics demographics = pdList.get(0);
+//                demographics.setFamilyName("FAKE Schuman");
+//                demographics.setGivenName("FAKE Robert");
+//                demographics.setId("8-4567");
+//                pdList.add(demographics);
                 // Joao: the NRR is being generated based on the request data, not on the response. This NRR is optional as per the CP, so it's left commented
 //                try {
 //                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

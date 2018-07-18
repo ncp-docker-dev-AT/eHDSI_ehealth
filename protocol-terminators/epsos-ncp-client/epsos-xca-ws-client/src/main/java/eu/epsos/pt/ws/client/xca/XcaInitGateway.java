@@ -6,7 +6,6 @@ import eu.epsos.dts.xds.AdhocQueryResponseConverter;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.transformation.TMServices;
-import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -171,10 +170,12 @@ public class XcaInitGateway {
 //                Element elementNormalize = TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement();
 //                elementNormalize.normalize();
 //                cdaValidationService.validateModel(XMLUtils.toOM(elementNormalize).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
-                String cdaModel = CdaModel.obtainCdaModel(document.getClassCode().getValue(), true);
-                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(TMServices.byteToDocument(
-                        queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(), cdaModel, NcpSide.NCP_B);
-
+                //String cdaModel = CdaModel.obtainCdaModel(document.getClassCode().getValue(), true);
+                if (OpenNCPValidation.isValidationEnable()) {
+                    OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(TMServices.byteToDocument(
+                            queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
+                            NcpSide.NCP_B, document.getClassCode().getValue(), true);
+                }
 //                //Resets the response document to a translated version.
                 queryResponse.getDocumentResponse().get(0).setDocument(TMServices.transformDocument(
                         queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage));
@@ -184,9 +185,12 @@ public class XcaInitGateway {
 //                        queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
 //                        CdaModel.obtainCdaModel(document.getClassCode().getValue(), false), NcpSide.NCP_B);
 
-                String cdaModel2 = CdaModel.obtainCdaModel(document.getClassCode().getValue(), false);
-                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(TMServices.byteToDocument(
-                        queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(), cdaModel2, NcpSide.NCP_B);
+                //String cdaModel2 = CdaModel.obtainCdaModel(document.getClassCode().getValue(), false);
+                if (OpenNCPValidation.isValidationEnable()) {
+                    OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(TMServices.byteToDocument(
+                            queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
+                            NcpSide.NCP_B, document.getClassCode().getValue(), false);
+                }
 
             } catch (DocumentTransformationException e) {
                 LOGGER.warn("DocumentTransformationException: document cannot be translated:\n{}", e.getMessage());

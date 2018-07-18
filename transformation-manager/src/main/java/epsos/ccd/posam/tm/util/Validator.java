@@ -35,44 +35,43 @@ public class Validator implements TMConstants {
      * Validation against schema
      *
      * @param document - Validated document
-     * @throws Exception
      */
     public static boolean validateToSchema(Document document) {
 
         LOGGER.debug("method validateToSchema('{}')", document);
-        if (TMConfiguration.getInstance().isSchemaValidationEnabled()) {
-            // create a SchemaFactory capable of understanding WXS schemas
-            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        //if (TMConfiguration.getInstance().isSchemaValidationEnabled()) {
+        // create a SchemaFactory capable of understanding WXS schemas
+        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-            // load a WXS schema, represented by a Schema instance
-            try {
-                LOGGER.info("XSD Path File: '{}'", TMConfiguration.getInstance().getSchemaFilePath());
-                Source schemaFile = new StreamSource(new File(TMConfiguration.getInstance().getSchemaFilePath()));
-                Schema schema = factory.newSchema(schemaFile);
+        // load a WXS schema, represented by a Schema instance
+        try {
+            LOGGER.info("XSD Path File: '{}'", TMConfiguration.getInstance().getSchemaFilePath());
+            Source schemaFile = new StreamSource(new File(TMConfiguration.getInstance().getSchemaFilePath()));
+            Schema schema = factory.newSchema(schemaFile);
 
-                // create a Validator instance, which can be used to validate an instance document
-                javax.xml.validation.Validator validator = schema.newValidator();
+            // create a Validator instance, which can be used to validate an instance document
+            javax.xml.validation.Validator validator = schema.newValidator();
 
-                // validate the DOM tree
-                LOGGER.info("... Schema Validation ");
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("DOCUMENT: '{}", XMLUtil.prettyPrint(document));
-                }
-                validator.validate(new DOMSource(document));
-                LOGGER.info("OK , instance document is valid ");
-                return true;
-            } catch (SAXException e) {
-                LOGGER.error("Schema validation error, input document is invalid!", e);
-                return false;
-
-            } catch (Exception e) {
-                LOGGER.error("Schema validation error!", e);
-                return false;
+            // validate the DOM tree
+            LOGGER.info("... Schema Validation ");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("DOCUMENT: '{}", XMLUtil.prettyPrint(document));
             }
-        } else {
-            LOGGER.info("Schema validation DISABLED");
+            validator.validate(new DOMSource(document));
+            LOGGER.info("OK , instance document is valid ");
+            return true;
+        } catch (SAXException e) {
+            LOGGER.error("Schema validation error, input document is invalid!", e);
+            return false;
+
+        } catch (Exception e) {
+            LOGGER.error("Schema validation error!", e);
             return false;
         }
+//        } else {
+//            LOGGER.info("Schema validation DISABLED");
+//            return false;
+//        }
     }
 
     private static boolean isScanneddoc(String docType) {
@@ -85,8 +84,7 @@ public class Validator implements TMConstants {
      * Validation using Schematron
      *
      * @param document        - Validated document
-     * @param cdaDocumentType - type of CDA document (PatientSummary, ePrescription,
-     *                        eDispensation)
+     * @param cdaDocumentType - type of CDA document (PatientSummary, ePrescription, eDispensation)
      * @param friendly        - if true validate against friendly scheme, else against pivot
      */
     public static SchematronResult validateSchematron(Document document, String cdaDocumentType, boolean friendly) {

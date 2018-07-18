@@ -3,11 +3,12 @@ package eu.epsos.validation.datamodel.hl7v3;
 import eu.epsos.validation.datamodel.common.ObjectType;
 
 /**
- * This enumerator gathers all the models used in the HL7v3 Validator at EVS
- * Client.
+ * This enumerator gathers all the models used in the HL7v3 Validator at EVS Client.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @deprecated
  */
+@Deprecated
 public enum Hl7v3Model {
 
     PDQV3_ACCEPT_ACK("PDQv3 - Accept Acknowledgement", ObjectType.PDQ),

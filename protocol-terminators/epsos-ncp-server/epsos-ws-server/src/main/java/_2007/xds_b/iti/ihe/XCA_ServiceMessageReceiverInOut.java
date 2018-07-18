@@ -6,7 +6,6 @@ import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.datamodel.xd.XdModel;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -141,8 +140,9 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     /* Validate incoming query request */
                     String requestMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
-                    //XcaValidationService.getInstance().validateModel(requestMessage, XdModel.obtainModelXca(requestMessage).toString(), NcpSide.NCP_A);
-                    OpenNCPValidation.validateCrossCommunityAccess(requestMessage, XdModel.obtainModelXca(requestMessage).toString(), NcpSide.NCP_A);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A);
+                    }
 
                     AdhocQueryResponse adhocQueryResponse1;
                     AdhocQueryRequest wrappedParam = (AdhocQueryRequest) fromOM(
@@ -161,8 +161,9 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     /* Validate outgoing query response */
                     String responseMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
-                    //XcaValidationService.getInstance().validateModel(responseMessage, XdModel.obtainModelXca(responseMessage).toString(), NcpSide.NCP_A);
-                    OpenNCPValidation.validateCrossCommunityAccess(responseMessage, XdModel.obtainModelXca(responseMessage).toString(), NcpSide.NCP_A);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
+                    }
 
                     if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                         LOGGER_CLINICAL.debug("Response Header:\n{}", envelope.getHeader().toString());
@@ -173,8 +174,9 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     /* Validate incoming retrieve request */
                     String requestMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
-                    //XcaValidationService.getInstance().validateModel(requestMessage, XdModel.obtainModelXca(requestMessage).toString(), NcpSide.NCP_A);
-                    OpenNCPValidation.validateCrossCommunityAccess(requestMessage, XdModel.obtainModelXca(requestMessage).toString(), NcpSide.NCP_A);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A);
+                    }
 
                     ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponse3 = null;
                     ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType wrappedParam = (ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType) fromOM(
@@ -206,8 +208,9 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     /* Validate outgoing retrieve response */
                     String responseMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
-                    //XcaValidationService.getInstance().validateModel(responseMessage, XdModel.obtainModelXca(responseMessage).toString(), NcpSide.NCP_A);
-                    OpenNCPValidation.validateCrossCommunityAccess(responseMessage, XdModel.obtainModelXca(responseMessage).toString(), NcpSide.NCP_A);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
+                    }
 
                 } else {
                     LOGGER.error("Method not found: '{}'", methodName);

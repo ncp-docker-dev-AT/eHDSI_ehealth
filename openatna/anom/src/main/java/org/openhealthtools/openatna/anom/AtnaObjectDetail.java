@@ -47,11 +47,7 @@ public class AtnaObjectDetail implements Serializable {
         if (type != null ? !type.equals(that.type) : that.type != null) {
             return false;
         }
-        if (!Arrays.equals(value, that.value)) {
-            return false;
-        }
-
-        return true;
+        return Arrays.equals(value, that.value);
     }
 
     @Override
