@@ -167,7 +167,6 @@ public class OpenNCPValidation {
 
             XdsValidator xdsValidator = GazelleValidatorFactory.getXdsValidator();
             xmlResult = xdsValidator.validateDocument(request, xdsModel.getValidatorName());
-
         }
 
         if (StringUtils.isNotBlank(xmlResult)) {

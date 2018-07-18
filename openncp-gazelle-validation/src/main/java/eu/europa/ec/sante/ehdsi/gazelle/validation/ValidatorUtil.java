@@ -216,13 +216,15 @@ public class ValidatorUtil {
 
         } else if (message.contains(PROVIDE_AND_REGISTER_RESPONSE)) {
 
-            if (message.contains(Constant.CONSENT_CLASSCODE)) {
-                result.setValidatorName(EHDSI_XDS_CS_PUT_RESPONSE);
-            } else if (message.contains(Constant.ED_CLASSCODE)) {
-                result.setValidatorName(EHDSI_XDS_ED_INIT_RESPONSE);
-            } else {
-                result.setValidatorName(EHDSI_XDS_PROVIDE_DATA_RESPONSE);
-            }
+            //TODO: To be validated that only one eHDSI Gazelle Validator might be use for response validation
+            // if (message.contains(Constant.CONSENT_CLASSCODE)) {
+            //     result.setValidatorName(EHDSI_XDS_CS_PUT_RESPONSE);
+            // } else if (message.contains(Constant.ED_CLASSCODE)) {
+            //     result.setValidatorName(EHDSI_XDS_ED_INIT_RESPONSE);
+            // } else {
+            //     result.setValidatorName(EHDSI_XDS_PROVIDE_DATA_RESPONSE);
+            // }
+            result.setValidatorName(EHDSI_XDS_ED_INIT_RESPONSE);
             result.setObjectType(ObjectType.XDR_SUBMIT_RESPONSE.toString());
         }
         return result;
