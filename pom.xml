@@ -390,14 +390,14 @@
             <id>Oss Sonatype</id>
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
         </repository>
-        <repository>
-            <id>Enonic-Repository</id>
-            <url>http://repo.enonic.com/public/</url>
-        </repository>
-        <repository>
-            <id>ph-ed</id>
-            <url>http://www2.ph.ed.ac.uk/maven2/</url>
-        </repository>
+        <!--<repository>-->
+            <!--<id>Enonic-Repository</id>-->
+            <!--<url>http://repo.enonic.com/public/</url>-->
+        <!--</repository>-->
+        <!--<repository>-->
+            <!--<id>ph-ed</id>-->
+            <!--<url>http://www2.ph.ed.ac.uk/maven2/</url>-->
+        <!--</repository>-->
     </repositories>
 
     <build>

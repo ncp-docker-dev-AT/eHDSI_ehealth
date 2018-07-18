@@ -309,7 +309,7 @@
     <wsdl:service name="GazelleObjectValidatorService">
         <wsdl:port binding="tns:GazelleObjectValidatorServiceSoapBinding" name="GazelleObjectValidatorPort">
             <soap:address
-                    location="https://gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator"/>
+                    location="https://gazelle.ehdsi.eu/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

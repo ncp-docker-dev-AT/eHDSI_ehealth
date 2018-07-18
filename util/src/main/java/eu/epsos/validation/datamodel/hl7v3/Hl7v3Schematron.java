@@ -6,11 +6,13 @@ import eu.epsos.validation.datamodel.common.ObjectType;
  * This enumerator gathers all the schematrons used in the HL7v3 Validator at EVS Client.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @deprecated
  */
+@Deprecated
 public enum Hl7v3Schematron {
 
-    EPSOS_ID_SERVICE_REQUEST("epSOS - Identification Service (request)", ObjectType.XCPD_QUERY_REQUEST),
-    EPSOS_ID_SERVICE_RESPONSE("epSOS - Identification Service (response)", ObjectType.XCPD_QUERY_RESPONSE);
+    EPSOS_ID_SERVICE_REQUEST("eHDSI - Identification Service (request)", ObjectType.XCPD_QUERY_REQUEST),
+    EPSOS_ID_SERVICE_RESPONSE("eHDSI - Identification Service (response)", ObjectType.XCPD_QUERY_RESPONSE);
 
     private String name;
     private ObjectType objectType;

@@ -7,7 +7,9 @@ import tr.com.srdc.epsos.util.Constants;
  * This enumerator gathers all the models used in the CDA Model Based Validator at EVS Client.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @deprecated
  */
+@Deprecated
 public enum CdaModel {
 
     ART_DECOR_CDA_PIVOT("eHDSI - ART-DECOR based CDA validation (PIVOT)"),
@@ -49,7 +51,9 @@ public enum CdaModel {
      * @param isPivot   The boolean flag stating if the document is pivot or
      *                  not.
      * @return the correspondent CDA model.
+     * @deprecated
      */
+    @Deprecated
     public static String obtainCdaModel(String classCode, boolean isPivot) {
 
         if (classCode == null || classCode.isEmpty()) {

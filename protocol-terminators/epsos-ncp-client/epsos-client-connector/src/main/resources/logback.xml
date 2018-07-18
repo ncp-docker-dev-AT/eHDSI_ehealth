@@ -33,12 +33,12 @@
     </logger>
 
     <!-- Spring Web Service Payload Logging-->
-    <logger name="org.springframework.ws.client.MessageTracing" level="TRACE" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-    <logger name="org.springframework.ws.server.MessageTracing" level="TRACE" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
+    <!--<logger name="org.springframework.ws.client.MessageTracing" level="TRACE" additivity="false">-->
+    <!--<appender-ref ref="FILE"/>-->
+    <!--</logger>-->
+    <!--<logger name="org.springframework.ws.server.MessageTracing" level="TRACE" additivity="false">-->
+    <!--<appender-ref ref="FILE"/>-->
+    <!--</logger>-->
 
     <logger name="org.apache.http.client" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>

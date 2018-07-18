@@ -6,7 +6,9 @@ import eu.epsos.validation.datamodel.common.ObjectType;
  * This enumerator gathers all the models used in the Audit Messages Validator at EVS Client.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @deprecated
  */
+@Deprecated
 public enum AuditModel {
 
     EPSOS_IDENTIFICATION_SERVICE_AUDIT_SP("epSOS - Identification Service Audit (Service Provider)"),

@@ -6,7 +6,6 @@ import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.datamodel.hl7v3.Hl7v3Schematron;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import org.apache.axiom.om.*;
@@ -21,7 +20,7 @@ import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.XMLUtils;
-import org.h2.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.slf4j.Logger;
@@ -80,7 +79,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
         if (it.hasNext()) {
             return it.next().getText();
         } else {
-            // [Mustafa: May 8, 2012]: Should not be empty string, sch. giveserror.
+            // [Mustafa: May 8, 2012]: Should not be empty string, sch. gives error.
             return Constants.UUID_PREFIX;
         }
     }
@@ -105,18 +104,17 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             eventLog.setSC_UserID(clientDN);
             eventLog.setTargetip(req.getServerName());
 
-            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                 LOGGER_CLINICAL.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
             }
 
             /* Validate incoming request message */
-            OpenNCPValidation.validatePatientDemographic(XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement())),
-                    Hl7v3Schematron.EPSOS_ID_SERVICE_REQUEST.toString(), NcpSide.NCP_A);
-//            XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(
-//                    XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement())),
-//                    Hl7v3Schematron.EPSOS_ID_SERVICE_REQUEST.toString(), NcpSide.NCP_A);
+            String message = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
+            if (OpenNCPValidation.isValidationEnable()) {
+                OpenNCPValidation.validatePatientDemographicRequest(message, NcpSide.NCP_A);
+            }
 
-            XCPD_ServiceSkeleton skel = (XCPD_ServiceSkeleton) obj;
+            XCPD_ServiceSkeleton skeleton = (XCPD_ServiceSkeleton) obj;
             // Out Envelop
             SOAPEnvelope envelope;
             // Find the axisOperation that has been set by the Dispatch phase.
@@ -133,23 +131,19 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
 
                 if (StringUtils.equals("respondingGateway_PRPA_IN201305UV02", methodName)) {
 
-                    PRPAIN201306UV02 pRPA_IN201306UV021;
                     PRPAIN201305UV02 wrappedParam = (PRPAIN201305UV02) fromOM(msgContext.getEnvelope().getBody().getFirstElement(),
                             PRPAIN201305UV02.class, getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    pRPA_IN201306UV021 = skel.respondingGateway_PRPA_IN201305UV02(wrappedParam, sh, eventLog);
+                    PRPAIN201306UV02 prpain201306UV02 = skeleton.respondingGateway_PRPA_IN201305UV02(wrappedParam, sh, eventLog);
 
-                    envelope = toEnvelope(getSOAPFactory(msgContext), pRPA_IN201306UV021, false);
+                    envelope = toEnvelope(getSOAPFactory(msgContext), prpain201306UV02, false);
 
                     /* Validate response message */
-//                    XcpdValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(XMLUtils.toDOM(
-//                            envelope.getBody().getFirstElement())),
-//                            Hl7v3Schematron.EPSOS_ID_SERVICE_RESPONSE.toString(),
-//                            NcpSide.NCP_A);
-                    OpenNCPValidation.validatePatientDemographic(XMLUtil.prettyPrint(XMLUtils.toDOM(
-                            envelope.getBody().getFirstElement())),
-                            Hl7v3Schematron.EPSOS_ID_SERVICE_RESPONSE.toString(), NcpSide.NCP_A);
-
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validatePatientDemographicResponse(XMLUtil.prettyPrint(XMLUtils.toDOM(
+                                envelope.getBody().getFirstElement())),
+                                NcpSide.NCP_A);
+                    }
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
                     eventLog.setNcpSide(NcpSide.NCP_A);
@@ -157,7 +151,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
-                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                         LOGGER_CLINICAL.debug("Outgoing XCPD Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
 
@@ -193,7 +187,6 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
             OMFactory factory = OMAbstractFactory.getOMFactory();
-
             JaxbRIDataSource source = new JaxbRIDataSource(PRPAIN201305UV02.class, param, marshaller,
                     "urn:hl7-org:v3", "PRPA_IN201305UV02");
             OMNamespace namespace = factory.createOMNamespace("urn:hl7-org:v3", null);

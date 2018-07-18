@@ -1,10 +1,9 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation.impl;
 
-import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.datamodel.common.ObjectType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.CdaValidator;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.reporting.ReportBuilder;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.util.ObjectType;
 import net.ihe.gazelle.jaxb.cda.sante.ValidateBase64Document;
 import net.ihe.gazelle.jaxb.cda.sante.ValidateBase64DocumentResponse;
 import net.ihe.gazelle.jaxb.cda.sante.ValidateDocument;
@@ -77,7 +76,7 @@ public class CdaValidatorImpl extends AbstractValidator implements CdaValidator 
             //  return true;
         } catch (WebServiceClientException e) {
             logger.error("An error occurred during validation process of the CdaValidator. Please check the stack trace for more details.", e);
-            return ReportBuilder.build(validator, CdaModel.checkModel(validator).getObjectType().toString(), document, null, null, ncpSide);
+            return ReportBuilder.build(validator, ObjectType.CDA.toString(), document, null, null, ncpSide);
         }
     }
 
@@ -92,10 +91,10 @@ public class CdaValidatorImpl extends AbstractValidator implements CdaValidator 
             ValidateBase64DocumentResponse response = (ValidateBase64DocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
             //DetailedResult detailedResult = (DetailedResult) webServiceTemplate.getUnmarshaller().unmarshal(new StringSource(response.getDetailedResult()));
             DetailedResult detailedResult = unmarshal(response.getDetailedResult());
-            return ReportBuilder.build(validator, CdaModel.checkModel(validator).getObjectType().toString(), base64Document, detailedResult, response.getDetailedResult(), ncpSide);
+            return ReportBuilder.build(validator, ObjectType.CDA.toString(), base64Document, detailedResult, response.getDetailedResult(), ncpSide);
         } catch (WebServiceClientException e) {
             logger.error("An error occurred during validation process of the CdaValidator. Please check the stack trace for more details.", e);
-            return ReportBuilder.build(validator, CdaModel.checkModel(validator).getObjectType().toString(), base64Document, null, null, ncpSide);
+            return ReportBuilder.build(validator, ObjectType.CDA.toString(), base64Document, null, null, ncpSide);
         }
     }
 }

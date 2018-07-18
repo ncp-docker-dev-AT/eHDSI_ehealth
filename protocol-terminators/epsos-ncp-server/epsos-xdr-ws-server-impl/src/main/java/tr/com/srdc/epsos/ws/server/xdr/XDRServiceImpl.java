@@ -9,7 +9,6 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.EvidenceUtils;
-import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
@@ -329,8 +328,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 try {
 
                     /* Validate CDA epSOS Pivot */
-                    String cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
-                    OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8), cdaModel, NcpSide.NCP_A);
+                    //String cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8),
+                                NcpSide.NCP_A, obtainClassCode(request), true);
+                    }
 
 //                    cdaValidationService.validateModel(new String(doc.getValue(), StandardCharsets.UTF_8.name()),
 //                            CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
@@ -342,8 +344,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                    cdaValidationService.validateModel(new String(docBytes, StandardCharsets.UTF_8),
 //                            CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
 
-                    cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
-                    OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8), cdaModel, NcpSide.NCP_A);
+                    //cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8), NcpSide.NCP_A,
+                                obtainClassCode(request), true);
+                    }
 
                 } catch (DocumentTransformationException ex) {
                     LOGGER.error(ex.getLocalizedMessage(), ex);
@@ -499,8 +504,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
             try {
 
                 /* Validate CDA epSOS Pivot */
-                String cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
-                OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8), cdaModel, NcpSide.NCP_A);
+                //String cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
+                if (OpenNCPValidation.isValidationEnable()) {
+                    OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8),
+                            NcpSide.NCP_A, obtainClassCode(request), true);
+                }
 
 //                cdaValidationService.validateModel(new String(doc.getValue(), StandardCharsets.UTF_8.name()),
 //                        CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
@@ -511,8 +519,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 /* Validate CDA epSOS Pivot */
 //                cdaValidationService.validateModel(new String(docBytes, StandardCharsets.UTF_8.name()),
 //                        CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
-                cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
-                OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8), cdaModel, NcpSide.NCP_A);
+                //cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
+                if (OpenNCPValidation.isValidationEnable()) {
+                    OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8),
+                            NcpSide.NCP_A, obtainClassCode(request), true);
+                }
 
             } catch (DocumentTransformationException ex) {
                 LOGGER.error(ex.getLocalizedMessage(), ex);
@@ -631,8 +642,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
             try {
                 /* Validate CDA epSOS Pivot */
-                String cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
-                OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8), cdaModel, NcpSide.NCP_A);
+                //String cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
+                if (OpenNCPValidation.isValidationEnable()) {
+                    OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8),
+                            NcpSide.NCP_A, obtainClassCode(request), true);
+                }
 
                 //  cdaValidationService.validateModel(new String(doc.getValue(), StandardCharsets.UTF_8.name()),
                 //  CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
@@ -643,8 +657,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                        documentString,
 //                        CdaModel.obtainCdaModel(obtainClassCode(request), true),
 //                        NcpSide.NCP_A);
-                cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
-                OpenNCPValidation.validateCdaDocument(documentString, cdaModel, NcpSide.NCP_A);
+                //cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
+                if (OpenNCPValidation.isValidationEnable()) {
+                    OpenNCPValidation.validateCdaDocument(documentString, NcpSide.NCP_A, obtainClassCode(request), true);
+                }
 
                 org.w3c.dom.Document domDocument = XMLUtil.parseContent(documentString);
                 EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.HCER_CLASSCODE, domDocument);

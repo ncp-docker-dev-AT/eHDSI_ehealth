@@ -2,7 +2,6 @@ package eu.epsos.pt.cc;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.datamodel.saml.AssertionSchematron;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -45,7 +44,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 
     static {
         LOGGER.debug("Loading the WS-Security init libraries in ClientConnectorServiceMessageReceiverInOut 2009");
-        org.apache.xml.security.Init.init(); // Joao added 10/03/2017. 
+        org.apache.xml.security.Init.init();
     }
 
     @Override
@@ -136,20 +135,13 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                     }
 
                     //TODO: implement new Gazelle Validator
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
+                    }
+                    //  END: implement new Gazelle Validator
 
-                    //validateMessageAssertions(hcpAssertion);
-                    OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
-                    //END: implement new Gazelle Validator
-
-//                    if (StringUtils.equalsIgnoreCase(ConfigurationManagerFactory.getConfigurationManager().getProperty("automated.validation"), "true")) {
-//
-//                        AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
-//                                AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString(), NcpSide.NCP_B);
-//                    }
-                    QueryPatientDocument wrappedParam;
-                    wrappedParam = (QueryPatientDocument) fromOM(reqEnv.getBody().getFirstElement(),
-                            QueryPatientDocument.class,
-                            getEnvelopeNamespaces(reqEnv));
+                    QueryPatientDocument wrappedParam = (QueryPatientDocument) fromOM(reqEnv.getBody().getFirstElement(),
+                            QueryPatientDocument.class, getEnvelopeNamespaces(reqEnv));
 
                     QueryPatientResponseDocument queryPatientResponse13 = skel.queryPatient(wrappedParam, hcpAssertion);
                     envelope = toEnvelope(getSOAPFactory(msgContext), queryPatientResponse13);
@@ -162,20 +154,19 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 
                     Assertion hcpAssertion = null;
                     Assertion trcAssertion = null;
-                    String assertionSchematron = null;
+                    //String assertionSchematron = null;
                     for (Assertion ass : assertions) {
                         if (ass.getAdvice() == null) {
                             hcpAssertion = ass;
-                            assertionSchematron = AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString();
+                            //assertionSchematron = AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString();
                         } else {
                             trcAssertion = ass;
-                            assertionSchematron = AssertionSchematron.EPSOS_TRC_ASSERTION.toString();
+                            //assertionSchematron = AssertionSchematron.EPSOS_TRC_ASSERTION.toString();
                         }
                     }
-                    //validateMessageAssertions(hcpAssertion);
-                    OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
-//                    AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
-//                            assertionSchematron, NcpSide.NCP_B);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
+                    }
 
                     QueryDocumentsResponseDocument queryDocumentsResponse17;
 
@@ -195,20 +186,19 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 
                     Assertion hcpAssertion = null;
                     Assertion trcAssertion = null;
-                    String assertionSchematron = null;
+                    // String assertionSchematron = null;
                     for (Assertion ass : assertions) {
                         if (ass.getAdvice() == null) {
                             hcpAssertion = ass;
-                            assertionSchematron = AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString();
+                            //  assertionSchematron = AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString();
                         } else {
                             trcAssertion = ass;
-                            assertionSchematron = AssertionSchematron.EPSOS_TRC_ASSERTION.toString();
+                            // assertionSchematron = AssertionSchematron.EPSOS_TRC_ASSERTION.toString();
                         }
                     }
-                    //validateMessageAssertions(hcpAssertion);
-                    OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
-//                    AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(hcpAssertion.getDOM()),
-//                            assertionSchematron, NcpSide.NCP_B);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
+                    }
 
                     RetrieveDocumentResponseDocument retrieveDocumentResponse19;
                     RetrieveDocumentDocument1 wrappedParam;

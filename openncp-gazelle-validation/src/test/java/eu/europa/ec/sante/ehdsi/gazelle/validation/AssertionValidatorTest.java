@@ -41,7 +41,7 @@ public class AssertionValidatorTest {
     }
 
     @Test
-    public void testValidateDocument() {
+    public void testValidateDocument() throws GazelleValidationException {
 
         String XML_ASSERTION = "\n" +
                 "\n" +
@@ -117,6 +117,6 @@ public class AssertionValidatorTest {
                 "\n";
 
         String assertionsSTR = DatatypeConverter.printBase64Binary(XML_ASSERTION.getBytes(Charset.forName("UTF-8")));
-        Assert.assertTrue(assertionValidator.validateObject(assertionsSTR, "epSOS - HCP Identity Assertion", "NCP-B"));
+        Assert.assertNotNull(assertionValidator.validateObject(assertionsSTR, "epSOS - HCP Identity Assertion", "NCP-B"));
     }
 }

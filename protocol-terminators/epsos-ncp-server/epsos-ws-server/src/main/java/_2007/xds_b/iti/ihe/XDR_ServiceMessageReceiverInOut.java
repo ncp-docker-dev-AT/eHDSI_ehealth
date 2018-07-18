@@ -6,8 +6,6 @@ import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.datamodel.xd.XdModel;
-import eu.epsos.validation.services.XdrValidationService;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import org.apache.axiom.om.*;
@@ -131,9 +129,9 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     /* Validate incoming request */
                     String requestMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
-                    //XdrValidationService.getInstance().validateModel(requestMessage, XdModel.obtainModelXdr(requestMessage).toString(), NcpSide.NCP_A);
-                    OpenNCPValidation.validateXDRMessage(requestMessage, XdModel.obtainModelXdr(requestMessage).toString(), NcpSide.NCP_A);
-
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateXDRMessage(requestMessage, NcpSide.NCP_A);
+                    }
                     oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType registryResponse;
                     ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType wrappedParam = (ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType) fromOM(
                             msgContext.getEnvelope().getBody().getFirstElement(),
@@ -153,9 +151,9 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     /* Validate outgoing response */
                     String responseMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
-                    //XdrValidationService.getInstance().validateModel(responseMessage, XdModel.obtainModelXdr(responseMessage).toString(), NcpSide.NCP_A);
-                    OpenNCPValidation.validateXDRMessage(responseMessage, XdModel.obtainModelXdr(responseMessage).toString(), NcpSide.NCP_A);
-
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateXDRMessage(responseMessage, NcpSide.NCP_A);
+                    }
                     if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                         LOGGER_CLINICAL.debug("Response Header:\n{}", envelope.getHeader().toString());
                         LOGGER_CLINICAL.debug("Outgoing XDR Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));

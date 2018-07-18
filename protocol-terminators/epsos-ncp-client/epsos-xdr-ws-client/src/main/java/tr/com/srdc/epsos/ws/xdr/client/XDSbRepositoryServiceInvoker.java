@@ -6,7 +6,6 @@ import eu.epsos.pt.ws.client.xdr.transformation.TMServices;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
-import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -121,9 +120,11 @@ public class XDSbRepositoryServiceInvoker {
 //                    XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(cdaBytes).getDocumentElement()).toString(),
 //                    CdaModel.obtainCdaModel(docClassCode, false),
 //                    NcpSide.NCP_B);
-            String cdaModel = CdaModel.obtainCdaModel(docClassCode, false);
-            OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(cdaBytes).getDocumentElement()).toString(),
-                    cdaModel, NcpSide.NCP_B);
+            //String cdaModel = CdaModel.obtainCdaModel(docClassCode, false);
+            if (OpenNCPValidation.isValidationEnable()) {
+                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(cdaBytes).getDocumentElement()).toString(),
+                        NcpSide.NCP_B, docClassCode, false);
+            }
 
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
@@ -139,9 +140,11 @@ public class XDSbRepositoryServiceInvoker {
 //                    XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(transformedCda).getDocumentElement()).toString(),
 //                    CdaModel.obtainCdaModel(docClassCode, true),
 //                    NcpSide.NCP_B);
-            String cdaModel = CdaModel.obtainCdaModel(docClassCode, true);
-            OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(transformedCda).getDocumentElement()).toString(),
-                    cdaModel, NcpSide.NCP_B);
+            //String cdaModel = CdaModel.obtainCdaModel(docClassCode, true);
+            if (OpenNCPValidation.isValidationEnable()) {
+                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(transformedCda).getDocumentElement()).toString(),
+                        NcpSide.NCP_B, docClassCode, true);
+            }
 
         } catch (DocumentTransformationException ex) {
             LOGGER.error(ex.getLocalizedMessage(), ex);

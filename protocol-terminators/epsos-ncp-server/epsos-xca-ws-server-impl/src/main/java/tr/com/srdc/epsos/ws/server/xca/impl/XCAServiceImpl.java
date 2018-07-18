@@ -12,7 +12,6 @@ import eu.epsos.protocolterminators.ws.server.xca.XCAServiceInterface;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
-import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
@@ -1142,8 +1141,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     /* Validate CDA epSOS Friendly */
 //                    cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(),
 //                            CdaModel.obtainCdaModel(epsosDoc.getClassCode(), false), NcpSide.NCP_A);
-                    String cdaModel = CdaModel.obtainCdaModel(epsosDoc.getClassCode(), false);
-                    OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(), cdaModel, NcpSide.NCP_A);
+                    //String cdaModel = CdaModel.obtainCdaModel(epsosDoc.getClassCode(), false);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
+                                NcpSide.NCP_A, epsosDoc.getClassCode(), false);
+                    }
                     // Transcode to Epsos Pivot
                     doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
                     if (!checkIfOnlyWarnings(registryErrorList)) {
@@ -1165,8 +1167,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         }
                     }
                     /* Validate CDA epSOS Pivot */
-                    cdaModel = CdaModel.obtainCdaModel(epsosDoc.getClassCode(), true);
-                    OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(), cdaModel, NcpSide.NCP_A);
+                    //cdaModel = CdaModel.obtainCdaModel(epsosDoc.getClassCode(), true);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
+                                NcpSide.NCP_A, epsosDoc.getClassCode(), true);
+                    }
 //                    cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(),
 //                            CdaModel.obtainCdaModel(epsosDoc.getClassCode(), true), NcpSide.NCP_A);
                 }

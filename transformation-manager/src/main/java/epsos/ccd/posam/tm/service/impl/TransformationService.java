@@ -37,8 +37,8 @@ import java.util.*;
  */
 public class TransformationService implements ITransformationService, TMConstants, InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransformationService.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger logger = LoggerFactory.getLogger(TransformationService.class);
+    private final Logger logger_clinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private ITerminologyService tsamApi = null;
     private HashMap<String, String> level1Type;
@@ -47,31 +47,31 @@ public class TransformationService implements ITransformationService, TMConstant
 
     public TMResponseStructure toEpSOSPivot(Document epSOSOriginalData) {
 
-        LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [START]");
+        logger.info("Transforming OpenNCP CDA Document toEpsosPivot [START]");
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             try {
-                LOGGER_CLINICAL.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
+                logger_clinical.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {
-                LOGGER.error("Exception: '{}'", e.getMessage(), e);
+                logger.error("Exception: '{}'", e.getMessage(), e);
             }
         }
-        LOGGER.info("Transforming OpenNCP CDA Document toEpsosPivot [END]");
+        logger.info("Transforming OpenNCP CDA Document toEpsosPivot [END]");
         return responseStructure;
     }
 
     public TMResponseStructure translate(Document epSosCDA, String targetLanguageCode) {
 
-        LOGGER.info("Translating OpenNCP CDA Document [START]");
+        logger.info("Translating OpenNCP CDA Document [START]");
         TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             try {
-                LOGGER_CLINICAL.debug("Translate CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
+                logger_clinical.debug("Translate CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {
-                LOGGER.error("Exception: '{}'", e.getMessage(), e);
+                logger.error("Exception: '{}'", e.getMessage(), e);
             }
         }
-        LOGGER.info("Translating OpenNCP CDA Document [END]");
+        logger.info("Translating OpenNCP CDA Document [END]");
         return responseStructure;
     }
 
@@ -93,12 +93,12 @@ public class TransformationService implements ITransformationService, TMConstant
         if (nodeList.size() == 1) {
             Element docTypeCodeElement = (Element) nodeList.get(0);
             docTypeCode = docTypeCodeElement.getAttribute(CODE);
-            LOGGER.debug("docTypeCode: '{}'", docTypeCode);
+            logger.debug("docTypeCode: '{}'", docTypeCode);
             if (docTypeCode == null || docTypeCode.length() == 0) {
                 throw new TMException(TMError.ERROR_DOCUMENT_CODE_NOT_EXIST);
             }
         } else {
-            LOGGER.error("Problem obtaining document type code ! found /ClinicalDocument/code elements: '{}'", nodeList.size());
+            logger.error("Problem obtaining document type code ! found /ClinicalDocument/code elements: '{}'", nodeList.size());
             throw new TMException(TMError.ERROR_DOCUMENT_CODE_NOT_EXIST);
         }
 
@@ -107,15 +107,15 @@ public class TransformationService implements ITransformationService, TMConstant
         // check if structuredDocument
         Node nodeStructuredBody = XmlUtil.getNode(document, XPATH_STRUCTUREDBODY);
         if (nodeStructuredBody != null) {
-            LOGGER.debug("Found - '{}'", XPATH_STRUCTUREDBODY);
+            logger.debug("Found - '{}'", XPATH_STRUCTUREDBODY);
             // LEVEL 3 document
             level3Doc = true;
         } else {
             // check if unstructured document
-            LOGGER.debug("Not Found - '{}'", XPATH_STRUCTUREDBODY);
+            logger.debug("Not Found - '{}'", XPATH_STRUCTUREDBODY);
             Node nodeNonXMLBody = XmlUtil.getNode(document, XPATH_NONXMLBODY);
             if (nodeNonXMLBody != null) {
-                LOGGER.debug("Found - '{}'", NON_XML_BODY);
+                logger.debug("Found - '{}'", NON_XML_BODY);
                 // LEVEL 1 document
                 level3Doc = false;
             } else {
@@ -137,13 +137,14 @@ public class TransformationService implements ITransformationService, TMConstant
             throw new TMException(new TmErrorCtx(TMError.ERROR_DOCUMENT_CODE_UNKNOWN, docTypeCode));
         }
 
-        LOGGER.debug("docTypeConstant is: '{}'", docTypeConstant);
+        logger.debug("docTypeConstant is: '{}'", docTypeConstant);
         return docTypeConstant;
     }
 
 
     private TMResponseStructure process(Document inputDocument, String targetLanguageCode, boolean isTranscode) {
 
+        logger.info("Processing CDA Document: '{}', Target Language: '{}', Transcoding: '{}'", inputDocument.toString(), targetLanguageCode, isTranscode);
         TMResponseStructure responseStructure;
         String status;
         List<ITMTSAMEror> errors = new ArrayList<>();
@@ -155,7 +156,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 status = STATUS_FAILURE;
                 errors.add(TMError.ERROR_NULL_INPUT_DOCUMENT);
                 responseStructure = new TMResponseStructure(null, status, errors, warnings);
-                LOGGER.error("Error, null input document!");
+                logger.error("Error, null input document!");
                 return responseStructure;
             } else {
                 // validate schema
@@ -167,9 +168,9 @@ public class TransformationService implements ITransformationService, TMConstant
                 Document namespaceNotAwareDoc = inputDocument;
                 String cdaDocumentType = getCDADocumentType(namespaceNotAwareDoc);
 
-                boolean schemaValid = Validator.validateToSchema(namespaceAwareDoc);
+                //boolean schemaValid = Validator.validateToSchema(namespaceAwareDoc);
 
-                // mda validation
+                // MDA validation
                 if (config.isModelValidationEnabled()) {
                     ModelValidatorResult validateMDA = Validator.validateMDA(new String(inputDocbytes), cdaDocumentType, isTranscode);
 
@@ -180,16 +181,20 @@ public class TransformationService implements ITransformationService, TMConstant
                         warnings.add(TMError.WARNING_OUTPUT_MDA_VALIDATION_FAILED);
                     }
 
-                } else {
-                    // if model validation is enabled schema validation is done as part
-                    // of it so there is no point doing it again
+                }
+
+                //XSD Schema Validation
+                if (config.isSchemaValidationEnabled()) {
+
+                    boolean schemaValid = Validator.validateToSchema(namespaceAwareDoc);
+                    // if model validation is enabled schema validation is done as part of it so there is no point doing it again
                     if (!schemaValid) {
                         status = STATUS_FAILURE;
                         warnings.add(TMError.WARNING_INPUT_XSD_VALIDATION_FAILED);
                     }
                 }
 
-                // validate INPUT (schematron)
+                // Schematron Validation
                 if (config.isSchematronValidationEnabled()) {
                     // if transcoding, validate against friendly scheme,
                     // else against pivot scheme
@@ -198,13 +203,13 @@ public class TransformationService implements ITransformationService, TMConstant
                     if (result == null || !result.isValid()) {
                         status = STATUS_FAILURE;
                         warnings.add(TMError.WARNING_INPUT_SCHEMATRON_VALIDATION_FAILED);
-                        LOGGER.error("Schematron validation error, input document is invalid!");
+                        logger.error("Schematron validation error, input document is invalid!");
                         if (result != null) {
-                            LOGGER.error(result.toString());
+                            logger.error(result.toString());
                         }
                     }
                 } else {
-                    LOGGER.info("Schematron validation disabled");
+                    logger.info("Schematron validation disabled");
                 }
 
                 // transcode/translate document
@@ -215,9 +220,8 @@ public class TransformationService implements ITransformationService, TMConstant
                 Document finalDoc = XmlUtil.removeEmptyXmlns(namespaceNotAwareDoc);
 
                 if (config.isModelValidationEnabled()) {
-                    ModelValidatorResult validateMDA = Validator.validateMDA(
-                            XmlUtil.xmlToString(finalDoc), cdaDocumentType,
-                            !isTranscode);
+                    ModelValidatorResult validateMDA = Validator.validateMDA(XmlUtil.xmlToString(finalDoc),
+                            cdaDocumentType, !isTranscode);
                     if (!validateMDA.isSchemaValid()) {
                         warnings.add(TMError.WARNING_OUTPUT_XSD_VALIDATION_FAILED);
                     }
@@ -234,20 +238,20 @@ public class TransformationService implements ITransformationService, TMConstant
                         status = STATUS_FAILURE;
                         warnings.add(TMError.WARNING_OUTPUT_SCHEMATRON_VALIDATION_FAILED);
                         responseStructure = new TMResponseStructure(finalDoc, status, errors, warnings);
-                        LOGGER.error("Schematron validation error, result document is invalid!");
-                        if (LOGGER.isErrorEnabled() && result != null) {
-                            LOGGER.error(result.toString());
+                        logger.error("Schematron validation error, result document is invalid!");
+                        if (logger.isErrorEnabled() && result != null) {
+                            logger.error(result.toString());
                         }
                         return responseStructure;
                     }
                 } else {
-                    LOGGER.debug("Schematron validation disabled");
+                    logger.debug("Schematron validation disabled");
                 }
 
                 // create & fill TMResponseStructure
                 responseStructure = new TMResponseStructure(finalDoc, status, errors, warnings);
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("TM result:\n{}", responseStructure.toString());
+                if (logger.isInfoEnabled()) {
+                    logger.info("TM result:\n{}", responseStructure.toString());
                 }
             }
         } catch (TMException e) {
@@ -255,14 +259,14 @@ public class TransformationService implements ITransformationService, TMConstant
             errors.add(e.getReason());
             responseStructure = new TMResponseStructure(inputDocument, status, errors, warnings);
             // log ERROR
-            LOGGER.error(e.getReason().toString(), e);
+            logger.error(e.getReason().toString(), e);
         } catch (Exception e) {
             // write ERROR to ResponseStructure
             status = STATUS_FAILURE;
             errors.add(TMError.ERROR_PROCESSING_ERROR);
             responseStructure = new TMResponseStructure(inputDocument, status, errors, warnings);
             // log ERROR
-            LOGGER.error(TMError.ERROR_PROCESSING_ERROR.toString(), e);
+            logger.error(TMError.ERROR_PROCESSING_ERROR.toString(), e);
         }
 
         // audit log
@@ -280,7 +284,7 @@ public class TransformationService implements ITransformationService, TMConstant
      */
     private void writeAuditTrail(TMResponseStructure responseStructure) {
 
-        LOGGER.debug("[Transformation Service] Audit trail BEGIN");
+        logger.debug("[Transformation Service] Audit trail BEGIN");
 
         if (responseStructure != null) {
             if (config.isAuditTrailEnabled()) {
@@ -308,17 +312,17 @@ public class TransformationService implements ITransformationService, TMConstant
                     eventLog.setEventType(EventType.epsosPivotTranslation);
                     eventLog.setNcpSide(NcpSide.valueOf(config.getNcpSide()));
 
-                    LOGGER.info("Write AuditTrail: '{}'", eventLog.getEventType());
+                    logger.info("Write AuditTrail: '{}'", eventLog.getEventType());
                     AuditServiceFactory.getInstance().write(eventLog, config.getAuditTrailFacility(), config.getAuditTrailSeverity());
                 } catch (Exception e) {
-                    LOGGER.error("Audit trail ERROR! ", e);
+                    logger.error("Audit trail ERROR! ", e);
                 }
-                LOGGER.debug("[Transformation Service] Audit trail END");
+                logger.debug("[Transformation Service] Audit trail END");
             } else {
-                LOGGER.debug("[Transformation Service] Audit trail DISABLED");
+                logger.debug("[Transformation Service] Audit trail DISABLED");
             }
         } else {
-            LOGGER.error("Write AuditTrail Error: Cannot process Transformation Manager response");
+            logger.error("Write AuditTrail Error: Cannot process Transformation Manager response");
         }
 
     }
@@ -336,7 +340,7 @@ public class TransformationService implements ITransformationService, TMConstant
      */
     private String transcodeDocument(Document document, List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings, String cdaDocumentType) {
 
-        LOGGER.info("Transcoding Document '{}'", cdaDocumentType);
+        logger.info("Transcoding Document '{}'", cdaDocumentType);
         return processDocument(document, null, errors, warnings, cdaDocumentType, true);
     }
 
@@ -354,7 +358,7 @@ public class TransformationService implements ITransformationService, TMConstant
 
         // just log referenced keys and displayNames
         logReferences(hmReffIdDisplayName, process);
-        LOGGER.debug("replaceReferencedValues BEGIN");
+        logger.debug("replaceReferencedValues BEGIN");
         try {
             // find elements with ID attribute which id=remembered reference key
             // and
@@ -366,13 +370,13 @@ public class TransformationService implements ITransformationService, TMConstant
                 id = idElement.getAttribute(ID);
                 if (notEmpty(id) && hmReffIdDisplayName != null && hmReffIdDisplayName.containsKey(id) && idElement.getChildNodes().getLength() == 1) {
 
-                    LOGGER.debug("replaced id: '{}' '{}' --> '{}'", id, idElement.getTextContent(), hmReffIdDisplayName.get(id));
+                    logger.debug("replaced id: '{}' '{}' --> '{}'", id, idElement.getTextContent(), hmReffIdDisplayName.get(id));
                     idElement.setTextContent(hmReffIdDisplayName.get(id));
                 }
             }
-            LOGGER.debug("replaceReferencedValues END");
+            logger.debug("replaceReferencedValues END");
         } catch (Exception e) {
-            LOGGER.error("replaceReferencedValues error: ", e);
+            logger.error("replaceReferencedValues error: ", e);
         }
     }
 
@@ -386,10 +390,10 @@ public class TransformationService implements ITransformationService, TMConstant
 
         if (hmReffIdDisplayName != null && !hmReffIdDisplayName.isEmpty()) {
             Iterator<String> iKeys = hmReffIdDisplayName.keySet().iterator();
-            LOGGER.debug("List ('{}') - Reference id : displayName - ", process);
+            logger.debug("List ('{}') - Reference id : displayName - ", process);
             while (iKeys.hasNext()) {
                 String key = iKeys.next();
-                LOGGER.debug("'{}':'{}'", key, hmReffIdDisplayName.get(key));
+                logger.debug("'{}':'{}'", key, hmReffIdDisplayName.get(key));
             }
         }
     }
@@ -440,13 +444,13 @@ public class TransformationService implements ITransformationService, TMConstant
                         key = key.replace(HASH, EMPTY_STRING);
                         if (!hmReffIdDisplayName.containsKey(key)) {
                             hmReffIdDisplayName.put(key, displayName);
-                            LOGGER.debug("remembered @reference= '{}' | '{}'", key, displayName);
+                            logger.debug("remembered @reference= '{}' | '{}'", key, displayName);
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("checkRememberReference error: ", e);
+            logger.error("checkRememberReference error: ", e);
         }
     }
 
@@ -465,7 +469,7 @@ public class TransformationService implements ITransformationService, TMConstant
     private String translateDocument(Document document, String targetLanguageCode, List<ITMTSAMEror> errors,
                                      List<ITMTSAMEror> warnings, String cdaDocumentType) {
 
-        LOGGER.info("Translating Document '{}' to target Language: '{}'", cdaDocumentType, targetLanguageCode);
+        logger.info("Translating Document '{}' to target Language: '{}'", cdaDocumentType, targetLanguageCode);
         return processDocument(document, targetLanguageCode, errors, warnings,
                 cdaDocumentType, false);
     }
@@ -473,7 +477,7 @@ public class TransformationService implements ITransformationService, TMConstant
     private String processDocument(Document document, String targetLanguageCode, List<ITMTSAMEror> errors,
                                    List<ITMTSAMEror> warnings, String cdaDocumentType, boolean isTranscode) {
 
-        LOGGER.info("Processing Document '{}' to target Language: '{}' Transcoding: '{}", cdaDocumentType, targetLanguageCode, isTranscode);
+        logger.info("Processing Document '{}' to target Language: '{}' Transcoding: '{}", cdaDocumentType, targetLanguageCode, isTranscode);
         boolean processingOK = true;
         // hashMap for ID of referencedValues and transcoded/translated
         // DisplayNames
@@ -483,7 +487,7 @@ public class TransformationService implements ITransformationService, TMConstant
         if (CodedElementList.getInstance().isConfigurableElementIdentification()) {
 
             Collection<CodedElementListItem> ceList = CodedElementList.getInstance().getList(cdaDocumentType);
-            LOGGER.info("Configurable Element Identification is set, CodedElementList for '{}' contains elements: '{}'",
+            logger.info("Configurable Element Identification is set, CodedElementList for '{}' contains elements: '{}'",
                     cdaDocumentType, ceList.size());
             if (ceList == null || ceList.isEmpty()) {
                 warnings.add(TMError.WARNING_CODED_ELEMENT_LIST_EMPTY);
@@ -500,8 +504,8 @@ public class TransformationService implements ITransformationService, TMConstant
             while (iProcessed.hasNext()) {
 
                 codedElementListItem = iProcessed.next();
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Looking for: '{}'", codedElementListItem.toString());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Looking for: '{}'", codedElementListItem.toString());
                 }
                 xPathExpression = codedElementListItem.getxPath();
                 isRequired = codedElementListItem.isRequired();
@@ -514,12 +518,12 @@ public class TransformationService implements ITransformationService, TMConstant
                 }
 
                 nodeList = XmlUtil.getNodeList(document, xPathExpression);
-                LOGGER.debug("Found: '{}' elements", (nodeList == null ? "NULL" : nodeList.size()));
+                logger.debug("Found: '{}' elements", (nodeList == null ? "NULL" : nodeList.size()));
 
                 if (isRequired && (nodeList == null || nodeList.isEmpty())) {
 
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error("Required element is missing: '{}'", codedElementListItem.toString());
+                    if (logger.isErrorEnabled()) {
+                        logger.error("Required element is missing: '{}'", codedElementListItem.toString());
                     }
                     processingOK = false;
                     errors.add(new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_MISSING, codedElementListItem.toString()));
@@ -550,7 +554,7 @@ public class TransformationService implements ITransformationService, TMConstant
                                 String ctx = XmlUtil.getElementPath(originalElement);
                                 errors.add(isTranscode ? new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED, ctx)
                                         : new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSLATED, ctx));
-                                LOGGER.error("Required coded element was not translated");
+                                logger.error("Required coded element was not translated");
                             }
                         }
                     }
@@ -558,9 +562,9 @@ public class TransformationService implements ITransformationService, TMConstant
             }
         } else {
 
-            LOGGER.info("Configurable Element Identification is NOT set - looking for //*[@code] elements");
+            logger.info("Configurable Element Identification is NOT set - looking for //*[@code] elements");
             List<Node> nodeList = XmlUtil.getNodeList(document, XPATH_ALL_ELEMENTS_WITH_CODE_ATTR);
-            LOGGER.info("Found '{}' elements to translate/transcode", nodeList.size());
+            logger.info("Found '{}' elements to translate/transcode", nodeList.size());
             Element originalElement;
             for (Node aNodeList : nodeList) {
                 // iterate elements for translation
@@ -569,8 +573,8 @@ public class TransformationService implements ITransformationService, TMConstant
                 if (TRANSLATION.equals(originalElement.getLocalName())) {
 
                     CodedElement ce = new CodedElement(originalElement);
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("translation element - skipping: '{}'", ce.toString());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("translation element - skipping: '{}'", ce.toString());
                     }
                     continue;
                 }
@@ -603,8 +607,8 @@ public class TransformationService implements ITransformationService, TMConstant
             support.declarePrefix("urn", "urn:hl7-org:v3");
             parts = support.processName(originalElement.getAttributeNode(XSI_TYPE).getValue(), parts, false);
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Namespace URI: '{}' - Local Name: '{}' - Raw Name: '{}'", parts[0], parts[1], parts[2]);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Namespace URI: '{}' - Local Name: '{}' - Raw Name: '{}'", parts[0], parts[1], parts[2]);
             }
             if (!StringUtils.equals(parts[1], CE) && !StringUtils.equals(parts[1], CD)) {
                 warnings.add(TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE);
@@ -650,7 +654,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     codedElement, targetLanguageCode);
 
             if (tsamResponse.isStatusSuccess()) {
-                LOGGER.debug("processing successful '{}'", codedElement.toString());
+                logger.debug("processing successful '{}'", codedElement.toString());
                 // +++++ Element editing BEGIN +++++
 
                 // NEW TRANSLATION element
@@ -702,7 +706,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     }
                     attributesFilled = true;
                 } else {
-                    LOGGER.debug("Translation is same as original: '{}'", tsamResponse.getDesignation());
+                    logger.debug("Translation is same as original: '{}'", tsamResponse.getDesignation());
                 }
                 if (attributesFilled) {
                     if (oldTranslationElement != null) {
@@ -737,14 +741,14 @@ public class TransformationService implements ITransformationService, TMConstant
                 warnings.addAll(tsamResponse.getWarnings());
                 return true;
             } else {
-                LOGGER.error("processing failure! for Code: '{}'", codedElement.toString());
+                logger.error("processing failure! for Code: '{}'", codedElement.toString());
                 errors.addAll(tsamResponse.getErrors());
                 warnings.addAll(tsamResponse.getWarnings());
                 return false;
             }
         } catch (Exception e) {
             // system error
-            LOGGER.error("processing failure! ", e);
+            logger.error("processing failure! ", e);
             return false;
         }
     }
@@ -765,7 +769,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     if (TMConstants.TRANSLATION.equals(node.getLocalName())) {
                         oldTranslationElement = node;
-                        LOGGER.debug("Old translation found");
+                        logger.debug("Old translation found");
                         break;
                     }
                 }
@@ -787,7 +791,7 @@ public class TransformationService implements ITransformationService, TMConstant
         String elName = XmlUtil.getElementPath(originalElement);
         // ak je nullFlavor, neprekladat, nevyhadzovat chybu
         if (originalElement.hasAttribute("nullFlavor")) {
-            LOGGER.debug("nullFlavor, skippink: '{}'", elName);
+            logger.debug("nullFlavor, skippink: '{}'", elName);
             return true;
         } else {
             // ak chyba code alebo codeSystem vyhodit warning
@@ -804,10 +808,10 @@ public class TransformationService implements ITransformationService, TMConstant
                 NodeList origText = originalElement.getElementsByTagName("originalText");
                 if (origText.getLength() > 0) {
                     // ak element obsahuje originalText, preskocit, nevyhazovat warning
-                    LOGGER.debug("Element without required attributes, but has originalText, ignoring: '{}'", elName);
+                    logger.debug("Element without required attributes, but has originalText, ignoring: '{}'", elName);
                     return true;
                 } else {
-                    LOGGER.warn("Element has no \"code or \"codeSystem\" attribute: '{}'", elName);
+                    logger.warn("Element has no \"code or \"codeSystem\" attribute: '{}'", elName);
                     warnings.add(new TmErrorCtx(TMError.WARNING_MANDATORY_ATTRIBUTES_MISSING, "Element " + elName));
                     return false;
                 }

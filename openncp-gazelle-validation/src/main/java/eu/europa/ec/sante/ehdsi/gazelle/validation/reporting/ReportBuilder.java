@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation.reporting;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.GazelleConfiguration;
 import net.ihe.gazelle.jaxb.result.sante.DetailedResult;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -25,20 +26,23 @@ public class ReportBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportBuilder.class);
     private static final String REPORT_FILES_FOLDER = "validation";
+    private static final boolean GAZELLE_HTML_REPORT;
+
+    static {
+        GAZELLE_HTML_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfigure().getProperty("GAZELLE_HTML_REPORT"));
+    }
 
     private ReportBuilder() {
     }
 
     /**
-     * This is the main operation in the report building process. It main
-     * responsibility is to generate a report based on a supplied model,
-     * validation object and detailed result.
+     * This is the main operation in the report building process. It main responsibility is to generate a report based
+     * on a supplied model, validation object and detailed result.
      *
      * @param model            the model used in the Web Service invocation.
      * @param validationObject the validated object.
      * @param validationResult the validation result.
-     * @return A boolean flag, indicating if the reporting process succeed or
-     * not.
+     * @return A boolean flag, indicating if the reporting process succeed or not.
      */
     public static boolean build(final String model, final String objectType, final String validationObject,
                                 final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
@@ -81,7 +85,6 @@ public class ReportBuilder {
             validationBody = validationResponse.replace("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>", "");
         }
 
-
         reportDirName = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + "/" + sideFolder;
         reportFileName = reportDirName + File.separator + buildReportFileName(model, objectType, validationTestResult);
 
@@ -102,17 +105,17 @@ public class ReportBuilder {
                 }
             }
 
-
             LOGGER.info("Validation report written with success");
-            File repostHtmlFile = new File(StringUtils.replace(reportFileName, ".xml", ".html"));
-            try (BufferedWriter htmlReport = new BufferedWriter(new FileWriter(repostHtmlFile.getAbsoluteFile()))) {
-                ReportTransformer reportTransformer = new ReportTransformer(validationBody, (Base64.isBase64(validationObject) ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) : validationObject));
-                LOGGER.info("HTML:\n{}", reportTransformer.getHtmlReport());
-                htmlReport.write(reportTransformer.getHtmlReport());
-            } catch (IOException e) {
-                LOGGER.error("An I/O error has occurred while writting the HTML report file, please check the stack trace for more information.", e);
+            if (GAZELLE_HTML_REPORT) {
+                File repostHtmlFile = new File(StringUtils.replace(reportFileName, ".xml", ".html"));
+                try (BufferedWriter htmlReport = new BufferedWriter(new FileWriter(repostHtmlFile.getAbsoluteFile()))) {
+                    ReportTransformer reportTransformer = new ReportTransformer(validationBody, (Base64.isBase64(validationObject) ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) : validationObject));
+                    LOGGER.info("HTML:\n{}", reportTransformer.getHtmlReport());
+                    htmlReport.write(reportTransformer.getHtmlReport());
+                } catch (IOException e) {
+                    LOGGER.error("An I/O error has occurred while writting the HTML report file, please check the stack trace for more information.", e);
+                }
             }
-
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(reportFile.getAbsoluteFile()))) {
 
                 bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
@@ -135,6 +138,7 @@ public class ReportBuilder {
                 LOGGER.error("An I/O error has occurred while writting the report file, please check the stack trace for more information.", ex);
                 return false;
             }
+
         }
         return false;
     }

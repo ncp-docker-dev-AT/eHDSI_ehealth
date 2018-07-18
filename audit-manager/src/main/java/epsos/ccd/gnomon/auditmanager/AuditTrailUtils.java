@@ -3,7 +3,6 @@ package epsos.ccd.gnomon.auditmanager;
 import epsos.ccd.gnomon.utils.SecurityMgr;
 import epsos.ccd.gnomon.utils.Utils;
 import eu.epsos.util.audit.AuditLogSerializer;
-import eu.epsos.validation.datamodel.audit.AuditModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import net.RFC3881.*;
@@ -219,8 +218,10 @@ public enum AuditTrailUtils {
                     eventLog.getResM_PatricipantObjectDetail());
         }
         /* Invoke audit message validation services */
-        boolean validated = validateAuditMessage(eventLog, am);
-        LOGGER.info("Audit Message validated and  report generated: '{}'", validated);
+        if (OpenNCPValidation.isValidationEnable()) {
+            boolean validated = validateAuditMessage(eventLog, am);
+            LOGGER.info("Audit Message validated and  report generated: '{}'", validated);
+        }
         return am;
     }
 
@@ -1299,65 +1300,57 @@ public enum AuditTrailUtils {
 
         LOGGER.info("validateAuditMessage(EventLog '{}', AudiMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
                 am.getEventIdentification().getEventActionCode(), eventLog.getPC_UserID());
-        String model = "";
-        NcpSide ncpSide;
-
-        ncpSide = eventLog.getNcpSide();
-
-//        if (StringUtils.isBlank(eventLog.getPC_UserID())) {
-//            ncpSide = NcpSide.NCP_A;
-//        } else {
-//            ncpSide = NcpSide.NCP_B;
-//        }
+//        String model = "";
+        NcpSide ncpSide = eventLog.getNcpSide();
 
         if (StringUtils.equals(eventLog.getEventType(), "epsos-cf")) {
             throw new UnsupportedOperationException("EventCode not supported.");
         }
 
-        // Infer model according to NCP Side and EventCode
-        if (ncpSide == NcpSide.NCP_A) {
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-11")) {
-                model = AuditModel.EPSOS2_IDENTIFICATION_SERVICE_AUDIT_SP.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-21") || StringUtils.equals(eventLog.getEventType(), "epsos-22")
-                    || StringUtils.equals(eventLog.getEventType(), "epsos-31") || StringUtils.equals(eventLog.getEventType(), "epsos-32")
-                    || StringUtils.equals(eventLog.getEventType(), "epsos-94") || StringUtils.equals(eventLog.getEventType(), "epsos-96")
-                    || StringUtils.equals(eventLog.getEventType(), "ITI-38") || StringUtils.equals(eventLog.getEventType(), "ITI-39")
-                    || StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
-                model = AuditModel.EPSOS2_FETCH_DOC_SERVICE_SP.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-41") || StringUtils.equals(eventLog.getEventType(), "epsos-51")) {
-                model = AuditModel.EPSOS2_PROVIDE_DATA_SERVICE_SP.toString();
-            }
-        } else {
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-11")) {
-                model = AuditModel.EPSOS2_HCP_ASSURANCE_AUDIT.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-21") || StringUtils.equals(eventLog.getEventType(), "epsos-22")
-                    || StringUtils.equals(eventLog.getEventType(), "epsos-31") || StringUtils.equals(eventLog.getEventType(), "epsos-94")
-                    || StringUtils.equals(eventLog.getEventType(), "epsos-96") || StringUtils.equals(eventLog.getEventType(), "ITI-38")
-                    || StringUtils.equals(eventLog.getEventType(), "ITI-39") || StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
-                model = AuditModel.EPSOS2_HCP_ASSURANCE_AUDIT.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-32")) {
-                model = AuditModel.EPSOS2_FETCH_DOC_SERVICE_SC.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-41") || StringUtils.equals(eventLog.getEventType(), "epsos-51")) {
-                model = AuditModel.EPSOS2_PROVIDE_DATA_SERVICE_SC.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-91")) {
-                model = AuditModel.EPSOS2_ISSUANCE_HCP_ASSERTION.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-92")) {
-                model = AuditModel.EPSOS2_ISSUANCE_TRC_ASSERTION.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-93")) {
-                model = AuditModel.EPSOS2_IMPORT_NCP_TRUSTED_LIST.toString();
-            }
-        }
+//        // Infer model according to NCP Side and EventCode
+//        if (ncpSide == NcpSide.NCP_A) {
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-11")) {
+//                model = AuditModel.EPSOS2_IDENTIFICATION_SERVICE_AUDIT_SP.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-21") || StringUtils.equals(eventLog.getEventType(), "epsos-22")
+//                    || StringUtils.equals(eventLog.getEventType(), "epsos-31") || StringUtils.equals(eventLog.getEventType(), "epsos-32")
+//                    || StringUtils.equals(eventLog.getEventType(), "epsos-94") || StringUtils.equals(eventLog.getEventType(), "epsos-96")
+//                    || StringUtils.equals(eventLog.getEventType(), "ITI-38") || StringUtils.equals(eventLog.getEventType(), "ITI-39")
+//                    || StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
+//                model = AuditModel.EPSOS2_FETCH_DOC_SERVICE_SP.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-41") || StringUtils.equals(eventLog.getEventType(), "epsos-51")) {
+//                model = AuditModel.EPSOS2_PROVIDE_DATA_SERVICE_SP.toString();
+//            }
+//        } else {
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-11")) {
+//                model = AuditModel.EPSOS2_HCP_ASSURANCE_AUDIT.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-21") || StringUtils.equals(eventLog.getEventType(), "epsos-22")
+//                    || StringUtils.equals(eventLog.getEventType(), "epsos-31") || StringUtils.equals(eventLog.getEventType(), "epsos-94")
+//                    || StringUtils.equals(eventLog.getEventType(), "epsos-96") || StringUtils.equals(eventLog.getEventType(), "ITI-38")
+//                    || StringUtils.equals(eventLog.getEventType(), "ITI-39") || StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
+//                model = AuditModel.EPSOS2_HCP_ASSURANCE_AUDIT.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-32")) {
+//                model = AuditModel.EPSOS2_FETCH_DOC_SERVICE_SC.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-41") || StringUtils.equals(eventLog.getEventType(), "epsos-51")) {
+//                model = AuditModel.EPSOS2_PROVIDE_DATA_SERVICE_SC.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-91")) {
+//                model = AuditModel.EPSOS2_ISSUANCE_HCP_ASSERTION.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-92")) {
+//                model = AuditModel.EPSOS2_ISSUANCE_TRC_ASSERTION.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-93")) {
+//                model = AuditModel.EPSOS2_IMPORT_NCP_TRUSTED_LIST.toString();
+//            }
+//        }
         try {
-            //return AuditValidationService.getInstance().validateModel(convertAuditObjectToXML(am), model, ncpSide);
-            return OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(am), model, ncpSide);
+
+            return OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(am), eventLog.getEventType(), ncpSide);
         } catch (JAXBException e) {
             LOGGER.error("JAXBException: {}", e.getMessage(), e);
             return false;
