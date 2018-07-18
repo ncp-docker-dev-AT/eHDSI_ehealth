@@ -85,7 +85,9 @@
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="($medPackage)/@unit"/>
+                        <xsl:call-template name="supportUCUMAnnotations">
+                            <xsl:with-param name="value" select="$medPackage/@unit"/>
+                        </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:otherwise>

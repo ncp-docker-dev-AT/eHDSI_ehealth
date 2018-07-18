@@ -17,7 +17,7 @@
     <xsl:variable name="birthdate"
                   select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:birthTime"/>
     <xsl:variable name="gender"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@displayName"/>
+                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode"/>
     <xsl:variable name="creationDate"
                   select="/n1:ClinicalDocument/n1:effectiveTime"/>
     <xsl:variable name="lastUpdate"
@@ -136,18 +136,7 @@
                                     </xsl:call-template>
                                 </th>
                                 <td>
-                                    <xsl:choose>
-                                        <xsl:when
-                                                test="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@nullFlavor">
-                                            <xsl:call-template name="show-nullFlavor">
-                                                <xsl:with-param name="code"
-                                                                select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode/@nullFlavor"/>
-                                            </xsl:call-template>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:value-of select="$gender"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
+                                    <xsl:value-of select="$gender/@displayName"/>
                                 </td>
                                 <th style="width:100px;">
                                     <!-- Date Of Birth-->

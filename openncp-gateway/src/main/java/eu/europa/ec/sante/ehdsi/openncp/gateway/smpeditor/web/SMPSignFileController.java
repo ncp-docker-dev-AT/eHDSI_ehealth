@@ -178,7 +178,8 @@ public class SMPSignFileController {
 
         /*Iterate each chosen file*/
         for (int k = 0; k < signFiles.size(); k++) {
-            LOGGER.debug("\n***** MULTIPLE FILE NAME " + k + " - " + signFiles.get(k).getOriginalFilename());
+            
+            LOGGER.debug("\n***** MULTIPLE FILE NAME '{}-{}'", k, signFiles.get(k).getOriginalFilename());
             SMPFileOps smpfile = new SMPFileOps();
             SMPFields smpfields = new SMPFields();
 

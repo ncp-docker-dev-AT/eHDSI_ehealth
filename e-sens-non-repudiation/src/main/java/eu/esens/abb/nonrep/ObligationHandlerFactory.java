@@ -15,7 +15,7 @@ public class ObligationHandlerFactory {
         LOGGER.debug("In the ObligationHandlerFactory constructor");
     }
 
-    public synchronized static ObligationHandlerFactory getInstance() {
+    public static synchronized ObligationHandlerFactory getInstance() {
 
         if (instance == null) {
             try {

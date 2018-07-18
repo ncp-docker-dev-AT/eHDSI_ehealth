@@ -1,29 +1,5 @@
-/*
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. epsos@srdc.com.tr
- *
- * This file is part of SRDC epSOS NCP.
- *
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- *
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see http://www.gnu.org/licenses/.
- */
 package eu.epsos.dts.xds;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import javax.xml.bind.JAXBElement;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.AssociationType1;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
@@ -33,30 +9,41 @@ import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
 
+import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
- * This class represents a Data Transfer Service, used by XCA and
- * AdhocQueryResponse messages.
- *
+ * This class represents a Data Transfer Service, used by XCA and AdhocQueryResponse messages.
  */
 public final class AdhocQueryResponseConverter {
+
+    /**
+     * Private constructor to avoid instantiation.
+     */
+    private AdhocQueryResponseConverter() {
+    }
 
     /**
      * Transforms a AdhocQueryResponse in a QueryResponse.
      *
      * @param response - in AdhocQueryResponse format
-     * @return a QueryReponse object.
+     * @return a QueryResponse object.
      */
     public static QueryResponse convertAdhocQueryResponse(AdhocQueryResponse response) {
+
         QueryResponse queryResponse = new QueryResponse();
 
         if (response.getRegistryObjectList() != null) {
-            Map<String, String> documentAssociationsMap = new TreeMap<String, String>();
-            List<XDSDocument> documents = new ArrayList<XDSDocument>();
+            Map<String, String> documentAssociationsMap = new TreeMap<>();
+            List<XDSDocument> documents = new ArrayList<>();
 
             String str;
-            // TODO A.R. Why size()-1??? 
+            // TODO A.R. Why size()-1???
             for (int i = 0; i < response.getRegistryObjectList().getIdentifiable().size(); i++) {
-                JAXBElement<?> o = (JAXBElement<ExtrinsicObjectType>) response.getRegistryObjectList().getIdentifiable().get(i);
+                JAXBElement<?> o = response.getRegistryObjectList().getIdentifiable().get(i);
                 String declaredTypeName = o.getDeclaredType().getSimpleName();
                 // TODO A.R. What should we do with Assotoation?
                 if ("ExtrinsicObjectType".equals(declaredTypeName)) {
@@ -74,7 +61,7 @@ public final class AdhocQueryResponseConverter {
                     // Set name
                     document.setName(eo.getValue().getName().getLocalizedString().get(0).getValue());
 
-                    // Set documentUniqueId  
+                    // Set documentUniqueId
                     for (ExternalIdentifierType idenType : eo.getValue().getExternalIdentifier()) {
                         if (idenType.getName().getLocalizedString().get(0).getValue().equalsIgnoreCase("XDSDocumentEntry.uniqueId")) {
                             document.setDocumentUniqueId(idenType.getValue());
@@ -139,7 +126,7 @@ public final class AdhocQueryResponseConverter {
 
                     documents.add(document);
                 } else if ("AssociationType1".equals(declaredTypeName)) {
-                   JAXBElement<AssociationType1> eo;
+                    JAXBElement<AssociationType1> eo;
                     eo = (JAXBElement<AssociationType1>) response.getRegistryObjectList().getIdentifiable().get(i);
                     if (eo.getValue().getAssociationType().equals("urn:ihe:iti:2007:AssociationType:XFRM")) {
                         documentAssociationsMap.put(eo.getValue().getSourceObject(), eo.getValue().getTargetObject());
@@ -147,7 +134,7 @@ public final class AdhocQueryResponseConverter {
                 }
             }
 
-            List<XDSDocumentAssociation> documentAssociations = new ArrayList<XDSDocumentAssociation>();
+            List<XDSDocumentAssociation> documentAssociations = new ArrayList<>();
             for (String key : documentAssociationsMap.keySet()) {
                 String sourceObjectId = key;
                 String targetObjectId = documentAssociationsMap.get(key);
@@ -204,7 +191,7 @@ public final class AdhocQueryResponseConverter {
         }
 
         if (response.getRegistryErrorList() != null) {
-            List<String> errors = new ArrayList<String>(response.getRegistryErrorList().getRegistryError().size());
+            List<String> errors = new ArrayList<>(response.getRegistryErrorList().getRegistryError().size());
 
             for (int i = 0; i < response.getRegistryErrorList().getRegistryError().size(); i++) {
                 errors.add(response.getRegistryErrorList().getRegistryError().get(i).getCodeContext());
@@ -214,11 +201,5 @@ public final class AdhocQueryResponseConverter {
         }
 
         return queryResponse;
-    }
-
-    /**
-     * Private constructor to avoid instantiation.
-     */
-    private AdhocQueryResponseConverter() {
     }
 }

@@ -3,8 +3,7 @@ package epsos.ccd.netsmart.securitymanager.sts.client;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.datamodel.saml.AssertionSchematron;
-import eu.epsos.validation.services.AssertionValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.Configuration;
@@ -18,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.net.ssl.*;
 import javax.xml.namespace.QName;
@@ -255,10 +253,9 @@ public class TRCAssertionRequest {
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
 
             Assertion trcAssertion = (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
-            if (StringUtils.equalsIgnoreCase(ConfigurationManagerFactory.getConfigurationManager().getProperty("automated.validation"), "true")) {
-
-                AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(trcAssertion.getDOM()),
-                        AssertionSchematron.EPSOS_TRC_ASSERTION.toString(), NcpSide.NCP_B);
+            if (OpenNCPValidation.isValidationEnable()) {
+                
+                OpenNCPValidation.validateTRCAssertion(trcAssertion, NcpSide.NCP_B);
             }
             return trcAssertion;
 

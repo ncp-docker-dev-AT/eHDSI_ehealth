@@ -17,12 +17,13 @@ import javax.xml.ws.soap.SOAPFaultException;
  * This class represents the wrapper for the Audit messages validation.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @deprecated
  */
 @Deprecated
 public class AuditValidationService extends ValidationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditValidationService.class);
-    private static AuditValidationService INSTANCE = null;
+    private static AuditValidationService instance = null;
 
     /**
      * Private constructor to avoid instantiation.
@@ -30,12 +31,13 @@ public class AuditValidationService extends ValidationService {
     private AuditValidationService() {
     }
 
-    public synchronized static AuditValidationService getInstance() {
-        if (INSTANCE == null) {
+    public static synchronized AuditValidationService getInstance() {
 
-            INSTANCE = new AuditValidationService();
+        if (instance == null) {
+
+            instance = new AuditValidationService();
         }
-        return INSTANCE;
+        return instance;
     }
 
     @Override
@@ -55,7 +57,7 @@ public class AuditValidationService extends ValidationService {
             return false;
         }
 
-        if(ValidationService.isRemoteValidationOn()) {
+        if (ValidationService.isRemoteValidationOn()) {
             try {
                 AuditMessageValidationWSService amService = new AuditMessageValidationWSService();
                 AuditMessageValidationWS amPort = amService.getAuditMessageValidationWSPort();

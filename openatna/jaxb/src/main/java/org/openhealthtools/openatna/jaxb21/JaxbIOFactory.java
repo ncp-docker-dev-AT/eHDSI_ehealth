@@ -32,7 +32,6 @@ public class JaxbIOFactory implements AtnaIOFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JaxbIOFactory.class);
 
-
     private static JAXBContext jc;
 
     static {
@@ -68,7 +67,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
                     Marshaller marshaller = jc.createMarshaller();
                     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                     marshaller.marshal(a, bout);
-                    LOGGER.info("\n" + new String(bout.toByteArray()));
+                    LOGGER.info("\n{}", new String(bout.toByteArray()));
                     if (LOGGER.isDebugEnabled() && am != null) {
                         LOGGER.debug("Event Outcome: '{}'", am.getEventOutcome());
                     }
@@ -132,7 +131,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
         transform(doc, bout);
         byte[] bytes = bout.toByteArray();
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("\n" + new String(bytes));
+            LOGGER.info("\n{}", new String(bytes));
         }
         return new ProvisionalMessage(bytes);
     }
@@ -161,7 +160,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 marshaller.marshal(jmessage, bout);
-                LOGGER.debug("Written Audit Message:\n" + new String(bout.toByteArray()));
+                LOGGER.debug("Written Audit Message:\n{}", new String(bout.toByteArray()));
             }
 
         } catch (JAXBException e) {
@@ -349,7 +348,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
             List<SopClass> sops = desc.getSopClasses();
             for (SopClass sop : sops) {
                 ParticipantObjectDescriptionType.SOPClass sc = new ParticipantObjectDescriptionType.SOPClass();
-                sc.setNumberOfInstances(new BigInteger(Integer.toString(sop.getNumberOfInstances())));
+                sc.setNumberOfInstances(BigInteger.valueOf(sop.getNumberOfInstances()));
                 sc.setUID(sop.getUid());
                 List<String> insts = sop.getInstanceUids();
                 for (String inst : insts) {

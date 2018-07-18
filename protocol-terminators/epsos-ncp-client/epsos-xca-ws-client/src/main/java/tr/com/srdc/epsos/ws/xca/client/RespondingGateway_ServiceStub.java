@@ -9,8 +9,7 @@ import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.datamodel.xd.XdModel;
-import eu.epsos.validation.services.XcaValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -22,6 +21,7 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
 import org.opensaml.saml2.core.Assertion;
@@ -33,7 +33,6 @@ import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
@@ -184,7 +183,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                                                                   Assertion trcAssertion,
                                                                   String classCode)
             throws java.rmi.RemoteException {
-        org.apache.axis2.context.MessageContext _messageContext = null;
+        MessageContext _messageContext = null;
         try {
             // TMP
             // XCA list request start time
@@ -298,7 +297,9 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             start = System.currentTimeMillis();
 
             /* Validate Request Message */
-            XcaValidationService.getInstance().validateModel(logRequestBody, XdModel.obtainModelXca(logRequestBody).toString(), NcpSide.NCP_B);
+            if (OpenNCPValidation.isValidationEnable()) {
+                OpenNCPValidation.validateCrossCommunityAccess(logRequestBody, NcpSide.NCP_B);
+            }
 
             // TMP
             // Transaction end time
@@ -422,7 +423,9 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             }
 
             /* Validate Response Message */
-            XcaValidationService.getInstance().validateModel(logResponseBody, XdModel.obtainModelXca(logResponseBody).toString(), NcpSide.NCP_B);
+            if (OpenNCPValidation.isValidationEnable()) {
+                OpenNCPValidation.validateCrossCommunityAccess(logResponseBody, NcpSide.NCP_B);
+            }
 
             // TMP
             // Validation end time
@@ -652,7 +655,9 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             }
 
             /* Validate Request Message */
-            XcaValidationService.getInstance().validateModel(logRequestBody, XdModel.obtainModelXca(logRequestBody).toString(), NcpSide.NCP_B);
+            if (OpenNCPValidation.isValidationEnable()) {
+                OpenNCPValidation.validateCrossCommunityAccess(logRequestBody, NcpSide.NCP_B);
+            }
 
             /*
              * Execute Operation
@@ -662,7 +667,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 _operationClient.execute(true);
             } catch (AxisFault e) {
-                LOGGER.error("Axis Fault error: " + e.getMessage());
+                LOGGER.error("Axis Fault error: '{}'", e.getMessage());
                 LOGGER.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
 
                 String endpoint = null;
@@ -763,14 +768,15 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             }
 
             /* Validate Response Message */
-            XcaValidationService.getInstance().validateModel(logResponseBody, XdModel.obtainModelXca(logResponseBody).toString(), NcpSide.NCP_B);
+            if (OpenNCPValidation.isValidationEnable()) {
+                OpenNCPValidation.validateCrossCommunityAccess(logResponseBody, NcpSide.NCP_B);
+            }
 
             /*
              * Return
              */
             RetrieveDocumentSetResponseType retrieveDocumentSetResponse;
-            Object object = fromOM(returnEnv.getBody().getFirstElement(),
-                    RetrieveDocumentSetResponseType.class,
+            Object object = fromOM(returnEnv.getBody().getFirstElement(), RetrieveDocumentSetResponseType.class,
                     getEnvelopeNamespaces(returnEnv));
             retrieveDocumentSetResponse = (RetrieveDocumentSetResponseType) object;
 
@@ -809,8 +815,6 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         this.countryCode, // Country A ISO Code
                         EadcEntry.DsTypes.XCA, // Data source type
                         Direction.OUTBOUND); // Transaction direction
-            } catch (ParserConfigurationException ex) {
-                LOGGER.error("EADC INVOCATION FAILED!", ex);
             } catch (Exception ex) {
                 LOGGER.error("EADC INVOCATION FAILED!", ex);
             }
@@ -1042,6 +1046,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
         EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
         EventLogUtil.prepareXCACommonLogQuery(eventLog, request, response, classCode);
+        eventLog.setNcpSide(NcpSide.NCP_B);
         EventLogClientUtil.sendEventLog(eventLog);
         return eventLog;
     }
@@ -1056,6 +1061,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
         EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
         EventLogUtil.prepareXCACommonLogRetrieve(eventLog, request, response, classCode);
+        eventLog.setNcpSide(NcpSide.NCP_B);
         EventLogClientUtil.sendEventLog(eventLog);
         return eventLog;
     }

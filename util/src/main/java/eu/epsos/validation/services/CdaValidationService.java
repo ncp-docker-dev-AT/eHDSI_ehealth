@@ -31,6 +31,7 @@ public class CdaValidationService extends ValidationService {
     }
 
     public static CdaValidationService getInstance() {
+        
         if (instance == null) {
 
             instance = new CdaValidationService();

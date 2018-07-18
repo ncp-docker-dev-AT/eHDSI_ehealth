@@ -12,9 +12,8 @@ import eu.epsos.protocolterminators.ws.server.xca.XCAServiceInterface;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
-import eu.epsos.validation.datamodel.cda.CdaModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.services.CdaValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import fi.kela.se.epsos.data.model.*;
@@ -885,7 +884,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
     private Document transformDocument(Document doc, OMElement registryErrorList, OMElement registryResponseElement,
                                        boolean isTranscode, EventLog eventLog) {
 
-        LOGGER.debug("Transforming document, isTranscode: '{}'", isTranscode);
+        LOGGER.debug("Transforming document, isTranscode: '{}' - Event Type: '{}'", isTranscode, eventLog.getEventType());
+        if (eventLog.getReqM_PatricipantObjectDetail() != null) {
+            String requester = new String(eventLog.getReqM_PatricipantObjectDetail());
+            LOGGER.info("Participant Requester: '{}'", requester);
+        }
+        if (eventLog.getResM_PatricipantObjectDetail() != null) {
+            String responder = new String(eventLog.getResM_PatricipantObjectDetail());
+            LOGGER.info("Participant Responser: '{}'", responder);
+        }
 
         Document returnDoc;
         try {
@@ -1129,12 +1136,16 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                 if (doc != null) {
 
-                    CdaValidationService cdaValidationService = CdaValidationService.getInstance();
+                    // CdaValidationService cdaValidationService = CdaValidationService.getInstance();
 
                     /* Validate CDA epSOS Friendly */
-                    cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(),
-                            CdaModel.obtainCdaModel(epsosDoc.getClassCode(), false), NcpSide.NCP_A);
-
+//                    cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(),
+//                            CdaModel.obtainCdaModel(epsosDoc.getClassCode(), false), NcpSide.NCP_A);
+                    //String cdaModel = CdaModel.obtainCdaModel(epsosDoc.getClassCode(), false);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
+                                NcpSide.NCP_A, epsosDoc.getClassCode(), false);
+                    }
                     // Transcode to Epsos Pivot
                     doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
                     if (!checkIfOnlyWarnings(registryErrorList)) {
@@ -1156,8 +1167,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         }
                     }
                     /* Validate CDA epSOS Pivot */
-                    cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(),
-                            CdaModel.obtainCdaModel(epsosDoc.getClassCode(), true), NcpSide.NCP_A);
+                    //cdaModel = CdaModel.obtainCdaModel(epsosDoc.getClassCode(), true);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
+                                NcpSide.NCP_A, epsosDoc.getClassCode(), true);
+                    }
+//                    cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(),
+//                            CdaModel.obtainCdaModel(epsosDoc.getClassCode(), true), NcpSide.NCP_A);
                 }
 
                 // If the registryErrorList is empty or contains only Warning, the status of the request is SUCCESS
@@ -1239,7 +1255,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private boolean checkIfOnlyWarnings(OMElement registryErrorList) {
 
-
         boolean onlyWarnings = true;
         OMElement element;
         Iterator it = registryErrorList.getChildElements();
@@ -1269,7 +1284,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      * @param e       - Exception thrown by the system
      * @return response - populated with te specific Error Code according the document Class Code.
      */
-    private AdhocQueryResponse handleUnsupportedOpertationException(AdhocQueryRequest request, UnsupportedOperationException e) {
+    private AdhocQueryResponse handleUnsupportedOperationException(AdhocQueryRequest request, UnsupportedOperationException e) {
 
         AdhocQueryResponse response = ofQuery.createAdhocQueryResponse();
         RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
@@ -1322,7 +1337,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         try {
             AdhocQueryResponseBuilder(adhocQueryRequest, result, sh, eventLog);
         } catch (UnsupportedOperationException uoe) {
-            result = handleUnsupportedOpertationException(adhocQueryRequest, uoe);
+            result = handleUnsupportedOperationException(adhocQueryRequest, uoe);
         }
         return result;
     }

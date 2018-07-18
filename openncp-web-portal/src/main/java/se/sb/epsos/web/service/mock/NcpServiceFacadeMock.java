@@ -59,7 +59,7 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
         mockSubmitDocumentResponse(webServiceClient);
 
         auditService = mock(AuditService.class, settings);
-        when(auditService.write((EventLog) Mockito.notNull(), (String) Mockito.notNull(), (String) Mockito.notNull())).thenReturn(true);
+        when(auditService.write(Mockito.notNull(), (String) Mockito.notNull(), (String) Mockito.notNull())).thenReturn(true);
 
         trcServiceHandler = mock(TrcServiceHandler.class, settings);
         mockBuildTrcRequestResponse(trcServiceHandler);

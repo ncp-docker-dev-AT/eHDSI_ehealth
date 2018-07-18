@@ -20,23 +20,29 @@ import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
 public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory {
 
-    public static final String GAZELLE_ASSERTION_VALIDATOR_URI =
-            "https://gazelle.ehdsi.ihe-europe.net/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS";
+    public static final String GAZELLE_ASSERTION_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+            .getProperty("GAZELLE_ASSERTION_VALIDATOR_URI");
+    //"https://gazelle.ehdsi.eu/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    public static final String GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI =
-            "https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS";
+    public static final String GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+            .getProperty("GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI");
+    //"https://gazelle.ehdsi.eu/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS";
 
-    public static final String GAZELLE_CDA_VALIDATOR_URI =
-            "https://gazelle.ehdsi.ihe-europe.net/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
+    public static final String GAZELLE_CDA_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+            .getProperty("GAZELLE_CDA_VALIDATOR_URI");
+    //"https://gazelle.ehdsi.eu/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    public static final String GAZELLE_CERTIFICATE_VALIDATOR_URI =
-            "https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator";
+    public static final String GAZELLE_CERTIFICATE_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+            .getProperty("GAZELLE_CERTIFICATE_VALIDATOR_URI");
+    //"https://gazelle.ehdsi.eu/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator";
 
-    public static final String GAZELLE_SCHEMATRON_VALIDATOR_URI =
-            "https://gazelle.ehdsi.ihe-europe.net/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator";
+    public static final String GAZELLE_SCHEMATRON_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+            .getProperty("GAZELLE_SCHEMATRON_VALIDATOR_URI");
+    //"https://gazelle.ehdsi.eu/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator";
 
-    public static final String GAZELLE_XDS_VALIDATOR_URI =
-            "https://gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
+    public static final String GAZELLE_XDS_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+            .getProperty("GAZELLE_XDS_VALIDATOR_URI");
+    //"https://gazelle.ehdsi.eu/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
 
     private final Logger logger = LoggerFactory.getLogger(DefaultGazelleValidatorFactory.class);
 
@@ -48,6 +54,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
 
     @Override
     public AssertionValidator getAssertionValidator() {
+
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
         marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.assertion.sante");
 
@@ -64,6 +71,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
 
     @Override
     public CdaValidator getCdaValidator() {
+
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
         marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda.sante", "net.ihe.gazelle.jaxb.result.sante");
         return new CdaValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_CDA_VALIDATOR_URI));
@@ -71,6 +79,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
 
     @Override
     public CertificateValidator getCertificateValidator() {
+
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
         marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.certificate.sante");
 
@@ -79,6 +88,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
 
     @Override
     public SchematronValidator getSchematronValidator() {
+
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
         marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.schematron.sante");
 
@@ -87,28 +97,34 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
 
     @Override
     public XdsValidator getXdsValidator() {
+
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.xsd.sante");
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.xds.sante");
 
         return new XdsValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_XDS_VALIDATOR_URI));
     }
 
     private WebServiceTemplate createWebServiceTemplate(Marshaller marshaller, String defaultUri) {
+
         logger.debug("Configuring WebServiceTemplate ...");
 
         HttpClientBuilder httpClientBuilder = HttpClients.custom()
                 .addInterceptorFirst(new HttpComponentsMessageSender.RemoveSoapHeadersInterceptor());
 
-        if (configurationManager.getBooleanProperty(StandardProperties.HTTP_PROXY_USED)) {
+        boolean isBehindProxy = configurationManager.getBooleanProperty(StandardProperties.HTTP_PROXY_USED);
+        logger.info("NCP Node is behind a proxy: '{}'", isBehindProxy);
+        if (isBehindProxy) {
+
             String hostname = configurationManager.getProperty(StandardProperties.HTTP_PROXY_HOST);
             int port = configurationManager.getIntegerProperty(StandardProperties.HTTP_PROXY_PORT);
 
             httpClientBuilder.setProxy(new HttpHost(hostname, port));
+            logger.info("NCP Proxy is secured by Credentials: '{}'", configurationManager.getBooleanProperty(StandardProperties.HTTP_PROXY_AUTHENTICATED));
 
             if (configurationManager.getBooleanProperty(StandardProperties.HTTP_PROXY_AUTHENTICATED)) {
+
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                credentialsProvider.setCredentials(
-                        new AuthScope(hostname, port),
+                credentialsProvider.setCredentials(new AuthScope(hostname, port),
                         new UsernamePasswordCredentials(configurationManager.getProperty(StandardProperties.HTTP_PROXY_USERNAME),
                                 configurationManager.getProperty(StandardProperties.HTTP_PROXY_PASSWORD)));
 

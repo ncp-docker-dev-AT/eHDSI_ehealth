@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2013 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.validation.reporting;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
@@ -29,6 +10,7 @@ import java.io.File;
 
 /**
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @deprecated
  */
 @Deprecated
 public class ValidationReport {
@@ -38,7 +20,11 @@ public class ValidationReport {
     private static final String FILE_NAME_DELIMITER = "_";
     private static final String CLEANUP_VALIDATION_DIR_AFTER_TEST = "automated.validation.cleanup.dir";
 
+    private ValidationReport() {
+    }
+
     public static String build(NcpSide ncpSide, boolean cleanupDir) {
+
         /* METHOD ATTRIBUTES */
         String path;
         File folder;
@@ -46,7 +32,7 @@ public class ValidationReport {
         StringBuilder sb;
 
         /* ATTRIBUTES INITIALIZATION */
-        path = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + "/" + ncpSide.getName();
+        path = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + File.separator + ncpSide.getName();
         folder = new File(path);
         listOfFiles = folder.listFiles();
         sb = new StringBuilder();
@@ -62,11 +48,11 @@ public class ValidationReport {
             return null;
         }
         if (!folder.canRead()) {
-            LOG.error("Cannot read from specified folder. (" + path + ")");
+            LOG.error("Cannot read from specified folder. ('{}')", path);
             return null;
         }
         if (listOfFiles.length == 0) {
-            LOG.error("The specified folder is empty. (" + path + ")");
+            LOG.error("The specified folder is empty. ('{}')", path);
             return null;
         }
 
@@ -77,9 +63,9 @@ public class ValidationReport {
             if (listOfFiles[i].isFile()) {
                 sb.append("\n");
                 if (i == listOfFiles.length - 1) {
-                    sb.append(" \u2514\u2500" + processFile(listOfFiles[i]));
+                    sb.append(" \u2514\u2500").append(processFile(listOfFiles[i]));
                 } else {
-                    sb.append(" \u251c\u2500" + processFile(listOfFiles[i]));
+                    sb.append(" \u251c\u2500").append(processFile(listOfFiles[i]));
                 }
             }
         }
@@ -93,31 +79,32 @@ public class ValidationReport {
     }
 
     public static void write(NcpSide ncpSide, boolean cleanupDir) {
+
         /* METHOD ATTRIBUTES */
         String path;
         File folder;
         File[] listOfFiles;
 
         /* ATTRIBUTES INITIALIZATION */
-        path = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + "/" + ncpSide.getName();
+        path = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + File.separator + ncpSide.getName();
         folder = new File(path);
         listOfFiles = folder.listFiles();
 
         /* PRE-CONDITIONS VERIFICATION */
         if (!folder.exists()) {
-            LOG.error("The specified folder does not exists. (" + path + ")");
+            LOG.error("The specified folder does not exists. ('{}')", path);
             return;
         }
         if (!folder.isDirectory()) {
-            LOG.error("The specified folder is not a folder. (" + path + ")");
+            LOG.error("The specified folder is not a folder. ('{}')", path);
             return;
         }
         if (!folder.canRead()) {
-            LOG.error("Cannot read from specified folder. (" + path + ")");
+            LOG.error("Cannot read from specified folder. ('{}')", path);
             return;
         }
-        if (listOfFiles.length == 0) {
-            LOG.error("The specified folder is empty. (" + path + ")");
+        if (listOfFiles == null || listOfFiles.length == 0) {
+            LOG.error("The specified folder is empty. ('{}')", path);
             return;
         }
 
@@ -127,7 +114,7 @@ public class ValidationReport {
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
                 if (i == listOfFiles.length - 1) {
-                    LOG.info(" \u2514\u2500" + processFile(listOfFiles[i]));
+                    LOG.info("'{}'", "\u2514\u2500" + processFile(listOfFiles[i]));
                 } else {
                     LOG.info(" \u251c\u2500" + processFile(listOfFiles[i]));
                 }
@@ -168,7 +155,7 @@ public class ValidationReport {
             return;
         }
 
-        if (folder.listFiles().length != 0) {
+        if (folder.listFiles() != null || folder.listFiles().length != 0) {
             for (File f : folder.listFiles()) {
                 if (!f.delete()) {
                     LOG.info("Could not remove the following file: " + f.getAbsolutePath());
@@ -178,6 +165,7 @@ public class ValidationReport {
     }
 
     public static void cleanValidationDir(String path) {
+
         File folder = new File(path);
         if (!folder.isDirectory()) {
             LOG.error("The specified folder is not a folder. ({})", path);
@@ -187,10 +175,12 @@ public class ValidationReport {
     }
 
     public static void cleanValidationDir(NcpSide ncpSide) {
-        cleanValidationDir(new File(Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + "/" + ncpSide.getName()));
+
+        cleanValidationDir(new File(Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + File.separator + ncpSide.getName()));
     }
 
     private static String processFile(File file) {
+
         final String FILE_EXTENSION = ".xml";
         String fileName;
         String[] fileNameSplit;

@@ -16,6 +16,7 @@ import javax.xml.ws.soap.SOAPFaultException;
  * This class represents the wrapper for the XCA messages validation.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @deprecated
  */
 @Deprecated
 public class XcaValidationService extends ValidationService {
@@ -75,7 +76,7 @@ public class XcaValidationService extends ValidationService {
             }
         }
         if (!xdXmlDetails.isEmpty()) {
-            return ReportBuilder.build(model, XdModel.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(xdXmlDetails), xdXmlDetails.toString(), ncpSide); // Report generation.
+            return ReportBuilder.build(model, XdModel.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(xdXmlDetails), xdXmlDetails, ncpSide); // Report generation.
         } else {
             LOGGER.error("The webservice response is empty, writing report without validation part.");
             return ReportBuilder.build(model, XdModel.checkModel(model).getObjectType().toString(), object, null, null, ncpSide); // Report generation.

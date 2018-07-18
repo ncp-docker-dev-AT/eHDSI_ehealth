@@ -1,10 +1,10 @@
 package se.sb.epsos.web.service;
 
 import epsos.ccd.gnomon.auditmanager.*;
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -44,6 +44,7 @@ import java.io.FileInputStream;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -248,7 +249,6 @@ public class AssertionHandler implements Serializable {
         }
 
         String secHead = "No security header provided";
-        String basedSecHead = new String(Base64.encodeBase64(secHead.getBytes()));
         String reqm_participantObjectID = "urn:uuid:" + assertion.getID();
         String resm_participantObjectID = "urn:uuid:" + assertion.getID();
 
@@ -292,9 +292,9 @@ public class AssertionHandler implements Serializable {
                 EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID,
                 HR_UserID, HR_RoleID, HR_AlternativeUserID, SC_UserID,
                 SP_UserID, AS_AuditSourceId, ET_ObjectID,
-                reqm_participantObjectID, basedSecHead.getBytes(),
+                reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
                 resm_participantObjectID, ResM_PatricipantObjectDetail,
-                sourceHost, "N/A");
+                sourceHost, "N/A", NcpSide.NCP_B);
         eventLog.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog, "13", "2");
         LOGGER.debug("################################################");
@@ -366,7 +366,7 @@ public class AssertionHandler implements Serializable {
                 .buildObject(Signature.DEFAULT_ELEMENT_NAME);
         Credential signingCredential = SecurityHelper.getSimpleCredential(certificate, privateKey);
         signature.setSigningCredential(signingCredential);
-        signature.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+        signature.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         signature.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
 
         SecurityConfiguration securityConfiguration = Configuration.getGlobalSecurityConfiguration();

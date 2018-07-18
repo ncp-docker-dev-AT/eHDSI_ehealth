@@ -7,9 +7,6 @@ import java.util.Arrays;
  * Object Detail
  *
  * @author Andrew Harrison
- * @version $Revision:$
- * @created Sep 5, 2009: 2:37:18 PM
- * @date $Date:$ modified by $Author:$
  */
 public class AtnaObjectDetail implements Serializable {
 
@@ -50,11 +47,7 @@ public class AtnaObjectDetail implements Serializable {
         if (type != null ? !type.equals(that.type) : that.type != null) {
             return false;
         }
-        if (!Arrays.equals(value, that.value)) {
-            return false;
-        }
-
-        return true;
+        return Arrays.equals(value, that.value);
     }
 
     @Override
@@ -72,10 +65,10 @@ public class AtnaObjectDetail implements Serializable {
         }
         return "[" +
                 getClass().getName() +
-                " type=" +
+                " type='" +
                 getType() +
-                " value=" +
+                "' value='" +
                 new String(bytes) +
-                "]";
+                "']";
     }
 }

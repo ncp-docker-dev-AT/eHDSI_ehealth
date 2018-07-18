@@ -1,14 +1,12 @@
 package eu.epsos.protocolterminators.ws.server.xcpd.impl;
 
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
-import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;
 import tr.com.srdc.epsos.data.model.PatientId;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
 import tr.com.srdc.epsos.util.Constants;
 
 import java.io.File;
@@ -40,13 +38,13 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
     private static final String TELEPHONE = "telephone";
 
     @Override
-    public String getPatientId(String citizenNumber) throws NIException, InsufficientRightsException {
+    public String getPatientId(String citizenNumber) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<PatientDemographics> getPatientDemographics(List<PatientId> idList) throws NIException, InsufficientRightsException {
+    public List<PatientDemographics> getPatientDemographics(List<PatientId> idList) {
 
         LOGGER.info("Searching patients at NI Mock...");
 
@@ -63,12 +61,10 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
             File rootDir = new File(patientFile + aux.getRoot());
 
             if (rootDir.exists()) {
-                File extensionFile = new File(patientFile + aux.getRoot() + "/"
-                        + aux.getExtension() + ".properties");
+                File extensionFile = new File(patientFile + aux.getRoot() + File.separator + aux.getExtension() + ".properties");
 
                 if (extensionFile.exists()) {
-                    patientFile += aux.getRoot() + "/"
-                            + aux.getExtension() + ".properties";
+                    patientFile += aux.getRoot() + File.separator + aux.getExtension() + ".properties";
                     id = aux;
                     break;
                 }

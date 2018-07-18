@@ -28,7 +28,6 @@ public class AssertionValidatorImpl extends AbstractValidator implements Asserti
 
         try {
             ValidateDocumentResponse response = (ValidateDocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
-            LOGGER.info("Gazelle Result:\n{}", response.getDetailedResult());
             return StringUtils.hasText(response.getDetailedResult());
         } catch (WebServiceClientException e) {
             LOGGER.error("An error occurred during validation process of the AssertionValidator. Please check the stack trace for more details.", e);
@@ -45,7 +44,6 @@ public class AssertionValidatorImpl extends AbstractValidator implements Asserti
 
         try {
             ValidateBase64DocumentResponse response = (ValidateBase64DocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
-            LOGGER.info("Gazelle Result:\n{}", response.getDetailedResult());
 
             return StringUtils.hasText(response.getDetailedResult());
         } catch (WebServiceClientException e) {

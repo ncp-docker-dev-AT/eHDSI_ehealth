@@ -30,6 +30,7 @@
     <!-- Delete form-->
     <form action="#" th:action="@{/smpeditor/deletesmpfile} + '?' + ${_csrf.parameterName} + '=' + ${_csrf.token}"
           th:object="${smpdelete}" method="post" enctype="multipart/form-data">
+        <input type="hidden"name="${_csrf.parameterName}"value="${_csrf.token}" />
         <div class="form-group row" id="newfileinputs">
             <div id="newfileinputs" class="form-group row">
                 <label class="col-xs-2" for="country" th:text="#{label.SmpEditor.form.country}">Country</label>

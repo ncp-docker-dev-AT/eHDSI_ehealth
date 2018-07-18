@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012  SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.util.xdr;
 
 import eu.epsos.util.IheConstants;
@@ -50,6 +31,9 @@ public class XDRConstants {
         public static final String MESSAGEID_STR = "MessageID";
         public static final String SECURITY_STR = "Security";
         public static final String MUST_UNDERSTAND_STR = "mustUnderstand";
+
+        private SOAP_HEADERS() {
+        }
     }
 
     public class LOG {
@@ -57,12 +41,18 @@ public class XDRConstants {
         /* ProvideAndRegister */
         public static final String OUTGOING_XDR_PROVIDEANDREGISTER_MESSAGE = "Outgoing XDR request message to NCP-A:";
         public static final String INCOMING_XDR_PROVIDEANDREGISTER_MESSAGE = "Incoming XDR response message from NCP-A:";
+
+        private LOG() {
+        }
     }
 
     public class EXCEPTIONS {
 
         public static final String ERROR_JAXB_MARSHALLING = "Error in JAXB marshalling";
         public static final String UNABLE_CREATE_JAXB_CONTEXT = "Unable to create JAXBContext:";
+
+        private EXCEPTIONS() {
+        }
     }
 
     public class EXTRINSIC_OBJECT {
@@ -115,21 +105,33 @@ public class XDRConstants {
             public static final String TYPE_CODE_SCHEME = IheConstants.TYPE_CODE_SCHEME;
 
             public final class EDispensation {
+
                 public static final String DISPLAY_NAME = "eDispensation";
                 public static final String NODE_REPRESENTATION = "60593-1";
                 public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
+
+                private EDispensation() {
+                }
             }
 
             public final class Consent {
+
                 public static final String DISPLAY_NAME = "Privacy Policy Acknowledgement Document";
                 public static final String NODE_REPRESENTATION = "57016-8";
                 public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
+
+                private Consent() {
+                }
             }
 
             public final class Hcer {
+
                 public static final String DISPLAY_NAME = "Summarization of Episode Note";
                 public static final String NODE_REPRESENTATION = "34133-9";
                 public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
+
+                private Hcer() {
+                }
             }
         }
 
@@ -145,6 +147,9 @@ public class XDRConstants {
                     public static final String DISPLAY_NAME = "epSOS coded eDispensation";
                     public static final String NODE_REPRESENTATION = "urn:epSOS:ep:dis:2010";
                     public static final String CODING_SCHEME = "epSOS formatCodes";
+
+                    private EpsosPivotCoded() {
+                    }
                 }
 
                 public final class PdfSourceCoded {
@@ -152,6 +157,9 @@ public class XDRConstants {
                     public static final String DISPLAY_NAME = "PDF/A coded document";
                     public static final String NODE_REPRESENTATION = "urn:ihe:iti:xds-sd:pdf:2008";
                     public static final String CODING_SCHEME = "epSOS formatCodes";
+
+                    private PdfSourceCoded() {
+                    }
                 }
             }
 
@@ -162,6 +170,9 @@ public class XDRConstants {
                     public static final String DISPLAY_NAME = "Consent";
                     public static final String NODE_REPRESENTATION = "urn:ihe:iti:bppc-sd:2007";
                     public static final String CODING_SCHEME = "IHE PCC";
+
+                    private ScannedDocument() {
+                    }
                 }
 
                 public final class NotScannedDocument {
@@ -169,6 +180,9 @@ public class XDRConstants {
                     public static final String DISPLAY_NAME = "Consent";
                     public static final String NODE_REPRESENTATION = "urn:ihe:iti:bppc:2007";
                     public static final String CODING_SCHEME = "IHE PCC";
+
+                    private NotScannedDocument() {
+                    }
                 }
             }
 
@@ -179,8 +193,10 @@ public class XDRConstants {
                     public static final String DISPLAY_NAME = "epSOS Coded HCER";
                     public static final String NODE_REPRESENTATION = "urn:epSOS:hcer:hcer:2013";
                     public static final String CODING_SCHEME = "epSOS formatCodes";
-                }
 
+                    private EpsosPivotCoded() {
+                    }
+                }
             }
         }
     }
@@ -215,10 +231,16 @@ public class XDRConstants {
         public static final String XDSSUBMSET_SOURCEID_SCHEME = "urn:uuid:554ac39e-e3fe-47fe-b233-965d2a147832";
         public static final String XDSSUBMSET_SOURCEID_VALUE = "1.3.6.1.4.1.21367.2009.1.2.1";
         public static final String XDSSUBMSET_SOURCEID_STR = "XDSSubmissionSet.sourceId";
+
+        private REGISTRY_PACKAGE() {
+        }
     }
 
     public class SUBMISSION_SET_CLASSIFICATION {
 
         public static final String CLASSIFICATION_NODE_UUID = "urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd";
+
+        private SUBMISSION_SET_CLASSIFICATION() {
+        }
     }
 }

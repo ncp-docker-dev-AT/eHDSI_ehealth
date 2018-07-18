@@ -18,100 +18,100 @@
   *  Contact email: epsos@iuz.pt
   */
 
-package eu.epsos.validation.datamodel.common;
+ package eu.epsos.validation.datamodel.common;
 
-import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+ import javax.xml.bind.annotation.XmlElement;
+ import javax.xml.bind.annotation.XmlType;
+ import java.util.List;
 
-/**
- * This class represents a Note object.
- *
- * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
- */
-@XmlType(propOrder = {"test", "location", "description", "identifiant", "assertions"})
-public class Note {
+ /**
+  * This class represents a Note object.
+  *
+  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+  */
+ @XmlType(propOrder = {"test", "location", "description", "identifiant", "assertions"})
+ public class Note {
 
-    /* PARAMETERS */
-    private String test;
-    private String location;
-    private String description;
-    private String identifiant;
-    private List<Assertion> assertions;
-    /* GETTERS AND SETTERS */
+     /* PARAMETERS */
+     private String test;
+     private String location;
+     private String description;
+     private String identifiant;
+     private List<Assertion> assertions;
+     /* GETTERS AND SETTERS */
 
-    /**
-     * @return the test
-     */
-    @XmlElement(name = "Test")
-    public String getTest() {
-        return test;
-    }
+     /**
+      * @return the test
+      */
+     @XmlElement(name = "Test")
+     public String getTest() {
+         return test;
+     }
 
-    /**
-     * @param test the test to set
-     */
-    public void setTest(String test) {
-        this.test = test;
-    }
+     /**
+      * @param test the test to set
+      */
+     public void setTest(String test) {
+         this.test = test;
+     }
 
-    /**
-     * @return the location
-     */
-    @XmlElement(name = "Location")
-    public String getLocation() {
-        return location;
-    }
+     /**
+      * @return the location
+      */
+     @XmlElement(name = "Location")
+     public String getLocation() {
+         return location;
+     }
 
-    /**
-     * @param location the location to set
-     */
-    public void setLocation(String location) {
-        this.location = location;
-    }
+     /**
+      * @param location the location to set
+      */
+     public void setLocation(String location) {
+         this.location = location;
+     }
 
-    /**
-     * @return the description
-     */
-    @XmlElement(name = "Description")
-    public String getDescription() {
-        return description;
-    }
+     /**
+      * @return the description
+      */
+     @XmlElement(name = "Description")
+     public String getDescription() {
+         return description;
+     }
 
-    /**
-     * @param description the description to set
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
+     /**
+      * @param description the description to set
+      */
+     public void setDescription(String description) {
+         this.description = description;
+     }
 
-    /**
-     * @return the identifiant
-     */
-    @XmlElement(name = "Identifiant")
-    public String getIdentifiant() {
-        return identifiant;
-    }
+     /**
+      * @return the identifiant
+      */
+     @XmlElement(name = "Identifiant")
+     public String getIdentifiant() {
+         return identifiant;
+     }
 
-    /**
-     * @param identifiant the identifiant to set
-     */
-    public void setIdentifiant(String identifiant) {
-        this.identifiant = identifiant;
-    }
+     /**
+      * @param identifiant the identifiant to set
+      */
+     public void setIdentifiant(String identifiant) {
+         this.identifiant = identifiant;
+     }
 
-    /**
-     * @return the assertions
-     */
-    @XmlElement(name = "Assertion")
-    public List<Assertion> getAssertions() {
-        return assertions;
-    }
+     /**
+      * @return the assertions
+      */
+     @XmlElement(name = "Assertion")
+     public List<Assertion> getAssertions() {
+         return assertions;
+     }
 
-    /**
-     * @param assertions the assertions to set
-     */
-    public void setAssertions(List<Assertion> assertions) {
-        this.assertions = assertions;
-    }
-}
+     /**
+      * @param assertions the assertions to set
+      */
+     public void setAssertions(List<Assertion> assertions) {
+         this.assertions = assertions;
+     }
+ }

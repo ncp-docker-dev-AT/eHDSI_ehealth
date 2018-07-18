@@ -6,10 +6,11 @@ import epsos.ccd.netsmart.securitymanager.SamlTRCIssuer;
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.sts.util.STSUtils;
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensaml.DefaultBootstrap;
@@ -40,6 +41,7 @@ import javax.xml.ws.Service.Mode;
 import javax.xml.ws.handler.MessageContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
@@ -53,6 +55,7 @@ import java.util.UUID;
 public class STSService implements Provider<SOAPMessage> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(STSService.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final QName Messaging_To = new QName("http://www.w3.org/2005/08/addressing", "To");
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion"; // What
@@ -157,11 +160,12 @@ public class STSService implements Provider<SOAPMessage> {
             audit(samlTRCIssuer.getPointofCare(), samlTRCIssuer.getHumanRequestorNameId(),
                     samlTRCIssuer.getHumanRequestorSubjectId(), samlTRCIssuer.getHRRole(), patientID,
                     samlTRCIssuer.getFacilityType(), trc.getID(), tls_cn, mid,
-                    Base64.encodeBase64(strReqHeader.getBytes()), getMessageIdFromHeader(response.getSOAPHeader()),
-                    Base64.encodeBase64(strRespHeader.getBytes()));
+                    strReqHeader.getBytes(StandardCharsets.UTF_8),
+                    getMessageIdFromHeader(response.getSOAPHeader()),
+                    strRespHeader.getBytes(StandardCharsets.UTF_8));
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Outgoing SOAP Message response: '{}'", response.toString());
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.debug("Outgoing SOAP Message response: '{}'", response.toString());
                 log(response);
             }
             return response;
@@ -288,7 +292,7 @@ public class STSService implements Provider<SOAPMessage> {
                        String humanRequestorRole, String patientID, String facilityType, String assertionId,
                        String tls_cn, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
 
-        AuditService asd = AuditServiceFactory.getInstance();
+        AuditService auditService = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
         XMLGregorianCalendar date2 = null;
@@ -305,10 +309,10 @@ public class STSService implements Provider<SOAPMessage> {
                         + "<" + humanRequestorNameID + "@" + cms.getProperty("ncp.country") + ">", humanRequestorRole,
                 humanRequestorSubjectID, tls_cn, STSUtils.getServerIP(), cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
                 patientID, "urn:uuid:" + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
-                STSUtils.getServerIP(), getClientIP());
+                STSUtils.getServerIP(), getClientIP(), NcpSide.NCP_B);
 
         evLogTRC.setEventType(EventType.epsosTRCAssertion);
-        asd.write(evLogTRC, "13", "2");
+        auditService.write(evLogTRC, "13", "2");
     }
 
     private String getClientIP() {
@@ -324,10 +328,10 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             message.writeTo(out);
         } catch (IOException | SOAPException e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER_CLINICAL.error("Exception: '{}'", e.getMessage(), e);
         }
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("SOAPMessage:\n{}", out.toString());
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.info("SOAPMessage:\n{}", out.toString());
         }
     }
 }

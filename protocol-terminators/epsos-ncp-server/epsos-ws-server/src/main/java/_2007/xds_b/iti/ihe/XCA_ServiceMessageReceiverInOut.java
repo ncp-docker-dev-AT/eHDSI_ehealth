@@ -1,82 +1,3 @@
-/*
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * <p>
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- * <p>
- * XCA_ServiceMessageReceiverInOut.java
- * <p>
- * This file was auto-generated from WSDL by the Apache Axis2 version: 1.5.4
- * Built on : Dec 19, 2010 (08:18:42 CET)
- */
 package _2007.xds_b.iti.ihe;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
@@ -85,9 +6,12 @@ import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.datamodel.xd.XdModel;
-import eu.epsos.validation.services.XcaValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
+import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
+import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
+import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
+import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -201,6 +125,8 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 eventLog.setSourceip(ip);
                 eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
                 eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
+                LOGGER.info("[Audit Debug] Requester: ParticipantId: '{}'\nObjectDetail: '{}'",
+                        getMessageID(msgContext.getEnvelope()), msgContext.getEnvelope().getHeader().toString());
 
                 HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
                 String clientDN = HTTPUtil.getClientCertificate(req);
@@ -210,39 +136,47 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                     LOGGER_CLINICAL.debug("Incoming XCA Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
                 }
-                if (StringUtils.equals("respondingGateway_CrossGatewayQuery", methodName)) {
+                if (StringUtils.equals(XCAOperation.SERVICE_CROSS_GATEWAY_QUERY, methodName)) {
 
                     /* Validate incoming query request */
                     String requestMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
-                    XcaValidationService.getInstance().validateModel(requestMessage, XdModel.obtainModelXca(requestMessage).toString(), NcpSide.NCP_A);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A);
+                    }
 
-                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse adhocQueryResponse1;
-                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest wrappedParam = (oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest) fromOM(
-                            msgContext.getEnvelope().getBody().getFirstElement(), oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
+                    AdhocQueryResponse adhocQueryResponse1;
+                    AdhocQueryRequest wrappedParam = (AdhocQueryRequest) fromOM(
+                            msgContext.getEnvelope().getBody().getFirstElement(), AdhocQueryRequest.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
                     adhocQueryResponse1 = skel.respondingGateway_CrossGatewayQuery(wrappedParam, sh, eventLog);
                     envelope = toEnvelope(getSOAPFactory(msgContext), adhocQueryResponse1, false);
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
-
+                    LOGGER.info("[Audit Debug] Responder: ParticipantId: '{}'\nObjectDetail: '{}'",
+                            randomUUID, envelope.getHeader().toString());
+                    eventLog.setNcpSide(NcpSide.NCP_A);
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
                     /* Validate outgoing query response */
                     String responseMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
-                    XcaValidationService.getInstance().validateModel(responseMessage, XdModel.obtainModelXca(responseMessage).toString(), NcpSide.NCP_A);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
+                    }
 
                     if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                         LOGGER_CLINICAL.debug("Response Header:\n{}", envelope.getHeader().toString());
                         LOGGER_CLINICAL.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
 
-                } else if (StringUtils.equals("respondingGateway_CrossGatewayRetrieve", methodName)) {
+                } else if (StringUtils.equals(XCAOperation.SERVICE_CROSS_GATEWAY_RETRIEVE, methodName)) {
 
                     /* Validate incoming retrieve request */
                     String requestMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
-                    XcaValidationService.getInstance().validateModel(requestMessage, XdModel.obtainModelXca(requestMessage).toString(), NcpSide.NCP_A);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A);
+                    }
 
                     ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponse3 = null;
                     ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType wrappedParam = (ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType) fromOM(
@@ -259,9 +193,11 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
+                    eventLog.setNcpSide(NcpSide.NCP_A);
 
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
+
                     if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                         LOGGER_CLINICAL.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
@@ -272,7 +208,9 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                     /* Validate outgoing retrieve response */
                     String responseMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
-                    XcaValidationService.getInstance().validateModel(responseMessage, XdModel.obtainModelXca(responseMessage).toString(), NcpSide.NCP_A);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
+                    }
 
                 } else {
                     LOGGER.error("Method not found: '{}'", methodName);
@@ -348,8 +286,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         }
     }
 
-    private SOAPEnvelope toEnvelope(SOAPFactory factory, oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse param,
-                                    boolean optimizeContent) throws AxisFault {
+    private SOAPEnvelope toEnvelope(SOAPFactory factory, AdhocQueryResponse param, boolean optimizeContent) throws AxisFault {
 
         SOAPEnvelope envelope = factory.getDefaultEnvelope();
         envelope.getBody().addChild(toOM(param, optimizeContent));
@@ -357,7 +294,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         return envelope;
     }
 
-    private OMElement toOM(ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType param, boolean optimizeContent) throws AxisFault {
+    private OMElement toOM(RetrieveDocumentSetRequestType param, boolean optimizeContent) throws AxisFault {
 
         try {
 
@@ -365,7 +302,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
             OMFactory factory = OMAbstractFactory.getOMFactory();
 
-            JaxbRIDataSource source = new JaxbRIDataSource(ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType.class, param,
+            JaxbRIDataSource source = new JaxbRIDataSource(RetrieveDocumentSetRequestType.class, param,
                     marshaller, "urn:ihe:iti:xds-b:2007", "RetrieveDocumentSetRequest");
             OMNamespace namespace = factory.createOMNamespace("urn:ihe:iti:xds-b:2007", null);
 
@@ -376,8 +313,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         }
     }
 
-    private SOAPEnvelope toEnvelope(SOAPFactory factory, ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType param,
-                                    boolean optimizeContent) throws AxisFault {
+    private SOAPEnvelope toEnvelope(SOAPFactory factory, RetrieveDocumentSetRequestType param, boolean optimizeContent) throws AxisFault {
 
         SOAPEnvelope envelope = factory.getDefaultEnvelope();
         envelope.getBody().addChild(toOM(param, optimizeContent));
@@ -385,7 +321,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         return envelope;
     }
 
-    private OMElement toOM(ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType param, boolean optimizeContent) throws AxisFault {
+    private OMElement toOM(RetrieveDocumentSetResponseType param, boolean optimizeContent) throws AxisFault {
 
         try {
 
@@ -393,7 +329,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
             OMFactory factory = OMAbstractFactory.getOMFactory();
-            JaxbRIDataSource source = new JaxbRIDataSource(ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.class,
+            JaxbRIDataSource source = new JaxbRIDataSource(RetrieveDocumentSetResponseType.class,
                     param, marshaller, "urn:ihe:iti:xds-b:2007", "RetrieveDocumentSetResponse");
 
             OMNamespace namespace = factory.createOMNamespace("urn:ihe:iti:xds-b:2007", null);
@@ -405,7 +341,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         }
     }
 
-    private SOAPEnvelope toEnvelope(SOAPFactory factory, ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType param, boolean optimizeContent) throws AxisFault {
+    private SOAPEnvelope toEnvelope(SOAPFactory factory, RetrieveDocumentSetResponseType param, boolean optimizeContent) throws AxisFault {
 
         SOAPEnvelope envelope = factory.getDefaultEnvelope();
         envelope.getBody().addChild(toOM(param, optimizeContent));

@@ -181,7 +181,7 @@
     <wsdl:service name="AuditMessageValidationWSService">
         <wsdl:port binding="tns:AuditMessageValidationWSServiceSoapBinding" name="AuditMessageValidationWSPort">
             <soap:address
-                    location="https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS"/>
+                    location="https://gazelle.ehdsi.eu/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

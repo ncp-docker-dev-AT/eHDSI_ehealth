@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://gazelle.ihe.net/xsl/EVSClient/Schematron/schematronResultStylesheet4EVSC.xsl"?>
+<detailedResult>
+    <DocumentWellFormed>
+        <Result>PASSED</Result>
+    </DocumentWellFormed>
+    <DocumentValid>
+        <Result>PASSED</Result>
+    </DocumentValid>
+    <SchematronValidation>
+        <Warning>
+            <Test>(count(hl7:receiver/*) = 1) and (count(hl7:receiver) = 1) and (count(hl7:receiver/hl7:device/*) = 1)
+                and (count(hl7:receiver/hl7:device/hl7:id) = 1)
+            </Test>
+            <Location>/PRPA_IN201306UV02</Location>
+            <Description>Warning: 'hl7:receiver' only a "device.id" sub-element</Description>
+        </Warning>
+        <Report>
+            <Test>not (hl7:patientNonPersonLivingSubject)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient</Location>
+            <Description>Success: result relates to a
+                person
+            </Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:subjectOf2)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient</Location>
+            <Description>Success: subjectOf2 is omitted</Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:coveredPartyOf)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient</Location>
+            <Description>Success: coveredPartyOf must be omitted</Description>
+        </Report>
+        <Report>
+            <Test>@classCode = 'PAT'</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient</Location>
+            <Description>Success: classCode is equal to 'PAT'</Description>
+        </Report>
+        <Report>
+            <Test>count(hl7:id) = 1</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient</Location>
+            <Description>Success: exactly one main patient ID is present</Description>
+        </Report>
+        <Report>
+            <Test>hl7:statusCode/@code = 'active'</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient</Location>
+            <Description>Success: statusCode is equal to 'active'</Description>
+        </Report>
+        <Report>
+            <Test>hl7:patientPerson</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient</Location>
+            <Description>Success: The element "patient\patientPerson" is
+                present.
+            </Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:asPatientOfOtherProvider)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: asPatientOfOtherProvider is
+                omitted
+            </Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:guarantorRole)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: guarantorRole is omitted</Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:guardian)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: guardian is omitted</Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:contactParty)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: contactParty is omitted</Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:asMember)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: asMember is omitted</Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:careGiver)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: careGiver is omitted</Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:asStudent)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: asStudent is omitted</Description>
+        </Report>
+        <Report>
+            <Test>@classCode = 'PSN'</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: classCode must equal to 'PSN'</Description>
+        </Report>
+        <Report>
+            <Test>@determinerCode = 'INSTANCE'</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: determinerCode must equal to
+                'INSTANCE'
+            </Description>
+        </Report>
+        <Report>
+            <Test>count(hl7:name) &gt; 0</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: at least one sub-element "name" must be
+                present
+            </Description>
+        </Report>
+        <Report>
+            <Test>not(hl7:name/@nullFlavor) or ($idPresent and not($demographicsPresent))</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: the request contained only a patient identifier and no demographic data and
+                the patient name is null
+            </Description>
+        </Report>
+        <Report>
+            <Test>not(hl7:personalRelationship) or hl7:personalRelationship/@classCode = 'PRS'</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: relationship holder of the personal relationship is restricted to be a
+                person, classCode is equal to 'PRS'
+            </Description>
+        </Report>
+        <Report>
+            <Test>not(hl7:asEmployee) or hl7:asEmployee/@classCode = 'EMP'</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success:
+                classCode is equal to 'EMP'
+            </Description>
+        </Report>
+        <Report>
+            <Test>matches(hl7:birthTime/@value,
+                '^(18|19|20|21)\d\d((0[1-9]|1[012])((0[1-9]|[12][0-9]|3[01])(([0-1]\d|[2][0-3])([0-5]\d)(([0-5]\d)((\.\d)\d?\d?\d?)?)?)?)?)?([+-][0-1][0-9][0,3,4][0,5])?$')
+            </Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/patientPerson
+            </Location>
+            <Description>Success: The element "birthTime" is present and his attribute 'value' is
+                fulfilled and is valid according to the following regular expression
+                :YYYY[MM[DD[HHMM[SS[.S[S[S[S]]]]]]]][+/-ZZZZ]”
+            </Description>
+        </Report>
+        <Report>
+            <Test>count(hl7:acknowledgement) = 1</Test>
+            <Location>/PRPA_IN201306UV02</Location>
+            <Description>Success: exactly one sub-element
+                'acknowledgement' is present
+            </Description>
+        </Report>
+        <Report>
+            <Test>hl7:device/hl7:asAgent/hl7:representedOrganization</Test>
+            <Location>/PRPA_IN201306UV02/receiver</Location>
+            <Description>Success:
+                organizational information is presented in 'receiver'
+            </Description>
+        </Report>
+        <Report>
+            <Test>count(hl7:id) = 1</Test>
+            <Location>/PRPA_IN201306UV02/receiver/device/asAgent/representedOrganization</Location>
+            <Description>Success: exactly one sub-element 'id' is present here</Description>
+        </Report>
+        <Report>
+            <Test>hl7:id/@root</Test>
+            <Location>/PRPA_IN201306UV02/receiver/device/asAgent/representedOrganization</Location>
+            <Description>Success: homeCommunityId is specified in the attribute
+                'id/@root'
+            </Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:id/@nullFlavor or hl7:id/@extension or hl7:id/@assigningAuthorityName)</Test>
+            <Location>/PRPA_IN201306UV02/receiver/device/asAgent/representedOrganization</Location>
+            <Description>Success: only attribute 'root' is present in the sub-element 'id'</Description>
+        </Report>
+        <Report>
+            <Test>count(hl7:id) = 1</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/custodian/assignedEntity</Location>
+            <Description>Success: exactly one sub-element 'id' is present here</Description>
+        </Report>
+        <Report>
+            <Test>hl7:id/@root</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/custodian/assignedEntity</Location>
+            <Description>Success: homeCommunityId is specified in the attribute
+                'id/@root'
+            </Description>
+        </Report>
+        <Report>
+            <Test>not (hl7:id/@nullFlavor or hl7:id/@extension or hl7:id/@assigningAuthorityName)</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/custodian/assignedEntity</Location>
+            <Description>Success: only attribute 'root' is present in the sub-element 'id'</Description>
+        </Report>
+        <Report>
+            <Test>((hl7:code/@code = 'SupportsHealthDataLocator') or (hl7:code/@code = 'NotHealthDataLocator')) and
+                (hl7:code/@codeSystem = '1.3.6.1.4.1.19376.1.2.27.2')
+            </Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/custodian/assignedEntity</Location>
+            <Description>Success: specification of Health Data Locator support is present and valid</Description>
+        </Report>
+        <Report>
+            <Test>(count(hl7:sender/*) = 1) and (count(hl7:sender) = 1) and (count(hl7:sender/hl7:device/*) = 1) and
+                (count(hl7:sender/hl7:device/hl7:id) = 1)
+            </Test>
+            <Location>/PRPA_IN201306UV02</Location>
+            <Description>Success: 'hl7:sender' contains only a "device.id" sub-element</Description>
+        </Report>
+        <Report>
+            <Test>count(hl7:CorrelationTimeToLive) = 0</Test>
+            <Location>/PRPA_IN201306UV02</Location>
+            <Description>Success: Correlation is not cached
+                by the service provider
+            </Description>
+        </Report>
+        <Report>
+            <Test>(@code = 'P') or (@code = 'D')</Test>
+            <Location>/PRPA_IN201306UV02/processingCode</Location>
+            <Description>Success: The 'processingCode' is
+                correctly set to P or D
+            </Description>
+        </Report>
+        <Report>
+            <Test>count(hl7:patient) &lt;= 1</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1</Location>
+            <Description>Success: hl7:subject1 contain only a single
+                "patient" element.
+            </Description>
+        </Report>
+        <Report>
+            <Test>@code = 'active'</Test>
+            <Location>/PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/statusCode</Location>
+            <Description>Success: patient/statusCode is equal to "active"</Description>
+        </Report>
+        <Report>
+            <Test>hl7:value[matches(normalize-space(@xsi:type),'INT$')]</Test>
+            <Location>
+                /PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/subjectOf1/queryMatchObservation
+            </Location>
+            <Description>Success: The element
+                "queryMatchObservation\value" is present and his attribute 'xsi:type' is fulfilled.
+            </Description>
+        </Report>
+        <Report>
+            <Test>hl7:code/@codeSystem = '2.16.840.1.113883.1.11.19914'</Test>
+            <Location>
+                /PRPA_IN201306UV02/controlActProcess/subject/registrationEvent/subject1/patient/subjectOf1/queryMatchObservation
+            </Location>
+            <Description>Success: The
+                element "queryMatchObservation\code" is present and his attribute 'codeSystem' is
+                fulfilled.
+            </Description>
+        </Report>
+        <Result>PASSED</Result>
+        <ValidationCounters>
+            <NrOfChecks>38</NrOfChecks>
+            <NrOfValidationErrors>0</NrOfValidationErrors>
+            <NrOfValidationWarnings>1</NrOfValidationWarnings>
+            <NrOfValidationNotes>0</NrOfValidationNotes>
+            <NrOfValidationReports>37</NrOfValidationReports>
+            <NrOfValidationUnknown>0</NrOfValidationUnknown>
+        </ValidationCounters>
+    </SchematronValidation>
+    <ValidationResultsOverview>
+        <ValidationDate>2018, 05 29</ValidationDate>
+        <ValidationTime>05:31 (PM)</ValidationTime>
+        <ValidationServiceName>Gazelle Schematron Validator</ValidationServiceName>
+        <ValidationServiceVersion>2.3.0</ValidationServiceVersion>
+        <Schematron>epSOS - Identification Service (response)</Schematron>
+        <SchematronVersion>$Revision:34824$</SchematronVersion>
+        <SchematronAuthor>NA</SchematronAuthor>
+        <SchematronPath>epSOS/identification_service/PRPA_IN201306UV02_epsos.sch</SchematronPath>
+        <XSDFileUsed>hl7v3/multicacheschemas/PRPA_IN201306UV02.xsd</XSDFileUsed>
+        <ValidationTestResult>PASSED</ValidationTestResult>
+    </ValidationResultsOverview>
+</detailedResult>

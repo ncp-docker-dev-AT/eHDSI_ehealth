@@ -1,5 +1,6 @@
 package epsos.ccd.gnomon.auditmanager;
 
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
@@ -21,7 +22,8 @@ import java.math.BigInteger;
 public class EventLog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventLog.class);
-
+    // NCPSide A or B information required for online validation
+    private NcpSide ncpSide;
     private String EI_TransactionNumber;  // Number of the transaction including the 'Epsos-' prefix
     private String EI_TransactionName;    // Name of the transaction, specified in the use cases diagram
     private XMLGregorianCalendar EI_EventDateTime;
@@ -64,6 +66,7 @@ public class EventLog {
     private String EventType;             // one of the availbale epsos event ids
     private String EI_EventActionCode;    //  C:create, R:Read,View,Print,Query, U:Update, D:Delete, E:Execute
     private BigInteger EI_EventOutcomeIndicator; // Possible values are: 0:full success,1:partial delivery,4:temporal or recoverable failures,8:permanent failure
+
 
     public EventLog() {
     }
@@ -112,7 +115,7 @@ public class EventLog {
                                                      String ResM_ParticipantObjectID,
                                                      byte[] ResM_PatricipantObjectDetail,
                                                      String sourceip,
-                                                     String targetip) {
+                                                     String targetip, NcpSide ncpSide) {
         EventLog el = new EventLog();
         el.setEI_TransactionName(EI_TransactionName);
         el.setEI_EventActionCode(EI_EventActionCode);
@@ -133,6 +136,7 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
+        el.setNcpSide(ncpSide);
         LOGGER.info("'{}'", el.toString());
         return el;
     }
@@ -215,13 +219,11 @@ public class EventLog {
      *                                     encoded security header.
      * @param targetip                     The IP Address of the target Gateway
      */
-    public static EventLog createEventLogPivotTranslation(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode, XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
-                                                          String SP_UserID, String ET_ObjectID_in,
-                                                          String ET_ObjectID_out,
-                                                          String ReqM_ParticipantObjectID,
-                                                          byte[] ReqM_PatricipantObjectDetail,
-                                                          String ResM_ParticipantObjectID,
-                                                          byte[] ResM_PatricipantObjectDetail,
+    public static EventLog createEventLogPivotTranslation(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode,
+                                                          XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
+                                                          String SP_UserID, String ET_ObjectID_in, String ET_ObjectID_out,
+                                                          String ReqM_ParticipantObjectID, byte[] ReqM_PatricipantObjectDetail,
+                                                          String ResM_ParticipantObjectID, byte[] ResM_PatricipantObjectDetail,
                                                           String targetip) {
         EventLog el = new EventLog();
         // Set Audit Source
@@ -531,7 +533,7 @@ public class EventLog {
                                               String ResM_ParticipantObjectID,
                                               byte[] ResM_PatricipantObjectDetail,
                                               String sourceip,
-                                              String targetip) {
+                                              String targetip, NcpSide ncpSide) {
         EventLog el = new EventLog();
         el.setEI_TransactionName(EI_TransactionName);
         el.setEI_EventActionCode(EI_EventActionCode);
@@ -553,6 +555,7 @@ public class EventLog {
         el.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
+        el.ncpSide = ncpSide;
         LOGGER.info("'{}'", el.toString());
         return el;
     }
@@ -952,6 +955,14 @@ public class EventLog {
 
     public void setSP_UserID(String SP_UserID) {
         this.SP_UserID = SP_UserID;
+    }
+
+    public NcpSide getNcpSide() {
+        return ncpSide;
+    }
+
+    public void setNcpSide(NcpSide ncpSide) {
+        this.ncpSide = ncpSide;
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.util.Date;
  */
 
 /**
- Structure of a SMPFile
+ * Structure of a SMPFile
  */
 public class SMPFile {
 

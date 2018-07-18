@@ -1,7 +1,3 @@
-
-@import "ps.css";
-@import "ep.css";
-
 body {
     font-family: Arial;
     font-size:.6em;
@@ -109,47 +105,13 @@ input[type='checkbox'] {
 
     background: #009fd1;
 
-    cursor: pointer;
-
-    border-radius: 3px;
-    transition: all 0.25s ease-out;
-}
-
-.lbl-toggle:hover {
-    color: #085a9f;
-}
-
-.lbl-toggle::before {
-    content: ' ';
-    display: block;
-
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-left: 5px solid currentColor;
-    vertical-align: middle;
-    margin-right: .7rem;
-    transform: translateY(-2px);
-
-    transition: transform .2s ease-out;
-}
-
-.toggle:checked + .lbl-toggle::before {
-    transform: rotate(90deg) translateX(-3px);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 }
 
 .collapsible-content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height .25s ease-in-out;
-}
-
-.toggle:checked + .lbl-toggle + .collapsible-content {
-    max-height: none;
-}
-
-.toggle:checked + .lbl-toggle {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
 }
 
 .collapsible-content .content-inner {
@@ -178,47 +140,13 @@ input[type='checkbox'] {
 
     background: #085a9f;
 
-    cursor: pointer;
-
-    border-radius: 3px;
-    transition: all 0.25s ease-out;
-}
-
-.lbl-toggle-title:hover {
-    color: #009fd1;
-}
-
-.lbl-toggle-title::before {
-    content: ' ';
-    display: inline-block;
-
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-left: 5px solid currentColor;
-    vertical-align: middle;
-    margin-right: .7rem;
-    transform: translateY(-2px);
-
-    transition: transform .2s ease-out;
-}
-
-.toggle:checked + .lbl-toggle-title::before {
-    transform: rotate(90deg) translateX(-3px);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 }
 
 .collapsible-content-title {
     max-height: 0;
     overflow: hidden;
-    transition: max-height .25s ease-in-out;
-}
-
-.toggle:checked + .lbl-toggle-title + .collapsible-content-title {
-    max-height: none;
-}
-
-.toggle:checked + .lbl-toggle-title {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
 }
 
 .collapsible-content-title .content-inner-title {
@@ -246,47 +174,13 @@ input[type='checkbox'] {
 
     background: #085a9f;
 
-    cursor: pointer;
-
-    border-radius: 3px;
-    transition: all 0.25s ease-out;
-}
-
-.lbl-toggle-main:hover {
-    color: white;
-}
-
-.lbl-toggle-main::before {
-    content: ' ';
-    display: inline-block;
-
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-left: 5px solid currentColor;
-    vertical-align: middle;
-    margin-right: .7rem;
-    transform: translateY(-2px);
-
-    transition: transform .2s ease-out;
-}
-
-.toggle:checked + .lbl-toggle-main::before {
-    transform: rotate(90deg) translateX(-3px);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 }
 
 .collapsible-content-main {
     max-height: 0;
     overflow: hidden;
-    transition: max-height .25s ease-in-out;
-}
-
-.toggle:checked + .lbl-toggle-main + .collapsible-content-main {
-    max-height: none;
-}
-
-.toggle:checked + .lbl-toggle-main {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
 }
 
 .collapsible-content-main .content-inner-main {
@@ -297,52 +191,6 @@ input[type='checkbox'] {
     border-bottom-right-radius: 7px;
     padding: .5rem 1rem;
 }
-
-/************/
-/* Tooltips */
-/************/
-.tooltip {
-    position: relative;
-    display: inline-block;
-}
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 120px;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -60px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.tooltip .tooltiptext::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
-.narrative {
-    color: #085a9f;
-}
-
 
 
 /* Translation table - table containing the coded translations */
@@ -365,8 +213,6 @@ input[type='checkbox'] {
     vertical-align: top;
     text-align: left;
 }
-
-
 
 /******************************************************************/
 /* Ingredients table - Table containing the different ingredients */
@@ -391,44 +237,4 @@ input[type='checkbox'] {
     padding-left:10px;
     padding-right:10px;
     border-radius:10px 10px 10px 10px;
-}
-
-.button {
-    -moz-box-shadow:inset 0px 1px 0px 0px #54a3f7;
-    -webkit-box-shadow:inset 0px 1px 0px 0px #54a3f7;
-    box-shadow:inset 0px 1px 0px 0px #54a3f7;
-    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #007dc1), color-stop(1, #0061a7));
-    background:-moz-linear-gradient(top, #007dc1 5%, #0061a7 100%);
-    background:-webkit-linear-gradient(top, #007dc1 5%, #0061a7 100%);
-    background:-o-linear-gradient(top, #007dc1 5%, #0061a7 100%);
-    background:-ms-linear-gradient(top, #007dc1 5%, #0061a7 100%);
-    background:linear-gradient(to bottom, #007dc1 5%, #0061a7 100%);
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#007dc1', endColorstr='#0061a7',GradientType=0);
-    background-color:#007dc1;
-    -moz-border-radius:3px;
-    -webkit-border-radius:3px;
-    border-radius:3px;
-    border:1px solid #124d77;
-    display:inline-block;
-    cursor:pointer;
-    color:#ffffff;
-    font-family:Arial;
-    font-size:13px;
-    padding:6px 24px;
-    text-decoration:none;
-    text-shadow:0px 1px 0px #154682;
-}
-.button:hover {
-    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #0061a7), color-stop(1, #007dc1));
-    background:-moz-linear-gradient(top, #0061a7 5%, #007dc1 100%);
-    background:-webkit-linear-gradient(top, #0061a7 5%, #007dc1 100%);
-    background:-o-linear-gradient(top, #0061a7 5%, #007dc1 100%);
-    background:-ms-linear-gradient(top, #0061a7 5%, #007dc1 100%);
-    background:linear-gradient(to bottom, #0061a7 5%, #007dc1 100%);
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#0061a7', endColorstr='#007dc1',GradientType=0);
-    background-color:#0061a7;
-}
-.button:active {
-    position:relative;
-    top:1px;
 }

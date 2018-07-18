@@ -222,7 +222,7 @@
     <wsdl:service name="ModelBasedValidationWSService">
         <wsdl:port binding="tns:ModelBasedValidationWSServiceSoapBinding" name="ModelBasedValidationWSPort">
             <soap:address
-                    location="https://gazelle.ehdsi.ihe-europe.net/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS"/>
+                    location="https://gazelle.ehdsi.eu/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

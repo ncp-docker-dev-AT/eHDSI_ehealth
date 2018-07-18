@@ -105,52 +105,6 @@ public class SMPDeleteFileController {
         ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(partID, partScheme);
         DynamicDiscovery smpClient = null;
 
-//        ProxyCredentials proxyCredentials = null;
-//        if (ProxyUtil.isProxyAnthenticationMandatory()) {
-//            proxyCredentials = ProxyUtil.getProxyCredentials();
-//        }
-//        KeyStore truststore = null;
-//        try {
-//            truststore = loadTrustStore();
-//        } catch (KeyStoreException e) {
-//            LOGGER.error("KeyStoreException: '{}'", e.getMessage(), e);
-//        } catch (IOException e) {
-//            LOGGER.error("IOException: '{}'", e.getMessage(), e);
-//        } catch (NoSuchAlgorithmException e) {
-//            LOGGER.error("NoSuchAlgorithmException: '{}'", e.getMessage(), e);
-//        } catch (CertificateException e) {
-//            LOGGER.error("CertificateException: '{}'", e.getMessage(), e);
-//        }
-
-//        if (proxyCredentials != null) {
-//            try {
-//
-//                smpClient = DynamicDiscoveryBuilder.newInstance()
-//                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
-//                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
-//                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
-//                        .fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(),
-//                                Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(),
-//                                proxyCredentials.getProxyPassword())))
-//                        .build();
-//            } catch (ConnectionException ex) {
-//                success = false;
-//                errorType = "ConnectionException";
-//                LOGGER.error("\n ConnectionException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-//            } catch (TechnicalException e) {
-//                LOGGER.error("TechnicalException: '{}'" + e.getMessage(), e);
-//            }
-//        } else {
-//            try {
-//                smpClient = DynamicDiscoveryBuilder.newInstance()
-//                        .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
-//                                .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
-//                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
-//                        .build();
-//            } catch (TechnicalException e) {
-//                LOGGER.error("Technical Exception: '{}'", e.getMessage(), e);
-//            }
-//        }
         try {
             smpClient = DynamicDiscoveryClient.getInstance();
         } catch (ConnectionException ex) {
@@ -163,7 +117,6 @@ public class SMPDeleteFileController {
 
         List<DocumentIdentifier> documentIdentifiers = new ArrayList<>();
         try {
-            //documentIdentifiers = smpClient.getDocumentIdentifiers(participantIdentifier);
             documentIdentifiers = smpClient.getService().getServiceGroup(participantIdentifier).getDocumentIdentifiers();
         } catch (TechnicalException ex) {
             success = false;
@@ -262,8 +215,8 @@ public class SMPDeleteFileController {
     @RequestMapping(value = "smpeditor/deletesmpinfo", method = RequestMethod.GET)
     public String deleteInfo(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model, final RedirectAttributes redirectAttributes) {
         LOGGER.debug("\n==== in deleteInfo ====");
-   
-    /* Builds html colors and alerts */
+
+        /* Builds html colors and alerts */
         if (smpdelete.getStatusCode() == 400) {
             String messag = env.getProperty("http.failure");//messages.properties
             Alert status = new Alert(messag, Alert.fontColor.red, "#f2dede");
@@ -322,7 +275,7 @@ public class SMPDeleteFileController {
         if (urlServer.endsWith("/")) {
             urlServer = urlServer.substring(0, urlServer.length() - 1);
         }
-    /*Removes https:// from entered by the user so it won't repeat in uri set scheme*/
+        /*Removes https:// from entered by the user so it won't repeat in uri set scheme*/
         if (urlServer.startsWith("https")) {
             urlServer = urlServer.substring(8);
         }
@@ -453,7 +406,7 @@ public class SMPDeleteFileController {
             }
 
             if (!(itemDelete.getStatusCode() == 200 || itemDelete.getStatusCode() == 201)) {
-            /* Get BusinessCode and ErrorDescription from response */
+                /* Get BusinessCode and ErrorDescription from response */
 
                 //Save InputStream of response in ByteArrayOutputStream in order to read it more than once.
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -491,7 +444,7 @@ public class SMPDeleteFileController {
                 } catch (IOException ex) {
                     LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
-        
+
                 /*transform xml to string in order to send in Audit*/
                 String errorResult = Audit.prepareEventLog(bytes);
                 LOGGER.debug("\n ***************** ERROR RESULT - '{}'", errorResult);
@@ -528,7 +481,7 @@ public class SMPDeleteFileController {
     @RequestMapping(value = "smpeditor/deletesmpresult", method = RequestMethod.GET)
     public String postInfo(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model) {
         LOGGER.debug("\n==== in deletesmpresult ====");
-    
+
         /* Builds html colors and alerts */
         for (int i = 0; i < smpdelete.getAllItems().size(); i++) {
             if (smpdelete.getAllItems().get(i).getStatusCode() == 200) {

@@ -21,22 +21,23 @@ import javax.xml.ws.soap.SOAPFaultException;
  * Assertion Validation Service
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @deprecated
  */
 @Deprecated
 public class AssertionValidationService extends ValidationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionValidationService.class);
-    private static AssertionValidationService INSTANCE = null;
+    private static AssertionValidationService instance = null;
 
     private AssertionValidationService() {
     }
 
-    public synchronized static AssertionValidationService getInstance() {
+    public static synchronized AssertionValidationService getInstance() {
 
-        if (INSTANCE == null) {
-            INSTANCE = new AssertionValidationService();
+        if (instance == null) {
+            instance = new AssertionValidationService();
         }
-        return INSTANCE;
+        return instance;
     }
 
     @Override
@@ -64,10 +65,12 @@ public class AssertionValidationService extends ValidationService {
 
         if (!xmlDetails.isEmpty()) {
             LOGGER.info(xmlDetails);
-            return ReportBuilder.build(model, XdModel.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(xmlDetails), xmlDetails.toString(), ncpSide); // Report generation.
+            // Report generation.
+            return ReportBuilder.build(model, XdModel.checkModel(model).getObjectType().toString(), object, WsUnmarshaller.unmarshal(xmlDetails), xmlDetails, ncpSide);
         } else {
             LOGGER.error("The webservice response is empty, writing report without validation part.");
-            return ReportBuilder.build(model, XdModel.checkModel(model).getObjectType().toString(), object, null, null, ncpSide); // Report generation.
+            // Report generation.
+            return ReportBuilder.build(model, XdModel.checkModel(model).getObjectType().toString(), object, null, null, ncpSide);
         }
     }
 
@@ -82,7 +85,7 @@ public class AssertionValidationService extends ValidationService {
             return false;
         }
 
-        if(ValidationService.isRemoteValidationOn()) {
+        if (ValidationService.isRemoteValidationOn()) {
             try {
                 GazelleObjectValidatorService objectValidatorService = new GazelleObjectValidatorService();
                 GazelleObjectValidator gazellePort = objectValidatorService.getGazelleObjectValidatorPort();

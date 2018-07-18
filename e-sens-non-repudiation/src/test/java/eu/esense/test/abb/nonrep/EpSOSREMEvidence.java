@@ -5,7 +5,6 @@ import eu.esens.abb.nonrep.etsi.rem.*;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.utils.Constants;
 import org.joda.time.DateTime;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -131,14 +130,14 @@ public class EpSOSREMEvidence {
          * Sign it
          */
         String BaseURI = f.toURI().toURL().toString();
-        XMLSignature sig = new XMLSignature(doc, BaseURI, org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA);
+        XMLSignature sig = new XMLSignature(doc, BaseURI, XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256);
         doc.getDocumentElement().appendChild(sig.getElement());
         doc.appendChild(doc.createComment(" Comment after "));
 
         Transforms transforms = new Transforms(doc);
         transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
         transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
-        sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
+        sig.addDocument("", transforms, javax.xml.crypto.dsig.DigestMethod.SHA256);
 
         sig.addKeyInfo(cert);
         sig.addKeyInfo(cert.getPublicKey());
@@ -230,7 +229,7 @@ public class EpSOSREMEvidence {
          * Sign it
          */
         String BaseURI = f.toURI().toURL().toString();
-        XMLSignature sig = new XMLSignature(doc, BaseURI, org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_RSA);
+        XMLSignature sig = new XMLSignature(doc, BaseURI, XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256);
         doc.getDocumentElement().appendChild(sig.getElement());
         doc.appendChild(doc.createComment(" Comment after "));
 
@@ -238,7 +237,7 @@ public class EpSOSREMEvidence {
 
         transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
         transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
-        sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
+        sig.addDocument("", transforms, javax.xml.crypto.dsig.DigestMethod.SHA256);
 
         sig.addKeyInfo(cert);
         sig.addKeyInfo(cert.getPublicKey());

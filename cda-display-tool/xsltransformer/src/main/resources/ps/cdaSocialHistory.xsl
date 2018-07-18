@@ -195,7 +195,9 @@
                                     <xsl:when
                                             test="$socialHistoryObservationValue and $socialHistoryObservationValueUnit">
                                         <xsl:value-of select="$socialHistoryObservationValue"/> &#160;
-                                        <xsl:value-of select="$socialHistoryObservationValueUnit"/>
+                                        <xsl:call-template name="supportUCUMAnnotations">
+                                            <xsl:with-param name="value" select="$socialHistoryObservationValueUnit"/>
+                                        </xsl:call-template>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <!-- uncoded element Problem -->

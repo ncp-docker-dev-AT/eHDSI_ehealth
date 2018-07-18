@@ -13,13 +13,13 @@
             </xd:p>
             <xd:p>
                 <xd:b>Modified on:</xd:b>
-                Aug 24, 2010
+                May 29, 2018
             </xd:p>
             <xd:p>
                 <xd:b>Author:</xd:b>
                 Anne-Gaëlle BERGE, IHE Development, INRIA Rennes
             </xd:p>
-            <xd:p></xd:p>
+            <xd:p/>
         </xd:desc>
     </xd:doc>
     <xsl:template match="/">
@@ -236,8 +236,10 @@
                     <div class="rich-panel-header">Validation counters</div>
                     <div class="rich-panel-body">
                         <xsl:choose>
-                            <xsl:when test="detailedResult/ValidationCounters/NrOfChecks &gt; 0">
-                                <xsl:value-of select="detailedResult/ValidationCounters/NrOfChecks"/> check(s) performed
+                            <xsl:when test="detailedResult/SchematronValidation/ValidationCounters/NrOfChecks &gt; 0">
+                                <xsl:value-of
+                                        select="detailedResult/SchematronValidation/ValidationCounters/NrOfChecks"/>
+                                check(s) performed
                             </xsl:when>
                             <xsl:otherwise>
                                 No check was performed
@@ -245,9 +247,11 @@
                         </xsl:choose>
                         <br/>
                         <xsl:choose>
-                            <xsl:when test="detailedResult/ValidationCounters/NrOfValidationErrors &gt; 0">
+                            <xsl:when
+                                    test="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationErrors &gt; 0">
                                 <a href="#errors">
-                                    <xsl:value-of select="detailedResult/ValidationCounters/NrOfValidationErrors"/>
+                                    <xsl:value-of
+                                            select="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationErrors"/>
                                     error(s)
                                 </a>
                             </xsl:when>
@@ -257,9 +261,11 @@
                         </xsl:choose>
                         <br/>
                         <xsl:choose>
-                            <xsl:when test="detailedResult/ValidationCounters/NrOfValidationWarnings &gt; 0">
+                            <xsl:when
+                                    test="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationWarnings &gt; 0">
                                 <a href="#warnings">
-                                    <xsl:value-of select="detailedResult/ValidationCounters/NrOfValidationWarnings"/>
+                                    <xsl:value-of
+                                            select="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationWarnings"/>
                                     warning(s)
                                 </a>
                             </xsl:when>
@@ -269,9 +275,11 @@
                         </xsl:choose>
                         <br/>
                         <xsl:choose>
-                            <xsl:when test="detailedResult/ValidationCounters/NrOfValidationNotes &gt; 0">
+                            <xsl:when
+                                    test="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationNotes &gt; 0">
                                 <a href="#notes">
-                                    <xsl:value-of select="detailedResult/ValidationCounters/NrOfValidationNotes"/>
+                                    <xsl:value-of
+                                            select="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationNotes"/>
                                     note(s)
                                 </a>
                             </xsl:when>
@@ -281,9 +289,11 @@
                         </xsl:choose>
                         <br/>
                         <xsl:choose>
-                            <xsl:when test="detailedResult/ValidationCounters/NrOfValidationReports &gt; 0">
+                            <xsl:when
+                                    test="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationReports &gt; 0">
                                 <a href="#reports">
-                                    <xsl:value-of select="detailedResult/ValidationCounters/NrOfValidationReports"/>
+                                    <xsl:value-of
+                                            select="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationReports"/>
                                     successful check(s)
                                 </a>
                             </xsl:when>
@@ -293,9 +303,11 @@
                         </xsl:choose>
                         <br/>
                         <xsl:choose>
-                            <xsl:when test="detailedResult/ValidationCounters/NrOfValidationUnknown &gt; 0">
+                            <xsl:when
+                                    test="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationUnknown &gt; 0">
                                 <a href="#unknown">
-                                    <xsl:value-of select="detailedResult/ValidationCounters/NrOfValidationUnknown"/>
+                                    <xsl:value-of
+                                            select="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationUnknown"/>
                                     unknown exception(s)
                                 </a>
                             </xsl:when>
@@ -309,11 +321,11 @@
                 <div class="rich-panel">
                     <div class="rich-panel-header">Validation details</div>
                     <div class="rich-panel-body">
-                        <xsl:if test="detailedResult/ValidationCounters/NrOfValidationErrors &gt; 0">
+                        <xsl:if test="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationErrors &gt; 0">
                             <p id="errors">
                                 <b>Errors</b>
                             </p>
-                            <xsl:for-each select="detailedResult/ValidationResults/ResultXML/Error">
+                            <xsl:for-each select="detailedResult/SchematronValidation/Error">
                                 <table class="error">
                                     <tr>
                                         <td valign="top">
@@ -343,11 +355,11 @@
                                 <br/>
                             </xsl:for-each>
                         </xsl:if>
-                        <xsl:if test="detailedResult/ValidationCounters/NrOfValidationWarnings &gt; 0">
+                        <xsl:if test="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationWarnings &gt; 0">
                             <p id="warnings">
                                 <b>Warnings</b>
                             </p>
-                            <xsl:for-each select="detailedResult/ValidationResults/ResultXML/Warning">
+                            <xsl:for-each select="detailedResult/SchematronValidation/Warning">
                                 <table class="warning">
                                     <tr>
                                         <td valign="top">
@@ -377,11 +389,11 @@
                                 <br/>
                             </xsl:for-each>
                         </xsl:if>
-                        <xsl:if test="detailedResult/ValidationCounters/NrOfValidationNotes &gt; 0">
+                        <xsl:if test="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationNotes &gt; 0">
                             <p id="notes">
                                 <b>Notes</b>
                             </p>
-                            <xsl:for-each select="detailedResult/ValidationResults/ResultXML/Note">
+                            <xsl:for-each select="detailedResult/SchematronValidation/Note">
                                 <table class="note">
                                     <tr>
                                         <td valign="top">
@@ -411,11 +423,11 @@
                                 <br/>
                             </xsl:for-each>
                         </xsl:if>
-                        <xsl:if test="detailedResult/ValidationCounters/NrOfValidationUnknown &gt; 0">
+                        <xsl:if test="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationUnknown &gt; 0">
                             <p id="unknown">
                                 <b>Unknown exceptions</b>
                             </p>
-                            <xsl:for-each select="detailedResult/ValidationResults/ResultXML/Unknown">
+                            <xsl:for-each select="detailedResult/SchematronValidation/Unknown">
                                 <table class="unknown">
                                     <tr>
                                         <td valign="top">
@@ -445,11 +457,11 @@
                                 <br/>
                             </xsl:for-each>
                         </xsl:if>
-                        <xsl:if test="detailedResult/ValidationCounters/NrOfValidationReports &gt; 0">
+                        <xsl:if test="detailedResult/SchematronValidation/ValidationCounters/NrOfValidationReports &gt; 0">
                             <p id="reports">
                                 <b>Reports</b>
                             </p>
-                            <xsl:for-each select="detailedResult/ValidationResults/ResultXML/Report">
+                            <xsl:for-each select="detailedResult/SchematronValidation/Report">
                                 <table class="report">
                                     <tr>
                                         <td valign="top">

@@ -168,7 +168,7 @@
     <wsdl:service name="CertificateValidatorService">
         <wsdl:port binding="tns:CertificateValidatorServiceSoapBinding" name="CertificateValidatorPort">
             <soap:address
-                    location="https://gazelle.ehdsi.ihe-europe.net/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator"/>
+                    location="https://gazelle.ehdsi.eu/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

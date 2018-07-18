@@ -47,9 +47,5 @@ public class Alert {
 
     public enum alertType {danger, warning, success, info}
 
-    ;
-
     public enum fontColor {green, red}
-
-    ;
 }

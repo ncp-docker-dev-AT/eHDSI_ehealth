@@ -1,22 +1,3 @@
-/**
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- *
- * This file is part of SRDC epSOS NCP.
- *
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- *
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- */
 package tr.com.srdc.epsos.data.model;
 
 import java.text.ParseException;
@@ -29,48 +10,14 @@ import java.util.regex.Pattern;
 /**
  * Last update on 2012-09-08 part of review for version 0.3.0.
  *
- * @since 0.1.0
- *
  * @author SRDC<code> - epsos@srdc.com.tr</code>
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
+ * @since 0.1.0
  */
 public class PatientDemographics {
 
-	public static enum Gender {
-		FEMALE("F"),
-		MALE("M"),
-		UNDIFFERENTIATED("UN");
-
-		private String mnemonic;
-		
-		private Gender(String mnemonic) {
-			this.mnemonic = mnemonic;
-		}
-		
-		public String getMnemonic() {
-			return mnemonic;
-		}
-		
-		public static Gender parseGender(String genderString) throws ParseException {
-			for(Gender g : Gender.values()) {
-				if(g.name().equalsIgnoreCase(genderString) || g.mnemonic.equalsIgnoreCase(genderString)) {
-					return g;
-				}
-			}
-
-			throw new ParseException("Unable to parse gender string ('" + genderString + "') to a valid gender.", -1);
-		}
-		
-		@Override
-	 	public String toString() {
-			return mnemonic;
-	 	}		
-		
-	}
-	
-	private static Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", Pattern.CASE_INSENSITIVE);
-	private static Pattern telephonePattern = Pattern.compile("^\\+?(\\(.+\\))?[0-9 ?\\-?]+[0-9]$");
-
+    private static Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", Pattern.CASE_INSENSITIVE);
+    private static Pattern telephonePattern = Pattern.compile("^\\+?(\\(.+\\))?[0-9 ?\\-?]+[0-9]$");
     private String familyName;
     private String givenName;
     private Date birthDate;
@@ -112,22 +59,30 @@ public class PatientDemographics {
     }
 
     /**
-     * A shortcut method for backward compatibility with XCPD server version
-     * 0.2.0
-     * 
+     * A shortcut method for backward compatibility with XCPD server version 0.2.0
+     * <p>
      * NOTICE: If need to use multiple id's, use: getId(int i)
      *
      * @return he extension part of the first patient ID.
      */
     public String getId() {
-    	return getId(0);
+        return getId(0);
+    }
+
+    /**
+     * @param id the id to set
+     *           <p>
+     *           NOTICE: If need to set multiple id's use: setId(int i, String id)
+     */
+    public void setId(String id) {
+        setId(0, id);
     }
 
     /**
      * A shortcut method for backward compatibility with XCPD server version
      * 0.2.0
-     * 
-     * @param  i index number of id's
+     *
+     * @param i index number of id's
      * @return he extension part of the first patient ID.
      */
     public String getId(int i) {
@@ -136,35 +91,24 @@ public class PatientDemographics {
         }
         return null;
     }
-    
-    /**
-     * @param id the id to set
-     *
-     * NOTICE: If need to set multiple id's use: setId(int i, String id)
-     *
-     */
-    public void setId(String id) {
-    	setId(0, id);
-    }
 
     /**
      * @param id the id to set
-     *
-     * NOTICE: If need to set multiple id's use: setId(int i, String id)
-     *
+     *           <p>
+     *           NOTICE: If need to set multiple id's use: setId(int i, String id)
      */
     public void setId(int i, String id) {
         if (this.idList == null) {
-            this.idList = new ArrayList<PatientId>();
+            this.idList = new ArrayList<>();
         }
 
-        for(int j=idList.size();j<i+1;j++) {
-        	idList.add(null);
+        for (int j = idList.size(); j < i + 1; j++) {
+            idList.add(null);
         }
 
         PatientId pId = idList.get(i);
-        if(pId == null) {
-        	pId = new PatientId();
+        if (pId == null) {
+            pId = new PatientId();
             pId.setExtension(id);
             idList.set(i, pId);
         } else {
@@ -175,21 +119,29 @@ public class PatientDemographics {
     /**
      * A shortcut method for backward compatibility with XCPD server version
      * 0.2.0
-     *
+     * <p>
      * NOTICE: If need to use multiple use getHomeCommunityId(int i)
      *
      * @return he root part of the first patient ID.
      */
     public String getHomeCommunityId() {
-    	return getHomeCommunityId(0);
+        return getHomeCommunityId(0);
+    }
+
+    /**
+     * @param homeCommunityId the homeCommunityId to set
+     *                        <p>
+     *                        NOTICE: If need to use multiple use setHomeCommunityId(int i, String homeCommunityId)
+     */
+    public void setHomeCommunityId(String homeCommunityId) {
+        setHomeCommunityId(0, homeCommunityId);
     }
 
     /**
      * A shortcut method for backward compatibility with XCPD server version
      * 0.2.0
      *
-     * @param	i index number
-     *
+     * @param i index number
      * @return he root part of the first patient ID.
      */
     public String getHomeCommunityId(int i) {
@@ -198,32 +150,23 @@ public class PatientDemographics {
         }
         return null;
     }
-    
-    /**
-     * @param homeCommunityId the homeCommunityId to set
-     *
-     * NOTICE: If need to use multiple use setHomeCommunityId(int i, String homeCommunityId)
-     */
-    public void setHomeCommunityId(String homeCommunityId) {
-    	setHomeCommunityId(0, homeCommunityId);
-    }
 
     /**
      * @param homeCommunityId the homeCommunityId to set
-     * @param i index number
+     * @param i               index number
      */
     public void setHomeCommunityId(int i, String homeCommunityId) {
         if (this.idList == null) {
-            this.idList = new ArrayList<PatientId>();
+            this.idList = new ArrayList<>();
         }
 
-        for(int j=idList.size();j<i+1;j++) {
-        	idList.add(null);
+        for (int j = idList.size(); j < i + 1; j++) {
+            idList.add(null);
         }
 
         PatientId pId = idList.get(i);
-        if(pId == null) {
-        	pId = new PatientId();
+        if (pId == null) {
+            pId = new PatientId();
             pId.setRoot(homeCommunityId);
             idList.set(i, pId);
         } else {
@@ -326,12 +269,12 @@ public class PatientDemographics {
      * @param telephone the telephone to set
      */
     public void setTelephone(String telephone) throws ParseException {
-    	Matcher m = telephonePattern.matcher(telephone);
-    	if(m.matches()) {
-        	this.telephone = telephone;
-    	} else {
-    		throw new ParseException("Parsing failed for '" + telephone + "' using regexp '" + telephonePattern.pattern() + "'", 0);
-    	}
+        Matcher m = telephonePattern.matcher(telephone);
+        if (m.matches()) {
+            this.telephone = telephone;
+        } else {
+            throw new ParseException("Parsing failed for '" + telephone + "' using regexp '" + telephonePattern.pattern() + "'", 0);
+        }
     }
 
     /**
@@ -345,12 +288,12 @@ public class PatientDemographics {
      * @param email the email to set
      */
     public void setEmail(String email) throws ParseException {
-    	Matcher m = emailPattern.matcher(email);
-    	if(m.matches()) {
+        Matcher m = emailPattern.matcher(email);
+        if (m.matches()) {
             this.email = email;
-    	} else {
-    		throw new ParseException("Parsing failed for '" + email + "' using regexp '" + emailPattern.pattern() + "'", 0);
-    	}
+        } else {
+            throw new ParseException("Parsing failed for '" + email + "' using regexp '" + emailPattern.pattern() + "'", 0);
+        }
     }
 
     /**
@@ -367,13 +310,45 @@ public class PatientDemographics {
         this.idList = idList;
     }
 
-	@Override
-	public String toString() {
-		return "PatientDemographics [familyName=" + familyName + ", givenName="
-				+ givenName + ", birthDate=" + birthDate
-				+ ", administrativeGender=" + administrativeGender + ", city="
-				+ city + ", country=" + country + ", postalCode=" + postalCode
-				+ ", streetAddress=" + streetAddress + ", telephone="
-				+ telephone + ", email=" + email + ", idList=" + idList + "]";
-	}
+    @Override
+    public String toString() {
+        return "PatientDemographics [familyName=" + familyName + ", givenName="
+                + givenName + ", birthDate=" + birthDate
+                + ", administrativeGender=" + administrativeGender + ", city="
+                + city + ", country=" + country + ", postalCode=" + postalCode
+                + ", streetAddress=" + streetAddress + ", telephone="
+                + telephone + ", email=" + email + ", idList=" + idList + "]";
+    }
+
+    public enum Gender {
+        FEMALE("F"),
+        MALE("M"),
+        UNDIFFERENTIATED("UN");
+
+        private String mnemonic;
+
+        Gender(String mnemonic) {
+            this.mnemonic = mnemonic;
+        }
+
+        public static Gender parseGender(String genderString) throws ParseException {
+            for (Gender g : Gender.values()) {
+                if (g.name().equalsIgnoreCase(genderString) || g.mnemonic.equalsIgnoreCase(genderString)) {
+                    return g;
+                }
+            }
+
+            throw new ParseException("Unable to parse gender string ('" + genderString + "') to a valid gender.", -1);
+        }
+
+        public String getMnemonic() {
+            return mnemonic;
+        }
+
+        @Override
+        public String toString() {
+            return mnemonic;
+        }
+
+    }
 }

@@ -24,6 +24,7 @@ import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
@@ -62,7 +63,6 @@ import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.XSURI;
 import org.opensaml.xml.security.BasicSecurityConfiguration;
-import org.opensaml.xml.security.SecurityConfiguration;
 import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.security.credential.Credential;
 import org.opensaml.xml.signature.SignatureConstants;
@@ -347,7 +347,7 @@ public class EpsosHelperService {
             LOGGER.error("error creating disp doc");
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
-        return edDoc.getBytes();
+        return edDoc.getBytes(StandardCharsets.UTF_8);
     }
 
     /**
@@ -877,14 +877,11 @@ public class EpsosHelperService {
         Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
 
         sig.setSigningCredential(signingCredential);
-        //sig.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
         sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         sig.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
 
         BasicSecurityConfiguration secConfig = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
         secConfig.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
-//        BasicSecurityConfiguration config = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-//        config.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
 
         try {
             SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
@@ -1240,11 +1237,9 @@ public class EpsosHelperService {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
-        LOGGER.info("##########");
         String secHead = "No security header provided";
-        String basedSecHead = Base64.encodeBase64String(secHead.getBytes());
-        String reqm_participantObjectID = "urn:uuid:00000000-0000-0000-0000-000000000000";
-        String resm_participantObjectID = "urn:uuid:00000000-0000-0000-0000-000000000000";
+        String reqm_participantObjectID = "urn:uuid:" + message;
+        String resm_participantObjectID = "urn:uuid:" + message;
 
         InetAddress sourceIP = null;
         try {
@@ -1282,19 +1277,18 @@ public class EpsosHelperService {
         }
         eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
-                SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID, basedSecHead.getBytes(),
-                resm_participantObjectID, ResM_PatricipantObjectDetail, hostSource, "N/A");
-
+                SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
+                resm_participantObjectID, ResM_PatricipantObjectDetail, hostSource, "N/A", NcpSide.NCP_B);
 
         LOGGER.info("The audit has been prepared");
         eventLog1.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog1, "13", "2");
     }
 
-    private static Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String FriendlyName, String oasisName) {
+    private static Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String friendlyName, String oasisName) {
 
         Attribute attrPID = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
-        attrPID.setFriendlyName(FriendlyName);
+        attrPID.setFriendlyName(friendlyName);
         attrPID.setName(oasisName);
         attrPID.setNameFormat(Attribute.URI_REFERENCE);
         return attrPID;
@@ -1352,8 +1346,8 @@ public class EpsosHelperService {
                 xspaLocality, permissions, null);
     }
 
-    private static Assertion createStorkAssertion(String username, String fullName, String email, String role,
-                                                  String organization, String organizationId, String facilityType,
+    private static Assertion createStorkAssertion(String username, String fullName, String email, String role, String organization,
+                                                  String organizationId, String facilityType,
                                                   String purposeOfUse, String xspaLocality,
                                                   Vector permissions, String onBehalfId) {
         // assertion
@@ -1552,7 +1546,7 @@ public class EpsosHelperService {
                 Element link = (Element) nodeLst.item(s);
                 String countryCode = link.getAttribute("code");
                 String countryName = EpsosHelperService.getCountryName(countryCode, lang);
-                LOGGER.debug("Lang is: '{}' and Country code: '{}' name is: '{}'", lang, countryCode + countryName);
+                LOGGER.debug("Lang is: '{}' and Country code: '{}' name is: '{}'", lang, countryCode, countryName);
                 Country country = new Country(countryName, countryCode);
                 listOfCountries.add(country);
             }

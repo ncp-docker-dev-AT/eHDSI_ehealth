@@ -1,18 +1,15 @@
 package eu.esens.abb.nonrep;
 
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-
-import javax.mail.internet.MimeMessage;
-import javax.xml.soap.SOAPMessage;
-
 import org.joda.time.DateTime;
 import org.opensaml.xml.XMLObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import eu.esens.abb.nonrep.EnforcePolicy;
+import javax.mail.internet.MimeMessage;
+import javax.xml.soap.SOAPMessage;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.LinkedList;
 
 public class Context {
 

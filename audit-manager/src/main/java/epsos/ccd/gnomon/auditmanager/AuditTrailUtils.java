@@ -3,12 +3,12 @@ package epsos.ccd.gnomon.auditmanager;
 import epsos.ccd.gnomon.utils.SecurityMgr;
 import epsos.ccd.gnomon.utils.Utils;
 import eu.epsos.util.audit.AuditLogSerializer;
-import eu.epsos.validation.datamodel.audit.AuditModel;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.services.AuditValidationService;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import net.RFC3881.*;
 import net.RFC3881.AuditMessage.ActiveParticipant;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -218,50 +218,99 @@ public enum AuditTrailUtils {
                     eventLog.getResM_PatricipantObjectDetail());
         }
         /* Invoke audit message validation services */
-        boolean validated = validateAuditMessage(eventLog, am);
-        LOGGER.info("Audit Message validated and  report generated: '{}'", validated);
+        if (OpenNCPValidation.isValidationEnable()) {
+            boolean validated = validateAuditMessage(eventLog, am);
+            LOGGER.info("Audit Message validated and  report generated: '{}'", validated);
+        }
         return am;
     }
 
-    public AuditMessage addNonRepudiationSection(AuditMessage auditMessage, String ReqM_ParticipantObjectID,
-                                                 byte[] ReqM_PatricipantObjectDetail, String ResM_ParticipantObjectID,
-                                                 byte[] ResM_PatricipantObjectDetail) {
+    /**
+     * @param auditMessage
+     * @param participantObjectIDRequest
+     * @param participantObjectDetailRequest
+     * @param participantObjectIDResponse
+     * @param participantObjectDetailResponse
+     * @return
+     */
+    public AuditMessage addNonRepudiationSection(AuditMessage auditMessage, String participantObjectIDRequest,
+                                                 byte[] participantObjectDetailRequest, String participantObjectIDResponse,
+                                                 byte[] participantObjectDetailResponse) {
 
+        //TODO: Based on the current guidelines and functional specifications, this is not clear enough if an evidence
+        // has to be generated including the Non-Repudiation section (Type Value pair attributes - security header)
+        // while the Audit Message has been considering NCP internal actions.
         // Request
-        ParticipantObjectIdentificationType poit = new ParticipantObjectIdentificationType();
-        poit.setParticipantObjectID(ReqM_ParticipantObjectID);
-        poit.setParticipantObjectTypeCode(new Short("4"));
-        CodedValueType PS_object = new CodedValueType();
-        PS_object.setCode("req");
-        PS_object.setCodeSystemName("epSOS Msg");
-        PS_object.setDisplayName("Request Message");
-        poit.setParticipantObjectIDTypeCode(PS_object);
-        if (ReqM_PatricipantObjectDetail != null) {
-            TypeValuePairType pod = new TypeValuePairType();
-            pod.setType("securityheader");
-            pod.setValue(ReqM_PatricipantObjectDetail);
-            poit.getParticipantObjectDetail().add(pod);
-        }
-        auditMessage.getParticipantObjectIdentification().add(poit);
+        ParticipantObjectIdentificationType poiRequest = createParticipantObjectIdentification("req",
+                participantObjectIDRequest, participantObjectDetailRequest);
+        auditMessage.getParticipantObjectIdentification().add(poiRequest);
+
+        //        poit.setParticipantObjectID(ReqM_ParticipantObjectID);
+        //        poit.setParticipantObjectTypeCode(new Short("4"));
+        //        CodedValueType PS_object = new CodedValueType();
+        //        PS_object.setCode("req");
+        //        PS_object.setCodeSystemName("epSOS Msg");
+        //        PS_object.setDisplayName("Request Message");
+        //        poit.setParticipantObjectIDTypeCode(PS_object);
+        //        if (ReqM_PatricipantObjectDetail != null) {
+        //            TypeValuePairType pod = new TypeValuePairType();
+        //            pod.setType("securityheader");
+        //            pod.setValue(ReqM_PatricipantObjectDetail);
+        //            poit.getParticipantObjectDetail().add(pod);
+        //        }
 
         // Response
-        ParticipantObjectIdentificationType poit1 = new ParticipantObjectIdentificationType();
-        poit1.setParticipantObjectID(ResM_ParticipantObjectID);
-        poit1.setParticipantObjectTypeCode(new Short("4"));
-        CodedValueType PS_object1 = new CodedValueType();
-        PS_object1.setCode("rsp");
-        PS_object1.setCodeSystemName("epSOS Msg");
-        PS_object1.setDisplayName("Response Message");
-        poit1.setParticipantObjectIDTypeCode(PS_object1);
-        if (ResM_PatricipantObjectDetail != null) {
-            TypeValuePairType pod1 = new TypeValuePairType();
-            pod1.setType("securityheader");
-            pod1.setValue(ResM_PatricipantObjectDetail);
-            poit1.getParticipantObjectDetail().add(pod1);
-        }
-        auditMessage.getParticipantObjectIdentification().add(poit1);
+        ParticipantObjectIdentificationType poiResponse = createParticipantObjectIdentification("rsp",
+                participantObjectIDResponse, participantObjectDetailResponse);
+        auditMessage.getParticipantObjectIdentification().add(poiResponse);
+        //poit1 = new ParticipantObjectIdentificationType();
+        //poit1.setParticipantObjectID(ResM_ParticipantObjectID);
+        //poit1.setParticipantObjectTypeCode(new Short("4"));
+        //CodedValueType PS_object1 = new CodedValueType();
+        //PS_object1.setCode("rsp");
+        //PS_object1.setCodeSystemName("epSOS Msg");
+        //PS_object1.setDisplayName("Response Message");
+        //poit1.setParticipantObjectIDTypeCode(PS_object1);
+//        if (ResM_PatricipantObjectDetail != null) {
+//            TypeValuePairType pod1 = new TypeValuePairType();
+//            pod1.setType("securityheader");
+//            pod1.setValue(ResM_PatricipantObjectDetail);
+//            poit1.getParticipantObjectDetail().add(pod1);
+//        }
 
         return auditMessage;
+    }
+
+    /**
+     * @param action
+     * @param participantObjectId
+     * @param participantObjectDetail
+     * @return
+     */
+    private ParticipantObjectIdentificationType createParticipantObjectIdentification(String action, String participantObjectId,
+                                                                                      byte[] participantObjectDetail) {
+
+        ParticipantObjectIdentificationType participantObjectIdentification = new ParticipantObjectIdentificationType();
+        participantObjectIdentification.setParticipantObjectID(participantObjectId);
+        participantObjectIdentification.setParticipantObjectTypeCode(new Short("4"));
+
+        CodedValueType codedValue = new CodedValueType();
+        codedValue.setCode(action);
+        codedValue.setCodeSystemName("epSOS Msg");
+        if (StringUtils.equals("rsp", action)) {
+            codedValue.setDisplayName("Response Message");
+        } else {
+            codedValue.setDisplayName("Request Message");
+        }
+        participantObjectIdentification.setParticipantObjectIDTypeCode(codedValue);
+
+        if (ArrayUtils.isNotEmpty(participantObjectDetail)) {
+            TypeValuePairType typeValuePairType = new TypeValuePairType();
+            typeValuePairType.setType("securityheader");
+            typeValuePairType.setValue(participantObjectDetail);
+            participantObjectIdentification.getParticipantObjectDetail().add(typeValuePairType);
+        }
+        return participantObjectIdentification;
     }
 
     /**
@@ -1251,62 +1300,57 @@ public enum AuditTrailUtils {
 
         LOGGER.info("validateAuditMessage(EventLog '{}', AudiMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
                 am.getEventIdentification().getEventActionCode(), eventLog.getPC_UserID());
-        String model = "";
-        NcpSide ncpSide;
-
-        if (StringUtils.isBlank(eventLog.getPC_UserID())) {
-            ncpSide = NcpSide.NCP_A;
-        } else {
-            ncpSide = NcpSide.NCP_B;
-        }
+//        String model = "";
+        NcpSide ncpSide = eventLog.getNcpSide();
 
         if (StringUtils.equals(eventLog.getEventType(), "epsos-cf")) {
             throw new UnsupportedOperationException("EventCode not supported.");
         }
 
-        // Infer model according to NCP Side and EventCode
-        if (ncpSide == NcpSide.NCP_A) {
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-11")) {
-                model = AuditModel.EPSOS2_IDENTIFICATION_SERVICE_AUDIT_SP.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-21") || StringUtils.equals(eventLog.getEventType(), "epsos-22")
-                    || StringUtils.equals(eventLog.getEventType(), "epsos-31") || StringUtils.equals(eventLog.getEventType(), "epsos-32")
-                    || StringUtils.equals(eventLog.getEventType(), "epsos-94") || StringUtils.equals(eventLog.getEventType(), "epsos-96")
-                    || StringUtils.equals(eventLog.getEventType(), "ITI-38") || StringUtils.equals(eventLog.getEventType(), "ITI-39")
-                    || StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
-                model = AuditModel.EPSOS2_FETCH_DOC_SERVICE_SP.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-41") || StringUtils.equals(eventLog.getEventType(), "epsos-51")) {
-                model = AuditModel.EPSOS2_PROVIDE_DATA_SERVICE_SP.toString();
-            }
-        } else {
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-11")) {
-                model = AuditModel.EPSOS2_HCP_ASSURANCE_AUDIT.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-21") || StringUtils.equals(eventLog.getEventType(), "epsos-22")
-                    || StringUtils.equals(eventLog.getEventType(), "epsos-31") || StringUtils.equals(eventLog.getEventType(), "epsos-94")
-                    || StringUtils.equals(eventLog.getEventType(), "epsos-96") || StringUtils.equals(eventLog.getEventType(), "ITI-38")
-                    || StringUtils.equals(eventLog.getEventType(), "ITI-39") || StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
-                model = AuditModel.EPSOS2_HCP_ASSURANCE_AUDIT.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-32")) {
-                model = AuditModel.EPSOS2_FETCH_DOC_SERVICE_SC.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-41") || StringUtils.equals(eventLog.getEventType(), "epsos-51")) {
-                model = AuditModel.EPSOS2_PROVIDE_DATA_SERVICE_SC.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-91")) {
-                model = AuditModel.EPSOS2_ISSUANCE_HCP_ASSERTION.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-92")) {
-                model = AuditModel.EPSOS2_ISSUANCE_TRC_ASSERTION.toString();
-            }
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-93")) {
-                model = AuditModel.EPSOS2_IMPORT_NCP_TRUSTED_LIST.toString();
-            }
-        }
+//        // Infer model according to NCP Side and EventCode
+//        if (ncpSide == NcpSide.NCP_A) {
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-11")) {
+//                model = AuditModel.EPSOS2_IDENTIFICATION_SERVICE_AUDIT_SP.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-21") || StringUtils.equals(eventLog.getEventType(), "epsos-22")
+//                    || StringUtils.equals(eventLog.getEventType(), "epsos-31") || StringUtils.equals(eventLog.getEventType(), "epsos-32")
+//                    || StringUtils.equals(eventLog.getEventType(), "epsos-94") || StringUtils.equals(eventLog.getEventType(), "epsos-96")
+//                    || StringUtils.equals(eventLog.getEventType(), "ITI-38") || StringUtils.equals(eventLog.getEventType(), "ITI-39")
+//                    || StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
+//                model = AuditModel.EPSOS2_FETCH_DOC_SERVICE_SP.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-41") || StringUtils.equals(eventLog.getEventType(), "epsos-51")) {
+//                model = AuditModel.EPSOS2_PROVIDE_DATA_SERVICE_SP.toString();
+//            }
+//        } else {
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-11")) {
+//                model = AuditModel.EPSOS2_HCP_ASSURANCE_AUDIT.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-21") || StringUtils.equals(eventLog.getEventType(), "epsos-22")
+//                    || StringUtils.equals(eventLog.getEventType(), "epsos-31") || StringUtils.equals(eventLog.getEventType(), "epsos-94")
+//                    || StringUtils.equals(eventLog.getEventType(), "epsos-96") || StringUtils.equals(eventLog.getEventType(), "ITI-38")
+//                    || StringUtils.equals(eventLog.getEventType(), "ITI-39") || StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
+//                model = AuditModel.EPSOS2_HCP_ASSURANCE_AUDIT.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-32")) {
+//                model = AuditModel.EPSOS2_FETCH_DOC_SERVICE_SC.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-41") || StringUtils.equals(eventLog.getEventType(), "epsos-51")) {
+//                model = AuditModel.EPSOS2_PROVIDE_DATA_SERVICE_SC.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-91")) {
+//                model = AuditModel.EPSOS2_ISSUANCE_HCP_ASSERTION.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-92")) {
+//                model = AuditModel.EPSOS2_ISSUANCE_TRC_ASSERTION.toString();
+//            }
+//            if (StringUtils.equals(eventLog.getEventType(), "epsos-93")) {
+//                model = AuditModel.EPSOS2_IMPORT_NCP_TRUSTED_LIST.toString();
+//            }
+//        }
         try {
-            return AuditValidationService.getInstance().validateModel(convertAuditObjectToXML(am), model, ncpSide);
+
+            return OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(am), eventLog.getEventType(), ncpSide);
         } catch (JAXBException e) {
             LOGGER.error("JAXBException: {}", e.getMessage(), e);
             return false;
