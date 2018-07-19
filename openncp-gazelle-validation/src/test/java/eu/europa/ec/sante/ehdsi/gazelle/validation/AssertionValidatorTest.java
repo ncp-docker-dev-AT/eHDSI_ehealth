@@ -35,7 +35,7 @@ public class AssertionValidatorTest {
 
 
         WebServiceTemplate webServiceTemplate = new WebServiceTemplate(marshaller);
-        webServiceTemplate.setDefaultUri(DefaultGazelleValidatorFactory.GAZELLE_ASSERTION_VALIDATOR_URI);
+        webServiceTemplate.setDefaultUri(DefaultGazelleValidatorFactory.GAZELLE_SCHEMATRON_VALIDATOR_URI);
         webServiceTemplate.setMessageSender(new HttpComponentsMessageSender(httpClient));
         assertionValidator = new SchematronValidatorImpl(webServiceTemplate);
     }
@@ -117,6 +117,8 @@ public class AssertionValidatorTest {
                 "\n";
 
         String assertionsSTR = DatatypeConverter.printBase64Binary(XML_ASSERTION.getBytes(Charset.forName("UTF-8")));
-        Assert.assertNotNull(assertionValidator.validateObject(assertionsSTR, "epSOS - HCP Identity Assertion", "NCP-B"));
+        String result = assertionValidator.validateObject(assertionsSTR, "epSOS - HCP Identity Assertion", "epSOS - HCP Identity Assertion");
+        System.out.println(result);
+        Assert.assertNotNull(result);
     }
 }
