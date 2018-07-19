@@ -28,6 +28,7 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.xml.datatype.DatatypeFactory;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -293,6 +294,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     GregorianCalendar calendar = new GregorianCalendar();
                     calendar.setTime(new Date());
                     // TODO this is not final/correct version
+                    String securityHeader = "[No security header provided]";
                     EventLog eventLog = EventLog.createEventLogPivotTranslation(
                             TransactionName.epsosPivotTranslation, // Possible values according to D4.5.6 are E,R,U,D
                             EventActionCode.EXECUTE,
@@ -302,11 +304,11 @@ public class TransformationService implements ITransformationService, TMConstant
                             HTTPUtil.getSubjectDN(false),
                             // Identifier that allows to unequivocally identify the SOURCE document or source data entries. (UUID Format)
                             getOIDFromDocument(responseStructure.getDocument()),
-                            getOIDFromDocument(responseStructure.getResponseCDA()), // Identifier that allows to univocally identify the TARGET document. (UUID Format)
+                            getOIDFromDocument(responseStructure.getResponseCDA()), // Identifier that allows to unequivocally identify the TARGET document. (UUID Format)
                             Constants.UUID_PREFIX + "", // The value MUST contain the base64 encoded security header
-                            new byte[0], // ReqM_PatricipantObjectDetail - The value MUST contain the base64 encoded security header
+                            securityHeader.getBytes(StandardCharsets.UTF_8), // ReqM_ParticipantObjectDetail - The value MUST contain the base64 encoded security header
                             Constants.UUID_PREFIX + "", // String-encoded UUID of the response message
-                            new byte[0], // ResM_PatricipantObjectDetail - The value MUST contain the base64 encoded security header
+                            securityHeader.getBytes(StandardCharsets.UTF_8), // ResM_ParticipantObjectDetail - The value MUST contain the base64 encoded security header
                             ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP") // The IP Address of the target Gateway
                     );
                     eventLog.setEventType(EventType.epsosPivotTranslation);

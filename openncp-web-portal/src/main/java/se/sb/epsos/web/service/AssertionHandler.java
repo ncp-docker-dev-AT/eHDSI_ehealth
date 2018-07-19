@@ -248,7 +248,7 @@ public class AssertionHandler implements Serializable {
             LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
 
-        String secHead = "No security header provided";
+        String secHead = "[No security header provided]";
         String reqm_participantObjectID = "urn:uuid:" + assertion.getID();
         String resm_participantObjectID = "urn:uuid:" + assertion.getID();
 

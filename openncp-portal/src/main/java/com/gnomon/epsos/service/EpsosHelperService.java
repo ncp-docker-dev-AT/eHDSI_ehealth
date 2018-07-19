@@ -1237,7 +1237,7 @@ public class EpsosHelperService {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
-        String secHead = "No security header provided";
+        String secHead = "[No security header provided]";
         String reqm_participantObjectID = "urn:uuid:" + message;
         String resm_participantObjectID = "urn:uuid:" + message;
 
