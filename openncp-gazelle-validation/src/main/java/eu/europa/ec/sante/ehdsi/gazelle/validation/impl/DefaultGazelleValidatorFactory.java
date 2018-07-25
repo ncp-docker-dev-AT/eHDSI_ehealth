@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation.impl;
 
+import com.sun.xml.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.*;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
@@ -15,34 +16,35 @@ import org.slf4j.LoggerFactory;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.core.WebServiceTemplate;
+import org.springframework.ws.soap.SoapVersion;
+import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
-
 
 public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory {
 
-    public static final String GAZELLE_ASSERTION_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+    //  "https://gazelle.ehdsi.eu/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS";
+    public static final String GAZELLE_ASSERTION_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfiguration()
             .getProperty("GAZELLE_ASSERTION_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.eu/gazelle-xua-jar/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    public static final String GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+    //  "https://gazelle.ehdsi.eu/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS";
+    public static final String GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfiguration()
             .getProperty("GAZELLE_AUDIT_MESSAGE_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.eu/gazelle-atna-ejb/AuditMessageValidationWSService/AuditMessageValidationWS";
 
-    public static final String GAZELLE_CDA_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+    //  "https://gazelle.ehdsi.eu/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
+    public static final String GAZELLE_CDA_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfiguration()
             .getProperty("GAZELLE_CDA_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.eu/CDAGenerator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
 
-    public static final String GAZELLE_CERTIFICATE_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+    //  "https://gazelle.ehdsi.eu/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator";
+    public static final String GAZELLE_CERTIFICATE_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfiguration()
             .getProperty("GAZELLE_CERTIFICATE_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.eu/gazelle-atna-ejb/CertificateValidatorService/CertificateValidator";
 
-    public static final String GAZELLE_SCHEMATRON_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+    //  "https://gazelle.ehdsi.eu/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator";
+    public static final String GAZELLE_SCHEMATRON_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfiguration()
             .getProperty("GAZELLE_SCHEMATRON_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.eu/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator";
 
-    public static final String GAZELLE_XDS_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfigure()
+    //  "https://gazelle.ehdsi.eu/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
+    public static final String GAZELLE_XDS_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfiguration()
             .getProperty("GAZELLE_XDS_VALIDATOR_URI");
-    //"https://gazelle.ehdsi.eu/XDStarClient-ejb/ModelBasedValidationWSService/ModelBasedValidationWS";
 
     private final Logger logger = LoggerFactory.getLogger(DefaultGazelleValidatorFactory.class);
 
@@ -73,7 +75,7 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
     public CdaValidator getCdaValidator() {
 
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda.sante", "net.ihe.gazelle.jaxb.result.sante");
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda.sante");
         return new CdaValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_CDA_VALIDATOR_URI));
     }
 
@@ -104,6 +106,11 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
         return new XdsValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_XDS_VALIDATOR_URI));
     }
 
+    /**
+     * @param marshaller
+     * @param defaultUri
+     * @return
+     */
     private WebServiceTemplate createWebServiceTemplate(Marshaller marshaller, String defaultUri) {
 
         logger.debug("Configuring WebServiceTemplate ...");
@@ -127,7 +134,6 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
                 credentialsProvider.setCredentials(new AuthScope(hostname, port),
                         new UsernamePasswordCredentials(configurationManager.getProperty(StandardProperties.HTTP_PROXY_USERNAME),
                                 configurationManager.getProperty(StandardProperties.HTTP_PROXY_PASSWORD)));
-
                 httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
             }
         }
@@ -135,6 +141,12 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
         WebServiceTemplate webServiceTemplate = new WebServiceTemplate(marshaller);
         webServiceTemplate.setDefaultUri(defaultUri);
         webServiceTemplate.setMessageSender(new HttpComponentsMessageSender(httpClientBuilder.build()));
+        SaajSoapMessageFactory saajSoapMessageFactory = new SaajSoapMessageFactory(new SOAPMessageFactory1_1Impl());
+        saajSoapMessageFactory.setSoapVersion(SoapVersion.SOAP_11);
+        saajSoapMessageFactory.afterPropertiesSet();
+
+        webServiceTemplate.setMessageFactory(saajSoapMessageFactory);
+
         return webServiceTemplate;
     }
 }

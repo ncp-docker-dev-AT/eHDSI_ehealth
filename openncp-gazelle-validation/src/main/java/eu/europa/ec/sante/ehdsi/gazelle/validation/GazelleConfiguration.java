@@ -13,19 +13,20 @@ import java.io.File;
 
 public class GazelleConfiguration {
 
-    private static final String nationalConfig = System.getenv("EPSOS_PROPS_PATH") + "validation"
+    private static final String NATIONAL_CONFIG = System.getenv("EPSOS_PROPS_PATH") + "validation"
             + File.separatorChar + "gazelle.ehdsi.properties";
+    private static final Logger logger = LoggerFactory.getLogger((GazelleConfiguration.class));
     private static GazelleConfiguration instance;
-    private final Logger logger = LoggerFactory.getLogger((GazelleConfiguration.class));
     private Configuration configuration;
 
     private GazelleConfiguration() throws ConfigurationException {
 
-        File file = new File(nationalConfig);
+        logger.info("eHDSI Gazelle Initialization!");
+        File file = new File(NATIONAL_CONFIG);
         String gazelleConfig;
         if (file.exists()) {
             logger.info("Loading National Gazelle Configuration");
-            gazelleConfig = nationalConfig;
+            gazelleConfig = NATIONAL_CONFIG;
         } else {
             logger.info("Loading Default Gazelle Configuration");
             gazelleConfig = "gazelle.ehdsi.properties";
@@ -34,26 +35,28 @@ public class GazelleConfiguration {
         FileBasedConfigurationBuilder<FileBasedConfiguration> builder =
                 new FileBasedConfigurationBuilder<FileBasedConfiguration>(PropertiesConfiguration.class)
                         .configure(params.properties().setFileName(gazelleConfig));
+
         configuration = builder.getConfiguration();
     }
 
     public static GazelleConfiguration getInstance() {
 
-        if (null == instance) {
+        if (instance == null) {
             try {
                 instance = new GazelleConfiguration();
             } catch (ConfigurationException ex) {
-                throw new RuntimeException(ex);
+                logger.error("ConfigurationException: '{}'", ex.getMessage(), ex);
+                throw new RuntimeException(ex.getMessage(), ex);
             }
         }
         return instance;
     }
 
-    public Configuration getConfigure() {
+    public Configuration getConfiguration() {
         return configuration;
     }
 
-    public void setConfig(Configuration configure) {
-        this.configuration = configure;
+    public void setConfig(Configuration configuration) {
+        this.configuration = configuration;
     }
 }

@@ -543,6 +543,16 @@
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <configuration>
+                        <packagingExcludes>
+                            WEB-INF/lib/commons-configuration-1.7.jar
+                        </packagingExcludes>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
