@@ -173,6 +173,12 @@
             <groupId>com.matthewcasperson</groupId>
             <artifactId>parameter_validation_filter</artifactId>
             <version>1.2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -220,6 +226,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <webResources>
                         <resource>
                             <directory>target</directory>
@@ -230,25 +237,17 @@
                         </resource>
                     </webResources>
                     <packagingExcludes>
-                        WEB-INF/lib/antlr-2.7.6.jar,
                         WEB-INF/lib/axiom-dom-1.2.13.jar,
-                        WEB-INF/lib/commons-beanutils-core-1.7.0.jar,
-                        WEB-INF/lib/commons-codec-1.2.jar,
                         WEB-INF/lib/commons-codec-1.3.jar,
-                        WEB-INF/lib/commons-configuration-1.7.jar,
                         WEB-INF/lib/commons-collections-2.1.1.jar,
-                        WEB-INF/lib/commons-io-1.3.1.jar,
                         WEB-INF/lib/commons-io-1.4.jar,
                         WEB-INF/lib/httpcore-4.0.jar,
                         WEB-INF/lib/jaxen-1.1.1.jar,
                         WEB-INF/lib/jaxb-impl-2.1.7.jar,
                         WEB-INF/lib/jaxb-impl-2.2.4-1.jar
                         WEB-INF/lib/log4j-1.2.15.jar,
-                        WEB-INF/lib/org.apache.xerces-xercesImpl-2.10.0.jar,
                         WEB-INF/lib/xalan-2.7.0.jar,
-                        WEB-INF/lib/xalan-2.7.1.jar,
-                        WEB-INF/lib/xmlParserAPIs-2.0.2.jar,
-                        WEB-INF/lib/xml-apis-2.10.0.jar
+                        WEB-INF/lib/xalan-2.7.1.jar
                     </packagingExcludes>
                 </configuration>
             </plugin>

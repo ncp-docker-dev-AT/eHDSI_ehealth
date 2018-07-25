@@ -25,8 +25,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Environment config (These are default values. Override these props in settings.xml) -->
         <!-- Default empty build number and id, is overridden by CI server -->
-        <BUILD_NUMBER></BUILD_NUMBER>
-        <BUILD_ID></BUILD_ID>
+        <BUILD_NUMBER/>
+        <BUILD_ID/>
         <integrationtest.targetUrl>http://localhost:8080</integrationtest.targetUrl>
         <!-- script to run for remote deployment on integration test server, should be under src/scripts/ -->
         <integrationtest.deployScript>--</integrationtest.deployScript>
@@ -102,19 +102,17 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
-            <version>1.6</version>
             <scope>compile</scope>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>jboss</groupId>-->
-        <!--<artifactId>jboss-common</artifactId>-->
-        <!--<version>4.0.2</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
@@ -401,10 +399,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>
-				<configuration>
-					<attachClasses>true</attachClasses>
-				</configuration>
+                <version>3.2.2</version>
+                <configuration>
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                    <attachClasses>true</attachClasses>
+                    <!--<packagingExcludes>-->
+                    <!--WEB-INF/lib/commons-beanutils-core-1.8.0.jar-->
+                    <!--</packagingExcludes>-->
+                </configuration>
             </plugin>
             <plugin>
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
