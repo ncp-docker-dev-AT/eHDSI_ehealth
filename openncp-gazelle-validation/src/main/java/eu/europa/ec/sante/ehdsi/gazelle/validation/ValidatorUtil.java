@@ -5,6 +5,8 @@ import eu.europa.ec.sante.ehdsi.gazelle.validation.util.Constant;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.util.ObjectType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.util.XdsModel;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ValidatorUtil {
 
@@ -42,45 +44,51 @@ public class ValidatorUtil {
     public static final String EHDSI_XDS_PS_RETRIEVE_RESPONSE_XCA;
     public static final String EHDSI_XDS_FETCH_DOC_RETRIEVE_RESPONSE;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidatorUtil.class);
+
     static {
+        try {
+            EHDSI_ASSERTION_HCP_IDENTITY = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_HCP_IDENTITY_ASSERTION");
+            EHDSI_ASSERTION_TRC = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_TRC_ASSERTION");
 
-        EHDSI_ASSERTION_HCP_IDENTITY = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_HCP_IDENTITY_ASSERTION");
-        EHDSI_ASSERTION_TRC = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_TRC_ASSERTION");
+            EHDSI_ID_SERVICE_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_ID_SERVICE_REQUEST");
+            EHDSI_ID_SERVICE_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_ID_SERVICE_RESPONSE");
 
-        EHDSI_ID_SERVICE_REQUEST = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_ID_SERVICE_REQUEST");
-        EHDSI_ID_SERVICE_RESPONSE = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_ID_SERVICE_RESPONSE");
+            EHDSI_ART_DECOR_CDA_FRIENDLY = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_ART_DECOR_CDA_FRIENDLY");
+            EHDSI_ART_DECOR_CDA_PIVOT = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_ART_DECOR_CDA_PIVOT");
 
-        EHDSI_ART_DECOR_CDA_FRIENDLY = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_ART_DECOR_CDA_FRIENDLY");
-        EHDSI_ART_DECOR_CDA_PIVOT = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_ART_DECOR_CDA_PIVOT");
+            EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC");
+            EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP");
+            EHDSI_AUDIT_IMPORT_NCP_TRUSTED_LIST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_IMPORT_NCP_TRUSTED_LIST");
+            EHDSI_AUDIT_HCP_ASSURANCE_AUDIT = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_HCP_ASSURANCE_AUDIT");
+            EHDSI_AUDIT_FETCH_DOC_SERVICE_SC = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_FETCH_DOC_SERVICE_SC");
+            EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION");
+            EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP");
+            EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION");
+            EHDSI_AUDIT_FETCH_DOC_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_FETCH_DOC_SERVICE_SP");
 
-        EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC");
-        EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP");
-        EHDSI_AUDIT_IMPORT_NCP_TRUSTED_LIST = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_AUDIT_IMPORT_NCP_TRUSTED_LIST");
-        EHDSI_AUDIT_HCP_ASSURANCE_AUDIT = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_AUDIT_HCP_ASSURANCE_AUDIT");
-        EHDSI_AUDIT_FETCH_DOC_SERVICE_SC = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_AUDIT_FETCH_DOC_SERVICE_SC");
-        EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION");
-        EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP");
-        EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION");
-        EHDSI_AUDIT_FETCH_DOC_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_AUDIT_FETCH_DOC_SERVICE_SP");
-
-        EHDSI_XDS_OS_LIST_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_OS_LIST_REQUEST_XCA");
-        EHDSI_XDS_CS_PUT_REQUEST = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_CS_PUT_REQUEST");
-        EHDSI_XDS_PS_LIST_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_PS_LIST_REQUEST_XCA");
-        EHDSI_XDS_ED_INIT_REQUEST = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_ED_INIT_REQUEST");
-        EHDSI_XDS_PROVIDE_DATA_REQUEST = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_PROVIDE_DATA_REQUEST");
-        EHDSI_XDS_CS_PUT_RESPONSE = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_CS_PUT_RESPONSE");
-        EHDSI_XDS_ED_INIT_RESPONSE = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_ED_INIT_RESPONSE");
-        EHDSI_XDS_PROVIDE_DATA_RESPONSE = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_PROVIDE_DATA_RESPONSE");
-        EHDSI_XDS_FETCH_DOC_QUERY_REQUEST = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_FETCH_DOC_QUERY_REQUEST");
-        EHDSI_XDS_OS_LIST_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_OS_LIST_RESPONSE_XCA");
-        EHDSI_XDS_PS_LIST_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_PS_LIST_RESPONSE_XCA");
-        EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE");
-        EHDSI_XDS_OS_RETRIEVE_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_OS_RETRIEVE_REQUEST_XCA");
-        EHDSI_XDS_PS_RETRIEVE_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_PS_RETRIEVE_REQUEST_XCA");
-        EHDSI_XDS_FETCH_DOC_RETRIEVE_REQUEST = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_FETCH_DOC_RETRIEVE_REQUEST");
-        EHDSI_XDS_OS_RETRIEVE_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_OS_RETRIEVE_RESPONSE_XCA");
-        EHDSI_XDS_PS_RETRIEVE_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_PS_RETRIEVE_RESPONSE_XCA");
-        EHDSI_XDS_FETCH_DOC_RETRIEVE_RESPONSE = (String) GazelleConfiguration.getInstance().getConfigure().getProperty("EHDSI_XDS_FETCH_DOC_RETRIEVE_RESPONSE");
+            EHDSI_XDS_OS_LIST_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_OS_LIST_REQUEST_XCA");
+            EHDSI_XDS_CS_PUT_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_CS_PUT_REQUEST");
+            EHDSI_XDS_PS_LIST_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PS_LIST_REQUEST_XCA");
+            EHDSI_XDS_ED_INIT_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ED_INIT_REQUEST");
+            EHDSI_XDS_PROVIDE_DATA_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PROVIDE_DATA_REQUEST");
+            EHDSI_XDS_CS_PUT_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_CS_PUT_RESPONSE");
+            EHDSI_XDS_ED_INIT_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ED_INIT_RESPONSE");
+            EHDSI_XDS_PROVIDE_DATA_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PROVIDE_DATA_RESPONSE");
+            EHDSI_XDS_FETCH_DOC_QUERY_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_FETCH_DOC_QUERY_REQUEST");
+            EHDSI_XDS_OS_LIST_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_OS_LIST_RESPONSE_XCA");
+            EHDSI_XDS_PS_LIST_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PS_LIST_RESPONSE_XCA");
+            EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE");
+            EHDSI_XDS_OS_RETRIEVE_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_OS_RETRIEVE_REQUEST_XCA");
+            EHDSI_XDS_PS_RETRIEVE_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PS_RETRIEVE_REQUEST_XCA");
+            EHDSI_XDS_FETCH_DOC_RETRIEVE_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_FETCH_DOC_RETRIEVE_REQUEST");
+            EHDSI_XDS_OS_RETRIEVE_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_OS_RETRIEVE_RESPONSE_XCA");
+            EHDSI_XDS_PS_RETRIEVE_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PS_RETRIEVE_RESPONSE_XCA");
+            EHDSI_XDS_FETCH_DOC_RETRIEVE_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_FETCH_DOC_RETRIEVE_RESPONSE");
+        } catch (Exception e) {
+            LOGGER.error("Failure during static initialization: '{}'", e.getMessage(), e);
+            throw e;
+        }
     }
 
     private ValidatorUtil() {

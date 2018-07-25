@@ -24,6 +24,7 @@ public class TestConfiguration {
 
     @Bean
     public HttpClient httpClient() {
+
         HttpClientBuilder httpClientBuilder = HttpClients.custom()
                 .addInterceptorFirst(new HttpComponentsMessageSender.RemoveSoapHeadersInterceptor());
 

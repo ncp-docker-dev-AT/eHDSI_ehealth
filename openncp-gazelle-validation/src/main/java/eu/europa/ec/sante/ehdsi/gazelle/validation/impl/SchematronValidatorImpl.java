@@ -27,7 +27,6 @@ public class SchematronValidatorImpl extends AbstractValidator implements Schema
         request.setXmlMetadata(xmlMetadata);
 
         try {
-
             ValidateObjectResponse response = (ValidateObjectResponse) webServiceTemplate.marshalSendAndReceive(request);
             return response.getValidationResult();
 

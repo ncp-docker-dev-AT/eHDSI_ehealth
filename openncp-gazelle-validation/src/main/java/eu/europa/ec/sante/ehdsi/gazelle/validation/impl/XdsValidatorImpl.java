@@ -29,6 +29,7 @@ public class XdsValidatorImpl extends AbstractValidator implements XdsValidator 
         try {
             ValidateDocumentResponse response = (ValidateDocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
             return response.getDetailedResult();
+
         } catch (WebServiceClientException e) {
             logger.error(MSG_ERROR_XDR_VALIDATION, e);
             return "N/A";
@@ -46,6 +47,7 @@ public class XdsValidatorImpl extends AbstractValidator implements XdsValidator 
         try {
             ValidateBase64DocumentResponse response = (ValidateBase64DocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
             return response.getDetailedResult();
+
         } catch (WebServiceClientException e) {
             logger.error(MSG_ERROR_XDR_VALIDATION, e);
             return "N/A";

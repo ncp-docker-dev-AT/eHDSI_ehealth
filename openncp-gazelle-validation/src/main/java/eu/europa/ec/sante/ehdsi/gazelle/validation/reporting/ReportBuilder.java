@@ -29,7 +29,7 @@ public class ReportBuilder {
     private static final boolean GAZELLE_HTML_REPORT;
 
     static {
-        GAZELLE_HTML_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfigure().getProperty("GAZELLE_HTML_REPORT"));
+        GAZELLE_HTML_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfiguration().getProperty("GAZELLE_HTML_REPORT"));
     }
 
     private ReportBuilder() {
