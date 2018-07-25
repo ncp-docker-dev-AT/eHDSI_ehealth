@@ -30,13 +30,14 @@ public class AssertionValidatorTest {
 
     @Before
     public void setUp() {
-        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.schematron.sante", "net.ihe.gazelle.jaxb.result.sante");
 
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.schematron.sante");
 
         WebServiceTemplate webServiceTemplate = new WebServiceTemplate(marshaller);
         webServiceTemplate.setDefaultUri(DefaultGazelleValidatorFactory.GAZELLE_SCHEMATRON_VALIDATOR_URI);
         webServiceTemplate.setMessageSender(new HttpComponentsMessageSender(httpClient));
+
         assertionValidator = new SchematronValidatorImpl(webServiceTemplate);
     }
 

@@ -17,18 +17,20 @@ public class CertificateValidatorImpl extends AbstractValidator implements Certi
     }
 
     @Override
-    public boolean validate(String certificate, String type, boolean checkRevocation) {
+    public String validate(String certificate, String type, boolean checkRevocation) {
+
         Validate request = new Validate();
         request.setCertificatesInPEMFormat(certificate);
         request.setType(type);
         request.setCheckRevocation(checkRevocation);
 
         try {
+
             ValidateResponse response = (ValidateResponse) webServiceTemplate.marshalSendAndReceive(request);
-            return response.getDetailedResult() != null;
+            return response.getDetailedResult().getValidatedCertificates();
         } catch (WebServiceClientException e) {
             logger.error("An error occurred during validation process of the CertificateValidator. Please check the stack trace for more details.", e);
-            return false;
+            return "N/A";
         }
     }
 }
