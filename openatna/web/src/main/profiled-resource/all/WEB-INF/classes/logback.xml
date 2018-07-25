@@ -26,6 +26,15 @@
         <appender-ref ref="FILE_CLINICAL"/>
     </logger>
 
+    <!-- Spring Web Service Payload Logging - Uncomment to enable MessageTracing Request/Response-->
+    <!--<logger name="org.springframework.ws.client.MessageTracing" level="TRACE" additivity="false">-->
+    <!--<appender-ref ref="FILE_CLINICAL"/>-->
+    <!--</logger>-->
+    <!--<logger name="org.springframework.ws.server.MessageTracing" level="TRACE" additivity="false">-->
+    <!--<appender-ref ref="FILE_CLINICAL"/>-->
+    <!--</logger>-->
+    <!-- End Spring Web Service Logging-->
+
     <logger name="org.openhealthtools.openatna" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>

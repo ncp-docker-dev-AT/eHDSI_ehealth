@@ -2,7 +2,6 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <!--pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern-->
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </layout>
     </appender>
@@ -10,13 +9,19 @@
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>${catalina.base}/logs/openncp-web-portal.log</file>
         <append>true</append>
-        <!-- encoders are assigned the type
-             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            <!--pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern-->
         </encoder>
     </appender>
+
+    <!-- Spring Web Service Payload Logging - Uncomment to enable MessageTracing Request/Response-->
+    <!--<logger name="org.springframework.ws.client.MessageTracing" level="TRACE" additivity="false">-->
+    <!--<appender-ref ref="FILE_CLINICAL"/>-->
+    <!--</logger>-->
+    <!--<logger name="org.springframework.ws.server.MessageTracing" level="TRACE" additivity="false">-->
+    <!--<appender-ref ref="FILE_CLINICAL"/>-->
+    <!--</logger>-->
+    <!-- End Spring Web Service Logging-->
 
     <logger name="eu" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
