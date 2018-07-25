@@ -166,7 +166,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
-                        <version>3.2.2</version>
                         <configuration>
                             <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                             <warName>openncp-openatna-all</warName>
@@ -176,9 +175,6 @@
                                     <directory>src/main/profiled-resource/all</directory>
                                 </resource>
                             </webResources>
-                            <!--<packagingExcludes>-->
-                            <!--WEB-INF/lib/commons-beanutils-core-1.7.0.jar-->
-                            <!--</packagingExcludes>-->
                         </configuration>
                     </plugin>
                 </plugins>
@@ -191,7 +187,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
-                        <version>3.2.2</version>
                         <configuration>
                             <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                             <warName>openncp-openatna-service</warName>
@@ -214,7 +209,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
-                        <version>3.2.2</version>
                         <configuration>
                             <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                             <warName>openncp-openatna-web</warName>

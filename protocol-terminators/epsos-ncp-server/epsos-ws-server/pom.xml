@@ -16,9 +16,6 @@
     <name>OpenNCP CC Web Services (IHE XCPD, XCA, XDR)</name>
 
     <properties>
-        <!--<tomcat.home>${CATALINA_HOME}/</tomcat.home>-->
-        <!--<tomcat.username>username</tomcat.username>-->
-        <!--<tomcat.password>password</tomcat.password>-->
         <jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
         <skip.deploy>true</skip.deploy>
     </properties>
@@ -227,6 +224,9 @@
                 <version>3.1.0</version>
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>aar</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
                     <webResources>
                         <resource>
                             <directory>target</directory>
@@ -325,43 +325,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!--<plugin>-->
-                    <!--<groupId>org.codehaus.cargo</groupId>-->
-                    <!--<artifactId>cargo-maven2-plugin</artifactId>-->
-                    <!--<version>1.6.1</version>-->
-                    <!--<configuration>-->
-                    <!--<container>-->
-                    <!--<containerId>tomcat7x</containerId>-->
-                    <!--<type>remote</type>-->
-                    <!--</container>-->
-                    <!--<configuration>-->
-                    <!--<type>runtime</type>-->
-                    <!--<properties>-->
-                    <!--<cargo.hostname>${remote.hostname}</cargo.hostname>-->
-                    <!--<cargo.servlet.port>${remote.port}</cargo.servlet.port>-->
-                    <!--<cargo.remote.username>${remote.user}</cargo.remote.username>-->
-                    <!--<cargo.remote.password>${remote.pass}</cargo.remote.password>-->
-                    <!--</properties>-->
-                    <!--</configuration>-->
-                    <!--</configuration>-->
-                    <!--<executions>-->
-                    <!--<execution>-->
-                    <!--<id>deploy-cargo</id>-->
-                    <!--<phase>pre-integration-test</phase>-->
-                    <!--<goals>-->
-                    <!--&lt;!&ndash;<goal>deploy</goal>&ndash;&gt;-->
-                    <!--<goal>redeploy</goal>-->
-                    <!--</goals>-->
-                    <!--</execution>-->
-                    <!--<execution>-->
-                    <!--<id>undeploy-cargo</id>-->
-                    <!--<phase>post-integration-test</phase>-->
-                    <!--<goals>-->
-                    <!--<goal>undeploy</goal>-->
-                    <!--</goals>-->
-                    <!--</execution>-->
-                    <!--</executions>-->
-                    <!--</plugin>-->
 
                     <!-- failsafe -->
                     <plugin>

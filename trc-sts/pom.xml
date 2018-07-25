@@ -174,9 +174,6 @@
                     <configuration>
                         <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
-                        <!--<packagingExcludes>-->
-                        <!--WEB-INF/lib/commons-beanutils-core-1.7.0.jar-->
-                        <!--</packagingExcludes>-->
                     </configuration>
                 </plugin>
                 <plugin>

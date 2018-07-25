@@ -399,13 +399,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.2</version>
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <attachClasses>true</attachClasses>
-                    <!--<packagingExcludes>-->
-                    <!--WEB-INF/lib/commons-beanutils-core-1.8.0.jar-->
-                    <!--</packagingExcludes>-->
                 </configuration>
             </plugin>
             <plugin>
