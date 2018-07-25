@@ -2,7 +2,7 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
         </layout>
     </appender>
 
@@ -10,9 +10,30 @@
         <file>${catalina.base}/logs/openncp-openatna.log</file>
         <append>true</append>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <appender name="FILE_CLINICAL" class="ch.qos.logback.core.FileAppender">
+        <file>${catalina.base}/logs/openncp-openatna-clinical.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%class{0}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="LOGGER_CLINICAL" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE_CLINICAL"/>
+    </logger>
+
+    <!-- Spring Web Service Payload Logging - Uncomment to enable MessageTracing Request/Response-->
+    <!--<logger name="org.springframework.ws.client.MessageTracing" level="TRACE" additivity="false">-->
+    <!--<appender-ref ref="FILE_CLINICAL"/>-->
+    <!--</logger>-->
+    <!--<logger name="org.springframework.ws.server.MessageTracing" level="TRACE" additivity="false">-->
+    <!--<appender-ref ref="FILE_CLINICAL"/>-->
+    <!--</logger>-->
+    <!-- End Spring Web Service Logging-->
 
     <logger name="org.openhealthtools.openatna" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
@@ -34,13 +55,15 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <!-- Limit the org.apache logger to INFO as its DEBUG is verbose -->
     <logger name="org.apache" level="WARN" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <!-- Limit the org.hibernate logger to WARN -->
-    <logger name="org.hibernate" level="WARN" additivity="false">
+    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="org.hibernate" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -48,17 +71,14 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <!-- Limit the net.sf.ehcache logger to ERROR -->
     <logger name="net.sf.ehcache" level="ERROR" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <!-- Limit jboss axis to INFO as its DEBUG is even more verbose -->
     <logger name="org.jboss.axis" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <!-- Limit the JSR77 categories -->
     <logger name="org.jboss.management" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
