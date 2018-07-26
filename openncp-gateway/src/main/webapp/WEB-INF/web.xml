@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
-    <display-name>eHDSI OpenNCP Gateway-${project.version}</display-name>
+    <display-name>eHDSI OpenNCP Gateway - ${project.version}</display-name>
 
     <filter>
         <display-name>springMultipartFilter</display-name>
