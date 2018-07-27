@@ -235,7 +235,8 @@ public class OpenNCPValidation {
      */
     public static boolean isValidationEnable() {
 
-        return ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation");
+        return ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation") &&
+                !StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD");
     }
 
     public static boolean isRemoteValidationEnable() {
