@@ -23,6 +23,8 @@ public class ValidatorUtil {
     public static final String EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
     public static final String EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION;
     public static final String EHDSI_AUDIT_FETCH_DOC_SERVICE_SP;
+    public static final String EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY;
+    public static final String EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH;
     public static final String EHDSI_ASSERTION_HCP_IDENTITY;
     public static final String EHDSI_ASSERTION_TRC;
     public static final String EHDSI_XDS_OS_LIST_REQUEST_XCA;
@@ -66,6 +68,8 @@ public class ValidatorUtil {
             EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP");
             EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION");
             EHDSI_AUDIT_FETCH_DOC_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_FETCH_DOC_SERVICE_SP");
+            EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY");
+            EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH");
 
             EHDSI_XDS_OS_LIST_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_OS_LIST_REQUEST_XCA");
             EHDSI_XDS_CS_PUT_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_CS_PUT_REQUEST");
@@ -147,6 +151,12 @@ public class ValidatorUtil {
             if (StringUtils.equals(eventType, "epsos-93")) {
                 //EPSOS2_IMPORT_NCP_TRUSTED_LIST
                 model = ValidatorUtil.EHDSI_AUDIT_IMPORT_NCP_TRUSTED_LIST;
+            }
+            if (StringUtils.equals(eventType, "ehealth-193")) {
+                model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY;
+            }
+            if (StringUtils.equals(eventType, "ehealth-194")) {
+                model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH;
             }
         }
         return model;
