@@ -539,8 +539,8 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.6</version>
                     <configuration>
                         <encoding>UTF-8</encoding>
                     </configuration>
@@ -548,6 +548,11 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
+                    <configuration>
+                        <packagingExcludes>
+                            WEB-INF/lib/xercesImpl-2.10.0.jar
+                        </packagingExcludes>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

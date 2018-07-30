@@ -28,7 +28,6 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
-import net.ihe.gazelle.medication.NullFlavor;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -2710,17 +2709,11 @@ public class EpsosHelperService {
                     pd.setAdministrativeGender(dem.getUserValue());
                     break;
             }
-            LOGGER.info(dem.getKey() + ": " + dem.getUserValue());
+            LOGGER.info("{}: '{}'", dem.getKey(), dem.getUserValue());
         }
 
         pd.setPatientIdArray(idArray);
         return pd;
-    }
-
-    private static boolean containsNullFlavor(Node node, NullFlavor flavor) {
-
-        return (node.getAttributes().getNamedItem("nullFlavor") != null &&
-                node.getAttributes().getNamedItem("nullFlavor").getNodeValue().equals(flavor.value()));
     }
 
     public static String toString(Node node, boolean omitXmlDeclaration, boolean prettyPrint) {

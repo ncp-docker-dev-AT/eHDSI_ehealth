@@ -264,6 +264,7 @@
                             <value>all</value>
                         </property>
                     </properties>
+                    <outputFile/>
                 </configuration>
             </plugin>
             <plugin>
@@ -271,12 +272,15 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                    <packagingExcludes>
+                        WEB-INF/lib/xercesImpl-2.10.0.jar
+                    </packagingExcludes>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <version>2.3</version>
                 <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.3</version>
                 <executions>
                     <execution>
                         <id>xjc</id>
@@ -296,8 +300,8 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.2</version>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
