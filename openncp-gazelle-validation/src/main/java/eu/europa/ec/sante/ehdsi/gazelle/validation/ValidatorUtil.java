@@ -122,13 +122,13 @@ public class ValidatorUtil {
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
             }
             if (StringUtils.equals(eventType, "epsos-21") || StringUtils.equals(eventType, "epsos-22")
-                    || StringUtils.equals(eventType, "epsos-31") || StringUtils.equals(eventType, "epsos-94")
+                    || StringUtils.equals(eventType, "epsos-94")
                     || StringUtils.equals(eventType, "epsos-96") || StringUtils.equals(eventType, "ITI-38")
                     || StringUtils.equals(eventType, "ITI-39") || StringUtils.equals(eventType, "epsos-95")) {
                 //EPSOS2_HCP_ASSURANCE_AUDIT
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
             }
-            if (StringUtils.equals(eventType, "epsos-32")) {
+            if (StringUtils.equals(eventType, "epsos-31") || StringUtils.equals(eventType, "epsos-32")) {
                 //EPSOS2_FETCH_DOC_SERVICE_SC
                 model = ValidatorUtil.EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
             }
