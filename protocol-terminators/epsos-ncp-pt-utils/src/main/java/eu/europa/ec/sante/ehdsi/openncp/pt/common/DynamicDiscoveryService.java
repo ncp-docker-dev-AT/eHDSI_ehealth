@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.pt.common;
 
 import epsos.ccd.gnomon.auditmanager.*;
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
@@ -90,6 +91,7 @@ public class DynamicDiscoveryService {
                     null, sc_userid, sp_userid, partid, null, EM_PatricipantObjectID,
                     EM_PatricipantObjectDetail, objectID, null, new byte[1],
                     null, new byte[1], sourceip, targetip);
+            eventLog1.setNcpSide(NcpSide.NCP_B);
             eventLog1.setEventType(EventType.ehealthSMPQuery);
             // facility = 13 --> log audit | severity = 2 --> Critical: critical
             // conditions

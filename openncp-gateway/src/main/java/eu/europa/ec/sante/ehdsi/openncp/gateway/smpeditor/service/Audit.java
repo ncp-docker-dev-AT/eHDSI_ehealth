@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
 import epsos.ccd.gnomon.auditmanager.*;
+import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.util.DateTimeUtil;
 import org.slf4j.Logger;
@@ -86,8 +87,9 @@ public class Audit {
                     new byte[1], // Base64 encoded error message
                     sourceip, targetip);
             eventLog1.setEventType(EventType.ehealthSMPQuery);
+            eventLog1.setNcpSide(NcpSide.NCP_A);
             //facility = 13 --> log audit | severity = 2 --> Critical: critical conditions
-            //Acording to https://tools.ietf.org/html/rfc5424 (Syslog Protocol)
+            //According to https://tools.ietf.org/html/rfc5424 (Syslog Protocol)
             asd.write(eventLog1, "13", "2");
     /*  try {
         Thread.sleep(10000);
@@ -157,8 +159,9 @@ public class Audit {
                     new byte[1], // Base64 encoded error message
                     sourceip, targetip);
             eventLog1.setEventType(EventType.ehealthSMPPush);
+            eventLog1.setNcpSide(NcpSide.NCP_A);
             //facility = 13 --> log audit | severity = 2 --> Critical: critical conditions
-            //Acording to https://tools.ietf.org/html/rfc5424 (Syslog Protocol)
+            //According to https://tools.ietf.org/html/rfc5424 (Syslog Protocol)
             asd.write(eventLog1, "13", "2");
      /* try {
         Thread.sleep(10000);
