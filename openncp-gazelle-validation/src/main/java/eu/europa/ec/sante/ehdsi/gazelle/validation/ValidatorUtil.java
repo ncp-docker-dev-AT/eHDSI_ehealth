@@ -10,40 +10,40 @@ import org.slf4j.LoggerFactory;
 
 public class ValidatorUtil {
 
-    private static final String EHDSI_ART_DECOR_CDA_FRIENDLY;
-    private static final String EHDSI_ART_DECOR_CDA_PIVOT;
-    private static final String EHDSI_ART_DECOR_SCANNED_DOCUMENT;
     public static final String EHDSI_ID_SERVICE_REQUEST;
     public static final String EHDSI_ID_SERVICE_RESPONSE;
-    private static final String EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC;
-    private static final String EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP;
-    private static final String EHDSI_AUDIT_IMPORT_NCP_TRUSTED_LIST;
-    private static final String EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
-    private static final String EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
-    private static final String EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION;
-    private static final String EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
-    private static final String EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION;
-    private static final String EHDSI_AUDIT_FETCH_DOC_SERVICE_SP;
     public static final String EHDSI_ASSERTION_HCP_IDENTITY;
     public static final String EHDSI_ASSERTION_TRC;
-    private static final String EHDSI_XDS_OS_LIST_REQUEST_XCA;
-    private static final String EHDSI_XDS_CS_PUT_REQUEST;
-    private static final String EHDSI_XDS_PS_LIST_REQUEST_XCA;
-    private static final String EHDSI_XDS_ED_INIT_REQUEST;
-    private static final String EHDSI_XDS_PROVIDE_DATA_REQUEST;
-    private static final String EHDSI_XDS_CS_PUT_RESPONSE;
-    private static final String EHDSI_XDS_ED_INIT_RESPONSE;
-    private static final String EHDSI_XDS_PROVIDE_DATA_RESPONSE;
-    private static final String EHDSI_XDS_FETCH_DOC_QUERY_REQUEST;
-    private static final String EHDSI_XDS_OS_LIST_RESPONSE_XCA;
-    private static final String EHDSI_XDS_PS_LIST_RESPONSE_XCA;
-    private static final String EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE;
-    private static final String EHDSI_XDS_OS_RETRIEVE_REQUEST_XCA;
-    private static final String EHDSI_XDS_PS_RETRIEVE_REQUEST_XCA;
-    private static final String EHDSI_XDS_FETCH_DOC_RETRIEVE_REQUEST;
-    private static final String EHDSI_XDS_OS_RETRIEVE_RESPONSE_XCA;
-    private static final String EHDSI_XDS_PS_RETRIEVE_RESPONSE_XCA;
-    private static final String EHDSI_XDS_FETCH_DOC_RETRIEVE_RESPONSE;
+    public static final String EHDSI_ART_DECOR_CDA_FRIENDLY;
+    public static final String EHDSI_ART_DECOR_CDA_PIVOT;
+    public static final String EHDSI_ART_DECOR_SCANNED_DOCUMENT;
+    public static final String EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC;
+    public static final String EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP;
+    public static final String EHDSI_AUDIT_IMPORT_NCP_TRUSTED_LIST;
+    public static final String EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
+    public static final String EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
+    public static final String EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION;
+    public static final String EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
+    public static final String EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION;
+    public static final String EHDSI_AUDIT_FETCH_DOC_SERVICE_SP;
+    public static final String EHDSI_XDS_OS_LIST_REQUEST_XCA;
+    public static final String EHDSI_XDS_CS_PUT_REQUEST;
+    public static final String EHDSI_XDS_PS_LIST_REQUEST_XCA;
+    public static final String EHDSI_XDS_ED_INIT_REQUEST;
+    public static final String EHDSI_XDS_PROVIDE_DATA_REQUEST;
+    public static final String EHDSI_XDS_CS_PUT_RESPONSE;
+    public static final String EHDSI_XDS_ED_INIT_RESPONSE;
+    public static final String EHDSI_XDS_PROVIDE_DATA_RESPONSE;
+    public static final String EHDSI_XDS_FETCH_DOC_QUERY_REQUEST;
+    public static final String EHDSI_XDS_OS_LIST_RESPONSE_XCA;
+    public static final String EHDSI_XDS_PS_LIST_RESPONSE_XCA;
+    public static final String EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE;
+    public static final String EHDSI_XDS_OS_RETRIEVE_REQUEST_XCA;
+    public static final String EHDSI_XDS_PS_RETRIEVE_REQUEST_XCA;
+    public static final String EHDSI_XDS_FETCH_DOC_RETRIEVE_REQUEST;
+    public static final String EHDSI_XDS_OS_RETRIEVE_RESPONSE_XCA;
+    public static final String EHDSI_XDS_PS_RETRIEVE_RESPONSE_XCA;
+    public static final String EHDSI_XDS_FETCH_DOC_RETRIEVE_RESPONSE;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidatorUtil.class);
 
@@ -158,36 +158,23 @@ public class ValidatorUtil {
      * This helper method will return a specific CDA model based on a document class code
      * (also choosing between friendly or pivot documents).
      *
-     * @param classCode           The document class code.
-     * @param isPivot             The boolean flag stating if the document is pivot or
-     *                            not.
-     * @param isScannedDocument   The boolean flag stating if the document is a scanned document or
-     *                            not.
+     * @param classCode         The document class code.
+     * @param isPivot           The boolean flag stating if the document is pivot or
+     *                          not.
+     * @param isScannedDocument The boolean flag stating if the document is a scanned document or
+     *                          not.
      * @return the correspondent CDA model.
      */
     public static String obtainCdaModel(String classCode, boolean isPivot, boolean isScannedDocument) {
 
         if (StringUtils.isBlank(classCode)) {
             return null;
-        }
-        switch (classCode) {
-            case Constant.PS_CLASSCODE:
-            case Constant.EP_CLASSCODE:
-                if (isScannedDocument) {
-                    return ValidatorUtil.EHDSI_ART_DECOR_SCANNED_DOCUMENT;
-                } else {
-                    return isPivot ? ValidatorUtil.EHDSI_ART_DECOR_CDA_PIVOT : ValidatorUtil.EHDSI_ART_DECOR_CDA_FRIENDLY;
-                }
-            case Constant.ED_CLASSCODE:
+        } else {
+            if (isScannedDocument) {
+                return ValidatorUtil.EHDSI_ART_DECOR_SCANNED_DOCUMENT;
+            } else {
                 return isPivot ? ValidatorUtil.EHDSI_ART_DECOR_CDA_PIVOT : ValidatorUtil.EHDSI_ART_DECOR_CDA_FRIENDLY;
-            case Constant.MRO_CLASSCODE:
-                //No support for MRO yet
-            case Constant.HCER_CLASSCODE:
-                //No support for HCER yet
-            case Constant.CONSENT_CLASSCODE:
-                //No support for CONSENT yet
-            default:
-                return null;
+            }
         }
     }
 
