@@ -12,8 +12,6 @@ public class ValidatorUtil {
 
     public static final String EHDSI_ID_SERVICE_REQUEST;
     public static final String EHDSI_ID_SERVICE_RESPONSE;
-    public static final String EHDSI_ASSERTION_HCP_IDENTITY;
-    public static final String EHDSI_ASSERTION_TRC;
     public static final String EHDSI_ART_DECOR_CDA_FRIENDLY;
     public static final String EHDSI_ART_DECOR_CDA_PIVOT;
     public static final String EHDSI_ART_DECOR_SCANNED_DOCUMENT;

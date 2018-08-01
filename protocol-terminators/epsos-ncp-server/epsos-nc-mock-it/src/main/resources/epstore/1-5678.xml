@@ -87,7 +87,7 @@
             <representedCustodianOrganization>
                 <id root="1.2.246.10.2462460.19.1"/>
                 <name>Kansaneläkelaitos</name>
-                <telecom nullFlavor="NI"/>
+                <telecom nullFlavor="UNK"/>
                 <addr>
                     <postBox>PL 450</postBox>
                     <postalCode>00101</postalCode>
@@ -110,7 +110,7 @@
                 <state nullFlavor="UNK"/>
                 <country>FI</country>
             </addr>
-            <telecom nullFlavor="NI"/>
+            <telecom nullFlavor="UNK"/>
             <assignedPerson>
                 <name>
                     <family>Vastaava</family>
@@ -120,7 +120,7 @@
             <representedOrganization classCode="ORG" determinerCode="INSTANCE">
                 <id root="1.2.246.10.2462460.19.1"/>
                 <name>Kansaneläkelaitos</name>
-                <telecom nullFlavor="NI"/>
+                <telecom nullFlavor="UNK"/>
                 <addr use="PST">
                     <postBox>P.O.B. 450</postBox>
                     <city>Helsinki</city>
