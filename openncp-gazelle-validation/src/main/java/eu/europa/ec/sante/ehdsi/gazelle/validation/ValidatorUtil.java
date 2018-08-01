@@ -10,10 +10,13 @@ import org.slf4j.LoggerFactory;
 
 public class ValidatorUtil {
 
-    public static final String EHDSI_ART_DECOR_CDA_FRIENDLY;
-    public static final String EHDSI_ART_DECOR_CDA_PIVOT;
     public static final String EHDSI_ID_SERVICE_REQUEST;
     public static final String EHDSI_ID_SERVICE_RESPONSE;
+    public static final String EHDSI_ASSERTION_HCP_IDENTITY;
+    public static final String EHDSI_ASSERTION_TRC;
+    public static final String EHDSI_ART_DECOR_CDA_FRIENDLY;
+    public static final String EHDSI_ART_DECOR_CDA_PIVOT;
+    public static final String EHDSI_ART_DECOR_SCANNED_DOCUMENT;
     public static final String EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC;
     public static final String EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP;
     public static final String EHDSI_AUDIT_IMPORT_NCP_TRUSTED_LIST;
@@ -58,6 +61,7 @@ public class ValidatorUtil {
 
             EHDSI_ART_DECOR_CDA_FRIENDLY = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_ART_DECOR_CDA_FRIENDLY");
             EHDSI_ART_DECOR_CDA_PIVOT = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_ART_DECOR_CDA_PIVOT");
+            EHDSI_ART_DECOR_SCANNED_DOCUMENT = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_ART_DECOR_SCANNED_DOCUMENT");
 
             EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC");
             EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP");
@@ -166,44 +170,24 @@ public class ValidatorUtil {
      * This helper method will return a specific CDA model based on a document class code
      * (also choosing between friendly or pivot documents).
      *
-     * @param classCode The document class code.
-     * @param isPivot   The boolean flag stating if the document is pivot or
-     *                  not.
+     * @param classCode         The document class code.
+     * @param isPivot           The boolean flag stating if the document is pivot or
+     *                          not.
+     * @param isScannedDocument The boolean flag stating if the document is a scanned document or
+     *                          not.
      * @return the correspondent CDA model.
      */
-    public static String obtainCdaModel(String classCode, boolean isPivot) {
+    public static String obtainCdaModel(String classCode, boolean isPivot, boolean isScannedDocument) {
 
-        if (classCode == null || classCode.isEmpty()) {
+        if (StringUtils.isBlank(classCode)) {
             return null;
-        }
-        if (isPivot) {
-//            if (classCode.equals(Constants.MRO_CLASSCODE)) {
-//                return CdaModel.MRO.toString();
-//            }
-            if (classCode.equals(Constant.PS_CLASSCODE) || classCode.equals(Constant.EP_CLASSCODE) || classCode.equals(Constant.ED_CLASSCODE)) {
-                return ValidatorUtil.EHDSI_ART_DECOR_CDA_PIVOT;
-            }
-//            if (classCode.equals(Constants.HCER_CLASSCODE)) {
-//                return CdaModel.HCER.toString();
-//            }
-//            if (classCode.equals(Constants.CONSENT_CLASSCODE)) {
-//                return CdaModel.CONSENT.toString();
-//            }
         } else {
-//            if (classCode.equals(Constants.MRO_CLASSCODE)) {
-//                return CdaModel.MRO.toString();
-//            }
-            if (classCode.equals(Constant.PS_CLASSCODE) || classCode.equals(Constant.EP_CLASSCODE) || classCode.equals(Constant.ED_CLASSCODE)) {
-                return ValidatorUtil.EHDSI_ART_DECOR_CDA_FRIENDLY;
+            if (isScannedDocument) {
+                return ValidatorUtil.EHDSI_ART_DECOR_SCANNED_DOCUMENT;
+            } else {
+                return isPivot ? ValidatorUtil.EHDSI_ART_DECOR_CDA_PIVOT : ValidatorUtil.EHDSI_ART_DECOR_CDA_FRIENDLY;
             }
-//            if (classCode.equals(Constants.HCER_CLASSCODE)) {
-//                return CdaModel.HCER.toString();
-//            }
-//            if (classCode.equals(Constants.CONSENT_CLASSCODE)) {
-//                return CdaModel.CONSENT.toString();
-//            }
         }
-        return null;
     }
 
     /**
