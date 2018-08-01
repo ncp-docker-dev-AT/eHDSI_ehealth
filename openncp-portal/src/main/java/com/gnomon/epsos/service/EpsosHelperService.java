@@ -1055,11 +1055,11 @@ public class EpsosHelperService {
         Assertion assertion;
 
         try {
-            boolean isPhysician = role.equalsIgnoreCase(LiferayUtils.LPDoctorRole);
-            boolean isPharmacist = role.equalsIgnoreCase(LiferayUtils.LPPharmacistRole);
-            boolean isNurse = role.equalsIgnoreCase(LiferayUtils.LPNurseRole);
-            boolean isAdministrator = role.equalsIgnoreCase(LiferayUtils.LPAdministratorRole);
-            boolean isPatient = role.equalsIgnoreCase(LiferayUtils.LPPatientRole);
+            boolean isPhysician = role.equalsIgnoreCase(LiferayUtils.LP_DOCTOR_ROLE);
+            boolean isPharmacist = role.equalsIgnoreCase(LiferayUtils.LP_PHARMACIST_ROLE);
+            boolean isNurse = role.equalsIgnoreCase(LiferayUtils.LP_NURSE_ROLE);
+            boolean isAdministrator = role.equalsIgnoreCase(LiferayUtils.LP_ADMINISTRATIVE_ROLE);
+            boolean isPatient = role.equalsIgnoreCase(LiferayUtils.LP_PATIENT_ROLE);
 
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
                 LOGGER.info("The portal role is one of the expected. Continuing ...");

@@ -67,8 +67,8 @@ public class DispensePrescriptionPage extends BasePage {
         });
 
         add(dispenseModalWindow);
-        LOGGER.error("PARAMETERS: " + parameters.toString());
-        LOGGER.debug("Creating new instance of: " + this.getClass().getSimpleName());
+        LOGGER.error("PARAMETERS: '{}'", parameters.toString());
+        LOGGER.debug("Creating new instance of: '{}'", this.getClass().getSimpleName());
         (getSession()).addToBreadCrumbList(new BreadCrumbVO<>(getString("dispensePrescription.title"), this));
         PersonCacheKey key = new PersonCacheKey(getSession().getId(), parameters.getString("personId"));
         Person person = PersonCache.getInstance().get(key);
@@ -244,8 +244,8 @@ public class DispensePrescriptionPage extends BasePage {
 
                     item.getModelObject().setProductName(item.getModelObject().getPrescriptionRow().getProductName());
                     item.getModelObject().setProductId(item.getModelObject().getPrescriptionRow().getProductId());
-                    item.getModelObject().setPackageSize(item.getModelObject().getPrescriptionRow().getPackageSize().clone());
-                    item.getModelObject().setNbrPackages(item.getModelObject().getPrescriptionRow().getNbrPackages().clone());
+                    item.getModelObject().setPackageSize(new QuantityVO(item.getModelObject().getPrescriptionRow().getPackageSize()));
+                    item.getModelObject().setNbrPackages(new QuantityVO(item.getModelObject().getPrescriptionRow().getNbrPackages()));
 
                     item.add(new Label("packageSize.quantityUnit", item.getModelObject().getPrescriptionRow().getPackageSize().getQuantityUnit()));
                     item.add(new Label("nbrPackages.quantityUnit", item.getModelObject().getPrescriptionRow().getNbrPackages().getQuantityUnit()));

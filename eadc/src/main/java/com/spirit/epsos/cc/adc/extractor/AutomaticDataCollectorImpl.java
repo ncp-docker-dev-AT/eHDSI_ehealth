@@ -18,7 +18,7 @@ import java.util.TreeMap;
 
 /**
  * Utility for extracting data from a transaction-xml-structure and inserting the results into an sql-database.
- * A detailed behavior of the extraction-process can be configured within the config.xml. The supportedstructure for
+ * A detailed behavior of the extraction-process can be configured within the config.xml. The supported structure for
  * config.xml as well as the supported structure for the transaction-xml are specified by xml-schemas.
  * All files are located within the EADC_resources directory. This directory must be placed within the
  * current working directory.
@@ -210,10 +210,8 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
         try {
             result = currentTransformer.transform(transaction);
         } catch (Exception exception) {
-            LOGGER.error("Error when transforming a document",
-                    exception);
-            throw new Exception("Error when transforming a document",
-                    exception);
+            LOGGER.error("Error when transforming a document", exception);
+            throw new Exception("Error when transforming a document", exception);
         }
         // As the XSLT returns plain text, the content is found within the result's root-node which is a text-node.
         return result.getFirstChild().getTextContent();
