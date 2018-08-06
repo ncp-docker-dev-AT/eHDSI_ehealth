@@ -1,8 +1,8 @@
 package com.liferay.portal.stork.util;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.services.AssertionValidationService;
 import eu.europa.ec.joinup.ecc.openstork.utils.StorkUtils;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.stork.peps.auth.commons.*;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
 import eu.stork.peps.exceptions.STORKSAMLEngineException;
@@ -12,13 +12,10 @@ import org.junit.Test;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tr.com.srdc.epsos.util.XMLUtil;
 
-import javax.xml.transform.TransformerException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -65,7 +62,7 @@ public class StorkConversionUtilsTest {
 
         final String VALIDATION_SCHEMATRON = "epSOS - HCP Identity Assertion";
 
-        STORKAuthnResponse storkResponse = null;
+        STORKAuthnResponse storkResponse;
         Assertion expResult = null;
 
         storkResponse = generateStorkResponse();
@@ -77,12 +74,7 @@ public class StorkConversionUtilsTest {
         LOG.info(" Validating converted assertion at IHE  ");
         LOG.info("----------------------------------------------");
 
-        try {
-            assertTrue(AssertionValidationService.getInstance().validateSchematron(XMLUtil.prettyPrint(result.getDOM()),
-                    VALIDATION_SCHEMATRON, NcpSide.NCP_A));
-        } catch (TransformerException ex) {
-            LOG.error(null, ex);
-        }
+        OpenNCPValidation.validateHCPAssertion(result, NcpSide.NCP_A);
     }
 
     /**
