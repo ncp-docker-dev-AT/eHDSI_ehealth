@@ -285,7 +285,7 @@ public class SMPUpdateFileController {
         if ("ServiceInformation".equals(type)) {
             EndpointType endpoint = serviceMetadata.getServiceInformation().getProcessList().getProcesses().get(0).getServiceEndpointList().getEndpoints().get(0);
 
-            X509Certificate cert = null;
+            X509Certificate cert;
             String subjectName = null;
             if (smpfields.getCertificate().isEnable()) {
                 try {

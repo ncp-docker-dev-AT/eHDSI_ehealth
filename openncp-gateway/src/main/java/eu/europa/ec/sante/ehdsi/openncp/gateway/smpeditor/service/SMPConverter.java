@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
 import java.lang.Object;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -41,11 +42,9 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
+ * Service responsible for converting the data introduced by the user to a xml file.
+ *
  * @author Inês Garganta
- */
-
-/**
- * Service responsible for converting the data introduced by the user to a xml file
  */
 @Service
 public class SMPConverter {
@@ -74,7 +73,6 @@ public class SMPConverter {
         ServiceMetadata serviceMetadata = objectFactory.createServiceMetadata();
 
         //XML file generated at path
-        //generatedFile = new File("/" + fileName);
         generatedFile = new File(Constants.SMP_DIR_PATH + "/" + fileName);
 
         //Type of SMP File -> Redirect | Service Information
@@ -104,22 +102,20 @@ public class SMPConverter {
             ServiceEndpointList serviceEndpointList = objectFactory.createServiceEndpointList();
             ServiceInformationType serviceInformationType = objectFactory.createServiceInformationType();
 
-
             createStaticFields(type, /*clientServer,*/ issuanceType, CC, documentIdentifier, endpointType, participantIdentifierType,
                     processIdentifier, businessLevelSignature, minimumAuthLevel);
 
-      /*
-       * URI definition
-       */
+            /*
+             * URI definition
+             */
             if (endpointUri == null) {
                 endpointUri = "";
             }
             endpointType.setEndpointURI(endpointUri);//Set by user
 
-
-      /*
-       * Dates parse to Calendar
-       */
+            /*
+             * Dates parse to Calendar
+             */
             Calendar calad = Calendar.getInstance();
             calad.setTime(servActDate);
             int yearad = calad.get(Calendar.YEAR);
@@ -158,7 +154,7 @@ public class SMPConverter {
 
             }
 
-            /**
+            /*
              * certificate parse
              */
             if (certificateFile != null) {
@@ -173,13 +169,13 @@ public class SMPConverter {
                         ks = KeyStore.getInstance(KeyStore.getDefaultType());
                         ks.load(certificateFile, null);
                     } catch (KeyStoreException ex) {
-                        LOGGER.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n KeyStoreException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     } catch (IOException ex) {
-                        LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     } catch (NoSuchAlgorithmException ex) {
-                        LOGGER.error("\n NoSuchAlgorithmException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n NoSuchAlgorithmException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     } catch (CertificateException ex) {
-                        LOGGER.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n CertificateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     }
 
                     if (ks != null && ks.isKeyEntry(certificateAlias)) {
@@ -208,9 +204,9 @@ public class SMPConverter {
                     }
 
                 } catch (KeyStoreException ex) {
-                    LOGGER.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n KeyStoreException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (CertificateEncodingException ex) {
-                    LOGGER.error("\n CertificateEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n CertificateEncodingException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
 
             } else {
@@ -218,14 +214,13 @@ public class SMPConverter {
                 endpointType.setCertificate(by);
             }
 
-      /*
-       Endpoint Service Description, Technical ContactUrl and Technical InformationUrl definition
-       */
+
+            //   Endpoint Service Description, Technical ContactUrl and Technical InformationUrl definition
             endpointType.setServiceDescription(servDescription); //Set by User
             endpointType.setTechnicalContactUrl(tecContact); //Set by User
             endpointType.setTechnicalInformationUrl(tecInformation); //Set by User
 
-      /*Not used*/
+            /*Not used*/
             extensionType.setExtensionAgencyID(null);
             extensionType.setExtensionAgencyName(null);
             extensionType.setExtensionAgencyURI(null);
@@ -236,33 +231,35 @@ public class SMPConverter {
             extensionType.setExtensionURI(null);
             extensionType.setExtensionVersionID(null);
 
-      /*
-       Endpoint Extension file parse
-       */
+            //    Endpoint Extension file parse
             if (extension != null) {
                 nullExtension = false;
                 Document docOriginal = null;
                 try {
                     String content = new Scanner(extension.getInputStream()).useDelimiter("\\Z").next();
-                    docOriginal = parseDocument(content);
+                    LOGGER.info("XML Extension Content:\n'{}'", content);
+                    //docOriginal = parseDocument(content);
+                    docOriginal = parseStringToDocument(content);
 
                 } catch (FileNotFoundException ex) {
                     nullExtension = true;
-                    LOGGER.error("\n FileNotFoundException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (IOException ex) {
                     nullExtension = true;
-                    LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (SAXException ex) {
-                    nullExtension = true;
-                    LOGGER.error("\n SAXException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (ParserConfigurationException ex) {
-                    nullExtension = true;
-                    LOGGER.error("\n ParserConfigurationException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
+//                catch (SAXException ex) {
+//                    nullExtension = true;
+//                    LOGGER.error("\n SAXException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+//                } catch (ParserConfigurationException ex) {
+//                    nullExtension = true;
+//                    LOGGER.error("\n ParserConfigurationException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+//                }
 
                 if (nullExtension) {
                     //Does not add extension
                 } else {
+                    //Adding ISM Extension to SMP file.
                     docOriginal.getDocumentElement().normalize();
                     extensionType.setAny(docOriginal.getDocumentElement()); //Set by user
                     endpointType.getExtensions().add(extensionType);
@@ -375,19 +372,19 @@ public class SMPConverter {
             endpointType.setMinimumAuthenticationLevel(minimumAutenticationLevel);
 
 
-      /*User fields*/
-      /*
-       * URI definition
-       */
+            /*User fields*/
+            /*
+             * URI definition
+             */
             if (endpointUri == null) {
                 endpointUri = "";
             }
             endpointType.setEndpointURI(endpointUri);//Set by user
 
 
-      /*
-       * Dates parse to Calendar
-       */
+            /*
+             * Dates parse to Calendar
+             */
             Calendar calad = Calendar.getInstance();
             calad.setTime(servActDate);
             int yearad = calad.get(Calendar.YEAR);
@@ -487,7 +484,7 @@ public class SMPConverter {
             endpointType.setTechnicalContactUrl(tecContact); //Set by User
             endpointType.setTechnicalInformationUrl(tecInformation); //Set by User
 
-      /*Not used*/
+            /*Not used*/
             extensionType.setExtensionAgencyID(null);
             extensionType.setExtensionAgencyName(null);
             extensionType.setExtensionAgencyURI(null);
@@ -567,7 +564,7 @@ public class SMPConverter {
      */
     public ServiceMetadata convertFromXml(MultipartFile fileUpdate) {
         LOGGER.debug("\n======= in convertFromXml ======= ");
-        LOGGER.debug("\n************* fileUpdate - " + fileUpdate.getOriginalFilename());
+        LOGGER.debug("\n************* fileUpdate - '{}'", fileUpdate.getOriginalFilename());
 
         isSignedServiceMetadata = false;
         ObjectFactory objectFactory = new ObjectFactory();
@@ -673,7 +670,6 @@ public class SMPConverter {
         XMLStreamWriter xsw = null;
 
         try (FileOutputStream generatedFileOS = new FileOutputStream(generatedFile)) {
-            //generatedFileOS = new FileOutputStream(generatedFile);
 
             xsw = XMLOutputFactory.newFactory().createXMLStreamWriter(generatedFileOS, "UTF-8");
             xsw.setNamespaceContext(new NamespaceContext() {
@@ -706,22 +702,21 @@ public class SMPConverter {
             LOGGER.info("Service Metadata:\n{}", stringWriter.toString());
 
             generatedFileOS.flush();
-            generatedFileOS.close();
 
         } catch (JAXBException ex) {
-            LOGGER.error("\n JAXBException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("\n JAXBException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (FileNotFoundException ex) {
-            LOGGER.error("\n FileNotFoundException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (IOException ex) {
-            LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (XMLStreamException ex) {
-            LOGGER.error("\n XMLStreamException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("\n XMLStreamException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } finally {
             if (xsw != null) {
                 try {
                     xsw.close();
                 } catch (XMLStreamException ex) {
-                    LOGGER.error("\n XMLStreamException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n XMLStreamException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
             }
         }
@@ -762,14 +757,34 @@ public class SMPConverter {
 
     /*Auxiliary*/
     public Document parseDocument(String docContent) throws IOException, SAXException, ParserConfigurationException {
-        InputStream inputStream = new ByteArrayInputStream(docContent.getBytes());
+
+        InputStream inputStream = new ByteArrayInputStream(docContent.getBytes(StandardCharsets.UTF_8));
         getDocumentBuilder().setErrorHandler(new SimpleErrorHandler());
         return getDocumentBuilder().parse(inputStream);
     }
 
     private DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         return dbf.newDocumentBuilder();
+    }
+
+    private Document parseStringToDocument(String document) {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        Document doc = null;
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            doc = db.parse(new ByteArrayInputStream(document.getBytes(StandardCharsets.UTF_8)));
+        } catch (SAXException e) {
+            LOGGER.error("SAXException: ", e);
+        } catch (IOException e) {
+            LOGGER.error("IOException: ", e);
+        } catch (ParserConfigurationException e) {
+            LOGGER.error("ParserConfigurationException: ", e);
+        }
+        return doc;
     }
 }
