@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.exception.GenericException;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +32,8 @@ public class SignFile {
     private static final String OASIS_NS = "http://docs.oasis-open.org/bdxr/ns/SMP/2016/05";
     private static final String XMLDSIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     private static Signer NATIONAL_INFRASTRUCTURE_SIGNER;
-    org.slf4j.Logger logger = LoggerFactory.getLogger(SignFile.class);
+    private final Logger logger = LoggerFactory.getLogger(SignFile.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("loggerClinical");
     private File generatedSignFile;
     private boolean invalidKeystoreSMP;
     private boolean invalidKeyPairSMP;
@@ -205,7 +207,7 @@ public class SignFile {
         // Marshalling and parsing the document - signature validation fails without this stinky "magic".
         // _Probably_ SUN's implementation doesn't import correctly signatures between two different documents.
         String strUnwrapped = marshall(docUnwrapped);
-        logger.debug("\n ********* buildDocWithGivenRoot: \n" + strUnwrapped);
+        loggerClinical.debug("\n ********* buildDocWithGivenRoot: \n" + strUnwrapped);
         return parseDocument(strUnwrapped);
     }
 

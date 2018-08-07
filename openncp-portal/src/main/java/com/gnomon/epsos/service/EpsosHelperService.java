@@ -1820,9 +1820,9 @@ public class EpsosHelperService {
     public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
 
         Assertion trc;
-        LOGGER.debug("Try to create TRCA for patient : " + patient.getExtension());
+        LOGGER_CLINICAL.debug("Try to create TRCA for patient : " + patient.getExtension());
         String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
-        LOGGER.info("TRCA Patient ID: '{}'", pat);
+        LOGGER_CLINICAL.info("TRCA Patient ID: '{}'", pat);
         LOGGER.info("Assertion ID: '{}'", idAs.getID());
         LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
         TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).PurposeOfUse(purpose).build();
@@ -2674,7 +2674,7 @@ public class EpsosHelperService {
             id.setRoot(identifiers.get(i).getDomain());
             id.setExtension(identifiers.get(i).getUserValue());
             idArray[i] = id;
-            LOGGER.info(identifiers.get(i).getDomain() + ": " + identifiers.get(i).getUserValue());
+            LOGGER_CLINICAL.info(identifiers.get(i).getDomain() + ": " + identifiers.get(i).getUserValue());
         }
 
         for (Demographics dem : demographics) {

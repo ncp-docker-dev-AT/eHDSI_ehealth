@@ -125,7 +125,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 eventLog.setSourceip(ip);
                 eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
                 eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
-                LOGGER.info("[Audit Debug] Requester: ParticipantId: '{}'\nObjectDetail: '{}'",
+                LOGGER_CLINICAL.info("[Audit Debug] Requester: ParticipantId: '{}'\nObjectDetail: '{}'",
                         getMessageID(msgContext.getEnvelope()), msgContext.getEnvelope().getHeader().toString());
 
                 HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);

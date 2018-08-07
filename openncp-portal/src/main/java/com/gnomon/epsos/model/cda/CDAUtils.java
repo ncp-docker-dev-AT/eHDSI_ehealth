@@ -91,13 +91,12 @@ public class CDAUtils {
 
     public static String getRelativePrescriptionBarcode(Document doc) {
 
-        NodeList nl;
         String refBarcode = "";
 
         try {
             XPath xpath = getXPathFactory();
             XPathExpression epExpr = xpath.compile("//xsi:component/xsi:structuredBody/xsi:component/xsi:section//xsi:id/@extension");
-            nl = (NodeList) epExpr.evaluate(doc, XPathConstants.NODESET);
+            NodeList nl = (NodeList) epExpr.evaluate(doc, XPathConstants.NODESET);
             if (nl.item(0) != null) {
                 refBarcode = nl.item(0).getNodeValue();
             }
@@ -153,7 +152,6 @@ public class CDAUtils {
 
     private static String getRelativeProductLineFromEP(Document epDoc, String id) {
 
-        Node nl;
         String nodeString = "";
         try {
             Document doc = epDoc;
@@ -161,7 +159,7 @@ public class CDAUtils {
             XPath xpath = getXPathFactory();
 
             XPathExpression epExpr = xpath.compile("//xsi:substanceAdministration[xsi:id/@extension='" + id + "']//xsi:consumable//xsi:manufacturedProduct");
-            nl = (Node) epExpr.evaluate(doc, XPathConstants.NODE);
+            Node nl = (Node) epExpr.evaluate(doc, XPathConstants.NODE);
             XPathExpression materialExpr = xpath.compile("//xsi:substanceAdministration/xsi:consumable/xsi:manufacturedProduct/xsi:manufacturedMaterial");
             Node oldMaterialNode = (Node) materialExpr.evaluate(epDoc, XPathConstants.NODE);
             XPathExpression code = xpath.compile("//xsi:substanceAdministration/xsi:consumable/xsi:manufacturedProduct/xsi:manufacturedMaterial/xsi:code");
@@ -318,11 +316,27 @@ public class CDAUtils {
 
     private static String getRecordTargetFromEP(Document epDoc) {
 
-        Node nl;
         String nodeString = "";
         try {
-            nl = epDoc.getElementsByTagName("recordTarget").item(0);
+            Node nl = epDoc.getElementsByTagName("recordTarget").item(0);
             nodeString = Utils.nodeToString(nl);
+        } catch (Exception e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+        }
+        return nodeString;
+    }
+
+    private static String getSetIdFromEP(Document epDoc) {
+
+        String nodeString = "";
+        try {
+            NodeList nl = epDoc.getElementsByTagName("setId");
+            if (nl.getLength()==0) {
+                nodeString = "<setId nullFlavor=\"NI\"/>";
+            } else {
+                Node node = nl.item(0);
+                nodeString = Utils.nodeToString(node);
+            }
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
@@ -331,10 +345,9 @@ public class CDAUtils {
 
     private static String getCustodianFromEP(Document epDoc) {
 
-        Node nl;
         String nodeString = "";
         try {
-            nl = epDoc.getElementsByTagName("custodian").item(0);
+            Node nl = epDoc.getElementsByTagName("custodian").item(0);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
@@ -344,10 +357,9 @@ public class CDAUtils {
 
     private static String getLegalAuthFromEP(Document epDoc) {
 
-        Node nl;
         String nodeString = "";
         try {
-            nl = epDoc.getElementsByTagName("legalAuthenticator").item(0);
+            Node nl = epDoc.getElementsByTagName("legalAuthenticator").item(0);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
@@ -357,10 +369,9 @@ public class CDAUtils {
 
     private static String getAuthorFromEP(Document epDoc) {
 
-        Node nl;
         String nodeString = "";
         try {
-            nl = epDoc.getElementsByTagName("author").item(0);
+            Node nl = epDoc.getElementsByTagName("author").item(0);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
@@ -370,13 +381,12 @@ public class CDAUtils {
 
     private static String getRelativePrescriptionText(Document epDoc) {
 
-        Node nl;
         String nodeString = "";
         try {
             Document doc = epDoc;
             XPath xpath = getXPathFactory();
             XPathExpression epExpr = xpath.compile("//xsi:component/xsi:structuredBody/xsi:component/xsi:section//xsi:text");
-            nl = (Node) epExpr.evaluate(doc, XPathConstants.NODE);
+            Node nl = (Node) epExpr.evaluate(doc, XPathConstants.NODE);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
@@ -386,12 +396,11 @@ public class CDAUtils {
 
     public static String getRelativePrescriptionRoot(Document doc) {
 
-        NodeList nl;
         String refBarcode = "";
         try {
             XPath xpath = getXPathFactory();
             XPathExpression epExpr = xpath.compile("//xsi:component/xsi:structuredBody/xsi:component/xsi:section//xsi:id/@root");
-            nl = (NodeList) epExpr.evaluate(doc, XPathConstants.NODESET);
+            NodeList nl = (NodeList) epExpr.evaluate(doc, XPathConstants.NODESET);
             if (nl.item(0) != null) {
                 refBarcode = nl.item(0).getNodeValue();
             }
@@ -602,6 +611,8 @@ public class CDAUtils {
         sb.append("<confidentialityCode code=\"N\" codeSystem=\"2.16.840.1.113883.5.25\" codeSystemName=\"Confidentiality\" codeSystemVersion=\"913-20091020\" displayName=\"normal\"/>");
         sb.append("\r\n");
         sb.append("<languageCode code=\"").append(cda.getLanguageCode()).append("\"/>");
+        sb.append("\r\n");
+        sb.append(getSetIdFromEP(epDoc));
         sb.append("\r\n");
         sb.append(getRecordTargetFromEP(epDoc));
         sb.append("\r\n");

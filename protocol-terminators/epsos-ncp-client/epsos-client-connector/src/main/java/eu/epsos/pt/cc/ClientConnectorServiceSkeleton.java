@@ -31,6 +31,7 @@ import java.util.List;
 public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSkeletonInterface {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorServiceSkeleton.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final String UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION = "Unsupported Class Code scheme: ";
     private static final String UNSUPPORTED_CLASS_CODE_EXCEPTION = "Unsupported Class Code: ";
@@ -69,7 +70,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                     pDemographic.getBirthDate(), pDemographic.getGivenName());
             request = eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(pDemographic);
 
-            LOGGER.info("Patient Demographics Request: '{}', '{}', '{}'", request.getId(), request.getGivenName(),
+            LOGGER_CLINICAL.info("Patient Demographics Request: '{}', '{}', '{}'", request.getId(), request.getGivenName(),
                     request.getBirthDate());
 
             String countryCode = arg0.getCountryCode();

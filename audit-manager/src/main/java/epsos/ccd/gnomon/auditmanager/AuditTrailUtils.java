@@ -1276,7 +1276,7 @@ public enum AuditTrailUtils {
      */
     private boolean validateAuditMessage(EventLog eventLog, AuditMessage am) {
 
-        LOGGER.info("validateAuditMessage(EventLog '{}', AudiMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
+        LOGGER.info("validateAuditMessage(EventLog '{}', AuditMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
                 am.getEventIdentification().getEventActionCode(), eventLog.getPC_UserID());
         try {
             // Infer model according to NCP Side and EventCode

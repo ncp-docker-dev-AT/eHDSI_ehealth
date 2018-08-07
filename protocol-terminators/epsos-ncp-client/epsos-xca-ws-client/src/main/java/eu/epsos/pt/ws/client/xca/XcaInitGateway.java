@@ -48,6 +48,7 @@ import java.util.Locale;
 public class XcaInitGateway {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XcaInitGateway.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     /**
      * Private constructor to disable class instantiation.
@@ -59,7 +60,7 @@ public class XcaInitGateway {
                                                   final Assertion idAssertion, final Assertion trcAssertion, String service) throws XCAException {
 
 
-        LOGGER.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
+        LOGGER_CLINICAL.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
                 documentCode.getValue(), idAssertion.getID(), trcAssertion.getID(), service);
         QueryResponse result = null;
 
