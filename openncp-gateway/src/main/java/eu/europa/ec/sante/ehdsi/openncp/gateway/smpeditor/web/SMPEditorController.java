@@ -20,22 +20,22 @@ import java.util.Set;
 @Controller
 public class SMPEditorController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SMPEditorController.class);
+    private final Logger logger = LoggerFactory.getLogger(SMPEditorController.class);
 
     /**
-     * Generates smpeditor page
+     * Generates SMP editor page
      *
-     * @return
+     * @return Mapping for template view
      */
     @RequestMapping("/smpeditor/smpeditor")
-    public String SMPEditor() {
+    public String initSMPEditor() {
 
-        LOGGER.info("SMP Editor Initialization");
+        logger.info("SMP Editor Initialization");
 
-        File smp_dir = new File(Constants.SMP_DIR_PATH);
-        if (!smp_dir.exists()) {
+        File configurationDirectory = new File(Constants.SMP_DIR_PATH);
+        if (!configurationDirectory.exists()) {
 
-            boolean directoryCreated = smp_dir.mkdir();
+            boolean directoryCreated = configurationDirectory.mkdir();
             Set<PosixFilePermission> perms = new HashSet<>();
             //add owners permission
             perms.add(PosixFilePermission.OWNER_READ);
@@ -51,11 +51,11 @@ public class SMPEditorController {
             try {
                 Files.setPosixFilePermissions(Paths.get(Constants.SMP_DIR_PATH), perms);
             } catch (IOException e) {
-                LOGGER.error("IOException: '{}'", e.getMessage(), e);
+                logger.error("IOException: '{}'", e.getMessage(), e);
             }
-            LOGGER.info("SMP directory created: '{}'", directoryCreated);
+            logger.info("SMP directory created: '{}'", directoryCreated);
         } else {
-            LOGGER.info("SMP directory already exist");
+            logger.info("SMP directory already exist");
         }
         return "smpeditor/smpeditor";
     }
