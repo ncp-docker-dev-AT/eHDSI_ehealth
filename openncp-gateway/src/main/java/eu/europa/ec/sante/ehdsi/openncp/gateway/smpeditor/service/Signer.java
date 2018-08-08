@@ -47,7 +47,6 @@ public class Signer {
         KeyStore ks = null;
         try {
             ks = KeyStore.getInstance("JKS");
-            // InputStream keystoreStream = this.getClass().getResourceAsStream(keystoreResPath);
             ks.load(keystoreResPath.getInputStream(), keystorePass.toCharArray());
         } catch (KeyStoreException ex) {
             logger.error("\nKeyStoreException 1 - " + SimpleErrorHandler.printExceptionStackTrace(ex), ex);

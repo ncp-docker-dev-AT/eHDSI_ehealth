@@ -1,29 +1,10 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.cc;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import eu.epsos.protocolterminators.integrationtest.common.AbstractIT;
 import eu.epsos.validation.datamodel.common.EpsosService;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.epsos.validation.reporting.ValidationReport;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.reporting.ValidationReport;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;

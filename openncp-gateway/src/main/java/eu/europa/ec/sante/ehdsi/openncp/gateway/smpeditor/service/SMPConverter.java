@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
 import java.lang.Object;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -41,17 +42,14 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
+ * Service responsible for converting the data introduced by the user to a xml file.
+ *
  * @author Inês Garganta
- */
-
-/**
- * Service responsible for converting the data introduced by the user to a xml file
  */
 @Service
 public class SMPConverter {
 
-    private final Logger logger = LoggerFactory.getLogger(SMPConverter.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMPConverter.class);
     SimpleErrorHandler error;
     Boolean isSignedServiceMetadata;
     @Autowired
@@ -69,13 +67,12 @@ public class SMPConverter {
                              SMPFieldProperties businessLevelSignature, SMPFieldProperties minimumAuthLevel,
                              String certificateUID, String redirectHref) {
 
-        logger.debug("\n==== in converteToXML ====");
+        LOGGER.debug("\n==== in converteToXML ====");
 
         ObjectFactory objectFactory = new ObjectFactory();
         ServiceMetadata serviceMetadata = objectFactory.createServiceMetadata();
 
         //XML file generated at path
-        //generatedFile = new File("/" + fileName);
         generatedFile = new File(Constants.SMP_DIR_PATH + "/" + fileName);
 
         //Type of SMP File -> Redirect | Service Information
@@ -83,7 +80,7 @@ public class SMPConverter {
       /*
        Redirect SMP Type
       */
-            logger.debug("\n******* Redirect ************");
+            LOGGER.debug("\n******* Redirect ************");
             RedirectType redirectType = objectFactory.createRedirectType();
 
             redirectType.setCertificateUID(certificateUID);
@@ -94,7 +91,7 @@ public class SMPConverter {
       /*
        ServiceInformation SMP Type
        */
-            logger.debug("\n******* ServiceInformation ************");
+            LOGGER.debug("\n******* ServiceInformation ************");
             DocumentIdentifier documentIdentifier = objectFactory.createDocumentIdentifier();
             EndpointType endpointType = objectFactory.createEndpointType();
             ExtensionType extensionType = objectFactory.createExtensionType();
@@ -105,22 +102,20 @@ public class SMPConverter {
             ServiceEndpointList serviceEndpointList = objectFactory.createServiceEndpointList();
             ServiceInformationType serviceInformationType = objectFactory.createServiceInformationType();
 
-
             createStaticFields(type, /*clientServer,*/ issuanceType, CC, documentIdentifier, endpointType, participantIdentifierType,
                     processIdentifier, businessLevelSignature, minimumAuthLevel);
 
-      /*
-       * URI definition
-       */
+            /*
+             * URI definition
+             */
             if (endpointUri == null) {
                 endpointUri = "";
             }
             endpointType.setEndpointURI(endpointUri);//Set by user
 
-
-      /*
-       * Dates parse to Calendar
-       */
+            /*
+             * Dates parse to Calendar
+             */
             Calendar calad = Calendar.getInstance();
             calad.setTime(servActDate);
             int yearad = calad.get(Calendar.YEAR);
@@ -134,7 +129,7 @@ public class SMPConverter {
                 XMLGregorianCalendar xmlGregorianCalendarAD = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarAD);
                 endpointType.setServiceActivationDate(xmlGregorianCalendarAD);//Set by user
             } catch (DatatypeConfigurationException e) {
-                logger.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
+                LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
             }
 
 
@@ -154,12 +149,12 @@ public class SMPConverter {
                     XMLGregorianCalendar xmlGregorianCalendarED = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarED);
                     endpointType.setServiceExpirationDate(xmlGregorianCalendarED);//Set by user
                 } catch (DatatypeConfigurationException e) {
-                    logger.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
+                    LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
                 }
 
             }
 
-            /**
+            /*
              * certificate parse
              */
             if (certificateFile != null) {
@@ -168,28 +163,28 @@ public class SMPConverter {
                     String certAlias = env.getProperty(type + ".certificate.alias");
                     String certificatePass = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPass);
                     String certificateAlias = ConfigurationManagerFactory.getConfigurationManager().getProperty(certAlias);
-                    logger.info("Certificate Info: '{}', '{}', '{}', '{}'", certPass, certAlias, certificatePass, certificateAlias);
+                    LOGGER.info("Certificate Info: '{}', '{}', '{}', '{}'", certPass, certAlias, certificatePass, certificateAlias);
                     KeyStore ks = null;
                     try {
                         ks = KeyStore.getInstance(KeyStore.getDefaultType());
                         ks.load(certificateFile, null);
                     } catch (KeyStoreException ex) {
-                        logger.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n KeyStoreException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     } catch (IOException ex) {
-                        logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     } catch (NoSuchAlgorithmException ex) {
-                        logger.error("\n NoSuchAlgorithmException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n NoSuchAlgorithmException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     } catch (CertificateException ex) {
-                        logger.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n CertificateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     }
 
                     if (ks != null && ks.isKeyEntry(certificateAlias)) {
                         char c[] = new char[certificatePass.length()];
                         certificatePass.getChars(0, c.length, c, 0);
                         Certificate certs[] = ks.getCertificateChain(certificateAlias);
-                        if (logger.isDebugEnabled()) {
+                        if (LOGGER.isDebugEnabled()) {
                             for (Certificate certificate : certs) {
-                                logger.debug("Certificate Info: '{}' - '{}'", ((X509Certificate) certificate).getSerialNumber(), ((X509Certificate) certificate).getSubjectDN().getName());
+                                LOGGER.debug("Certificate Info: '{}' - '{}'", ((X509Certificate) certificate).getSerialNumber(), ((X509Certificate) certificate).getSubjectDN().getName());
                             }
                         }
                         if (certs[0] instanceof X509Certificate) {
@@ -205,13 +200,13 @@ public class SMPConverter {
                             certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
                         }
                     } else {
-                        logger.debug("\n ********** '{}' is unknown to this keystore", certificateAlias);
+                        LOGGER.debug("\n ********** '{}' is unknown to this keystore", certificateAlias);
                     }
 
                 } catch (KeyStoreException ex) {
-                    logger.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n KeyStoreException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (CertificateEncodingException ex) {
-                    logger.error("\n CertificateEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n CertificateEncodingException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
 
             } else {
@@ -219,14 +214,13 @@ public class SMPConverter {
                 endpointType.setCertificate(by);
             }
 
-      /*
-       Endpoint Service Description, Technical ContactUrl and Technical InformationUrl definition
-       */
+
+            //   Endpoint Service Description, Technical ContactUrl and Technical InformationUrl definition
             endpointType.setServiceDescription(servDescription); //Set by User
             endpointType.setTechnicalContactUrl(tecContact); //Set by User
             endpointType.setTechnicalInformationUrl(tecInformation); //Set by User
 
-      /*Not used*/
+            /*Not used*/
             extensionType.setExtensionAgencyID(null);
             extensionType.setExtensionAgencyName(null);
             extensionType.setExtensionAgencyURI(null);
@@ -237,33 +231,35 @@ public class SMPConverter {
             extensionType.setExtensionURI(null);
             extensionType.setExtensionVersionID(null);
 
-      /*
-       Endpoint Extension file parse
-       */
+            //    Endpoint Extension file parse
             if (extension != null) {
                 nullExtension = false;
                 Document docOriginal = null;
                 try {
                     String content = new Scanner(extension.getInputStream()).useDelimiter("\\Z").next();
-                    docOriginal = parseDocument(content);
+                    LOGGER.info("XML Extension Content:\n'{}'", content);
+                    //docOriginal = parseDocument(content);
+                    docOriginal = parseStringToDocument(content);
 
                 } catch (FileNotFoundException ex) {
                     nullExtension = true;
-                    logger.error("\n FileNotFoundException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (IOException ex) {
                     nullExtension = true;
-                    logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (SAXException ex) {
-                    nullExtension = true;
-                    logger.error("\n SAXException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (ParserConfigurationException ex) {
-                    nullExtension = true;
-                    logger.error("\n ParserConfigurationException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
+//                catch (SAXException ex) {
+//                    nullExtension = true;
+//                    LOGGER.error("\n SAXException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+//                } catch (ParserConfigurationException ex) {
+//                    nullExtension = true;
+//                    LOGGER.error("\n ParserConfigurationException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+//                }
 
                 if (nullExtension) {
                     //Does not add extension
                 } else {
+                    //Adding ISM Extension to SMP file.
                     docOriginal.getDocumentElement().normalize();
                     extensionType.setAny(docOriginal.getDocumentElement()); //Set by user
                     endpointType.getExtensions().add(extensionType);
@@ -324,7 +320,7 @@ public class SMPConverter {
                             Date servExpDate, byte[] certificate, FileInputStream certificateFile, Element extension,
                             MultipartFile extensionFile, String fileName, String certificateUID, String redirectHref) {
 
-        logger.debug("\n==== in updateToXml ====");
+        LOGGER.debug("\n==== in updateToXml ====");
 
         ObjectFactory objectFactory = new ObjectFactory();
         ServiceMetadata serviceMetadata = objectFactory.createServiceMetadata();
@@ -338,7 +334,7 @@ public class SMPConverter {
       /*
        Redirect SMP Type
        */
-            logger.debug("\n******* Redirect ************");
+            LOGGER.debug("\n******* Redirect ************");
             RedirectType redirectType = objectFactory.createRedirectType();
 
             redirectType.setCertificateUID(certificateUID);
@@ -349,7 +345,7 @@ public class SMPConverter {
       /*
        ServiceInformation SMP Type
        */
-            logger.debug("\n******* ServiceInformation ************");
+            LOGGER.debug("\n******* ServiceInformation ************");
             DocumentIdentifier documentIdentifier = objectFactory.createDocumentIdentifier();
             EndpointType endpointType = objectFactory.createEndpointType();
             ExtensionType extensionType = objectFactory.createExtensionType();
@@ -376,19 +372,19 @@ public class SMPConverter {
             endpointType.setMinimumAuthenticationLevel(minimumAutenticationLevel);
 
 
-      /*User fields*/
-      /*
-       * URI definition
-       */
+            /*User fields*/
+            /*
+             * URI definition
+             */
             if (endpointUri == null) {
                 endpointUri = "";
             }
             endpointType.setEndpointURI(endpointUri);//Set by user
 
 
-      /*
-       * Dates parse to Calendar
-       */
+            /*
+             * Dates parse to Calendar
+             */
             Calendar calad = Calendar.getInstance();
             calad.setTime(servActDate);
             int yearad = calad.get(Calendar.YEAR);
@@ -402,7 +398,7 @@ public class SMPConverter {
                 XMLGregorianCalendar xmlGregorianCalendarAD = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarAD);
                 endpointType.setServiceActivationDate(xmlGregorianCalendarAD);//Set by user
             } catch (DatatypeConfigurationException e) {
-                logger.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
+                LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
             }
 
 
@@ -422,7 +418,7 @@ public class SMPConverter {
                     XMLGregorianCalendar xmlGregorianCalendarED = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarED);
                     endpointType.setServiceExpirationDate(xmlGregorianCalendarED);//Set by user
                 } catch (DatatypeConfigurationException e) {
-                    logger.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
+                    LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
                 }
             }
 
@@ -441,13 +437,13 @@ public class SMPConverter {
                         ks = KeyStore.getInstance(KeyStore.getDefaultType());
                         ks.load(certificateFile, null);
                     } catch (KeyStoreException ex) {
-                        logger.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                     } catch (IOException ex) {
-                        logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                     } catch (NoSuchAlgorithmException ex) {
-                        logger.error("\n NoSuchAlgorithmException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n NoSuchAlgorithmException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                     } catch (CertificateException ex) {
-                        logger.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                     }
                     if (ks != null && ks.isKeyEntry(certificateAlias)) {
                         char c[] = new char[certificatePass.length()];
@@ -469,12 +465,12 @@ public class SMPConverter {
                             certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
                         }
                     } else {
-                        logger.debug("\n ********** '{}' is unknown to this keystore", certificateAlias);
+                        LOGGER.debug("\n ********** '{}' is unknown to this keystore", certificateAlias);
                     }
                 } catch (KeyStoreException ex) {
-                    logger.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (CertificateEncodingException ex) {
-                    logger.error("\n CertificateEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n CertificateEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
             } else {
                 byte[] by = "".getBytes();
@@ -488,7 +484,7 @@ public class SMPConverter {
             endpointType.setTechnicalContactUrl(tecContact); //Set by User
             endpointType.setTechnicalInformationUrl(tecInformation); //Set by User
 
-      /*Not used*/
+            /*Not used*/
             extensionType.setExtensionAgencyID(null);
             extensionType.setExtensionAgencyName(null);
             extensionType.setExtensionAgencyURI(null);
@@ -511,7 +507,7 @@ public class SMPConverter {
                 }
 
             } else {
-                logger.debug("\n********* CONVERTER EXTENSION FILE - " + extensionFile.getOriginalFilename());
+                LOGGER.debug("\n********* CONVERTER EXTENSION FILE - " + extensionFile.getOriginalFilename());
 
                 nullExtension = false;
                 Document docOriginal = null;
@@ -522,16 +518,16 @@ public class SMPConverter {
 
                 } catch (FileNotFoundException ex) {
                     nullExtension = true;
-                    logger.error("\n FileNotFoundException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n FileNotFoundException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (IOException ex) {
                     nullExtension = true;
-                    logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (SAXException ex) {
                     nullExtension = true;
-                    logger.error("\n SAXException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n SAXException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (ParserConfigurationException ex) {
                     nullExtension = true;
-                    logger.error("\n ParserConfigurationException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n ParserConfigurationException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
 
                 if (nullExtension) {
@@ -567,8 +563,8 @@ public class SMPConverter {
      * @return
      */
     public ServiceMetadata convertFromXml(MultipartFile fileUpdate) {
-        logger.debug("\n======= in convertFromXml ======= ");
-        logger.debug("\n************* fileUpdate - " + fileUpdate.getOriginalFilename());
+        LOGGER.debug("\n======= in convertFromXml ======= ");
+        LOGGER.debug("\n************* fileUpdate - '{}'", fileUpdate.getOriginalFilename());
 
         isSignedServiceMetadata = false;
         ObjectFactory objectFactory = new ObjectFactory();
@@ -581,18 +577,18 @@ public class SMPConverter {
             Object result = jaxbUnmarshaller.unmarshal(fileUpdate.getInputStream());
 
             if (result instanceof SignedServiceMetadata) {
-                logger.debug("\n******* CONVERTER SignedServiceMetadata SMPFILE");
+                LOGGER.debug("\n******* CONVERTER SignedServiceMetadata SMPFILE");
                 isSignedServiceMetadata = true;
                 signedServiceMetadata = (SignedServiceMetadata) result;
                 serviceMetadata = signedServiceMetadata.getServiceMetadata();
             } else if (result instanceof ServiceMetadata) {
-                logger.debug("\n******* CONVERTER ServiceMetadata SMPFILE");
+                LOGGER.debug("\n******* CONVERTER ServiceMetadata SMPFILE");
                 serviceMetadata = (ServiceMetadata) result;
             }
         } catch (JAXBException ex) {
-            logger.error("JAXBException - " + ex.getErrorCode(), ex);
+            LOGGER.error("JAXBException - " + ex.getErrorCode(), ex);
         } catch (IOException ex) {
-            logger.error("IOException - " + ex.getLocalizedMessage(), ex);
+            LOGGER.error("IOException - " + ex.getLocalizedMessage(), ex);
         }
 
         return serviceMetadata;
@@ -668,13 +664,12 @@ public class SMPConverter {
      */
     private void getXMLFile(ServiceMetadata serviceMetadata) {
 
-        logger.info("Generate XML SMP file: '{}'", serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue());
+        LOGGER.info("Generate XML SMP file: '{}'", serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue());
 
         // Generates the final SMP XML file
         XMLStreamWriter xsw = null;
 
         try (FileOutputStream generatedFileOS = new FileOutputStream(generatedFile)) {
-            //generatedFileOS = new FileOutputStream(generatedFile);
 
             xsw = XMLOutputFactory.newFactory().createXMLStreamWriter(generatedFileOS, "UTF-8");
             xsw.setNamespaceContext(new NamespaceContext() {
@@ -703,26 +698,25 @@ public class SMPConverter {
             jaxbMarshaller.marshal(serviceMetadata, generatedFileOS);
             jaxbMarshaller.marshal(serviceMetadata, stringWriter);
 
-            logger.info("JAXB Class: '{}'", jaxbContext.getClass());
-            logger.info("Service Metadata:\n{}", stringWriter.toString());
+            LOGGER.info("JAXB Class: '{}'", jaxbContext.getClass());
+            LOGGER.info("Service Metadata:\n{}", stringWriter.toString());
 
             generatedFileOS.flush();
-            generatedFileOS.close();
 
         } catch (JAXBException ex) {
-            logger.error("\n JAXBException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("\n JAXBException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (FileNotFoundException ex) {
-            logger.error("\n FileNotFoundException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (IOException ex) {
-            logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (XMLStreamException ex) {
-            logger.error("\n XMLStreamException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("\n XMLStreamException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } finally {
             if (xsw != null) {
                 try {
                     xsw.close();
                 } catch (XMLStreamException ex) {
-                    logger.error("\n XMLStreamException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    LOGGER.error("\n XMLStreamException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
             }
         }
@@ -763,14 +757,34 @@ public class SMPConverter {
 
     /*Auxiliary*/
     public Document parseDocument(String docContent) throws IOException, SAXException, ParserConfigurationException {
-        InputStream inputStream = new ByteArrayInputStream(docContent.getBytes());
+
+        InputStream inputStream = new ByteArrayInputStream(docContent.getBytes(StandardCharsets.UTF_8));
         getDocumentBuilder().setErrorHandler(new SimpleErrorHandler());
         return getDocumentBuilder().parse(inputStream);
     }
 
     private DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         return dbf.newDocumentBuilder();
+    }
+
+    private Document parseStringToDocument(String document) {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        Document doc = null;
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            doc = db.parse(new ByteArrayInputStream(document.getBytes(StandardCharsets.UTF_8)));
+        } catch (SAXException e) {
+            LOGGER.error("SAXException: ", e);
+        } catch (IOException e) {
+            LOGGER.error("IOException: ", e);
+        } catch (ParserConfigurationException e) {
+            LOGGER.error("ParserConfigurationException: ", e);
+        }
+        return doc;
     }
 }

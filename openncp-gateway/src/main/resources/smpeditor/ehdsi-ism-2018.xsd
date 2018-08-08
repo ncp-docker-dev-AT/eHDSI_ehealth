@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://ec.europa.eu/sante/ehncp/ism"
+           elementFormDefault="qualified" targetNamespace="http://ec.europa.eu/sante/ehncp/ism">
+
+    <xs:element name="patientSearch">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="country" type="country"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="id" type="id"/>
+    <xs:element name="textField" type="textField"/>
+    <xs:element name="birthDate" type="birthDate"/>
+    <xs:element name="sex" type="sex"/>
+    <xs:element name="field" type="field"/>
+
+    <xs:complexType name="country">
+        <xs:sequence>
+            <xs:element name="searchFields" type="searchFields"/>
+        </xs:sequence>
+        <xs:attribute name="code" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="searchFields">
+        <xs:sequence>
+            <xs:element ref="id" maxOccurs="unbounded"/>
+            <xs:element ref="textField" minOccurs="0"/>
+            <xs:element ref="birthDate" minOccurs="0"/>
+            <xs:element ref="sex" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="field">
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="min" type="xs:integer"/>
+        <xs:attribute name="max" type="xs:integer"/>
+    </xs:complexType>
+
+    <xs:complexType name="sex">
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="min" type="xs:integer"/>
+        <xs:attribute name="max" type="xs:integer"/>
+    </xs:complexType>
+
+    <xs:complexType name="textField">
+        <xs:attribute name="friendlyName" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="min" type="xs:integer"/>
+        <xs:attribute name="max" type="xs:integer"/>
+    </xs:complexType>
+
+    <xs:complexType name="id">
+        <xs:attribute name="domain" type="xs:string" use="required"/>
+        <xs:attribute name="format" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string" use="required"/>
+        <xs:attribute name="min" type="xs:integer"/>
+        <xs:attribute name="max" type="xs:integer"/>
+    </xs:complexType>
+
+    <xs:complexType name="birthDate">
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="min" type="xs:integer"/>
+        <xs:attribute name="max" type="xs:integer"/>
+    </xs:complexType>
+</xs:schema>

@@ -36,7 +36,7 @@
         <dependency>
             <groupId>net.bull.javamelody</groupId>
             <artifactId>javamelody-core</artifactId>
-            <version>1.70.0</version>
+            <version>${javamelody.version}</version>
         </dependency>
         <dependency>
             <groupId>com.lowagie</groupId>

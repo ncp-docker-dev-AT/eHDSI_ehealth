@@ -1137,8 +1137,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                 if (doc != null) {
 
-                    // CdaValidationService cdaValidationService = CdaValidationService.getInstance();
-
                     /* Validate CDA epSOS Friendly */
 //                    cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(),
 //                            CdaModel.obtainCdaModel(epsosDoc.getClassCode(), false), NcpSide.NCP_A);

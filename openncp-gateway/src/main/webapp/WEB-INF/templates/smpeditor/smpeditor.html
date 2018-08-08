@@ -15,42 +15,43 @@
                     <li class="active">Home/SMP Editor</li>
                 </ol>
             </div>
-        </nav><!-- HEADER -->
-
+        </nav>
+        <!-- HEADER -->
         <h1 th:text="#{label.SmpEditor.menu.title}" class="center">Choose one option</h1>
-
         <div id="homebuttons">
             <a class="btn btn-default btn-lg homebuttons" type="button" th:href="@{/smpeditor/generatesmpfile}"
                th:text="#{label.SmpEditor.menu.op1}">
                 Generate SMP File
             </a>
         </div>
-
         <div id="homebuttons">
             <a class="btn btn-default btn-lg homebuttons" type="button" th:href="@{/smpeditor/updatesmpfile}"
                th:text="#{label.SmpEditor.menu.op2}">
                 Update SMP File
             </a>
         </div>
-
         <div id="homebuttons">
             <a class="btn btn-default btn-lg homebuttons" type="button" th:href="@{/smpeditor/signsmpfile}"
                th:text="#{label.SmpEditor.menu.op3}">
                 Sign SMP File
             </a>
         </div>
-
         <div id="homebuttons">
             <a class="btn btn-default btn-lg homebuttons" type="button" th:href="@{/smpeditor/uploadsmpfile}"
                th:text="#{label.SmpEditor.menu.op4}">
                 Upload File to SMP Server
             </a>
         </div>
-
         <div id="homebuttons">
             <a class="btn btn-default btn-lg homebuttons" type="button" th:href="@{/smpeditor/deletesmpfile}"
                th:text="#{label.SmpEditor.menu.op5}">
                 Delete File from SMP Server
+            </a>
+        </div>
+        <div id="homebuttons">
+            <a class="btn btn-default btn-lg homebuttons" type="button" th:href="@{/dynamicdiscovery/syncsearchmask}"
+               th:text="#{label.SmpEditor.menu.op6}">
+                Synchronize ISM
             </a>
         </div>
         <script type="text/javascript" th:src="@{/resources/vendor/jquery/js/jquery-3.1.1.min.js}"></script>
