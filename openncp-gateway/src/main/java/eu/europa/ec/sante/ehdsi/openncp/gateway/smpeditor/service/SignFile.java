@@ -33,7 +33,6 @@ public class SignFile {
     private static final String XMLDSIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     private static Signer NATIONAL_INFRASTRUCTURE_SIGNER;
     private final Logger logger = LoggerFactory.getLogger(SignFile.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("loggerClinical");
     private File generatedSignFile;
     private boolean invalidKeystoreSMP;
     private boolean invalidKeyPairSMP;
@@ -207,7 +206,7 @@ public class SignFile {
         // Marshalling and parsing the document - signature validation fails without this stinky "magic".
         // _Probably_ SUN's implementation doesn't import correctly signatures between two different documents.
         String strUnwrapped = marshall(docUnwrapped);
-        loggerClinical.debug("\n ********* buildDocWithGivenRoot: \n" + strUnwrapped);
+        logger.debug("\n ********* buildDocWithGivenRoot: \n" + strUnwrapped);
         return parseDocument(strUnwrapped);
     }
 

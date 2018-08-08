@@ -51,7 +51,7 @@ import java.util.*;
 public class SMPConverter {
 
     private final Logger logger = LoggerFactory.getLogger(SMPConverter.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("loggerClinical");
+
     SimpleErrorHandler error;
     Boolean isSignedServiceMetadata;
     @Autowired
@@ -703,8 +703,8 @@ public class SMPConverter {
             jaxbMarshaller.marshal(serviceMetadata, generatedFileOS);
             jaxbMarshaller.marshal(serviceMetadata, stringWriter);
 
-            loggerClinical.info("JAXB Class: '{}'", jaxbContext.getClass());
-            loggerClinical.info("Service Metadata:\n{}", stringWriter.toString());
+            logger.info("JAXB Class: '{}'", jaxbContext.getClass());
+            logger.info("Service Metadata:\n{}", stringWriter.toString());
 
             generatedFileOS.flush();
             generatedFileOS.close();

@@ -32,7 +32,7 @@ import java.util.UUID;
 public class SamlTRCIssuer {
 
     private final Logger logger = LoggerFactory.getLogger(SamlTRCIssuer.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("loggerClinical");
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     KeyStoreManager ksm;
     HashMap<String, String> auditDataMap;

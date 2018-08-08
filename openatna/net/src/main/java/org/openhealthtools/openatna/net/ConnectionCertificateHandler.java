@@ -57,7 +57,9 @@ import java.util.Enumeration;
  */
 public class ConnectionCertificateHandler {
 
-    private static Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.net.ConnectionCertificateHandler");
+    private static final Logger LOGGER = LoggerFactory.getLogger("org.openhealthtools.openatna.net.ConnectionCertificateHandler");
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+
 
     /**
      * Creates a key/trust store and loads in the corresponding file.
@@ -67,7 +69,7 @@ public class ConnectionCertificateHandler {
         if (url == null) {
             throw new IllegalArgumentException("Keystore url may not be null");
         }
-        log.debug("Initializing key store");
+        LOGGER.debug("Initializing key store");
         KeyStore keystore = null;
         if (url.getFile().endsWith(".p12")) {
             keystore = KeyStore.getInstance("pkcs12");
@@ -86,7 +88,7 @@ public class ConnectionCertificateHandler {
         if (keystore == null) {
             throw new IllegalArgumentException("Keystore may not be null");
         }
-        log.debug("Initializing key manager");
+        LOGGER.debug("Initializing key manager");
         KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmfactory.init(keystore, password != null ? password.toCharArray() : null);
         return kmfactory.getKeyManagers();
@@ -100,7 +102,7 @@ public class ConnectionCertificateHandler {
         if (keystore == null) {
             throw new IllegalArgumentException("Keystore may not be null");
         }
-        log.debug("Initializing trust manager");
+        LOGGER.debug("Initializing trust manager");
         TrustManagerFactory tmfactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmfactory.init(keystore);
         TrustManager[] trustmanagers = tmfactory.getTrustManagers();
@@ -137,14 +139,14 @@ public class ConnectionCertificateHandler {
                         message += "\n  Issuer: " + Xcert.getIssuerDN();
                     }
                 }
-                log.info(message);
+                LOGGER_CLINICAL.info(message);
             }
         }
         return "";
     }
 
     /**
-     * For debuging only.  Prints out keystore certificate chain.
+     * For debugging only.  Prints out keystore certificate chain.
      *
      * @param keystore Keystore to print out.
      * @throws KeyStoreException If the keystore is broken.
@@ -163,12 +165,12 @@ public class ConnectionCertificateHandler {
                 message += "\n  Valid until: " + cert.getNotAfter();
                 message += "\n  Issuer: " + cert.getIssuerDN();
             }
-            log.info(message);
+            LOGGER_CLINICAL.info(message);
         }
     }
 
     /**
-     * For debuging only.  Prints out keystore certificate chain.
+     * For debugging only.  Prints out keystore certificate chain.
      *
      * @param keystore Keystore to print out.
      * @throws KeyStoreException If the keystore is broken.
@@ -192,7 +194,7 @@ public class ConnectionCertificateHandler {
                         message += "\n  Issuer: " + Xcert.getIssuerDN();
                     }
                 }
-                log.info(message);
+                LOGGER_CLINICAL.info(message);
             }
         }
     }
@@ -203,20 +205,20 @@ public class ConnectionCertificateHandler {
             KeyStore ks = ConnectionCertificateHandler.createKeyStore(new URL("file:certs/keystore"), "password");
             ConnectionCertificateHandler.printKeyCertificates(ks);
             KeyManager[] kms = ConnectionCertificateHandler.createKeyManagers(ks, "password");
-            log.info("Printing all key managers:");
+            LOGGER.info("Printing all key managers:");
             for (KeyManager km : kms) {
-                log.info(km.toString());
+                LOGGER.info(km.toString());
             }
             KeyStore ts = ConnectionCertificateHandler.createKeyStore(new URL("file:certs/truststore"), "password");
             ConnectionCertificateHandler.printTrustCerts(ts);
             TrustManager[] tms = ConnectionCertificateHandler.createTrustManagers(ts, null);
-            log.info("Printing all trust managers:");
+            LOGGER.info("Printing all trust managers:");
             for (TrustManager tm : tms) {
-                log.info(tm.toString());
+                LOGGER.info(tm.toString());
             }
 
         } catch (Exception e) {
-            log.info("Top Level Error: " + e);
+            LOGGER.info("Top Level Error: " + e);
         }
     }
 }
