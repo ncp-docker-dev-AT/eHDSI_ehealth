@@ -21,7 +21,7 @@ import static eu.epsos.assertionvalidator.AssertionHelper.getAttributeFromAssert
 public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
     private final Logger logger = LoggerFactory.getLogger(DefaultPolicyManagerImpl.class);
-    private final Logger logger_clinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
 
     @Override
@@ -85,7 +85,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         if (StringUtils.isEmpty(subjectId)) {
             throw new InvalidFieldException("XSPA Subject 'urn:oasis:names:tc:xacml:1.0:subject:subject-id' attribute in assertion should be filled.");
         }
-        logger.info("HCP Identity Assertion XSPA Subject: '{}", subjectId);
+        loggerClinical.info("HCP Identity Assertion XSPA Subject: '{}", subjectId);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         if (resourceId.equals("")) {
             throw new InvalidFieldException("XSPA subject 'uurn:oasis:names:tc:xacml:1.0:resource:resource-id' attribute in assertion should be filled.");
         }
-        logger_clinical.info("TRC Assertion XSPA subject: '{}'", resourceId);
+        loggerClinical.info("TRC Assertion XSPA subject: '{}'", resourceId);
     }
 
     @Override
@@ -373,8 +373,8 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
     @Override
     public boolean isConsentGiven(String patientId, String countryId) {
-        logger_clinical.info("Checking consent of patient '{}' for country '{}'", patientId, countryId);
-        logger_clinical.info("Consent is Valid by default of patient '{}' from country '{}'", patientId, countryId);
+        loggerClinical.info("Checking consent of patient '{}' for country '{}'", patientId, countryId);
+        loggerClinical.info("Consent is Valid by default of patient '{}' from country '{}'", patientId, countryId);
         return true;
     }
 }
