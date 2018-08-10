@@ -43,8 +43,6 @@ public class SMPSignFileController {
 
     private SMPConverter smpconverter;
 
-    private XMLValidator xmlValidator;
-
     private Environment env;
 
     private ReadSMPProperties readProperties;
@@ -52,9 +50,8 @@ public class SMPSignFileController {
     private String type;
 
     @Autowired
-    public SMPSignFileController(SMPConverter smpconverter, XMLValidator xmlValidator, Environment env, ReadSMPProperties readProperties) {
+    public SMPSignFileController(SMPConverter smpconverter, Environment env, ReadSMPProperties readProperties) {
         this.smpconverter = smpconverter;
-        this.xmlValidator = xmlValidator;
         this.env = env;
         this.readProperties = readProperties;
     }
