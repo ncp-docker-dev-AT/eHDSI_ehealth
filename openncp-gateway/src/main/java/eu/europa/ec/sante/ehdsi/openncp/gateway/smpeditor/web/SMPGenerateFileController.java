@@ -47,8 +47,6 @@ public class SMPGenerateFileController {
 
     private SMPConverter smpconverter = new SMPConverter();
 
-    private XMLValidator xmlValidator = new XMLValidator();
-
     private Environment env;
 
     private ReadSMPProperties readProperties = new ReadSMPProperties();
@@ -56,11 +54,9 @@ public class SMPGenerateFileController {
     private String type;
 
     @Autowired
-    public SMPGenerateFileController(SMPConverter smpconverter, XMLValidator xmlValidator, Environment env,
-                                     ReadSMPProperties readProperties) {
+    public SMPGenerateFileController(SMPConverter smpconverter, Environment env, ReadSMPProperties readProperties) {
 
         this.smpconverter = smpconverter;
-        this.xmlValidator = xmlValidator;
         this.env = env;
         this.readProperties = readProperties;
     }
@@ -303,7 +299,7 @@ public class SMPGenerateFileController {
         }
 
         smpfile.setGeneratedFile(smpconverter.getFile());
-        boolean valid = xmlValidator.validator(smpfile.getGeneratedFile().getPath());
+        boolean valid = XMLValidator.validate(smpfile.getGeneratedFile().getPath(), "/bdx-smp-201605.xsd");
         if (valid) {
             LOGGER.debug("\n****VALID XML File");
         } else {

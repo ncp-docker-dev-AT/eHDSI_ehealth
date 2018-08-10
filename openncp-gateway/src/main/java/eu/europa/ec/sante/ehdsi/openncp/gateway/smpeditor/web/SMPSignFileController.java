@@ -178,7 +178,7 @@ public class SMPSignFileController {
 
         /*Iterate each chosen file*/
         for (int k = 0; k < signFiles.size(); k++) {
-            
+
             LOGGER.debug("\n***** MULTIPLE FILE NAME '{}-{}'", k, signFiles.get(k).getOriginalFilename());
             SMPFileOps smpfile = new SMPFileOps();
             SMPFields smpfields = new SMPFields();
@@ -189,12 +189,12 @@ public class SMPSignFileController {
             try {
                 smpfile.getSignFile().transferTo(convFile);
             } catch (IOException ex) {
-                LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (IllegalStateException ex) {
-                LOGGER.error("\n IllegalStateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
 
-            boolean valid = xmlValidator.validator(convFile.getPath());
+            boolean valid = XMLValidator.validate(convFile.getPath(), "/bdx-smp-201605.xsd");
             boolean fileDeleted;
 
             if (valid) {

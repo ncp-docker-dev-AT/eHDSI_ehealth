@@ -51,8 +51,6 @@ public class SMPUpdateFileController {
 
     private SMPConverter smpconverter = new SMPConverter();
 
-    private XMLValidator xmlValidator = new XMLValidator();
-
     private Environment env;
 
     private String type;
@@ -60,12 +58,10 @@ public class SMPUpdateFileController {
     private boolean isSigned;
 
     @Autowired
-    public SMPUpdateFileController(SMPConverter smpconverter, XMLValidator xmlValidator, Environment env,
-                                   ReadSMPProperties readProperties) {
+    public SMPUpdateFileController(SMPConverter smpconverter, Environment env, ReadSMPProperties readProperties) {
 
-        LOGGER.debug("SMPUpdateFileController('{}', '{}', '{}', '{}'", smpconverter, xmlValidator, env, readProperties);
+        LOGGER.debug("SMPUpdateFileController('{}', '{}', '{}'", smpconverter, env, readProperties);
         this.smpconverter = smpconverter;
-        this.xmlValidator = xmlValidator;
         this.env = env;
         this.readProperties = readProperties;
     }
@@ -112,7 +108,7 @@ public class SMPUpdateFileController {
         }
 
         /*Validate xml file*/
-        boolean valid = xmlValidator.validator(convFile.getPath());
+        boolean valid = XMLValidator.validate(convFile.getPath(), "/bdx-smp-201605.xsd");
         boolean fileDeleted;
 
         if (valid) {
@@ -521,7 +517,7 @@ public class SMPUpdateFileController {
         }
 
         smpfileupdate.setGeneratedFile(smpconverter.getFile());
-        boolean valid = xmlValidator.validator(smpfileupdate.getGeneratedFile().getPath());
+        boolean valid = XMLValidator.validate(smpfileupdate.getGeneratedFile().getPath(), "/bdx-smp-201605.xsd");
         if (valid) {
             LOGGER.debug("\n****VALID XML File");
         } else {

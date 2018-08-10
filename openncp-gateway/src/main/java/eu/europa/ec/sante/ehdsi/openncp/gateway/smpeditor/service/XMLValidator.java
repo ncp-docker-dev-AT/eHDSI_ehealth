@@ -2,7 +2,6 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -11,81 +10,51 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
-/**
- * @author Inês Garganta
- */
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Service responsible for validate the generated xml file against the xsd file.
+ *
+ * @author Inês Garganta
  */
-@Service
 public class XMLValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XMLValidator.class);
 
-    private String reasonInvalid;
-
-    public static boolean validateXml(String xsdPath, String xmlPath) {
-
-        SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-        File schemaFile = new File(xsdPath);
-        Schema schema;
-        try {
-            schema = schemaFactory.newSchema(schemaFile);
-        } catch (SAXException e) {
-            LOGGER.warn("The XSD file not found in path : " + xsdPath, e);
-            return false;
-        }
-        Validator validator = schema.newValidator();
-        Source source = new StreamSource(xmlPath);
-        try {
-            validator.validate(source);
-        } catch (Exception ex) {
-            LOGGER.warn("The XML file is invalid in path : " + xmlPath, ex);
-            return false;
-        }
-        return true;
+    private XMLValidator() {
     }
 
-    public String getReasonInvalid() {
-        return reasonInvalid;
-    }
+    /**
+     * @param xmlStream
+     * @param xsdResource
+     * @return
+     */
+    public static boolean validate(String xmlStream, String xsdResource) {
 
-    public void setReasonInvalid(String reasonInvalid) {
-        this.reasonInvalid = reasonInvalid;
-    }
-
-    public boolean validator(String XMLFileSource) {
-
-        LOGGER.debug("\n====== XMLFileSource - '{}'", XMLFileSource);
+        LOGGER.debug("XML/XSD Validation");
 
         boolean valid = true;
 
-        ClassLoader classLoader = getClass().getClassLoader();
-        //SPECIFICATION
-        File schemaFile = new File(classLoader.getResource("/src/main/resources/smpeditor/bdx-smp-201605.xsd").getFile());
-        LOGGER.info("File: '{}'", schemaFile.getAbsolutePath());
+        InputStream inputStream = XMLValidator.class.getResourceAsStream(xsdResource);
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Source xmlFile = new StreamSource(new File(XMLFileSource));
+        Source xmlFile = new StreamSource(new ByteArrayInputStream(xmlStream.getBytes(StandardCharsets.UTF_8)));
 
         try {
 
-            //axParser.setProperty(JAXP_SCHEMA_SOURCE, new File(schemaSource));
-            Schema schema = schemaFactory.newSchema(schemaFile);
+            Schema schema = schemaFactory.newSchema(new StreamSource(inputStream));
             Validator validator = schema.newValidator();
             validator.validate(xmlFile);
-            LOGGER.debug("\n" + xmlFile.getSystemId() + " is valid");
+            LOGGER.debug("'{}' is valid", xmlFile.getSystemId());
         } catch (SAXException ex) {
             valid = false;
-            reasonInvalid = ex.getMessage();
-            LOGGER.debug("\n" + xmlFile.getSystemId() + " is NOT valid reason:" + ex);
-            LOGGER.error("\n SAXException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.debug("'{}' is NOT valid reason: '{}'", xmlFile.getSystemId(), ex.getMessage(), ex);
+            LOGGER.error("\n SAXException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (IOException ex) {
             valid = false;
-            LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex), ex);
         }
 
         return valid;
