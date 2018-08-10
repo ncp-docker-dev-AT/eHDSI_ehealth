@@ -134,7 +134,7 @@ public class EpsosRestService {
         LOGGER.info("user: '{}'", username);
         LOGGER.info("password: '{}'", password);
         username = URLDecoder.decode(username, "UTF-8");
-        LOGGER.info("companyId: '{}'", COMPANY_ID);
+        LOGGER.info("Company ID: '{}'", COMPANY_ID);
         int usertype = 100;
         User user = null;
         String ret = "";
@@ -295,8 +295,9 @@ public class EpsosRestService {
         LOGGER.info("Searching patients: " + ru.getEmailaddress() + " " + ru.getFullname() + " " + ru.getOrgid() + " "
                 + ru.getOrgname() + " " + ru.getOrgtype() + " " + ru.getRolename() + " " + ru.getScreenname() + " "
                 + pdq.getDemographics().getBirthDate());
-        String ret = "";
-        Object ass = EpsosHelperService.getUserAssertion(ru.getScreenname(), ru.getFullname(), ru.getEmailaddress(), ru.getRolename());
+        String ret;
+        Object ass = EpsosHelperService.getUserAssertion(ru.getScreenname(), ru.getFullname(), ru.getEmailaddress(),
+                ru.getRolename());
 
         List<Patient> patients = EpsosHelperService.searchPatients((Assertion) ass, pd, pdq.getDemographics().getCountry());
         LOGGER.info("Patients found: '{}'", patients.size());
