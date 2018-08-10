@@ -1639,10 +1639,11 @@ public class EpsosHelperService {
         try {
             File file = new File(path);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(file);
             doc.getDocumentElement().normalize();
-            NodeList nodeLst = doc.getElementsByTagName("id");
+            NodeList nodeLst = doc.getElementsByTagNameNS("*", "id");
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
                 SearchMask sm = new SearchMask();
@@ -1652,8 +1653,7 @@ public class EpsosHelperService {
                 v.add(sm);
             }
         } catch (Exception e) {
-            LOGGER.error("Error getting country ids " + e.getMessage());
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error getting country ids '{}'", e.getMessage(), e);
         }
         return v;
     }
@@ -1732,11 +1732,12 @@ public class EpsosHelperService {
         try {
             File file = new File(path);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(file);
             doc.getDocumentElement().normalize();
             // textFields
-            NodeList nodeLst = doc.getElementsByTagName("textField");
+            NodeList nodeLst = doc.getElementsByTagNameNS("*", "textField");
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
                 Demographics dem = new Demographics();
@@ -1747,7 +1748,7 @@ public class EpsosHelperService {
                 dem.setFriendlyName(link.getAttribute("friendlyName"));
 
                 // search for mandatory items
-                NodeList nodeLst2 = doc.getElementsByTagName("field");
+                NodeList nodeLst2 = doc.getElementsByTagNameNS("*", "field");
                 for (int i = 0; i < nodeLst2.getLength(); i++) {
                     Element link2 = (Element) nodeLst2.item(i);
                     if (link2.getAttribute("label").equals(dem.getLabel())) {
@@ -1758,7 +1759,7 @@ public class EpsosHelperService {
                 v.add(dem);
             }
             // sex
-            nodeLst = doc.getElementsByTagName("sex");
+            nodeLst = doc.getElementsByTagNameNS("*", "sex");
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
                 Demographics dem = new Demographics();
@@ -1768,7 +1769,7 @@ public class EpsosHelperService {
                 v.add(dem);
             }
             // birth date
-            nodeLst = doc.getElementsByTagName("birthDate");
+            nodeLst = doc.getElementsByTagNameNS("*", "birthDate");
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
                 Demographics dem = new Demographics();
@@ -1820,7 +1821,7 @@ public class EpsosHelperService {
     public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
 
         Assertion trc;
-        LOGGER.debug("Try to create TRCA for patient : " + patient.getExtension());
+        LOGGER.debug("Try to create TRCA for patient: '{}'", patient.getExtension());
         String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
         LOGGER.info("TRCA Patient ID: '{}'", pat);
         LOGGER.info("Assertion ID: '{}'", idAs.getID());
