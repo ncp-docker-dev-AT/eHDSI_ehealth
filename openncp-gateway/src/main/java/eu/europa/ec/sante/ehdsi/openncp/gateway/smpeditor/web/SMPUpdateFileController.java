@@ -51,8 +51,6 @@ public class SMPUpdateFileController {
 
     private SMPConverter smpconverter = new SMPConverter();
 
-    private XMLValidator xmlValidator = new XMLValidator();
-
     private Environment env;
 
     private String type;
@@ -60,12 +58,10 @@ public class SMPUpdateFileController {
     private boolean isSigned;
 
     @Autowired
-    public SMPUpdateFileController(SMPConverter smpconverter, XMLValidator xmlValidator, Environment env,
-                                   ReadSMPProperties readProperties) {
+    public SMPUpdateFileController(SMPConverter smpconverter, Environment env, ReadSMPProperties readProperties) {
 
-        LOGGER.debug("SMPUpdateFileController('{}', '{}', '{}', '{}'", smpconverter, xmlValidator, env, readProperties);
+        LOGGER.debug("SMPUpdateFileController('{}', '{}', '{}'", smpconverter, env, readProperties);
         this.smpconverter = smpconverter;
-        this.xmlValidator = xmlValidator;
         this.env = env;
         this.readProperties = readProperties;
     }
