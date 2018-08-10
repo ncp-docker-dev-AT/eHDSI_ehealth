@@ -124,7 +124,7 @@ public class SMPUploadFileController {
                 LOGGER.error("IllegalStateException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
 
-            boolean valid = xmlValidator.validator(convFile.getPath());
+            boolean valid = XMLValidator.validate(convFile.getPath(), "/bdx-smp-201605.xsd");
             boolean fileDeleted;
 
             if (valid) {

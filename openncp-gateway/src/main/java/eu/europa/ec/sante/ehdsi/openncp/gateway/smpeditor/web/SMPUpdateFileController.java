@@ -112,7 +112,7 @@ public class SMPUpdateFileController {
         }
 
         /*Validate xml file*/
-        boolean valid = xmlValidator.validator(convFile.getPath());
+        boolean valid = XMLValidator.validate(convFile.getPath(), "/bdx-smp-201605.xsd");
         boolean fileDeleted;
 
         if (valid) {
@@ -521,7 +521,7 @@ public class SMPUpdateFileController {
         }
 
         smpfileupdate.setGeneratedFile(smpconverter.getFile());
-        boolean valid = xmlValidator.validator(smpfileupdate.getGeneratedFile().getPath());
+        boolean valid = XMLValidator.validate(smpfileupdate.getGeneratedFile().getPath(), "/bdx-smp-201605.xsd");
         if (valid) {
             LOGGER.debug("\n****VALID XML File");
         } else {
