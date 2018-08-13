@@ -97,7 +97,7 @@ public class SMPConverter {
         ServiceMetadata serviceMetadata = objectFactory.createServiceMetadata();
 
         //XML file generated at path
-        generatedFile = new File(Constants.SMP_DIR_PATH + "/" + fileName);
+        generatedFile = new File(Constants.SMP_DIR_PATH + File.separator + fileName);
 
         //Type of SMP File -> Redirect | Service Information
         if ("Redirect".equals(type)) {
@@ -670,7 +670,7 @@ public class SMPConverter {
 
         try (FileOutputStream generatedFileOS = new FileOutputStream(generatedFile)) {
 
-            xsw = XMLOutputFactory.newFactory().createXMLStreamWriter(generatedFileOS, "UTF-8");
+            xsw = XMLOutputFactory.newFactory().createXMLStreamWriter(generatedFileOS, StandardCharsets.UTF_8.name());
             xsw.setNamespaceContext(new NamespaceContext() {
                 @Override
                 public Iterator getPrefixes(String namespaceURI) {
@@ -692,8 +692,7 @@ public class SMPConverter {
 
             JAXBContext jaxbContext = JAXBContext.newInstance(ServiceMetadata.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8);
-            //jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "false");
+            jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8.name());
             jaxbMarshaller.marshal(serviceMetadata, generatedFileOS);
             jaxbMarshaller.marshal(serviceMetadata, stringWriter);
 
