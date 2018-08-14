@@ -33,22 +33,14 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     // Path to the factory.xslt
-    private static final String pathToFactoryXslt = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
-            + "EADC_resources"
-            + File.separator
-            + "xslt"
-            + File.separator
-            + "factory.xslt";
+    private static final String PATH_XSLT_FACTORY = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
+            + "EADC_resources" + File.separator + "xslt" + File.separator + "factory.xslt";
     // Path to the config.xml
-    private static final String pathToConfigXml = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
-            + "EADC_resources"
-            + File.separator
-            + "config"
-            + File.separator
-            + "config.xml";
+    private static final String PATH_XML_CONFIG = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
+            + "EADC_resources" + File.separator + "config" + File.separator + "config.xml";
 
-    // map with one intermediaTransformer per CDA-classcode
-    private TreeMap<String, EasyXsltTransformer> intermediaTransformerList;
+    // map with one intermediateTransformer per CDA-classcode
+    private final TreeMap<String, EasyXsltTransformer> intermediateTransformerList;
     // DOM structure for caching the factory.xslt
     private Document factoryXslt;
     // DOM structure for caching the config.xml
@@ -57,14 +49,14 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     /**
      * Initialize a new AutomaticDataCollector
      *
-     * @throws IllegalArgumentException Will be thrown, when a required resource
-     *                                  can not be initialized
+     * @throws IllegalArgumentException Will be thrown, when a required resource can not be initialized
      */
     public AutomaticDataCollectorImpl() {
+
         try {
-            intermediaTransformerList = new TreeMap<>();
-            this.factoryXslt = XmlFileReader.getInstance().readXmlDocumentFromFile(AutomaticDataCollectorImpl.pathToFactoryXslt);
-            this.configXml = XmlFileReader.getInstance().readXmlDocumentFromFile(AutomaticDataCollectorImpl.pathToConfigXml);
+            intermediateTransformerList = new TreeMap<>();
+            this.factoryXslt = XmlFileReader.getInstance().readXmlDocumentFromFile(AutomaticDataCollectorImpl.PATH_XSLT_FACTORY);
+            this.configXml = XmlFileReader.getInstance().readXmlDocumentFromFile(AutomaticDataCollectorImpl.PATH_XML_CONFIG);
             LOGGER.debug("Instance of AutomaticDataCollector created");
         } catch (Exception exception) {
             LOGGER.error("Error, when creating an Instance of AutomaticDataCollector");
@@ -170,12 +162,12 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
         processedDocumentCodeAndCodeSystemCombination = processedDocumentCode + "\"" + processedDocumentCodeSystem;
         // Guarantee, that the cachedIntermediaTransformerList is being initialized only once.
         // And ensure, that a cachedIntermediaTransformer is only created/added once to the cachedIntermediaTransformerList
-        EasyXsltTransformer currentTransformer = this.intermediaTransformerList.get(processedDocumentCodeAndCodeSystemCombination);
+        EasyXsltTransformer currentTransformer = this.intermediateTransformerList.get(processedDocumentCodeAndCodeSystemCombination);
         Document result;
         if (currentTransformer == null) {
             try {
-                synchronized (this.intermediaTransformerList) {
-                    currentTransformer = this.intermediaTransformerList.get(processedDocumentCodeAndCodeSystemCombination);
+                synchronized (this.intermediateTransformerList) {
+                    currentTransformer = this.intermediateTransformerList.get(processedDocumentCodeAndCodeSystemCombination);
                     if (currentTransformer == null) {
                         LOGGER.info("Creating the XSLT-Transformer for code: '{}' and codeSystem: '{}'",
                                 processedDocumentCode, processedDocumentCodeSystem);
@@ -190,7 +182,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
                                 "'" + processedDocumentCodeSystem
                                         + "'");
                         currentTransformer = new EasyXsltTransformer(new EasyXsltTransformer(this.factoryXslt).transform(this.configXml));
-                        this.intermediaTransformerList.put(processedDocumentCodeAndCodeSystemCombination,
+                        this.intermediateTransformerList.put(processedDocumentCodeAndCodeSystemCombination,
                                 currentTransformer);
                     }
                 }
@@ -230,12 +222,12 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     private void runSqlScript(String dataSourceName, String sqlScript) throws Exception {
 
         EadcDbConnect sqlConnection = null;
-        try {
+        try (StringReader stringReader = new StringReader(sqlScript)) {
             sqlConnection = EadcFactory.INSTANCE.createEadcDbConnect(dataSourceName);
             ScriptRunner objScriptRunner = new ScriptRunner(sqlConnection.getConnection(), false, true);
             objScriptRunner.setLogWriter(null);
             objScriptRunner.setErrorLogWriter(null);
-            StringReader stringReader = new StringReader(sqlScript);
+
             objScriptRunner.runScript(stringReader);
         } catch (Exception exception) {
             LOGGER.error("The following error occurred during an SQL operation:", exception);
