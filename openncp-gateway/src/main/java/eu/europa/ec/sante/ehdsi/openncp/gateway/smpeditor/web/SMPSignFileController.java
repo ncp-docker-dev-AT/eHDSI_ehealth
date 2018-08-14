@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -164,7 +166,7 @@ public class SMPSignFileController {
      * @return
      */
     @RequestMapping(value = "/smpeditor/signsmpfile", method = RequestMethod.POST)
-    public String postSign(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model, final RedirectAttributes redirectAttributes) {
+    public String postSign(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model, final RedirectAttributes redirectAttributes) throws IOException {
 
         LOGGER.debug("\n==== in postSign ====");
         model.addAttribute("smpfilesign", smpfilesign);
@@ -190,8 +192,8 @@ public class SMPSignFileController {
             } catch (IllegalStateException ex) {
                 LOGGER.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
-
-            boolean valid = XMLValidator.validate(convFile.getPath(), "/bdx-smp-201605.xsd");
+            String contentFile = new String(Files.readAllBytes(Paths.get(convFile.getPath())));
+            boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
             boolean fileDeleted;
 
             if (valid) {
