@@ -3,6 +3,7 @@ package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.opensaml.Configuration;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml2.core.Assertion;
@@ -261,8 +262,8 @@ public class AssertionUtils {
         Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
 
         sig.setSigningCredential(signingCredential);
-        sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        sig.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+        sig.setSignatureAlgorithm(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256);
+        sig.setCanonicalizationAlgorithm(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
 
         SecurityConfiguration secConfig = Configuration.getGlobalSecurityConfiguration();
         try {

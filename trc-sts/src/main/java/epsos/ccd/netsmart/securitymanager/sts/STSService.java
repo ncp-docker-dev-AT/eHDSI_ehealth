@@ -78,7 +78,7 @@ public class STSService implements Provider<SOAPMessage> {
     public SOAPMessage invoke(SOAPMessage source) {
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Incoming SOAP Message request: '{}'", source.toString());
+            LOGGER.debug("Incoming SOAP Message request: '{}'", source);
             log(source);
             String value = System.getProperty("javax.net.ssl.key.alias");
             LOGGER.debug("Certificate Alias: '{}'", value);
@@ -165,7 +165,7 @@ public class STSService implements Provider<SOAPMessage> {
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
 
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                LOGGER_CLINICAL.debug("Outgoing SOAP Message response: '{}'", response.toString());
+                LOGGER_CLINICAL.debug("Outgoing SOAP Message response: '{}'", response);
                 log(response);
             }
             return response;

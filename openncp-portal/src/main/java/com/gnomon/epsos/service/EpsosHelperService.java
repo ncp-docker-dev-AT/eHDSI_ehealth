@@ -28,6 +28,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -64,7 +65,6 @@ import org.opensaml.xml.schema.XSURI;
 import org.opensaml.xml.security.BasicSecurityConfiguration;
 import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.security.credential.Credential;
-import org.opensaml.xml.signature.SignatureConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
@@ -876,11 +876,11 @@ public class EpsosHelperService {
         Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
 
         sig.setSigningCredential(signingCredential);
-        sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        sig.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+        sig.setSignatureAlgorithm(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256);
+        sig.setCanonicalizationAlgorithm(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
 
         BasicSecurityConfiguration secConfig = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-        secConfig.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
+        secConfig.setSignatureReferenceDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256);
 
         try {
             SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
