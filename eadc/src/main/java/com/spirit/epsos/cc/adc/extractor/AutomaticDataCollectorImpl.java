@@ -172,29 +172,19 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
                         LOGGER.info("Creating the XSLT-Transformer for code: '{}' and codeSystem: '{}'",
                                 processedDocumentCode, processedDocumentCodeSystem);
                         ((Element) this.factoryXslt.getElementsByTagNameNS("http://www.w3.org/1999/XSL/Transform",
-                                "variable")
-                                .item(0)).setAttribute("select",
-                                "'" + processedDocumentCode
-                                        + "'");
+                                "variable").item(0)).setAttribute("select", "'" + processedDocumentCode + "'");
                         ((Element) this.factoryXslt.getElementsByTagNameNS("http://www.w3.org/1999/XSL/Transform",
-                                "variable")
-                                .item(1)).setAttribute("select",
-                                "'" + processedDocumentCodeSystem
-                                        + "'");
+                                "variable").item(1)).setAttribute("select", "'" + processedDocumentCodeSystem + "'");
+
                         currentTransformer = new EasyXsltTransformer(new EasyXsltTransformer(this.factoryXslt).transform(this.configXml));
-                        this.intermediateTransformerList.put(processedDocumentCodeAndCodeSystemCombination,
-                                currentTransformer);
+                        this.intermediateTransformerList.put(processedDocumentCodeAndCodeSystemCombination, currentTransformer);
                     }
                 }
             } catch (Exception exception) {
                 LOGGER.error("Unable to initialize the customized XSLT for processedDocumentCode:" + processedDocumentCode
-                                + " and processedDocumentCodeSystem:"
-                                + processedDocumentCodeSystem,
-                        exception);
+                        + " and processedDocumentCodeSystem:" + processedDocumentCodeSystem, exception);
                 throw new Exception("Unable to initialize the customized XSLT for processedDocumentCode:" + processedDocumentCode
-                        + " and processedDocumentCodeSystem:"
-                        + processedDocumentCodeSystem,
-                        exception);
+                        + " and processedDocumentCodeSystem:" + processedDocumentCodeSystem, exception);
             }
             LOGGER.info("Current intermediaTransformer retrieved successfully");
         }

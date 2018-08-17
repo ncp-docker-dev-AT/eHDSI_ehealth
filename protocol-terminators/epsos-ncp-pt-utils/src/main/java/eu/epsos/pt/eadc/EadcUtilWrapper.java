@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2013  SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.eadc;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
@@ -25,6 +6,9 @@ import eu.epsos.pt.eadc.datamodel.ObjectFactory;
 import eu.epsos.pt.eadc.datamodel.TransactionInfo;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
+import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
@@ -32,38 +16,32 @@ import org.apache.axis2.util.XMLUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Attribute;
 import org.opensaml.saml2.core.AttributeStatement;
+import org.opensaml.saml2.core.AuthnStatement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.securityman.helper.Helper;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.OidUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
-import javax.xml.namespace.QName;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.opensaml.saml2.core.AuthnStatement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import tr.com.srdc.epsos.util.OidUtil;
 
 /**
- * This class wraps the EADC invocation. As it gathers several aspects required
- * to its proper usage, such as the compilation and preparation of transaction
- * details.
+ * This class wraps the EADC invocation. As it gathers several aspects required to its proper usage, such as
+ * the compilation and preparation of transaction details.
  *
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
 public class EadcUtilWrapper {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(EadcUtilWrapper.class);
 
     private EadcUtilWrapper() {
     }
@@ -81,11 +59,11 @@ public class EadcUtilWrapper {
      * @throws Exception
      */
     public static void invokeEadc(MessageContext reqMsgCtx, MessageContext respMsgCtx, ServiceClient serviceClient,
-                                  Document CDA, Date startTime, Date endTime, String rcvgIso, EadcEntry.DsTypes dsType,
-                                  Direction direction) throws Exception {
+                                  Document cda, Date startTime, Date endTime, String rcvgIso, EadcEntry.DsTypes dsType,
+                                  Direction direction, ServiceType serviceType) throws Exception {
 
-        EadcUtil.invokeEadc(reqMsgCtx, respMsgCtx, CDA, buildTransactionInfo(reqMsgCtx, respMsgCtx, serviceClient,
-                direction, startTime, endTime, rcvgIso), dsType);
+        EadcUtil.invokeEadc(reqMsgCtx, respMsgCtx, cda, buildTransactionInfo(reqMsgCtx, respMsgCtx, serviceClient,
+                direction, startTime, endTime, rcvgIso, serviceType), dsType);
     }
 
     /**
@@ -102,7 +80,7 @@ public class EadcUtilWrapper {
      */
     private static TransactionInfo buildTransactionInfo(MessageContext reqMsgContext, MessageContext rspMsgContext,
                                                         ServiceClient serviceClient, Direction direction, Date startTime,
-                                                        Date endTime, String countryAcode) throws Exception {
+                                                        Date endTime, String countryAcode, ServiceType serviceType) throws Exception {
 
         TransactionInfo result = new ObjectFactory().createComplexTypeTransactionInfo();
         result.setAuthenticationLevel(reqMsgContext != null ? extractAuthenticationMethodFromAssertion(getAssertion(reqMsgContext)) : null);
@@ -134,9 +112,9 @@ public class EadcUtilWrapper {
         result.setHumanRequestor(reqMsgContext != null ? extractNameIdFromAssertion(getAssertion(reqMsgContext)) : null);
         result.setUserId(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xacml:1.0:subject:subject-id") : null);
 
-        result.setPOC(reqMsgContext != null ? 
-                      extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
-                      extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type") + ")" : null);
+        result.setPOC(reqMsgContext != null ?
+                extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
+                        extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type") + ")" : null);
         result.setPOCID(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:subject:organization-id") : null);
 
         result.setReceivingISO(countryAcode);
@@ -155,7 +133,7 @@ public class EadcUtilWrapper {
             result.setServiceName(reqMsgContext.getOperationContext().getServiceName());
         }
         result.setReceivingMsgID(rspMsgContext != null ? rspMsgContext.getOptions().getMessageId() : null);
-        result.setServiceType(null);
+        result.setServiceType(serviceType.getDescription());
         result.setTransactionCounter("");
         result.setTransactionPK(UUID.randomUUID().toString());
         return result;
@@ -209,7 +187,7 @@ public class EadcUtilWrapper {
         return attributeValue;
 
     }
-    
+
     /**
      * Utility method to convert a specific date to the RFC 2822 format.
      *
@@ -219,8 +197,8 @@ public class EadcUtilWrapper {
     private static String getDateAsRFC822String(Date date) {
 
         // Date format according to RFC 2822 specifications.
-        SimpleDateFormat RFC822DATEFORMAT = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.ROOT);
-        return RFC822DATEFORMAT.format(date);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.ROOT);
+        return dateFormat.format(date);
     }
 
     /**
@@ -257,62 +235,65 @@ public class EadcUtilWrapper {
     private static Document convertToDomDocument(byte[] documentData) throws ParserConfigurationException, SAXException, IOException {
 
         Document xmlDocument;
-        String xmlStr = new String(documentData, "UTF-8");
+        String xmlStr = new String(documentData, StandardCharsets.UTF_8);
         xmlDocument = XMLUtil.parseContent(xmlStr);
         return xmlDocument;
     }
-    
+
     /**
      * Extracts the HP Authentication Method from the given Assertion.
      * All AuthN methods start with "urn:oasis:names:tc:SAML:2.0:ac:classes", e.g.
      * "urn:oasis:names:tc:SAML:2.0:ac:classes:Password", so we just extract the last portion.
-     * 
+     *
      * @param idAssertion the Identity Assertion
      * @return a string containing the authentication method
      */
     private static String extractAuthenticationMethodFromAssertion(Assertion idAssertion) {
+
         if (!idAssertion.getAuthnStatements().isEmpty()) {
             AuthnStatement authnStatement = idAssertion.getAuthnStatements().get(0);
             String authnContextClassRef = authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
-            return authnContextClassRef.substring(authnContextClassRef.lastIndexOf(":")+1);
+            return authnContextClassRef.substring(authnContextClassRef.lastIndexOf(':') + 1);
         } else {
             return null;
         }
     }
-    
+
     /**
      * Extracts the Subject NameID from the given Assertion.
-     * 
+     *
      * @param idAssertion the Identity Assertion
      * @return string containing the assertion's Subject NameID
      */
     private static String extractNameIdFromAssertion(Assertion idAssertion) {
         return idAssertion.getSubject().getNameID().getValue();
     }
-    
+
     /**
      * Extracts the sending country ISO code from Issuer of the given Assertion.
-     * E.g., for this issuer: 
+     * E.g., for this issuer:
      * <saml2:Issuer NameQualifier="urn:epsos:wp34:assertions">urn:idp:PT:countryB</saml2:Issuer>
      * it will extract "PT"
-     *      * 
+     * *
+     *
      * @param idAssertion
      * @return string containing the assertion issuer's ISO country code
      */
     private static String extractSendingCountryIsoFromAssertion(Assertion idAssertion) {
         return idAssertion.getIssuer().getValue().split(":")[2];
     }
-    
+
     /**
      * Copied from *_ServiceMessageReceiverInOut.java
      * It returns the MessageID directly from the SOAP Envelope.
-     * 
+     *
      * @param envelope The SOAP envelope
      * @return The message ID
      */
     private static String getMessageID(SOAPEnvelope envelope) {
 
-        Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(new QName("http://www.w3.org/2005/08/addressing", "MessageID"));
+        Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(
+                new QName("http://www.w3.org/2005/08/addressing", "MessageID"));
         if (it.hasNext()) {
             return it.next().getText();
         } else {
