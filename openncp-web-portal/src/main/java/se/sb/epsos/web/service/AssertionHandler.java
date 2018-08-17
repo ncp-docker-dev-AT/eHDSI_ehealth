@@ -5,6 +5,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -366,8 +367,8 @@ public class AssertionHandler implements Serializable {
                 .buildObject(Signature.DEFAULT_ELEMENT_NAME);
         Credential signingCredential = SecurityHelper.getSimpleCredential(certificate, privateKey);
         signature.setSigningCredential(signingCredential);
-        signature.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        signature.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+        signature.setSignatureAlgorithm(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256);
+        signature.setCanonicalizationAlgorithm(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
 
         SecurityConfiguration securityConfiguration = Configuration.getGlobalSecurityConfiguration();
         SecurityHelper.prepareSignatureParams(signature, signingCredential, securityConfiguration, null);

@@ -141,13 +141,13 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
                             sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getParticipantIdentifier().getValue());
 
                     List<ProcessType> processTypes = sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList().getProcess();
-                    LOGGER.info("ProcessType: '{}' - '{}'", processTypes.toString(), processTypes.size());
+                    LOGGER.info("ProcessType: '{}' - '{}'", processTypes, processTypes.size());
                     if (!processTypes.isEmpty()) {
                         List<EndpointType> endpointTypes = processTypes.get(0).getServiceEndpointList().getEndpoint();
-                        LOGGER.info("EndpointType: '{}' - '{}'", endpointTypes.toString(), endpointTypes.size());
+                        LOGGER.info("EndpointType: '{}' - '{}'", endpointTypes, endpointTypes.size());
                         if (!endpointTypes.isEmpty()) {
                             List<ExtensionType> extensionTypes = endpointTypes.get(0).getExtension();
-                            LOGGER.info("ExtensionType: '{}' - '{}'", extensionTypes.toString(), extensionTypes.size());
+                            LOGGER.info("ExtensionType: '{}' - '{}'", extensionTypes, extensionTypes.size());
                             if (!extensionTypes.isEmpty()) {
                                 Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
 

@@ -56,6 +56,10 @@
         <appender-ref ref="DB"/>
     </logger>
 
+    <logger name="com.spirit.epsos.cc.adc" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="tr.com.srdc.epsos.ws.server.xca.impl" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>

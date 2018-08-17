@@ -8,6 +8,7 @@ import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
@@ -418,7 +419,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         transactionEndTime, // Transaction End Time
                         this.countryCode, // Country A ISO Code
                         EadcEntry.DsTypes.XCPD, // Data source type
-                        EadcUtil.Direction.OUTBOUND); // Transaction direction
+                        EadcUtil.Direction.OUTBOUND, ServiceType.PATIENT_IDENTIFICATION_QUERY); // Transaction direction
             } catch (Exception ex) {
                 LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
             }

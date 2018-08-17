@@ -1,7 +1,8 @@
 package epsos.ccd.netsmart.securitymanager.keyselector;
 
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
+
 import javax.xml.crypto.*;
-import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 import java.security.KeyStore;
@@ -23,8 +24,8 @@ public class SMgrX509KeySelector extends KeySelector {
 
     private static boolean algEquals(String algURI, String algName) {
 
-        return (algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase("http://www.w3.org/2009/xmldsig11#dsa-sha256"))
-                || (algName.equalsIgnoreCase("RSA") && algURI.equalsIgnoreCase("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
+        return (algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase(CryptographicConstant.ALGO_ID_SIGNATURE_DSA_SHA256))
+                || (algName.equalsIgnoreCase("RSA") && algURI.equalsIgnoreCase(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256));
     }
 
     public KeySelectorResult select(KeyInfo keyInfo, KeySelector.Purpose purpose, AlgorithmMethod method,

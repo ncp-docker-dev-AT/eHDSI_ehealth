@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.exception.GenericException;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.crypto.dsig.CanonicalizationMethod;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,7 +29,7 @@ import java.io.*;
 @Service
 public class SignFile {
 
-    private static final String C14N_METHOD = CanonicalizationMethod.INCLUSIVE;
+    private static final String C14N_METHOD = CryptographicConstant.ALGO_ID_C14N_INCL_OMIT_COMMENTS;
     private static final String OASIS_NS = "http://docs.oasis-open.org/bdxr/ns/SMP/2016/05";
     private static final String XMLDSIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     private static Signer NATIONAL_INFRASTRUCTURE_SIGNER;
@@ -87,7 +88,9 @@ public class SignFile {
         generatedSignFile = new File(Constants.SMP_DIR_PATH + fileName);
         Source source = new DOMSource(docServiceMetadata);
         Result result = new StreamResult(generatedSignFile);
-        Transformer xformer = TransformerFactory.newInstance().newTransformer();
+        TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer xformer = factory.newTransformer();
         xformer.transform(source, result);
     }
 
@@ -99,6 +102,7 @@ public class SignFile {
 
     private String marshall(Document doc) throws TransformerException, UnsupportedEncodingException {
         TransformerFactory tf = TransformerFactory.newInstance();
+        tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer trans = tf.newTransformer();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         trans.transform(new DOMSource(doc), new StreamResult(stream));
@@ -110,7 +114,7 @@ public class SignFile {
         return getDocumentBuilder().parse(inputStream);
     }
 
-    private Element findSig(String type, Document doc) throws ParserConfigurationException, SAXException, IOException {
+    private Element findSig(String type, Document doc) {
         Element extension = findExtension(type, doc);
         if (extension != null) {
             return findSignatureByParentNode(extension);
@@ -120,20 +124,20 @@ public class SignFile {
 
     private Element findSignatureByParentNode(Element sigParent) {
         for (Node child = sigParent.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if ("Signature" .equals(child.getLocalName()) && XMLDSIG_NS.equals(child.getNamespaceURI())) {
+            if ("Signature".equals(child.getLocalName()) && XMLDSIG_NS.equals(child.getNamespaceURI())) {
                 return (Element) child;
             }
         }
         throw new RuntimeException("Signature not found in given node.");
     }
 
-    private Element findExtension(String type, Document doc) throws ParserConfigurationException, SAXException, IOException {
+    private Element findExtension(String type, Document doc) {
         Element extension = null;
         if (!type.equals("Redirect")) {
             logger.debug("\n ********* ServiceInformation");
             Element serviceInformation = findFirstElementByName(doc, "ServiceInformation");
             for (Node child = serviceInformation.getFirstChild(); child != null; child = child.getNextSibling()) {
-                if ("Extension" .equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
+                if ("Extension".equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
                     extension = (Element) child;
                 }
             }
@@ -144,7 +148,7 @@ public class SignFile {
             logger.debug("\n ********* Redirect");
             Element redirect = findFirstElementByName(doc, "Redirect");
             for (Node child = redirect.getFirstChild(); child != null; child = child.getNextSibling()) {
-                if ("Extension" .equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
+                if ("Extension".equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
                     extension = (Element) child;
                 }
             }
@@ -155,13 +159,13 @@ public class SignFile {
         return extension;
     }
 
-    private Element newExtension(String type, Document doc) throws ParserConfigurationException, SAXException, IOException {
+    private Element newExtension(String type, Document doc) {
         Element extension = null;
         if (!type.equals("Redirect")) {
             Element serviceInformation = findFirstElementByName(doc, "ServiceInformation");
             //Find extension, if exists delete all childs
             for (Node child = serviceInformation.getFirstChild(); child != null; child = child.getNextSibling()) {
-                if ("Extension" .equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
+                if ("Extension".equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
                     extension = (Element) child;
                     while (extension.hasChildNodes()) {
                         extension.removeChild(extension.getFirstChild());
@@ -177,7 +181,7 @@ public class SignFile {
             Element redirect = findFirstElementByName(doc, "Redirect");
             //Find extension, if exists delete all childs
             for (Node child = redirect.getFirstChild(); child != null; child = child.getNextSibling()) {
-                if ("Extension" .equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
+                if ("Extension".equals(child.getLocalName()) && OASIS_NS.equals(child.getNamespaceURI())) {
                     extension = (Element) child;
                     while (extension.hasChildNodes()) {
                         extension.removeChild(extension.getFirstChild());
@@ -198,7 +202,9 @@ public class SignFile {
         return (Element) elements.item(0);
     }
 
-    private Document buildDocWithGivenRoot(Element smNode) throws ParserConfigurationException, TransformerException, IOException, SAXException {
+    private Document buildDocWithGivenRoot(Element smNode) throws ParserConfigurationException, TransformerException,
+            IOException, SAXException {
+
         Document docUnwrapped = getDocumentBuilder().newDocument();
         Node sm = docUnwrapped.importNode(smNode, true);
         docUnwrapped.appendChild(sm);
@@ -206,7 +212,7 @@ public class SignFile {
         // Marshalling and parsing the document - signature validation fails without this stinky "magic".
         // _Probably_ SUN's implementation doesn't import correctly signatures between two different documents.
         String strUnwrapped = marshall(docUnwrapped);
-        logger.debug("\n ********* buildDocWithGivenRoot: \n" + strUnwrapped);
+        logger.debug("\n ********* buildDocWithGivenRoot: \n'{}'", strUnwrapped);
         return parseDocument(strUnwrapped);
     }
 

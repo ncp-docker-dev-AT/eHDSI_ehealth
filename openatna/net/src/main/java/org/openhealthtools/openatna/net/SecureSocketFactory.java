@@ -156,7 +156,7 @@ public class SecureSocketFactory {//implements SecureProtocolSocketFactory {
                 }
                 trustmanagers = ConnectionCertificateHandler.createTrustManagers(keystore, this.scd);
             }
-            SSLContext sslcontext = SSLContext.getInstance("TLS");
+            SSLContext sslcontext = SSLContext.getInstance("TLSv1.2");
             sslcontext.init(keymanagers, trustmanagers, null);
 
             return sslcontext;

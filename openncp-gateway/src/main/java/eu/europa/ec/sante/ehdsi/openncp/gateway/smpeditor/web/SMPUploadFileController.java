@@ -29,9 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.w3c.dom.Document;
@@ -47,6 +47,8 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -69,15 +71,12 @@ public class SMPUploadFileController {
 
     private SMPConverter smpconverter = new SMPConverter();
 
-    private XMLValidator xmlValidator = new XMLValidator();
-
     private Environment env;
 
     @Autowired
-    public SMPUploadFileController(SMPConverter smpconverter, XMLValidator xmlValidator, Environment env) {
-        LOGGER.debug("Constructor SMPUploadFileController({}, {}, {})", smpconverter.toString(), xmlValidator.toString(), env.toString());
+    public SMPUploadFileController(SMPConverter smpconverter, Environment env) {
+        LOGGER.debug("Constructor SMPUploadFileController({}, {})", smpconverter, env);
         this.smpconverter = smpconverter;
-        this.xmlValidator = xmlValidator;
         this.env = env;
     }
 
@@ -87,7 +86,7 @@ public class SMPUploadFileController {
      * @param model
      * @return
      */
-    @RequestMapping(value = "/smpeditor/uploadsmpfile", method = RequestMethod.GET)
+    @GetMapping(value = "/smpeditor/uploadsmpfile")
     public String uploadFile(Model model) {
         LOGGER.debug("\n==== in uploadFile ====");
         model.addAttribute("smpupload", new SMPHttp());
@@ -103,7 +102,7 @@ public class SMPUploadFileController {
      * @param redirectAttributes
      * @return
      */
-    @RequestMapping(value = "smpeditor/uploadsmpfile", method = RequestMethod.POST)
+    @PostMapping(value = "smpeditor/uploadsmpfile")
     public String postUpload(@ModelAttribute("smpupload") SMPHttp smpupload, Model model, final RedirectAttributes redirectAttributes) throws Exception {
         LOGGER.debug("\n==== in postUpload ====");
         model.addAttribute("smpupload", smpupload);
@@ -124,7 +123,8 @@ public class SMPUploadFileController {
                 LOGGER.error("IllegalStateException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
 
-            boolean valid = xmlValidator.validator(convFile.getPath());
+            String contentFile = new String(Files.readAllBytes(Paths.get(convFile.getPath())));
+            boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
             boolean fileDeleted;
 
             if (valid) {
@@ -441,7 +441,7 @@ public class SMPUploadFileController {
      * @param model
      * @return
      */
-    @RequestMapping(value = "smpeditor/uploadsmpinfo", method = RequestMethod.GET)
+    @GetMapping(value = "smpeditor/uploadsmpinfo")
     public String uploadInfo(@ModelAttribute("smpupload") SMPHttp smpupload, Model model) {
         LOGGER.debug("\n==== in uploadInfo ====");
         model.addAttribute("smpupload", smpupload);

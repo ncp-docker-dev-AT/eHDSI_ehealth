@@ -85,7 +85,7 @@ public class EvidenceEmitterTest {
         File keyStoreFile = File.createTempFile("sample", ".keystore");
         FileUtils.copyInputStreamToFile(keyStore, keyStoreFile);
         org.w3c.dom.Document incomingMsg = XMLUtil.newDocumentFromInputStream(inputStream);
-        String a1 = XMLUtil.DocumentToString(incomingMsg);
+        String a1 = XMLUtil.documentToString(incomingMsg);
         LOGGER.info(a1);
         //org.w3c.dom.Document incomingMsg = XMLUtil.newDocumentFromInputStream(inputStream);
         EvidenceUtils.createEvidenceREMNRR(
@@ -112,7 +112,7 @@ public class EvidenceEmitterTest {
         loader = EvidenceEmitterTest.class.getClassLoader();
         InputStream inputStream = loader.getResourceAsStream("testData//sample.xml");
         org.w3c.dom.Document incomingMsg = XMLUtil.newDocumentFromInputStream(inputStream);
-        String a1 = XMLUtil.DocumentToString(incomingMsg);
+        String a1 = XMLUtil.documentToString(incomingMsg);
         InputStream keyStore = loader.getResourceAsStream("testData///sample.keystore");
         File keyStoreFile = File.createTempFile("sample", ".keystore");
         FileUtils.copyInputStreamToFile(keyStore, keyStoreFile);

@@ -6,6 +6,7 @@ import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -96,6 +97,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
     public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
 
         ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponseType = null;
+        ServiceType serviceType;
         try {
             Date startTime = new Date();
             // get the implementation class for the Web Service
@@ -169,6 +171,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         LOGGER_CLINICAL.debug("Response Header:\n{}", envelope.getHeader().toString());
                         LOGGER_CLINICAL.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
+                    serviceType = ServiceType.DOCUMENT_LIST_RESPONSE;
 
                 } else if (StringUtils.equals(XCAOperation.SERVICE_CROSS_GATEWAY_RETRIEVE, methodName)) {
 
@@ -211,6 +214,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
                     }
+                    serviceType = ServiceType.DOCUMENT_EXCHANGED_RESPONSE;
 
                 } else {
                     LOGGER.error("Method not found: '{}'", methodName);
@@ -225,7 +229,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 try {
                     EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null,
                             EadcUtilWrapper.getCDA(retrieveDocumentSetResponseType), startTime, endTime, tr.com.srdc.epsos.util.Constants.COUNTRY_CODE,
-                            EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND);
+                            EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND, serviceType);
 
                 } catch (Exception e) {
                     LOGGER.error("EADC INVOCATION FAILED: '{}'", e.getMessage(), e);

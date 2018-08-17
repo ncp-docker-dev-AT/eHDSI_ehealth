@@ -122,6 +122,12 @@ public class ValidatorUtil {
                 //EPSOS2_PROVIDE_DATA_SERVICE_SP
                 model = ValidatorUtil.EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
             }
+            if (StringUtils.equals(eventType, "ehealth-193")) {
+                model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY;
+            }
+            if (StringUtils.equals(eventType, "ehealth-194")) {
+                model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH;
+            }
         } else {
             if (StringUtils.equals(eventType, "epsos-11")) {
                 //EPSOS2_HCP_ASSURANCE_AUDIT

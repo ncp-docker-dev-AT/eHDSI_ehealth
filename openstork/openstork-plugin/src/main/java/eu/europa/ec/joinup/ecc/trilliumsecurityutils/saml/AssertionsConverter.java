@@ -49,8 +49,8 @@ public class AssertionsConverter {
     private static final String PORTAL_PATIENT_PERMISSIONS = "PORTAL_PATIENT_PERMISSIONS";
 
     private static <T> T create(Class<T> cls, QName qname) {
-        return (T) ((XMLObjectBuilder) org.opensaml.Configuration.getBuilderFactory()
-                .getBuilder(qname)).buildObject(qname);
+        return (T) org.opensaml.Configuration.getBuilderFactory()
+                .getBuilder(qname).buildObject(qname);
     }
 
     public static Assertion createPlainTRCA(String purpose, Assertion idAs, String patientId) throws SMgrException {
@@ -109,7 +109,7 @@ public class AssertionsConverter {
         }
 
         String orgName;
-        Vector perms = new Vector();
+        List<String> permissions = new ArrayList<>();
 
         String username = "TRILLIUM GATEWAY";
         String rolename = "";
@@ -120,7 +120,7 @@ public class AssertionsConverter {
             String doctor_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_DOCTOR_PERMISSIONS);
             String p[] = doctor_perms.split(",");
             for (String aP : p) {
-                perms.add(prefix + aP);
+                permissions.add(prefix + aP);
             }
         }
         if (isPharmacist) {
@@ -128,7 +128,7 @@ public class AssertionsConverter {
             String pharm_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PHARMACIST_PERMISSIONS);
             String p1[] = pharm_perms.split(",");
             for (String aP1 : p1) {
-                perms.add(prefix + aP1);
+                permissions.add(prefix + aP1);
             }
         }
         if (isNurse) {
@@ -136,7 +136,7 @@ public class AssertionsConverter {
             String nurse_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_NURSE_PERMISSIONS);
             String p1[] = nurse_perms.split(",");
             for (String aP1 : p1) {
-                perms.add(prefix + aP1);
+                permissions.add(prefix + aP1);
             }
         }
         if (isPatient) {
@@ -144,7 +144,7 @@ public class AssertionsConverter {
             String patient_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PATIENT_PERMISSIONS);
             String p1[] = patient_perms.split(",");
             for (String aP1 : p1) {
-                perms.add(prefix + aP1);
+                permissions.add(prefix + aP1);
             }
         }
         if (isAdministrator) {
@@ -152,7 +152,7 @@ public class AssertionsConverter {
             String admin_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_ADMIN_PERMISSIONS);
             String p1[] = admin_perms.split(",");
             for (String aP1 : p1) {
-                perms.add(prefix + aP1);
+                permissions.add(prefix + aP1);
             }
         }
 
@@ -167,7 +167,7 @@ public class AssertionsConverter {
             orgType = "Hospital";
         }
         Assertion assertion = createEpsosAssertion(username, rolename, orgName, orgId, orgType, "TREATMENT",
-                poc, perms);
+                poc, permissions);
 
         LOGGER.debug("Getting config manager");
         String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
@@ -187,7 +187,7 @@ public class AssertionsConverter {
         LOGGER.info("#### HCPA End");
 
         if (assertion != null) {
-            LOGGER.info("The assertion has been created with id: " + assertion.getID());
+            LOGGER.info("The assertion has been created with id: '{}'", assertion.getID());
         } else {
             LOGGER.error("########### Error creating assertion");
         }
@@ -414,7 +414,7 @@ public class AssertionsConverter {
 
     private static Assertion createEpsosAssertion(String username, String role, String organization, String organizationId,
                                                   String facilityType, String purposeOfUse, String xspaLocality,
-                                                  java.util.Vector permissions) {
+                                                  List<String> permissions) {
         // assertion
         Assertion assertion = null;
         try {

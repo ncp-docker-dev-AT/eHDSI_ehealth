@@ -882,38 +882,45 @@ public enum AuditTrailUtils {
         return am;
     }
 
-    private AuditMessage addError(AuditMessage am, String EM_PatricipantObjectID, byte[] EM_PatricipantObjectDetail,
-                                  Short EM_Code, Short EM_CodeRole, String EM_TypeCode, String EM_qualifier) {
+    /**
+     * @param auditMessage
+     * @param errorMessagePartObjectId
+     * @param errorMessagePartObjectDetail
+     * @param errorMessageCode
+     * @param errorMessageCodeRole
+     * @param errorMessageTypeCode
+     * @param errorMessageQualifier
+     * @return
+     */
+    private AuditMessage addError(AuditMessage auditMessage, String errorMessagePartObjectId, byte[] errorMessagePartObjectDetail,
+                                  Short errorMessageCode, Short errorMessageCodeRole, String errorMessageTypeCode,
+                                  String errorMessageQualifier) {
 
-        // Error Message
-        boolean noErrorOccured;
-        LOGGER.info("The EM_PatricipantObjectID is: '{}'", EM_PatricipantObjectID);
-        try {
-            noErrorOccured = Utils.isEmpty(EM_PatricipantObjectID);
-        } catch (Exception e) {
-            noErrorOccured = true;
-            LOGGER.error("The participant object id is null. So no error occured" + e.getMessage(), e);
-        }
+        // Error Message handling for audit purpose
+        if (StringUtils.isNotBlank(errorMessagePartObjectId)) {
 
-        if (noErrorOccured) {
-            LOGGER.info("There is no error occured");
-        } else {
-            ParticipantObjectIdentificationType em = new ParticipantObjectIdentificationType();
-            em.setParticipantObjectID(EM_PatricipantObjectID);
-            em.setParticipantObjectTypeCode(EM_Code);
-            em.setParticipantObjectTypeCodeRole(EM_CodeRole);
-            CodedValueType EM_object = new CodedValueType();
-            EM_object.setCode(EM_TypeCode);
-            em.setParticipantObjectIDTypeCode(EM_object);
-            if (EM_PatricipantObjectDetail != null) {
-                TypeValuePairType pod = new TypeValuePairType();
-                pod.setType(EM_qualifier);
-                pod.setValue(EM_PatricipantObjectDetail);
-                em.getParticipantObjectDetail().add(pod);
+            LOGGER.info("Error Message Participant ID is: '{}'", errorMessagePartObjectId);
+            CodedValueType codedValueType = new CodedValueType();
+            codedValueType.setCode(errorMessageTypeCode);
+
+            ParticipantObjectIdentificationType participantObjectIdentificationType = new ParticipantObjectIdentificationType();
+            participantObjectIdentificationType.setParticipantObjectID(errorMessagePartObjectId);
+            participantObjectIdentificationType.setParticipantObjectTypeCode(errorMessageCode);
+            participantObjectIdentificationType.setParticipantObjectTypeCodeRole(errorMessageCodeRole);
+            participantObjectIdentificationType.setParticipantObjectIDTypeCode(codedValueType);
+
+            if (errorMessagePartObjectDetail != null) {
+                TypeValuePairType typeValuePairType = new TypeValuePairType();
+                typeValuePairType.setType(errorMessageQualifier);
+                typeValuePairType.setValue(errorMessagePartObjectDetail);
+                participantObjectIdentificationType.getParticipantObjectDetail().add(typeValuePairType);
             }
-            am.getParticipantObjectIdentification().add(em);
+            auditMessage.getParticipantObjectIdentification().add(participantObjectIdentificationType);
+
+        } else {
+            LOGGER.debug("No Error Message reported by the auditing process!");
         }
-        return am;
+        return auditMessage;
     }
 
     private AuditMessage addEventTarget(AuditMessage am, String ET_ObjectID, Short TypeCode, Short TypeCodeRole,
@@ -936,7 +943,7 @@ public enum AuditTrailUtils {
     private AuditMessage addEventTarget(AuditMessage am, String ET_ObjectID, Short ObjectTypeCode, Short ObjectDataLifeCycle,
                                         String EM_Code, String EM_CodeSystemName, String EM_DisplayName) {
 
-        LOGGER.info("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", am.toString(), ET_ObjectID,
+        LOGGER.info("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", am, ET_ObjectID,
                 ObjectTypeCode, ObjectDataLifeCycle, EM_Code, EM_CodeSystemName, EM_DisplayName);
 
         ParticipantObjectIdentificationType em = new ParticipantObjectIdentificationType();
