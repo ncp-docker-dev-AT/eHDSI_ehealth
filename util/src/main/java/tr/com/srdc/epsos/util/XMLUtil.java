@@ -1,5 +1,6 @@
 package tr.com.srdc.epsos.util;
 
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.dom4j.DocumentHelper;
@@ -74,7 +75,7 @@ public class XMLUtil {
      */
     public static Document canonicalize(Document doc) throws Exception {
 
-        Canonicalizer canon = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
+        Canonicalizer canon = Canonicalizer.getInstance(CryptographicConstant.ALGO_ID_C14N_INCL_OMIT_COMMENTS);
         byte[] back = canon.canonicalizeSubtree(doc);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -115,11 +116,11 @@ public class XMLUtil {
         return doc;
     }
 
-    public static String DocumentToString(Document doc) throws TransformerException {
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        //transformer.setOutputProperty(OutputKeys.INDENT, indent);
-        //transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+    public static String documentToString(Document doc) throws TransformerException {
+
+        TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = factory.newTransformer();
         StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(doc), new StreamResult(writer));
         return writer.getBuffer().toString().replaceAll("\n|\r", "");
@@ -136,8 +137,9 @@ public class XMLUtil {
         }
 
         StringWriter stringWriter = new StringWriter();
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
+        TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "no");
@@ -175,8 +177,9 @@ public class XMLUtil {
     public static String prettyPrint(Node node) throws TransformerException {
 
         StringWriter stringWriter = new StringWriter();
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
+        TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -192,8 +195,9 @@ public class XMLUtil {
      */
     public static void prettyPrint(Document doc, OutputStream out) throws TransformerException, UnsupportedEncodingException {
 
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
+        TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");

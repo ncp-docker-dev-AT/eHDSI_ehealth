@@ -12,14 +12,13 @@
             </div>
             <div class="container">
                 <ol class="breadcrumb">
-                    <li class="active">Home/SMP Editor/Upload File</li>
+                    <li class="active">Home/SMP Editor/Synchronize International Search Mask</li>
                 </ol>
             </div>
-        </nav><!-- HEADER -->
-
+        </nav>
+        <!-- HEADER -->
         <h2 class="marginleft" th:text="#{label.SmpEditor.menu.op4}">Upload SMP file</h2>
         <h3 class="subtitle" th:text="#{label.SmpEditor.op4.subTitle}">Info</h3>
-
 
         <div th:if="${synchronizedCountry != null}">
             <h1>Result</h1>
@@ -29,8 +28,6 @@
         </div>
 
         <div id="btnformnsf">
-            <a href="#" id="abutton" th:href="@{/smpeditor/uploadsmpfile}" class="btn btn-default"
-               th:text="#{label.button.back}">Back</a>
             <a href="#" id="abutton" th:href="@{/smpeditor/smpeditor}" class="btn btn-default" th:text="#{label.button.done}">Done</a>
         </div>
         <script type="text/javascript" th:src="@{/resources/vendor/jquery/js/jquery-3.1.1.min.js}"></script>

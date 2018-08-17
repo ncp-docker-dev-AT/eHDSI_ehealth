@@ -16,6 +16,7 @@
  */
 package epsos.openncp.protocolterminator;
 
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -383,15 +384,15 @@ public class HCPIAssertionCreator {
             // Create Signature/SignedInfo/Reference
             List<Transform> lst = new ArrayList<>();
             lst.add(factory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
-            lst.add(factory.newTransform(CanonicalizationMethod.EXCLUSIVE, (TransformParameterSpec) null));
+            lst.add(factory.newTransform(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS, (TransformParameterSpec) null));
             Reference ref = factory.newReference("#" + assertion.getID(),
-                    factory.newDigestMethod(DigestMethod.SHA256, null), lst, null, null);
+                    factory.newDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256, null), lst, null, null);
 
             // Set Signature/SignedInfo
             SignedInfo signedInfo = factory.newSignedInfo(factory.newCanonicalizationMethod
-                    (CanonicalizationMethod.EXCLUSIVE,
+                    (CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS,
                             (C14NMethodParameterSpec) null), factory.newSignatureMethod
-                    ("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null), Collections.singletonList(ref));
+                    (CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256, null), Collections.singletonList(ref));
 
             // Sign Assertion
             XMLSignature signature = factory.newXMLSignature(signedInfo, keyInfo);

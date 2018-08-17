@@ -28,12 +28,11 @@ import java.text.SimpleDateFormat;
 
 public class LiferayUtils {
 
-
-    public static final String LPPharmacistRole = "Pharmacist";
-    public static final String LPDoctorRole = "Doctor";
-    public static final String LPNurseRole = "Nurse";
-    public static final String LPAdministratorRole = "Administrator";
-    public static final String LPPatientRole = "Patient";
+    public static final String LP_PHARMACIST_ROLE = "Pharmacist";
+    public static final String LP_DOCTOR_ROLE = "Doctor";
+    public static final String LP_NURSE_ROLE = "Nurse";
+    public static final String LP_ADMINISTRATIVE_ROLE = "Administrator";
+    public static final String LP_PATIENT_ROLE = "Patient";
     private static final Logger LOGGER = LoggerFactory.getLogger("LiferayUtils");
 
     private LiferayUtils() {
@@ -94,27 +93,27 @@ public class LiferayUtils {
 
     public static boolean isPharmacist(long userid, long companyid) {
 
-        return userHasRole(userid, companyid, LPPharmacistRole);
+        return userHasRole(userid, companyid, LP_PHARMACIST_ROLE);
     }
 
     public static boolean isDoctor(long userid, long companyid) {
 
-        return userHasRole(userid, companyid, LPDoctorRole);
+        return userHasRole(userid, companyid, LP_DOCTOR_ROLE);
     }
 
     public static boolean isNurse(long userid, long companyid) {
 
-        return userHasRole(userid, companyid, LPNurseRole);
+        return userHasRole(userid, companyid, LP_NURSE_ROLE);
     }
 
     public static boolean isAdministrator(long userid, long companyid) {
 
-        return userHasRole(userid, companyid, LPAdministratorRole);
+        return userHasRole(userid, companyid, LP_ADMINISTRATIVE_ROLE);
     }
 
     public static boolean isPatient(long userid, long companyid) {
 
-        return userHasRole(userid, companyid, LPPatientRole);
+        return userHasRole(userid, companyid, LP_PATIENT_ROLE);
     }
 
     public static boolean userHasRole(long userId, long companyId, String rolename) {
@@ -156,11 +155,6 @@ public class LiferayUtils {
             LOGGER.error(ExceptionUtils.getStackTrace(e1));
         }
         return df;
-    }
-
-    public static String getPortalTranslation(String path, String key, String lang) {
-
-        return FacesService.translate(key, lang);
     }
 
     public static String getPortalTranslation(String key, String lang) {

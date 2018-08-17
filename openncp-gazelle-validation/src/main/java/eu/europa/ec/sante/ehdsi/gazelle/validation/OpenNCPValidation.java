@@ -217,7 +217,8 @@ public class OpenNCPValidation {
 
         LOGGER.info("[Validation Service: CDA Validator]");
         String xmlResult = "";
-        String cdaModel = ValidatorUtil.obtainCdaModel(classCode, isPivot);
+        boolean isScannedDocument = cda.contains("nonXMLBody");
+        String cdaModel = ValidatorUtil.obtainCdaModel(classCode, isPivot, isScannedDocument);
         if (isRemoteValidationEnable()) {
             xmlResult = GazelleValidatorFactory.getCdaValidator().validateDocument(cda, cdaModel, ncpSide);
 

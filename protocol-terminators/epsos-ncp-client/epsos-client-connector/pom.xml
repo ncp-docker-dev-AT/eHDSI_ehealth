@@ -36,7 +36,7 @@
         <dependency>
             <groupId>net.bull.javamelody</groupId>
             <artifactId>javamelody-core</artifactId>
-            <version>1.70.0</version>
+            <version>${javamelody.version}</version>
         </dependency>
         <dependency>
             <groupId>com.lowagie</groupId>
@@ -258,7 +258,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.2</version>
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <webResources>
@@ -279,6 +278,7 @@
                         WEB-INF/lib/log4j-1.2.15.jar,
                         WEB-INF/lib/xalan-2.7.0.jar,
                         WEB-INF/lib/xalan-2.7.1.jar,
+                        WEB-INF/lib/xercesImpl-2.10.0.jar,
                         WEB-INF/lib/xmlbeans-2.3.0.jar
                     </packagingExcludes>
                 </configuration>
@@ -335,7 +335,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
                         <configuration>
                             <quiet>true</quiet>
                             <reportOutputDirectory>target/${project.artifactId}</reportOutputDirectory>

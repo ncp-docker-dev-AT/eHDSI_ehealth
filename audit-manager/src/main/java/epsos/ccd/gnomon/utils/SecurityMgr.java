@@ -1,11 +1,13 @@
 package epsos.ccd.gnomon.utils;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import javax.xml.XMLConstants;
 import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
@@ -64,7 +66,9 @@ public class SecurityMgr {
         String signed = "";
         try {
             bas = new ByteArrayOutputStream();
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer trans = factory.newTransformer();
             trans.transform(new DOMSource(doc), new StreamResult(bas));
             signed = bas.toString();
         } catch (Exception e) {
@@ -106,13 +110,13 @@ public class SecurityMgr {
                 PublicKey publicKey = cert.getPublicKey();
 
                 // Create a Reference to the enveloped document
-                Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(DigestMethod.SHA256, null),
+                Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256, null),
                         transforms, null, null);
 
                 // Create the SignedInfo
                 SignedInfo signedInfo = sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
-                        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null),
-                        sigFactory.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null),
+                        CryptographicConstant.ALGO_ID_C14N_INCL_WITH_COMMENTS, (C14NMethodParameterSpec) null),
+                        sigFactory.newSignatureMethod(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256, null),
                         Collections.singletonList(ref));
 
                 // Create a KeyValue containing the RSA PublicKey
@@ -122,7 +126,8 @@ public class SecurityMgr {
                 // Create a KeyInfo and add the KeyValue to it
                 KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(keyValue));
 
-                // Create a DOMSignContext and specify the RSA PrivateKey and location of the resulting XMLSignature's parent element
+                // Create a DOMSignContext and specify the RSA PrivateKey and location of the resulting XMLSignature's
+                // parent element
                 DOMSignContext dsc = new DOMSignContext(privateKey, sigParent);
 
                 // Create the XMLSignature (but don't sign it yet)
@@ -167,17 +172,17 @@ public class SecurityMgr {
                 PublicKey publicKey = cert.getPublicKey();
 
                 // Create a Reference to the enveloped document
-                Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(DigestMethod.SHA256, null),
+                Reference ref = sigFactory.newReference("", sigFactory.newDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256, null),
                         transforms, null, null);
 
                 // Create the SignedInfo
                 SignedInfo signedInfo = sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
-                        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
-                        .newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null), Collections.singletonList(ref));
+                        CryptographicConstant.ALGO_ID_C14N_INCL_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
+                        .newSignatureMethod(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256, null), Collections.singletonList(ref));
 
                 sigFactory.newSignedInfo(sigFactory.newCanonicalizationMethod(
-                        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
-                        .newSignatureMethod("http://www.w3.org/2009/xmldsig11#dsa-sha256", null), Collections.singletonList(ref));
+                        CryptographicConstant.ALGO_ID_C14N_INCL_WITH_COMMENTS, (C14NMethodParameterSpec) null), sigFactory
+                        .newSignatureMethod(CryptographicConstant.ALGO_ID_SIGNATURE_DSA_SHA256, null), Collections.singletonList(ref));
 
                 // Create a KeyValue containing the RSA PublicKey
                 KeyInfoFactory keyInfoFactory = sigFactory.getKeyInfoFactory();
@@ -205,7 +210,9 @@ public class SecurityMgr {
 
                 // output the resulting document
                 bas = new ByteArrayOutputStream();
-                Transformer trans = TransformerFactory.newInstance().newTransformer();
+                TransformerFactory factory = TransformerFactory.newInstance();
+                Transformer trans = factory.newTransformer();
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
                 trans.transform(new DOMSource(doc), new StreamResult(bas));
                 signed = bas.toString();
             }

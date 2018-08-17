@@ -164,8 +164,6 @@ public class XcaInitGateway {
             //TODO: review this try - catch - finally mechanism and the transformation/translation mechanism.
             try {
                 LOGGER.info("******************************************");
-//                CdaValidationService cdaValidationService = CdaValidationService.getInstance();
-
                 /* Validate CDA epSOS Pivot */
 //                Element elementNormalize = TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement();
 //                elementNormalize.normalize();

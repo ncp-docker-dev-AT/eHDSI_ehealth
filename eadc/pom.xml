@@ -110,7 +110,7 @@
                     <driver>org.h2.Driver</driver>
                     <url>jdbc:h2:file:target/temp-database/h2db</url>
                     <username>sa</username>
-                    <password></password>
+                    <password/>
                     <!--all executions are ignored if -Dmaven.test.skip=true -->
                     <skip>${maven.test.skip}</skip>
                 </configuration>
@@ -187,11 +187,6 @@
                                     here -->
                                 <include>**/**IntegrationTest.java</include>
                             </includes>
-                            <systemPropertyVariables>
-                                <java.util.logging.config.file>
-                                    <!-- ${project.build.testOutputDirectory}/logging.properties -->
-                                </java.util.logging.config.file>
-                            </systemPropertyVariables>
                             <classpathDependencyExcludes>
                             </classpathDependencyExcludes>
                         </configuration>

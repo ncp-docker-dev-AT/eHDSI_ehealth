@@ -240,7 +240,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                 </configuration>
@@ -248,7 +247,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.9.1</version>
                 <configuration>
                     <consoleOutput>true</consoleOutput>
                     <!-- <configLocation>http://dev.iuz.pt/openncp-jenkins/checkstyle.xml</configLocation> -->
@@ -259,7 +257,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>2.7.1</version>
                 <configuration>
                     <linkXRef>true</linkXRef>
                     <targetJdk>${java.version}</targetJdk>
@@ -273,7 +270,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.5.2</version>
                 <configuration>
                     <onlyAnalyze>
                         tr.com.srdc.epsos.-,eu.epsos.-,fi.kela.se.epsos.-,pt.spms.epsos.utils.logging.-,_2007.xds_b.iti.ihe.-,_2009.xcpd.iti.ihe.-

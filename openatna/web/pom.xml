@@ -18,7 +18,7 @@
         <dependency>
             <groupId>net.bull.javamelody</groupId>
             <artifactId>javamelody-core</artifactId>
-            <version>1.70.0</version>
+            <version>${javamelody.version}</version>
         </dependency>
         <dependency>
             <groupId>com.lowagie</groupId>
@@ -103,7 +103,7 @@
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.1.10</version>
+                <version>6.1.26</version>
                 <configuration>
                     <scanIntervalSeconds>10</scanIntervalSeconds>
                     <contextPath>/atna</contextPath>
@@ -113,6 +113,8 @@
                             <maxIdleTime>60000</maxIdleTime>
                         </connector>
                     </connectors>
+                    <stopKey/>
+                    <stopPort/>
                 </configuration>
             </plugin>
         </plugins>
@@ -126,7 +128,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.3</version>
                         <executions>
                             <execution>
                                 <id>ant1</id>
@@ -175,6 +176,9 @@
                                     <directory>src/main/profiled-resource/all</directory>
                                 </resource>
                             </webResources>
+                            <packagingExcludes>
+                                WEB-INF/lib/xercesImpl-2.10.0.jar
+                            </packagingExcludes>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -197,6 +201,9 @@
                                 </resource>
                             </webResources>
                             <includeEmptyDirectories>false</includeEmptyDirectories>
+                            <packagingExcludes>
+                                WEB-INF/lib/xercesImpl-2.10.0.jar
+                            </packagingExcludes>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -218,6 +225,9 @@
                                     <directory>src/main/profiled-resource/web</directory>
                                 </resource>
                             </webResources>
+                            <packagingExcludes>
+                                WEB-INF/lib/xercesImpl-2.10.0.jar
+                            </packagingExcludes>
                         </configuration>
                     </plugin>
                 </plugins>

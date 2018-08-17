@@ -46,7 +46,7 @@ public class XCARetrieveTest {
     public void doRetrieve() throws XCAException {
 
         // build assertions
-        Assertion idAssertion = new HCPIAssertionCreator().createHCPIAssertion(XSPARole.PHARMACIST);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.PHARMACIST);
         Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion(HOME_COMMUNITY_ID, PATIENT_COUNTRY);
 
         // build XDS document

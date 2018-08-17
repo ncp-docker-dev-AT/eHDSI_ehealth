@@ -111,7 +111,6 @@ public class XDSbRepositoryServiceInvoker {
         xdrDocument.setId(uuid);
 
         byte[] cdaBytes = null;
-        //CdaValidationService cdaValidationService = CdaValidationService.getInstance();
         try {
             cdaBytes = request.getCda().getBytes(StandardCharsets.UTF_8);
 

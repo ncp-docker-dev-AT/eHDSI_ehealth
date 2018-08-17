@@ -297,7 +297,7 @@ public class Utils {
 
     public User getLiferayUserUnEncrypted(String user) throws Exception {
 
-        User liferayUser = UserLocalServiceUtil.getUserByScreenName(EpsosRestService.companyId, user);
+        User liferayUser = UserLocalServiceUtil.getUserByScreenName(EpsosRestService.COMPANY_ID, user);
         if (Validator.isNotNull(liferayUser)) {
             return liferayUser;
         }

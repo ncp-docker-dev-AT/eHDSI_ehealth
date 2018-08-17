@@ -1,16 +1,8 @@
-/*
- *  HCPIAssertionCreator.java
- *  Created on 09/09/2014, 9:34:46 AM
- *  
- *  TRILLIUM.SECURITY.UTILS
- *  eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml
- *  
- *  Copyright (C) 2014 iUZ Technologies, Lda - http://www.iuz.pt and Gnomon Informatics - http://www.gnomon.com.gr 
- */
 package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.exceptions.InvalidInput;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
@@ -434,21 +426,21 @@ public class HCPIAssertionCreator {
             keyInfo = kFactory.newKeyInfo(Collections.singletonList(kFactory.newX509Data(Collections.singletonList(entry.getCertificate()))));
 
             // Create Signature/SignedInfo/Reference
-            List<Transform> lst = new ArrayList<Transform>();
+            List<Transform> lst = new ArrayList<>();
             lst.add(factory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
-            lst.add(factory.newTransform(CanonicalizationMethod.EXCLUSIVE, (TransformParameterSpec) null));
-            Reference ref = factory.newReference("#" + assertion.getID(), factory.newDigestMethod(DigestMethod.SHA256, null), lst, null, null);
+            lst.add(factory.newTransform(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS, (TransformParameterSpec) null));
+            Reference ref = factory.newReference("#" + assertion.getID(), factory.newDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256, null), lst, null, null);
 
             // Set Signature/SignedInfo
-            SignedInfo signedInfo = factory.newSignedInfo(factory.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE, (C14NMethodParameterSpec) null),
-                    factory.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null), Collections.singletonList(ref));
+            SignedInfo signedInfo = factory.newSignedInfo(factory.newCanonicalizationMethod(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS, (C14NMethodParameterSpec) null),
+                    factory.newSignatureMethod(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256, null), Collections.singletonList(ref));
 
             // Sign Assertion
             XMLSignature signature = factory.newXMLSignature(signedInfo, keyInfo);
             DOMSignContext signContext = new DOMSignContext(keyPair.getPrivate(), assertion.getDOM());
             signature.sign(signContext);
         } catch (Exception e) {
-            LOG.error("Signature element not created!", e.getLocalizedMessage());
+            LOG.error("Signature element not created: '{}'", e.getLocalizedMessage(), e);
         }
 
         // Set Signature's place

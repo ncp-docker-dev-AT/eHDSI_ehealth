@@ -9,6 +9,7 @@ import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
@@ -462,7 +463,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         transactionEndTime, // Transaction End Time
                         this.countryCode, // Country A ISO Code
                         EadcEntry.DsTypes.XCA, // Data source type
-                        Direction.OUTBOUND); // Transaction direction
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY); // Transaction direction
             } catch (Exception ex) {
                 LOGGER.error("EADC INVOCATION FAILED!", ex);
             }
@@ -814,7 +815,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         transactionEndTime, // Transaction End Time
                         this.countryCode, // Country A ISO Code
                         EadcEntry.DsTypes.XCA, // Data source type
-                        Direction.OUTBOUND); // Transaction direction
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY); // Transaction direction
             } catch (Exception ex) {
                 LOGGER.error("EADC INVOCATION FAILED!", ex);
             }

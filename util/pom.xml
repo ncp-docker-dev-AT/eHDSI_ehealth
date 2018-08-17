@@ -29,11 +29,11 @@
             <artifactId>openncp-evidence-emitter</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-security-manager</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>eu.europa.ec.sante.ehdsi</groupId>-->
+            <!--<artifactId>openncp-security-manager</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
         <!-- TODO: Aligning version of Xalan and Xerces among the full Project -->
         <dependency>
             <groupId>xalan</groupId>
@@ -61,11 +61,6 @@
             <artifactId>mail</artifactId>
             <version>${mail.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.sun.xml.messaging.saaj</groupId>-->
-            <!--<artifactId>saaj-impl</artifactId>-->
-            <!--<version>${saaj-impl.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -89,7 +84,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.17</version>
                 <configuration>
                     <consoleOutput>true</consoleOutput>
                     <!-- <configLocation>http://dev.iuz.pt/openncp-jenkins/checkstyle.xml</configLocation> -->
@@ -99,7 +93,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.6</version>
                 <configuration>
                     <linkXRef>true</linkXRef>
                     <targetJdk>${java.version}</targetJdk>
@@ -108,148 +101,10 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.3</version>
                 <configuration>
                     <xmlOutput>true</xmlOutput>
                     <xmlOutputDirectory>target/site</xmlOutputDirectory>
                 </configuration>
-            </plugin>
-            <!-- *************************************************************************************
-                The following plugin will generate all the clients for IHE Remote Validation Services
-            ****************************************************************************************** -->
-            <plugin>
-                <groupId>org.jvnet.jax-ws-commons</groupId>
-                <artifactId>jaxws-maven-plugin</artifactId>
-                <version>2.3</version>
-                <executions>
-                    <execution>
-                        <id>Assertions - Validator</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <vmArgs>
-                                <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-                            </vmArgs>
-                            <wsdlLocation>/META-INF/wsdl/assertion-validator/ModelBasedValidationWS.wsdl</wsdlLocation>
-                            <wsdlFiles>
-                                <wsdlFile>
-                                    ${basedir}/src/main/resources/META-INF/wsdl/assertion-validator/ModelBasedValidationWS.wsdl
-                                </wsdlFile>
-                            </wsdlFiles>
-                            <packageName>net.ihe.gazelle.jaxb.assertion</packageName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>AuditMessage - Validator</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <vmArgs>
-                                <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-                            </vmArgs>
-                            <wsdlLocation>/META-INF/wsdl/audit-validator/AuditMessageValidationWS.wsdl</wsdlLocation>
-                            <wsdlFiles>
-                                <wsdlFile>
-                                    ${basedir}/src/main/resources/META-INF/wsdl/audit-validator/AuditMessageValidationWS.wsdl
-                                </wsdlFile>
-                            </wsdlFiles>
-                            <packageName>net.ihe.gazelle.jaxb.audit</packageName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>Model-Based CDA Validator</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <vmArgs>
-                                <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-                            </vmArgs>
-                            <wsdlLocation>/META-INF/wsdl/cda-validator/ModelBasedValidationWS.wsdl</wsdlLocation>
-                            <wsdlFiles>
-                                <wsdlFile>
-                                    ${basedir}/src/main/resources/META-INF/wsdl/cda-validator/ModelBasedValidationWS.wsdl
-                                </wsdlFile>
-                            </wsdlFiles>
-                            <packageName>net.ihe.gazelle.jaxb.cda</packageName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>TLS certificate Validator</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <vmArgs>
-                                <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-                            </vmArgs>
-                            <wsdlLocation>/META-INF/wsdl/certificate-validator/CertificateValidator.wsdl</wsdlLocation>
-                            <wsdlFiles>
-                                <wsdlFile>
-                                    ${basedir}/src/main/resources/META-INF/wsdl/certificate-validator/CertificateValidator.wsdl
-                                </wsdlFile>
-                            </wsdlFiles>
-                            <packageName>net.ihe.gazelle.jaxb.certificate</packageName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>Schematron - Validator</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <vmArgs>
-                                <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-                            </vmArgs>
-                            <wsdlLocation>/META-INF/wsdl/schematron-validator/GazelleObjectValidator.wsdl</wsdlLocation>
-                            <wsdlFiles>
-                                <wsdlFile>
-                                    ${basedir}/src/main/resources/META-INF/wsdl/schematron-validator/GazelleObjectValidator.wsdl
-                                </wsdlFile>
-                            </wsdlFiles>
-                            <packageName>net.ihe.gazelle.jaxb.schematron</packageName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>Model-based XDS Validator</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <vmArgs>
-                                <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-                            </vmArgs>
-                            <wsdlLocation>/META-INF/wsdl/xds-validator/ModelBasedValidationWS.wsdl</wsdlLocation>
-                            <wsdlFiles>
-                                <wsdlFile>
-                                    ${basedir}/src/main/resources/META-INF/wsdl/xds-validator/ModelBasedValidationWS.wsdl
-                                </wsdlFile>
-                            </wsdlFiles>
-                            <packageName>net.ihe.gazelle.jaxb.xds</packageName>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.sun.xml.ws</groupId>
-                        <artifactId>jaxws-rt</artifactId>
-                        <version>2.2.8</version>
-                    </dependency>
-                    <!-- to compile xjc-generated sources -->
-                    <dependency>
-                        <groupId>org.jvnet.jaxb2_commons</groupId>
-                        <artifactId>jaxb2-basics-runtime</artifactId>
-                        <version>0.6.4</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

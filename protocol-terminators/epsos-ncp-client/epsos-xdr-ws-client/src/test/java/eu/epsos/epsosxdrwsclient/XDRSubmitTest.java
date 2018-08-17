@@ -54,8 +54,8 @@ public class XDRSubmitTest {
     public void doSubmit() throws XdrException, ParseException {
 
         // build assertions
-        Assertion idAssertion = new HCPIAssertionCreator().createHCPIAssertion(XSPARole.PHARMACIST);
-        Assertion trcAssertion = new TRCAssertionCreator().createTRCAssertion("", "");
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.PHARMACIST);
+        Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion("", "");
 
         // build patient id
         PatientId patientId = new PatientId();

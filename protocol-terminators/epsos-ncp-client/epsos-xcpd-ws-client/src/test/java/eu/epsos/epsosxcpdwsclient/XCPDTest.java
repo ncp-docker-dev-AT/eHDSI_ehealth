@@ -46,7 +46,7 @@ public class XCPDTest {
 
         PatientDemographics patientDemographics = new PatientDemographics();
 
-        // build patientid
+        // build patient Id
         PatientId patientId = new PatientId();
         patientId.setRoot(HOME_COMMUNITY_ID);
         patientId.setExtension(PATIENT_ID);
@@ -58,7 +58,7 @@ public class XCPDTest {
         patientDemographics.setCountry(PATIENT_COUNTRY);
 
         // assertions
-        Assertion idAssertion = new HCPIAssertionCreator().createHCPIAssertion(XSPARole.PHYSICIAN);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.PHYSICIAN);
 
         // Call the service
         try {
