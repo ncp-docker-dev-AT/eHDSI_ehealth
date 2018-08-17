@@ -54,8 +54,8 @@ import java.util.UUID;
 @BindingType(value = "http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 public class STSService implements Provider<SOAPMessage> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(STSService.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger logger = LoggerFactory.getLogger(STSService.class);
+    private final Logger logger_clinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final QName Messaging_To = new QName("http://www.w3.org/2005/08/addressing", "To");
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion"; // What
@@ -77,11 +77,11 @@ public class STSService implements Provider<SOAPMessage> {
     @Override
     public SOAPMessage invoke(SOAPMessage source) {
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Incoming SOAP Message request: '{}'", source);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Incoming SOAP Message request: '{}'", source);
             log(source);
             String value = System.getProperty("javax.net.ssl.key.alias");
-            LOGGER.debug("Certificate Alias: '{}'", value);
+            logger.debug("Certificate Alias: '{}'", value);
         }
 
         SOAPBody body;
@@ -96,7 +96,7 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             DefaultBootstrap.bootstrap();
         } catch (ConfigurationException ex) {
-            LOGGER.error(null, ex);
+            logger.error(null, ex);
         }
         try {
             if (!SUPPORTED_ACTION_URI.equals(getRSTAction(body))) {
@@ -128,14 +128,14 @@ public class STSService implements Provider<SOAPMessage> {
             SamlTRCIssuer samlTRCIssuer = new SamlTRCIssuer();
             Assertion hcpIdAssertion = getIdAssertionFromHeader(header);
             if (hcpIdAssertion != null) {
-                LOGGER.info("hcpIdAssertion: '{}'", hcpIdAssertion.getID());
+                logger.info("hcpIdAssertion: '{}'", hcpIdAssertion.getID());
                 if (hcpIdAssertion.getIssueInstant() != null) {
-                    LOGGER.info("hcpIdAssertion Issue Instant: '{}'", hcpIdAssertion.getIssueInstant());
+                    logger.info("hcpIdAssertion Issue Instant: '{}'", hcpIdAssertion.getIssueInstant());
                 }
             }
             Assertion trc = samlTRCIssuer.issueTrcToken(hcpIdAssertion, patientID, purposeOfUse, null);
             if (hcpIdAssertion != null) {
-                LOGGER.info("HCP Assertion Date: '{}' TRC Assertion Date: '{}' -- '{}'",
+                logger.info("HCP Assertion Date: '{}' TRC Assertion Date: '{}' -- '{}'",
                         hcpIdAssertion.getIssueInstant().withZone(DateTimeZone.UTC),
                         trc.getIssueInstant().withZone(DateTimeZone.UTC), trc.getAuthnStatements().isEmpty());
             }
@@ -151,7 +151,7 @@ public class STSService implements Provider<SOAPMessage> {
             String strReqHeader = STSUtils.domElementToString(header);
 
             String tls_cn = STSUtils.getSSLCertPeer(context.getMessageContext());
-            LOGGER.info("tls_cn: '{}'", tls_cn);
+            logger.info("tls_cn: '{}'", tls_cn);
 
             if (context.getUserPrincipal() != null) {
                 tls_cn = context.getUserPrincipal().getName();
@@ -165,13 +165,13 @@ public class STSService implements Provider<SOAPMessage> {
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
 
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                LOGGER_CLINICAL.debug("Outgoing SOAP Message response: '{}'", response);
+                logger_clinical.debug("Outgoing SOAP Message response: '{}'", response);
                 log(response);
             }
             return response;
 
         } catch (SOAPException | WSTrustException | MarshallingException | SMgrException | ParserConfigurationException ex) {
-            LOGGER.error(null, ex);
+            logger.error(null, ex);
             throw new WebServiceException(ex);
         }
     }
@@ -210,7 +210,7 @@ public class STSService implements Provider<SOAPMessage> {
                 try {
                     sm.verifyEnvelopedSignature(assertDoc);
                 } catch (SMgrException ex) {
-                    LOGGER.error(null, ex);
+                    logger.error(null, ex);
                     throw new WSTrustException("Error validating SAML Assertion signature", ex);
                 }
             }
@@ -219,7 +219,7 @@ public class STSService implements Provider<SOAPMessage> {
             return (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
 
         } catch (ParserConfigurationException | UnmarshallingException ex) {
-            LOGGER.error(null, ex);
+            logger.error(null, ex);
             throw new WSTrustException("Error Parsing SAML Assertion in Message Header", ex);
         }
     }
@@ -264,7 +264,7 @@ public class STSService implements Provider<SOAPMessage> {
             relatesToElem.setTextContent(messageId);
 
         } catch (SOAPException ex) {
-            LOGGER.error(null, ex);
+            logger.error(null, ex);
             throw new WebServiceException("Could not create Response Header");
         }
     }
@@ -299,7 +299,7 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-            LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
+            logger.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
@@ -328,10 +328,10 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             message.writeTo(out);
         } catch (IOException | SOAPException e) {
-            LOGGER_CLINICAL.error("Exception: '{}'", e.getMessage(), e);
+            logger_clinical.error("Exception: '{}'", e.getMessage(), e);
         }
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-            LOGGER_CLINICAL.info("SOAPMessage:\n{}", out.toString());
+            logger_clinical.info("SOAPMessage:\n{}", out.toString());
         }
     }
 }
