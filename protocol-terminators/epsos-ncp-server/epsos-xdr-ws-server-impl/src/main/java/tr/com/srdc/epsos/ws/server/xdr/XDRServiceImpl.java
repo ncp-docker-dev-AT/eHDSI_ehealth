@@ -346,7 +346,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     //cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8), NcpSide.NCP_A,
-                                obtainClassCode(request), true);
+                                obtainClassCode(request), false);
                     }
 
                 } catch (DocumentTransformationException ex) {
