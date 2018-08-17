@@ -26,11 +26,12 @@ import java.util.List;
  * This class implements the contact point into the NCP-B, allowing the Portal-B to contact and perform requests in NCP-B.
  *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
- * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
+ * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>n
  */
 public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSkeletonInterface {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorServiceSkeleton.class);
+    private final Logger logger = LoggerFactory.getLogger(ClientConnectorServiceSkeleton.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final String UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION = "Unsupported Class Code scheme: ";
     private static final String UNSUPPORTED_CLASS_CODE_EXCEPTION = "Unsupported Class Code: ";
@@ -53,7 +54,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             throws NoPatientIdDiscoveredException, ParseException {
 
         final String methodName = "queryPatient";
-        LoggingSlf4j.start(LOGGER, methodName);
+        LoggingSlf4j.start(logger, methodName);
 
         QueryPatientResponseDocument result = QueryPatientResponseDocument.Factory.newInstance();
 
@@ -64,12 +65,12 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             tr.com.srdc.epsos.data.model.PatientDemographics request;
             QueryPatientRequest arg0 = queryPatient.getQueryPatient().getArg0();
             PatientDemographics pDemographic = arg0.getPatientDemographics();
-            LOGGER.info("Patient Demographics: '{}', '{}', '{}'",
+            loggerClinical.info("Patient Demographics: '{}', '{}', '{}'",
                     ((pDemographic.getPatientIdArray() == null) ? "N/A" : pDemographic.getPatientIdArray()[0]),
                     pDemographic.getBirthDate(), pDemographic.getGivenName());
             request = eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(pDemographic);
 
-            LOGGER.info("Patient Demographics Request: '{}', '{}', '{}'", request.getId(), request.getGivenName(),
+            loggerClinical.info("Patient Demographics Request: '{}', '{}', '{}'", request.getId(), request.getGivenName(),
                     request.getBirthDate());
 
             String countryCode = arg0.getCountryCode();
@@ -86,11 +87,11 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             result.setQueryPatientResponse(response);
 
         } catch (ClientConnectorException ex) {
-            LoggingSlf4j.error(LOGGER, methodName);
+            LoggingSlf4j.error(logger, methodName);
             throw ex;
         }
 
-        LoggingSlf4j.end(LOGGER, methodName);
+        LoggingSlf4j.end(logger, methodName);
         return result;
     }
 
@@ -114,7 +115,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                                                          Assertion trcAssertion) throws XCAException {
 
         final String methodName = "queryDocuments";
-        LoggingSlf4j.start(LOGGER, methodName);
+        LoggingSlf4j.start(logger, methodName);
 
         QueryDocumentsResponse result = QueryDocumentsResponse.Factory.newInstance();
 
@@ -157,7 +158,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             }
 
         } catch (RuntimeException ex) {
-            LoggingSlf4j.error(LOGGER, methodName);
+            LoggingSlf4j.error(logger, methodName);
             throw ex;
         }
 
@@ -166,7 +167,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         QueryDocumentsResponseDocument wapper = QueryDocumentsResponseDocument.Factory.newInstance();
         wapper.setQueryDocumentsResponse(result);
 
-        LoggingSlf4j.end(LOGGER, methodName);
+        LoggingSlf4j.end(logger, methodName);
         return wapper;
     }
 
@@ -189,7 +190,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
          * Setup
          */
         final String methodName = "retrieveDocument";
-        LoggingSlf4j.start(LOGGER, methodName);
+        LoggingSlf4j.start(logger, methodName);
 
 
         RetrieveDocumentResponse result;
@@ -215,7 +216,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             XDSDocument request = XdsDocumentDts.newInstance(xdsDocument);
             request.setClassCode(documentCode);
 
-            LOGGER.info("[ClientConnector retrieveDocument()] Document: '{}' homeCommunityId: '{}' targetLanguage: '{}'",
+            logger.info("[ClientConnector retrieveDocument()] Document: '{}' homeCommunityId: '{}' targetLanguage: '{}'",
                     request.getDocumentUniqueId(), homeCommunityId, targetLanguage);
             switch (documentCode.getValue()) {
                 case Constants.PS_CLASSCODE:
@@ -237,14 +238,14 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             result = RetrieveDocumentResponseDTS.newInstance(response);
 
         } catch (ClientConnectorException ex) {
-            LoggingSlf4j.error(LOGGER, methodName);
+            LoggingSlf4j.error(logger, methodName);
             throw ex;
         }
 
         /* create return wrapper */
         RetrieveDocumentResponseDocument wrapper = RetrieveDocumentResponseDocument.Factory.newInstance();
         wrapper.setRetrieveDocumentResponse(result);
-        LoggingSlf4j.end(LOGGER, methodName);
+        LoggingSlf4j.end(logger, methodName);
         return wrapper;
     }
 
@@ -269,7 +270,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             throws XdrException, ParseException {
 
         final String methodName = "submitDocument";
-        LoggingSlf4j.start(LOGGER, methodName);
+        LoggingSlf4j.start(logger, methodName);
 
         SubmitDocumentResponseDocument result = SubmitDocumentResponseDocument.Factory.newInstance();
 
@@ -312,11 +313,11 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             result.setSubmitDocumentResponse(SubmitDocumentResponseDts.newInstance(response));
 
         } catch (RuntimeException ex) {
-            LoggingSlf4j.error(LOGGER, methodName);
+            LoggingSlf4j.error(logger, methodName);
             throw ex;
         }
 
-        LoggingSlf4j.end(LOGGER, methodName);
+        LoggingSlf4j.end(logger, methodName);
         return result;
     }
 
@@ -332,7 +333,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     public SayHelloResponseDocument sayHello(SayHelloDocument sayHello) {
 
         final String methodName = "sayHello";
-        LoggingSlf4j.start(LOGGER, methodName);
+        LoggingSlf4j.start(logger, methodName);
 
         SayHelloResponseDocument result = SayHelloResponseDocument.Factory.newInstance();
 
@@ -341,7 +342,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
 
         result.setSayHelloResponse(resp);
 
-        LoggingSlf4j.end(LOGGER, methodName);
+        LoggingSlf4j.end(logger, methodName);
         return result;
     }
 }
