@@ -102,15 +102,18 @@ public class EadcUtilWrapper {
         Probably related to how the Axis2 engine sets the MessageID, similar issues 
         were faced during the Evidence Emitter refactoring. Plus, for the XCA Retrieve request messages, 
         when comparing this MessageID with the one from the message itself, be sure to compare it with
-        the corect WSA headers, there are duplicated ones, although belonging to different
+        the correct WSA headers, there are duplicated ones, although belonging to different
         namespaces (the correct one is xmlns = http://www.w3.org/2005/08/addressing) (EHNCP-1141)*/
         result.setSndMsgID(reqMsgContext != null ? getMessageID(reqMsgContext.getEnvelope()) : null);
         result.setHomeHCID("");
         result.setHomeISO(Constants.COUNTRY_CODE);
         result.setHomeNCPOID(Constants.HOME_COMM_ID);
 
-        result.setHumanRequestor(reqMsgContext != null ? extractNameIdFromAssertion(getAssertion(reqMsgContext)) : null);
-        result.setUserId(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xacml:1.0:subject:subject-id") : null);
+        //  TODO: Clarify values for this field according specifications and GDPR, current value set to "N/A GDPR"
+        result.setHumanRequestor("N/A GDPR");
+        result.setUserId("N/A GDPR");
+        //result.setHumanRequestor(reqMsgContext != null ? extractNameIdFromAssertion(getAssertion(reqMsgContext)) : null);
+        //result.setUserId(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xacml:1.0:subject:subject-id") : null);
 
         result.setPOC(reqMsgContext != null ?
                 extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
