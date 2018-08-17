@@ -99,8 +99,8 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
         String processedDocumentCodeSystem;
         String processedDocumentCodeAndCodeSystemCombination;
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XML Document: {}", EadcUtil.convertXMLDocumentToString(transaction));
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.debug("XML Document: {}", EadcUtil.convertXMLDocumentToString(transaction));
         }
 
         NodeList clinicalDocumentNodeList = transaction.getElementsByTagNameNS(cdaNamespace, "ClinicalDocument");
