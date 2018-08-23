@@ -22,6 +22,8 @@ import java.math.BigInteger;
 public class EventLog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventLog.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+
     // NCPSide A or B information required for online validation
     private NcpSide ncpSide;
     private String EI_TransactionNumber;  // Number of the transaction including the 'Epsos-' prefix
@@ -556,7 +558,7 @@ public class EventLog {
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
         el.ncpSide = ncpSide;
-        LOGGER.info("'{}'", el.toString());
+        LOGGER_CLINICAL.info("'{}'", el.toString());
         return el;
     }
 

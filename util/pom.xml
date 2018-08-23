@@ -29,11 +29,11 @@
             <artifactId>openncp-evidence-emitter</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-security-manager</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>eu.europa.ec.sante.ehdsi</groupId>-->
+            <!--<artifactId>openncp-security-manager</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
         <!-- TODO: Aligning version of Xalan and Xerces among the full Project -->
         <dependency>
             <groupId>xalan</groupId>

@@ -272,7 +272,7 @@ public class TRCAssertionRequest {
             KeyStoreManager ksm = new DefaultKeyStoreManager();
             String KEYSTORE_PASS = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
 
-            ctx = SSLContext.getInstance("TLS");
+            ctx = SSLContext.getInstance("TLSv1.2");
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
             kmf.init(ksm.getKeyStore(), KEYSTORE_PASS.toCharArray());

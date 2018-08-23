@@ -10,7 +10,7 @@ import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
 
 public class FieldValueValidators {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(FieldValueValidators.class);
+    public static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final int CONDITIONS_SECOND_RANGE = 60; // a tolerance on the clock (second)
     private static final int HCP_MAXIMUM_TIME_SPAN = 4; // maximum timespan for hcp identity assertion (hours)
@@ -29,7 +29,7 @@ public class FieldValueValidators {
         if (assertion.getIssuer().getValue() == null) {
             throw (new InvalidFieldException("Issuer should be filled."));
         } else {
-            LOGGER.info("Issuer	: " + assertion.getIssuer().getValue());
+            LOGGER_CLINICAL.info("Issuer	: " + assertion.getIssuer().getValue());
         }
     }
 
@@ -37,7 +37,7 @@ public class FieldValueValidators {
         if (assertion.getSubject().getNameID().getValue() == null) {
             throw (new InvalidFieldException("NameID should be filled."));
         } else {
-            LOGGER.info("Subject Name ID	: " + assertion.getSubject().getNameID().getValue());
+            LOGGER_CLINICAL.info("Subject Name ID	: " + assertion.getSubject().getNameID().getValue());
         }
     }
 

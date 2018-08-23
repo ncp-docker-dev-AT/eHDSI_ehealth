@@ -45,6 +45,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     private static final String ERROR_ANSWER_NOT_AVAILABLE = "AnswerNotAvailable";
     private static final String ERROR_INSUFFICIENT_RIGHTS = "InsufficientRights";
     private static final Logger LOGGER = LoggerFactory.getLogger(XCPDServiceImpl.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private ObjectFactory of;
     private ServiceLoader<PatientSearchInterface> serviceLoader;
     private PatientSearchInterface patientSearchService;
@@ -577,8 +578,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     sb.append("<id>").append(patientId.getRoot()).append("</id>");
                     sb.append("<extension>").append(patientId.getExtension()).append("</extension>");
                     sb.append("</identifier>");
-                    LOGGER.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
-                    LOGGER.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
+                    LOGGER_CLINICAL.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
+                    LOGGER_CLINICAL.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
                     patientIdList.add(patientId);
                 }
                 sb.append("</patient>");

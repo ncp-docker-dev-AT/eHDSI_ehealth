@@ -122,19 +122,25 @@ public class ValidatorUtil {
                 //EPSOS2_PROVIDE_DATA_SERVICE_SP
                 model = ValidatorUtil.EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
             }
+            if (StringUtils.equals(eventType, "ehealth-193")) {
+                model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY;
+            }
+            if (StringUtils.equals(eventType, "ehealth-194")) {
+                model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH;
+            }
         } else {
             if (StringUtils.equals(eventType, "epsos-11")) {
                 //EPSOS2_HCP_ASSURANCE_AUDIT
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
             }
             if (StringUtils.equals(eventType, "epsos-21") || StringUtils.equals(eventType, "epsos-22")
-                    || StringUtils.equals(eventType, "epsos-31") || StringUtils.equals(eventType, "epsos-94")
+                    || StringUtils.equals(eventType, "epsos-94")
                     || StringUtils.equals(eventType, "epsos-96") || StringUtils.equals(eventType, "ITI-38")
                     || StringUtils.equals(eventType, "ITI-39") || StringUtils.equals(eventType, "epsos-95")) {
                 //EPSOS2_HCP_ASSURANCE_AUDIT
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
             }
-            if (StringUtils.equals(eventType, "epsos-32")) {
+            if (StringUtils.equals(eventType, "epsos-31") || StringUtils.equals(eventType, "epsos-32")) {
                 //EPSOS2_FETCH_DOC_SERVICE_SC
                 model = ValidatorUtil.EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
             }

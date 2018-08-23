@@ -152,7 +152,7 @@ public class SMPGenerateFileController {
      */
     @PostMapping(value = "smpeditor/newsmpfile")
     public String postnewfile(@ModelAttribute("smpfile") SMPFile smpfile, Model model,
-                              final RedirectAttributes redirectAttributes, SessionStatus status) {
+                              final RedirectAttributes redirectAttributes, SessionStatus status) throws IOException {
 
         LOGGER.debug("\n==== in postnewfile ==== ");
         model.addAttribute("smpfile", smpfile);
@@ -299,7 +299,8 @@ public class SMPGenerateFileController {
         }
 
         smpfile.setGeneratedFile(smpconverter.getFile());
-        boolean valid = XMLValidator.validate(smpfile.getGeneratedFile().getPath(), "/bdx-smp-201605.xsd");
+        String content = new String(Files.readAllBytes(Paths.get(smpfile.getGeneratedFile().getPath())));
+        boolean valid = XMLValidator.validate(content, "/bdx-smp-201605.xsd");
         if (valid) {
             LOGGER.debug("\n****VALID XML File");
         } else {

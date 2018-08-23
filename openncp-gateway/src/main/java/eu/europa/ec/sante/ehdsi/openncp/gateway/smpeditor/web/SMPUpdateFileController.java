@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -89,7 +91,7 @@ public class SMPUpdateFileController {
      */
     @PostMapping(value = "smpeditor/updatesmpfile")
     public String post(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, Model model,
-                       final RedirectAttributes redirectAttributes) {
+                       final RedirectAttributes redirectAttributes) throws IOException {
 
         LOGGER.debug("\n==== in post ====");
         model.addAttribute("smpfileupdate", smpfileupdate);
@@ -108,7 +110,8 @@ public class SMPUpdateFileController {
         }
 
         /*Validate xml file*/
-        boolean valid = XMLValidator.validate(convFile.getPath(), "/bdx-smp-201605.xsd");
+        String contentFile = new String(Files.readAllBytes(Paths.get(convFile.getPath())));
+        boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
         boolean fileDeleted;
 
         if (valid) {
@@ -391,7 +394,7 @@ public class SMPUpdateFileController {
      */
     @PostMapping(value = "smpeditor/updatesmpfileform")
     public String updatenewfile(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, Model model,
-                                final RedirectAttributes redirectAttributes, @RequestParam(value = "action") String action) {
+                                final RedirectAttributes redirectAttributes, @RequestParam(value = "action") String action) throws IOException {
 
         LOGGER.debug("\n==== in updatenewfile ==== ");
 
@@ -517,7 +520,8 @@ public class SMPUpdateFileController {
         }
 
         smpfileupdate.setGeneratedFile(smpconverter.getFile());
-        boolean valid = XMLValidator.validate(smpfileupdate.getGeneratedFile().getPath(), "/bdx-smp-201605.xsd");
+        String contentFile = new String(Files.readAllBytes(Paths.get(smpfileupdate.getGeneratedFile().getPath())));
+        boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
         if (valid) {
             LOGGER.debug("\n****VALID XML File");
         } else {

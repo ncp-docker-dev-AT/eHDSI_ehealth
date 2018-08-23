@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -158,8 +159,9 @@ public class EadcUtil {
         System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
         StringWriter objStrWriter = new StringWriter();
         StreamResult objStreamResult = new StreamResult(objStrWriter);
-        TransformerFactory objTransFactory = TransformerFactory.newInstance();
-        Transformer objTransformer = objTransFactory.newTransformer();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer objTransformer = transformerFactory.newTransformer();
         objTransformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
         objTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
         objTransformer.setOutputProperty(OutputKeys.METHOD, "xml");

@@ -31,7 +31,8 @@ import java.util.UUID;
  */
 public class SamlTRCIssuer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SamlTRCIssuer.class);
+    private final Logger logger = LoggerFactory.getLogger(SamlTRCIssuer.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     KeyStoreManager ksm;
     HashMap<String, String> auditDataMap;
@@ -178,7 +179,7 @@ public class SamlTRCIssuer {
 
             return trc;
         } catch (Exception ex) {
-            LOGGER.error(null, ex);
+            logger.error(null, ex);
             throw new SMgrException(ex.getMessage());
         }
     }
@@ -199,7 +200,7 @@ public class SamlTRCIssuer {
     public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
                                    List<Attribute> attrValuePair) throws SMgrException {
 
-        LOGGER.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
+        loggerClinical.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
                 hcpIdentityAssertion.getID(), patientID, purposeOfUse);
 
         //initializing the map
@@ -212,24 +213,24 @@ public class SamlTRCIssuer {
         try {
             sman.verifySAMLAssertion(hcpIdentityAssertion);
         } catch (SMgrException ex) {
-            LOGGER.error(null, ex);
+            logger.error(null, ex);
             throw new SMgrException("SAML Assertion Validation Failed: " + ex.getMessage());
         }
 
         DateTime nowUTC = new DateTime(DateTimeZone.UTC);
 
-        LOGGER.info("Assertion validity: '{}' - '{}", hcpIdentityAssertion.getConditions().getNotBefore(),
+        logger.info("Assertion validity: '{}' - '{}", hcpIdentityAssertion.getConditions().getNotBefore(),
                 hcpIdentityAssertion.getConditions().getNotOnOrAfter());
         if (hcpIdentityAssertion.getConditions().getNotBefore().isAfter(nowUTC.toDateTime())) {
             String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used before " +
                     hcpIdentityAssertion.getConditions().getNotBefore() + ". Current UTC time is " + nowUTC.toDateTime();
-            LOGGER.error(msg);
+            logger.error(msg);
             throw new SMgrException(msg);
         }
         if (hcpIdentityAssertion.getConditions().getNotOnOrAfter().isBefore(nowUTC.toDateTime())) {
             String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used after " +
                     hcpIdentityAssertion.getConditions().getNotOnOrAfter() + ". Current UTC time is " + nowUTC.toDateTime();
-            LOGGER.error(msg);
+            logger.error(msg);
             throw new SMgrException(msg);
         }
 
@@ -340,29 +341,29 @@ public class SamlTRCIssuer {
         String poc = ((XSString) findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization").getAttributeValues().get(0)).getValue();
 
-        LOGGER.info("Point of Care: {0}", poc);
+        logger.info("Point of Care: {0}", poc);
         auditDataMap.put("pointOfCare", poc);
 
         String pocId = ((XSURI) findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization-id").getAttributeValues().get(0)).getValue();
 
-        LOGGER.info("Point of Care id: {0}", pocId);
+        logger.info("Point of Care id: {0}", pocId);
         auditDataMap.put("pointOfCareID", pocId);
 
         String hrRole = ((XSString) findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xacml:2.0:subject:role").getAttributeValues().get(0)).getValue();
 
-        LOGGER.info("HR Role {0}", hrRole);
+        logger.info("HR Role {0}", hrRole);
         auditDataMap.put("humanRequestorRole", hrRole);
 
         String facilityType = ((XSString) findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:epsos:names:wp3.4:subject:healthcare-facility-type").getAttributeValues().get(0)).getValue();
 
-        LOGGER.info("Facility Type {0}", facilityType);
+        logger.info("Facility Type {0}", facilityType);
         auditDataMap.put("facilityType", facilityType);
 
         sman.signSAMLAssertion(trc);
-        LOGGER.info("Assertion generated at '{}'", trc.getIssueInstant().toString());
+        logger.info("Assertion generated at '{}'", trc.getIssueInstant().toString());
 
         return trc;
     }
@@ -401,11 +402,11 @@ public class SamlTRCIssuer {
 
     protected Attribute findStringInAttributeStatement(List<AttributeStatement> statements, String attrName) {
 
-        LOGGER.info("Size:{0}", statements.size());
+        logger.info("Size:{0}", statements.size());
         for (AttributeStatement stmt : statements) {
             for (Attribute attribute : stmt.getAttributes()) {
                 if (attribute.getName().equals(attrName)) {
-                    LOGGER.info("Attribute Name:{0}", attribute.getName());
+                    logger.info("Attribute Name:{0}", attribute.getName());
                     Attribute attr = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
 
                     attr.setFriendlyName(attribute.getFriendlyName());
@@ -426,11 +427,11 @@ public class SamlTRCIssuer {
 
     protected Attribute findURIInAttributeStatement(List<AttributeStatement> statements, String attrName) {
 
-        LOGGER.info("Size:{0}", statements.size());
+        logger.info("Size:{0}", statements.size());
         for (AttributeStatement stmt : statements) {
             for (Attribute attribute : stmt.getAttributes()) {
                 if (attribute.getName().equals(attrName)) {
-                    LOGGER.info("Attribute Name:{0}", attribute.getName());
+                    logger.info("Attribute Name:{0}", attribute.getName());
                     Attribute attr = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
 
                     attr.setFriendlyName(attribute.getFriendlyName());
@@ -453,9 +454,9 @@ public class SamlTRCIssuer {
     protected NameID findProperNameID(Subject subject) {
 
         String format = subject.getNameID().getFormat();
-        LOGGER.info("is email?: {0}", format.equals(NameID.EMAIL));
-        LOGGER.info("is x509 subject?: {0}", format.equals(NameID.X509_SUBJECT));
-        LOGGER.info("is Unspecified?: {0}", format.equals(NameID.UNSPECIFIED));
+        logger.info("is email?: {0}", format.equals(NameID.EMAIL));
+        logger.info("is x509 subject?: {0}", format.equals(NameID.X509_SUBJECT));
+        logger.info("is Unspecified?: {0}", format.equals(NameID.UNSPECIFIED));
         NameID n = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
         n.setFormat(format);
         n.setValue(subject.getNameID().getValue());
@@ -474,32 +475,32 @@ public class SamlTRCIssuer {
     }
 
     public String getPointofCare() {
-        LOGGER.info("Point Of Care: {0}", auditDataMap.get("pointOfCare"));
+        logger.info("Point Of Care: {0}", auditDataMap.get("pointOfCare"));
         return auditDataMap.get("pointOfCare");
     }
 
     public String getPointofCareID() {
-        LOGGER.info("Point Of Care ID: {0}", auditDataMap.get("pointOfCareID"));
+        logger.info("Point Of Care ID: {0}", auditDataMap.get("pointOfCareID"));
         return auditDataMap.get("pointOfCareID");
     }
 
     public String getHumanRequestorNameId() {
-        LOGGER.info("human Requestor NameID: {0}", auditDataMap.get("humanRequestorNameID"));
+        logger.info("human Requestor NameID: {0}", auditDataMap.get("humanRequestorNameID"));
         return auditDataMap.get("humanRequestorNameID");
     }
 
     public String getHumanRequestorSubjectId() {
-        LOGGER.info("human Requestor subjectID: {0}", auditDataMap.get("humanRequestorSubjectID"));
+        logger.info("human Requestor subjectID: {0}", auditDataMap.get("humanRequestorSubjectID"));
         return auditDataMap.get("humanRequestorSubjectID");
     }
 
     public String getHRRole() {
-        LOGGER.info("human Requestor Role: {0}", auditDataMap.get("humanRequestorRole"));
+        logger.info("human Requestor Role: {0}", auditDataMap.get("humanRequestorRole"));
         return auditDataMap.get("humanRequestorRole");
     }
 
     public String getFacilityType() {
-        LOGGER.info("Facility Type: {0}", auditDataMap.get("facilityType"));
+        logger.info("Facility Type: {0}", auditDataMap.get("facilityType"));
         return auditDataMap.get("facilityType");
     }
 }

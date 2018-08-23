@@ -47,6 +47,8 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -121,7 +123,8 @@ public class SMPUploadFileController {
                 LOGGER.error("IllegalStateException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
 
-            boolean valid = XMLValidator.validate(convFile.getPath(), "/bdx-smp-201605.xsd");
+            String contentFile = new String(Files.readAllBytes(Paths.get(convFile.getPath())));
+            boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
             boolean fileDeleted;
 
             if (valid) {

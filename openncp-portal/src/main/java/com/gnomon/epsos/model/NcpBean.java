@@ -14,7 +14,6 @@ import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 @ManagedBean
 @SessionScoped
@@ -51,36 +50,32 @@ public class NcpBean implements Serializable {
         LiferayUtils.storeToSession("user", user);
 
         identifiers = new ArrayList<>();
-        Vector vec = EpsosHelperService.getCountryIdsFromCS(selectedCountry);
-        for (Object aVec1 : vec) {
+        List<SearchMask> searchMaskList = EpsosHelperService.getCountryIdsFromCS(selectedCountry);
+        for (SearchMask aVec1 : searchMaskList) {
             Identifier id = new Identifier();
-            id.setKey(EpsosHelperService.getPortalTranslation(
-                    ((SearchMask) aVec1).getLabel(), LiferayUtils.getPortalLanguage()) + "*");
-            id.setDomain(((SearchMask) aVec1).getDomain());
-            
+            id.setKey(EpsosHelperService.getPortalTranslation(aVec1.getLabel(), LiferayUtils.getPortalLanguage()) + "*");
+            id.setDomain(aVec1.getDomain());
+
             if (StringUtils.isBlank(id.getKey()) || StringUtils.equals(id.getKey(), "*")) {
-                id.setKey(((SearchMask) aVec1).getLabel() + "*");
+                id.setKey(aVec1.getLabel() + "*");
             }
             identifiers.add(id);
             LOGGER.info("Identifier: '{}'", id);
         }
 
         demographics = new ArrayList<>();
-        vec = EpsosHelperService.getCountryDemographicsFromCS(this.selectedCountry);
-        for (Object aVec : vec) {
+        List<Demographics> demographicsList = EpsosHelperService.getCountryDemographicsFromCS(this.selectedCountry);
+        for (Demographics aVec : demographicsList) {
             Demographics id = new Demographics();
-            if (((Demographics) aVec).getMandatory()) {
-                id.setLabel(EpsosHelperService.getPortalTranslation(
-                        ((Demographics) aVec).getLabel(), LiferayUtils.getPortalLanguage()) + "*");
+            if (aVec.getMandatory()) {
+                id.setLabel(EpsosHelperService.getPortalTranslation(aVec.getLabel(), LiferayUtils.getPortalLanguage()) + "*");
             } else {
-                id.setLabel(EpsosHelperService.getPortalTranslation(
-                        ((Demographics) aVec).getLabel(),
-                        LiferayUtils.getPortalLanguage()));
+                id.setLabel(EpsosHelperService.getPortalTranslation(aVec.getLabel(), LiferayUtils.getPortalLanguage()));
             }
-            id.setLength(((Demographics) aVec).getLength());
-            id.setKey(((Demographics) aVec).getKey());
-            id.setMandatory(((Demographics) aVec).getMandatory());
-            id.setType(((Demographics) aVec).getType());
+            id.setLength(aVec.getLength());
+            id.setKey(aVec.getKey());
+            id.setMandatory(aVec.getMandatory());
+            id.setType(aVec.getType());
             demographics.add(id);
         }
         showDemographics = !demographics.isEmpty();
