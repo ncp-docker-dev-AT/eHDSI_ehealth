@@ -1258,7 +1258,6 @@ public class EpsosHelperService {
 
         String AS_AuditSourceId = Constants.COUNTRY_PRINCIPAL_SUBDIVISION;
         String ET_ObjectID = "urn:uuid:" + message;
-        byte[] ResM_PatricipantObjectDetail = new byte[1];
 
         AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
@@ -1277,7 +1276,7 @@ public class EpsosHelperService {
         eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                resm_participantObjectID, ResM_PatricipantObjectDetail, hostSource, "N/A", NcpSide.NCP_B);
+                resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8), hostSource, "N/A", NcpSide.NCP_B);
 
         LOGGER.info("The audit has been prepared");
         eventLog1.setEventType(EventType.epsosHcpAuthentication);
