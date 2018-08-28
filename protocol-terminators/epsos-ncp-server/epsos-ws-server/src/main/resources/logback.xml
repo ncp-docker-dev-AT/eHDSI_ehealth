@@ -37,6 +37,15 @@
         </connectionSource>
     </appender>
 
+    <!-- Spring Web Service Payload Logging - Uncomment to enable MessageTracing Request/Response-->
+    <!--<logger name="org.springframework.ws.client.MessageTracing" level="TRACE" additivity="false">-->
+    <!--<appender-ref ref="FILE_CLINICAL"/>-->
+    <!--</logger>-->
+    <!--<logger name="org.springframework.ws.server.MessageTracing" level="TRACE" additivity="false">-->
+    <!--<appender-ref ref="FILE_CLINICAL"/>-->
+    <!--</logger>-->
+    <!-- End Spring Web Service Logging-->
+
     <logger name="eu.epsos.protocolterminators.ws.server" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
@@ -45,6 +54,10 @@
     <logger name="eu.epsos.protocolterminators.ws.server.xca.impl" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
+    </logger>
+
+    <logger name="com.spirit.epsos.cc.adc" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
     </logger>
 
     <logger name="tr.com.srdc.epsos.ws.server.xca.impl" level="DEBUG" additivity="false">

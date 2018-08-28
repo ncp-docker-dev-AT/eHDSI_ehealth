@@ -33,9 +33,9 @@ public class CdaValidatorTest {
 
     @Before
     public void setUp() {
-        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda.sante", "net.ihe.gazelle.jaxb.result.sante");
 
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.cda.sante");
 
         WebServiceTemplate webServiceTemplate = new WebServiceTemplate(marshaller);
         webServiceTemplate.setDefaultUri(DefaultGazelleValidatorFactory.GAZELLE_CDA_VALIDATOR_URI);
@@ -45,15 +45,8 @@ public class CdaValidatorTest {
 
     @Test
     public void testValidateDocument() throws IOException {
-        Assert.assertTrue(
-                cdaValidator.validateDocument(IOUtils.toString(new ClassPathResource("/cda/2-4567.xml").getInputStream(),
-                        StandardCharsets.UTF_8),
-                        "eHDSI - ART-DECOR based CDA validation (PIVOT)", NcpSide.NCP_B));
+        String result = cdaValidator.validateDocument(IOUtils.toString(new ClassPathResource("/cda/2-4567.xml").getInputStream(),
+                StandardCharsets.UTF_8), "eHDSI - ART-DECOR based CDA validation (PIVOT)", NcpSide.NCP_B);
+        Assert.assertNotNull(result);
     }
-
-//    @Test
-//    public void testValidateDocument() throws IOException {
-//        Assert.assertTrue(
-//                cdaValidator.validateDocument(IOUtils.toString(new ClassPathResource("/cda/2-4567.xml").getInputStream(), StandardCharsets.UTF_8), "eHDSI - ART-DECOR based CDA validation (PIVOT)"));
-//    }
 }

@@ -321,7 +321,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 throw e;
             }
 
-            //CdaValidationService cdaValidationService = CdaValidationService.getInstance();
             for (int i = 0; i < request.getDocument().size(); i++) {
                 Document doc = request.getDocument().get(i);
                 byte[] docBytes = doc.getValue();
@@ -347,7 +346,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     //cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8), NcpSide.NCP_A,
-                                obtainClassCode(request), true);
+                                obtainClassCode(request), false);
                     }
 
                 } catch (DocumentTransformationException ex) {
@@ -497,7 +496,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
-        //CdaValidationService cdaValidationService = CdaValidationService.getInstance();
         for (int i = 0; i < request.getDocument().size(); i++) {
             Document doc = request.getDocument().get(i);
             byte[] docBytes = doc.getValue();
@@ -636,7 +634,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
          * Here PDP checks and related calls are skipped, necessary checks to be
          * performed in the NI while processing the consent document.
          */
-        //CdaValidationService cdaValidationService = CdaValidationService.getInstance();
         for (int i = 0; i < request.getDocument().size(); i++) {
             Document doc = request.getDocument().get(i);
 

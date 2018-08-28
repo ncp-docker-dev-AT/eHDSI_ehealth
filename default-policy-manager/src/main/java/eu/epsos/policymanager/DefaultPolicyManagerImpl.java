@@ -16,11 +16,13 @@ import java.util.List;
 import static eu.epsos.assertionvalidator.AssertionHelper.getAttributeFromAssertion;
 
 /**
- * Default Policy Manager implementation conformant with IHE profiles and eHDSI specifications.
+ * Default Policy Manager implementation conform with IHE profiles and eHDSI specifications.
  */
 public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
     private final Logger logger = LoggerFactory.getLogger(DefaultPolicyManagerImpl.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
+
 
     @Override
     public void HealthcareFacilityValidator(Assertion assertion, String documentClass) throws MissingFieldException,
@@ -83,7 +85,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         if (StringUtils.isEmpty(subjectId)) {
             throw new InvalidFieldException("XSPA Subject 'urn:oasis:names:tc:xacml:1.0:subject:subject-id' attribute in assertion should be filled.");
         }
-        logger.info("HCP Identity Assertion XSPA Subject: '{}", subjectId);
+        loggerClinical.info("HCP Identity Assertion XSPA Subject: '{}", subjectId);
     }
 
     @Override
@@ -93,7 +95,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         if (resourceId.equals("")) {
             throw new InvalidFieldException("XSPA subject 'uurn:oasis:names:tc:xacml:1.0:resource:resource-id' attribute in assertion should be filled.");
         }
-        logger.info("TRC Assertion XSPA subject: '{}'", resourceId);
+        loggerClinical.info("TRC Assertion XSPA subject: '{}'", resourceId);
     }
 
     @Override
@@ -371,9 +373,8 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
     @Override
     public boolean isConsentGiven(String patientId, String countryId) {
-
-        logger.info("Checking consent of patient '{}' for country '{}'", patientId, countryId);
-        logger.info("Consent is Valid by default of patient '{}' from country '{}'", patientId, countryId);
+        loggerClinical.info("Checking consent of patient '{}' for country '{}'", patientId, countryId);
+        loggerClinical.info("Consent is Valid by default of patient '{}' from country '{}'", patientId, countryId);
         return true;
     }
 }

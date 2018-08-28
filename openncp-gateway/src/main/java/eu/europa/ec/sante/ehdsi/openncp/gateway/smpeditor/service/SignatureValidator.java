@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -83,8 +84,8 @@ public class SignatureValidator {
 
         boolean algEquals(String algURI, String algName) {
 
-            return (algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase("http://www.w3.org/2009/xmldsig11#dsa-sha256"))
-                    || (algName.equalsIgnoreCase("RSA") && algURI.equalsIgnoreCase("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
+            return (algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase(CryptographicConstant.ALGO_ID_SIGNATURE_DSA_SHA256))
+                    || (algName.equalsIgnoreCase("RSA") && algURI.equalsIgnoreCase(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256));
         }
     }
 }

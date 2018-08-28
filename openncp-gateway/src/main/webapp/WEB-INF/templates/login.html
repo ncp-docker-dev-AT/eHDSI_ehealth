@@ -10,13 +10,10 @@
 <nav class="navbar navbar-default navbar-inverse navbar-static-top">
     <div class="container-fluid" th:fragment="head">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#" th:text="#{application.title}">OpenNCP Gateway2</a>
+            <a class="navbar-brand" href="#" th:text="#{application.title}">OpenNCP Gateway</a>
         </div>
         <ul class="nav navbar-nav">
-            <li><a href="#" th:text="#{label.Home}">Home</a></li>
-            <li><a href="#" th:href="@{/smpeditor/smpeditor}" th:text="#{label.SmpEditor}">SMP Editor</a></li>
-            <li><a href="#" th:href="@{/dynamicdiscovery/syncsearchmask}" th:text="#{label.SearchMash}">Sync Search
-                Mask</a></li>
+
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li>
@@ -25,8 +22,6 @@
                     <span th:text="${#authentication.name}">John Smith</span>
                 </a>
             </li>
-            <li><a href="#" th:href="@{/logout}" th:text="Sign-out"><span class="glyphicon glyphicon-log-out"
-                                                                          aria-hidden="true"></span></a></li>
         </ul>
     </div>
     <div class="container">

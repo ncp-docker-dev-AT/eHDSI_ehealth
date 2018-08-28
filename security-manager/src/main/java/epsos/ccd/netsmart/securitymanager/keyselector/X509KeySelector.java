@@ -18,6 +18,8 @@
 package epsos.ccd.netsmart.securitymanager.keyselector;
 
 
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
+
 import javax.security.auth.x500.X500Principal;
 import javax.xml.crypto.*;
 import javax.xml.crypto.dsig.SignatureMethod;
@@ -226,9 +228,9 @@ public class X509KeySelector extends KeySelector {
      * signature algorithm URI.
      */
     private String getPKAlgorithmOID(String algURI) {
-        if (algURI.equalsIgnoreCase("http://www.w3.org/2009/xmldsig11#dsa-sha256")) {
+        if (algURI.equalsIgnoreCase(CryptographicConstant.ALGO_ID_SIGNATURE_DSA_SHA256)) {
             return "1.2.840.10040.4.1";
-        } else if (algURI.equalsIgnoreCase("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256")) {
+        } else if (algURI.equalsIgnoreCase(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256)) {
             return "1.2.840.113549.1.1";
         } else {
             return null;
@@ -241,8 +243,8 @@ public class X509KeySelector extends KeySelector {
      */
     private boolean algEquals(String algURI, String algName) {
 
-        return algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase("http://www.w3.org/2009/xmldsig11#dsa-sha256")
-                || algName.equalsIgnoreCase("RSA") && algURI.equalsIgnoreCase("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        return algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase(CryptographicConstant.ALGO_ID_SIGNATURE_DSA_SHA256)
+                || algName.equalsIgnoreCase("RSA") && algURI.equalsIgnoreCase(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256);
     }
 
     /**

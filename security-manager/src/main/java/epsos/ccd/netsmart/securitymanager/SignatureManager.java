@@ -3,7 +3,7 @@ package epsos.ccd.netsmart.securitymanager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.security.SAMLSignatureProfileValidator;
@@ -56,8 +56,6 @@ import java.util.List;
 public class SignatureManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SignatureManager.class);
-    private static final String NCP_ALGO_SIGNATURE = "secman.signature.algorithm.default";
-    private static final String NCP_ALGO_DIGEST = "secman.digest.algorithm.default";
     private KeyStoreManager keyManager;
     private String signatureAlgorithm;
     private String digestAlgorithm;
@@ -78,19 +76,8 @@ public class SignatureManager {
 
     private void init() {
 
-        signatureAlgorithm = ConfigurationManagerFactory.getConfigurationManager().getProperty(NCP_ALGO_SIGNATURE);
-
-        // If not defined
-        if (signatureAlgorithm.length() == 0) {
-            signatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256;
-        }
-
-        digestAlgorithm = ConfigurationManagerFactory.getConfigurationManager().getProperty(NCP_ALGO_DIGEST);
-
-        // If not defined
-        if (digestAlgorithm.length() == 0) {
-            digestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA256;
-        }
+        signatureAlgorithm = CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256;
+        digestAlgorithm = CryptographicConstant.ALGO_ID_DIGEST_SHA256;
     }
 
     /**
@@ -224,7 +211,7 @@ public class SignatureManager {
         sig.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_WITH_COMMENTS);
 
         BasicSecurityConfiguration securityConfiguration = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-        securityConfiguration.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
+        securityConfiguration.setSignatureReferenceDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256);
         try {
             SecurityHelper.prepareSignatureParams(sig, signingCredential, securityConfiguration, null);
         } catch (SecurityException e) {
@@ -287,7 +274,7 @@ public class SignatureManager {
             Reference ref = fac.newReference("", fac.newDigestMethod(digestAlgorithm, null), Collections.singletonList(
                     fac.newTransform(Transform.ENVELOPED, (XMLStructure) null)), null, null);
 
-            SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
+            SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CryptographicConstant.ALGO_ID_C14N_EXCL_WITH_COMMENTS,
                     (C14NMethodParameterSpec) null), fac.newSignatureMethod(signatureAlgorithm, null),
                     Collections.singletonList(ref));
 

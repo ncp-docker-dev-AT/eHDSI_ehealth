@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
         "eu.europa.ec.sante.ehdsi.openncp.gateway.domain"})
 @PropertySources({
         @PropertySource("messages/messages.properties"),
-        @PropertySource("WEB-INF/classes/src/main/resources/smpeditor/smpeditor.properties")
+        @PropertySource("WEB-INF/classes/smpeditor.properties")
 })
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 

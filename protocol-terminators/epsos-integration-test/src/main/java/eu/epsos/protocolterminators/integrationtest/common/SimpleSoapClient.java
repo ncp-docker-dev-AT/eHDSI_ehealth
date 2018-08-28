@@ -30,7 +30,6 @@ public class SimpleSoapClient {
     private static final Logger LOG = LoggerFactory.getLogger(SimpleSoapClient.class);
     private static final String SECURITY_NS = IheConstants.SOAP_HEADERS.SECURITY_XSD;
     private static final String SECURITY_HEADER = "Security";
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private final String endpoint;
 
     /**
@@ -62,8 +61,8 @@ public class SimpleSoapClient {
         }
 
         // build list of SAML2 assertions
-        Assertion idAssertion = new HCPIAssertionCreator().createHCPIAssertion(XSPARole.PHYSICIAN);
-        Assertion trcAssertion = new TRCAssertionCreator().createTRCAssertion("", "");
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.PHYSICIAN);
+        Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion("", "");
         Collection<Assertion> assertions = new ArrayList<>();
         assertions.add(idAssertion);
         assertions.add(trcAssertion);
@@ -122,7 +121,7 @@ public class SimpleSoapClient {
             // populate SOAP body
             SOAPBody body = message.getSOAPBody();
             body.addDocument(document);
-            LOG.debug("Request: " + LINE_SEPARATOR + getXmlFromSOAPMessage(message));
+            LOG.debug("Request:\n'{}'", getXmlFromSOAPMessage(message));
 
             // do SOAP request
             SOAPConnection connection = SOAPConnectionFactory.newInstance().createConnection();
@@ -131,13 +130,12 @@ public class SimpleSoapClient {
 
             // process response
             SOAPBody responseBody = response.getSOAPBody();
-            LOG.debug("Response: " + LINE_SEPARATOR + getXmlFromSOAPMessage(response));
-            SOAPBodyElement responseElement = (SOAPBodyElement) responseBody.getChildElements().next();
-            returnElement = responseElement;
+            LOG.debug("Response:\n'{}'", getXmlFromSOAPMessage(response));
+            returnElement = (SOAPBodyElement) responseBody.getChildElements().next();
 
             /* If error present */
             if (responseBody.getFault() != null) {
-                LOG.info(LINE_SEPARATOR + getXmlFromSOAPMessage(response));
+                LOG.info(getXmlFromSOAPMessage(response));
                 throw new SOAPFaultException(responseBody.getFault());
             }
 

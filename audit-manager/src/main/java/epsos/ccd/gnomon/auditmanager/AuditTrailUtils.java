@@ -69,43 +69,41 @@ public enum AuditTrailUtils {
         }
         try {
             validated = Utils.validateSchema(auditMessage, url);
-            LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Validating Schema");
+            LOGGER.info("'{}' Validating Schema", auditmessage.getEventIdentification().getEventID().getCode());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
         boolean forceWrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "true", true));
         if (!validated) {
-            LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message not validated");
+            LOGGER.info("'{}' Message not validated", auditmessage.getEventIdentification().getEventID().getCode());
             if (!forceWrite) {
                 auditMessage = "";
             }
         }
         if (validated || forceWrite) {
             if (validated) {
-                LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message validated");
+                LOGGER.info("'{}' Message validated", auditmessage.getEventIdentification().getEventID().getCode());
             } else {
-                LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " message not validated");
+                LOGGER.info("'{}' message not validated", auditmessage.getEventIdentification().getEventID().getCode());
             }
             if (forceWrite && !validated) {
-                LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode()
-                        + " AuditManager is force to send the message. So trying ...");
+                LOGGER.info("'{}' AuditManager is force to send the message. So trying ...",
+                        auditmessage.getEventIdentification().getEventID().getCode());
             }
 
             try {
                 // validate xml according to xsd
-                LOGGER.debug(auditmessage.getEventIdentification().getEventID().getCode()
-                        + " XML stuff: Create Dom From String");
+                LOGGER.debug("'{}' XML stuff: Create Dom From String", auditmessage.getEventIdentification().getEventID().getCode());
                 Document doc = Utils.createDomFromString(auditMessage);
                 if (sign) {
                     // Gnomon SecMan
                     auditMessage = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
 
-                    LOGGER.info(auditmessage.getEventIdentification().getEventID().getCode() + " message signed");
+                    LOGGER.info("'{}' message signed", auditmessage.getEventIdentification().getEventID().getCode());
                 }
             } catch (Exception e) {
                 auditMessage = "";
-                LOGGER.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error signing doc"
-                        + e.getMessage(), e);
+                LOGGER.error("'{}' Error signing doc: '{}'", auditmessage.getEventIdentification().getEventID().getCode(), e.getMessage(), e);
             }
         }
         return auditMessage;
@@ -144,6 +142,7 @@ public enum AuditTrailUtils {
     public AuditMessage createAuditMessage(EventLog eventLog) {
 
         LOGGER.info("createAuditMessage(EventLog '{}')", eventLog.getEventType());
+        //TODO: Check if the Audit Message return with a null value shall be considered as fatal?
         AuditMessage am = new AuditMessage();
         AuditTrailUtils au = AuditTrailUtils.getInstance();
         if (StringUtils.equals(eventLog.getEventType(), EventType.epsosIdentificationServiceFindIdentityByTraits.getCode())) {
@@ -217,10 +216,17 @@ public enum AuditTrailUtils {
                     eventLog.getReqM_PatricipantObjectDetail(), eventLog.getResM_ParticipantObjectID(),
                     eventLog.getResM_PatricipantObjectDetail());
         }
+
+        //TODO: Check if the Audit Message return with a null value shall be considered as fatal?
         /* Invoke audit message validation services */
         if (OpenNCPValidation.isValidationEnable()) {
-            boolean validated = validateAuditMessage(eventLog, am);
-            LOGGER.info("Audit Message validated and  report generated: '{}'", validated);
+
+            if (am == null) {
+                LOGGER.error("Validation of the Audit Message cannot proceed on a Null value!!!");
+            } else {
+                boolean validated = validateAuditMessage(eventLog, am);
+                LOGGER.info("Audit Message validated and  report generated: '{}'", validated);
+            }
         }
         return am;
     }
@@ -245,38 +251,10 @@ public enum AuditTrailUtils {
                 participantObjectIDRequest, participantObjectDetailRequest);
         auditMessage.getParticipantObjectIdentification().add(poiRequest);
 
-        //        poit.setParticipantObjectID(ReqM_ParticipantObjectID);
-        //        poit.setParticipantObjectTypeCode(new Short("4"));
-        //        CodedValueType PS_object = new CodedValueType();
-        //        PS_object.setCode("req");
-        //        PS_object.setCodeSystemName("epSOS Msg");
-        //        PS_object.setDisplayName("Request Message");
-        //        poit.setParticipantObjectIDTypeCode(PS_object);
-        //        if (ReqM_PatricipantObjectDetail != null) {
-        //            TypeValuePairType pod = new TypeValuePairType();
-        //            pod.setType("securityheader");
-        //            pod.setValue(ReqM_PatricipantObjectDetail);
-        //            poit.getParticipantObjectDetail().add(pod);
-        //        }
-
         // Response
         ParticipantObjectIdentificationType poiResponse = createParticipantObjectIdentification("rsp",
                 participantObjectIDResponse, participantObjectDetailResponse);
         auditMessage.getParticipantObjectIdentification().add(poiResponse);
-        //poit1 = new ParticipantObjectIdentificationType();
-        //poit1.setParticipantObjectID(ResM_ParticipantObjectID);
-        //poit1.setParticipantObjectTypeCode(new Short("4"));
-        //CodedValueType PS_object1 = new CodedValueType();
-        //PS_object1.setCode("rsp");
-        //PS_object1.setCodeSystemName("epSOS Msg");
-        //PS_object1.setDisplayName("Response Message");
-        //poit1.setParticipantObjectIDTypeCode(PS_object1);
-//        if (ResM_PatricipantObjectDetail != null) {
-//            TypeValuePairType pod1 = new TypeValuePairType();
-//            pod1.setType("securityheader");
-//            pod1.setValue(ResM_PatricipantObjectDetail);
-//            poit1.getParticipantObjectDetail().add(pod1);
-//        }
 
         return auditMessage;
     }
@@ -904,38 +882,45 @@ public enum AuditTrailUtils {
         return am;
     }
 
-    private AuditMessage addError(AuditMessage am, String EM_PatricipantObjectID, byte[] EM_PatricipantObjectDetail,
-                                  Short EM_Code, Short EM_CodeRole, String EM_TypeCode, String EM_qualifier) {
+    /**
+     * @param auditMessage
+     * @param errorMessagePartObjectId
+     * @param errorMessagePartObjectDetail
+     * @param errorMessageCode
+     * @param errorMessageCodeRole
+     * @param errorMessageTypeCode
+     * @param errorMessageQualifier
+     * @return
+     */
+    private AuditMessage addError(AuditMessage auditMessage, String errorMessagePartObjectId, byte[] errorMessagePartObjectDetail,
+                                  Short errorMessageCode, Short errorMessageCodeRole, String errorMessageTypeCode,
+                                  String errorMessageQualifier) {
 
-        // Error Message
-        boolean noErrorOccured;
-        LOGGER.info("The EM_PatricipantObjectID is: '{}'", EM_PatricipantObjectID);
-        try {
-            noErrorOccured = Utils.isEmpty(EM_PatricipantObjectID);
-        } catch (Exception e) {
-            noErrorOccured = true;
-            LOGGER.error("The participant object id is null. So no error occured" + e.getMessage(), e);
-        }
+        // Error Message handling for audit purpose
+        if (StringUtils.isNotBlank(errorMessagePartObjectId)) {
 
-        if (noErrorOccured) {
-            LOGGER.info("There is no error occured");
-        } else {
-            ParticipantObjectIdentificationType em = new ParticipantObjectIdentificationType();
-            em.setParticipantObjectID(EM_PatricipantObjectID);
-            em.setParticipantObjectTypeCode(EM_Code);
-            em.setParticipantObjectTypeCodeRole(EM_CodeRole);
-            CodedValueType EM_object = new CodedValueType();
-            EM_object.setCode(EM_TypeCode);
-            em.setParticipantObjectIDTypeCode(EM_object);
-            if (EM_PatricipantObjectDetail != null) {
-                TypeValuePairType pod = new TypeValuePairType();
-                pod.setType(EM_qualifier);
-                pod.setValue(EM_PatricipantObjectDetail);
-                em.getParticipantObjectDetail().add(pod);
+            LOGGER.info("Error Message Participant ID is: '{}'", errorMessagePartObjectId);
+            CodedValueType codedValueType = new CodedValueType();
+            codedValueType.setCode(errorMessageTypeCode);
+
+            ParticipantObjectIdentificationType participantObjectIdentificationType = new ParticipantObjectIdentificationType();
+            participantObjectIdentificationType.setParticipantObjectID(errorMessagePartObjectId);
+            participantObjectIdentificationType.setParticipantObjectTypeCode(errorMessageCode);
+            participantObjectIdentificationType.setParticipantObjectTypeCodeRole(errorMessageCodeRole);
+            participantObjectIdentificationType.setParticipantObjectIDTypeCode(codedValueType);
+
+            if (errorMessagePartObjectDetail != null) {
+                TypeValuePairType typeValuePairType = new TypeValuePairType();
+                typeValuePairType.setType(errorMessageQualifier);
+                typeValuePairType.setValue(errorMessagePartObjectDetail);
+                participantObjectIdentificationType.getParticipantObjectDetail().add(typeValuePairType);
             }
-            am.getParticipantObjectIdentification().add(em);
+            auditMessage.getParticipantObjectIdentification().add(participantObjectIdentificationType);
+
+        } else {
+            LOGGER.debug("No Error Message reported by the auditing process!");
         }
-        return am;
+        return auditMessage;
     }
 
     private AuditMessage addEventTarget(AuditMessage am, String ET_ObjectID, Short TypeCode, Short TypeCodeRole,
@@ -958,7 +943,7 @@ public enum AuditTrailUtils {
     private AuditMessage addEventTarget(AuditMessage am, String ET_ObjectID, Short ObjectTypeCode, Short ObjectDataLifeCycle,
                                         String EM_Code, String EM_CodeSystemName, String EM_DisplayName) {
 
-        LOGGER.info("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", am.toString(), ET_ObjectID,
+        LOGGER.info("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", am, ET_ObjectID,
                 ObjectTypeCode, ObjectDataLifeCycle, EM_Code, EM_CodeSystemName, EM_DisplayName);
 
         ParticipantObjectIdentificationType em = new ParticipantObjectIdentificationType();
@@ -1298,57 +1283,16 @@ public enum AuditTrailUtils {
      */
     private boolean validateAuditMessage(EventLog eventLog, AuditMessage am) {
 
-        LOGGER.info("validateAuditMessage(EventLog '{}', AudiMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
+        LOGGER.info("validateAuditMessage(EventLog '{}', AuditMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
                 am.getEventIdentification().getEventActionCode(), eventLog.getPC_UserID());
-//        String model = "";
-        NcpSide ncpSide = eventLog.getNcpSide();
-
-        if (StringUtils.equals(eventLog.getEventType(), "epsos-cf")) {
-            throw new UnsupportedOperationException("EventCode not supported.");
-        }
-
-//        // Infer model according to NCP Side and EventCode
-//        if (ncpSide == NcpSide.NCP_A) {
-//            if (StringUtils.equals(eventLog.getEventType(), "epsos-11")) {
-//                model = AuditModel.EPSOS2_IDENTIFICATION_SERVICE_AUDIT_SP.toString();
-//            }
-//            if (StringUtils.equals(eventLog.getEventType(), "epsos-21") || StringUtils.equals(eventLog.getEventType(), "epsos-22")
-//                    || StringUtils.equals(eventLog.getEventType(), "epsos-31") || StringUtils.equals(eventLog.getEventType(), "epsos-32")
-//                    || StringUtils.equals(eventLog.getEventType(), "epsos-94") || StringUtils.equals(eventLog.getEventType(), "epsos-96")
-//                    || StringUtils.equals(eventLog.getEventType(), "ITI-38") || StringUtils.equals(eventLog.getEventType(), "ITI-39")
-//                    || StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
-//                model = AuditModel.EPSOS2_FETCH_DOC_SERVICE_SP.toString();
-//            }
-//            if (StringUtils.equals(eventLog.getEventType(), "epsos-41") || StringUtils.equals(eventLog.getEventType(), "epsos-51")) {
-//                model = AuditModel.EPSOS2_PROVIDE_DATA_SERVICE_SP.toString();
-//            }
-//        } else {
-//            if (StringUtils.equals(eventLog.getEventType(), "epsos-11")) {
-//                model = AuditModel.EPSOS2_HCP_ASSURANCE_AUDIT.toString();
-//            }
-//            if (StringUtils.equals(eventLog.getEventType(), "epsos-21") || StringUtils.equals(eventLog.getEventType(), "epsos-22")
-//                    || StringUtils.equals(eventLog.getEventType(), "epsos-31") || StringUtils.equals(eventLog.getEventType(), "epsos-94")
-//                    || StringUtils.equals(eventLog.getEventType(), "epsos-96") || StringUtils.equals(eventLog.getEventType(), "ITI-38")
-//                    || StringUtils.equals(eventLog.getEventType(), "ITI-39") || StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
-//                model = AuditModel.EPSOS2_HCP_ASSURANCE_AUDIT.toString();
-//            }
-//            if (StringUtils.equals(eventLog.getEventType(), "epsos-32")) {
-//                model = AuditModel.EPSOS2_FETCH_DOC_SERVICE_SC.toString();
-//            }
-//            if (StringUtils.equals(eventLog.getEventType(), "epsos-41") || StringUtils.equals(eventLog.getEventType(), "epsos-51")) {
-//                model = AuditModel.EPSOS2_PROVIDE_DATA_SERVICE_SC.toString();
-//            }
-//            if (StringUtils.equals(eventLog.getEventType(), "epsos-91")) {
-//                model = AuditModel.EPSOS2_ISSUANCE_HCP_ASSERTION.toString();
-//            }
-//            if (StringUtils.equals(eventLog.getEventType(), "epsos-92")) {
-//                model = AuditModel.EPSOS2_ISSUANCE_TRC_ASSERTION.toString();
-//            }
-//            if (StringUtils.equals(eventLog.getEventType(), "epsos-93")) {
-//                model = AuditModel.EPSOS2_IMPORT_NCP_TRUSTED_LIST.toString();
-//            }
-//        }
         try {
+            // Infer model according to NCP Side and EventCode
+            NcpSide ncpSide = eventLog.getNcpSide();
+
+            if (StringUtils.equals(eventLog.getEventType(), "epsos-cf")) {
+                throw new UnsupportedOperationException("EventCode not supported.");
+            }
+
 
             return OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(am), eventLog.getEventType(), ncpSide);
         } catch (JAXBException e) {

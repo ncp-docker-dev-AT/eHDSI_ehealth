@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,7 +48,6 @@ public class Signer {
         KeyStore ks = null;
         try {
             ks = KeyStore.getInstance("JKS");
-            // InputStream keystoreStream = this.getClass().getResourceAsStream(keystoreResPath);
             ks.load(keystoreResPath.getInputStream(), keystorePass.toCharArray());
         } catch (KeyStoreException ex) {
             logger.error("\nKeyStoreException 1 - " + SimpleErrorHandler.printExceptionStackTrace(ex), ex);
@@ -103,15 +103,13 @@ public class Signer {
     public void sign(String refUri, Element xtPointer, String c14nMethod) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, MarshalException, XMLSignatureException {
 
         Reference ref = sigFactory.newReference(
-                refUri,
-                sigFactory.newDigestMethod(DigestMethod.SHA256, null),
+                refUri, sigFactory.newDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256, null),
                 Collections.singletonList(sigFactory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null)),
-                null,
-                null);
+                null, null);
 
         SignedInfo signedInfo = sigFactory.newSignedInfo(
                 sigFactory.newCanonicalizationMethod(c14nMethod, (C14NMethodParameterSpec) null),
-                sigFactory.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", null),
+                sigFactory.newSignatureMethod(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256, null),
                 Collections.singletonList(ref));
 
         DOMSignContext signContext = new DOMSignContext(privateKeyEntry.getPrivateKey(), xtPointer);

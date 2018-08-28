@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -43,8 +45,6 @@ public class SMPSignFileController {
 
     private SMPConverter smpconverter;
 
-    private XMLValidator xmlValidator;
-
     private Environment env;
 
     private ReadSMPProperties readProperties;
@@ -52,9 +52,8 @@ public class SMPSignFileController {
     private String type;
 
     @Autowired
-    public SMPSignFileController(SMPConverter smpconverter, XMLValidator xmlValidator, Environment env, ReadSMPProperties readProperties) {
+    public SMPSignFileController(SMPConverter smpconverter, Environment env, ReadSMPProperties readProperties) {
         this.smpconverter = smpconverter;
-        this.xmlValidator = xmlValidator;
         this.env = env;
         this.readProperties = readProperties;
     }
@@ -167,7 +166,7 @@ public class SMPSignFileController {
      * @return
      */
     @RequestMapping(value = "/smpeditor/signsmpfile", method = RequestMethod.POST)
-    public String postSign(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model, final RedirectAttributes redirectAttributes) {
+    public String postSign(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model, final RedirectAttributes redirectAttributes) throws IOException {
 
         LOGGER.debug("\n==== in postSign ====");
         model.addAttribute("smpfilesign", smpfilesign);
@@ -178,7 +177,7 @@ public class SMPSignFileController {
 
         /*Iterate each chosen file*/
         for (int k = 0; k < signFiles.size(); k++) {
-            
+
             LOGGER.debug("\n***** MULTIPLE FILE NAME '{}-{}'", k, signFiles.get(k).getOriginalFilename());
             SMPFileOps smpfile = new SMPFileOps();
             SMPFields smpfields = new SMPFields();
@@ -189,12 +188,12 @@ public class SMPSignFileController {
             try {
                 smpfile.getSignFile().transferTo(convFile);
             } catch (IOException ex) {
-                LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (IllegalStateException ex) {
-                LOGGER.error("\n IllegalStateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                LOGGER.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
-
-            boolean valid = xmlValidator.validator(convFile.getPath());
+            String contentFile = new String(Files.readAllBytes(Paths.get(convFile.getPath())));
+            boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
             boolean fileDeleted;
 
             if (valid) {

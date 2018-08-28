@@ -65,7 +65,7 @@ public class EvidenceUtils {
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'",
-                    XMLUtil.DocumentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
+                    XMLUtil.documentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title);
         }
@@ -98,7 +98,7 @@ public class EvidenceUtils {
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
-                    XMLUtil.DocumentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
+                    XMLUtil.documentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title, msguuid);
         }
@@ -187,7 +187,7 @@ public class EvidenceUtils {
 
             oh.discharge();
             Utilities.serialize(oh.getMessage().getDocumentElement());
-            String oblString = XMLUtil.DocumentToString(oh.getMessage());
+            String oblString = XMLUtil.documentToString(oh.getMessage());
             if (title == null || title.isEmpty()) {
                 title = getPath() + "nrr/" + getDocumentTitle(msguuid, oh.toString()) + ".xml";
             } else {
@@ -207,7 +207,7 @@ public class EvidenceUtils {
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRO()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'",
-                    XMLUtil.DocumentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
+                    XMLUtil.documentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType, submissionTime, status, title);
         }
         MessageType messageType = null;
@@ -238,7 +238,7 @@ public class EvidenceUtils {
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRO()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
-                    XMLUtil.DocumentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
+                    XMLUtil.documentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title, msguuid);
         }
@@ -337,7 +337,7 @@ public class EvidenceUtils {
 
             handler.discharge();
             Utilities.serialize(handler.getMessage().getDocumentElement());
-            String oblString = XMLUtil.DocumentToString(handler.getMessage());
+            String oblString = XMLUtil.documentToString(handler.getMessage());
             if (title == null || title.isEmpty()) {
                 title = getPath() + "nro/" + getDocumentTitle(msguuid, handler.toString()) + ".xml";
             } else {

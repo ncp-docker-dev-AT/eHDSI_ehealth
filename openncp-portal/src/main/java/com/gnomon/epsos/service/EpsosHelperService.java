@@ -28,7 +28,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
-import net.ihe.gazelle.medication.NullFlavor;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -65,7 +65,6 @@ import org.opensaml.xml.schema.XSURI;
 import org.opensaml.xml.security.BasicSecurityConfiguration;
 import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.security.credential.Credential;
-import org.opensaml.xml.signature.SignatureConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
@@ -877,11 +876,11 @@ public class EpsosHelperService {
         Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
 
         sig.setSigningCredential(signingCredential);
-        sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        sig.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+        sig.setSignatureAlgorithm(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256);
+        sig.setCanonicalizationAlgorithm(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
 
         BasicSecurityConfiguration secConfig = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-        secConfig.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
+        secConfig.setSignatureReferenceDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256);
 
         try {
             SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
@@ -940,7 +939,7 @@ public class EpsosHelperService {
             }
 
             String orgName;
-            Vector perms = new Vector();
+            List<String> permissions = new ArrayList<>();
 
             String username = user.getScreenName();
             String rolename = "";
@@ -952,7 +951,7 @@ public class EpsosHelperService {
                 String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
                 String[] p = doctor_perms.split(",");
                 for (String aP : p) {
-                    perms.add(prefix + aP);
+                    permissions.add(prefix + aP);
                 }
             }
             if (isPharmacist) {
@@ -960,7 +959,7 @@ public class EpsosHelperService {
                 String pharm_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_PERMISSIONS);
                 String[] p1 = pharm_perms.split(",");
                 for (String aP1 : p1) {
-                    perms.add(prefix + aP1);
+                    permissions.add(prefix + aP1);
                 }
             }
 
@@ -969,7 +968,7 @@ public class EpsosHelperService {
                 String nurse_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_NURSE_PERMISSIONS);
                 String[] p1 = nurse_perms.split(",");
                 for (String aP1 : p1) {
-                    perms.add(prefix + aP1);
+                    permissions.add(prefix + aP1);
                 }
             }
 
@@ -978,7 +977,7 @@ public class EpsosHelperService {
                 String patient_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
                 String[] p1 = patient_perms.split(",");
                 for (String aP1 : p1) {
-                    perms.add(prefix + aP1);
+                    permissions.add(prefix + aP1);
                 }
             }
 
@@ -987,7 +986,7 @@ public class EpsosHelperService {
                 String admin_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
                 String[] p1 = admin_perms.split(",");
                 for (String aP1 : p1) {
-                    perms.add(prefix + aP1);
+                    permissions.add(prefix + aP1);
                 }
             }
             Company company = CompanyLocalServiceUtil.getCompany(user.getCompanyId());
@@ -1010,7 +1009,7 @@ public class EpsosHelperService {
             if (isEmergency) {
                 purposeOfUse = "EMERGENCY";
             }
-            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType, purposeOfUse, poc, perms);
+            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType, purposeOfUse, poc, permissions);
 
             // send Audit message
             // GUI-27
@@ -1056,11 +1055,11 @@ public class EpsosHelperService {
         Assertion assertion;
 
         try {
-            boolean isPhysician = role.equalsIgnoreCase(LiferayUtils.LPDoctorRole);
-            boolean isPharmacist = role.equalsIgnoreCase(LiferayUtils.LPPharmacistRole);
-            boolean isNurse = role.equalsIgnoreCase(LiferayUtils.LPNurseRole);
-            boolean isAdministrator = role.equalsIgnoreCase(LiferayUtils.LPAdministratorRole);
-            boolean isPatient = role.equalsIgnoreCase(LiferayUtils.LPPatientRole);
+            boolean isPhysician = role.equalsIgnoreCase(LiferayUtils.LP_DOCTOR_ROLE);
+            boolean isPharmacist = role.equalsIgnoreCase(LiferayUtils.LP_PHARMACIST_ROLE);
+            boolean isNurse = role.equalsIgnoreCase(LiferayUtils.LP_NURSE_ROLE);
+            boolean isAdministrator = role.equalsIgnoreCase(LiferayUtils.LP_ADMINISTRATIVE_ROLE);
+            boolean isPatient = role.equalsIgnoreCase(LiferayUtils.LP_PATIENT_ROLE);
 
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
                 LOGGER.info("The portal role is one of the expected. Continuing ...");
@@ -1071,7 +1070,7 @@ public class EpsosHelperService {
 
             String orgName;
 
-            Vector perms = new Vector();
+            List<String> permissions = new ArrayList<>();
 
             String username = screenname;
             String rolename = "";
@@ -1083,7 +1082,7 @@ public class EpsosHelperService {
                 String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
                 String[] p = doctor_perms.split(",");
                 for (String aP : p) {
-                    perms.add(prefix + aP);
+                    permissions.add(prefix + aP);
                 }
             }
             if (isPharmacist) {
@@ -1091,7 +1090,7 @@ public class EpsosHelperService {
                 String pharm_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_PERMISSIONS);
                 String[] p1 = pharm_perms.split(",");
                 for (String aP1 : p1) {
-                    perms.add(prefix + aP1);
+                    permissions.add(prefix + aP1);
                 }
             }
 
@@ -1100,7 +1099,7 @@ public class EpsosHelperService {
                 String nurse_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_NURSE_PERMISSIONS);
                 String[] p1 = nurse_perms.split(",");
                 for (String aP1 : p1) {
-                    perms.add(prefix + aP1);
+                    permissions.add(prefix + aP1);
                 }
             }
 
@@ -1109,7 +1108,7 @@ public class EpsosHelperService {
                 String patient_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
                 String[] p1 = patient_perms.split(",");
                 for (String aP1 : p1) {
-                    perms.add(prefix + aP1);
+                    permissions.add(prefix + aP1);
                 }
             }
 
@@ -1118,7 +1117,7 @@ public class EpsosHelperService {
                 String admin_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
                 String[] p1 = admin_perms.split(",");
                 for (String aP1 : p1) {
-                    perms.add(prefix + aP1);
+                    permissions.add(prefix + aP1);
                 }
             }
             orgName = "eHealthPass";
@@ -1133,7 +1132,7 @@ public class EpsosHelperService {
                 orgType = "Resident Physician";
             }
             assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType,
-                    "TREATMENT", poc, perms);
+                    "TREATMENT", poc, permissions);
 
             // send Audit message
             // GUI-27
@@ -1237,7 +1236,7 @@ public class EpsosHelperService {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
-        String secHead = "No security header provided";
+        String secHead = "[No security header provided]";
         String reqm_participantObjectID = "urn:uuid:" + message;
         String resm_participantObjectID = "urn:uuid:" + message;
 
@@ -1259,7 +1258,6 @@ public class EpsosHelperService {
 
         String AS_AuditSourceId = Constants.COUNTRY_PRINCIPAL_SUBDIVISION;
         String ET_ObjectID = "urn:uuid:" + message;
-        byte[] ResM_PatricipantObjectDetail = new byte[1];
 
         AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
@@ -1278,7 +1276,7 @@ public class EpsosHelperService {
         eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                resm_participantObjectID, ResM_PatricipantObjectDetail, hostSource, "N/A", NcpSide.NCP_B);
+                resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8), hostSource, "N/A", NcpSide.NCP_B);
 
         LOGGER.info("The audit has been prepared");
         eventLog1.setEventType(EventType.epsosHcpAuthentication);
@@ -1338,7 +1336,7 @@ public class EpsosHelperService {
     }
 
     private static Assertion createAssertion(String username, String role, String organization, String organizationId,
-                                             String facilityType, String purposeOfUse, String xspaLocality, Vector permissions) {
+                                             String facilityType, String purposeOfUse, String xspaLocality, List<String> permissions) {
 
         String fullName = LiferayUtils.getPortalUser().getFullName();
         String email = LiferayUtils.getPortalUser().getEmailAddress();
@@ -1349,7 +1347,7 @@ public class EpsosHelperService {
     private static Assertion createStorkAssertion(String username, String fullName, String email, String role, String organization,
                                                   String organizationId, String facilityType,
                                                   String purposeOfUse, String xspaLocality,
-                                                  Vector permissions, String onBehalfId) {
+                                                  List<String> permissions, String onBehalfId) {
         // assertion
         LOGGER.info("username: '{}'", username);
         LOGGER.info("FullName: '{}'", fullName);
@@ -1554,7 +1552,7 @@ public class EpsosHelperService {
 
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
-            LOGGER.error("getCountriesFromCS: " + e.getMessage());
+            LOGGER.error("getCountriesFromCS: '{}'", e.getMessage());
         }
         return listOfCountries;
     }
@@ -1615,8 +1613,8 @@ public class EpsosHelperService {
                 Element link = (Element) nodeLst.item(s);
                 String a1 = EpsosHelperService.getPortalTranslation(
                         link.getAttribute("code"), language);
-                Vector v = getCountryIdsFromCS(link.getAttribute("code"));
-                SearchMask sm = (SearchMask) v.get(0);
+                List<SearchMask> v = getCountryIdsFromCS(link.getAttribute("code"));
+                SearchMask sm = v.get(0);
                 if (sm.getDomain() != null) {
                     listOfCountries = listOfCountries + seperator + a1;
                 }
@@ -1629,10 +1627,10 @@ public class EpsosHelperService {
         return listOfCountries;
     }
 
-    public static Vector getCountryIdsFromCS(String country, String portalPath) {
+    public static List<SearchMask> getCountryIdsFromCS(String country, String portalPath) {
 
         String path;
-        Vector v = new Vector();
+        List<SearchMask> searchMaskList = new ArrayList<>();
         String filename = "InternationalSearch_" + country + ".xml";
         path = getSearchMaskPath() + "forms" + File.separator + filename;
         LOGGER.info("#### Path is: '{}'", path);
@@ -1640,39 +1638,39 @@ public class EpsosHelperService {
         try {
             File file = new File(path);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(file);
             doc.getDocumentElement().normalize();
-            NodeList nodeLst = doc.getElementsByTagName("id");
+            NodeList nodeLst = doc.getElementsByTagNameNS("*", "id");
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
                 SearchMask sm = new SearchMask();
                 sm.setDomain(link.getAttribute("domain"));
                 sm.setLabel(link.getAttribute("label"));
                 sm.setFriendlyName(link.getAttribute("friendlyName"));
-                v.add(sm);
+                searchMaskList.add(sm);
             }
         } catch (Exception e) {
-            LOGGER.error("Error getting country ids " + e.getMessage());
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Error getting country ids '{}'", e.getMessage(), e);
         }
-        return v;
+        return searchMaskList;
     }
 
     public static List<Identifier> getCountryIdentifiers(String country, String language, String path, User user) {
 
         List<Identifier> identifiers = new ArrayList<>();
 
-        Vector vec = EpsosHelperService.getCountryIdsFromCS(country, path);
-        for (Object aVec : vec) {
+        List<SearchMask> vec = EpsosHelperService.getCountryIdsFromCS(country, path);
+        for (SearchMask aVec : vec) {
             Identifier id = new Identifier();
-            id.setKey(EpsosHelperService.getPortalTranslation(((SearchMask) aVec).getLabel(), language) + "*");
-            id.setDomain(((SearchMask) aVec).getDomain());
+            id.setKey(EpsosHelperService.getPortalTranslation(aVec.getLabel(), language) + "*");
+            id.setDomain(aVec.getDomain());
             if (id.getKey().equals("") || id.getKey().equals("*")) {
-                id.setKey(((SearchMask) aVec).getLabel() + "*");
+                id.setKey(aVec.getLabel() + "*");
             }
 
-            id.setFriendlyName(((SearchMask) aVec).getFriendlyName());
+            id.setFriendlyName(aVec.getFriendlyName());
 
             if (Validator.isNotNull(user)) {
                 String idvalue = (String) user.getExpandoBridge().getAttribute(id.getDomain());
@@ -1688,20 +1686,19 @@ public class EpsosHelperService {
     public static List<Demographics> getCountryDemographics(String country, String language, String path, User user) {
 
         List<Demographics> demographics = new ArrayList<>();
-        Vector vec = EpsosHelperService.getCountryDemographicsFromCS(country, path);
-        for (Object aVec : vec) {
+        List<Demographics> demographicsList = EpsosHelperService.getCountryDemographicsFromCS(country, path);
+        for (Demographics demo : demographicsList) {
             Demographics id = new Demographics();
-            if (((Demographics) aVec).getMandatory()) {
-                id.setLabel(EpsosHelperService.getPortalTranslation(
-                        ((Demographics) aVec).getLabel(), language) + "*");
+            if (demo.getMandatory()) {
+                id.setLabel(EpsosHelperService.getPortalTranslation(demo.getLabel(), language) + "*");
             } else {
-                id.setLabel(EpsosHelperService.getPortalTranslation(((Demographics) aVec).getLabel(), language));
+                id.setLabel(EpsosHelperService.getPortalTranslation(demo.getLabel(), language));
             }
-            id.setLength(((Demographics) aVec).getLength());
-            id.setKey(((Demographics) aVec).getKey());
-            id.setMandatory(((Demographics) aVec).getMandatory());
-            id.setType(((Demographics) aVec).getType());
-            id.setFriendlyName(((Demographics) aVec).getFriendlyName());
+            id.setLength(demo.getLength());
+            id.setKey(demo.getKey());
+            id.setMandatory(demo.getMandatory());
+            id.setType(demo.getType());
+            id.setFriendlyName(demo.getFriendlyName());
 
             if (Validator.isNotNull(user)) {
                 String idvalue = (String) user.getExpandoBridge().getAttribute(id.getKey());
@@ -1712,7 +1709,7 @@ public class EpsosHelperService {
         return demographics;
     }
 
-    public static Vector getCountryIdsFromCS(String country) {
+    public static List<SearchMask> getCountryIdsFromCS(String country) {
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
@@ -1724,20 +1721,21 @@ public class EpsosHelperService {
         return Constants.EPSOS_PROPS_PATH;
     }
 
-    public static Vector getCountryDemographicsFromCS(String country, String portalPath) {
+    public static List<Demographics> getCountryDemographicsFromCS(String country, String portalPath) {
 
-        Vector v = new Vector();
+        List<Demographics> demographicsList = new ArrayList<>();
         String filename = "InternationalSearch_" + country + ".xml";
 
         String path = getSearchMaskPath() + "forms" + File.separator + filename;
         try {
             File file = new File(path);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(file);
             doc.getDocumentElement().normalize();
             // textFields
-            NodeList nodeLst = doc.getElementsByTagName("textField");
+            NodeList nodeLst = doc.getElementsByTagNameNS("*", "textField");
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
                 Demographics dem = new Demographics();
@@ -1748,7 +1746,7 @@ public class EpsosHelperService {
                 dem.setFriendlyName(link.getAttribute("friendlyName"));
 
                 // search for mandatory items
-                NodeList nodeLst2 = doc.getElementsByTagName("field");
+                NodeList nodeLst2 = doc.getElementsByTagNameNS("*", "field");
                 for (int i = 0; i < nodeLst2.getLength(); i++) {
                     Element link2 = (Element) nodeLst2.item(i);
                     if (link2.getAttribute("label").equals(dem.getLabel())) {
@@ -1756,36 +1754,36 @@ public class EpsosHelperService {
                         break;
                     }
                 }
-                v.add(dem);
+                demographicsList.add(dem);
             }
             // sex
-            nodeLst = doc.getElementsByTagName("sex");
+            nodeLst = doc.getElementsByTagNameNS("*", "sex");
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
                 Demographics dem = new Demographics();
                 dem.setLabel(link.getAttribute("label"));
                 dem.setKey(link.getAttribute("label"));
                 dem.setType("text");
-                v.add(dem);
+                demographicsList.add(dem);
             }
             // birth date
-            nodeLst = doc.getElementsByTagName("birthDate");
+            nodeLst = doc.getElementsByTagNameNS("*", "birthDate");
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
                 Demographics dem = new Demographics();
                 dem.setLabel(link.getAttribute("label"));
                 dem.setKey(link.getAttribute("label"));
                 dem.setType("calendar");
-                v.add(dem);
+                demographicsList.add(dem);
             }
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
-        LOGGER.info("Demographics size: '{}'", v.size());
-        return v;
+        LOGGER.info("Demographics size: '{}'", demographicsList.size());
+        return demographicsList;
     }
 
-    public static Vector getCountryDemographicsFromCS(String country) {
+    public static List<Demographics> getCountryDemographicsFromCS(String country) {
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
@@ -1821,13 +1819,13 @@ public class EpsosHelperService {
     public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
 
         Assertion trc;
-        LOGGER.debug("Try to create TRCA for patient : " + patient.getExtension());
+        LOGGER_CLINICAL.debug("Try to create TRCA for patient: '{}'", patient.getExtension());
         String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
-        LOGGER.info("TRCA Patient ID: '{}'", pat);
+        LOGGER_CLINICAL.info("TRCA Patient ID: '{}'", pat);
         LOGGER.info("Assertion ID: '{}'", idAs.getID());
         LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
         TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).PurposeOfUse(purpose).build();
-        LOGGER.info("TRCAssertionRequest: '{}", req1.toString());
+        LOGGER.info("TRCAssertionRequest: '{}", req1);
         trc = req1.request();
 
         AssertionMarshaller marshaller = new AssertionMarshaller();
@@ -2675,7 +2673,7 @@ public class EpsosHelperService {
             id.setRoot(identifiers.get(i).getDomain());
             id.setExtension(identifiers.get(i).getUserValue());
             idArray[i] = id;
-            LOGGER.info(identifiers.get(i).getDomain() + ": " + identifiers.get(i).getUserValue());
+            LOGGER_CLINICAL.info(identifiers.get(i).getDomain() + ": " + identifiers.get(i).getUserValue());
         }
 
         for (Demographics dem : demographics) {
@@ -2710,17 +2708,11 @@ public class EpsosHelperService {
                     pd.setAdministrativeGender(dem.getUserValue());
                     break;
             }
-            LOGGER.info(dem.getKey() + ": " + dem.getUserValue());
+            LOGGER.info("{}: '{}'", dem.getKey(), dem.getUserValue());
         }
 
         pd.setPatientIdArray(idArray);
         return pd;
-    }
-
-    private static boolean containsNullFlavor(Node node, NullFlavor flavor) {
-
-        return (node.getAttributes().getNamedItem("nullFlavor") != null &&
-                node.getAttributes().getNamedItem("nullFlavor").getNodeValue().equals(flavor.value()));
     }
 
     public static String toString(Node node, boolean omitXmlDeclaration, boolean prettyPrint) {

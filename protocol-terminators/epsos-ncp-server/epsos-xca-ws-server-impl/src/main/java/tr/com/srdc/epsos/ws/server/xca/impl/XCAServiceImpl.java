@@ -58,6 +58,7 @@ import java.util.*;
 public class XCAServiceImpl implements XCAServiceInterface {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCAServiceImpl.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private ITransformationService transformationService;
     private OMFactory factory;
     private oasis.names.tc.ebxml_regrep.xsd.query._3.ObjectFactory ofQuery;
@@ -887,11 +888,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
         LOGGER.debug("Transforming document, isTranscode: '{}' - Event Type: '{}'", isTranscode, eventLog.getEventType());
         if (eventLog.getReqM_PatricipantObjectDetail() != null) {
             String requester = new String(eventLog.getReqM_PatricipantObjectDetail());
-            LOGGER.info("Participant Requester: '{}'", requester);
+            LOGGER_CLINICAL.info("Participant Requester: '{}'", requester);
         }
         if (eventLog.getResM_PatricipantObjectDetail() != null) {
             String responder = new String(eventLog.getResM_PatricipantObjectDetail());
-            LOGGER.info("Participant Responser: '{}'", responder);
+            LOGGER_CLINICAL.info("Participant Responser: '{}'", responder);
         }
 
         Document returnDoc;
@@ -1135,8 +1136,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 LOGGER.debug("Client userID: '{}'", eventLog.getSC_UserID());
 
                 if (doc != null) {
-
-                    // CdaValidationService cdaValidationService = CdaValidationService.getInstance();
 
                     /* Validate CDA epSOS Friendly */
 //                    cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(),

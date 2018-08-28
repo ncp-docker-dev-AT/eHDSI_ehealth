@@ -37,6 +37,8 @@ public class Diagnosis implements Serializable {
 
     //Messages logger
     private static final Logger log = LoggerFactory.getLogger("Diagnosis");
+
+    private static final String DEFAULT_LANGUAGE = "en-GB";
     //System home path
     private static final String HOME_PATH;
     //Epsos repository path
@@ -65,7 +67,7 @@ public class Diagnosis implements Serializable {
 
         try {
             //Logging a short info message
-            log.info("Trying to read the epsos problem codes from the file: " + EPSOS_REPOSITORY_PATH + "/SNOMEDCT.xml");
+            log.info("Trying to read the epsos problem codes from the file: '{}/SNOMEDCT.xml'", EPSOS_REPOSITORY_PATH);
 
             //Reading codes from the local SNOMED CT file
             File snomedct = new File(EPSOS_REPOSITORY_PATH + "/SNOMEDCT.xml");
@@ -76,7 +78,7 @@ public class Diagnosis implements Serializable {
 
             //Getting all the entries
             NodeList entries = doc.getElementsByTagName("SNOMEDCTEntry");
-            log.info("SNOMEDCT ENTRIES SIZE : " + entries.getLength());
+            log.info("SNOMEDCT ENTRIES SIZE: '{}'", entries.getLength());
             //Iterating through the matched XML entries
             for (int i = 0; i < entries.getLength(); i++) {
                 //Getting the next element entry
@@ -84,7 +86,7 @@ public class Diagnosis implements Serializable {
 
                 //Checking if this is an EPSOS CodeProb code
                 if (entry.getAttributes().getNamedItem("epsosName").getNodeValue().equals("epSOSCodeProb")) {
-                    log.info("####" + entry.getAttributes().getNamedItem("code").getNodeValue());
+                    log.info("#### '{}'", entry.getAttributes().getNamedItem("code").getNodeValue());
                     //Getting the code
                     String code = entry.getAttributes().getNamedItem("code").getNodeValue();
 
@@ -101,7 +103,8 @@ public class Diagnosis implements Serializable {
 
                         //Checking if language comes in correct form
                         if (language.equals("en")) {
-                            language = "en-GB";
+
+                            language = DEFAULT_LANGUAGE;
                         }
 
                         //Getting the display name of the code
@@ -113,7 +116,7 @@ public class Diagnosis implements Serializable {
                             problemsDictionary.get(language).put(display, code);
                         } else {
                             //Creating an empty hash map
-                            Map<String, String> map = new HashMap<String, String>();
+                            Map<String, String> map = new HashMap<>();
 
                             //Adding the next code and display name
                             map.put(display, code);
@@ -126,7 +129,7 @@ public class Diagnosis implements Serializable {
             }
         } catch (Exception exc) {
             //Printing an error message
-            log.error(new Date() + " ERROR: " + exc.getMessage());
+            log.error("'{}' ERROR: '{}'", new Date(), exc.getMessage());
         }
 
         //Building a map of diagnosis observation display names nad codes
@@ -134,7 +137,7 @@ public class Diagnosis implements Serializable {
 
         try {
             //Logging a short info message
-            log.info("Trying to read the IHE ICD-10 codes from the file: " + EPSOS_REPOSITORY_PATH + "/ICD-10.xml");
+            log.info("Trying to read the IHE ICD-10 codes from the file: '{}/ICD-10.xml'", EPSOS_REPOSITORY_PATH);
 
             //Reading codes from the local ICD-10 file
             File icd10 = new File(EPSOS_REPOSITORY_PATH + "/ICD-10.xml");
@@ -166,7 +169,7 @@ public class Diagnosis implements Serializable {
 
                     //Checking if language comes in correct form
                     if (language.equals("en")) {
-                        language = "en-GB";
+                        language = DEFAULT_LANGUAGE;
                     }
 
                     //Getting the display name of the code
@@ -178,7 +181,7 @@ public class Diagnosis implements Serializable {
                         observationsDictionary.get(language).put(display, code);
                     } else {
                         //Creating an empty hash map
-                        Map<String, String> map = new HashMap<String, String>();
+                        Map<String, String> map = new HashMap<>();
 
                         //Adding the next code and display name
                         map.put(display, code);
@@ -190,7 +193,7 @@ public class Diagnosis implements Serializable {
             }
         } catch (Exception exc) {
             //Printing an error message
-            log.error(new Date() + " ERROR: " + exc.getMessage());
+            log.error("'{}' ERROR: '{}'", new Date(), exc.getMessage());
         }
     }
 
@@ -211,7 +214,7 @@ public class Diagnosis implements Serializable {
     //Resolved diagnosis indicator
     private boolean resolved;
     //Language selected by the user
-    private String language = "en-GB";
+    private String language = DEFAULT_LANGUAGE;
     //List of current session stored diagnoses
     @ManagedProperty(value = "#{diagnoses}")
     private Diagnoses diagnoses;
@@ -228,6 +231,25 @@ public class Diagnosis implements Serializable {
 
         //Getting the user selected language
         language = user.getLanguageId().replace("_", "-");
+    }
+
+    public Diagnosis(Diagnosis diagnosis) {
+        this(diagnosis.key, diagnosis.problem, diagnosis.status, diagnosis.onset, diagnosis.resolution,
+                diagnosis.observations, diagnosis.description, diagnosis.resolved, diagnosis.language, diagnosis.diagnoses);
+    }
+
+    public Diagnosis(String key, String problem, String status, Date onset, Date resolution, List<String> observations,
+                     String description, boolean resolved, String language, Diagnoses diagnoses) {
+        this.key = key;
+        this.problem = problem;
+        this.status = status;
+        this.onset = onset;
+        this.resolution = resolution;
+        this.observations = observations;
+        this.description = description;
+        this.resolved = resolved;
+        this.language = language;
+        this.diagnoses = diagnoses;
     }
 
     /**
@@ -369,7 +391,7 @@ public class Diagnosis implements Serializable {
      */
     public List<Map.Entry<String, String>> getSelectedObservations() {
         //Creating an empty map of entries
-        Map<String, String> entries = new HashMap<String, String>();
+        Map<String, String> entries = new HashMap<>();
 
         //Iterating throught the list of stored observations
         for (String observation : observations) {
@@ -382,9 +404,7 @@ public class Diagnosis implements Serializable {
         }
 
         //Creating an empty list of map entries
-        List<Map.Entry<String, String>> list = new ArrayList<>(entries.entrySet());
-
-        return list;
+        return new ArrayList<>(entries.entrySet());
     }
 
     /**
@@ -453,9 +473,7 @@ public class Diagnosis implements Serializable {
         //Checking if the dictionary provide such a language, otherwise return empty
         if (problemsDictionary.get(language) != null) {
             //Iterating through the problem codes for the selected language
-            for (String display : problemsDictionary.get(language).keySet()) {
-                list.add(display);
-            }
+            list.addAll(problemsDictionary.get(language).keySet());
         }
 
         return list;
@@ -517,7 +535,7 @@ public class Diagnosis implements Serializable {
         boolean passed = true;
 
         //Checking if the problem populated with a valid code
-        if (problem == null || problem.isEmpty()) {
+        if (StringUtils.isBlank(problem)) {
             //Setting the diagnosis as not passed
             passed = false;
 
@@ -578,7 +596,7 @@ public class Diagnosis implements Serializable {
         //Checking if the diagnosis validation passed
         if (passed) {
             //Copying the diagnosis instance
-            Diagnosis diagnosis = this.clone();
+            Diagnosis diagnosis = new Diagnosis(this);
 
             //Adding the cloned diagnosis to the list of session stored diagnoses
             diagnoses.add(diagnosis);
@@ -591,27 +609,6 @@ public class Diagnosis implements Serializable {
         rc.addCallbackParam("passed", passed);
     }
 
-    /**
-     * A method copying a diagnosis instance.
-     *
-     * @return a clone of the diagnosis instance.
-     */
-    @Override
-    public Diagnosis clone() {
-        //Creating a new diagnosis
-        Diagnosis diagnosis = new Diagnosis();
-
-        //Copying the diagnosis attributes
-        diagnosis.setProblem(problem);
-        diagnosis.setStatus(status);
-        diagnosis.setOnset(onset);
-        diagnosis.setResolution(resolution);
-        diagnosis.setResolved(resolved);
-        diagnosis.setObservations(observations);
-        diagnosis.setDescription(description);
-
-        return diagnosis;
-    }
 
     /**
      * A method resetting the diagnosis.

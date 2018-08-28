@@ -45,6 +45,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     private static final String ERROR_ANSWER_NOT_AVAILABLE = "AnswerNotAvailable";
     private static final String ERROR_INSUFFICIENT_RIGHTS = "InsufficientRights";
     private static final Logger LOGGER = LoggerFactory.getLogger(XCPDServiceImpl.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private ObjectFactory of;
     private ServiceLoader<PatientSearchInterface> serviceLoader;
     private PatientSearchInterface patientSearchService;
@@ -350,7 +351,12 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         }
     }
 
+    /**
+     * @param inputMessage
+     * @return
+     */
     private PatientDemographics parsePRPAIN201305UV02toPatientDemographics(PRPAIN201305UV02 inputMessage) {
+
         PatientDemographics pd = new PatientDemographics();
         PRPAIN201305UV02QUQIMT021001UV01ControlActProcess cap = inputMessage.getControlActProcess();
 
@@ -392,16 +398,16 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                             if (s instanceof JAXBElement) {
                                 JAXBElement element = (JAXBElement) s;
                                 String eName = element.getName().getLocalPart();
-                                if ("city".equals(eName)) {
+                                if (StringUtils.equals("city", eName)) {
                                     AdxpCity ac = (AdxpCity) element.getValue();
                                     pd.setCity(ac.getContent());
-                                } else if ("streetName".equals(eName)) {
+                                } else if (StringUtils.equals("streetName", eName)) {
                                     AdxpStreetName asn = (AdxpStreetName) element.getValue();
                                     pd.setStreetAddress(asn.getContent());
-                                } else if ("country".equals(eName)) {
+                                } else if (StringUtils.equals("country", eName)) {
                                     AdxpCountry ac = (AdxpCountry) element.getValue();
                                     pd.setCountry(ac.getContent());
-                                } else if ("postalCode".equals(eName)) {
+                                } else if (StringUtils.equals("postalCode", eName)) {
                                     AdxpPostalCode apc = (AdxpPostalCode) element.getValue();
                                     pd.setPostalCode(apc.getContent());
                                 }
@@ -422,10 +428,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                             if (s instanceof JAXBElement) {
                                 JAXBElement element = (JAXBElement) s;
                                 String eName = element.getName().getLocalPart();
-                                if ("given".equals(eName)) {
+                                if (StringUtils.equals("given", eName)) {
                                     EnGiven eg = (EnGiven) element.getValue();
                                     pd.setGivenName(eg.getContent());
-                                } else if ("family".equals(eName)) {
+                                } else if (StringUtils.equals("family", eName)) {
                                     EnFamily ef = (EnFamily) element.getValue();
                                     pd.setFamilyName(ef.getContent());
                                 }
@@ -572,8 +578,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     sb.append("<id>").append(patientId.getRoot()).append("</id>");
                     sb.append("<extension>").append(patientId.getExtension()).append("</extension>");
                     sb.append("</identifier>");
-                    LOGGER.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
-                    LOGGER.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
+                    LOGGER_CLINICAL.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
+                    LOGGER_CLINICAL.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
                     patientIdList.add(patientId);
                 }
                 sb.append("</patient>");
@@ -682,13 +688,12 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 // Preparing demographic query not allowed error
                 fillOutputMessage(outputMessage, "Queries are only available with patient identifiers", ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED);
             }
-        } catch (MissingFieldException | InvalidFieldException e) {
+        } catch (MissingFieldException | InvalidFieldException | InsufficientRightsException | XSDValidationException e) {
+
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);
-        } catch (InsufficientRightsException e) {
-            fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);
-        } catch (XSDValidationException e) {
-            fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);
+            LOGGER.error(e.getMessage(), e);
         } catch (Exception e) {
+            
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_ANSWER_NOT_AVAILABLE);
             LOGGER.error(e.getMessage(), e);
         }

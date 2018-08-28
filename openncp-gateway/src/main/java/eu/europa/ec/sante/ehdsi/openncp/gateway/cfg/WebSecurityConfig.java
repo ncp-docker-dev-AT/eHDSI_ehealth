@@ -56,6 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/monitoring/**").hasAuthority(GatewayConstant.GTW_ROLE_SMP_ADMIN)
                 .antMatchers("/smpeditor/**").hasAuthority(GatewayConstant.GTW_ROLE_SMP_ADMIN)
                 .antMatchers("/dynamicdiscovery/**").hasAuthority(GatewayConstant.GTW_ROLE_SMP_ADMIN)
+                .antMatchers("/user/**").hasAuthority(GatewayConstant.GTW_ROLE_SMP_ADMIN)
                 .anyRequest().authenticated().and().formLogin()
                 .loginPage("/login.html")
                 .and().logout().permitAll()
