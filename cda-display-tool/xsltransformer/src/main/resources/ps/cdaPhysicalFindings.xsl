@@ -39,8 +39,14 @@
                 name="diastolicBLabel"
                 select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8462-4']/@displayName"/>
         <xsl:variable
-                name="nullEntry"
-                select="n1:entry"/>
+                name="systolicBDate"
+                select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8480-6']/../n1:effectiveTime/@value"/>
+        <xsl:variable
+                name="diastolicBDate"
+                select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8462-4']/../n1:effectiveTime/@value"/>
+        <xsl:variable
+                name="physicalFindingsOrganizerDate"
+                select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:effectiveTime"/>
         <xsl:variable name="physAct"
                       select="n1:entry/n1:observation"/>
         <!-- End definition of variables-->
@@ -55,6 +61,19 @@
                     </label>
                     <div class="collapsible-content-title">
                         <div class="content-inner-title">
+                            <xsl:choose>
+                                <xsl:when test="(not($physicalFindingsOrganizerDate/@value = $systolicBDate) or not($physicalFindingsOrganizerDate/@value = $diastolicBDate))">
+                                    <table>
+                                        <tr>
+                                            <td style="background-color:#ffffcc">
+                                                <i class="fas fa-exclamation-triangle" style="color:#085a9f" aria-hidden="true"/>
+                                                <!-- HOTFIX - Has to be replaced with a value from the epSOSDisplayLabel value set -->
+                                                The date of the organizer should match the date of the observations.<br/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </xsl:when>
+                            </xsl:choose>
                             <xsl:choose>
                                 <xsl:when test="$shownarrative='true'">
                                     <div class="wrap-collabsible">
@@ -101,6 +120,7 @@
                                                         </tr>
                                                         <xsl:for-each select="n1:entry">
                                                             <xsl:call-template name="physicalFindingsSectionEntry">
+                                                                <xsl:with-param name="physicalFindingsOrganizerDate" select="$physicalFindingsOrganizerDate"/>
                                                             </xsl:call-template>
                                                         </xsl:for-each>
                                                     </tbody>
@@ -124,6 +144,7 @@
 
     <!-- FOR EACH ENTRY -->
     <xsl:template name="physicalFindingsSectionEntry">
+        <xsl:param name="physicalFindingsOrganizerDate"/>
         <!-- Defining all needed variables -->
         <xsl:variable
                 name="systolicBLabel"
@@ -146,12 +167,6 @@
         <xsl:variable
                 name="systolicBNode"
                 select="n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8480-6']/../n1:value"/>
-        <xsl:variable
-                name="physicalFindingsDateFrom"
-                select="n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:effectiveTime"/>
-        <xsl:variable
-                name="nullEntry"
-                select="."/>
 
         <xsl:variable name="physAct" select="n1:observation"/>
         <!-- End definition of variables-->
@@ -162,7 +177,7 @@
                 <tr>
                     <td>
                         <xsl:call-template name="show-time">
-                            <xsl:with-param name="datetime" select="$physicalFindingsDateFrom"/>
+                            <xsl:with-param name="datetime" select="$physicalFindingsOrganizerDate"/>
                         </xsl:call-template>&#160;
                     </td>
                     <td>
