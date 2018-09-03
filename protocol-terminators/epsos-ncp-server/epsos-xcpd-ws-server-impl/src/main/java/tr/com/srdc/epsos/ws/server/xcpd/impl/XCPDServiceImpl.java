@@ -44,8 +44,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     private static final String ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED = "DemographicsQueryNotAllowed";
     private static final String ERROR_ANSWER_NOT_AVAILABLE = "AnswerNotAvailable";
     private static final String ERROR_INSUFFICIENT_RIGHTS = "InsufficientRights";
-    private static final Logger LOGGER = LoggerFactory.getLogger(XCPDServiceImpl.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger logger = LoggerFactory.getLogger(XCPDServiceImpl.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private ObjectFactory of;
     private ServiceLoader<PatientSearchInterface> serviceLoader;
     private PatientSearchInterface patientSearchService;
@@ -54,11 +54,11 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         of = new ObjectFactory();
         serviceLoader = ServiceLoader.load(PatientSearchInterface.class);
         try {
-            LOGGER.info("Loading National implementation of PatientSearchInterface...");
+            logger.info("Loading National implementation of PatientSearchInterface...");
             patientSearchService = serviceLoader.iterator().next();
-            LOGGER.info("Successfully loaded PatientSearchService");
+            logger.info("Successfully loaded PatientSearchService");
         } catch (Exception e) {
-            LOGGER.error("Failed to load implementation of PatientSearchService: " + e.getMessage(), e);
+            logger.error("Failed to load implementation of PatientSearchService: " + e.getMessage(), e);
             throw e;
         }
     }
@@ -69,14 +69,14 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
     public void prepareEventLog(EventLog eventLog, PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, Element sh) {
 
-        LOGGER.info("prepareEventLog('{}')", eventLog.getEventType());
+        logger.info("prepareEventLog('{}')", eventLog.getEventType());
         eventLog.setEventType(EventType.epsosIdentificationServiceFindIdentityByTraits);
         eventLog.setEI_TransactionName(TransactionName.epsosIdentificationServiceFindIdentityByTraits);
         eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
-            LOGGER.error("DatatypeConfigurationException: {}", e.getMessage(), e);
+            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
         }
         eventLog.setHR_UserID(Constants.HR_ID_PREFIX + "<" + Helper.getUserID(sh) + "@" + Helper.getOrganization(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
@@ -340,14 +340,14 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         outputMessage.getControlActProcess().getQueryAck().setQueryResponseCode(of.createCS());
         outputMessage.getControlActProcess().getQueryAck().getQueryResponseCode().setCode(errorCode);
         if (detail != null) {
-            LOGGER.error(detail);
+            logger.error(detail);
             // Set acknowledgement/acknowledgementDetail
             outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().add(of.createMCCIMT000300UV01AcknowledgementDetail());
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).setText(of.createED());
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().setContent(detail);
         } else {
-            LOGGER.info("XCPD Request is valid.");
+            logger.info("XCPD Request is valid.");
         }
     }
 
@@ -373,7 +373,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         pd.setAdministrativeGender(PatientDemographics.Gender.parseGender(gender.getValue().get(0).getCode()));
                     }
                 } catch (Exception e) {
-                    LOGGER.warn("Unable to parse administrative gender", e);
+                    logger.warn("Unable to parse administrative gender", e);
                 }
 
                 // BirthDate
@@ -385,7 +385,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         pd.setBirthDate(DateUtil.parseDateFromString(sbd, "yyyyMMdd"));
                     }
                 } catch (Exception e) {
-                    LOGGER.warn("Unable to parse birthDate", e);
+                    logger.warn("Unable to parse birthDate", e);
                 }
 
                 // City, street name, country, postal code
@@ -415,7 +415,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         }
                     }
                 } catch (Exception e) {
-                    LOGGER.warn("Unable to parse city, street name, country or postal code", e);
+                    logger.warn("Unable to parse city, street name, country or postal code", e);
                 }
 
                 // Given name, family name
@@ -439,7 +439,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         }
                     }
                 } catch (Exception e) {
-                    LOGGER.warn("Unable to parse given name or family name", e);
+                    logger.warn("Unable to parse given name or family name", e);
                 }
 
                 // Id
@@ -450,7 +450,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         pd.setId(id.getValue().get(0).getExtension());
                     }
                 } catch (Exception e) {
-                    LOGGER.warn("Unable to parse patient id", e);
+                    logger.warn("Unable to parse patient id", e);
                 }
 
                 //TODO Email
@@ -548,7 +548,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         try {
             shElement = XMLUtils.toDOM(sh);
         } catch (Exception e) {
-            LOGGER.error("SOAP header jaxb to dom failed.", e);
+            logger.error("SOAP header jaxb to dom failed.", e);
             throw e;
         }
         patientSearchService.setSOAPHeader(shElement);
@@ -558,9 +558,9 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
             String senderHomeCommID = inputMessage.getSender().getDevice().getId().get(0).getRoot();
             String receiverHomeCommID = inputMessage.getReceiver().get(0).getDevice().getId().get(0).getRoot();
-            LOGGER.info("Sender Home Community ID.... '{}'", senderHomeCommID);
-            LOGGER.info("Receiver Home Community ID.. '{}'", receiverHomeCommID);
-            LOGGER.info("Constants.HOME_COMM_ID...... '{}'", Constants.HOME_COMM_ID);
+            logger.info("Sender Home Community ID.... '{}'", senderHomeCommID);
+            logger.info("Receiver Home Community ID.. '{}'", receiverHomeCommID);
+            logger.info("Constants.HOME_COMM_ID...... '{}'", Constants.HOME_COMM_ID);
 
             List<PRPAMT201306UV02LivingSubjectId> idList = inputQBP.getParameterList().getLivingSubjectId();
             // TODO: enable demographic searches
@@ -579,13 +579,13 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     sb.append("<extension>").append(patientId.getExtension()).append("</extension>");
                     sb.append("</identifier>");
                     if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                        LOGGER_CLINICAL.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
-                        LOGGER_CLINICAL.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
+                        loggerClinical.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
+                        loggerClinical.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
                     }
                     patientIdList.add(patientId);
                 }
                 sb.append("</patient>");
-                LOGGER.debug("patientIdList.size: '{}'", patientIdList.size());
+                logger.debug("patientIdList.size: '{}'", patientIdList.size());
 
                 // call to NI
                 // Joao: we have an adhoc XML document, so we can generate this evidence correctly
@@ -610,7 +610,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                             "NI_XCPD_REQ",
                             Helper.getHCPAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
                 } catch (Exception e) {
-                    LOGGER.error(ExceptionUtils.getStackTrace(e));
+                    logger.error(ExceptionUtils.getStackTrace(e));
                 }
                 List<PatientDemographics> pdList = patientSearchService.getPatientDemographics(patientIdList);
 //                PatientDemographics demographics = pdList.get(0);
@@ -634,7 +634,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 //                            "NI_XCPD_RES",
 //                            Helper.getHCPAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
 //                } catch (Exception e) {
-//                    LOGGER.error(ExceptionUtils.getStackTrace(e));
+//                    logger.error(ExceptionUtils.getStackTrace(e));
 //                }
                 if (pdList.isEmpty()) {
                     // Preparing answer not available error
@@ -652,14 +652,14 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     // ships within the HCP assertion
                     // TODO: Might be necessary to remove later, although it does no harm in reality!
                     else {
-                        LOGGER.info("Could not get client country code from the service consumer certificate. " +
+                        logger.info("Could not get client country code from the service consumer certificate. " +
                                 "The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
                         if (sigCountryCode != null) {
-                            LOGGER.info("Found the client country code via the signature certificate.");
+                            logger.info("Found the client country code via the signature certificate.");
                             countryCode = sigCountryCode;
                         }
                     }
-                    LOGGER.info("The client country code to be used by the PDP: '{}'", countryCode);
+                    logger.info("The client country code to be used by the PDP: '{}'", countryCode);
 
                     // Then, it is the Policy Decision Point (PDP) that decides according to the consents of the patients
                     /*
@@ -693,11 +693,11 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         } catch (MissingFieldException | InvalidFieldException | InsufficientRightsException | XSDValidationException e) {
 
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         } catch (Exception e) {
             
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_ANSWER_NOT_AVAILABLE);
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         // Set queryByParameter
         PRPAMT201306UV02QueryByParameter qbpValue = of.createPRPAMT201306UV02QueryByParameter();
@@ -740,11 +740,11 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         // Prepare Audit Log
         try {
             prepareEventLog(eventLog, inputMessage, outputMessage, shElement);
-            LOGGER.info("Preparing Event Log: '{}' - SC UserId: '{}' - SP UserId: '{}'", eventLog.getEventType(),
+            logger.info("Preparing Event Log: '{}' - SC UserId: '{}' - SP UserId: '{}'", eventLog.getEventType(),
                     eventLog.getSC_UserID(), eventLog.getSP_UserID());
 
         } catch (Exception ex) {
-            LOGGER.error("Prepare Audit log failed.", ex);
+            logger.error("Prepare Audit log failed.", ex);
             // Is it fatal, if Audit log cannot be created?
         }
     }

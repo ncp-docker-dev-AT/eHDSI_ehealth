@@ -46,7 +46,7 @@ import java.util.*;
 public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final javax.xml.bind.JAXBContext wsContext;
 
@@ -106,7 +106,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             eventLog.setTargetip(req.getServerName());
 
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                LOGGER_CLINICAL.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
+                loggerClinical.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
             }
 
             /* Validate incoming request message */
@@ -153,7 +153,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     auditService.write(eventLog, "", "1");
 
                     if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                        LOGGER_CLINICAL.debug("Outgoing XCPD Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
+                        loggerClinical.debug("Outgoing XCPD Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
 
                 } else {

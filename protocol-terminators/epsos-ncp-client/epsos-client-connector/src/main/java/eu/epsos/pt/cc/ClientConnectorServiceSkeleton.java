@@ -27,7 +27,7 @@ import java.util.List;
  * This class implements the contact point into the NCP-B, allowing the Portal-B to contact and perform requests in NCP-B.
  *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
- * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>n
+ * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
 public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSkeletonInterface {
 

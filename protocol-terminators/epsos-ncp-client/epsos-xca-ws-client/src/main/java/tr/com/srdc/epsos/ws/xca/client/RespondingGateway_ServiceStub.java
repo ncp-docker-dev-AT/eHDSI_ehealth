@@ -44,7 +44,7 @@ import java.util.UUID;
 public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RespondingGateway_ServiceStub.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final javax.xml.bind.JAXBContext wsContext;
     private static int counter = 0;
@@ -268,7 +268,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                     String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
-                    LOGGER_CLINICAL.debug("{}\n{}", XCAConstants.LOG.OUTGOING_XCA_QUERY_MESSAGE, logRequestMsg);
+                    loggerClinical.debug("{}\n{}", XCAConstants.LOG.OUTGOING_XCA_QUERY_MESSAGE, logRequestMsg);
                 }
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
             } catch (Exception ex) {
@@ -416,7 +416,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                     String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv));
-                    LOGGER_CLINICAL.debug("{}\n{}", XCAConstants.LOG.INCOMING_XCA_QUERY_MESSAGE, logResponseMsg);
+                    loggerClinical.debug("{}\n{}", XCAConstants.LOG.INCOMING_XCA_QUERY_MESSAGE, logResponseMsg);
                 }
                 logResponseBody = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv.getBody().getFirstElement()));
             } catch (Exception ex) {
@@ -635,7 +635,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                     String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
-                    LOGGER_CLINICAL.debug("{}\n{}", XCAConstants.LOG.OUTGOING_XCA_RETRIEVE_MESSAGE, logRequestMsg);
+                    loggerClinical.debug("{}\n{}", XCAConstants.LOG.OUTGOING_XCA_RETRIEVE_MESSAGE, logRequestMsg);
                 }
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
                 // NRO
@@ -761,7 +761,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                     String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv));
-                    LOGGER_CLINICAL.debug("{}\n{}", XCAConstants.LOG.INCOMING_XCA_RETRIEVE_MESSAGE, logResponseMsg);
+                    loggerClinical.debug("{}\n{}", XCAConstants.LOG.INCOMING_XCA_RETRIEVE_MESSAGE, logResponseMsg);
                 }
                 logResponseBody = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv.getBody().getFirstElement()));
             } catch (Exception ex) {

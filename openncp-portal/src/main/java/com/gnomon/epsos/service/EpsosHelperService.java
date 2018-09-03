@@ -1171,36 +1171,12 @@ public class EpsosHelperService {
     }
 
     /**
-     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime             The datetime the event occured
-     * @param EI_EventOutcomeIndicator     <br>
-     *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
-     * @param PC_UserID                    Point of Care: Oid of the department
-     * @param PC_RoleID                    Role of the department
-     * @param HR_UserID                    Identifier of the HCP initiated the event
-     * @param HR_RoleID                    Role of the HCP initiated the event
-     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
-     *                                     the Subject-ID
-     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
-     *                                     triggered the epsos operation
-     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
-     *                                     processed the epsos operation
-     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
-     *                                     the audit source
-     * @param ET_ObjectID                  The string encoded UUID of the returned document
-     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
-     *                                     message
-     * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     *                                     encoded security header.
-     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
-     *                                     message
-     * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     *                                     encoded security header.
-     * @param sourceip                     The IP Address of the source Gateway
-     * @param targetip                     The IP Address of the target Gateway
+     * @param fullname
+     * @param email
+     * @param orgName
+     * @param orgType
+     * @param rolename
+     * @param message
      */
     public static void sendAuditEpsos91(String fullname, String email, String orgName, String orgType, String rolename,
                                         String message) {

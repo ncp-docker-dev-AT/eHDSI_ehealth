@@ -47,7 +47,7 @@ import java.util.UUID;
 public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XDR_ServiceMessageReceiverInOut.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final javax.xml.bind.JAXBContext wsContext;
 
@@ -123,7 +123,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 eventLog.setTargetip(req.getServerName());
 
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                    LOGGER_CLINICAL.debug("Incoming XDR Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
+                    loggerClinical.debug("Incoming XDR Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
                 }
 
                 if (StringUtils.equals("documentRecipient_ProvideAndRegisterDocumentSetB", methodName)) {
@@ -156,8 +156,8 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         OpenNCPValidation.validateXDRMessage(responseMessage, NcpSide.NCP_A);
                     }
                     if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                        LOGGER_CLINICAL.debug("Response Header:\n{}", envelope.getHeader().toString());
-                        LOGGER_CLINICAL.debug("Outgoing XDR Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
+                        loggerClinical.debug("Response Header:\n{}", envelope.getHeader().toString());
+                        loggerClinical.debug("Outgoing XDR Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
 
                 } else {

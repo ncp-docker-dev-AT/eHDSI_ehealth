@@ -40,7 +40,7 @@ import java.util.Map;
 public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorServiceMessageReceiverInOut.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("FILE_CLINICAL");
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     static {
         LOGGER.debug("Loading the WS-Security init libraries in ClientConnectorServiceMessageReceiverInOut 2009");
@@ -59,7 +59,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             try {
                 String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv));
-                LOGGER_CLINICAL.debug("Incoming '{}' request message from portal:\n{}", operationName, logRequestMsg);
+                loggerClinical.debug("Incoming '{}' request message from portal:\n{}", operationName, logRequestMsg);
 
             } catch (Exception ex) {
                 LOGGER.debug(ex.getLocalizedMessage(), ex);
@@ -230,7 +230,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                     try {
                         String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope));
-                        LOGGER_CLINICAL.debug("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);
+                        loggerClinical.debug("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);
 
                     } catch (Exception ex) {
                         LOGGER.debug(ex.getLocalizedMessage(), ex);
