@@ -39,7 +39,7 @@ import java.util.*;
 public class TransformationService implements ITransformationService, TMConstants, InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(TransformationService.class);
-    private final Logger logger_clinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private ITerminologyService tsamApi = null;
     private HashMap<String, String> level1Type;
@@ -52,7 +52,7 @@ public class TransformationService implements ITransformationService, TMConstant
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             try {
-                logger_clinical.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
+                loggerClinical.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
             }
@@ -67,7 +67,7 @@ public class TransformationService implements ITransformationService, TMConstant
         TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             try {
-                logger_clinical.debug("Translate CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
+                loggerClinical.debug("Translate CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
             }

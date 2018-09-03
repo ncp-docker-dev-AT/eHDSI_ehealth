@@ -578,8 +578,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     sb.append("<id>").append(patientId.getRoot()).append("</id>");
                     sb.append("<extension>").append(patientId.getExtension()).append("</extension>");
                     sb.append("</identifier>");
-                    LOGGER_CLINICAL.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
-                    LOGGER_CLINICAL.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
+                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                        LOGGER_CLINICAL.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
+                        LOGGER_CLINICAL.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
+                    }
                     patientIdList.add(patientId);
                 }
                 sb.append("</patient>");

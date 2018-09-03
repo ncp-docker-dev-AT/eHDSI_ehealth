@@ -127,15 +127,14 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 eventLog.setSourceip(ip);
                 eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
                 eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
-                LOGGER_CLINICAL.info("[Audit Debug] Requester: ParticipantId: '{}'\nObjectDetail: '{}'",
-                        getMessageID(msgContext.getEnvelope()), msgContext.getEnvelope().getHeader().toString());
-
                 HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
                 String clientDN = HTTPUtil.getClientCertificate(req);
                 eventLog.setSC_UserID(clientDN);
 
                 eventLog.setTargetip(req.getServerName());
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    LOGGER_CLINICAL.info("[Audit Debug] Requester: ParticipantId: '{}'\nObjectDetail: '{}'",
+                            getMessageID(msgContext.getEnvelope()), msgContext.getEnvelope().getHeader().toString());
                     LOGGER_CLINICAL.debug("Incoming XCA Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
                 }
                 if (StringUtils.equals(XCAOperation.SERVICE_CROSS_GATEWAY_QUERY, methodName)) {

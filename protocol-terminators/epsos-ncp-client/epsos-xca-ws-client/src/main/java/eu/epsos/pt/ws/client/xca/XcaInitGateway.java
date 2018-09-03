@@ -20,6 +20,7 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +61,10 @@ public class XcaInitGateway {
                                                   final Assertion idAssertion, final Assertion trcAssertion, String service) throws XCAException {
 
 
-        LOGGER_CLINICAL.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
-                documentCode.getValue(), idAssertion.getID(), trcAssertion.getID(), service);
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
+                    documentCode.getValue(), idAssertion.getID(), trcAssertion.getID(), service);
+        }
         QueryResponse result = null;
 
         try {

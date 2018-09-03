@@ -888,11 +888,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
         LOGGER.debug("Transforming document, isTranscode: '{}' - Event Type: '{}'", isTranscode, eventLog.getEventType());
         if (eventLog.getReqM_PatricipantObjectDetail() != null) {
             String requester = new String(eventLog.getReqM_PatricipantObjectDetail());
-            LOGGER_CLINICAL.info("Participant Requester: '{}'", requester);
+            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.info("Participant Requester: '{}'", requester);
+            }
         }
         if (eventLog.getResM_PatricipantObjectDetail() != null) {
             String responder = new String(eventLog.getResM_PatricipantObjectDetail());
-            LOGGER_CLINICAL.info("Participant Responser: '{}'", responder);
+            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.info("Participant Responser: '{}'", responder);
+            }
         }
 
         Document returnDoc;

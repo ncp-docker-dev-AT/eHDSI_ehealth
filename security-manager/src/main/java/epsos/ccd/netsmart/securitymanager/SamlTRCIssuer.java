@@ -199,10 +199,10 @@ public class SamlTRCIssuer {
      */
     public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
                                    List<Attribute> attrValuePair) throws SMgrException {
-
-        loggerClinical.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
-                hcpIdentityAssertion.getID(), patientID, purposeOfUse);
-
+        if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            loggerClinical.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
+                    hcpIdentityAssertion.getID(), patientID, purposeOfUse);
+        }
         //initializing the map
         auditDataMap.clear();
         XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();

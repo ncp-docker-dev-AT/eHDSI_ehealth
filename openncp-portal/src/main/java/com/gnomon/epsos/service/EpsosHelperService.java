@@ -376,8 +376,9 @@ public class EpsosHelperService {
 
             properties.put(IHtmlToPdfTransformer.PDF_RENDERER_CLASS, IHtmlToPdfTransformer.FLYINGSAUCER_PDF_RENDERER);
             properties.put(IHtmlToPdfTransformer.FOP_TTF_FONT_PATH, fontPath);
-
-            LOGGER_CLINICAL.info("Converted CDA for Servlet:\n{}", cleanCDA);
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.info("Converted CDA for Servlet:\n{}", cleanCDA);
+            }
             converter.convertToPdf(cleanCDA, IHtmlToPdfTransformer.A4P, headerFooterList, uri, out, properties);
 
             out.flush();
@@ -1819,9 +1820,13 @@ public class EpsosHelperService {
     public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
 
         Assertion trc;
-        LOGGER_CLINICAL.debug("Try to create TRCA for patient: '{}'", patient.getExtension());
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.debug("Try to create TRCA for patient: '{}'", patient.getExtension());
+        }
         String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
-        LOGGER_CLINICAL.info("TRCA Patient ID: '{}'", pat);
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.info("TRCA Patient ID: '{}'", pat);
+        }
         LOGGER.info("Assertion ID: '{}'", idAs.getID());
         LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
         TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).PurposeOfUse(purpose).build();
@@ -2673,7 +2678,9 @@ public class EpsosHelperService {
             id.setRoot(identifiers.get(i).getDomain());
             id.setExtension(identifiers.get(i).getUserValue());
             idArray[i] = id;
-            LOGGER_CLINICAL.info(identifiers.get(i).getDomain() + ": " + identifiers.get(i).getUserValue());
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.info(identifiers.get(i).getDomain() + ": " + identifiers.get(i).getUserValue());
+            }
         }
 
         for (Demographics dem : demographics) {
