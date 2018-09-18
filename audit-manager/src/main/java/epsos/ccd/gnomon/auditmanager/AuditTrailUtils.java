@@ -475,8 +475,7 @@ public enum AuditTrailUtils {
     }
 
     /**
-     * Constructs an Audit Message for the epSOS Patient Service According
-     * schema is Patient Service
+     * Constructs an Audit Message for the epSOS Patient Service According schema is Patient Service.
      *
      * @param eventLog the EventLog object
      * @return the created AuditMessage object
@@ -923,21 +922,35 @@ public enum AuditTrailUtils {
         return auditMessage;
     }
 
-    private AuditMessage addEventTarget(AuditMessage am, String ET_ObjectID, Short TypeCode, Short TypeCodeRole,
-                                        String EM_Code, String action, Short ObjectDataLifeCycle) {
+    /**
+     * @param auditMessage
+     * @param eventTargetObjectId
+     * @param typeCode
+     * @param typeCodeRole
+     * @param errorMessageCode
+     * @param action
+     * @param objectDataLifeCycle
+     * @return
+     */
+    private AuditMessage addEventTarget(AuditMessage auditMessage, String eventTargetObjectId, Short typeCode, Short typeCodeRole,
+                                        String errorMessageCode, String action, Short objectDataLifeCycle) {
+
+        LOGGER.info("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", auditMessage, eventTargetObjectId,
+                typeCode, typeCodeRole, errorMessageCode, action, objectDataLifeCycle);
 
         ParticipantObjectIdentificationType em = new ParticipantObjectIdentificationType();
-        em.setParticipantObjectID(ET_ObjectID);
-        em.setParticipantObjectTypeCode(TypeCode);
-        em.setParticipantObjectTypeCodeRole(TypeCodeRole);
-        CodedValueType EM_object = new CodedValueType();
-        EM_object.setCode(EM_Code);
+        em.setParticipantObjectID(eventTargetObjectId);
+        em.setParticipantObjectTypeCode(typeCode);
+        em.setParticipantObjectTypeCodeRole(typeCodeRole);
+        CodedValueType errorMessageCodedValueType = new CodedValueType();
+        errorMessageCodedValueType.setCode(errorMessageCode);
         if (action.equals("Discard") || action.equals("Pin")) {
-            em.setParticipantObjectDataLifeCycle(ObjectDataLifeCycle);
+            em.setParticipantObjectDataLifeCycle(objectDataLifeCycle);
         }
-        em.setParticipantObjectIDTypeCode(EM_object);
-        am.getParticipantObjectIdentification().add(em);
-        return am;
+        em.setParticipantObjectIDTypeCode(errorMessageCodedValueType);
+        auditMessage.getParticipantObjectIdentification().add(em);
+
+        return auditMessage;
     }
 
     private AuditMessage addEventTarget(AuditMessage am, String ET_ObjectID, Short ObjectTypeCode, Short ObjectDataLifeCycle,
@@ -1267,12 +1280,18 @@ public enum AuditTrailUtils {
         }
     }
 
-    public synchronized void sendATNASyslogMessage(AuditLogSerializer auditLogSerializer, AuditMessage auditmessage,
+    /**
+     * @param auditLogSerializer
+     * @param auditMessage
+     * @param facility
+     * @param severity
+     */
+    public synchronized void sendATNASyslogMessage(AuditLogSerializer auditLogSerializer, AuditMessage auditMessage,
                                                    String facility, String severity) {
 
-        MessageSender t = new MessageSender(auditLogSerializer, auditmessage, facility, severity);
+        MessageSender messageSender = new MessageSender(auditLogSerializer, auditMessage, facility, severity);
         LOGGER.debug("Starting new thread for sending message");
-        t.start();
+        messageSender.start();
     }
 
     /**
