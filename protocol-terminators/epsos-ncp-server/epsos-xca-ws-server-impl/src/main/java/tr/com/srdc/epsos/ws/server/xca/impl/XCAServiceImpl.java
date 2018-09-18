@@ -88,7 +88,19 @@ public class XCAServiceImpl implements XCAServiceInterface {
         transformationService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
     }
 
+    private boolean isUUIDValid(String message) {
+        try {
+            UUID.fromString(message);
+            return true;
+        } catch (IllegalArgumentException e) {
+            logger.error("IllegalArgumentException: '{}'", e.getMessage());
+            return false;
+        }
+    }
+
     private void prepareEventLogForQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, Element sh, String classCode) {
+
+        logger.info("method prepareEventLogForQuery('{}')", eventLog.getET_ObjectID());
 
         switch (classCode) {
             case Constants.EP_CLASSCODE:
@@ -125,8 +137,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                 }
                 // PT-237 fix. This method should be somewhere centrally
+
                 if (!StringUtils.startsWith(documentId, "urn:uuid:")) {
-                    documentId = "urn:uuid:" + documentId;
+                    if (isUUIDValid(documentId)) {
+                        documentId = "urn:uuid:" + documentId;
+                    }
                 }
                 eventLog.setET_ObjectID(documentId);
                 break;
@@ -1329,8 +1344,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     /**
-     * XCA list operation implementation, returns the list of patient summaries or ePrescriptions,
-     * depending on the query.
+     * XCA list operation implementation, returns the list of patient summaries or ePrescriptions, depending on the query.
      */
     @Override
     public AdhocQueryResponse queryDocument(AdhocQueryRequest adhocQueryRequest, SOAPHeader sh, EventLog eventLog)

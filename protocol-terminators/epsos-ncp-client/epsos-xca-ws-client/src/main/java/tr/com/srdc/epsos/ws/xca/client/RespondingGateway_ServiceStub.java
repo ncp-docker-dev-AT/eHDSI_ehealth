@@ -22,6 +22,7 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,8 +45,6 @@ import java.util.UUID;
 public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RespondingGateway_ServiceStub.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     private static final javax.xml.bind.JAXBContext wsContext;
     private static int counter = 0;
 
@@ -73,6 +72,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         }
     }
 
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     protected org.apache.axis2.description.AxisOperation[] _operations;
     //hashmaps to keep the fault mapping
     private java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
@@ -93,10 +93,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     }
 
     /**
-     * Constructor that takes in a configContext and useseperate listner
+     * Constructor that takes in a configContext and use separate listener
      */
-    public RespondingGateway_ServiceStub(org.apache.axis2.context.ConfigurationContext configurationContext, java.lang.String targetEndpoint, boolean useSeparateListener)
-            throws org.apache.axis2.AxisFault {
+    public RespondingGateway_ServiceStub(ConfigurationContext configurationContext, String targetEndpoint, boolean useSeparateListener)
+            throws AxisFault {
         //To populate AxisService
         populateAxisService();
         populateFaults();
@@ -105,8 +105,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
         _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(targetEndpoint));
         _serviceClient.getOptions().setUseSeparateListener(useSeparateListener);
-
-        _serviceClient.getOptions().setTimeOutInMilliSeconds(180000); //Wait time after which a client times out in a blocking scenario: 3 minutes
+        //  Wait time after which a client times out in a blocking scenario: 3 minutes
+        _serviceClient.getOptions().setTimeOutInMilliSeconds(180000);
 
         //Set the soap version
         _serviceClient.getOptions().setSoapVersionURI(org.apache.axiom.soap.SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
@@ -318,10 +318,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             try {
                 _operationClient.execute(true);
             } catch (AxisFault e) {
-                LOGGER.error("Axis Fault error: " + e.getMessage());
+                LOGGER.error("Axis Fault error: '{}'", e.getMessage());
                 LOGGER.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
                 String endpoint = null;
-                LOGGER.debug("ClassCode: " + classCode);
+                LOGGER.debug("ClassCode: '{}'", classCode);
                 DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
                 switch (classCode) {
                     case Constants.PS_CLASSCODE:

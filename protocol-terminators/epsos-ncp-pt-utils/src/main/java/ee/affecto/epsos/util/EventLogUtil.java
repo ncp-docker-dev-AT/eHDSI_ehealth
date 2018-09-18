@@ -10,6 +10,7 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.v3.II;
 import org.hl7.v3.PRPAIN201305UV02;
@@ -21,9 +22,10 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 // Common part for client and server logging
-// TODO A.R. Should be moved into epsos-util later to avoid duplication
+// TODO A.R. Should be moved into openncp-util later to avoid duplication
 public class EventLogUtil {
 
     private EventLogUtil() {
@@ -73,7 +75,6 @@ public class EventLogUtil {
             eventLog.setEM_PatricipantObjectID(error);
             eventLog.setEM_PatricipantObjectDetail(error.getBytes());
         }
-
     }
 
     public static void prepareXCACommonLogQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, String classCode) {
@@ -109,20 +110,29 @@ public class EventLogUtil {
                     }
                 }
                 // PT-237 add safely the urn:uuid prefix
-                eventLog.setET_ObjectID(EventLogClientUtil.appendUrnUuid(Constants.UUID_PREFIX + documentId));
+                if (!StringUtils.startsWith(documentId, "urn:uuid:") && isUUIDValid(documentId)) {
+
+                    documentId = "urn:uuid:" + documentId;
+                }
+                //eventLog.setET_ObjectID(EventLogClientUtil.appendUrnUuid(Constants.UUID_PREFIX + documentId));
+                eventLog.setET_ObjectID(documentId);
                 break;
             }
         }
 
         if (response.getRegistryObjectList() == null) {
+
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
         } else if (response.getRegistryErrorList() == null) {
+
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         } else {
+
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.TEMPORAL_FAILURE);
         }
 
         if (response.getRegistryErrorList() != null) {
+
             RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
             eventLog.setEM_PatricipantObjectID(re.getErrorCode());
             eventLog.setEM_PatricipantObjectDetail(re.getCodeContext() == null ? null : re.getCodeContext().getBytes());
@@ -189,12 +199,16 @@ public class EventLogUtil {
                 ExtrinsicObjectType eot = (ExtrinsicObjectType) identif.getValue();
                 id = eot.getId();
                 for (ClassificationType classif : eot.getClassification()) {
-                    if (classif.getClassificationScheme().equals("urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a")) {
-                        classCode = classif.getNodeRepresentation();
-                    } else if (classif.getClassificationScheme().equals("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4")) {
-                        eventCode = classif.getNodeRepresentation();
-                    } else if (classif.getClassificationScheme().equals("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1")) {
-                        countryCode = classif.getNodeRepresentation();
+                    switch (classif.getClassificationScheme()) {
+                        case "urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a":
+                            classCode = classif.getNodeRepresentation();
+                            break;
+                        case "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4":
+                            eventCode = classif.getNodeRepresentation();
+                            break;
+                        case "urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1":
+                            countryCode = classif.getNodeRepresentation();
+                            break;
                     }
                 }
                 for (ExternalIdentifierType externalIdentifier : eot.getExternalIdentifier()) {
@@ -235,11 +249,9 @@ public class EventLogUtil {
             eventLog.setEM_PatricipantObjectID(re.getErrorCode());
             eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
         }
-
-
     }
 
-    public static String getMessageID(org.apache.axiom.soap.SOAPEnvelope envelope) {
+    public static String getMessageID(SOAPEnvelope envelope) {
 
         Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(new QName("http://www.w3.org/2005/08/addressing", "MessageID"));
         if (it.hasNext()) {
@@ -256,11 +268,13 @@ public class EventLogUtil {
             attributeValue = attribute.getAttributeValues().get(0).getDOM().getTextContent();
         }
         return attributeValue;
-
     }
 
     /**
-     * Extracts the XDS patient ID from the XCA query
+     * Extracts the XDS patient ID from the XCA query.
+     *
+     * @param request
+     * @return
      */
     private static String getDocumentEntryPatientId(AdhocQueryRequest request) {
 
@@ -272,5 +286,14 @@ public class EventLogUtil {
             }
         }
         return "$XDSDocumentEntryPatientId Not Found!";
+    }
+
+    private static boolean isUUIDValid(String message) {
+        try {
+            UUID.fromString(message);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }
