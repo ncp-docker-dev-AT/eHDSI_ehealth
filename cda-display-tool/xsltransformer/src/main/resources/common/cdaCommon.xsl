@@ -793,7 +793,7 @@
         <xsl:variable name="denominatorValue" select="$medStrengthDenominator/@value"/>
         <xsl:variable name="denominatorUnit">
             <xsl:call-template name="supportUCUMAnnotations">
-                <xsl:with-param name="value" select="$medStrengthDenominator/@value"/>
+                <xsl:with-param name="value" select="$medStrengthDenominator/@unit"/>
             </xsl:call-template>
         </xsl:variable>
 
