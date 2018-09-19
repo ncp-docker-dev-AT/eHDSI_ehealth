@@ -169,7 +169,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 Document namespaceNotAwareDoc = inputDocument;
                 String cdaDocumentType = getCDADocumentType(namespaceNotAwareDoc);
 
-                //boolean schemaValid = Validator.validateToSchema(namespaceAwareDoc);
+                //  boolean schemaValid = Validator.validateToSchema(namespaceAwareDoc);
 
                 // MDA validation
                 if (config.isModelValidationEnabled()) {
@@ -305,9 +305,13 @@ public class TransformationService implements ITransformationService, TMConstant
                             // Identifier that allows to unequivocally identify the SOURCE document or source data entries. (UUID Format)
                             getOIDFromDocument(responseStructure.getDocument()),
                             getOIDFromDocument(responseStructure.getResponseCDA()), // Identifier that allows to unequivocally identify the TARGET document. (UUID Format)
-                            Constants.UUID_PREFIX + "", // The value MUST contain the base64 encoded security header
+                            //Constants.UUID_PREFIX + "",
+                            // The value MUST contain the base64 encoded security header
+                            Constants.UUID_PREFIX + responseStructure.getRequestId(),
                             securityHeader.getBytes(StandardCharsets.UTF_8), // ReqM_ParticipantObjectDetail - The value MUST contain the base64 encoded security header
-                            Constants.UUID_PREFIX + "", // String-encoded UUID of the response message
+                            //Constants.UUID_PREFIX + "",
+                            // String-encoded UUID of the response message
+                            Constants.UUID_PREFIX + responseStructure.getRequestId(),
                             securityHeader.getBytes(StandardCharsets.UTF_8), // ResM_ParticipantObjectDetail - The value MUST contain the base64 encoded security header
                             ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP") // The IP Address of the target Gateway
                     );

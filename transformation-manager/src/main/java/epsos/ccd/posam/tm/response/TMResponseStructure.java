@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Data transfer class.<br>
@@ -33,7 +34,9 @@ import java.util.List;
  */
 public class TMResponseStructure implements TMConstants {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TMResponseStructure.class);
+    private final Logger logger = LoggerFactory.getLogger(TMResponseStructure.class);
+
+    private String requestId;
 
     /**
      * Target / response CDA document.
@@ -61,6 +64,7 @@ public class TMResponseStructure implements TMConstants {
     private String status;
 
     public TMResponseStructure(Document responseCDA, String status, List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings) {
+        this.requestId = UUID.randomUUID().toString();
         this.responseCDA = responseCDA;
         this.errors = errors;
         this.warnings = warnings;
@@ -81,6 +85,7 @@ public class TMResponseStructure implements TMConstants {
             Document document = builder.newDocument();
 
             Element root = document.createElement("responseStructure");
+            root.setAttribute("requestId", getRequestId());
             document.appendChild(root);
             root.appendChild(document.createElement("responseElement"));
             root.appendChild(document.createElement("responseStatus"));
@@ -99,6 +104,7 @@ public class TMResponseStructure implements TMConstants {
             Element errorsElement = document.createElement(ERRORS);
             if (!getErrors().isEmpty()) {
                 for (ITMTSAMEror tmException : uniqueList(getErrors())) {
+
                     Element errorElement = document.createElement(ERROR);
                     errorElement.setAttribute(CODE, tmException.getCode());
                     errorElement.setAttribute(DESCRIPTION, tmException.getDescription());
@@ -113,8 +119,7 @@ public class TMResponseStructure implements TMConstants {
                 for (ITMTSAMEror tmException : uniqueList(getWarnings())) {
                     Element warningElement = document.createElement(WARNING);
                     warningElement.setAttribute(CODE, tmException.getCode());
-                    warningElement.setAttribute(DESCRIPTION, tmException
-                            .getDescription());
+                    warningElement.setAttribute(DESCRIPTION, tmException.getDescription());
                     warningsElement.appendChild(warningElement);
                 }
             }
@@ -122,7 +127,7 @@ public class TMResponseStructure implements TMConstants {
 
             return document;
         } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            logger.error("Exception: '{}'", e.getMessage(), e);
             throw new TMException(TMError.ERROR_PROCESSING_ERROR);
         }
     }
@@ -144,6 +149,10 @@ public class TMResponseStructure implements TMConstants {
             }
         }
         return result;
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 
     /**
