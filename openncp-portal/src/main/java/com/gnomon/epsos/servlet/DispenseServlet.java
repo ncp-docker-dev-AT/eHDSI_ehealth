@@ -12,6 +12,7 @@ import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
 import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentResponse;
 import eu.epsos.util.IheConstants;
+import org.apache.commons.codec.binary.Base64;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 public class DispenseServlet extends HttpServlet {
 
@@ -104,7 +107,7 @@ public class DispenseServlet extends HttpServlet {
                     dispensedLines.add(dispensedResult);
                 }
 
-                String eDUUID = java.util.UUID.randomUUID().toString().replaceAll("-", "");
+                String eDUUID = generateIdentifierExtension();
                 String edOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DISPENSATION_OID);
                 if (!dispensedLines.isEmpty()) {
                     edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user, eDUUID);
@@ -178,5 +181,14 @@ public class DispenseServlet extends HttpServlet {
                 LOGGER.error("IOException: '{}'", e.getMessage(), e);
             }
         }
+    }
+
+    private String generateIdentifierExtension() {
+
+        Random r = new SecureRandom();
+        byte[] b = new byte[16];
+        r.nextBytes(b);
+        String s = Base64.encodeBase64String(b);
+        return s.substring(0, 16);
     }
 }
