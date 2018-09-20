@@ -1,6 +1,7 @@
 package ee.affecto.epsos.util;
 
 import epsos.ccd.gnomon.auditmanager.*;
+import eu.epsos.util.xdr.XDRConstants;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
@@ -105,7 +106,8 @@ public class EventLogUtil {
                 ExtrinsicObjectType eot = (ExtrinsicObjectType) response.getRegistryObjectList().getIdentifiable().get(i).getValue();
                 String documentId = "";
                 for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
-                    if (eit.getIdentificationScheme().equals("urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab")) {
+
+                    if (eit.getIdentificationScheme().equals(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME)) {
                         documentId = eit.getValue();
                     }
                 }
@@ -200,7 +202,7 @@ public class EventLogUtil {
                 id = eot.getId();
                 for (ClassificationType classif : eot.getClassification()) {
                     switch (classif.getClassificationScheme()) {
-                        case "urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a":
+                        case XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME:
                             classCode = classif.getNodeRepresentation();
                             break;
                         case "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4":

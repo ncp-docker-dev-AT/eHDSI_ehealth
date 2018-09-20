@@ -9,6 +9,7 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.EvidenceUtils;
+import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
@@ -87,20 +88,16 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     protected String getLocation() {
 
-        //  return ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
-        //  RegisteredService.CONSENT_SERVICE);
+        //  Returning HOME COMMUNITY ID insteand of RegisteredService.CONSENT_SERVICE
         return "urn:oid:" + Constants.HOME_COMM_ID;
     }
 
     /**
-     * Prepare audit log for the dispensation service, initialize() operation,
-     * i.e. dispensation submit operation
+     * Prepare audit log for the dispensation service, initialize() operation, i.e. dispensation submit operation
      *
-     * @throws DatatypeConfigurationException
      * @author konstantin.hypponen@kela.fi
      */
-    public void prepareEventLogForDispensationInitialize(EventLog eventLog,
-                                                         ProvideAndRegisterDocumentSetRequestType request,
+    public void prepareEventLogForDispensationInitialize(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request,
                                                          RegistryResponseType response, Element sh) {
 
         eventLog.setEventType(EventType.epsosDispensationServiceInitialize);
@@ -122,7 +119,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         .getIdentifiable().get(i).getValue();
                 String documentId = "";
                 for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
-                    if (StringUtils.equals(eit.getIdentificationScheme(), "urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab")) {
+                    if (StringUtils.equals(eit.getIdentificationScheme(), XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME)) {
                         documentId = eit.getValue();
                     }
                 }
@@ -153,10 +150,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
     }
 
     /**
-     * Prepare audit log for the consent service, put() operation, i.e. consent
-     * submission
+     * Prepare audit log for the consent service, put() operation, i.e. consent submission
      *
-     * @throws DatatypeConfigurationException
      * @author konstantin.hypponen@kela.fi TODO: check the audit logs in
      * Gazelle, fix if needed
      */
@@ -183,7 +178,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         .getIdentifiable().get(i).getValue();
                 String documentId = "";
                 for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
-                    if (StringUtils.equals(eit.getIdentificationScheme(), "urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab")) {
+                    if (StringUtils.equals(eit.getIdentificationScheme(), XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME)) {
                         documentId = eit.getValue();
                     }
                 }
@@ -251,6 +246,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return patientId.substring(0, patientId.indexOf("^^^"));
     }
 
+    /**
+     * @param request
+     * @param sh
+     * @param eventLog
+     * @return
+     * @throws Exception
+     */
     public RegistryResponseType saveDispensation(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader sh,
                                                  EventLog eventLog) throws Exception {
 
@@ -290,13 +292,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         if (cIndex > 0) {
             countryCode = DN.substring(cIndex + 2, cIndex + 4);
-        } // Mustafa: This part is added for handling consents when the call is
-        // not https
-        // In this case, we check the country code of the signature certificate
-        // that
-        // ships within the HCP assertion
-        // TODO: Might be necessary to remove later, although it does no harm in
-        // reality!
+        }
+        // Mustafa: This part is added for handling consents when the call is not https.
+        // In this case, we check the country code of the signature certificate that ships within the HCP assertion.
+        // TODO: Might be necessary to remove later, although it does no harm in reality!
         else {
             LOGGER.info("Could not get client country code from the service consumer certificate. The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
             if (sigCountryCode != null) {
@@ -327,23 +326,15 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 try {
 
                     /* Validate CDA epSOS Pivot */
-                    //String cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8),
                                 NcpSide.NCP_A, obtainClassCode(request), true);
                     }
 
-//                    cdaValidationService.validateModel(new String(doc.getValue(), StandardCharsets.UTF_8.name()),
-//                            CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
-
                     //Resets the response document to a translated version.
                     docBytes = TMServices.transformDocument(docBytes, Constants.LANGUAGE_CODE);
 
                     /* Validate CDA epSOS Pivot */
-//                    cdaValidationService.validateModel(new String(docBytes, StandardCharsets.UTF_8),
-//                            CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
-
-                    //cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8), NcpSide.NCP_A,
                                 obtainClassCode(request), false);
@@ -502,22 +493,15 @@ public class XDRServiceImpl implements XDRServiceInterface {
             try {
 
                 /* Validate CDA epSOS Pivot */
-                //String cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8),
                             NcpSide.NCP_A, obtainClassCode(request), true);
                 }
 
-//                cdaValidationService.validateModel(new String(doc.getValue(), StandardCharsets.UTF_8.name()),
-//                        CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
-
                 //Resets the response document to a translated version.
                 docBytes = TMServices.transformDocument(docBytes, Constants.LANGUAGE_CODE);
 
                 /* Validate CDA epSOS Pivot */
-//                cdaValidationService.validateModel(new String(docBytes, StandardCharsets.UTF_8.name()),
-//                        CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
-                //cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8),
                             NcpSide.NCP_A, obtainClassCode(request), true);
@@ -627,7 +611,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
             rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
         }
 
-        //  String documentId = request.getDocument().get(0).getId();
         String patientId = getPatientId(request);
         LOGGER.info("Received a HCER document for patient: '{}' ", patientId);
         /*
@@ -639,22 +622,14 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
             try {
                 /* Validate CDA epSOS Pivot */
-                //String cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8),
                             NcpSide.NCP_A, obtainClassCode(request), true);
                 }
 
-                //  cdaValidationService.validateModel(new String(doc.getValue(), StandardCharsets.UTF_8.name()),
-                //  CdaModel.obtainCdaModel(obtainClassCode(request), true), NcpSide.NCP_A);
-                String documentString = new String(TMServices.transformDocument(doc.getValue(), Constants.LANGUAGE_CODE), "UTF-8");
+                String documentString = new String(TMServices.transformDocument(doc.getValue(), Constants.LANGUAGE_CODE), StandardCharsets.UTF_8);
 
                 /* Validate CDA epSOS Pivot */
-//                cdaValidationService.validateModel(
-//                        documentString,
-//                        CdaModel.obtainCdaModel(obtainClassCode(request), true),
-//                        NcpSide.NCP_A);
-                //cdaModel = CdaModel.obtainCdaModel(obtainClassCode(request), true);
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(documentString, NcpSide.NCP_A, obtainClassCode(request), true);
                 }
@@ -679,14 +654,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         } else {
             response.setStatus(AdhocQueryResponseStatus.SUCCESS);
         }
-        /* HCER audit not wanted?
-         try {
-         prepareEventLogForHCERPut(eventLog, request, response, shElement);
-         } catch (Exception ex) {
-         LOGGER.error(ex);
-         // Is this fatal?
-         }
-         */
+
         return response;
     }
 
@@ -706,8 +674,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
     }
 
     /**
-     * This method will extract the document class code from a given
-     * ProvideAndRegisterDocumentSetRequestType message.
+     * This method will extract the document class code from a given ProvideAndRegisterDocumentSetRequestType message.
      *
      * @param request the request containing the class code.
      * @return the class code.
@@ -719,7 +686,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             return null;
         }
 
-        final String CLASS_SCHEME = "urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a";
+        final String CLASS_SCHEME = XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME;
         String result = "";
 
         for (int i = 0; i < request.getSubmitObjectsRequest()
@@ -745,6 +712,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return result;
     }
 
+    /**
+     * @param dPe
+     * @return
+     */
     private DocumentProcessingException normalizeDocProcException(DocumentProcessingException dPe) {
 
         final String REPOSITORY_INTERNAL_ERROR = "XDSRepositoryError";

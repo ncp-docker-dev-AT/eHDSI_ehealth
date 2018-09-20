@@ -1,5 +1,7 @@
 package tr.com.srdc.epsos.ws.xca.client.example;
 
+import eu.epsos.util.xca.XCAConstants;
+import eu.epsos.util.xdr.XDRConstants;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
@@ -15,6 +17,7 @@ import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.activation.DataHandler;
@@ -126,13 +129,13 @@ public class RespondingGateway_ServiceStub_Mock {
     private String prepareExtrinsicObjectPS(ExtrinsicObjectType eot, Boolean isPDF, String documentId) {
 
         String name = "Patient Summary";
-        String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
         // Set Extrinsic Object
         eot.setStatus("urn:oasis:names:tc:ebxml-regrep:StatusType:Approved");
         eot.setHome("2.16.17.710.820.1000.990.1.1.1");
         eot.setId(uuid);
         eot.setLid(uuid);
-        eot.setObjectType("urn:uuid:7edca82f-054d-47f2-a032-9b2a5b5186c1");
+        eot.setObjectType(XCAConstants.XDS_DOC_ENTRY_CLASSIFICATION_NODE);
 
         // Status
         eot.setMimeType("text/xml");
@@ -169,7 +172,7 @@ public class RespondingGateway_ServiceStub_Mock {
 
 
         eot.getClassification().add(makeClassification(
-                "urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a",
+                XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME,
                 uuid,
                 "60591-5",
                 "2.16.840.1.113883.6.1",
@@ -230,10 +233,10 @@ public class RespondingGateway_ServiceStub_Mock {
                 "XDSDocumentEntry.patientId"));
 
         eot.getExternalIdentifier().add(makeExternalIdentifier(
-                "urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab",
+                XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME,
                 uuid,
                 documentId,
-                "XDSDocumentEntry.uniqueId"));
+                XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR));
 
         return uuid;
     }
