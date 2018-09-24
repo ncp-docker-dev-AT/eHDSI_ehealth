@@ -870,7 +870,7 @@
         <xsl:param name="medUnitIntakeGlobal"/>
         <xsl:param name="medUnitIntakeEndpoint"/>
         <xsl:choose>
-            <xsl:when test="$medUnitIntakeEndpoint/@value or $medUnitIntakeEndpoint/@nullFlavor">
+            <xsl:when test="$medUnitIntakeEndpoint/@value">
                 <xsl:call-template name="show-numberUnitIntake">
                     <xsl:with-param name="medUnitIntake" select="$medUnitIntakeEndpoint/@value"/>
                     <xsl:with-param name="medUnitIntakeUnit" select="$medUnitIntakeEndpoint/@unit"/>
