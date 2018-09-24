@@ -12,6 +12,7 @@ import eu.epsos.protocolterminators.ws.server.xca.XCAServiceInterface;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
+import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
@@ -132,7 +133,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 ExtrinsicObjectType eot = (ExtrinsicObjectType) response.getRegistryObjectList().getIdentifiable().get(i).getValue();
                 String documentId = "";
                 for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
-                    if (eit.getIdentificationScheme().equals("urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab")) {
+                    if (eit.getIdentificationScheme().equals(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME)) {
                         documentId = eit.getValue();
                     }
                 }
@@ -372,7 +373,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.setHome(Constants.OID_PREFIX + Constants.HOME_COMM_ID);
         eot.setId(uuid);
         eot.setLid(uuid);
-        eot.setObjectType("urn:uuid:7edca82f-054d-47f2-a032-9b2a5b5186c1");
+        eot.setObjectType(XCAConstants.XDS_DOC_ENTRY_CLASSIFICATION_NODE);
 
         // Status
         eot.setMimeType("text/xml");
@@ -409,7 +410,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // repositoryUniqueId (optional)
         eot.getSlot().add(makeSlot("repositoryUniqueId", repositoryId));
 
-        eot.getClassification().add(makeClassification("urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a",
+        eot.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME,
                 uuid, classCode, "2.16.840.1.113883.6.1", title));
         // Type code (not written in 3.4.2)
         eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
@@ -441,8 +442,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
                 uuid, getDocumentEntryPatientId(request), "XDSDocumentEntry.patientId"));
 
-        eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab",
-                uuid, documentId, "XDSDocumentEntry.uniqueId"));
+        eot.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME,
+                uuid, documentId, XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR));
 
         return uuid;
     }
@@ -458,7 +459,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.setHome(Constants.OID_PREFIX + Constants.HOME_COMM_ID);
         eot.setId(uuid);
         eot.setLid(uuid);
-        eot.setObjectType("urn:uuid:7edca82f-054d-47f2-a032-9b2a5b5186c1");
+        eot.setObjectType(XCAConstants.XDS_DOC_ENTRY_CLASSIFICATION_NODE);
 
         // Status
         eot.setMimeType("text/xml");
@@ -491,7 +492,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         eot.getClassification().add(
                 makeClassification(
-                        "urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a", uuid,
+                        XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
                         Constants.EP_CLASSCODE, "2.16.840.1.113883.6.1", name));
         // Type code (not written in 3.4.2)
         eot.getClassification().add(makeClassification(
@@ -555,11 +556,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 document.getPatientId() + "^^^&" + Constants.HOME_COMM_ID + "&ISO",
                 "XDSDocumentEntry.patientId"));
 
-        eot.getExternalIdentifier().add(makeExternalIdentifier(
-                "urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab",
-                uuid,
-                document.getId(),
-                "XDSDocumentEntry.uniqueId"));
+        eot.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME,
+                uuid, document.getId(), XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR));
 
         return uuid;
     }
