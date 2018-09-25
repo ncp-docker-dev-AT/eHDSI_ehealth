@@ -263,14 +263,14 @@
                                 </td>
                                 <td>
                                     <xsl:choose>
-                                        <xsl:when test="not ($medDose/@nullFlavor)">
-                                            <xsl:value-of select="$medDose/@displayName"/>
-                                        </xsl:when>
-                                        <xsl:otherwise>
+                                        <xsl:when test="$medDose/@nullFlavor">
                                             <xsl:call-template name="show-nullFlavor">
                                                 <xsl:with-param name="code"
                                                                 select="$medDose/@nullFlavor"/>
                                             </xsl:call-template>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="$medDose/@displayName"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </td>
