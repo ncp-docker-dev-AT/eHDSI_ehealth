@@ -29,7 +29,7 @@ public class AuditModelUtil {
     public static final String EPSOS_PATIENT_ID_MAPPING_AUDIT = "epSOS - Patient ID Mapping Audit";
     public static final String EPSOS_ED_INIT_AUDIT_SP = "epSOS - DispensationService:Initialize() Audit (Service Provider)";
     public static final String EPSOS_ED_DISCARD_AUDIT_SC = "epSOS - DispensationService:Discard() Audit (Service Consumer)";
-    public static final String EPSOS2_PIVOS_TRANSLATION = "epSOS-2 - Pivot Translation of a Medical Document";
+    public static final String EPSOS2_PIVOT_TRANSLATION = "epSOS-2 - Pivot Translation of a Medical Document";
     public static final String EPSOS2_ISSUANCE_TRC_ASSERTION = "epSOS-2 - Issuance of a Treatment Relationship Confirmation Assertion";
     public static final String EPSOS_CS_DISCARD_AUDIT_SP = "epSOS - ConsentService:Discard() Audit (Service Provider)";
     public static final String EPSOS2_PROVIDE_DATA_SERVICE_SP = "epSOS-2 - Provide Data Service (Service Provider)";
