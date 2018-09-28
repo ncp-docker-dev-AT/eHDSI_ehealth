@@ -3,6 +3,7 @@ package se.sb.epsos.web.util;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationFactory;
+import org.apache.commons.configuration.DefaultConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,20 +26,19 @@ public class MasterConfigManager {
         super();
         String cfgFilePath = System.getProperty(CONFIG_PROPERTY);
         if (cfgFilePath == null || "".equals(cfgFilePath)) {
-            LOGGER.warn("No excplicit master config file found in system property ''{}', using default bundled config", CONFIG_PROPERTY);
+            LOGGER.warn("No explicit master config file found in system property ''{}', using default bundled config", CONFIG_PROPERTY);
             cfgFilePath = getClass().getClassLoader().getResource(DEFAULT_CONFIG_FILE).getPath();
         }
         if (!System.getProperties().containsKey("override-config.xml")) {
             System.setProperty("override-config.xml", "override-config.xml");
         }
-        ConfigurationFactory factory = new ConfigurationFactory(cfgFilePath);
         try {
-            this.config = factory.getConfiguration();
+            this.config = new DefaultConfigurationBuilder(cfgFilePath).getConfiguration();
         } catch (ConfigurationException e) {
-            LOGGER.error("Failed to initilaize master config", e);
+            LOGGER.error("Failed to initialize master config", e);
         }
         if (config != null) {
-            LOGGER.debug("Master configuration read sucessfully!");
+            LOGGER.debug("Master configuration read successfully!");
         }
     }
 
