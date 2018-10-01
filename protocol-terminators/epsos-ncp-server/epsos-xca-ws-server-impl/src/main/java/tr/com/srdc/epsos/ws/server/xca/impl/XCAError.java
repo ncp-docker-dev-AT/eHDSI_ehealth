@@ -8,7 +8,7 @@ public enum XCAError {
     ERROR_1103("1103", true, "No Data for MRO", ""),
     ERROR_4201("4201", true, "Unsupported Feature", ""),
     ERROR_4202("4202", true, "Unknown Signifier", ""),
-    ERROR_4203("4203", true, "Transcoding Error", ""),
+    ERROR_4203("4203", true, "The requested encoding cannot be provided due to a transcoding error.", ""),
     ERROR_4204("4204", true, "Unknown Filter", ""),
     ERROR_4205("4205", true, "Unknown Option", ""),
     ERROR_4206("4206", true, "Unknown Patient Identifier", ""),

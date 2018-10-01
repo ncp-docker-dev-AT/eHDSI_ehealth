@@ -67,6 +67,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
     private oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
     private DocumentSearchInterface documentSearchService;
 
+    /**
+     * Public Constructor for IHE XCA Profile implementation, the default constructor will handle the loading of
+     * the National Connector implementation by using the <class>ServiceLoader</class>
+     *
+     * @see ServiceLoader
+     */
     public XCAServiceImpl() {
 
         ServiceLoader<DocumentSearchInterface> serviceLoader = ServiceLoader.load(DocumentSearchInterface.class);
@@ -89,9 +95,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
         transformationService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
     }
 
+    /**
+     * @param message
+     * @return
+     */
     private boolean isUUIDValid(String message) {
         try {
-            UUID.fromString(message);
+            UUID uuid = UUID.fromString(message);
+            logger.debug("Valid UUID: '{}'", uuid);
             return true;
         } catch (IllegalArgumentException e) {
             logger.error("IllegalArgumentException: '{}'", e.getMessage());
@@ -138,10 +149,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                 }
                 // PT-237 fix. This method should be somewhere centrally
-
-                if (!StringUtils.startsWith(documentId, "urn:uuid:")) {
+                if (!StringUtils.startsWith(documentId, Constants.UUID_PREFIX)) {
                     if (isUUIDValid(documentId)) {
-                        documentId = "urn:uuid:" + documentId;
+                        documentId = Constants.UUID_PREFIX + documentId;
                     }
                 }
                 eventLog.setET_ObjectID(documentId);
@@ -298,7 +308,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     private ClassificationType makeClassification(String classificationScheme, String classifiedObject, String nodeRepresentation, String value, String name) {
 
-        String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
         ClassificationType cl = ofRim.createClassificationType();
         cl.setId(uuid);
         cl.setNodeRepresentation(nodeRepresentation);
@@ -314,7 +324,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     private ClassificationType makeClassification(String classificationScheme, String classifiedObject, String nodeRepresentation) {
 
-        String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
         ClassificationType cl = ofRim.createClassificationType();
         cl.setId(uuid);
         cl.setNodeRepresentation(nodeRepresentation);
@@ -325,7 +335,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     private ExternalIdentifierType makeExternalIdentifier(String identificationScheme, String registryObject, String value, String name) {
 
-        String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
         ExternalIdentifierType ex = ofRim.createExternalIdentifierType();
         ex.setId(uuid);
         ex.setIdentificationScheme(identificationScheme);
@@ -451,7 +461,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     private String prepareExtrinsicObjectEP(AdhocQueryRequest request, ExtrinsicObjectType eot, EPDocumentMetaData document) {
 
         String name = "ePrescription";
-        String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
         boolean isPDF = document.getFormat() == EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF;
 
         // Set Extrinsic Object
@@ -543,16 +553,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Author Person
         ClassificationType authorClassification = makeClassification(
-                "urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d",
-                uuid,
-                "");
+                "urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d", uuid, "");
         authorClassification.getSlot().add(makeSlot("authorPerson", document.getAuthor()));
         eot.getClassification().add(authorClassification);
 
         // External Identifiers
         eot.getExternalIdentifier().add(makeExternalIdentifier(
-                "urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
-                uuid,
+                "urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427", uuid,
                 document.getPatientId() + "^^^&" + Constants.HOME_COMM_ID + "&ISO",
                 "XDSDocumentEntry.patientId"));
 
@@ -564,7 +571,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     private AssociationType1 makeAssociation(String source, String target) {
 
-        String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
         AssociationType1 association = ofRim.createAssociationType1();
         association.setId(uuid);
         association.setAssociationType("urn:ihe:iti:2007:AssociationType:XFRM");
@@ -588,7 +595,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         //String location = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
         //              RegisteredService.PATIENT_SERVICE);
         // EHNCP-1131
-        return "urn:oid:" + Constants.HOME_COMM_ID;
+        return Constants.OID_PREFIX + Constants.HOME_COMM_ID;
     }
 
     private RegistryError createErrorMessage(String errorCode, String codeContext, String value, boolean isWarning) {
@@ -1049,7 +1056,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XCA_RETRIEVE_REQ",
                         Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {
-                logger.error("createEvidenceREMNRO: " + ExceptionUtils.getStackTrace(e));
+                logger.error("createEvidenceREMNRO: '{}'", ExceptionUtils.getStackTrace(e), e);
             }
 
             //TODO: EHNCP-1271 - Shall we indicate a specific ERROR Code???
@@ -1154,15 +1161,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                 if (doc != null) {
 
-                    /* Validate CDA epSOS Friendly */
-//                    cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(),
-//                            CdaModel.obtainCdaModel(epsosDoc.getClassCode(), false), NcpSide.NCP_A);
-                    //String cdaModel = CdaModel.obtainCdaModel(epsosDoc.getClassCode(), false);
+                    /* Validate CDA eHDSI Friendly */
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
                                 NcpSide.NCP_A, epsosDoc.getClassCode(), false);
                     }
-                    // Transcode to Epsos Pivot
+                    // Transcode to eHDSI Pivot
                     doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
                     if (!checkIfOnlyWarnings(registryErrorList)) {
 
@@ -1173,39 +1177,46 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                             OMElement errorCode = errors.next();
                             logger.error("Error: '{}'-'{}'", errorCode.getText(), errorCode.getAttributeValue(QName.valueOf("errorCode")));
-                            if (StringUtils.equals(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED.getCode(), errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
+                            logger.error("TRANSCODING ERROR: '{}'-'{}'", TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED.getCode(),
+                                    errorCode.getAttributeValue(QName.valueOf("errorCode")));
+                            //if (StringUtils.equals(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED.getCode(), errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
+                            //if (StringUtils.equals(TSAMError.ERROR_CODE_SYSTEM_CONCEPT_NOTFOUND.getCode(), errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
+                            if (StringUtils.startsWith(errorCode.getAttributeValue(QName.valueOf("errorCode")), "45")) {
                                 //throw new TranscodingErrorException("The requested encoding cannot be provided due to a transcoding error.");
-                                registryErrorList.addChild(createErrorOMMessage(ns, "4203", "The requested encoding cannot be provided due to a transcoding error.", "", false));
+                                registryErrorList.addChild(createErrorOMMessage(ns, XCAError.ERROR_4203.getCode(), XCAError.ERROR_4203.getMessage(), "", false));
                                 // If the error is FATAL flag failure has been set to true
                                 failure = true;
                                 break;
                             }
                         }
                     }
-                    /* Validate CDA epSOS Pivot */
-                    //cdaModel = CdaModel.obtainCdaModel(epsosDoc.getClassCode(), true);
+                    /* Validate CDA eHDSI Pivot */
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
                                 NcpSide.NCP_A, epsosDoc.getClassCode(), true);
                     }
-//                    cdaValidationService.validateModel(XMLUtils.toOM(doc.getDocumentElement()).toString(),
-//                            CdaModel.obtainCdaModel(epsosDoc.getClassCode(), true), NcpSide.NCP_A);
                 }
+
+                logger.info("Error Registry: Failure '{}'", failure);
 
                 // If the registryErrorList is empty or contains only Warning, the status of the request is SUCCESS
                 if (!registryErrorList.getChildElements().hasNext()) {
+                    logger.info("XCA Retrieve Document - Transformation Status: '{}'\nDefault Case", AdhocQueryResponseStatus.SUCCESS);
                     registryResponse.addAttribute(factory.createOMAttribute("status", null,
                             AdhocQueryResponseStatus.SUCCESS));
                 } else {
                     if (checkIfOnlyWarnings(registryErrorList)) {
+                        logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning", AdhocQueryResponseStatus.SUCCESS);
                         registryResponse.addAttribute(factory.createOMAttribute("status", null,
                                 AdhocQueryResponseStatus.SUCCESS));
                     } else if (failure) {
                         // If there is a failure during the request process, the status is FAILURE
+                        logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning Failure: '{}'", AdhocQueryResponseStatus.FAILURE, failure);
                         registryResponse.addAttribute(factory.createOMAttribute("status", null,
                                 AdhocQueryResponseStatus.FAILURE));
                     } else {
-                        //Otherwise the status is PARTIALSUCCESS
+                        //Otherwise the status is PARTIAL SUCCESS
+                        logger.info("XCA Retrieve Document - Transformation Status: '{}'\nOtherwise...", AdhocQueryResponseStatus.PARTIAL_SUCCESS);
                         registryResponse.addAttribute(factory.createOMAttribute("status", null,
                                 AdhocQueryResponseStatus.PARTIAL_SUCCESS));
                     }
@@ -1271,12 +1282,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private boolean checkIfOnlyWarnings(OMElement registryErrorList) {
 
+        logger.info("Method checkIfOnlyWarnings()");
         boolean onlyWarnings = true;
         OMElement element;
         Iterator it = registryErrorList.getChildElements();
         while (it.hasNext()) {
             element = (OMElement) it.next();
             logger.info("checkIfOnlyWarnings() - Element: '{}'", element.getText());
+            logger.info("[TEST eHDSI PIVOT] Checking Elements and Attributes\n{}\n{}", element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
+                    "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error");
             if (StringUtils.equals(element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
                     "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error")) {
                 onlyWarnings = false;
