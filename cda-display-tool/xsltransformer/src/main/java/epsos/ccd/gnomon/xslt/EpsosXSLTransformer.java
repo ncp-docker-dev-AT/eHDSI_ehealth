@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
@@ -24,7 +25,7 @@ public class EpsosXSLTransformer {
 
     private static final String MAIN_XSLT = "/resources/cda.xsl";
     private static final String STANDARD_XSLT = "/resources/def_cda.xsl";
-    private static final Logger logger = LoggerFactory.getLogger(EpsosXSLTransformer.class);
+    private final Logger logger = LoggerFactory.getLogger(EpsosXSLTransformer.class);
     private Path path = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository");
 
     /**
@@ -41,12 +42,12 @@ public class EpsosXSLTransformer {
      * @param actionpath
      * @param path
      * @param export
-     * @param shownarrative
+     * @param showNarrative
      * @param xsl
      * @return
      */
     private String transform(String xml, String lang, String actionpath, Path path, boolean export,
-                             boolean shownarrative, String xsl) {
+                             boolean showNarrative, String xsl) {
 
         String output = "";
         checkLanguageFiles();
@@ -65,19 +66,20 @@ public class EpsosXSLTransformer {
                 logger.info("SystemID: '{}'", systemId);
                 logger.info("Path: '{}'", path);
                 logger.info("Lang: '{}'", lang);
-                logger.info("Show Narrative: '{}'", String.valueOf(shownarrative));
+                logger.info("Show Narrative: '{}'", String.valueOf(showNarrative));
             }
+
             StreamSource xmlSource = new StreamSource(new StringReader(xml));
             StreamSource xslSource = new StreamSource(xslStream);
-
             xslSource.setSystemId(systemId);
 
             TransformerFactory transformerFactory = net.sf.saxon.TransformerFactoryImpl.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             Transformer transformer = transformerFactory.newTransformer(xslSource);
             transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
             transformer.setParameter("epsosLangDir", path);
             transformer.setParameter("userLang", lang);
-            transformer.setParameter("shownarrative", String.valueOf(shownarrative));
+            transformer.setParameter("shownarrative", String.valueOf(showNarrative));
 
             if (StringUtils.isNotBlank(actionpath)) {
                 transformer.setParameter("actionpath", actionpath);
@@ -179,9 +181,8 @@ public class EpsosXSLTransformer {
 
     private void checkLanguageFiles() {
 
-//        final String filesNeeded[] = {"epSOSDisplayLabels.xml", "NullFlavor.xml", "SNOMEDCT.xml",
-//                "UCUMUnifiedCodeforUnitsofMeasure.xml"};
-        final String filesNeeded[] = {"1.3.6.1.4.1.12559.11.10.1.3.1.42.17.xml", "1.3.6.1.4.1.12559.11.10.1.3.1.42.37.xml",
+        //  "epSOSDisplayLabels.xml", "NullFlavor.xml", "SNOMEDCT.xml","UCUMUnifiedCodeforUnitsofMeasure.xml"
+        final String[] filesNeeded = {"1.3.6.1.4.1.12559.11.10.1.3.1.42.17.xml", "1.3.6.1.4.1.12559.11.10.1.3.1.42.37.xml",
                 "1.3.6.1.4.1.12559.11.10.1.3.1.42.46.xml", "1.3.6.1.4.1.12559.11.10.1.3.1.42.16.xml"};
         // get User Path
         try {
@@ -195,7 +196,7 @@ public class EpsosXSLTransformer {
                 throw new TerminologyFileNotFoundException("Folder " + path.toString() + " doesn't exists");
             }
         } catch (Exception e) {
-            logger.error("FATAL ERROR: " + e.getMessage(), e);
+            logger.error("FATAL ERROR: '{}'", e.getMessage(), e);
         }
     }
 }
