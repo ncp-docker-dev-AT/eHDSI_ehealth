@@ -59,10 +59,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         javax.xml.bind.JAXBContext jc;
         jc = null;
         try {
-            jc = javax.xml.bind.JAXBContext.newInstance(
-                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
-                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse.class,
-                    RetrieveDocumentSetRequestType.class,
+            jc = javax.xml.bind.JAXBContext.newInstance(oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
+                    oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse.class, RetrieveDocumentSetRequestType.class,
                     RetrieveDocumentSetResponseType.class);
         } catch (javax.xml.bind.JAXBException ex) {
             LOGGER.error(XCAConstants.EXCEPTIONS.UNABLE_CREATE_JAXB_CONTEXT + " " + ex.getMessage(), ex);
