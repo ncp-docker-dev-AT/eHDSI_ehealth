@@ -421,7 +421,7 @@ public class SMPSignFileController {
                             smpfile.setCertificate(cert.getEncoded());
                         }
                     } catch (CertificateException ex) {
-                        LOGGER.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                        LOGGER.error("CertificateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     }
                 } else {
                     smpfile.setCertificate(null);

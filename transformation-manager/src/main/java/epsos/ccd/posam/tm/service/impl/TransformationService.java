@@ -229,7 +229,6 @@ public class TransformationService implements ITransformationService, TMConstant
                     if (!validateMDA.isModelValid()) {
                         warnings.add(TMError.WARNING_OUTPUT_MDA_VALIDATION_FAILED);
                     }
-
                 }
                 // validate RESULT (schematron)
                 if (config.isSchematronValidationEnabled()) {
@@ -330,7 +329,6 @@ public class TransformationService implements ITransformationService, TMConstant
         } else {
             logger.error("Write AuditTrail Error: Cannot process Transformation Manager response");
         }
-
     }
 
     /**
@@ -529,7 +527,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 if (isRequired && (nodeList == null || nodeList.isEmpty())) {
 
                     if (logger.isErrorEnabled()) {
-                        logger.error("Required element is missing: '{}'", codedElementListItem.toString());
+                        logger.error("Required element is missing: '{}'", codedElementListItem);
                     }
                     processingOK = false;
                     errors.add(new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_MISSING, codedElementListItem.toString()));
@@ -660,7 +658,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     codedElement, targetLanguageCode);
 
             if (tsamResponse.isStatusSuccess()) {
-                logger.debug("processing successful '{}'", codedElement.toString());
+                logger.debug("processing successful '{}'", codedElement);
                 // +++++ Element editing BEGIN +++++
 
                 // NEW TRANSLATION element
