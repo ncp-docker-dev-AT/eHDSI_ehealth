@@ -871,8 +871,7 @@ public class EpsosHelperService {
         }
 
         org.opensaml.xml.signature.Signature sig = (org.opensaml.xml.signature.Signature) Configuration
-                .getBuilderFactory()
-                .getBuilder(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME)
+                .getBuilderFactory().getBuilder(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME)
                 .buildObject(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME);
         Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
 
@@ -993,8 +992,9 @@ public class EpsosHelperService {
             Company company = CompanyLocalServiceUtil.getCompany(user.getCompanyId());
             orgName = company.getName();
             String poc = "POC";
+
             // fixed for consent creation AuthorInstitution Validation problem
-            String orgId = company.getCompanyId() + ".1";
+            String organizationId = Constants.OID_PREFIX + PORTAL_HOSPITAL_OID;
             List depts = user.getOrganizations();
             String orgType;
             if (isPharmacist) {
@@ -1010,7 +1010,7 @@ public class EpsosHelperService {
             if (isEmergency) {
                 purposeOfUse = "EMERGENCY";
             }
-            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType, purposeOfUse, poc, permissions);
+            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, organizationId, orgType, purposeOfUse, poc, permissions);
 
             // send Audit message
             // GUI-27
@@ -1023,10 +1023,7 @@ public class EpsosHelperService {
             // GUI-25
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
-                String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-                LOGGER.info("KEY ALIAS: '{}'", KEY_ALIAS);
-
-                signSAMLAssertion(assertion, KEY_ALIAS);
+                signSAMLAssertion(assertion, Constants.NCP_SIG_PRIVATEKEY_ALIAS);
                 AssertionMarshaller marshaller = new AssertionMarshaller();
                 Element element = marshaller.marshall(assertion);
 
@@ -2064,8 +2061,8 @@ public class EpsosHelperService {
     }
 
     private static void updatePortalProperty(String key, String value) {
-        if (Validator.isNull(ConfigurationManagerFactory.getConfigurationManager()
-                .getProperty(key))) {
+
+        if (Validator.isNull(ConfigurationManagerFactory.getConfigurationManager().getProperty(key))) {
             ConfigurationManagerFactory.getConfigurationManager().setProperty(key, value);
         }
     }
