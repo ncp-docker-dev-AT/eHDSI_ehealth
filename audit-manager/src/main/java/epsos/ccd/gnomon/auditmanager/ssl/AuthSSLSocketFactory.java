@@ -24,7 +24,7 @@ public class AuthSSLSocketFactory {
     private KeystoreDetails details = null;
     private KeystoreDetails truststore = null;
     private SSLContext sslcontext = null;
-    private X509TrustManager defaultTrustManager = null;
+    private X509TrustManager defaultTrustManager;
 
     /**
      * @param details
@@ -191,7 +191,7 @@ public class AuthSSLSocketFactory {
                     String alias = (String) aliases.nextElement();
                     Certificate[] certs = keystore.getCertificateChain(alias);
                     if (certs != null) {
-                        LOGGER.debug("Certificate chain '" + alias + "':");
+                        LOGGER.debug("Certificate chain: '{}'", alias);
                         for (int c = 0; c < certs.length; c++) {
                             if (certs[c] instanceof X509Certificate) {
                                 X509Certificate cert = (X509Certificate) certs[c];
@@ -213,7 +213,7 @@ public class AuthSSLSocketFactory {
                 Enumeration aliases = keystore.aliases();
                 while (aliases.hasMoreElements()) {
                     String alias = (String) aliases.nextElement();
-                    LOGGER.debug("Trusted certificate '" + alias + "':");
+                    LOGGER.debug("Trusted certificate: '{}':", alias);
                     Certificate trustedCert = keystore.getCertificate(alias);
                     if (trustedCert != null && trustedCert instanceof X509Certificate) {
                         X509Certificate cert = (X509Certificate) trustedCert;
