@@ -33,6 +33,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
@@ -56,6 +57,16 @@ public class EpsosRestService {
     private static final String PURPOSE_OF_USE_TREATMENT = "TREATMENT";
     @Context
     private static HttpServletRequest servletRequest;
+    private static JAXBContext jaxbContext;
+
+    static {
+        try {
+            jaxbContext = JAXBContext.newInstance(PatientDiscovery.class);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private PatientDiscovery pdq = null;
     private PatientDemographics pd = null;
     private Info ru = null;
@@ -579,9 +590,8 @@ public class EpsosRestService {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
-        JAXBContext jaxbContext;
         try {
-            jaxbContext = JAXBContext.newInstance(PatientDiscovery.class);
+
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             StringReader reader = new StringReader(soapMessage);
             pdq = (PatientDiscovery) jaxbUnmarshaller.unmarshal(reader);

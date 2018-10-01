@@ -35,6 +35,16 @@ public enum AuditTrailUtils {
     INSTANCE;
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditTrailUtils.class);
 
+    private static JAXBContext jaxbContext;
+
+    static {
+        try {
+            jaxbContext = JAXBContext.newInstance(AuditMessage.class);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public static AuditTrailUtils getInstance() {
         return INSTANCE;
     }
@@ -96,9 +106,9 @@ public enum AuditTrailUtils {
                 LOGGER.debug("'{}' XML stuff: Create Dom From String", auditmessage.getEventIdentification().getEventID().getCode());
                 Document doc = Utils.createDomFromString(auditMessage);
                 if (sign) {
+
                     // Gnomon SecMan
                     auditMessage = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
-
                     LOGGER.info("'{}' message signed", auditmessage.getEventIdentification().getEventID().getCode());
                 }
             } catch (Exception e) {
@@ -121,14 +131,14 @@ public enum AuditTrailUtils {
 
         LOGGER.info("Converting message - JAXB marshalling the Audit Object");
         StringWriter sw = new StringWriter();
-        JAXBContext context = JAXBContext.newInstance(AuditMessage.class);
-        Marshaller m = context.createMarshaller();
+
+        Marshaller marshaller = jaxbContext.createMarshaller();
         try {
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         } catch (PropertyException e) {
             LOGGER.error("Unable to format converted AuditMessage to XML: '{}'", e.getMessage(), e);
         }
-        m.marshal(am, sw);
+        marshaller.marshal(am, sw);
         LOGGER.info("Converting message finished");
         return sw.toString();
     }
