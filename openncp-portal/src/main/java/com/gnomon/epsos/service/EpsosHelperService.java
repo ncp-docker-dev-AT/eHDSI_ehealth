@@ -994,7 +994,7 @@ public class EpsosHelperService {
             String poc = "POC";
 
             // fixed for consent creation AuthorInstitution Validation problem
-            String organizationId = Constants.OID_PREFIX + PORTAL_HOSPITAL_OID;
+            String organizationId = Constants.OID_PREFIX + getConfigProperty(PORTAL_HOSPITAL_OID);
             List depts = user.getOrganizations();
             String orgType;
             if (isPharmacist) {
