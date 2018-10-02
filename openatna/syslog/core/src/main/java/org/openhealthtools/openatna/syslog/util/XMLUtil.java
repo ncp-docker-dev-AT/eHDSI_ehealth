@@ -1,13 +1,3 @@
-/*
- * XMLUtil.java
- *
- * Created on November 9, 2007, 1:13 PM
- *
- * To change this template, choose Tools | Options and locate the template under
- * the Source Creation and Management node. Right-click the template and choose
- * Open. You can then make changes to the template in the Source Editor.
- */
-
 package org.openhealthtools.openatna.syslog.util;
 
 import org.slf4j.Logger;
@@ -93,6 +83,7 @@ public class XMLUtil {
 
         StringWriter stringWriter = new StringWriter();
         TransformerFactory tf = TransformerFactory.newInstance();
+        tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -108,6 +99,7 @@ public class XMLUtil {
         /** FIXME: We assume that Transfor deals with encoding/charset internally */
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
@@ -117,9 +109,9 @@ public class XMLUtil {
 
     public static Map<String, String> parseNamespaceBindings(String namespaceBindings) {
 
-        if (namespaceBindings == null)
+        if (namespaceBindings == null) {
             return null;
-        //remove { and } 
+        }
         String namespacesParsed = namespaceBindings.substring(1, namespaceBindings.length() - 1);
         String[] bindings = namespacesParsed.split(",");
         Map<String, String> namespaces = new HashMap<>();
@@ -128,7 +120,6 @@ public class XMLUtil {
             String prefix = pair[0].trim();
             String namespace = pair[1].trim();
             //Remove ' and '
-            //namespace = namespace.substring(1,namespace.length()-1);
             namespaces.put(prefix, namespace);
         }
         return namespaces;
@@ -139,8 +130,7 @@ public class XMLUtil {
         Locale oldLocale = Locale.getDefault();
         Locale.setDefault(new Locale("en"));
         try {
-            JAXBContext jc = JAXBContext.newInstance(
-                    context);
+            JAXBContext jc = JAXBContext.newInstance(context);
             Marshaller marshaller = jc.createMarshaller();
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = schemaFactory.newSchema(new File(schemaLocation));
@@ -165,8 +155,7 @@ public class XMLUtil {
         Locale oldLocale = Locale.getDefault();
         Locale.setDefault(new Locale("en"));
         try {
-            JAXBContext jc = JAXBContext.newInstance(
-                    context);
+            JAXBContext jc = JAXBContext.newInstance(context);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = schemaFactory.newSchema(new File(schemaLocation));
@@ -201,7 +190,7 @@ public class XMLUtil {
         return null;
     }
 
-    public static void main(String args[]) {
+    public static void main(String... args) {
 
         try {
             String xmlString = "<RegistryResponse xmlns=\"urn:oasis:names:tc:ebxml-regrep:registry:xsd:2.1\" status=\"Success\"><Slot/></RegistryResponse>";

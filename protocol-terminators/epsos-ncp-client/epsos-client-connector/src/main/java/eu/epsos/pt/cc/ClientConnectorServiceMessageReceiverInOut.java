@@ -40,12 +40,13 @@ import java.util.Map;
 public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorServiceMessageReceiverInOut.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     static {
         LOGGER.debug("Loading the WS-Security init libraries in ClientConnectorServiceMessageReceiverInOut 2009");
         org.apache.xml.security.Init.init();
     }
+
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     @Override
     public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
@@ -154,14 +155,14 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 
                     Assertion hcpAssertion = null;
                     Assertion trcAssertion = null;
-                    //String assertionSchematron = null;
+
                     for (Assertion ass : assertions) {
+
                         if (ass.getAdvice() == null) {
                             hcpAssertion = ass;
-                            //assertionSchematron = AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString();
+
                         } else {
                             trcAssertion = ass;
-                            //assertionSchematron = AssertionSchematron.EPSOS_TRC_ASSERTION.toString();
                         }
                     }
                     if (OpenNCPValidation.isValidationEnable()) {
@@ -172,8 +173,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 
                     QueryDocumentsDocument wrappedParam;
                     wrappedParam = (QueryDocumentsDocument) fromOM(reqEnv.getBody().getFirstElement(),
-                            QueryDocumentsDocument.class,
-                            getEnvelopeNamespaces(reqEnv));
+                            QueryDocumentsDocument.class, getEnvelopeNamespaces(reqEnv));
                     queryDocumentsResponse17 = skel.queryDocuments(wrappedParam, hcpAssertion, trcAssertion);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), queryDocumentsResponse17);
@@ -186,14 +186,13 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 
                     Assertion hcpAssertion = null;
                     Assertion trcAssertion = null;
-                    // String assertionSchematron = null;
+
                     for (Assertion ass : assertions) {
+
                         if (ass.getAdvice() == null) {
                             hcpAssertion = ass;
-                            //  assertionSchematron = AssertionSchematron.EPSOS_HCP_IDENTITY_ASSERTION.toString();
                         } else {
                             trcAssertion = ass;
-                            // assertionSchematron = AssertionSchematron.EPSOS_TRC_ASSERTION.toString();
                         }
                     }
                     if (OpenNCPValidation.isValidationEnable()) {
@@ -270,6 +269,13 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         return envelope;
     }
 
+    /**
+     * @param param
+     * @param type
+     * @param extraNamespaces
+     * @return
+     * @throws AxisFault
+     */
     public XmlObject fromOM(OMElement param, Class type, Map extraNamespaces) throws AxisFault {
 
         try {
@@ -277,51 +283,43 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
             if (SubmitDocumentDocument1.class.equals(type)) {
 
                 if (extraNamespaces != null) {
-                    return SubmitDocumentDocument1.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching(),
+                    return SubmitDocumentDocument1.Factory.parse(param.getXMLStreamReaderWithoutCaching(),
                             new XmlOptions().setLoadAdditionalNamespaces(extraNamespaces));
 
                 } else {
-                    return SubmitDocumentDocument1.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching());
+                    return SubmitDocumentDocument1.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                 }
             }
 
             if (SubmitDocumentResponseDocument.class.equals(type)) {
 
                 if (extraNamespaces != null) {
-                    return SubmitDocumentResponseDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching(),
+                    return SubmitDocumentResponseDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching(),
                             new XmlOptions().setLoadAdditionalNamespaces(extraNamespaces));
 
                 } else {
-                    return SubmitDocumentResponseDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching());
+                    return SubmitDocumentResponseDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                 }
             }
 
             if (QueryPatientDocument.class.equals(type)) {
 
                 if (extraNamespaces != null) {
-                    return QueryPatientDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching(),
+                    return QueryPatientDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching(),
                             new XmlOptions().setLoadAdditionalNamespaces(extraNamespaces));
 
                 } else {
-                    return QueryPatientDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching());
+                    return QueryPatientDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                 }
             }
 
             if (QueryPatientResponseDocument.class.equals(type)) {
                 if (extraNamespaces != null) {
-                    return QueryPatientResponseDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching(),
+                    return QueryPatientResponseDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching(),
                             new XmlOptions().setLoadAdditionalNamespaces(extraNamespaces));
 
                 } else {
-                    return QueryPatientResponseDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching());
+                    return QueryPatientResponseDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                 }
             }
 
@@ -332,63 +330,53 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                     return SayHelloDocument.Factory.parse(xmlStreamReaderWithoutCaching, setLoadAdditionalNamespaces);
 
                 } else {
-                    return SayHelloDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching());
+                    return SayHelloDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                 }
             }
 
             if (SayHelloResponseDocument.class.equals(type)) {
                 if (extraNamespaces != null) {
-                    return SayHelloResponseDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching(),
+                    return SayHelloResponseDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching(),
                             new org.apache.xmlbeans.XmlOptions().setLoadAdditionalNamespaces(extraNamespaces));
 
                 } else {
-                    return SayHelloResponseDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching());
+                    return SayHelloResponseDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                 }
             }
 
             if (QueryDocumentsDocument.class.equals(type)) {
                 if (extraNamespaces != null) {
-                    return QueryDocumentsDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching(),
+                    return QueryDocumentsDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching(),
                             new XmlOptions().setLoadAdditionalNamespaces(extraNamespaces));
 
                 } else {
-                    return QueryDocumentsDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching());
+                    return QueryDocumentsDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                 }
             }
 
             if (QueryDocumentsResponseDocument.class.equals(type)) {
                 if (extraNamespaces != null) {
-                    return QueryDocumentsResponseDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching(),
+                    return QueryDocumentsResponseDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching(),
                             new XmlOptions().setLoadAdditionalNamespaces(extraNamespaces));
 
                 } else {
-                    return QueryDocumentsResponseDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching());
+                    return QueryDocumentsResponseDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                 }
             }
 
             if (RetrieveDocumentDocument1.class.equals(type)) {
                 if (extraNamespaces != null) {
-                    return RetrieveDocumentDocument1.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching(),
+                    return RetrieveDocumentDocument1.Factory.parse(param.getXMLStreamReaderWithoutCaching(),
                             new XmlOptions().setLoadAdditionalNamespaces(extraNamespaces));
 
                 } else {
-                    return RetrieveDocumentDocument1.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching());
+                    return RetrieveDocumentDocument1.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                 }
             }
 
             if (RetrieveDocumentResponseDocument.class.equals(type)) {
                 if (extraNamespaces != null) {
-                    return RetrieveDocumentResponseDocument.Factory.parse(
-                            param.getXMLStreamReaderWithoutCaching(),
+                    return RetrieveDocumentResponseDocument.Factory.parse(param.getXMLStreamReaderWithoutCaching(),
                             new XmlOptions().setLoadAdditionalNamespaces(extraNamespaces));
 
                 } else {

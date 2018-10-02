@@ -54,6 +54,16 @@ import java.util.*;
 @Service
 public class SMPConverter {
 
+    private static JAXBContext jaxbContext;
+
+    static {
+        try {
+            jaxbContext = JAXBContext.newInstance(SignedServiceMetadata.class, ServiceMetadata.class);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private final Logger logger = LoggerFactory.getLogger(SMPConverter.class);
     Boolean isSignedServiceMetadata;
     @Autowired
@@ -572,7 +582,6 @@ public class SMPConverter {
         SignedServiceMetadata signedServiceMetadata = objectFactory.createSignedServiceMetadata();
 
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(SignedServiceMetadata.class, ServiceMetadata.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             Object result = jaxbUnmarshaller.unmarshal(fileUpdate.getInputStream());
 
@@ -688,8 +697,6 @@ public class SMPConverter {
             });
 
             StringWriter stringWriter = new StringWriter();
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(ServiceMetadata.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8.name());
             jaxbMarshaller.marshal(serviceMetadata, generatedFileOS);

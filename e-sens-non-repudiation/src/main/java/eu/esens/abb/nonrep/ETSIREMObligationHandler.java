@@ -1,7 +1,7 @@
 package eu.esens.abb.nonrep;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 import eu.esens.abb.nonrep.etsi.rem.*;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
@@ -17,6 +17,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,7 +44,17 @@ public class ETSIREMObligationHandler implements ObligationHandler {
     private static final String REM_NRR_PREFIX = "urn:eSENS:obligations:nrr:ETSIREM";
     private static final String REM_NRO_PREFIX = "urn:eSENS:obligations:nro:ETSIREM";
     private static final String REM_NRD_PREFIX = "urn:eSENS:obligations:nrd:ETSIREM";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ETSIREMObligationHandler.class);
+    private static JAXBContext jaxbContext;
+
+    static {
+        try {
+            jaxbContext = JAXBContext.newInstance("eu.esens.abb.nonrep.etsi.rem");
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private final Logger logger = LoggerFactory.getLogger(ETSIREMObligationHandler.class);
     private List<ESensObligation> obligations;
     private Document audit = null;
     private Context context;
@@ -61,6 +72,9 @@ public class ETSIREMObligationHandler implements ObligationHandler {
      */
     @Override
     public void discharge() throws ObligationDischargeException {
+
+        StopWatch watch = new StopWatch();
+        watch.start();
         /*
          * Here I need to check the IHE message type. It can be XCA, XCF,
          * whatever
@@ -76,28 +90,38 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         // } else {
         // throw new ObligationDischargeException("Unkwnon message type");
         // }
-
-        /*
-         * For the e-SENS pilot we issue the NRO and NRR token to all the
-         * incoming messages -> This is the per hop protocol.
-         */
+        
+        //  For the e-SENS pilot we issue the NRO and NRR token to all the incoming messages -> This is the per hop protocol.
         try {
             makeETSIREM();
         } catch (Exception e) {
+            watch.stop();
             throw new ObligationDischargeException(e);
         }
+        watch.stop();
+        logger.info("Time Elapsed: '{}ms'", watch.getTime());
     }
 
+    /**
+     * @throws DatatypeConfigurationException
+     * @throws JAXBException
+     * @throws CertificateEncodingException
+     * @throws NoSuchAlgorithmException
+     * @throws SOAPException
+     * @throws ParserConfigurationException
+     * @throws XMLSecurityException
+     * @throws TransformerException
+     */
     private void makeETSIREM() throws DatatypeConfigurationException, JAXBException, CertificateEncodingException,
             NoSuchAlgorithmException, SOAPException, ParserConfigurationException, XMLSecurityException, TransformerException {
 
-        JAXBContext jc = JAXBContext.newInstance("eu.esens.abb.nonrep.etsi.rem");
+
         ObjectFactory of = new ObjectFactory();
         REMEvidenceType type = new REMEvidenceType();
 
         for (ESensObligation eSensObl : obligations) {
 
-            LOGGER.info("ObligationID '{}'", eSensObl.getObligationID());
+            logger.info("ObligationID '{}'", eSensObl.getObligationID());
             switch (eSensObl.getObligationID()) {
                 case REM_NRO_PREFIX: {
                     String outcome;
@@ -110,7 +134,6 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
                     type.setVersion(find(REM_NRO_PREFIX + ":version", listAttr));
                     type.setEventCode(outcome);
-
                     type.setEvidenceIdentifier(UUID.randomUUID().toString());
 
                     /*
@@ -130,7 +153,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
                     Document doc = db.newDocument();
 
                     JAXBElement<REMEvidenceType> back = of.createSubmissionAcceptanceRejection(type);
-                    Marshaller marshaller = jc.createMarshaller();
+                    Marshaller marshaller = jaxbContext.createMarshaller();
                     marshaller.marshal(back, doc);
 
                     sign(doc, context.getIssuerCertificate(), context.getSigningKey());
@@ -173,7 +196,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
                     Document doc = db.newDocument();
 
                     JAXBElement<REMEvidenceType> back = of.createAcceptanceRejectionByRecipient(type);
-                    Marshaller marshaller = jc.createMarshaller();
+                    Marshaller marshaller = jaxbContext.createMarshaller();
                     marshaller.marshal(back, doc);
 
                     sign(doc, context.getIssuerCertificate(), context.getSigningKey());
@@ -212,17 +235,28 @@ public class ETSIREMObligationHandler implements ObligationHandler {
                     Document doc = db.newDocument();
 
                     JAXBElement<REMEvidenceType> back = of.createDeliveryNonDeliveryToRecipient(type);
-                    Marshaller marshaller = jc.createMarshaller();
+                    Marshaller marshaller = jaxbContext.createMarshaller();
                     marshaller.marshal(back, doc);
 
                     sign(doc, context.getIssuerCertificate(), context.getSigningKey());
                     audit = doc;
                     break;
                 }
+                default:
+                    logger.warn("ETSI-REM evidence type not supported: '{}'", eSensObl.getObligationID());
+                    break;
             }
         }
     }
 
+    /**
+     * @param type
+     * @throws CertificateEncodingException
+     * @throws NoSuchAlgorithmException
+     * @throws DatatypeConfigurationException
+     * @throws SOAPException
+     * @throws TransformerException
+     */
     private void mapToIso(REMEvidenceType type) throws CertificateEncodingException, NoSuchAlgorithmException,
             DatatypeConfigurationException, SOAPException, TransformerException {
 
@@ -272,7 +306,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         type.setRecipientsDetails(rd);
 
         // Evidence Issuer Details is the C field of the ISO token
-        LOGGER.debug("Context Details: Issuer:'{}', Recipient:'{}', Sender:'{}'", context.getIssuerCertificate() != null ? context.getIssuerCertificate().getSerialNumber() : "N/A",
+        logger.debug("Context Details: Issuer:'{}', Recipient:'{}', Sender:'{}'", context.getIssuerCertificate() != null ? context.getIssuerCertificate().getSerialNumber() : "N/A",
                 context.getRecipientCertificate() != null ? context.getRecipientCertificate().getSerialNumber() : "N/A",
                 context.getSenderCertificate() != null ? context.getSenderCertificate().getSerialNumber() : "N/A");
 
@@ -308,7 +342,7 @@ public class ETSIREMObligationHandler implements ObligationHandler {
             Utilities.serialize(context.getIncomingMsgAsDocument().getDocumentElement(), baos);
 
         } else {
-            throw new IllegalStateException("No valid incoming msg passed");
+            throw new IllegalStateException("Not valid incoming Message passed");
         }
         md.update(baos.toByteArray());
         mdt.setDigestValue(md.digest());
@@ -330,14 +364,20 @@ public class ETSIREMObligationHandler implements ObligationHandler {
 
         AuthenticationDetailsType adt = new AuthenticationDetailsType();
         adt.setAuthenticationMethod(context.getAuthenticationMethod());
-        // this is the authentication time. I set it as "now", since it is
-        // required by the REM, but it is not used here.
-        adt.setAuthenticationTime((new XMLGregorianCalendarImpl(new DateTime().toGregorianCalendar())));
+        // this is the authentication time. I set it as "now", since it is required by the REM, but it is not used here.
+        XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(
+                new DateTime().toGregorianCalendar());
+        adt.setAuthenticationTime(xmlGregorianCalendar);
 
         type.setSenderAuthenticationDetails(adt);
 
     }
 
+    /**
+     * @param string
+     * @param listAttr
+     * @return
+     */
     private String find(String string, List<AttributeAssignmentType> listAttr) {
 
         for (AttributeAssignmentType att : listAttr) {
@@ -348,6 +388,12 @@ public class ETSIREMObligationHandler implements ObligationHandler {
         return null;
     }
 
+    /**
+     * @param doc
+     * @param cert
+     * @param key
+     * @throws XMLSecurityException
+     */
     private void sign(Document doc, X509Certificate cert, PrivateKey key) throws XMLSecurityException {
 
         String baseURI = "./";

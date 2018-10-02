@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012  SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.validation.datamodel.dts;
 
 import eu.epsos.validation.datamodel.common.DetailedResult;
@@ -31,15 +12,25 @@ import java.io.StringWriter;
 
 
 /**
- * This class provides data transfer services in the form of unmarshall
- * operations. It allows the conversion of a XML web service response to the
- * correspondent set of java objects.
+ * This class provides data transfer services in the form of unmarshall operations. It allows the conversion of a XML
+ * web service response to the correspondent set of java objects.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @deprecated
  */
+@Deprecated
 public class WsUnmarshaller {
 
     private static final Logger logger = LoggerFactory.getLogger(WsUnmarshaller.class);
+    private static JAXBContext jaxbContext;
+
+    static {
+        try {
+            jaxbContext = JAXBContext.newInstance(DetailedResult.class);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     /**
      * Private constructor to avoid instantiation.
@@ -65,8 +56,7 @@ public class WsUnmarshaller {
 
             try {
 
-                JAXBContext jc = JAXBContext.newInstance(DetailedResult.class);
-                Unmarshaller unmarshaller = jc.createUnmarshaller();
+                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
                 result = (DetailedResult) unmarshaller.unmarshal(is);
 
             } catch (JAXBException ex) {
@@ -93,8 +83,7 @@ public class WsUnmarshaller {
         try {
             StringWriter writer = new StringWriter();
 
-            JAXBContext context = JAXBContext.newInstance(DetailedResult.class);
-            Marshaller m = context.createMarshaller();
+            Marshaller m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(detailedResult, writer);
 

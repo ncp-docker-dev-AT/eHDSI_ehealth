@@ -238,8 +238,7 @@ public class XMLUtil {
         Locale oldLocale = Locale.getDefault();
         Locale.setDefault(new Locale("en"));
         try {
-            JAXBContext jc = JAXBContext.newInstance(
-                    context);
+            JAXBContext jc = JAXBContext.newInstance(context);
             Marshaller marshaller = jc.createMarshaller();
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = schemaFactory.newSchema(new File(schemaLocation));
@@ -269,8 +268,7 @@ public class XMLUtil {
         Locale oldLocale = Locale.getDefault();
         Locale.setDefault(new Locale("en"));
         try {
-            JAXBContext jc = JAXBContext.newInstance(
-                    context);
+            JAXBContext jc = JAXBContext.newInstance(context);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = schemaFactory.newSchema(new File(schemaLocation));

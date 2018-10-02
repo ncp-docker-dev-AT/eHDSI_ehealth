@@ -297,7 +297,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
         // In this case, we check the country code of the signature certificate that ships within the HCP assertion.
         // TODO: Might be necessary to remove later, although it does no harm in reality!
         else {
-            LOGGER.info("Could not get client country code from the service consumer certificate. The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
+            LOGGER.info("Could not get client country code from the service consumer certificate. " +
+                    "The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
             if (sigCountryCode != null) {
                 LOGGER.info("Found the client country code via the signature certificate.");
                 countryCode = sigCountryCode;

@@ -135,7 +135,7 @@ public class ReportBuilder {
                 return true;
 
             } catch (IOException ex) {
-                LOGGER.error("An I/O error has occurred while writting the report file, please check the stack trace for more information.", ex);
+                LOGGER.error("An I/O error has occurred while writing the report file, please check the stack trace for more information.", ex);
                 return false;
             }
 
@@ -209,7 +209,7 @@ public class ReportBuilder {
 
         TimeZone tz = TimeZone.getTimeZone("UTC");
         //ISO 8601 format: 2017-11-25T10:59:53Z
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         df.setTimeZone(tz);
         return df.format(new Date());
     }

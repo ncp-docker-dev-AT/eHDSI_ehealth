@@ -27,7 +27,7 @@ import java.util.TimeZone;
 
 /**
  * Thread for sending the messages to the syslog repository. Each message is being sent using a different thread.
- * If a message can;t be send immediately, it tries for a time interval.
+ * If a message can't be send immediately, it tries for a time interval.
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -36,16 +36,14 @@ import java.util.TimeZone;
  */
 public class MessageSender extends Thread {
 
+    private static final String AUDIT_REPOSITORY_URL = "audit.repository.url";
+    private static final String AUDIT_REPOSITORY_PORT = "audit.repository.port";
+    private static final String KEYSTORE_FILE = "NCP_SIG_KEYSTORE_PATH";
+    private static final String TRUSTSTORE = "TRUSTSTORE_PATH";
+    private static final String KEY_ALIAS = "NCP_SIG_PRIVATEKEY_ALIAS";
+    private static String[] enabledProtocols = {"TLSv1"};
     private final Logger logger = LoggerFactory.getLogger(MessageSender.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
-    private static String[] enabledProtocols = {"TLSv1"};
-    private static String AUDIT_REPOSITORY_URL = "audit.repository.url";
-    private static String AUDIT_REPOSITORY_PORT = "audit.repository.port";
-    private static String KEYSTORE_FILE = "NCP_SIG_KEYSTORE_PATH";
-    private static String TRUSTSTORE = "TRUSTSTORE_PATH";
-    private static String KEY_ALIAS = "NCP_SIG_PRIVATEKEY_ALIAS";
-
     private AuditLogSerializer auditLogSerializer;
     private AuditMessage auditmessage;
     private String facility;
@@ -66,7 +64,7 @@ public class MessageSender extends Thread {
         boolean sent = false;
         logger.info("Try to construct the message");
         try {
-            logger.info(auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() + " Try to construct the message");
+            logger.info("'{}' - Try to construct the message", auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode());
             String auditmsg = AuditTrailUtils.constructMessage(auditmessage, true);
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                 loggerClinical.debug("Audit Message sent:\n{}", auditmsg);
@@ -108,8 +106,7 @@ public class MessageSender extends Thread {
     }
 
     /**
-     * This class is responsible for sending the audit message to the
-     * repository. Creates UDP logs for every step.
+     * This class is responsible for sending the audit message to the repository. Creates UDP logs for every step.
      *
      * @param auditmsg
      * @param facility
@@ -140,7 +137,7 @@ public class MessageSender extends Thread {
                 ks.load(Utils.fullStream(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEYSTORE_FILE)),
                         ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue()).toCharArray());
                 X509Certificate cert = (X509Certificate) ks.getCertificate(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS));
-                logger.debug("KEYSTORE: {}", cert.toString());
+                logger.debug("KEYSTORE: {}", cert);
                 KeyStore ks1 = KeyStore.getInstance("JKS");
                 stream = Utils.fullStream(ConfigurationManagerFactory.getConfigurationManager().getProperty(TRUSTSTORE));
                 ks1.load(stream, ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE_PWD.getValue()).toCharArray());
@@ -149,7 +146,7 @@ public class MessageSender extends Thread {
                 while (enu.hasMoreElements()) {
                     i++;
                     String alias = enu.nextElement();
-                    logger.debug("ALIAS " + i + " " + alias);
+                    logger.debug("ALIAS '{}'-'{}'", i, alias);
                     logger.debug(ks1.getCertificate(alias).toString());
                 }
             } catch (Exception e) {
@@ -162,18 +159,18 @@ public class MessageSender extends Thread {
         BufferedOutputStream bos = null;
         SSLSocket sslsocket = null;
         try {
-            logger.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Initialize the SSL socket");
+            logger.debug("'{}' - Initialize the SSL socket", auditmessage.getEventIdentification().getEventID().getCode());
             File u = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty(TRUSTSTORE));
             KeystoreDetails trust = new KeystoreDetails(u.toString(), ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE_PWD.getValue()),
                     ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS));
             File uu = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEYSTORE_FILE));
             KeystoreDetails key = new KeystoreDetails(uu.toString(), ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue()),
                     ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS), ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue()));
-            AuthSSLSocketFactory f = new AuthSSLSocketFactory(key, trust);
-            logger.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Create socket");
+            AuthSSLSocketFactory authSSLSocketFactory = new AuthSSLSocketFactory(key, trust);
+            logger.debug("'{}' - Create socket", auditmessage.getEventIdentification().getEventID().getCode());
 
-            sslsocket = (SSLSocket) f.createSecureSocket(host, port);
-            logger.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Enabling protocols");
+            sslsocket = (SSLSocket) authSSLSocketFactory.createSecureSocket(host, port);
+            logger.debug("'{}' - Enabling protocols", auditmessage.getEventIdentification().getEventID().getCode());
             sslsocket.setEnabledProtocols(enabledProtocols);
 
             String[] suites = sslsocket.getSupportedCipherSuites();
@@ -199,13 +196,13 @@ public class MessageSender extends Thread {
             // Sets the bom for utf-8
             bos.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
             bos.flush();
-            logger.debug(auditmessage.getEventIdentification().getEventID().getCode() + " Write the object to bos");
+            logger.debug("'{}' - Write the object to bos", auditmessage.getEventIdentification().getEventID().getCode());
             // Write the syslog message to repository
             bos.write(auditmsg.getBytes());
-            logger.info(auditmessage.getEventIdentification().getEventID().getCode() + " Message sent");
+            logger.info("'{}' -  Message sent", auditmessage.getEventIdentification().getEventID().getCode());
             sent = true;
         } catch (Exception e) {
-            logger.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error sending message" + e.getMessage(), e);
+            logger.error("'{}' - Error sending message: '{}'", auditmessage.getEventIdentification().getEventID().getCode(), e.getMessage(), e);
         } finally {
             // closes the boom and the socket
             Utils.close(bos);

@@ -80,28 +80,28 @@ public class OpenNCPValidation {
     private static boolean validateAssertion(Assertion assertion, String schematron, NcpSide ncpSide) {
 
         LOGGER.info("[Validation Service: Assertion Validator]");
-        String base64 = "";
-        String xmlResult = "";
+        try {
+            String base64 = DatatypeConverter.printBase64Binary(XMLUtil.prettyPrint(assertion.getDOM()).getBytes(StandardCharsets.UTF_8));
+            String xmlResult = "";
 
-        if (isRemoteValidationEnable()) {
-            SchematronValidator schematronValidator = GazelleValidatorFactory.getSchematronValidator();
-            try {
-                base64 = DatatypeConverter.printBase64Binary(XMLUtil.prettyPrint(assertion.getDOM()).getBytes(StandardCharsets.UTF_8));
+            if (isRemoteValidationEnable()) {
+
+                SchematronValidator schematronValidator = GazelleValidatorFactory.getSchematronValidator();
                 xmlResult = schematronValidator.validateObject(base64, schematron, schematron);
 
-            } catch (TransformerException e) {
-                LOGGER.error("TransformerException: '{}'", e.getMessage(), e);
-                return false;
-            } catch (GazelleValidationException e) {
-                LOGGER.error("GazelleValidationException: '{}'", e.getMessage());
-                return false;
             }
-        }
-        if (StringUtils.isNotBlank(xmlResult)) {
-            DetailedResult detailedResult = DetailedResultUnMarshaller.unmarshal(xmlResult);
-            return ReportBuilder.build(schematron, ObjectType.ASSERTION.toString(), base64, detailedResult, xmlResult, ncpSide);
-        } else {
-            return ReportBuilder.build(schematron, ObjectType.ASSERTION.toString(), base64, null, null, ncpSide);
+            if (StringUtils.isNotBlank(xmlResult)) {
+                DetailedResult detailedResult = DetailedResultUnMarshaller.unmarshal(xmlResult);
+                return ReportBuilder.build(schematron, ObjectType.ASSERTION.toString(), base64, detailedResult, xmlResult, ncpSide);
+            } else {
+                return ReportBuilder.build(schematron, ObjectType.ASSERTION.toString(), base64, null, null, ncpSide);
+            }
+        } catch (GazelleValidationException e) {
+            LOGGER.error("GazelleValidationException: '{}'", e.getMessage());
+            return false;
+        } catch (TransformerException e) {
+            LOGGER.error("TransformerException: '{}'", e.getMessage(), e);
+            return false;
         }
     }
 
@@ -132,15 +132,15 @@ public class OpenNCPValidation {
      * @param ncpSide
      * @return
      */
-    private static boolean validatePatientDemographic(String request, String validator, ObjectType objectType, NcpSide ncpSide) {
+    private static boolean validatePatientDemographic(String request, String validator, ObjectType
+            objectType, NcpSide ncpSide) {
 
         LOGGER.info("[Validation Service: XCPD Validator]");
         String xmlResult = "";
-        String base64 = "";
+        String base64 = DatatypeConverter.printBase64Binary(request.getBytes(StandardCharsets.UTF_8));
 
         if (isRemoteValidationEnable()) {
             SchematronValidator schematronValidator = GazelleValidatorFactory.getSchematronValidator();
-            base64 = DatatypeConverter.printBase64Binary(request.getBytes(StandardCharsets.UTF_8));
             try {
                 xmlResult = schematronValidator.validateObject(base64, validator, validator);
             } catch (GazelleValidationException e) {
