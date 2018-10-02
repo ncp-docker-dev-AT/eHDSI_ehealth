@@ -190,7 +190,8 @@ public class SMPConverter {
                     String certAlias = environment.getProperty(type + ".certificate.alias");
                     String certificatePass = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPass);
                     String certificateAlias = ConfigurationManagerFactory.getConfigurationManager().getProperty(certAlias);
-                    logger.info("Certificate Info: '{}', '{}', '{}', '{}'", certPass, certAlias, certificatePass, certificateAlias);
+                    logger.info("Certificate Info: '{}', '{}', '{}', '{}'", StringUtils.isNotBlank(certPass) ? "******" : "N/A", certAlias,
+                            StringUtils.isNotBlank(certificatePass) ? "******" : "N/A", certificateAlias);
                     KeyStore ks = null;
                     try {
                         ks = KeyStore.getInstance(KeyStore.getDefaultType());
