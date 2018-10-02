@@ -1,311 +1,65 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <Configuration>
 	<Users>
-		<andreas password="1234">
-			<userId>1234</userId>
-			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Andreas Rehn</commonName>
-			<givenName>Andreas</givenName>
-			<familyName>Rehn</familyName>
-			<telecom>tel:+460001000000</telecom>
-			<street>Ringvägen 100</street>
-			<city>Stockholm</city>
-			<postalCode>11860</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</andreas>
-		<fredrik password="1234">
-			<userId>1234</userId>
-			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Fredrik Dahlman</commonName>
-			<givenName>Fredrik</givenName>
-			<familyName>Dahlman</familyName>
-			<telecom>tel:+460001000000</telecom>
-			<street>Ringvägen 100</street>
-			<city>Stockholm</city>
-			<postalCode>11860</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</fredrik>
-		<gareth password="1234">
-			<userId>1234</userId>
-			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Gareth Woodham</commonName>
-			<givenName>Gareth</givenName>
-			<familyName>Woodham</familyName>
-			<telecom>tel:+460001000000</telecom>
-			<street>Ringvägen 100</street>
-			<city>Stockholm</city>
-			<postalCode>11860</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</gareth>
-		<anders password="1234">
-			<userId>1234</userId>
-			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Anders Nyström</commonName>
-			<givenName>Anders</givenName>
-			<familyName>Nyström</familyName>
-			<telecom>tel:+460002000000</telecom>
-			<street>Ringvägen 100</street>
-			<city>Stockholm</city>
-			<postalCode>11860</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</anders>
-		<stefan password="1234">
-			<userId>1234</userId>
-			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Stefan Gustafsson</commonName>
-			<givenName>Stefan</givenName>
-			<familyName>Gustafsson</familyName>
-			<telecom>tel:+460003000000</telecom>
-			<street>Ringvägen 100</street>
-			<city>Stockholm</city>
-			<postalCode>11860</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</stefan>
-		<oskar password="1234">
-			<userId>1234</userId>
-			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Oskar Thunman</commonName>
-			<givenName>Oskar</givenName>
-			<familyName>Thunman</familyName>
-			<telecom>tel:+460004000000</telecom>
-			<street>Ringvägen 100</street>
-			<city>Stockholm</city>
-			<postalCode>11860</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</oskar>
-		<annika password="1234">
-			<userId>1234</userId>
-			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Annika Ohlson</commonName>
-			<givenName>Annika</givenName>
-			<familyName>Ohlson</familyName>
-			<telecom>tel:+460005000000</telecom>
-			<street>Ringvägen 100</street>
-			<city>Stockholm</city>
-			<postalCode>11860</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-			</roles>
-		</annika>
-		<eva password="1234">
-			<userId>1234</userId>
-			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Eva Leach Elfgren</commonName>
-			<givenName>Eva</givenName>
-			<familyName>Leach Elfgren</familyName>
-			<telecom>tel:+460006000000</telecom>
-			<street>Ringvägen 100</street>
-			<city>Stockholm</city>
-			<postalCode>11860</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-			</roles>
-		</eva>
-		<doktor password="1234">
-			<organizationName>epSOS Test Sjukhus</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Doktor Kosmos</commonName>
+		<doctor password="1234">
+			<userId>1000</userId>
+			<organizationName>eHDSI Testing MedCare</organizationName>
+			<organizationId>1.2.246.553.999</organizationId>
+			<commonName>John Doe</commonName>
+			<givenName>John</givenName>
+			<familyName>Doe</familyName>
+			<telecom>tel:+32123456</telecom>
+			<street>Breydel Street 4</street>
+			<city>Brussels</city>
+			<postalCode>1000</postalCode>
 			<roles>
 				<role>ROLE_DOCTOR</role>
 			</roles>
-		</doktor>
-		<syster password="1234">
-			<organizationName>epSOS Test Sjukhus</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Syster Yster</commonName>
-			<roles>
-				<role>ROLE_NURSE</role>
-			</roles>
-		</syster>
-		<apotek password="1234">
-			<organizationName>epSOS Test Apotek</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Apo Tekare</commonName>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-			</roles>
-		</apotek>
-		<pharmacist password="pharmacist">
-			<organizationName>epSOS Pharmacist</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>epSOS Pharmacist</commonName>
+		</doctor>
+		<pharmacist password="1234">
+			<userId>1100</userId>
+			<organizationName>eHDSI Testing MedCare</organizationName>
+			<organizationId>1.2.246.553.999</organizationId>
+			<commonName>Celine House</commonName>
+			<givenName>Celine</givenName>
+			<familyName>House</familyName>
+			<telecom>tel:+32654321</telecom>
+			<street>Breydel Street 12</street>
+			<city>Brussels</city>
+			<postalCode>1000</postalCode>
 			<roles>
 				<role>ROLE_PHARMACIST</role>
 			</roles>
 		</pharmacist>
-		<daniel password="1234">
-			<userId>1234</userId>
-			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
-			<commonName>Daniel</commonName>
-			<givenName>Daniel</givenName>
-			<familyName>Gronberg</familyName>
-			<telecom>tel:+460001000000</telecom>
-			<street>Ringvägen 100</street>
-			<city>Stockholm</city>
-			<postalCode>11860</postalCode>
+		<nurse password="1234">
+			<userId>1200</userId>
+			<organizationName>eHDSI Testing MedCare</organizationName>
+			<organizationId>1.2.246.553.999</organizationId>
+			<commonName>Jane Doe</commonName>
+			<givenName>Jane</givenName>
+			<familyName>Doe</familyName>
+			<telecom>tel:+32987654</telecom>
+			<street>Breydel Street 24</street>
+			<city>Brussels</city>
+			<postalCode>1000</postalCode>
 			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
 				<role>ROLE_NURSE</role>
+			</roles>
+		</nurse>
+		<admin password="1234">
+			<userId>1300</userId>
+			<organizationName>eHDSI Testing MedCare</organizationName>
+			<organizationId>1.2.246.553.999</organizationId>
+			<commonName>John Doe</commonName>
+			<givenName>John</givenName>
+			<familyName>Doe</familyName>
+			<telecom>tel:+32123456</telecom>
+			<street>Breydel Street 48</street>
+			<city>Brussels</city>
+			<postalCode>1000</postalCode>
+			<roles>
 				<role>ROLE_ADMIN</role>
 			</roles>
-		</daniel>
-		<marjo password="1234">
-			<userId>1234</userId>
-			<organizationName>Kela testiapteekki</organizationName>
-			<organizationId>1.2.246.553.999</organizationId>
-			<commonName>Marjo Vesala</commonName>
-			<givenName>Marjo</givenName>
-			<familyName>Vesala</familyName>
-			<telecom>tel:+3581234567890</telecom>
-			<street>Jokukatu 443</street>
-			<city>Jyväskylä</city>
-			<postalCode>40500</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</marjo>
-		<konsta password="1234">
-			<userId>1234</userId>
-			<organizationName>Kela testiapteekki</organizationName>
-			<organizationId>1.2.246.553.999</organizationId>
-			<commonName>Konstantin Hyppönen</commonName>
-			<givenName>Konstantin</givenName>
-			<familyName>Hyppönen</familyName>
-			<telecom>tel:+3581234567890</telecom>
-			<street>Jokukatu 443b</street>
-			<city>Jyväskylä</city>
-			<postalCode>40500</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</konsta>
-		<jaakko password="1234">
-			<userId>1244</userId>
-			<organizationName>Kela testiapteekki</organizationName>
-			<organizationId>1.2.246.553.999</organizationId>
-			<commonName>Jaakko Mäkelä</commonName>
-			<givenName>Jaakko</givenName>
-			<familyName>Mäkelä</familyName>
-			<telecom>tel:+3581234567890</telecom>
-			<street>Jokukatu 443e</street>
-			<city>Helsinki</city>
-			<postalCode>11000</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-			</roles>
-		</jaakko>
-		<mirva password="1234">
-			<userId>1243</userId>
-			<organizationName>Kela testiapteekki</organizationName>
-			<organizationId>1.2.246.553.999</organizationId>
-			<commonName>Mirva Kinnunen</commonName>
-			<givenName>Mirva</givenName>
-			<familyName>Kinnunen</familyName>
-			<telecom>tel:+3581234567890</telecom>
-			<street>Jokukatu 443f</street>
-			<city>Helsinki</city>
-			<postalCode>11000</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-			</roles>
-		</mirva>
-		<mikko password="1234">
-			<userId>1245</userId>
-			<organizationName>Kela testiapteekki</organizationName>
-			<organizationId>1.2.246.553.999</organizationId>
-			<commonName>Mikko A. Lahtinen</commonName>
-			<givenName>Mikko A.</givenName>
-			<familyName>Lahtinen</familyName>
-			<telecom>tel:+3581234567890</telecom>
-			<street>Jokukatu 443d</street>
-			<city>Helsinki</city>
-			<postalCode>11000</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-			</roles>
-		</mikko>
-		<jussi password="1234">
-			<userId>1247</userId>
-			<organizationName>Kela testiapteekki</organizationName>
-			<organizationId>1.2.246.553.999</organizationId>
-			<commonName>Jussi Lemmetty</commonName>
-			<givenName>Jussi</givenName>
-			<familyName>Lemmetty</familyName>
-			<telecom>tel:+3581234567890</telecom>
-			<street>Jokukatu 443f</street>
-			<city>Jyväskylä</city>
-			<postalCode>44000</postalCode>
-			<roles>
-				<role>ROLE_PHARMACIST</role>
-				<role>ROLE_DOCTOR</role>
-				<role>ROLE_NURSE</role>
-				<role>ROLE_ADMIN</role>
-			</roles>
-		</jussi>
-        <harri password="1234">
-            <userId>1248</userId>
-            <organizationName>THL testiapteekki</organizationName>
-            <organizationId>1.2.246.553.998</organizationId>
-            <commonName>Harri Nurmi</commonName>
-            <givenName>Harri</givenName>
-            <familyName>Nurmi</familyName>
-            <telecom>tel:+3581234567890</telecom>
-            <street>Jokukatu 123a</street>
-            <city>Tampere</city>
-            <postalCode>33100</postalCode>
-            <roles>
-                <role>ROLE_PHARMACIST</role>
-            </roles>
-        </harri>
+		</admin>
 	</Users>
 </Configuration>
