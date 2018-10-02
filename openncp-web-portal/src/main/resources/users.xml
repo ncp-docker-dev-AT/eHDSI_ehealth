@@ -4,7 +4,7 @@
 		<andreas password="1234">
 			<userId>1234</userId>
 			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Andreas Rehn</commonName>
 			<givenName>Andreas</givenName>
 			<familyName>Rehn</familyName>
@@ -22,7 +22,7 @@
 		<fredrik password="1234">
 			<userId>1234</userId>
 			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Fredrik Dahlman</commonName>
 			<givenName>Fredrik</givenName>
 			<familyName>Dahlman</familyName>
@@ -40,7 +40,7 @@
 		<gareth password="1234">
 			<userId>1234</userId>
 			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Gareth Woodham</commonName>
 			<givenName>Gareth</givenName>
 			<familyName>Woodham</familyName>
@@ -58,7 +58,7 @@
 		<anders password="1234">
 			<userId>1234</userId>
 			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Anders Nyström</commonName>
 			<givenName>Anders</givenName>
 			<familyName>Nyström</familyName>
@@ -76,7 +76,7 @@
 		<stefan password="1234">
 			<userId>1234</userId>
 			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Stefan Gustafsson</commonName>
 			<givenName>Stefan</givenName>
 			<familyName>Gustafsson</familyName>
@@ -94,7 +94,7 @@
 		<oskar password="1234">
 			<userId>1234</userId>
 			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Oskar Thunman</commonName>
 			<givenName>Oskar</givenName>
 			<familyName>Thunman</familyName>
@@ -112,7 +112,7 @@
 		<annika password="1234">
 			<userId>1234</userId>
 			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Annika Ohlson</commonName>
 			<givenName>Annika</givenName>
 			<familyName>Ohlson</familyName>
@@ -129,7 +129,7 @@
 		<eva password="1234">
 			<userId>1234</userId>
 			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Eva Leach Elfgren</commonName>
 			<givenName>Eva</givenName>
 			<familyName>Leach Elfgren</familyName>
@@ -145,7 +145,7 @@
 		</eva>
 		<doktor password="1234">
 			<organizationName>epSOS Test Sjukhus</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Doktor Kosmos</commonName>
 			<roles>
 				<role>ROLE_DOCTOR</role>
@@ -153,7 +153,7 @@
 		</doktor>
 		<syster password="1234">
 			<organizationName>epSOS Test Sjukhus</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Syster Yster</commonName>
 			<roles>
 				<role>ROLE_NURSE</role>
@@ -161,7 +161,7 @@
 		</syster>
 		<apotek password="1234">
 			<organizationName>epSOS Test Apotek</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Apo Tekare</commonName>
 			<roles>
 				<role>ROLE_PHARMACIST</role>
@@ -169,7 +169,7 @@
 		</apotek>
 		<pharmacist password="pharmacist">
 			<organizationName>epSOS Pharmacist</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>epSOS Pharmacist</commonName>
 			<roles>
 				<role>ROLE_PHARMACIST</role>
@@ -178,7 +178,7 @@
 		<daniel password="1234">
 			<userId>1234</userId>
 			<organizationName>epSOS Test</organizationName>
-			<organizationId>2.9000027</organizationId>
+			<organizationId>2.16.17.710.818.1000.990.1000</organizationId>
 			<commonName>Daniel</commonName>
 			<givenName>Daniel</givenName>
 			<familyName>Gronberg</familyName>
