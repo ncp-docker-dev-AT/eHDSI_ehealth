@@ -30,13 +30,13 @@ public enum TMError implements ITMTSAMEror {
      * code, description:<br>
      * "4502","Not conformant input CDA Header"
      */
-    ERROR_NOT_CONFORMANT_CDA_HEADER("4502", "Not conformant input CDA Header"),
+    ERROR_NOT_CONFORMANT_CDA_HEADER("4502", "Not conforming input CDA Header"),
     /**
      * Error; Input object is not valid pdf file <br>
      * code, description:<br>
      * "4503","Not conformant input object"
      */
-    ERROR_NOT_CONFORMANT_INPUT_OBJECT("4503", "Not conformant input object"),
+    ERROR_NOT_CONFORMANT_INPUT_OBJECT("4503", "Not conforming input object"),
 
     /**
      * Error; required coded element was not transcoded <br>
@@ -56,7 +56,7 @@ public enum TMError implements ITMTSAMEror {
      * code, description:<br>
      * "4507","Not conformant input CDA"
      */
-    ERROR_NOT_CONFORMANT_INPUT_CDA("4507", "Not conformant input CDA"),
+    ERROR_NOT_CONFORMANT_INPUT_CDA("4507", "Not conforming input CDA"),
     /**
      * Error; Input pdf file is null <br>
      * code, description:<br>
@@ -80,7 +80,7 @@ public enum TMError implements ITMTSAMEror {
      * code, description:<br>
      * "4511","Required coded element missing"
      */
-    ERROR_REQUIRED_CODED_ELEMENT_MISSING("4511", "required coded element missing"),
+    ERROR_REQUIRED_CODED_ELEMENT_MISSING("4511", "Required coded element missing"),
     /**
      * Error; Required coded element was not translated<br>
      * code, description:<br>
@@ -151,7 +151,8 @@ public enum TMError implements ITMTSAMEror {
      */
     WARNING_CODED_ELEMENT_NOT_PROPER_TYPE("2507", "Element does not have a proper type"),
 
-    WARNING_MANDATORY_ATTRIBUTES_MISSING("2508", "Some mandatory attributes (code, codeSystem) are missing"),;
+    WARNING_MANDATORY_ATTRIBUTES_MISSING("2508", "Some mandatory attributes (code, codeSystem) are missing"),
+    ;
 
     /**
      * Exception code
