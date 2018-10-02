@@ -29,7 +29,7 @@
                     <given>MARCIA FILIPA</given>
                     <family>MARQUES SA</family>
                 </name>
-                <administrativeGenderCode code="FFF" codeSystem="2.16.840.1.113883.5.1"
+                <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"
                                           codeSystemName="AdministrativeGender" codeSystemVersion="913-20091020"
                                           displayName="Female"/>
                 <birthTime value="20000101"/>
@@ -1682,17 +1682,14 @@
                                 <manufacturedProduct classCode="MANU">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <code code="50011073" codeSystem="2.16.620.1.101.10.5.2.1"
-                                              codeSystemName="CNPEM"
-                                              displayName="Levotiroxina sódica | A101 | Oral | 0.1 mg | [21-60] unidades">
+                                        <code code="H03AA01" codeSystem="2.16.840.1.113883.6.73"
+                                              codeSystemName="Anatomical Therapeutic Chemical"
+                                              displayName="Levothyroxine Sodium ">>
                                             <originalText><reference value="#medication0"/></originalText>
                                         </code>
-                                        <name>Levotiroxina sódica | A101 | Oral | 0.1 mg | [21-60]
-                                            unidades</name>
-                                        <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication"
-                                                        nullFlavor="NI"/>
-                                        <epsos:asContent xmlns:epsos="urn:epsos-org:ep:medication"
-                                                         classCode="CONT">
+                                        <name>Levotiroxina sódica | A101 | Oral | 0.1 mg | [21-60] unidades</name>
+                                        <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication" nullFlavor="NI"/>
+                                        <epsos:asContent xmlns:epsos="urn:epsos-org:ep:medication" classCode="CONT">
                                             <epsos:containerPackagedMedicine classCode="CONT"
                                                                              determinerCode="INSTANCE">
                                                 <epsos:name>Levotiroxina sódica | A101 | Oral | 0.1
@@ -1761,9 +1758,10 @@
                                 <manufacturedProduct classCode="MANU">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <code code="50086812" codeSystem="2.16.620.1.101.10.5.2.1"
-                                              codeSystemName="CNPEM"
-                                              displayName="Triapin 5 mg + 5 mg comprimidos de libertação prolongada">
+
+                                        <code code="C09BB05" codeSystem="2.16.840.1.113883.6.73"
+                                              codeSystemName="Anatomical Therapeutic Chemical"
+                                              displayName="Ramipril and Felodipine">
                                             <originalText><reference value="#medication1"/></originalText>
                                         </code>
                                         <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication"
@@ -1868,15 +1866,13 @@
                                 <manufacturedProduct classCode="MANU">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <code code="50123963" codeSystem="2.16.620.1.101.10.5.2.1"
-                                              codeSystemName="CNPEM"
-                                              displayName="Tresiba Caneta pré-cheia - 5 unidade(s) - 3 ml">
+                                        <code code="A10AE06" codeSystem="2.16.840.1.113883.6.73"
+                                              codeSystemName="Anatomical Therapeutic Chemical"
+                                              displayName="Insulin Degludec">
                                             <originalText><reference value="#medication2"/></originalText>
                                         </code>
-                                        <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication"
-                                                        nullFlavor="NI"/>
-                                        <epsos:asContent xmlns:epsos="urn:epsos-org:ep:medication"
-                                                         classCode="CONT">
+                                        <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication" nullFlavor="NI"/>
+                                        <epsos:asContent xmlns:epsos="urn:epsos-org:ep:medication" classCode="CONT">
                                             <epsos:containerPackagedMedicine classCode="CONT"
                                                                              determinerCode="INSTANCE">
                                                 <epsos:name>Tresiba Caneta pré-cheia - 5 unidade(s)
@@ -1898,20 +1894,15 @@
                                                 <epsos:capacityQuantity unit="1" value="5"/>
                                             </epsos:containerPackagedMedicine>
                                         </epsos:asContent>
-                                        <epsos:ingredient xmlns:epsos="urn:epsos-org:ep:medication"
-                                                          classCode="ACTI">
+                                        <epsos:ingredient xmlns:epsos="urn:epsos-org:ep:medication" classCode="ACTI">
                                             <epsos:quantity>
-                                                <epsos:numerator nullFlavor="UNK"
-                                                                 xsi:type="epsos:PQ"/>
-                                                <epsos:denominator nullFlavor="UNK"
-                                                                   xsi:type="epsos:PQ"/>
+                                                <epsos:numerator nullFlavor="UNK" xsi:type="epsos:PQ"/>
+                                                <epsos:denominator nullFlavor="UNK" xsi:type="epsos:PQ"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="50123963"
-                                                            codeSystem="2.16.620.1.101.10.5.2.1"
-                                                            codeSystemName="CNPEM"
-                                                            displayName="Tresiba Caneta pré-cheia - 5 unidade(s) - 3 ml"
-                                                />
+                                                <epsos:code code="A10AE06" codeSystem="2.16.840.1.113883.6.73"
+                                                            codeSystemName="Anatomical Therapeutic Chemical"
+                                                            displayName="Insulin Degludec" />
                                             </epsos:ingredient>
                                         </epsos:ingredient>
                                     </manufacturedMaterial>
@@ -2074,9 +2065,9 @@
                                 <manufacturedProduct classCode="MANU">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <code code="50048236" codeSystem="2.16.620.1.101.10.5.2.1"
-                                              codeSystemName="CNPEM"
-                                              displayName="Combivent Unidose 0,52 mg/2,5 ml + 3 mg/2,5 ml solução para inalação por vaporização">
+                                        <code code="R03AK04" codeSystem="2.16.840.1.113883.6.73"
+                                              codeSystemName="Anatomical Therapeutic Chemical"
+                                              displayName="Salbutamol and Sodium Cromoglicate">
                                             <originalText><reference value="#medication4"/></originalText>
                                         </code>
                                         <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication"
@@ -2100,20 +2091,15 @@
                                                 <epsos:capacityQuantity unit="1" value="1"/>
                                             </epsos:containerPackagedMedicine>
                                         </epsos:asContent>
-                                        <epsos:ingredient xmlns:epsos="urn:epsos-org:ep:medication"
-                                                          classCode="ACTI">
+                                        <epsos:ingredient xmlns:epsos="urn:epsos-org:ep:medication" classCode="ACTI">
                                             <epsos:quantity>
-                                                <epsos:numerator nullFlavor="UNK"
-                                                                 xsi:type="epsos:PQ"/>
-                                                <epsos:denominator nullFlavor="UNK"
-                                                                   xsi:type="epsos:PQ"/>
+                                                <epsos:numerator nullFlavor="UNK" xsi:type="epsos:PQ"/>
+                                                <epsos:denominator nullFlavor="UNK" xsi:type="epsos:PQ"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="50048236"
-                                                            codeSystem="2.16.620.1.101.10.5.2.1"
-                                                            codeSystemName="CNPEM"
-                                                            displayName="Combivent Unidose 0,52 mg/2,5 ml + 3 mg/2,5 ml solução para inalação por vaporização"
-                                                />
+                                                <epsos:code code="R03AK04" codeSystem="2.16.840.1.113883.6.73"
+                                                            codeSystemName="Anatomical Therapeutic Chemical"
+                                                            displayName="Salbutamol and Sodium Cromoglicate"/>
                                             </epsos:ingredient>
                                         </epsos:ingredient>
                                     </manufacturedMaterial>
