@@ -275,7 +275,6 @@ public class AssertionHandler implements Serializable {
 
         String AS_AuditSourceId = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
         String ET_ObjectID = "urn:uuid:" + assertion.getID();
-        byte[] ResM_PatricipantObjectDetail = new byte[1];
 
         AuditService asd = getAuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -294,7 +293,7 @@ public class AssertionHandler implements Serializable {
                 HR_UserID, HR_RoleID, HR_AlternativeUserID, SC_UserID,
                 SP_UserID, AS_AuditSourceId, ET_ObjectID,
                 reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                resm_participantObjectID, ResM_PatricipantObjectDetail,
+                resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
                 sourceHost, "N/A", NcpSide.NCP_B);
         eventLog.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog, "13", "2");
