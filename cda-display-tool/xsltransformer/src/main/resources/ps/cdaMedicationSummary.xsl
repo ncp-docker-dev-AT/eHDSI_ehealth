@@ -285,10 +285,19 @@
                                     </xsl:call-template>
                                 </td>
                                 <td>
-                                    <xsl:call-template name="show-frequencyIntake">
-                                        <xsl:with-param name="medFrequencyIntakeType" select="$medFrequencyIntakeType"/>
-                                        <xsl:with-param name="medFrequencyIntake" select="$medFrequencyIntake"/>
-                                    </xsl:call-template>
+                                    <xsl:choose>
+                                        <xsl:when test="not ($medFrequencyIntake/@nullFlavor)">
+                                            <xsl:call-template name="show-frequencyIntake">
+                                                <xsl:with-param name="medFrequencyIntakeType" select="$medFrequencyIntakeType"/>
+                                                <xsl:with-param name="medFrequencyIntake" select="$medFrequencyIntake"/>
+                                            </xsl:call-template>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:call-template name="show-nullFlavor">
+                                                <xsl:with-param name="code" select="$medFrequencyIntake/@nullFlavor"/>
+                                            </xsl:call-template>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </td>
                                 <td>
                                     <xsl:value-of select="$medRouteAdministration/@displayName"/>
