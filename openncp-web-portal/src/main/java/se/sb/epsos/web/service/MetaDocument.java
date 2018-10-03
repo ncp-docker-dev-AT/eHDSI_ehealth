@@ -67,7 +67,7 @@ public class MetaDocument implements Serializable {
         return null;
     }
 
-    public Date getCreationDate() {
+    public Date getCreationdate() {
 
         if (doc != null && doc.getCreationDate() != null) {
 
