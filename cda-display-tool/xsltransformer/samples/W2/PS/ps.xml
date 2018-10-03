@@ -1487,9 +1487,11 @@
                                 <manufacturedProduct classCode="MANU">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <code code="50011073" codeSystem="2.16.620.1.101.10.5.2.1"
-                                              codeSystemName="CNPEM"
-                                              displayName="Levotiroxina sódica | A101 | Oral | 0.1 mg | [21-60] unidades">
+                                        <code code="H03AA01"
+                                              codeSystem="2.16.840.1.113883.6.73"
+                                              codeSystemName="Anatomical Therapeutic Chemical"
+                                              codeSystemVersion="2017-01"
+                                              displayName="levothyroxine sodium">
                                             <originalText><reference value="#medication0"/></originalText>
                                         </code>
                                         <name>Levotiroxina sódica | A101 | Oral | 0.1 mg | [21-60]
@@ -1524,8 +1526,7 @@
                                                             codeSystem="2.16.840.1.113883.6.73"
                                                             codeSystemName="Anatomical Therapeutic Chemical"
                                                             codeSystemVersion="2017-01"
-                                                            displayName="LEVOTHYROXINE SODIQUE">
-                                                </epsos:code>
+                                                            displayName="levothyroxine sodium"/>
                                             </epsos:ingredient>
                                         </epsos:ingredient>
                                     </manufacturedMaterial>
@@ -1578,9 +1579,11 @@
                                 <manufacturedProduct classCode="MANU">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <code code="50086812" codeSystem="2.16.620.1.101.10.5.2.1"
-                                              codeSystemName="CNPEM"
-                                              displayName="Triapin 5 mg + 5 mg comprimidos de libertação prolongada">
+                                        <code code="C09BB05"
+                                              codeSystem="2.16.840.1.113883.6.73"
+                                              codeSystemName="Anatomical Therapeutic Chemical"
+                                              codeSystemVersion="2017-01"
+                                              displayName="ramipril and felodipine">
                                             <originalText><reference value="#medication1"/></originalText>
                                         </code>
                                         <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication"
@@ -1613,8 +1616,7 @@
                                                             codeSystem="2.16.840.1.113883.6.73"
                                                             codeSystemName="Anatomical Therapeutic Chemical"
                                                             codeSystemVersion="2017-01"
-                                                            displayName="RAMIPRIL ET FELODIPINE">
-                                                </epsos:code>
+                                                            displayName="ramipril and felodipine"/>
                                             </epsos:ingredient>
                                         </epsos:ingredient>
                                     </manufacturedMaterial>
@@ -1667,9 +1669,11 @@
                                 <manufacturedProduct classCode="MANU">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <code code="50123963" codeSystem="2.16.620.1.101.10.5.2.1"
-                                              codeSystemName="CNPEM"
-                                              displayName="Tresiba Caneta pré-cheia - 5 unidade(s) - 3 ml">
+                                        <code code="A10AE06"
+                                              codeSystem="2.16.840.1.113883.6.73"
+                                              codeSystemName="Anatomical Therapeutic Chemical"
+                                              codeSystemVersion="2017-01"
+                                              displayName="insulin degludec">
                                             <originalText><reference value="#medication2"/></originalText>
                                         </code>
                                         <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication"
@@ -1698,11 +1702,11 @@
                                                                    xsi:type="epsos:PQ"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="50123963"
-                                                            codeSystem="2.16.620.1.101.10.5.2.1"
-                                                            codeSystemName="CNPEM"
-                                                            displayName="Tresiba Caneta pré-cheia - 5 unidade(s) - 3 ml"
-                                                />
+                                                <epsos:code code="A10AE06"
+                                                      codeSystem="2.16.840.1.113883.6.73"
+                                                      codeSystemName="Anatomical Therapeutic Chemical"
+                                                      codeSystemVersion="2017-01"
+                                                      displayName="insulin degludec"/>
                                             </epsos:ingredient>
                                         </epsos:ingredient>
                                     </manufacturedMaterial>
@@ -1755,9 +1759,11 @@
                                 <manufacturedProduct classCode="MANU">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <code code="50001647" codeSystem="2.16.620.1.101.10.5.2.1"
-                                              codeSystemName="CNPEM"
-                                              displayName="Augmentin 500 mg/125 mg, comprimidos revestidos por película">
+                                        <code code="J01CR02"
+                                                    codeSystem="2.16.840.1.113883.6.73"
+                                                    codeSystemName="Anatomical Therapeutic Chemical"
+                                                    codeSystemVersion="2017-01"
+                                                    displayName="AMOXICILLINE ET INHIBITEUR D'ENZYME">
                                             <originalText><reference value="#medication3"/></originalText>
                                         </code>
                                         <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication"
@@ -1790,8 +1796,7 @@
                                                             codeSystem="2.16.840.1.113883.6.73"
                                                             codeSystemName="Anatomical Therapeutic Chemical"
                                                             codeSystemVersion="2017-01"
-                                                            displayName="AMOXICILLINE ET INHIBITEUR D'ENZYME">
-                                                </epsos:code>
+                                                            displayName="amoxicillin and enzyme inhibitor"/>
                                             </epsos:ingredient>
                                         </epsos:ingredient>
                                     </manufacturedMaterial>
@@ -1844,9 +1849,11 @@
                                 <manufacturedProduct classCode="MANU">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <code code="50048236" codeSystem="2.16.620.1.101.10.5.2.1"
-                                              codeSystemName="CNPEM"
-                                              displayName="Combivent Unidose 0,52 mg/2,5 ml + 3 mg/2,5 ml solução para inalação por vaporização">
+                                        <code code="R03AL02"
+                                              codeSystem="2.16.840.1.113883.6.73"
+                                              codeSystemName="Anatomical Therapeutic Chemical"
+                                              codeSystemVersion="2017-01"
+                                              displayName="salbutamol and ipratropium bromide">
                                             <originalText><reference value="#medication4"/></originalText>
                                         </code>
                                         <epsos:formCode xmlns:epsos="urn:epsos-org:ep:medication"
@@ -1876,11 +1883,11 @@
                                                                    xsi:type="epsos:PQ"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="50048236"
-                                                            codeSystem="2.16.620.1.101.10.5.2.1"
-                                                            codeSystemName="CNPEM"
-                                                            displayName="Combivent Unidose 0,52 mg/2,5 ml + 3 mg/2,5 ml solução para inalação por vaporização"
-                                                />
+                                                <epsos:code code="R03AL02"
+                                                      codeSystem="2.16.840.1.113883.6.73"
+                                                      codeSystemName="Anatomical Therapeutic Chemical"
+                                                      codeSystemVersion="2017-01"
+                                                      displayName="salbutamol and ipratropium bromide"/>
                                             </epsos:ingredient>
                                         </epsos:ingredient>
                                     </manufacturedMaterial>
