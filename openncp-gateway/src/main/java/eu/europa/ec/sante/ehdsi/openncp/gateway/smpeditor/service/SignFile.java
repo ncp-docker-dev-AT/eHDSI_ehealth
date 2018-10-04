@@ -85,7 +85,7 @@ public class SignFile {
         Element siSigPointer = findSig(type, docUnwrapped);
         SignatureValidator.validateSignature(siSigPointer);
 
-        generatedSignFile = new File(Constants.SMP_DIR_PATH + fileName);
+        generatedSignFile = new File(Constants.SMP_DIR_PATH + File.separator + fileName);
         Source source = new DOMSource(docServiceMetadata);
         Result result = new StreamResult(generatedSignFile);
         TransformerFactory factory = TransformerFactory.newInstance();

@@ -33,7 +33,10 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,6 +79,7 @@ public class SMPUpdateFileController {
      */
     @GetMapping(value = "/smpeditor/updatesmpfile")
     public String updateFile(Model model) {
+
         LOGGER.debug("\n==== in updateFile ====");
         model.addAttribute("smpfileupdate", new SMPFileOps());
         return "smpeditor/updatesmpfile";
@@ -96,13 +100,14 @@ public class SMPUpdateFileController {
         LOGGER.debug("\n==== in post ====");
         model.addAttribute("smpfileupdate", smpfileupdate);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("\n**********  smpfileupdate - '{}'", smpfileupdate);
+            LOGGER.debug("SMP File Update - '{}'", smpfileupdate);
         }
         isSigned = false;
-
-        File convFile = new File(Constants.SMP_DIR_PATH + smpfileupdate.getUpdateFile().getOriginalFilename());
+        LOGGER.debug("File: '{}' will be loaded for update", smpfileupdate.getUpdateFile().getOriginalFilename());
+        File convFile = new File(Constants.SMP_DIR_PATH + File.separator + smpfileupdate.getUpdateFile().getOriginalFilename());
         try {
             smpfileupdate.getUpdateFile().transferTo(convFile);
+            LOGGER.debug("File: '{}' loaded", smpfileupdate.getUpdateFile().getOriginalFilename());
         } catch (IOException ex) {
             LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (IllegalStateException ex) {
@@ -203,7 +208,7 @@ public class SMPUpdateFileController {
       Used to check SMP File type in order to render html updatesmpfileform page
       */
             String documentID = "";
-            HashMap<String, String> propertiesMap = readProperties.readPropertiesFile();
+            Map<String, String> propertiesMap = readProperties.readPropertiesFile();
             Set set2 = propertiesMap.entrySet();
 
             for (Object aSet2 : set2) {
@@ -477,7 +482,7 @@ public class SMPUpdateFileController {
                         String[] ids = result.split("/services/");//SPECIFICATION
 
                         String docID = ids[1];
-                        HashMap<String, String> propertiesMap = readProperties.readPropertiesFile();
+                        Map<String, String> propertiesMap = readProperties.readPropertiesFile();
                         String[] nIDs = docID.split(env.getProperty("DocumentIdentifier.Scheme") + "::");//SPECIFICATION May change if Document Identifier specification change
                         String docuID = nIDs[1];
                         LOGGER.debug("\n ****** docuID - '{}'", docuID);

@@ -3,7 +3,6 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities;
 /**
  * @author Inês Garganta
  */
-
 public class SMPFieldProperties {
 
     private boolean enable;
@@ -28,5 +27,4 @@ public class SMPFieldProperties {
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
     }
-
 }

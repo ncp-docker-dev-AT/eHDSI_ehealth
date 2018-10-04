@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -257,7 +256,7 @@ public class SMPGenerateFileController {
                     }
 
                     String docID = ids[1];
-                    HashMap<String, String> propertiesMap = readProperties.readPropertiesFile();
+                    Map<String, String> propertiesMap = readProperties.readPropertiesFile();
                     //SPECIFICATION May change if Document Identifier specification change
                     String[] nIDs = docID.split(env.getProperty("DocumentIdentifier.Scheme") + "::");
                     String docuID = nIDs[1];
