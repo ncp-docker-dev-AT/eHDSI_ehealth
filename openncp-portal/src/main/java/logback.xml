@@ -55,6 +55,10 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="eu.europa.ec.sante.ehdsi.openncp.configmanager" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>

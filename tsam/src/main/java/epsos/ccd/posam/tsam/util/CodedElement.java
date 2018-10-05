@@ -32,7 +32,6 @@ public class CodedElement {
      */
     private String version;
 
-
     /**
      * valueSet
      */

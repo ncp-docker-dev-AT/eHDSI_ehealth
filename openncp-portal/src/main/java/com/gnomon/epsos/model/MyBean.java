@@ -50,8 +50,8 @@ import java.util.List;
 @SessionScoped
 public class MyBean implements Serializable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MyBean.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger logger = LoggerFactory.getLogger(MyBean.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final long serialVersionUID = 1L;
     private List<Country> countries;
     private String selectedCountry;
@@ -100,10 +100,10 @@ public class MyBean implements Serializable {
 
     public MyBean() {
 
-        LOGGER.info("Initializing MyBean ...");
+        logger.info("Initializing MyBean ...");
         checkButtonPermissions();
         String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH");
-        LOGGER.info("EPSOS PROPS PATH IS: '{}'", epsosPropsPath);
+        logger.info("EPSOS PROPS PATH IS: '{}'", epsosPropsPath);
         if (!Validator.isNull(epsosPropsPath)) {
             try {
                 cdaStylesheet = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CDA_STYLESHEET);
@@ -113,12 +113,12 @@ public class MyBean implements Serializable {
                 identifiers = new ArrayList<>();
                 demographics = new ArrayList<>();
                 countries = EpsosHelperService.getCountriesFromCS(LiferayUtils.getPortalLanguage());
-                LOGGER.info("Countries found: '{}'", countries.size());
+                logger.info("Countries found: '{}'", countries.size());
             } catch (Exception e) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Error getting user", ""));
-                LOGGER.error("Error getting user");
-                LOGGER.error(ExceptionUtils.getStackTrace(e));
+                logger.error("Error getting user");
+                logger.error(ExceptionUtils.getStackTrace(e));
             }
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -131,7 +131,7 @@ public class MyBean implements Serializable {
         RenderRequest renderRequest = (RenderRequest) (FacesContext.getCurrentInstance().getExternalContext()
                 .getRequestMap().get("javax.portlet.request"));
         String parameter = renderRequest.getParameter("productId");
-        LOGGER.info("PRODUCT ID: '{}'", parameter);
+        logger.info("PRODUCT ID: '{}'", parameter);
     }
 
     public List<Country> getCountries() {
@@ -172,20 +172,20 @@ public class MyBean implements Serializable {
     public void searchPatientsRequest(ActionEvent event) {
 
         checkButtonPermissions();
-        LOGGER.info("searchPatientORequest ::: Selected country is : '{}'", selectedCountry);
+        logger.info("searchPatientORequest ::: Selected country is : '{}'", selectedCountry);
         String country = (String) event.getComponent().getAttributes().get("selectedCountry");
         identifiers = (List<Identifier>) event.getComponent().getAttributes().get("identifiers");
         demographics = (List<Demographics>) event.getComponent().getAttributes().get("demographics");
         if (Validator.isNotNull(country)) {
             selectedCountry = country;
         }
-        LOGGER.info("searchPatientsRequest ::: Selected country is : '{}'", selectedCountry);
+        logger.info("searchPatientsRequest ::: Selected country is : '{}'", selectedCountry);
         searchPatients();
     }
 
     private void searchPatients(Assertion assertion, List<Identifier> identifiers, List<Demographics> demographics, String country) {
 
-        LOGGER.info("Search Patients selected country is: '{}'", country);
+        logger.info("Search Patients selected country is: '{}'", country);
         String runningMode = MyServletContextListener.getRunningMode();
         Assertion ass;
 
@@ -205,17 +205,17 @@ public class MyBean implements Serializable {
                 patients = new ArrayList<>();
 
                 String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-                LOGGER.info("Connector URL: '{}'", serviceUrl);
+                logger.info("Connector URL: '{}'", serviceUrl);
 
                 PatientDemographics pd = EpsosHelperService.createPatientDemographicsForQuery(identifiers, demographics);
                 ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
-                LOGGER.info("Test Assertions: '{}'", EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS));
+                logger.info("Test Assertions: '{}'", EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS));
                 ass = assertion;
 
-                if (LOGGER.isDebugEnabled()) {
+                if (logger.isDebugEnabled()) {
 
-                    LOGGER.debug("Searching for patients in '{}'", country);
-                    LOGGER.debug("Assertion id: '{}'", ass.getID());
+                    logger.debug("Searching for patients in '{}'", country);
+                    logger.debug("Assertion id: '{}'", ass.getID());
                 }
 
                 List<PatientDemographics> queryPatient = proxy.queryPatient(ass, country, pd);
@@ -229,12 +229,12 @@ public class MyBean implements Serializable {
                 if (queryPatient.isEmpty()) {
                     queryPatientsException = LiferayUtils.getPortalTranslation("patient.list.no.patient");
                 }
-                LOGGER.info("Found '{}' patients", patients.size());
+                logger.info("Found '{}' patients", patients.size());
                 showPatientList = true;
 
             } catch (Exception ex) {
 
-                LOGGER.error(ExceptionUtils.getStackTrace(ex));
+                logger.error(ExceptionUtils.getStackTrace(ex));
                 patients = new ArrayList<>();
                 showPatientList = true;
                 queryPatientsException = LiferayUtils.getPortalTranslation(ex.getMessage());
@@ -244,7 +244,7 @@ public class MyBean implements Serializable {
 
     public void searchPatients() {
 
-        LOGGER.info("Searching for patients (creating assertions)...");
+        logger.info("Searching for patients (creating assertions)...");
         Object obj = EpsosHelperService.getUserAssertion(emergency);
 
         if (obj instanceof Assertion) {
@@ -255,8 +255,8 @@ public class MyBean implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "ASSERTION", obj.toString()));
             errorUserAssertion = (String) obj;
         }
-        LOGGER.info("Searching for patients (demographics) '{}' (Identifiers) '{}'", demographics.size(), identifiers.size());
-        LOGGER.info("Purpose Of Use: '{}'", emergency);
+        logger.info("Searching for patients (demographics) '{}' (Identifiers) '{}'", demographics.size(), identifiers.size());
+        logger.info("Purpose Of Use: '{}'", emergency);
         searchPatients(hcpAssertion, identifiers, demographics, selectedCountry);
     }
 
@@ -395,15 +395,15 @@ public class MyBean implements Serializable {
             FacesContext.getCurrentInstance().getExternalContext().redirect(
                     "/view1.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal");
         } catch (IOException e) {
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            logger.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
     public boolean getShowConsent() {
 
-        LOGGER.debug("### GET SHOW CONSENT ###");
-        LOGGER.debug("trcassertionexists: '{}'", trcassertionexists);
-        LOGGER.debug("consentExists: '{}'", consentExists);
+        logger.debug("### GET SHOW CONSENT ###");
+        logger.debug("trcassertionexists: '{}'", trcassertionexists);
+        logger.debug("consentExists: '{}'", consentExists);
         if (!trcassertionexists) {
             return false;
         }
@@ -417,9 +417,9 @@ public class MyBean implements Serializable {
 
     public boolean getShowConfirmation() {
 
-        LOGGER.debug("### GET SHOW CONFIRMATION ###");
-        LOGGER.debug("trcassertionexists: '{}'", trcassertionexists);
-        LOGGER.debug("consentExists: '{}'", consentExists);
+        logger.debug("### GET SHOW CONFIRMATION ###");
+        logger.debug("trcassertionexists: '{}'", trcassertionexists);
+        logger.debug("consentExists: '{}'", consentExists);
         return !trcassertionexists;
     }
 
@@ -440,7 +440,7 @@ public class MyBean implements Serializable {
             patientDocuments = new ArrayList<>();
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
 
-            LOGGER.info("Client Connector URL: '{}'", serviceUrl);
+            logger.info("Client Connector URL: '{}'", serviceUrl);
             ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
 
             patientId = PatientId.Factory.newInstance();
@@ -452,11 +452,11 @@ public class MyBean implements Serializable {
             // Patient Summary ClassCode.
             classCode.setValue(Constants.MRO_TITLE);
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                LOGGER_CLINICAL.info("MRO QUERY: Getting mro documents for: '{}' from '{}'", patientId.getExtension(), selectedCountry);
+                loggerClinical.info("MRO QUERY: Getting mro documents for: '{}' from '{}'", patientId.getExtension(), selectedCountry);
             }
             List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion, selectedCountry, patientId, classCode);
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                LOGGER_CLINICAL.info("MRO QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(), patientId.getExtension(), selectedCountry);
+                loggerClinical.info("MRO QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(), patientId.getExtension(), selectedCountry);
             }
 
             showMRO = true;
@@ -465,16 +465,16 @@ public class MyBean implements Serializable {
                 patientDocuments.add(document);
             }
             queryDocumentsException = LiferayUtils.getPortalTranslation("report.list.no.document");
-            LOGGER.debug("Selected Country: " + LiferayUtils.getFromSession("selectedCountry"));
+            logger.debug("Selected Country: " + LiferayUtils.getFromSession("selectedCountry"));
 
         } catch (Exception ex) {
 
-            LOGGER.error(ExceptionUtils.getStackTrace(ex));
+            logger.error(ExceptionUtils.getStackTrace(ex));
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "DOCUMENT QUERY", LiferayUtils.getPortalTranslation(ex.getMessage())));
             if (patientId != null) {
                 if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                    LOGGER_CLINICAL.error("MRO QUERY: Error getting ps documents for: '{}' from: '{}'\n{}",
+                    loggerClinical.error("MRO QUERY: Error getting ps documents for: '{}' from: '{}'\n{}",
                             patientId.getExtension(), selectedCountry, ex.getMessage());
                 }
             }
@@ -512,17 +512,17 @@ public class MyBean implements Serializable {
                 classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
                 classCode.setValue(Constants.PS_TITLE);
                 if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                    LOGGER_CLINICAL.info("PS QUERY: Getting ps documents for: '{}' from '{}'", patientId.getExtension(), selectedCountry);
-                    LOGGER_CLINICAL.info("HCP ASSERTION IS : " + hcpAssertion.getID());
-                    LOGGER_CLINICAL.info("TRCA ASSERTION IS : " + trcAssertion.getID());
-                    LOGGER_CLINICAL.info("selectedCountry: '{}'", selectedCountry);
-                    LOGGER_CLINICAL.info("patientId: '{}'", patientId);
-                    LOGGER_CLINICAL.info("classCode: '{}'", classCode);
+                    loggerClinical.info("PS QUERY: Getting ps documents for: '{}' from '{}'", patientId.getExtension(), selectedCountry);
+                    loggerClinical.info("HCP ASSERTION IS : " + hcpAssertion.getID());
+                    loggerClinical.info("TRCA ASSERTION IS : " + trcAssertion.getID());
+                    loggerClinical.info("selectedCountry: '{}'", selectedCountry);
+                    loggerClinical.info("patientId: '{}'", patientId);
+                    loggerClinical.info("classCode: '{}'", classCode);
                 }
                 List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion,
                         selectedCountry, patientId, classCode);
                 if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                    LOGGER_CLINICAL.info("PS QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(), patientId.getExtension(), selectedCountry);
+                    loggerClinical.info("PS QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(), patientId.getExtension(), selectedCountry);
                 }
                 showPS = true;
                 for (EpsosDocument1 aux : queryDocuments) {
@@ -530,15 +530,15 @@ public class MyBean implements Serializable {
                     patientDocuments.add(document);
                 }
                 queryDocumentsException = LiferayUtils.getPortalTranslation("report.list.no.document");
-                LOGGER.debug("Selected Country: " + LiferayUtils.getFromSession("selectedCountry"));
+                logger.debug("Selected Country: " + LiferayUtils.getFromSession("selectedCountry"));
 
             } catch (Exception ex) {
 
-                LOGGER.error(ExceptionUtils.getStackTrace(ex));
+                logger.error(ExceptionUtils.getStackTrace(ex));
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "DOCUMENT QUERY", LiferayUtils.getPortalTranslation(ex.getMessage())));
                 if (patientId != null) {
-                    LOGGER.error("PS QUERY: Error getting ps documents for : "
+                    logger.error("PS QUERY: Error getting ps documents for : "
                             + patientId.getExtension() + " from " + selectedCountry
                             + " - " + ex.getMessage());
                 }
@@ -554,7 +554,7 @@ public class MyBean implements Serializable {
 
     private void createTRCA(String docType, String purposeOfUse) {
 
-        LOGGER.info("Creating TRCAssertion for '{}' request and Purpose of Use: '{}'", docType, purposeOfUse);
+        logger.info("Creating TRCAssertion for '{}' request and Purpose of Use: '{}'", docType, purposeOfUse);
         String runningMode = MyServletContextListener.getRunningMode();
 
         if (StringUtils.equals(docType, "ps")) {
@@ -563,7 +563,7 @@ public class MyBean implements Serializable {
         if (StringUtils.equals(docType, "ep")) {
             showEP = false;
         }
-        LOGGER.info("signedTRC: '{}'", getSignedTRC());
+        logger.info("signedTRC: '{}'", getSignedTRC());
 
         PatientId patientId = null;
         try {
@@ -572,15 +572,15 @@ public class MyBean implements Serializable {
             patientId.setRoot(selectedPatient.getRoot());
             this.purposeOfUse = purposeOfUse;
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                LOGGER_CLINICAL.info("TRCA: Creating trca for hcpAssertion: '{}' for patient: '{}'. Purpose of use is: '{}'",
+                loggerClinical.info("TRCA: Creating trca for hcpAssertion: '{}' for patient: '{}'. Purpose of use is: '{}'",
                         hcpAssertion.getID(), patientId.getRoot(), purposeOfUse);
             }
             if (runningMode.equals("demo")) {
-                LOGGER.info("demo running so TRCA not created");
+                logger.info("demo running so TRCA not created");
             } else if (getSignedTRC() == null) {
                 trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, hcpAssertion, patientId);
                 if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                    LOGGER_CLINICAL.info("TRCA: Created: '{}' for: '{}' for patient: '{}_{}'. Purpose of use is: '{}'",
+                    loggerClinical.info("TRCA: Created: '{}' for: '{}' for patient: '{}_{}'. Purpose of use is: '{}'",
                             trcAssertion.getID(), hcpAssertion.getID(), patientId.getRoot(), patientId.getExtension(), purposeOfUse);
                 }
             }
@@ -617,12 +617,12 @@ public class MyBean implements Serializable {
                     "TRCA ERROR", LiferayUtils.getPortalTranslation(e.getMessage())));
             if (patientId != null) {
                 if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                    LOGGER_CLINICAL.error("TRCA: Error creating trca for patient: '{}' with hcpAssetion: '{}'. " +
+                    loggerClinical.error("TRCA: Error creating trca for patient: '{}' with hcpAssetion: '{}'. " +
                                     "Purpose of use is: '{} - '{}", patientId.getExtension(), hcpAssertion.getID(), purposeOfUse,
                             e.getMessage(), e);
                 }
             }
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            logger.error(ExceptionUtils.getStackTrace(e));
             trcassertionexists = false;
             trcassertionnotexists = true;
             queryDocumentsException = LiferayUtils.getPortalTranslation(e.getMessage());
@@ -641,9 +641,9 @@ public class MyBean implements Serializable {
         String consentCode = "";
         String consentDisplayName = "";
 
-        LOGGER.info("Consent Start Date: '{}'", consentStartDate);
-        LOGGER.info("Consent End Date: '{}'", consentEndDate);
-        LOGGER.info("Consent Opt: '{}'", consentOpt);
+        logger.info("Consent Start Date: '{}'", consentStartDate);
+        logger.info("Consent End Date: '{}'", consentEndDate);
+        logger.info("Consent Opt: '{}'", consentOpt);
 
         String consentStartDateStr = new SimpleDateFormat("yyyyMMdd")
                 .format(consentStartDate);
@@ -672,11 +672,11 @@ public class MyBean implements Serializable {
                             .toString()));
 
         } catch (Exception e) {
-            LOGGER.error("CONSENT: Error submitting consent for patient : "
+            logger.error("CONSENT: Error submitting consent for patient : "
                     + patient.getRoot() + " with hcpAssetion : "
                     + hcpAssertion.getID() + " - " + e.getMessage());
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
-            LOGGER.error(null, resp);
+            logger.error(ExceptionUtils.getStackTrace(e));
+            logger.error(null, resp);
             FacesContext.getCurrentInstance().addMessage(
                     null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERROR",
@@ -776,12 +776,12 @@ public class MyBean implements Serializable {
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.EP_TITLE);
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                LOGGER_CLINICAL.info("EP QUERY: Getting ePrescription documents for: {} from {}.",
+                loggerClinical.info("EP QUERY: Getting ePrescription documents for: {} from {}.",
                         patientId.getExtension(), selectedCountry);
             }
             List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion, selectedCountry, patientId, classCode);
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                LOGGER_CLINICAL.info("EP QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(),
+                loggerClinical.info("EP QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(),
                         patientId.getExtension(), selectedCountry);
             }
             showEP = true;
@@ -791,7 +791,7 @@ public class MyBean implements Serializable {
                 patientPrescriptions.add(document);
             }
             queryPrescriptionsException = LiferayUtils.getPortalTranslation("document.empty.list", FacesService.getPortalLanguage());
-            LOGGER.info("Documents are '{}'", queryDocuments.size());
+            logger.info("Documents are '{}'", queryDocuments.size());
         } catch (Exception ex) {
 
             FacesContext.getCurrentInstance().addMessage(
@@ -801,11 +801,11 @@ public class MyBean implements Serializable {
                             .getPortalTranslation(ex.getMessage(),
                                     FacesService.getPortalLanguage())));
             if (patientId != null) {
-                LOGGER.error("EP QUERY: Error getting ep documents for : "
+                logger.error("EP QUERY: Error getting ep documents for : "
                         + patientId.getExtension() + " from " + selectedCountry
                         + " - " + ex.getMessage());
             }
-            LOGGER.error(ExceptionUtils.getStackTrace(ex));
+            logger.error(ExceptionUtils.getStackTrace(ex));
             queryPrescriptionsException = LiferayUtils.getPortalTranslation(
                     ex.getMessage(), FacesService.getPortalLanguage());
             if (ex.getMessage().contains("4701")) {
@@ -983,7 +983,7 @@ public class MyBean implements Serializable {
     public String submitConfirmation() {
 
         createTRCA("generic", purposeOfUse);
-        LOGGER.info("### Selected patient: " + selectedPatient.getFamilyName());
+        logger.info("### Selected patient: " + selectedPatient.getFamilyName());
         ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
         ec.getRequestMap().put("trcAssertion", trcAssertion);
         return "genericPatientConfirmation";
@@ -1109,8 +1109,8 @@ public class MyBean implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                LOGGER.error("Error getting property for can convert to ccd");
-                LOGGER.error(ExceptionUtils.getStackTrace(e));
+                logger.error("Error getting property for can convert to ccd");
+                logger.error(ExceptionUtils.getStackTrace(e));
             }
         }
     }
@@ -1154,7 +1154,7 @@ public class MyBean implements Serializable {
     public void setSignedTRC(String signedTRC) throws Exception {
 
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-            LOGGER_CLINICAL.info("signedTRC: '{}'", signedTRC);
+            loggerClinical.info("signedTRC: '{}'", signedTRC);
         }
         if (signedTRC != null && !signedTRC.isEmpty()) {
             // Initialize the library
@@ -1176,7 +1176,7 @@ public class MyBean implements Serializable {
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
             trcAssertion = (Assertion) unmarshaller.unmarshall(metadataRoot);
 
-            LOGGER.info("TRCA '{}' with ID: '{}'", trcAssertion, trcAssertion.getID());
+            logger.info("TRCA '{}' with ID: '{}'", trcAssertion, trcAssertion.getID());
             LiferayUtils.storeToSession("trcAssertion", trcAssertion);
             this.signedTRC = signedTRC;
         }

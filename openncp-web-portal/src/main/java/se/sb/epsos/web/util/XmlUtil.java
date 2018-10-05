@@ -1,18 +1,9 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
- *
- *    This file is part of epSOS-WEB.
- *
- *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
- **/
 package se.sb.epsos.web.util;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -22,14 +13,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 
-
-/**
- * Created by IntelliJ IDEA.
- * User: andreas
- * Date: 2011-06-27
- * Time: 16.01
- * To change this template use File | Settings | File Templates.
- */
 public class XmlUtil {
 
     /**
@@ -43,6 +26,7 @@ public class XmlUtil {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Result result = new StreamResult(out);
         TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = factory.newTransformer();
         transformer.transform(source, result);
         return out.toByteArray();
@@ -73,6 +57,7 @@ public class XmlUtil {
 
         StringWriter stringWriter = new StringWriter();
         TransformerFactory tf = TransformerFactory.newInstance();
+        tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");

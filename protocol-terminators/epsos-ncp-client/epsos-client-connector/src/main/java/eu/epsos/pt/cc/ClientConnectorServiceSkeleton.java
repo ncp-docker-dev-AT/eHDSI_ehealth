@@ -8,6 +8,7 @@ import eu.epsos.pt.cc.dts.axis2.*;
 import eu.epsos.pt.cc.stub.*;
 import eu.epsos.util.IheConstants;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ import java.util.List;
  * This class implements the contact point into the NCP-B, allowing the Portal-B to contact and perform requests in NCP-B.
  *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
- * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>n
+ * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
 public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSkeletonInterface {
 
@@ -65,14 +66,14 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             tr.com.srdc.epsos.data.model.PatientDemographics request;
             QueryPatientRequest arg0 = queryPatient.getQueryPatient().getArg0();
             PatientDemographics pDemographic = arg0.getPatientDemographics();
-            loggerClinical.info("Patient Demographics: '{}', '{}', '{}'",
-                    ((pDemographic.getPatientIdArray() == null) ? "N/A" : pDemographic.getPatientIdArray()[0]),
-                    pDemographic.getBirthDate(), pDemographic.getGivenName());
             request = eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(pDemographic);
-
-            loggerClinical.info("Patient Demographics Request: '{}', '{}', '{}'", request.getId(), request.getGivenName(),
-                    request.getBirthDate());
-
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                loggerClinical.info("Patient Demographics: '{}', '{}', '{}'",
+                        ((pDemographic.getPatientIdArray() == null) ? "N/A" : pDemographic.getPatientIdArray()[0]),
+                        pDemographic.getBirthDate(), pDemographic.getGivenName());
+                loggerClinical.info("Patient Demographics Request: '{}', '{}', '{}'", request.getId(), request.getGivenName(),
+                        request.getBirthDate());
+            }
             String countryCode = arg0.getCountryCode();
 
             // call XCPD Client

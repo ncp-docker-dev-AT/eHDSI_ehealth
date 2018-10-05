@@ -32,12 +32,19 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
     public static final String AT_ID = "id";
     public static final String AT_OID = "oid";
     public static final String AT_STATUS = "status";
-    private static final Logger LOGGER = LoggerFactory.getLogger(TsamDao.class);
     private static final String CURRENT_STATUS = "current";
     private static final String VALID_STATUS = "valid";
+    private final Logger logger = LoggerFactory.getLogger(TsamDao.class);
     private TsamConfiguration config;
 
+    /**
+     * @param concept
+     * @param valueSetOid
+     * @param valueSetVersion - name of ValueSetVersion
+     * @return
+     */
     public boolean valueSetMatches(CodeSystemConcept concept, String valueSetOid, String valueSetVersion) {
+
         if (valueSetOid == null) {
             return false;
         }
@@ -59,9 +66,15 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         }
     }
 
+    /**
+     * @param target
+     * @return
+     * @throws TSAMException
+     */
     public List<Designation> getSourceDesignation(CodeSystemConcept target) throws TSAMException {
-        LOGGER.debug("--> method List<Designation> getSourceDesignation('{}')", target.getCode());
-        List result = null;
+
+        logger.debug("--> method List<Designation> getSourceDesignation('{}')", target.getCode());
+        List result;
         try {
             result = getDesignation(target, config.getTranscodingLang());
         } catch (TSAMException e) {
@@ -74,9 +87,15 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         return result;
     }
 
+    /**
+     * @param target
+     * @param lang
+     * @return
+     * @throws TSAMException
+     */
     public List<Designation> getDesignation(CodeSystemConcept target, String lang) throws TSAMException {
 
-        LOGGER.debug("--> method List<Designation> getDesignation('{}', '{}')", target.getCode(), lang);
+        logger.debug("--> method List<Designation> getDesignation('{}', '{}')", target.getCode(), lang);
         Criteria crt = getSessionFactory().getCurrentSession().createCriteria(Designation.class);
         crt.createCriteria(Designation.AT_CONCEPT).add(Restrictions.eq(CodeSystemConcept.AT_ID, target.getId()));
         crt.add(Restrictions.eq(Designation.AT_LANGUAGE, lang));
@@ -127,8 +146,14 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         return designations;
     }
 
+    /**
+     * @param sourceConcept
+     * @return
+     * @throws TSAMException
+     */
     public CodeSystemConcept getTargetConcept(CodeSystemConcept sourceConcept) throws TSAMException {
-        LOGGER.debug("--> method List<Designation> getTargetConcept('{}')", sourceConcept.getCode());
+
+        logger.debug("--> method List<Designation> getTargetConcept('{}')", sourceConcept.getCode());
         Criteria crt;
         crt = getSessionFactory().getCurrentSession().createCriteria(TranscodingAssociation.class).createCriteria(
                 TranscodingAssociation.AT_SOURCE_CONCEPT).add(
@@ -141,7 +166,7 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         for (TranscodingAssociation association : associations) {
             target = association.getTargedConcept();
             String status = association.getStatus();
-            if (status == null || !status.toLowerCase().equals(VALID_STATUS)) {
+            if (status == null || !status.equalsIgnoreCase(VALID_STATUS)) {
             } else {
                 break;
             }
@@ -152,8 +177,15 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         return target;
     }
 
+    /**
+     * @param code
+     * @param codeSystemVersion
+     * @return
+     * @throws TSAMException
+     */
     public CodeSystemConcept getConcept(String code, CodeSystemVersion codeSystemVersion) throws TSAMException {
-        LOGGER.debug("--> method CodeSystemConcept getConcept('{}', '{}')", code, codeSystemVersion.getFullName());
+
+        logger.debug("--> method CodeSystemConcept getConcept('{}', '{}')", code, codeSystemVersion.getFullName());
         List<CodeSystemConcept> concepts;
         List ids = new ArrayList();
         CodeSystemVersion tmp = codeSystemVersion;
@@ -181,9 +213,15 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         return concepts.get(0);
     }
 
+    /**
+     * @param version
+     * @param system
+     * @return
+     * @throws TSAMException
+     */
     public CodeSystemVersion getVersion(String version, CodeSystem system) throws TSAMException {
 
-        LOGGER.debug("--> method CodeSystemVersion getVersion('{}', '{}')", version, system.getOid());
+        logger.debug("--> method CodeSystemVersion getVersion('{}', '{}')", version, system.getOid());
         List<CodeSystemVersion> versions;
         Criteria crt;
         if (version != null) {
@@ -201,9 +239,14 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         return versions.get(0);
     }
 
+    /**
+     * @param oid
+     * @return
+     * @throws TSAMException
+     */
     public CodeSystem getCodeSystem(String oid) throws TSAMException {
 
-        LOGGER.debug("--> method CodeSystem getCodeSystem('{}')", oid);
+        logger.debug("--> method CodeSystem getCodeSystem('{}')", oid);
         Criteria crt = getSessionFactory().getCurrentSession().createCriteria(CodeSystem.class).add(
                 Restrictions.eq(TsamDao.AT_OID, oid));
         List<CodeSystem> systems = crt.list();
@@ -213,9 +256,15 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         return systems.get(0);
     }
 
+    /**
+     * @param valueSetOid
+     * @param valueSetVersionName
+     * @param language
+     * @return
+     */
     public List<RetrievedConcept> getConcepts(String valueSetOid, String valueSetVersionName, String language) {
 
-        LOGGER.debug("--> method List<RetrievedConcept> getConcepts('{}', '{}', '{}')", valueSetOid, valueSetVersionName, language);
+        logger.debug("--> method List<RetrievedConcept> getConcepts('{}', '{}', '{}')", valueSetOid, valueSetVersionName, language);
         ArrayList<RetrievedConcept> result;
         Criteria crtVersion = getSessionFactory().getCurrentSession().createCriteria(ValueSetVersion.class);
         if (valueSetVersionName != null) {
@@ -269,7 +318,7 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
          ) ON idd=idd2
          */
 
-        result = new ArrayList<RetrievedConcept>(lc.size());
+        result = new ArrayList<>(lc.size());
         RetrievedConcept retrievedConcept;
 
         long id1;
@@ -298,6 +347,9 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         return result;
     }
 
+    /**
+     * @return
+     */
     public List<String> getLtrLanguages() {
 
         final List<String> result = new ArrayList<>();
@@ -315,10 +367,16 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         return result;
     }
 
+    /**
+     * @return
+     */
     public TsamConfiguration getConfig() {
         return config;
     }
 
+    /**
+     * @param config
+     */
     public void setConfig(TsamConfiguration config) {
         this.config = config;
     }

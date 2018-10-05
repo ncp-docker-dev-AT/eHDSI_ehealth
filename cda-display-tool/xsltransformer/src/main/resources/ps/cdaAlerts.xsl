@@ -163,7 +163,7 @@
 
         <xsl:variable
                 name="reactionType"
-                select="n1:act/n1:templateId[@root= '2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:code/@displayName"/>
+                select="n1:act/n1:templateId[@root= '2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:code"/>
 
         <xsl:variable name="clinicalManifestation"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:entryRelationship[@typeCode='MFST']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value/@displayName"/>
@@ -225,7 +225,7 @@
                                         </xsl:call-template>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="$reactionType"/>
+                                        <xsl:value-of select="$reactionType/@displayName"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </td>

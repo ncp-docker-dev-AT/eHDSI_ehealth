@@ -84,8 +84,9 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         String subjectId = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_1_0_SUBJECT_SUBJECT_ID);
         if (StringUtils.isEmpty(subjectId)) {
             throw new InvalidFieldException("XSPA Subject 'urn:oasis:names:tc:xacml:1.0:subject:subject-id' attribute in assertion should be filled.");
+        } else if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            loggerClinical.info("HCP Identity Assertion XSPA Subject: '{}", subjectId);
         }
-        loggerClinical.info("HCP Identity Assertion XSPA Subject: '{}", subjectId);
     }
 
     @Override
@@ -94,8 +95,9 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         String resourceId = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_1_0_RESOURCE_RESOURCE_ID);
         if (resourceId.equals("")) {
             throw new InvalidFieldException("XSPA subject 'uurn:oasis:names:tc:xacml:1.0:resource:resource-id' attribute in assertion should be filled.");
+        } else if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            loggerClinical.info("TRC Assertion XSPA subject: '{}'", resourceId);
         }
-        loggerClinical.info("TRC Assertion XSPA subject: '{}'", resourceId);
     }
 
     @Override
@@ -373,8 +375,10 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
     @Override
     public boolean isConsentGiven(String patientId, String countryId) {
-        loggerClinical.info("Checking consent of patient '{}' for country '{}'", patientId, countryId);
-        loggerClinical.info("Consent is Valid by default of patient '{}' from country '{}'", patientId, countryId);
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            loggerClinical.info("Checking consent of patient '{}' for country '{}'", patientId, countryId);
+            loggerClinical.info("Consent is Valid by default of patient '{}' from country '{}'", patientId, countryId);
+        }
         return true;
     }
 }

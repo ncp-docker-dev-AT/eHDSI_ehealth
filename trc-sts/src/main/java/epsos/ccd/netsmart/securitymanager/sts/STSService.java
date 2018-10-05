@@ -55,7 +55,7 @@ import java.util.UUID;
 public class STSService implements Provider<SOAPMessage> {
 
     private final Logger logger = LoggerFactory.getLogger(STSService.class);
-    private final Logger logger_clinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final QName Messaging_To = new QName("http://www.w3.org/2005/08/addressing", "To");
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion"; // What
@@ -165,7 +165,7 @@ public class STSService implements Provider<SOAPMessage> {
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
 
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                logger_clinical.debug("Outgoing SOAP Message response: '{}'", response);
+                loggerClinical.debug("Outgoing SOAP Message response: '{}'", response);
                 log(response);
             }
             return response;
@@ -328,10 +328,12 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             message.writeTo(out);
         } catch (IOException | SOAPException e) {
-            logger_clinical.error("Exception: '{}'", e.getMessage(), e);
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                loggerClinical.error("Exception: '{}'", e.getMessage(), e);
+            }
         }
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-            logger_clinical.info("SOAPMessage:\n{}", out.toString());
+            loggerClinical.info("SOAPMessage:\n{}", out.toString());
         }
     }
 }

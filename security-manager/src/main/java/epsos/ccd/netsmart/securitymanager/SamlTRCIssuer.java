@@ -3,6 +3,7 @@ package epsos.ccd.netsmart.securitymanager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensaml.common.SAMLVersion;
@@ -199,10 +200,10 @@ public class SamlTRCIssuer {
      */
     public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
                                    List<Attribute> attrValuePair) throws SMgrException {
-
-        loggerClinical.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
-                hcpIdentityAssertion.getID(), patientID, purposeOfUse);
-
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            loggerClinical.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
+                    hcpIdentityAssertion.getID(), patientID, purposeOfUse);
+        }
         //initializing the map
         auditDataMap.clear();
         XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();

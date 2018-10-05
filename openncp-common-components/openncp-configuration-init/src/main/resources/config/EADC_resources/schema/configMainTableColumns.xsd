@@ -19,14 +19,14 @@
             <xs:enumeration value="ReceivingISO"/>
             <xs:enumeration value="ReceivingNCP_OID"/>
             <xs:enumeration value="ReceivingHost"/>
-            <xs:enumeration value="receivingAddr"/>
+            <xs:enumeration value="ReceivingAddr"/>
             <xs:enumeration value="ReceivingMsgID"/>
             <xs:enumeration value="TransactionCounter"/>
             <xs:enumeration value="HumanRequestor"/>
             <xs:enumeration value="UserId"/>
             <xs:enumeration value="POC"/>
             <xs:enumeration value="POC_ID"/>
-            <xs:enumeration value="AuthentificationLevel"/>
+            <xs:enumeration value="AuthenticationLevel"/>
             <xs:enumeration value="RequestAction"/>
             <xs:enumeration value="ResponseAction"/>
             <xs:enumeration value="ServiceType"/>

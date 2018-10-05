@@ -18,8 +18,8 @@ import java.util.List;
 
 public class SimpleUserDetailsService implements UserDetailsService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleUserDetailsService.class);
-
+    private static final String KEY_USER_PREFIX = "Users.";
+    private final Logger logger = LoggerFactory.getLogger(SimpleUserDetailsService.class);
     private Resource usersXML;
 
     private XMLConfiguration config;
@@ -27,49 +27,49 @@ public class SimpleUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
 
-        LOGGER.info("Checking userinfo for username '{}'", username);
+        logger.info("Checking userinfo for username '{}'", username);
         if (config == null) {
             try {
                 init();
             } catch (ConfigurationException e) {
-                LOGGER.error("ConfigurationException: '{}'", e.getMessage(), e);
+                logger.error("ConfigurationException: '{}'", e.getMessage(), e);
                 throw new DataAccessException("Failed to load users from XML") {
                     private static final long serialVersionUID = -3848074168433511697L;
                 };
             } catch (IOException e) {
-                LOGGER.error("IOException: '{}'", e.getMessage(), e);
+                logger.error("IOException: '{}'", e.getMessage(), e);
                 throw new DataAccessException("Failed to read XML file") {
                     private static final long serialVersionUID = 2763171318518245251L;
                 };
             }
         }
-        String passwd = config.getString("Users." + username + "[@password]");
+        String passwd = config.getString(KEY_USER_PREFIX + username + "[@password]");
         if (passwd == null) {
-            LOGGER.info("Username '{}' was not found in catalogue", username);
+            logger.info("Username '{}' was not found in catalogue", username);
             throw new UsernameNotFoundException("User " + username + " was not recognised");
         }
-        LOGGER.info("Username '{}' was found in catalogue, loading user details", username);
+        logger.info("Username '{}' was found in catalogue, loading user details", username);
         AuthenticatedUser userDetails = new AuthenticatedUser(username, passwd);
-        userDetails.setCommonName(config.getString("Users." + username + ".commonName"));
-        userDetails.setOrganizationId(config.getString("Users." + username + ".organizationId"));
-        userDetails.setOrganizationName(config.getString("Users." + username + ".organizationName"));
-        userDetails.setUserId(config.getString("Users." + username + ".userId"));
-        userDetails.setGivenName(config.getString("Users." + username + ".givenName"));
-        userDetails.setFamilyName(config.getString("Users." + username + ".familyName"));
-        userDetails.setTelecom(config.getString("Users." + username + ".telecom"));
-        userDetails.setStreet(config.getString("Users." + username + ".street"));
-        userDetails.setPostalCode(config.getString("Users." + username + ".postalCode"));
-        userDetails.setCity(config.getString("Users." + username + ".city"));
+        userDetails.setCommonName(config.getString(KEY_USER_PREFIX + username + ".commonName"));
+        userDetails.setOrganizationId(config.getString(KEY_USER_PREFIX + username + ".organizationId"));
+        userDetails.setOrganizationName(config.getString(KEY_USER_PREFIX + username + ".organizationName"));
+        userDetails.setUserId(config.getString(KEY_USER_PREFIX + username + ".userId"));
+        userDetails.setGivenName(config.getString(KEY_USER_PREFIX + username + ".givenName"));
+        userDetails.setFamilyName(config.getString(KEY_USER_PREFIX + username + ".familyName"));
+        userDetails.setTelecom(config.getString(KEY_USER_PREFIX + username + ".telecom"));
+        userDetails.setStreet(config.getString(KEY_USER_PREFIX + username + ".street"));
+        userDetails.setPostalCode(config.getString(KEY_USER_PREFIX + username + ".postalCode"));
+        userDetails.setCity(config.getString(KEY_USER_PREFIX + username + ".city"));
 
         @SuppressWarnings("unchecked")
-        List<String> roles = (List<String>) (List) config.getList("Users." + username + ".roles.role");
+        List<String> roles = (List<String>) (List) config.getList(KEY_USER_PREFIX + username + ".roles.role");
         List<GrantedAuthority> authorities = new ArrayList<>();
         for (String role : roles) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
         userDetails.setAuthorities(authorities);
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Loaded AuthenticatedUser: '{}'", userDetails.toString());
+        if (logger.isInfoEnabled()) {
+            logger.info("Loaded AuthenticatedUser: '{}'", userDetails);
         }
         return userDetails;
     }
@@ -77,9 +77,9 @@ public class SimpleUserDetailsService implements UserDetailsService {
     private void init() throws ConfigurationException, IOException {
 
         if (usersXML == null) {
-            throw new ConfigurationException("users xml config file path not set");
+            throw new ConfigurationException("Users xml config file path not set");
         }
-        LOGGER.info("Initializing user catalogue from XML in '{}'", usersXML.getURL().getPath());
+        logger.info("Initializing user catalogue from XML in '{}'", usersXML.getURL().getPath());
         config = new XMLConfiguration(usersXML.getURL());
     }
 

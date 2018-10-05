@@ -41,7 +41,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -53,6 +52,16 @@ import java.util.*;
  */
 @Service
 public class SMPConverter {
+
+    private static JAXBContext jaxbContext;
+
+    static {
+        try {
+            jaxbContext = JAXBContext.newInstance(SignedServiceMetadata.class, ServiceMetadata.class);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     private final Logger logger = LoggerFactory.getLogger(SMPConverter.class);
     Boolean isSignedServiceMetadata;
@@ -67,31 +76,24 @@ public class SMPConverter {
         String xsdFile = "//somewhere/myxsd.xsd";
         try (InputStream includeInputStream = SMPConverter.class.getClassLoader().getResource("include.xsd").openStream()) {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = schemaFactory.newSchema(new Source[]{
-                    new StreamSource(
-                            new File(xsdFile))
-            });
+            Schema schema = schemaFactory.newSchema(new Source[]{new StreamSource(new File(xsdFile))});
 
             StringReader stringReader = new StringReader(xmlString);
-
-            schema.newValidator().validate(
-                    new StreamSource(stringReader)
-            );
-
+            schema.newValidator().validate(new StreamSource(stringReader));
             stringReader.close();
         }
     }
 
     /**
-     * Converts the data received from the SMPGenerateFileController to a xml file
+     * Converts the data received from the SMPGenerateFileController to a XML file
      */
-    public void convertToXml(String type, String issuanceType, String countryCode, String endpointUri,
-                             String servDescription, String tecContact, String tecInformation, Date servActDate,
-                             Date servExpDate, MultipartFile extension, FileInputStream certificateFile, String fileName,
+    public void convertToXml(String type, String issuanceType, String countryCode, String endpointUri, String servDescription,
+                             String tecContact, String tecInformation, Date servActDate, Date servExpDate,
+                             MultipartFile extension, FileInputStream certificateFile, String fileName,
                              SMPFieldProperties businessLevelSignature, SMPFieldProperties minimumAuthLevel,
                              String certificateUID, String redirectHref) {
 
-        logger.debug("\n==== in converteToXML ====");
+        logger.debug("Converting SMP Model to XML");
         ObjectFactory objectFactory = new ObjectFactory();
         ServiceMetadata serviceMetadata = objectFactory.createServiceMetadata();
 
@@ -100,10 +102,9 @@ public class SMPConverter {
 
         //Type of SMP File -> Redirect | Service Information
         if ("Redirect".equals(type)) {
-      /*
-       Redirect SMP Type
-      */
-            logger.debug("\n******* Redirect ************");
+
+            //  Redirect SMP Type
+            logger.debug("Type Redirect");
             RedirectType redirectType = objectFactory.createRedirectType();
 
             redirectType.setCertificateUID(certificateUID);
@@ -112,7 +113,7 @@ public class SMPConverter {
             serviceMetadata.setRedirect(redirectType);
         } else {
             //  ServiceInformation SMP Type
-            logger.debug("\n******* ServiceInformation ************");
+            logger.debug("Type ServiceInformation");
             DocumentIdentifier documentIdentifier = objectFactory.createDocumentIdentifier();
             EndpointType endpointType = objectFactory.createEndpointType();
             ExtensionType extensionType = objectFactory.createExtensionType();
@@ -175,49 +176,57 @@ public class SMPConverter {
 
             //  Parsing Certificate
             if (certificateFile != null) {
+
                 try {
                     String certPass = environment.getProperty(type + ".certificate.password");
                     String certAlias = environment.getProperty(type + ".certificate.alias");
                     String certificatePass = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPass);
                     String certificateAlias = ConfigurationManagerFactory.getConfigurationManager().getProperty(certAlias);
-                    logger.info("Certificate Info: '{}', '{}', '{}', '{}'", certPass, certAlias, certificatePass, certificateAlias);
-                    KeyStore ks = null;
-                    try {
-                        ks = KeyStore.getInstance(KeyStore.getDefaultType());
-                        ks.load(certificateFile, null);
-                    } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException ex) {
-                        logger.error("\n{} - '{}'", ex.getClass(), SimpleErrorHandler.printExceptionStackTrace(ex));
-                    }
+                    logger.info("Certificate Info: '{}', '{}', '{}', '{}'", certAlias, certificateAlias, certPass,
+                            StringUtils.isNotBlank(certificatePass) ? "******" : "N/A");
 
-                    if (ks != null && ks.isKeyEntry(certificateAlias)) {
-                        char[] c = new char[certificatePass.length()];
-                        certificatePass.getChars(0, c.length, c, 0);
+                    // eHDSI OpenNCP has been using only JKS keystore.
+                    KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+                    ks.load(certificateFile, null);
+
+                    if (ks.isKeyEntry(certificateAlias)) {
+
                         Certificate[] certs = ks.getCertificateChain(certificateAlias);
-                        if (logger.isDebugEnabled()) {
-                            for (Certificate certificate : certs) {
-                                logger.debug("Certificate Info: '{}' - '{}'", ((X509Certificate) certificate).getSerialNumber(), ((X509Certificate) certificate).getSubjectDN().getName());
+                        if (certs != null) {
+                            if (logger.isDebugEnabled()) {
+
+                                for (Certificate certificate : certs) {
+                                    logger.debug("Certificate Info: '{}' - '{}'", ((X509Certificate) certificate).getSerialNumber(),
+                                            ((X509Certificate) certificate).getSubjectDN().getName());
+                                }
                             }
+                            if (certs[0] instanceof X509Certificate) {
+
+                                X509Certificate x509 = (X509Certificate) certs[0];
+                                endpointType.setCertificate(x509.getEncoded());
+                                certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
+                            }
+                        } else {
+                            logger.error("Keystore not configured for TLS certificate with alias: '{}'", certificateAlias);
                         }
-                        if (certs[0] instanceof X509Certificate) {
-                            X509Certificate x509 = (X509Certificate) certs[0];
-                            endpointType.setCertificate(x509.getEncoded());
-                            certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
-                        }
-                    } else if (ks != null && ks.isCertificateEntry(certificateAlias)) {
+                    } else if (ks.isCertificateEntry(certificateAlias)) {
+
                         Certificate c = ks.getCertificate(certificateAlias);
-                        if (c instanceof X509Certificate) {
-                            X509Certificate x509 = (X509Certificate) c;
-                            endpointType.setCertificate(x509.getEncoded());
-                            certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
+                        if (c != null) {
+                            if (c instanceof X509Certificate) {
+                                X509Certificate x509 = (X509Certificate) c;
+                                endpointType.setCertificate(x509.getEncoded());
+                                certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
+                            }
+                        } else {
+                            logger.error("Keystore not configured for TLS certificate with alias: '{}'", certificateAlias);
                         }
                     } else {
-                        logger.debug("\n ********** '{}' is unknown to this keystore", certificateAlias);
+                        logger.error("\n ********** '{}' is unknown to this keystore", certificateAlias);
                     }
 
-                } catch (KeyStoreException ex) {
-                    logger.error("\n KeyStoreException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (CertificateEncodingException ex) {
-                    logger.error("\n CertificateEncodingException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
+                    logger.error("{}: - '{}'", e.getClass(), e.getMessage(), e);
                 }
 
             } else {
@@ -328,7 +337,7 @@ public class SMPConverter {
                             Date servExpDate, byte[] certificate, FileInputStream certificateFile, Element extension,
                             MultipartFile extensionFile, String fileName, String certificateUID, String redirectHref) {
 
-        logger.debug("\n==== in updateToXml ====");
+        logger.debug("Update SMP Model to XML");
 
         ObjectFactory objectFactory = new ObjectFactory();
         ServiceMetadata serviceMetadata = objectFactory.createServiceMetadata();
@@ -340,7 +349,7 @@ public class SMPConverter {
       /*
        Redirect SMP Type
        */
-            logger.debug("\n******* Redirect ************");
+            logger.debug("Type Redirect");
             RedirectType redirectType = objectFactory.createRedirectType();
 
             redirectType.setCertificateUID(certificateUID);
@@ -348,10 +357,9 @@ public class SMPConverter {
 
             serviceMetadata.setRedirect(redirectType);
         } else {
-      /*
-       ServiceInformation SMP Type
-       */
-            logger.debug("\n******* ServiceInformation ************");
+
+            //  ServiceInformation SMP Type
+            logger.debug("Type ServiceInformation");
             DocumentIdentifier documentIdentifier = objectFactory.createDocumentIdentifier();
             EndpointType endpointType = objectFactory.createEndpointType();
             ExtensionType extensionType = objectFactory.createExtensionType();
@@ -362,10 +370,7 @@ public class SMPConverter {
             ServiceEndpointList serviceEndpointList = objectFactory.createServiceEndpointList();
             ServiceInformationType serviceInformationType = objectFactory.createServiceInformationType();
 
-
-      /*
-        Fields fetched from file
-      */
+            //  Fields fetched from file
             participantIdentifierType.setScheme(participantIDScheme);
             participantIdentifierType.setValue(participantID);
             documentIdentifier.setScheme(documentIDScheme);
@@ -376,7 +381,6 @@ public class SMPConverter {
             endpointType.setTransportProfile(transportProfile);
             endpointType.setRequireBusinessLevelSignature(requiredBusinessLevelSig);
             endpointType.setMinimumAuthenticationLevel(minimumAutenticationLevel);
-
 
             /*User fields*/
             /*
@@ -427,58 +431,57 @@ public class SMPConverter {
                 }
             }
 
-            /**
-             * certificate parse
-             */
+            // Parsing TLS certificate
             if (certificateFile != null) {
                 try {
                     String certPass = environment.getProperty(type + ".certificate.password");
                     String certAlias = environment.getProperty(type + ".certificate.alias");
                     String certificatePass = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPass);
                     String certificateAlias = ConfigurationManagerFactory.getConfigurationManager().getProperty(certAlias);
+                    logger.info("Certificate Info: '{}', '{}', '{}', '{}'", certAlias, certificateAlias, certPass,
+                            StringUtils.isNotBlank(certificatePass) ? "******" : "N/A");
 
-                    KeyStore ks = null;
-                    try {
-                        ks = KeyStore.getInstance(KeyStore.getDefaultType());
-                        ks.load(certificateFile, null);
-                    } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException ex) {
-                        logger.error("\n{} - '{}'", ex.getClass(), SimpleErrorHandler.printExceptionStackTrace(ex));
-                    }
-                    if (ks != null && ks.isKeyEntry(certificateAlias)) {
-                        char[] c = new char[certificatePass.length()];
-                        certificatePass.getChars(0, c.length, c, 0);
+                    KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+                    ks.load(certificateFile, null);
+
+                    if (ks.isKeyEntry(certificateAlias)) {
+
                         Certificate[] certs = ks.getCertificateChain(certificateAlias);
-                        if (certs[0] instanceof X509Certificate) {
-                            X509Certificate x509 = (X509Certificate) certs[0];
+                        if (certs != null) {
+
+                            if (certs[0] instanceof X509Certificate) {
+
+                                X509Certificate x509 = (X509Certificate) certs[0];
+                                endpointType.setCertificate(x509.getEncoded());
+                                certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
+                            }
+                        } else {
+                            logger.error("Keystore not configured for TLS certificate with alias: '{}'", certificateAlias);
                         }
-                        if (certs[certs.length - 1] instanceof X509Certificate) {
-                            X509Certificate x509 = (X509Certificate) certs[certs.length - 1];
-                            endpointType.setCertificate(x509.getEncoded());
-                            certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
-                        }
-                    } else if (ks != null && ks.isCertificateEntry(certificateAlias)) {
+                    } else if (ks.isCertificateEntry(certificateAlias)) {
+
                         Certificate c = ks.getCertificate(certificateAlias);
-                        if (c instanceof X509Certificate) {
-                            X509Certificate x509 = (X509Certificate) c;
-                            endpointType.setCertificate(x509.getEncoded());
-                            certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
+                        if (c != null) {
+                            if (c instanceof X509Certificate) {
+                                X509Certificate x509 = (X509Certificate) c;
+                                endpointType.setCertificate(x509.getEncoded());
+                                certificateSubjectName = x509.getIssuerX500Principal().getName() + " Serial Number #" + x509.getSerialNumber();
+                            }
+                        } else {
+                            logger.error("Keystore not configured for TLS certificate with alias: '{}'", certificateAlias);
                         }
                     } else {
                         logger.debug("\n ********** '{}' is unknown to this keystore", certificateAlias);
                     }
-                } catch (KeyStoreException ex) {
-                    logger.error("\n KeyStoreException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-                } catch (CertificateEncodingException ex) {
-                    logger.error("\n CertificateEncodingException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException ex) {
+                    logger.error("\n{} - '{}'", ex.getClass(), SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
             } else {
                 byte[] by = "".getBytes();
                 endpointType.setCertificate(by);
             }
 
-      /*
-       Endpoint Service Description, Technical ContactUrl and Technical InformationUrl definition
-       */
+            //  Endpoint Service Description, Technical ContactUrl and Technical InformationUrl definition
             endpointType.setServiceDescription(servDescription); //Set by User
             endpointType.setTechnicalContactUrl(tecContact); //Set by User
             endpointType.setTechnicalInformationUrl(tecInformation); //Set by User
@@ -572,7 +575,6 @@ public class SMPConverter {
         SignedServiceMetadata signedServiceMetadata = objectFactory.createSignedServiceMetadata();
 
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(SignedServiceMetadata.class, ServiceMetadata.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             Object result = jaxbUnmarshaller.unmarshal(fileUpdate.getInputStream());
 
@@ -688,8 +690,6 @@ public class SMPConverter {
             });
 
             StringWriter stringWriter = new StringWriter();
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(ServiceMetadata.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8.name());
             jaxbMarshaller.marshal(serviceMetadata, generatedFileOS);

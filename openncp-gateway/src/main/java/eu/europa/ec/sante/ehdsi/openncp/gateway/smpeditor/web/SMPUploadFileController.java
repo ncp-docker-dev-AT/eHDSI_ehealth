@@ -104,7 +104,8 @@ public class SMPUploadFileController {
      */
     @PostMapping(value = "smpeditor/uploadsmpfile")
     public String postUpload(@ModelAttribute("smpupload") SMPHttp smpupload, Model model, final RedirectAttributes redirectAttributes) throws Exception {
-        LOGGER.debug("\n==== in postUpload ====");
+
+        LOGGER.debug("Post Mapping for Upload");
         model.addAttribute("smpupload", smpupload);
 
         /*Iterate through all chosen files*/
@@ -114,7 +115,7 @@ public class SMPUploadFileController {
 
             itemUpload.setUploadFileName(smpupload.getUploadFiles().get(i).getOriginalFilename());
 
-            File convFile = new File(Constants.SMP_DIR_PATH + smpupload.getUploadFiles().get(i).getOriginalFilename());
+            File convFile = new File(Constants.SMP_DIR_PATH + File.separator + smpupload.getUploadFiles().get(i).getOriginalFilename());
             try {
                 smpupload.getUploadFiles().get(i).transferTo(convFile);
             } catch (IOException ex) {
@@ -233,11 +234,8 @@ public class SMPUploadFileController {
 
             URI uri = null;
             try {
-                uri = new URIBuilder()
-                        .setScheme("https")
-                        .setHost(urlServer)
-                        .setPath(serviceMetdataUrl)
-                        .build();
+                
+                uri = new URIBuilder().setScheme("https").setHost(urlServer).setPath(serviceMetdataUrl).build();
             } catch (URISyntaxException ex) {
                 LOGGER.error("URISyntaxException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
             }

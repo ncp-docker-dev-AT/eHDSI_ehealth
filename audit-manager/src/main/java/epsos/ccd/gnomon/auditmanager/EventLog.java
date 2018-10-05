@@ -3,6 +3,7 @@ package epsos.ccd.gnomon.auditmanager;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -558,7 +559,9 @@ public class EventLog {
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
         el.ncpSide = ncpSide;
-        LOGGER_CLINICAL.info("'{}'", el.toString());
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.info("'{}'", el.toString());
+        }
         return el;
     }
 
@@ -582,7 +585,6 @@ public class EventLog {
      *                                     triggered the epsos operation
      * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
      *                                     processed the epsos operation
-     * @param PC_UserID                    Point of Care: Oid of the department
      * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
      *                                     the audit source
      * @param PS_PatricipantObjectID       Patient Identifier in HL7 II format

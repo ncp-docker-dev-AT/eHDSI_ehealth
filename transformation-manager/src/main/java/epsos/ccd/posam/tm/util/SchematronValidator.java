@@ -6,6 +6,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
@@ -69,6 +70,7 @@ public class SchematronValidator implements InitializingBean, TMConstants {
             ensureTempExist();
             System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             Transformer transformer;
             Source in;
             Result out;

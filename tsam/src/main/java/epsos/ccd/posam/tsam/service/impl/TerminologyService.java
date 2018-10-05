@@ -70,7 +70,7 @@ public class TerminologyService implements ITerminologyService {
 
         } catch (TSAMException e) {
             response.addError(e.getReason(), epSOSRefConcept.toString());
-            LOGGER.warn(epSOSRefConcept + ", " + e.toString());
+            LOGGER.warn("{}, {}", epSOSRefConcept, e);
         } catch (Exception e) {
             response.addError(TSAMError.ERROR_PROCESSING_ERROR, epSOSRefConcept.toString());
             LOGGER.error(epSOSRefConcept.toString(), e);
@@ -230,7 +230,7 @@ public class TerminologyService implements ITerminologyService {
                 TSAMError warning = TSAMError.WARNING_MANY_DESIGNATIONS;
                 response.addWarning(warning, response.getCode());
                 if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("'{}': '{}'", response.getInputCodedElement(), warning.toString());
+                    LOGGER.warn("'{}': '{}'", response.getInputCodedElement(), warning);
                 }
             }
         }
@@ -254,7 +254,7 @@ public class TerminologyService implements ITerminologyService {
                 TSAMError warning = TSAMError.WARNING_VS_DOESNT_MATCH;
                 response.addWarning(warning, warnMsg);
                 if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("[{}]- '{}'", warning, warning.toString());
+                    LOGGER.warn("[{}]- '{}'", warning, warning);
                 }
             }
         }

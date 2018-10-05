@@ -21,6 +21,15 @@ import java.util.Date;
 public class PDP {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PDP.class);
+    private static JAXBContext jaxbContext;
+
+    static {
+        try {
+            jaxbContext = JAXBContext.newInstance("urn.oasis.names.tc.xacml3");
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     private PDP() {
     }
@@ -61,8 +70,7 @@ public class PDP {
                     String xacmlDocument = rs.getString("xacmlDocument");
                     ByteArrayInputStream bais = new ByteArrayInputStream(xacmlDocument.getBytes());
 
-                    JAXBContext jc = JAXBContext.newInstance("urn.oasis.names.tc.xacml3");
-                    Unmarshaller unmarshaller = jc.createUnmarshaller();
+                    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
                     PolicyType policy = (PolicyType) unmarshaller.unmarshal(bais);
 
                     RuleType rule = (RuleType) policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition().get(0);

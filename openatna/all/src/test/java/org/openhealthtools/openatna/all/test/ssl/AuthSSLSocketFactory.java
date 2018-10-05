@@ -217,7 +217,7 @@ public class AuthSSLSocketFactory {
                 trustmanagers = new TrustManager[]{defaultTrustManager};
             }
 
-            SSLContext sslcontext = SSLContext.getInstance("SSL");
+            SSLContext sslcontext = SSLContext.getInstance("TLSv1.2");
             sslcontext.init(keymanagers, trustmanagers, null);
             return sslcontext;
         } catch (NoSuchAlgorithmException e) {

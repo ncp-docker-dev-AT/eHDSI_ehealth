@@ -10,11 +10,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Data necessary to update or sign a SMPFile.
+ *
  * @author Inês Garganta
- */
-
-/**
- Data necessary to update or sign a SMPFile
  */
 public class SMPFileOps {
 

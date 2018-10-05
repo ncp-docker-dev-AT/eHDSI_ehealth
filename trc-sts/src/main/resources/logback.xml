@@ -47,6 +47,10 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>

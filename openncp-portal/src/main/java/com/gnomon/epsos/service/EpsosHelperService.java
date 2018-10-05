@@ -376,8 +376,9 @@ public class EpsosHelperService {
 
             properties.put(IHtmlToPdfTransformer.PDF_RENDERER_CLASS, IHtmlToPdfTransformer.FLYINGSAUCER_PDF_RENDERER);
             properties.put(IHtmlToPdfTransformer.FOP_TTF_FONT_PATH, fontPath);
-
-            LOGGER_CLINICAL.info("Converted CDA for Servlet:\n{}", cleanCDA);
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.info("Converted CDA for Servlet:\n{}", cleanCDA);
+            }
             converter.convertToPdf(cleanCDA, IHtmlToPdfTransformer.A4P, headerFooterList, uri, out, properties);
 
             out.flush();
@@ -870,8 +871,7 @@ public class EpsosHelperService {
         }
 
         org.opensaml.xml.signature.Signature sig = (org.opensaml.xml.signature.Signature) Configuration
-                .getBuilderFactory()
-                .getBuilder(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME)
+                .getBuilderFactory().getBuilder(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME)
                 .buildObject(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME);
         Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
 
@@ -992,8 +992,9 @@ public class EpsosHelperService {
             Company company = CompanyLocalServiceUtil.getCompany(user.getCompanyId());
             orgName = company.getName();
             String poc = "POC";
+
             // fixed for consent creation AuthorInstitution Validation problem
-            String orgId = company.getCompanyId() + ".1";
+            String organizationId = Constants.OID_PREFIX + getConfigProperty(PORTAL_HOSPITAL_OID);
             List depts = user.getOrganizations();
             String orgType;
             if (isPharmacist) {
@@ -1009,7 +1010,7 @@ public class EpsosHelperService {
             if (isEmergency) {
                 purposeOfUse = "EMERGENCY";
             }
-            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType, purposeOfUse, poc, permissions);
+            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, organizationId, orgType, purposeOfUse, poc, permissions);
 
             // send Audit message
             // GUI-27
@@ -1022,10 +1023,7 @@ public class EpsosHelperService {
             // GUI-25
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
-                String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-                LOGGER.info("KEY ALIAS: '{}'", KEY_ALIAS);
-
-                signSAMLAssertion(assertion, KEY_ALIAS);
+                signSAMLAssertion(assertion, Constants.NCP_SIG_PRIVATEKEY_ALIAS);
                 AssertionMarshaller marshaller = new AssertionMarshaller();
                 Element element = marshaller.marshall(assertion);
 
@@ -1170,36 +1168,12 @@ public class EpsosHelperService {
     }
 
     /**
-     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
-     * @param EI_EventDateTime             The datetime the event occured
-     * @param EI_EventOutcomeIndicator     <br>
-     *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
-     * @param PC_UserID                    Point of Care: Oid of the department
-     * @param PC_RoleID                    Role of the department
-     * @param HR_UserID                    Identifier of the HCP initiated the event
-     * @param HR_RoleID                    Role of the HCP initiated the event
-     * @param HR_AlternativeUserID         Human readable name of the HCP as given in
-     *                                     the Subject-ID
-     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
-     *                                     triggered the epsos operation
-     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
-     *                                     processed the epsos operation
-     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
-     *                                     the audit source
-     * @param ET_ObjectID                  The string encoded UUID of the returned document
-     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
-     *                                     message
-     * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
-     *                                     encoded security header.
-     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
-     *                                     message
-     * @param ResM_PatricipantObjectDetail The value MUST contain the base64
-     *                                     encoded security header.
-     * @param sourceip                     The IP Address of the source Gateway
-     * @param targetip                     The IP Address of the target Gateway
+     * @param fullname
+     * @param email
+     * @param orgName
+     * @param orgType
+     * @param rolename
+     * @param message
      */
     public static void sendAuditEpsos91(String fullname, String email, String orgName, String orgType, String rolename,
                                         String message) {
@@ -1819,9 +1793,13 @@ public class EpsosHelperService {
     public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
 
         Assertion trc;
-        LOGGER_CLINICAL.debug("Try to create TRCA for patient: '{}'", patient.getExtension());
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.debug("Try to create TRCA for patient: '{}'", patient.getExtension());
+        }
         String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
-        LOGGER_CLINICAL.info("TRCA Patient ID: '{}'", pat);
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            LOGGER_CLINICAL.info("TRCA Patient ID: '{}'", pat);
+        }
         LOGGER.info("Assertion ID: '{}'", idAs.getID());
         LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
         TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).PurposeOfUse(purpose).build();
@@ -2083,8 +2061,8 @@ public class EpsosHelperService {
     }
 
     private static void updatePortalProperty(String key, String value) {
-        if (Validator.isNull(ConfigurationManagerFactory.getConfigurationManager()
-                .getProperty(key))) {
+
+        if (Validator.isNull(ConfigurationManagerFactory.getConfigurationManager().getProperty(key))) {
             ConfigurationManagerFactory.getConfigurationManager().setProperty(key, value);
         }
     }
@@ -2308,20 +2286,28 @@ public class EpsosHelperService {
         }
     }
 
-    public static String styleDoc(String input, String lang,
-                                  boolean commonstyle, String actionUrl, boolean shownarrative) {
-        String convertedcda;
+    /**
+     * @param input
+     * @param lang
+     * @param commonstyle
+     * @param actionUrl
+     * @param showNarrative
+     * @return
+     */
+    public static String styleDoc(String input, String lang, boolean commonStyle, String actionUrl, boolean showNarrative) {
+
+        String convertedCda;
         EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
 
-        if (commonstyle) {
-            LOGGER.info("Transform the document using standard stylesheet as this is ccda");
-            convertedcda = xlsClass.transformUsingStandardCDAXsl(input);
+        if (commonStyle) {
+            LOGGER.info("Transform the document using standard stylesheet as this is CCDA");
+            convertedCda = xlsClass.transformUsingStandardCDAXsl(input);
         } else {
-            LOGGER.info("Transform the document using cdadisplay tool as this is epsos cda");
-            convertedcda = xlsClass.transform(input, lang, actionUrl);
+            LOGGER.info("Transform the document using CDA Display Tool as this is eHDSI CDA");
+            convertedCda = xlsClass.transform(input, lang, actionUrl);
         }
 
-        return convertedcda;
+        return convertedCda;
     }
 
     public static String styleDoc(String input, String lang, boolean commonstyle, String actionUrl) {
@@ -2673,7 +2659,9 @@ public class EpsosHelperService {
             id.setRoot(identifiers.get(i).getDomain());
             id.setExtension(identifiers.get(i).getUserValue());
             idArray[i] = id;
-            LOGGER_CLINICAL.info(identifiers.get(i).getDomain() + ": " + identifiers.get(i).getUserValue());
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.info(identifiers.get(i).getDomain() + ": " + identifiers.get(i).getUserValue());
+            }
         }
 
         for (Demographics dem : demographics) {

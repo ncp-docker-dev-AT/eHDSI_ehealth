@@ -170,7 +170,7 @@
 
     <xsl:template name="medicationSummarySectionEntry">
         <xsl:variable name="medDose"
-                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:formCode/@displayName"/>
+                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:formCode"/>
         <xsl:variable name="medUnitIntake"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:doseQuantity"/>
         <xsl:variable name="medFrequencyIntake"
@@ -262,7 +262,17 @@
                                     </xsl:call-template>
                                 </td>
                                 <td>
-                                    <xsl:value-of select="$medDose"/>
+                                    <xsl:choose>
+                                        <xsl:when test="$medDose/@nullFlavor">
+                                            <xsl:call-template name="show-nullFlavor">
+                                                <xsl:with-param name="code"
+                                                                select="$medDose/@nullFlavor"/>
+                                            </xsl:call-template>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="$medDose/@displayName"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </td>
                                 <td>
                                     <xsl:call-template name="show-numberUnitIntakeLow">
@@ -275,10 +285,19 @@
                                     </xsl:call-template>
                                 </td>
                                 <td>
-                                    <xsl:call-template name="show-frequencyIntake">
-                                        <xsl:with-param name="medFrequencyIntakeType" select="$medFrequencyIntakeType"/>
-                                        <xsl:with-param name="medFrequencyIntake" select="$medFrequencyIntake"/>
-                                    </xsl:call-template>
+                                    <xsl:choose>
+                                        <xsl:when test="not ($medFrequencyIntake/@nullFlavor)">
+                                            <xsl:call-template name="show-frequencyIntake">
+                                                <xsl:with-param name="medFrequencyIntakeType" select="$medFrequencyIntakeType"/>
+                                                <xsl:with-param name="medFrequencyIntake" select="$medFrequencyIntake"/>
+                                            </xsl:call-template>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:call-template name="show-nullFlavor">
+                                                <xsl:with-param name="code" select="$medFrequencyIntake/@nullFlavor"/>
+                                            </xsl:call-template>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </td>
                                 <td>
                                     <xsl:value-of select="$medRouteAdministration/@displayName"/>
