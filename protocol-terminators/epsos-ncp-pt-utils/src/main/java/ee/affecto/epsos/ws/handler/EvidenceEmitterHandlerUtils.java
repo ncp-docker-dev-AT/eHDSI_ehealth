@@ -27,8 +27,8 @@ import java.util.*;
  */
 public class EvidenceEmitterHandlerUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EvidenceEmitterHandlerUtils.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger logger = LoggerFactory.getLogger(EvidenceEmitterHandlerUtils.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
 
     private static final String CLIENT_CONNECTOR_XML_NAMESPACE = "http://clientconnector.protocolterminator.openncp.epsos/";
@@ -127,14 +127,14 @@ public class EvidenceEmitterHandlerUtils {
     public String getEventTypeFromMessage(SOAPBody soapBody) {
 
         String messageElement = soapBody.getFirstElementLocalName();
-        LOGGER.debug("Message body element: '{}'", messageElement);
+        logger.debug("Message body element: '{}'", messageElement);
         return iheEvents.get(messageElement);
     }
 
     public String getTransactionNameFromMessage(SOAPBody soapBody) {
 
         String messageElement = soapBody.getFirstElementLocalName();
-        LOGGER.debug("Message body element: '{}'", messageElement);
+        logger.debug("Message body element: '{}'", messageElement);
         return transactionNames.get(messageElement);
     }
 
@@ -181,7 +181,7 @@ public class EvidenceEmitterHandlerUtils {
         Element envAsDom = XMLUtils.toDOM(env);
         Document envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-            LOGGER_CLINICAL.debug("Pretty printing canonicalized: \n" + XMLUtil.prettyPrint(envCanonicalized));
+            loggerClinical.debug("Pretty printing canonicalized: \n" + XMLUtil.prettyPrint(envCanonicalized));
         }
         return envCanonicalized;
     }

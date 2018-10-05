@@ -192,12 +192,9 @@
                         <xsl:choose>
                             <xsl:when test="not ($socialHistoryObservationValueXsi/@nullFlavor)">
                                 <xsl:choose>
-                                    <xsl:when
-                                            test="$socialHistoryObservationValue and $socialHistoryObservationValueUnit">
-                                        <xsl:value-of select="$socialHistoryObservationValue"/> &#160;
-                                        <xsl:call-template name="supportUCUMAnnotations">
-                                            <xsl:with-param name="value" select="$socialHistoryObservationValueUnit"/>
-                                        </xsl:call-template>
+                                    <xsl:when test="$socialHistoryObservationValue and $socialHistoryObservationValueUnit">
+                                        <xsl:value-of select="$socialHistoryObservationValue"/>&#160;
+                                        <xsl:value-of select="$socialHistoryObservationValueUnit"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <!-- uncoded element Problem -->
@@ -209,7 +206,6 @@
                                         </xsl:if>
                                     </xsl:otherwise>
                                 </xsl:choose>
-
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:call-template name="show-nullFlavor">

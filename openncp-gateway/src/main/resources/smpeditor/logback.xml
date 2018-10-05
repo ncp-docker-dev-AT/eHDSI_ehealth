@@ -27,6 +27,10 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="epsos.ccd.gnomon.auditmanager.ssl" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>

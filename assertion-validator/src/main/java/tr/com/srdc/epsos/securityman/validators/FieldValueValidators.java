@@ -28,7 +28,7 @@ public class FieldValueValidators {
     public static void validateIssuerValue(Assertion assertion) throws InvalidFieldException {
         if (assertion.getIssuer().getValue() == null) {
             throw (new InvalidFieldException("Issuer should be filled."));
-        } else {
+        } else if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             LOGGER_CLINICAL.info("Issuer	: " + assertion.getIssuer().getValue());
         }
     }
@@ -36,7 +36,7 @@ public class FieldValueValidators {
     public static void validateNameIDValue(Assertion assertion) throws InvalidFieldException {
         if (assertion.getSubject().getNameID().getValue() == null) {
             throw (new InvalidFieldException("NameID should be filled."));
-        } else {
+        } else if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             LOGGER_CLINICAL.info("Subject Name ID	: " + assertion.getSubject().getNameID().getValue());
         }
     }

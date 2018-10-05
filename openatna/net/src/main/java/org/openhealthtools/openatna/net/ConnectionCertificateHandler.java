@@ -20,6 +20,7 @@
 
 package org.openhealthtools.openatna.net;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,7 +140,9 @@ public class ConnectionCertificateHandler {
                         message += "\n  Issuer: " + Xcert.getIssuerDN();
                     }
                 }
-                LOGGER_CLINICAL.info(message);
+                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    LOGGER_CLINICAL.info(message);
+                }
             }
         }
         return "";
@@ -165,7 +168,9 @@ public class ConnectionCertificateHandler {
                 message += "\n  Valid until: " + cert.getNotAfter();
                 message += "\n  Issuer: " + cert.getIssuerDN();
             }
-            LOGGER_CLINICAL.info(message);
+            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                LOGGER_CLINICAL.info(message);
+            }
         }
     }
 
@@ -194,7 +199,9 @@ public class ConnectionCertificateHandler {
                         message += "\n  Issuer: " + Xcert.getIssuerDN();
                     }
                 }
-                LOGGER_CLINICAL.info(message);
+                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    LOGGER_CLINICAL.info(message);
+                }
             }
         }
     }

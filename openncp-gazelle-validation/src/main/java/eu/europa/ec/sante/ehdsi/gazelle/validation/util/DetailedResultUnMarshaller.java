@@ -14,6 +14,16 @@ public class DetailedResultUnMarshaller {
 
     private static final Logger logger = LoggerFactory.getLogger(DetailedResultUnMarshaller.class);
 
+    private static JAXBContext jaxbContext;
+
+    static {
+        try {
+            jaxbContext = JAXBContext.newInstance(DetailedResult.class);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private DetailedResultUnMarshaller() {
     }
 
@@ -34,8 +44,7 @@ public class DetailedResultUnMarshaller {
 
             try {
 
-                JAXBContext jc = JAXBContext.newInstance(DetailedResult.class);
-                Unmarshaller unmarshaller = jc.createUnmarshaller();
+                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
                 result = (DetailedResult) unmarshaller.unmarshal(is);
 
             } catch (JAXBException ex) {
@@ -61,9 +70,7 @@ public class DetailedResultUnMarshaller {
 
         try {
             StringWriter writer = new StringWriter();
-
-            JAXBContext context = JAXBContext.newInstance(DetailedResult.class);
-            Marshaller m = context.createMarshaller();
+            Marshaller m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(detailedResult, writer);
 

@@ -24,11 +24,11 @@ import javax.xml.transform.TransformerException;
  */
 public class DocumentSubmitMockImpl extends NationalConnectorGateway implements DocumentSubmitInterface {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentSubmitMockImpl.class);
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger logger = LoggerFactory.getLogger(DocumentSubmitMockImpl.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     public DocumentSubmitMockImpl() {
-        LOGGER.info("Instantiating DocumentSubmitMockImpl");
+        logger.info("Instantiating DocumentSubmitMockImpl");
     }
 
     /**
@@ -43,11 +43,11 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
         try {
             dispensation = XMLUtil.prettyPrint(dispensationDocument.getDocument().getFirstChild());
         } catch (TransformerException e) {
-            LOGGER.error("TransformerException while submitDispensation(): '{}'", e.getMessage(), e);
+            logger.error("TransformerException while submitDispensation(): '{}'", e.getMessage(), e);
             throwDocumentProcessingException("Cannot parse dispensation!", "4106");
         }
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-            LOGGER_CLINICAL.info("eDispensation document content: '{}'", dispensation);
+            loggerClinical.info("eDispensation document content: '{}'", dispensation);
         }
 
         if (dispensation == null || dispensation.isEmpty()) {
@@ -55,12 +55,12 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
         }
 
         if (StringUtils.contains(dispensation, "testSubmitNoEP")) {
-            LOGGER.error("Tried to submit dispensation with no matching ePrescription.");
+            logger.error("Tried to submit dispensation with no matching ePrescription.");
             throwDocumentProcessingException("testSubmitNoEP", "4105");
         }
 
         if (StringUtils.contains(dispensation, "testSubmitDispEP")) {
-            LOGGER.error("Tried to submit already dispensed ePrescription.");
+            logger.error("Tried to submit already dispensed ePrescription.");
             throwDocumentProcessingException("testSubmitDispEP", "4106");
         }
     }
@@ -72,7 +72,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
      */
     @Override
     public void cancelDispensation(DocumentAssociation<EDDocumentMetaData> dispensationToDiscard) {
-        LOGGER.info("eDispensation to be discarded: '{}'", dispensationToDiscard.getXMLDocumentMetaData().getId());
+        logger.info("eDispensation to be discarded: '{}'", dispensationToDiscard.getXMLDocumentMetaData().getId());
     }
 
     /**
@@ -82,7 +82,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
      */
     @Override
     public void cancelConsent(DocumentAssociation<ConsentDocumentMetaData> consentToDiscard) {
-        LOGGER.info("Consent to be discarded: '{}'", consentToDiscard.getXMLDocumentMetaData().getId());
+        logger.info("Consent to be discarded: '{}'", consentToDiscard.getXMLDocumentMetaData().getId());
     }
 
     /**
@@ -97,11 +97,11 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
         try {
             consent = PrettyPrinter.prettyPrint(consentDocument.getDocument());
         } catch (TransformerException e) {
-            LOGGER.error("TransformerException: '{}'", e.getMessage(), e);
+            logger.error("TransformerException: '{}'", e.getMessage(), e);
             throwDocumentProcessingException("Cannot parse consent!", "4106");
         }
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-            LOGGER_CLINICAL.info("Patient consent content: '{}'", consent);
+            loggerClinical.info("Patient consent content: '{}'", consent);
         }
     }
 
@@ -120,11 +120,11 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
         try {
             consent = PrettyPrinter.prettyPrint(hcerDocument.getDocument());
         } catch (TransformerException e) {
-            LOGGER.error("TransformerException: '{}'", e.getMessage(), e);
+            logger.error("TransformerException: '{}'", e.getMessage(), e);
             throwDocumentProcessingException("Cannot parse HCER!", "4106");
         }
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-            LOGGER_CLINICAL.info("HCER document content: '{}'", consent);
+            loggerClinical.info("HCER document content: '{}'", consent);
         }
     }
 }

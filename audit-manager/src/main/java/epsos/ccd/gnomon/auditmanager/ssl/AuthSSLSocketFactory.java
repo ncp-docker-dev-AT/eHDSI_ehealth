@@ -24,7 +24,7 @@ public class AuthSSLSocketFactory {
     private KeystoreDetails details = null;
     private KeystoreDetails truststore = null;
     private SSLContext sslcontext = null;
-    private X509TrustManager defaultTrustManager = null;
+    private X509TrustManager defaultTrustManager;
 
     /**
      * @param details
@@ -191,17 +191,17 @@ public class AuthSSLSocketFactory {
                     String alias = (String) aliases.nextElement();
                     Certificate[] certs = keystore.getCertificateChain(alias);
                     if (certs != null) {
-                        LOGGER.debug("Certificate chain '" + alias + "':");
+                        LOGGER.debug("Certificate chain: '{}'", alias);
                         for (int c = 0; c < certs.length; c++) {
                             if (certs[c] instanceof X509Certificate) {
                                 X509Certificate cert = (X509Certificate) certs[c];
-                                LOGGER.debug("Certificate " + (c + 1) + ":");
-                                LOGGER.debug("   Subject DN: " + cert.getSubjectDN());
+                                LOGGER.debug("Certificate '{}':", (c + 1));
+                                LOGGER.debug("   Subject DN: '{}'", cert.getSubjectDN());
                                 LOGGER.debug("   Serial Number: '{}'", cert.getSerialNumber());
-                                LOGGER.debug("   Signature Algorithm: " + cert.getSigAlgName());
-                                LOGGER.debug("   Valid from: " + cert.getNotBefore());
-                                LOGGER.debug("   Valid until: " + cert.getNotAfter());
-                                LOGGER.debug("   Issuer: " + cert.getIssuerDN());
+                                LOGGER.debug("   Signature Algorithm: '{}'", cert.getSigAlgName());
+                                LOGGER.debug("   Valid from: '{}'", cert.getNotBefore());
+                                LOGGER.debug("   Valid until: '{}'", cert.getNotAfter());
+                                LOGGER.debug("   Issuer: '{}'", cert.getIssuerDN());
                             }
                         }
                     }
@@ -213,16 +213,16 @@ public class AuthSSLSocketFactory {
                 Enumeration aliases = keystore.aliases();
                 while (aliases.hasMoreElements()) {
                     String alias = (String) aliases.nextElement();
-                    LOGGER.debug("Trusted certificate '" + alias + "':");
+                    LOGGER.debug("Trusted certificate: '{}':", alias);
                     Certificate trustedCert = keystore.getCertificate(alias);
-                    if (trustedCert != null && trustedCert instanceof X509Certificate) {
+                    if (trustedCert instanceof X509Certificate) {
                         X509Certificate cert = (X509Certificate) trustedCert;
-                        LOGGER.debug("   Subject DN: " + cert.getSubjectDN());
-                        LOGGER.debug("   Serial Number: " + cert.getSerialNumber());
-                        LOGGER.debug("   Signature Algorithm: " + cert.getSigAlgName());
-                        LOGGER.debug("   Valid from: " + cert.getNotBefore());
-                        LOGGER.debug("   Valid until: " + cert.getNotAfter());
-                        LOGGER.debug("   Issuer: " + cert.getIssuerDN());
+                        LOGGER.debug("   Subject DN: '{}'", cert.getSubjectDN());
+                        LOGGER.debug("   Serial Number: '{}'", cert.getSerialNumber());
+                        LOGGER.debug("   Signature Algorithm: '{}'", cert.getSigAlgName());
+                        LOGGER.debug("   Valid from: '{}'", cert.getNotBefore());
+                        LOGGER.debug("   Valid until: '{}'", cert.getNotAfter());
+                        LOGGER.debug("   Issuer: '{}'", cert.getIssuerDN());
                     }
                 }
                 trustmanagers = createTrustManagers(truststore, keystore, defaultTrustManager);
@@ -232,9 +232,9 @@ public class AuthSSLSocketFactory {
                 trustmanagers = new TrustManager[]{defaultTrustManager};
             }
 
-            SSLContext sslcontext = SSLContext.getInstance("SSL");
-            sslcontext.init(keymanagers, trustmanagers, null);
-            return sslcontext;
+            SSLContext sslcontextLocal = SSLContext.getInstance("TLSv1.2");
+            sslcontextLocal.init(keymanagers, trustmanagers, null);
+            return sslcontextLocal;
         } catch (NoSuchAlgorithmException e) {
             LOGGER.error("NoSuchAlgorithmException: '{}'", e.getMessage(), e);
             throw new IOException("Unsupported algorithm exception: " + e.getMessage());

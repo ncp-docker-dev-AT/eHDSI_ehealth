@@ -21,6 +21,7 @@ public class ValidatorUtil {
     public static final String EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
     public static final String EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
     public static final String EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION;
+    public static final String EHDSI_AUDIT_PIVOT_TRANSLATION;
     public static final String EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
     public static final String EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION;
     public static final String EHDSI_AUDIT_FETCH_DOC_SERVICE_SP;
@@ -70,6 +71,7 @@ public class ValidatorUtil {
             EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP");
             EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION");
             EHDSI_AUDIT_FETCH_DOC_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_FETCH_DOC_SERVICE_SP");
+            EHDSI_AUDIT_PIVOT_TRANSLATION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_PIVOT_TRANSLATION");
             EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY");
             EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH");
 
@@ -110,9 +112,13 @@ public class ValidatorUtil {
                 //model = ValidatorUtil.EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP;
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
             }
+            if (StringUtils.equals(eventType, "epsos-94")) {
+                model = ValidatorUtil.EHDSI_AUDIT_PIVOT_TRANSLATION;
+            }
             if (StringUtils.equals(eventType, "epsos-21") || StringUtils.equals(eventType, "epsos-22")
                     || StringUtils.equals(eventType, "epsos-31") || StringUtils.equals(eventType, "epsos-32")
-                    || StringUtils.equals(eventType, "epsos-94") || StringUtils.equals(eventType, "epsos-96")
+                    //|| StringUtils.equals(eventType, "epsos-94")
+                    || StringUtils.equals(eventType, "epsos-96")
                     || StringUtils.equals(eventType, "ITI-38") || StringUtils.equals(eventType, "ITI-39")
                     || StringUtils.equals(eventType, "epsos-95")) {
                 //EPSOS2_FETCH_DOC_SERVICE_SP
@@ -133,8 +139,11 @@ public class ValidatorUtil {
                 //EPSOS2_HCP_ASSURANCE_AUDIT
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
             }
+            if (StringUtils.equals(eventType, "epsos-94")) {
+                model = ValidatorUtil.EHDSI_AUDIT_PIVOT_TRANSLATION;
+            }
             if (StringUtils.equals(eventType, "epsos-21") || StringUtils.equals(eventType, "epsos-22")
-                    || StringUtils.equals(eventType, "epsos-94")
+                    //|| StringUtils.equals(eventType, "epsos-94")
                     || StringUtils.equals(eventType, "epsos-96") || StringUtils.equals(eventType, "ITI-38")
                     || StringUtils.equals(eventType, "ITI-39") || StringUtils.equals(eventType, "epsos-95")) {
                 //EPSOS2_HCP_ASSURANCE_AUDIT

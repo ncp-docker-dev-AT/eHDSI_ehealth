@@ -49,7 +49,10 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Ines Garganta
@@ -121,7 +124,7 @@ public class SMPDeleteFileController {
         } catch (TechnicalException ex) {
             success = false;
             errorType = "TechnicalException";
-            LOGGER.error("TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            LOGGER.error("TechnicalException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
         URI serviceGroup = null;
@@ -129,7 +132,7 @@ public class SMPDeleteFileController {
         for (int i = 0; i < documentIdentifiers.size(); i++) {
             String smptype = "Unknown type";
             String documentID = "";
-            HashMap<String, String> propertiesMap = readProperties.readPropertiesFile();
+            Map<String, String> propertiesMap = readProperties.readPropertiesFile();
             Set set2 = propertiesMap.entrySet();
             for (Object aSet2 : set2) {
                 Map.Entry mentry2 = (Map.Entry) aSet2;

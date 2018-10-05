@@ -20,6 +20,15 @@ import java.util.HashMap;
 public class CdaExtraction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CdaExtraction.class);
+    private static JAXBContext jaxbContext;
+
+    static {
+        try {
+            jaxbContext = JAXBContext.newInstance(DetailedResult.class);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     private CdaExtraction() {
     }
@@ -59,8 +68,7 @@ public class CdaExtraction {
         InputStream is = new ByteArrayInputStream(xmlDetails.getBytes());
 
         try {
-            JAXBContext jc = JAXBContext.newInstance(DetailedResult.class);
-            Unmarshaller unmarshaller = jc.createUnmarshaller();
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             return (DetailedResult) unmarshaller.unmarshal(is);
         } catch (JAXBException ex) {
             LOGGER.error(ex.getMessage(), ex);

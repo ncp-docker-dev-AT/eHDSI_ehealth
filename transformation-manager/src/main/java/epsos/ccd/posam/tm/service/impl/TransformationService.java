@@ -39,7 +39,7 @@ import java.util.*;
 public class TransformationService implements ITransformationService, TMConstants, InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(TransformationService.class);
-    private final Logger logger_clinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private ITerminologyService tsamApi = null;
     private HashMap<String, String> level1Type;
@@ -52,7 +52,7 @@ public class TransformationService implements ITransformationService, TMConstant
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             try {
-                logger_clinical.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
+                loggerClinical.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
             }
@@ -67,7 +67,7 @@ public class TransformationService implements ITransformationService, TMConstant
         TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
             try {
-                logger_clinical.debug("Translate CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
+                loggerClinical.debug("Translate CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
             }
@@ -169,7 +169,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 Document namespaceNotAwareDoc = inputDocument;
                 String cdaDocumentType = getCDADocumentType(namespaceNotAwareDoc);
 
-                //boolean schemaValid = Validator.validateToSchema(namespaceAwareDoc);
+                //  boolean schemaValid = Validator.validateToSchema(namespaceAwareDoc);
 
                 // MDA validation
                 if (config.isModelValidationEnabled()) {
@@ -229,7 +229,6 @@ public class TransformationService implements ITransformationService, TMConstant
                     if (!validateMDA.isModelValid()) {
                         warnings.add(TMError.WARNING_OUTPUT_MDA_VALIDATION_FAILED);
                     }
-
                 }
                 // validate RESULT (schematron)
                 if (config.isSchematronValidationEnabled()) {
@@ -305,9 +304,13 @@ public class TransformationService implements ITransformationService, TMConstant
                             // Identifier that allows to unequivocally identify the SOURCE document or source data entries. (UUID Format)
                             getOIDFromDocument(responseStructure.getDocument()),
                             getOIDFromDocument(responseStructure.getResponseCDA()), // Identifier that allows to unequivocally identify the TARGET document. (UUID Format)
-                            Constants.UUID_PREFIX + "", // The value MUST contain the base64 encoded security header
+                            //Constants.UUID_PREFIX + "",
+                            // The value MUST contain the base64 encoded security header
+                            Constants.UUID_PREFIX + responseStructure.getRequestId(),
                             securityHeader.getBytes(StandardCharsets.UTF_8), // ReqM_ParticipantObjectDetail - The value MUST contain the base64 encoded security header
-                            Constants.UUID_PREFIX + "", // String-encoded UUID of the response message
+                            //Constants.UUID_PREFIX + "",
+                            // String-encoded UUID of the response message
+                            Constants.UUID_PREFIX + responseStructure.getRequestId(),
                             securityHeader.getBytes(StandardCharsets.UTF_8), // ResM_ParticipantObjectDetail - The value MUST contain the base64 encoded security header
                             ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP") // The IP Address of the target Gateway
                     );
@@ -326,7 +329,6 @@ public class TransformationService implements ITransformationService, TMConstant
         } else {
             logger.error("Write AuditTrail Error: Cannot process Transformation Manager response");
         }
-
     }
 
     /**
@@ -525,7 +527,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 if (isRequired && (nodeList == null || nodeList.isEmpty())) {
 
                     if (logger.isErrorEnabled()) {
-                        logger.error("Required element is missing: '{}'", codedElementListItem.toString());
+                        logger.error("Required element is missing: '{}'", codedElementListItem);
                     }
                     processingOK = false;
                     errors.add(new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_MISSING, codedElementListItem.toString()));
@@ -656,7 +658,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     codedElement, targetLanguageCode);
 
             if (tsamResponse.isStatusSuccess()) {
-                logger.debug("processing successful '{}'", codedElement.toString());
+                logger.debug("processing successful '{}'", codedElement);
                 // +++++ Element editing BEGIN +++++
 
                 // NEW TRANSLATION element

@@ -1,5 +1,6 @@
 package eu.epsos.dts.xds;
 
+import eu.epsos.util.xdr.XDRConstants;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.AssociationType1;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
@@ -63,7 +64,7 @@ public final class AdhocQueryResponseConverter {
 
                     // Set documentUniqueId
                     for (ExternalIdentifierType idenType : eo.getValue().getExternalIdentifier()) {
-                        if (idenType.getName().getLocalizedString().get(0).getValue().equalsIgnoreCase("XDSDocumentEntry.uniqueId")) {
+                        if (idenType.getName().getLocalizedString().get(0).getValue().equalsIgnoreCase(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR)) {
                             document.setDocumentUniqueId(idenType.getValue());
                         }
                     }
@@ -110,7 +111,7 @@ public final class AdhocQueryResponseConverter {
                         }
 
                         // Set ClassCode
-                        if (str.equals("urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a")) {
+                        if (str.equals(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME)) {
                             document.setClassCode(eo.getValue().getClassification().get(j).getSlot().get(0).getValueList().getValue().get(0), eo.getValue().getClassification().get(j).getNodeRepresentation());
                         }
 

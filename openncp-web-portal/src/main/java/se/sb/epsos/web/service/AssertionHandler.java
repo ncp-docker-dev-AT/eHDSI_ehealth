@@ -36,6 +36,7 @@ import se.sb.epsos.web.pages.KeyStoreInitializationException;
 import se.sb.epsos.web.pages.KeyStoreManager;
 import se.sb.epsos.web.pages.KeyStoreManagerImpl;
 import se.sb.epsos.web.util.CdaHelper.Validator;
+import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -142,7 +143,7 @@ public class AssertionHandler implements Serializable {
         attributeStatement.getAttributes().add(attrPID_3);
 
         Attribute attrPID_4 = createAttribute(builderFactory, "XSPA Organization ID",
-                "urn:oasis:names:tc:xspa:1.0:subject:organization-id", userDetails.getOrganizationId(), "AA", "");
+                "urn:oasis:names:tc:xspa:1.0:subject:organization-id", Constants.OID_PREFIX + userDetails.getOrganizationId(), "AA", "");
         attributeStatement.getAttributes().add(attrPID_4);
 
         Attribute attrPID_5 = createAttribute(builderFactory, "epSOS Healthcare Facility Type",
@@ -275,7 +276,6 @@ public class AssertionHandler implements Serializable {
 
         String AS_AuditSourceId = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
         String ET_ObjectID = "urn:uuid:" + assertion.getID();
-        byte[] ResM_PatricipantObjectDetail = new byte[1];
 
         AuditService asd = getAuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -294,7 +294,7 @@ public class AssertionHandler implements Serializable {
                 HR_UserID, HR_RoleID, HR_AlternativeUserID, SC_UserID,
                 SP_UserID, AS_AuditSourceId, ET_ObjectID,
                 reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                resm_participantObjectID, ResM_PatricipantObjectDetail,
+                resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
                 sourceHost, "N/A", NcpSide.NCP_B);
         eventLog.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog, "13", "2");
