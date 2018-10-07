@@ -85,7 +85,7 @@ public class ReportBuilder {
             validationBody = validationResponse.replace("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>", "");
         }
 
-        reportDirName = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + "/" + sideFolder;
+        reportDirName = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + File.separator + sideFolder;
         reportFileName = reportDirName + File.separator + buildReportFileName(model, objectType, validationTestResult);
 
         if (checkReportDir(reportDirName)) {

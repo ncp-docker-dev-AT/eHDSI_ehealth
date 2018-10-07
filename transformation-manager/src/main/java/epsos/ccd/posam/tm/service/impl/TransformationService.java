@@ -46,6 +46,14 @@ public class TransformationService implements ITransformationService, TMConstant
     private HashMap<String, String> level3Type;
     private TMConfiguration config;
 
+    /**
+     * @param epSOSOriginalData Medical document in its original data format as provided from
+     *                          the NationalConnector to this component. The provided document
+     *                          is compliant with the epSOS pivot CDA (see D 3.5.2 Appendix C)
+     *                          unless the adoption of the element binding with the epSOS
+     *                          reference Value Sets. [Mandatory]
+     * @return
+     */
     public TMResponseStructure toEpSOSPivot(Document epSOSOriginalData) {
 
         logger.info("Transforming OpenNCP CDA Document toEpsosPivot [START]");
@@ -61,6 +69,11 @@ public class TransformationService implements ITransformationService, TMConstant
         return responseStructure;
     }
 
+    /**
+     * @param epSosCDA           Document in epSOS pivot format (with epSOS codes )
+     * @param targetLanguageCode Identifier (code) of the target language.
+     * @return
+     */
     public TMResponseStructure translate(Document epSosCDA, String targetLanguageCode) {
 
         logger.info("Translating OpenNCP CDA Document [START]");
@@ -478,6 +491,15 @@ public class TransformationService implements ITransformationService, TMConstant
                 cdaDocumentType, false);
     }
 
+    /**
+     * @param document
+     * @param targetLanguageCode
+     * @param errors
+     * @param warnings
+     * @param cdaDocumentType
+     * @param isTranscode
+     * @return
+     */
     private String processDocument(Document document, String targetLanguageCode, List<ITMTSAMEror> errors,
                                    List<ITMTSAMEror> warnings, String cdaDocumentType, boolean isTranscode) {
 
@@ -493,7 +515,7 @@ public class TransformationService implements ITransformationService, TMConstant
             Collection<CodedElementListItem> ceList = CodedElementList.getInstance().getList(cdaDocumentType);
             logger.info("Configurable Element Identification is set, CodedElementList for '{}' contains elements: '{}'",
                     cdaDocumentType, ceList.size());
-            if (ceList == null || ceList.isEmpty()) {
+            if (ceList.isEmpty()) {
                 warnings.add(TMError.WARNING_CODED_ELEMENT_LIST_EMPTY);
                 return STATUS_SUCCESS;
             }
@@ -503,13 +525,13 @@ public class TransformationService implements ITransformationService, TMConstant
             List<Node> nodeList;
             boolean isRequired;
             String celTargetLanguageCode;
-            boolean useCELTargetLanguageCode = false;
+            boolean useCELTargetLanguageCode;
 
             while (iProcessed.hasNext()) {
 
                 codedElementListItem = iProcessed.next();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Looking for: '{}'", codedElementListItem.toString());
+                    logger.debug("Looking for: '{}'", codedElementListItem);
                 }
                 xPathExpression = codedElementListItem.getxPath();
                 isRequired = codedElementListItem.isRequired();
@@ -518,7 +540,9 @@ public class TransformationService implements ITransformationService, TMConstant
                     celTargetLanguageCode = codedElementListItem.getTargetLanguageCode();
 
                     // if targetLanguageCode is specified in CodedElementList, this is used for translation
-                    useCELTargetLanguageCode = celTargetLanguageCode != null && celTargetLanguageCode.length() > 1;
+                    useCELTargetLanguageCode = StringUtils.isNotEmpty(celTargetLanguageCode);
+                    logger.debug("Language has been specified for Coded Element: '{}' - '{}'", codedElementListItem.getxPath(),
+                            useCELTargetLanguageCode ? codedElementListItem.getTargetLanguageCode() : useCELTargetLanguageCode);
                 }
 
                 nodeList = XmlUtil.getNodeList(document, xPathExpression);
@@ -586,11 +610,10 @@ public class TransformationService implements ITransformationService, TMConstant
                 checkType(originalElement, warnings);
 
                 // call TSAM transcode/translate method for each coded element
-                isProcessingSuccesful = (isTranscode ? transcodeElement(
-                        originalElement, document, hmReffId_DisplayName, null,
-                        null, errors, warnings) : translateElement(
-                        originalElement, document, targetLanguageCode,
-                        hmReffId_DisplayName, null, null, errors, warnings));
+                isProcessingSuccesful = (isTranscode ?
+                        transcodeElement(originalElement, document, hmReffId_DisplayName, null, null, errors, warnings) :
+                        translateElement(originalElement, document, targetLanguageCode, hmReffId_DisplayName, null, null, errors, warnings));
+                return (isProcessingSuccesful ? STATUS_SUCCESS : STATUS_FAILURE);
             }
         }
         return (processingOK ? STATUS_SUCCESS : STATUS_FAILURE);
