@@ -73,7 +73,7 @@ public class AssertionHandlerConfigManagerTest {
     public void testGetRoleDisplayName_ROLE_DOCTOR() throws Exception {
         String role = AssertionHandlerConfigManager.getRoleDisplayName("ROLE_DOCTOR");
         assertNotNull(role);
-        assertEquals("medical doctor",role);
+        assertEquals("physician",role);
     }
     
     @Test

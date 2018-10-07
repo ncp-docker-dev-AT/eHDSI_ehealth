@@ -7,7 +7,7 @@ package eu.epsos.assertionvalidator;
  */
 public enum XSPARole {
 
-    EPSOS_DOCTOR("medical doctor"),
+    //EPSOS_DOCTOR("medical doctor"),
     DENTIST("dentist"),
     NURSE("nurse"),
     PHARMACIST("pharmacist"),

@@ -62,8 +62,8 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         String xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
         // TODO: XSPARole.EPSOS_DOCTOR this role is not valid and considered as workaround
         if (xspaRole.equals(XSPARole.NURSE.toString()) || xspaRole.equals(XSPARole.PHARMACIST.toString())
-                || xspaRole.equals(XSPARole.PHYSICIAN.toString()) || xspaRole.equals(XSPARole.EPSOS_DOCTOR.toString())
-                || xspaRole.equals(XSPARole.NURSE_MIDWIFE.toString()) || xspaRole.equals(XSPARole.PATIENT.toString())) {
+                || xspaRole.equals(XSPARole.PHYSICIAN.toString()) || xspaRole.equals(XSPARole.NURSE_MIDWIFE.toString())
+                || xspaRole.equals(XSPARole.PATIENT.toString())) {
 
             logger.info("HCP Identity Assertion XSPA Role: '{}'", xspaRole);
         } else if (xspaRole.equals(XSPARole.ANCILLARY_SERVICES.toString()) || xspaRole.equals(XSPARole.CLINICAL_SERVICES.toString())) {
@@ -177,8 +177,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
             logger.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!xspaRole.equals(XSPARole.PHYSICIAN.toString()) && !xspaRole.equals("medical doctor")
-                && !xspaRole.equals(XSPARole.PATIENT.toString())) {
+        if (!xspaRole.equals(XSPARole.PHYSICIAN.toString()) && !xspaRole.equals("medical doctor") && !xspaRole.equals(XSPARole.PATIENT.toString())) {
             logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to access Patient Summary documents.", xspaRole);
             throw new InsufficientRightsException();
         }
@@ -310,8 +309,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
             logger.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!xspaRole.equals(XSPARole.PHARMACIST.toString()) && !xspaRole.equals(XSPARole.PHYSICIAN.toString())
-                && !xspaRole.equals("medical doctor")) {
+        if (!xspaRole.equals(XSPARole.PHARMACIST.toString()) && !xspaRole.equals(XSPARole.PHYSICIAN.toString())) { //&& !xspaRole.equals("medical doctor")) {
             logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit eDispensations or HCER documents.", xspaRole);
             throw new InsufficientRightsException();
         }
@@ -353,7 +351,8 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
             logger.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!xspaRole.equals(XSPARole.PHARMACIST.toString()) && !xspaRole.equals(XSPARole.PHYSICIAN.toString()) && !xspaRole.equals("medical doctor")) {
+        if (!xspaRole.equals(XSPARole.PHARMACIST.toString()) && !xspaRole.equals(XSPARole.PHYSICIAN.toString())) { //
+            // && !xspaRole.equals("medical doctor")) {
             logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit consent documents.", xspaRole);
             throw new InsufficientRightsException();
         }

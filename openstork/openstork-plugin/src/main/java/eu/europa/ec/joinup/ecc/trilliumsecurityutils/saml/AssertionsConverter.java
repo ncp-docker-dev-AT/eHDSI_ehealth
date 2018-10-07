@@ -116,7 +116,7 @@ public class AssertionsConverter {
         String prefix = "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission:";
 
         if (isPhysician) {
-            rolename = "medical doctor";
+            rolename = "physician";
             String doctor_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_DOCTOR_PERMISSIONS);
             String p[] = doctor_perms.split(",");
             for (String aP : p) {

@@ -1,22 +1,3 @@
-/*
-*  This file is part of epSOS OpenNCP implementation
-*  Copyright (C) 2014 iUZ Technologies and Gnomon Informatics
-*
-*  This program is free software: you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation, either version 3 of the License, or
-*  (at your option) any later version.
-*
-*  This program is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*
-*  Contact email: contact@iuz.pt, info@gnomon.com.gr
-*/
 package eu.europa.ec.joinup.ecc.openstork.utils.datamodel;
 
 import eu.epsos.assertionvalidator.XSPARole;
@@ -28,7 +9,7 @@ import eu.epsos.assertionvalidator.XSPARole;
  */
 public enum HcpRole {
 
-    MEDICAL_DOCTOR("medical doctor", XSPARole.PHYSICIAN),
+    PHYSICIAN("physician", XSPARole.PHYSICIAN),
     PHARMACIST("pharmacist", XSPARole.PHARMACIST),
     NURSE("nurse", XSPARole.NURSE),
     PATIENT("patient", XSPARole.PATIENT),
@@ -48,7 +29,7 @@ public enum HcpRole {
     }
 
     /**
-     * @return the xspaRole
+     * @return the XSPA Role
      */
     public XSPARole getXspaRole() {
         return xspaRole;

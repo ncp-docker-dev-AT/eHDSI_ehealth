@@ -163,7 +163,7 @@ public class HCPIAssertionCreator {
             XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
-            attVal.setTextContent("medical doctor" + " the");
+            attVal.setTextContent("physician" + " the");
 
             attVal.getNamespaceManager().registerNamespace(ns1);
             attVal.getNamespaceManager().registerNamespace(ns2);
@@ -184,7 +184,7 @@ public class HCPIAssertionCreator {
             XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
-            attVal.setTextContent("medical doctor");
+            attVal.setTextContent("physician");
 
             attVal.getNamespaceManager().registerNamespace(ns1);
             attVal.getNamespaceManager().registerNamespace(ns2);

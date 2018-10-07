@@ -946,8 +946,8 @@ public class EpsosHelperService {
             String prefix = "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission:";
 
             if (isPhysician) {
-                rolename = "medical doctor";
 
+                rolename = "physician";
                 String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
                 String[] p = doctor_perms.split(",");
                 for (String aP : p) {
@@ -1075,7 +1075,7 @@ public class EpsosHelperService {
             String prefix = "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission:";
 
             if (isPhysician) {
-                rolename = "medical doctor";
+                rolename = "physician";
 
                 String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
                 String[] p = doctor_perms.split(",");
@@ -1305,8 +1305,8 @@ public class EpsosHelperService {
     }
 
     private static <T> T create(Class<T> cls, QName qname) {
-        return (T) (Configuration.getBuilderFactory()
-                .getBuilder(qname)).buildObject(qname);
+
+        return (T) (Configuration.getBuilderFactory().getBuilder(qname)).buildObject(qname);
     }
 
     private static Assertion createAssertion(String username, String role, String organization, String organizationId,
@@ -1319,19 +1319,19 @@ public class EpsosHelperService {
     }
 
     private static Assertion createStorkAssertion(String username, String fullName, String email, String role, String organization,
-                                                  String organizationId, String facilityType,
-                                                  String purposeOfUse, String xspaLocality,
-                                                  List<String> permissions, String onBehalfId) {
+                                                  String organizationId, String facilityType, String purposeOfUse,
+                                                  String xspaLocality, List<String> permissions, String onBehalfId) {
+
         // assertion
-        LOGGER.info("username: '{}'", username);
+        LOGGER.info("Username: '{}'", username);
         LOGGER.info("FullName: '{}'", fullName);
         LOGGER.info("Email: '{}'", email);
-        LOGGER.info("role: '{}'", role);
-        LOGGER.info("organization: '{}'", organization);
-        LOGGER.info("organizationId: '{}'", organizationId);
-        LOGGER.info("facilityType: '{}'", facilityType);
-        LOGGER.info("purposeOfUse: '{}'", purposeOfUse);
-        LOGGER.info("xspaLocality: '{}'", xspaLocality);
+        LOGGER.info("Role: '{}'", role);
+        LOGGER.info("Organization: '{}'", organization);
+        LOGGER.info("OrganizationId: '{}'", organizationId);
+        LOGGER.info("FacilityType: '{}'", facilityType);
+        LOGGER.info("PurposeOfUse: '{}'", purposeOfUse);
+        LOGGER.info("XSPALocality: '{}'", xspaLocality);
 
         Assertion assertion = null;
         try {
