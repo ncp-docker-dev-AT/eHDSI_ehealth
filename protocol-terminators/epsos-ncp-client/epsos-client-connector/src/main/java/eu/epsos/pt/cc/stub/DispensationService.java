@@ -5,7 +5,7 @@ import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
 import eu.epsos.exceptions.XdrException;
 import eu.epsos.pt.cc.dts.axis2.XdrRequestDts;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 import tr.com.srdc.epsos.data.model.XdrResponse;
 

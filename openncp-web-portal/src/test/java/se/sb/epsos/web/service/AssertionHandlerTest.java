@@ -1,40 +1,21 @@
-/*    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
- *
- *    This file is part of epSOS-WEB.
- *
- *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
- **/
 package se.sb.epsos.web.service;
 
 import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import junit.framework.TestCase;
 import org.mockito.MockSettings;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.security.SecurityException;
-import org.opensaml.xml.signature.SignatureException;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.Assertion;
 import se.sb.epsos.web.auth.AuthenticatedUser;
-import se.sb.epsos.web.pages.KeyStoreInitializationException;
 
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.Arrays;
 
 import static org.mockito.Mockito.*;
 
 public class AssertionHandlerTest extends TestCase {
+
     private AssertionHandler assertionHandler;
     private AuthenticatedUser userDetailsMock;
     private Assertion assertionMock;
@@ -44,6 +25,7 @@ public class AssertionHandlerTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
+
         super.setUp();
         as = mock(AuditService.class, settings);
         configurationManager = mock(ConfigurationManager.class);
@@ -51,7 +33,9 @@ public class AssertionHandlerTest extends TestCase {
         assertionHandler = new AssertionHandler() {
             private static final long serialVersionUID = 1L;
 
-            protected ConfigurationManager getConfigurationManager() { return configurationManager; }
+            protected ConfigurationManager getConfigurationManager() {
+                return configurationManager;
+            }
 
             protected AuditService getAuditService() {
                 return as;
@@ -93,8 +77,8 @@ public class AssertionHandlerTest extends TestCase {
         super.tearDown();
     }
 
-    public void testCreateAssertion() throws ConfigurationException, AssertionException, UnrecoverableKeyException, KeyStoreException,
-            NoSuchAlgorithmException, KeyStoreInitializationException, SecurityException, MarshallingException, SignatureException {
+    public void testCreateAssertion() throws InitializationException, SecurityException {
+
         Assertion assertion = assertionHandler.createSAMLAssertion(userDetailsMock);
         assertNotNull(assertion);
         assertNotNull(assertion.getIssuer().getValue());
@@ -110,7 +94,8 @@ public class AssertionHandlerTest extends TestCase {
 //		assertEquals(assertion.getSignature().getSigningCredential().getPrivateKey().getAlgorithm(), "RSA");
     }
 
-    public void testSendAuditEpsos91() throws Exception {
+    public void testSendAuditEpsos91() {
+
         assertionHandler.sendAuditEpsos91(userDetailsMock, assertionMock);
     }
 }

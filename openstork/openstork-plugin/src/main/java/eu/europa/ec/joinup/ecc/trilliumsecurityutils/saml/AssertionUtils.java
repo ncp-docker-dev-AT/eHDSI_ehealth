@@ -3,15 +3,16 @@ package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
-import org.opensaml.Configuration;
-import org.opensaml.common.SignableSAMLObject;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.io.UnmarshallingException;
-import org.opensaml.xml.security.SecurityConfiguration;
-import org.opensaml.xml.security.SecurityHelper;
-import org.opensaml.xml.security.credential.Credential;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.common.SignableSAMLObject;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.security.credential.Credential;
+import org.opensaml.security.credential.CredentialSupport;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.support.Signer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -256,30 +257,30 @@ public class AssertionUtils {
             cert = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
 
-        org.opensaml.xml.signature.Signature sig = (org.opensaml.xml.signature.Signature) Configuration.getBuilderFactory()
-                .getBuilder(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME)
-                .buildObject(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME);
-        Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
+        Signature sig = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME)
+                .buildObject(Signature.DEFAULT_ELEMENT_NAME);
+        Credential signingCredential = CredentialSupport.getSimpleCredential(cert, privateKey);
 
         sig.setSigningCredential(signingCredential);
-        sig.setSignatureAlgorithm(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256);
-        sig.setCanonicalizationAlgorithm(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
-
-        SecurityConfiguration secConfig = Configuration.getGlobalSecurityConfiguration();
-        try {
-            SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
-        } catch (SecurityException e) {
-            throw new SMgrException(e.getMessage(), e);
-        }
+        sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        sig.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+        KeyInfo keyInfo = (KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME).buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
+        sig.setKeyInfo(keyInfo);
+//        SecurityConfiguration secConfig = Configuration.getGlobalSecurityConfiguration();
+//        try {
+//            SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
+//        } catch (SecurityException e) {
+//            throw new SMgrException(e.getMessage(), e);
+//        }
 
         as.setSignature(sig);
         try {
-            Configuration.getMarshallerFactory().getMarshaller(as).marshall(as);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(as).marshall(as);
         } catch (MarshallingException e) {
             throw new SMgrException(e.getMessage(), e);
         }
         try {
-            org.opensaml.xml.signature.Signer.signObject(sig);
+            Signer.signObject(sig);
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }

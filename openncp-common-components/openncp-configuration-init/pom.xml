@@ -12,7 +12,7 @@
     <artifactId>openncp-configuration-init</artifactId>
     <packaging>jar</packaging>
 
-    <name>OpenNCP NCP Configuration Utility</name>
+    <name>OpenNCP NCP Configuration Initialization</name>
     <description>
         This project will help the installation of new OpenNCP instances, by setting up all the NCP required
         properties in the database.

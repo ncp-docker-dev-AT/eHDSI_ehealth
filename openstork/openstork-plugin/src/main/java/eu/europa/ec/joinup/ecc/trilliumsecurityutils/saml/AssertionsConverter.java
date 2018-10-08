@@ -11,16 +11,20 @@ import eu.epsos.assertionvalidator.PolicyManagerInterface;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.common.SAMLObjectBuilder;
-import org.opensaml.common.SAMLVersion;
 import org.opensaml.common.impl.SecureRandomIdentifierGenerator;
-import org.opensaml.saml2.core.*;
-import org.opensaml.saml2.core.impl.AssertionMarshaller;
-import org.opensaml.saml2.core.impl.IssuerBuilder;
-import org.opensaml.xml.*;
-import org.opensaml.xml.schema.XSString;
-import org.opensaml.xml.schema.XSURI;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.XSURI;
+import org.opensaml.saml.common.SAMLObjectBuilder;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.*;
+import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
+import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -48,9 +52,17 @@ public class AssertionsConverter {
     private static final String PORTAL_ADMIN_PERMISSIONS = "PORTAL_ADMIN_PERMISSIONS";
     private static final String PORTAL_PATIENT_PERMISSIONS = "PORTAL_PATIENT_PERMISSIONS";
 
+    static {
+        try {
+            InitializationService.initialize();
+        } catch (InitializationException e) {
+            LOGGER.error("InitializationException: '{}'", e.getMessage());
+        }
+    }
+
     private static <T> T create(Class<T> cls, QName qname) {
-        return (T) org.opensaml.Configuration.getBuilderFactory()
-                .getBuilder(qname).buildObject(qname);
+
+        return (T) (XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(qname)).buildObject(qname);
     }
 
     public static Assertion createPlainTRCA(String purpose, Assertion idAs, String patientId) throws SMgrException {
@@ -207,7 +219,7 @@ public class AssertionsConverter {
         try {
             //initializing the map
             auditDataMap.clear();
-            XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+            XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
             SecureRandomIdentifierGenerator randomGen = new SecureRandomIdentifierGenerator();
 
             //Doing an indirect copy so, because when cloning, signatures are lost.
@@ -386,7 +398,7 @@ public class AssertionsConverter {
                     attr.setName(attribute.getNameFormat());
                     attr.setNameFormat(attribute.getNameFormat());
 
-                    XMLObjectBuilder uriBuilder = Configuration.getBuilderFactory().getBuilder(XSURI.TYPE_NAME);
+                    XMLObjectBuilder uriBuilder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
                     XSURI attrVal = (XSURI) uriBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSURI.TYPE_NAME);
 
                     attrVal.setValue(((XSURI) attribute.getAttributeValues().get(0)).getValue());
@@ -418,12 +430,9 @@ public class AssertionsConverter {
         // assertion
         Assertion assertion = null;
         try {
-            DefaultBootstrap.bootstrap();
-            XMLObjectBuilderFactory builderFactory = org.opensaml.Configuration
-                    .getBuilderFactory();
 
-            SAMLObjectBuilder<Assertion> builder = (SAMLObjectBuilder<Assertion>) builderFactory
-                    .getBuilder(Assertion.DEFAULT_ELEMENT_NAME);
+            XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+            SAMLObjectBuilder<Assertion> builder = (SAMLObjectBuilder<Assertion>) builderFactory.getBuilder(Assertion.DEFAULT_ELEMENT_NAME);
 
             // Create the NameIdentifier
             SAMLObjectBuilder nameIdBuilder = (SAMLObjectBuilder) builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME);
@@ -528,7 +537,7 @@ public class AssertionsConverter {
 
             assertion.getStatements().add(attrStmt);
 
-        } catch (ConfigurationException e) {
+        } catch (Exception e) {
             LOGGER.error("ConfigurationException: '{}'", e.getMessage(), e);
         }
         return assertion;
@@ -753,7 +762,7 @@ public class AssertionsConverter {
                     attr.setName(attribute.getNameFormat());
                     attr.setNameFormat(attribute.getNameFormat());
 
-                    XMLObjectBuilder stringBuilder = Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
+                    XMLObjectBuilder stringBuilder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
                     XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
                     attrVal.setValue(((XSString) attribute.getAttributeValues().get(0)).getValue());
                     attr.getAttributeValues().add(attrVal);

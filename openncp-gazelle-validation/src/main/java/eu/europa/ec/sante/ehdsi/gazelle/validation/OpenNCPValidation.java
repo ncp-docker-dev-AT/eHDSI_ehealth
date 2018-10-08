@@ -9,7 +9,7 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import net.ihe.gazelle.jaxb.result.sante.DetailedResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.XMLUtil;

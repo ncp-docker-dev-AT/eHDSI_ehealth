@@ -24,7 +24,7 @@ import eu.epsos.pt.cc.ClientGenericIT;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 
 import javax.naming.NamingException;
 import java.util.ArrayList;

@@ -9,26 +9,24 @@ import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.Configuration;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.common.SAMLObjectBuilder;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.common.SignableSAMLObject;
-import org.opensaml.saml2.core.*;
-import org.opensaml.saml2.core.impl.IssuerBuilder;
-import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.XMLObjectBuilder;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.schema.XSString;
-import org.opensaml.xml.schema.XSURI;
-import org.opensaml.xml.security.SecurityConfiguration;
-import org.opensaml.xml.security.SecurityException;
-import org.opensaml.xml.security.SecurityHelper;
-import org.opensaml.xml.security.credential.Credential;
-import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.SignatureException;
-import org.opensaml.xml.signature.Signer;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.XSURI;
+import org.opensaml.saml.common.SAMLObjectBuilder;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.common.SignableSAMLObject;
+import org.opensaml.saml.saml2.core.*;
+import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
+import org.opensaml.security.credential.Credential;
+import org.opensaml.security.credential.CredentialSupport;
+import org.opensaml.xmlsec.SecurityConfigurationSupport;
+import org.opensaml.xmlsec.SignatureSigningConfiguration;
+import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.support.Signer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.sb.epsos.web.auth.AuthenticatedUser;
@@ -74,13 +72,13 @@ public class AssertionHandler implements Serializable {
         LOGGER.info("NotOnOrAfter: '{}'", nowUTC.toDateTime().plusHours(2));
     }
 
-    Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws ConfigurationException {
+    Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws InitializationException {
 
         LOGGER.debug("################################################");
         LOGGER.debug("# createSAMLAssertion() - start                #");
         LOGGER.debug("################################################");
-        DefaultBootstrap.bootstrap();
-        XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+        InitializationService.initialize();
+        XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
         @SuppressWarnings("unchecked")
         SAMLObjectBuilder<Assertion> nameIdBuilder = (SAMLObjectBuilder<Assertion>) builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME);
@@ -311,9 +309,10 @@ public class AssertionHandler implements Serializable {
         return attrPID;
     }
 
-    private Attribute AddAttributeValue(XMLObjectBuilderFactory builderFactory, Attribute attribute, String value, String namespace, String xmlschema) {
-        @SuppressWarnings("unchecked")
-        XMLObjectBuilder<Assertion> stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
+    private Attribute AddAttributeValue(XMLObjectBuilderFactory builderFactory, Attribute attribute, String value,
+                                        String namespace, String xmlschema) {
+
+        XMLObjectBuilder<Assertion> stringBuilder = (XMLObjectBuilder<Assertion>) builderFactory.getBuilder(XSString.TYPE_NAME);
         XSString attrValPID = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
         attrValPID.setValue(value);
         attribute.getAttributeValues().add(attrValPID);
@@ -332,13 +331,13 @@ public class AssertionHandler implements Serializable {
 
         if (StringUtils.isBlank(namespace)) {
             XSString attrValPID;
-            stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
+            stringBuilder = (XMLObjectBuilder<Assertion>) builderFactory.getBuilder(XSString.TYPE_NAME);
             attrValPID = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
             attrValPID.setValue(value);
             attrPID.getAttributeValues().add(attrValPID);
         } else {
             XSURI attrValPID;
-            stringBuilder = builderFactory.getBuilder(XSURI.TYPE_NAME);
+            stringBuilder = (XMLObjectBuilder<Assertion>) builderFactory.getBuilder(XSURI.TYPE_NAME);
             attrValPID = (XSURI) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSURI.TYPE_NAME);
             attrValPID.setValue(value);
             attrPID.getAttributeValues().add(attrValPID);
@@ -348,11 +347,10 @@ public class AssertionHandler implements Serializable {
     }
 
     public <T> T create(Class<T> cls, QName qname) {
-        return (T) Configuration.getBuilderFactory().getBuilder(qname).buildObject(qname);
+        return (T) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(qname).buildObject(qname);
     }
 
-    public void signSAMLAssertion(SignableSAMLObject assertion) throws KeyStoreInitializationException, KeyStoreException,
-            UnrecoverableKeyException, NoSuchAlgorithmException, SecurityException, MarshallingException, SignatureException {
+    public void signSAMLAssertion(SignableSAMLObject assertion) throws Exception {
 
         LOGGER.debug("################################################");
         LOGGER.debug("# signSAMLAssertion() - start                  #");
@@ -363,18 +361,19 @@ public class AssertionHandler implements Serializable {
 
         PrivateKey privateKey = privateKeyPair.getPrivate();
 
-        Signature signature = (Signature) Configuration.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME)
+        Signature signature = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME)
                 .buildObject(Signature.DEFAULT_ELEMENT_NAME);
-        Credential signingCredential = SecurityHelper.getSimpleCredential(certificate, privateKey);
+        Credential signingCredential = CredentialSupport.getSimpleCredential(certificate, privateKey);
         signature.setSigningCredential(signingCredential);
         signature.setSignatureAlgorithm(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256);
         signature.setCanonicalizationAlgorithm(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
 
-        SecurityConfiguration securityConfiguration = Configuration.getGlobalSecurityConfiguration();
-        SecurityHelper.prepareSignatureParams(signature, signingCredential, securityConfiguration, null);
+        SignatureSigningConfiguration securityConfiguration = SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
+        //SecurityHelper.prepareSignatureParams(signature, signingCredential, securityConfiguration, null);
 
         assertion.setSignature(signature);
-        Configuration.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
+        XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
+        //Signer.signObject(signature);
         Signer.signObject(signature);
         LOGGER.debug("# signSAMLAssertion() - stop ");
     }

@@ -1,33 +1,17 @@
-/*
- *  Copyright 2010 jerouris.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
 package epsos.ccd.netsmart.securitymanager;
 
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
+import net.shibboleth.utilities.java.support.xml.BasicParserPool;
+import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.*;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.opensaml.xml.io.UnmarshallingException;
-import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.parse.XMLParserException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.io.Unmarshaller;
+import org.opensaml.core.xml.io.UnmarshallerFactory;
+import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -37,7 +21,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import static org.junit.Assert.fail;
@@ -54,7 +37,7 @@ public class SignatureManagerSAMLTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        DefaultBootstrap.bootstrap();
+        InitializationService.initialize();
     }
 
     @AfterClass
@@ -74,12 +57,10 @@ public class SignatureManagerSAMLTest {
 
     /**
      * Test of signSAMLAssertion method, of class SignatureManager.
-     *
-     * @throws java.io.IOException
      */
     @Ignore
     @Test
-    public void testSignAndVerifySAMLAssertion() throws IOException {
+    public void testSignAndVerifySAMLAssertion() {
         try {
             logger.info("signSAMLAssertion");
 
@@ -90,8 +71,8 @@ public class SignatureManagerSAMLTest {
             InputStream in = ClassLoader.getSystemResourceAsStream("SAMLIdAssertion.xml");
             Document samlas = ppMgr.parse(in);
             Element samlasRoot = samlas.getDocumentElement();
-            // Get apropriate unmarshaller
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            // Get appropriate unmarshaller
+            UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(samlasRoot);
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
             Assertion as = (Assertion) unmarshaller.unmarshall(samlasRoot);
@@ -106,7 +87,8 @@ public class SignatureManagerSAMLTest {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             Document signedDoc = dbf.newDocumentBuilder().newDocument();
-            Configuration.getMarshallerFactory().getMarshaller(as).marshall(as, signedDoc);
+            //Configuration.getMarshallerFactory().getMarshaller(as).marshall(as, signedDoc);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(as).marshall(as, signedDoc);
             try {
                 XMLUtils.sendXMLtoStream(signedDoc, new FileOutputStream("SignedSamlAssertion.xml"));
             } catch (FileNotFoundException ex) {

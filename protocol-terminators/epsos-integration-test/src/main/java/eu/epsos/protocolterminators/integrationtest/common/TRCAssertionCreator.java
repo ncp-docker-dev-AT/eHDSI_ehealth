@@ -2,13 +2,13 @@ package eu.epsos.protocolterminators.integrationtest.common;
 
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.joda.time.DateTime;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.*;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.Namespace;
-import org.opensaml.xml.XMLObjectBuilder;
-import org.opensaml.xml.io.Marshaller;
-import org.opensaml.xml.schema.XSAny;
+import org.opensaml.core.xml.Namespace;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.Marshaller;
+import org.opensaml.core.xml.schema.XSAny;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -54,7 +54,7 @@ public class TRCAssertionCreator {
 
         SAML saml = new SAML();
 
-        org.opensaml.saml2.core.Subject subject = saml.createSubject("physician", "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", "sender-vouches");
+        Subject subject = saml.createSubject("physician", "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", "sender-vouches");
 
         // Create assertion
         Assertion assertion = saml.createAssertion(subject);
@@ -98,13 +98,8 @@ public class TRCAssertionCreator {
         AttributeStatement attributeStatement = saml.create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
 
         // Namespaces
-        Namespace ns1 = new Namespace();
-        ns1.setNamespacePrefix("xs");
-        ns1.setNamespaceURI("http://www.w3.org/2001/XMLSchema");
-
-        Namespace ns2 = new Namespace();
-        ns2.setNamespacePrefix("xsi");
-        ns2.setNamespaceURI("http://www.w3.org/2001/XMLSchema-instance");
+        Namespace ns1 = new Namespace("http://www.w3.org/2001/XMLSchema", "xs");
+        Namespace ns2 = new Namespace("http://www.w3.org/2001/XMLSchema-instance", "xsi");
 
         // Set HCP Identifier
         if (true) {
@@ -113,13 +108,13 @@ public class TRCAssertionCreator {
             att.setName("urn:oasis:names:tc:xacml:1.0:resource:resource-id");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent(patientIdIso);
 
-            attVal.getNamespaceManager().registerNamespace(ns1);
-            attVal.getNamespaceManager().registerNamespace(ns2);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
@@ -134,13 +129,13 @@ public class TRCAssertionCreator {
             att.setName("urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("TREATMENT");
 
-            attVal.getNamespaceManager().registerNamespace(ns1);
-            attVal.getNamespaceManager().registerNamespace(ns2);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
@@ -154,7 +149,7 @@ public class TRCAssertionCreator {
         // Set Signature
         try {
             // Set assertion.DOM
-            Marshaller marshaller = Configuration.getMarshallerFactory().getMarshaller(assertion);
+            Marshaller marshaller = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion);
             Element elem;
             elem = marshaller.marshall(assertion);
             assertion.setDOM(elem);

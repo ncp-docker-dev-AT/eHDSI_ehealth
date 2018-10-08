@@ -12,14 +12,14 @@ import com.liferay.portal.model.User;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
+import net.shibboleth.utilities.java.support.xml.BasicParserPool;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.opensaml.xml.parse.BasicParserPool;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.Unmarshaller;
+import org.opensaml.core.xml.io.UnmarshallerFactory;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +50,9 @@ import java.util.List;
 @SessionScoped
 public class MyBean implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private final Logger logger = LoggerFactory.getLogger(MyBean.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-    private static final long serialVersionUID = 1L;
     private List<Country> countries;
     private String selectedCountry;
     private List<Identifier> identifiers;
@@ -1158,7 +1158,8 @@ public class MyBean implements Serializable {
         }
         if (signedTRC != null && !signedTRC.isEmpty()) {
             // Initialize the library
-            DefaultBootstrap.bootstrap();
+            //DefaultBootstrap.bootstrap();
+            InitializationService.initialize();
 
             // Get parser pool manager
             BasicParserPool ppMgr = new BasicParserPool();
@@ -1170,7 +1171,7 @@ public class MyBean implements Serializable {
             Element metadataRoot = inCommonMDDoc.getDocumentElement();
 
             // Get appropriate unmarshaller
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(metadataRoot);
 
             // Unmarshall using the document root element, an EntitiesDescriptor in this case

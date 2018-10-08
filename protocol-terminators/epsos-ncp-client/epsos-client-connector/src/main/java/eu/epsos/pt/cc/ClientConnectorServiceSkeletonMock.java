@@ -1,7 +1,7 @@
 package eu.epsos.pt.cc;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;

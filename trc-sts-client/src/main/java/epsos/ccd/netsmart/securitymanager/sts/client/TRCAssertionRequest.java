@@ -6,12 +6,14 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.opensaml.Configuration;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.opensaml.xml.io.UnmarshallingException;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.io.Unmarshaller;
+import org.opensaml.core.xml.io.UnmarshallerFactory;
+import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -55,6 +57,11 @@ public class TRCAssertionRequest {
 
     static {
 
+        try {
+            InitializationService.initialize();
+        } catch (InitializationException e) {
+            LOGGER.error("OpenSAML module cannot be initialized: '{}'", e.getMessage(), e);
+        }
         if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url").length() == 0) {
             ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.url", "https://localhost:8443/TRC-STS/SecurityTokenService");
         }
@@ -106,7 +113,8 @@ public class TRCAssertionRequest {
 
         try {
             Document doc = builder.newDocument();
-            Configuration.getMarshallerFactory().getMarshaller(as).marshall(as, doc);
+            //Configuration.getMarshallerFactory().getMarshaller(as).marshall(as, doc);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(as).marshall(as, doc);
             return doc.getDocumentElement();
         } catch (MarshallingException ex) {
             LOGGER.error(null, ex);
@@ -118,8 +126,9 @@ public class TRCAssertionRequest {
     private Assertion convertElementToAssertion(Element e) {
 
         try {
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
-            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(e);
+//            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+//            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(e);
+            Unmarshaller unmarshaller = XMLObjectProviderRegistrySupport.getUnmarshallerFactory().getUnmarshaller(e);
             // Unmarshalling using the document root element, an EntitiesDescriptor in this case
             return (Assertion) unmarshaller.unmarshall(e);
         } catch (UnmarshallingException ex) {
@@ -249,12 +258,13 @@ public class TRCAssertionRequest {
                 return null;
             }
 
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            //UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
 
             Assertion trcAssertion = (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
             if (OpenNCPValidation.isValidationEnable()) {
-                
+
                 OpenNCPValidation.validateTRCAssertion(trcAssertion, NcpSide.NCP_B);
             }
             return trcAssertion;

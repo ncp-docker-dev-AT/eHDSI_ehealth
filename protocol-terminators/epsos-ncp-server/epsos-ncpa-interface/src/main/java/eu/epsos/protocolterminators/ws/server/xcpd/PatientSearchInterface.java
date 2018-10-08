@@ -2,7 +2,7 @@ package eu.epsos.protocolterminators.ws.server.xcpd;
 
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorInterface;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
-import org.opensaml.xml.io.MarshallingException;
+import org.opensaml.core.xml.io.MarshallingException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;

@@ -3,9 +3,9 @@ package tr.com.srdc.epsos.securityman;
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import eu.epsos.assertionvalidator.PolicyManagerInterface;
-import org.opensaml.common.xml.SAMLSchemaBuilder;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.io.UnmarshallingException;
+import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.common.xml.SAMLSchemaBuilder;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -66,7 +66,9 @@ public class SAML2Validator {
                 for (int i = 0; i < assertionList.getLength(); i++) {
                     hcpAss = (Element) assertionList.item(i);
                     // Validate Assertion according to SAML XSD
-                    SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(hcpAss));
+                    //SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(hcpAss));
+                    SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                    schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(hcpAss));
 
                     hcpAssertion = (Assertion) SAML.fromElement(hcpAss);
                     if (hcpAssertion.getAdvice() == null) {
@@ -124,7 +126,9 @@ public class SAML2Validator {
                     }
 
                     // Validate Assertion according to SAML XSD
-                    SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(ass));
+                    //SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(ass));
+                    SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                    schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));
                     Assertion anAssertion = (Assertion) SAML.fromElement(ass);
                     if (anAssertion.getAdvice() == null) {
                         hcpAssertion = (Assertion) SAML.fromElement(ass);
@@ -189,7 +193,9 @@ public class SAML2Validator {
                     }
 
                     // Validate Assertion according to SAML XSD
-                    SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(ass));
+                    //SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(ass));
+                    SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                    schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));
                     Assertion anAssertion = (Assertion) SAML.fromElement(ass);
                     if (anAssertion.getAdvice() == null) {
                         hcpAssertion = (Assertion) SAML.fromElement(ass);
@@ -262,7 +268,9 @@ public class SAML2Validator {
             }
 
             try {
-                SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(ass));    // Validate Assertion according to SAML XSD
+                //SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(ass));    // Validate Assertion according to SAML XSD
+                SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));    // Validate Assertion according to SAML XSD
                 result.add((Assertion) SAML.fromElement(ass));
 
             } catch (UnmarshallingException | IOException | SAXException ex) {
@@ -382,7 +390,9 @@ public class SAML2Validator {
                 for (int i = 0; i < assertionList.getLength(); i++) {
                     hcpAss = (Element) assertionList.item(i);
                     // Validate Assertion according to SAML XSD
-                    SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(hcpAss));
+                    //SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(hcpAss));
+                    SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                    schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(hcpAss));
 
                     hcpAssertion = (Assertion) SAML.fromElement(hcpAss);
                     if (hcpAssertion.getAdvice() == null) {

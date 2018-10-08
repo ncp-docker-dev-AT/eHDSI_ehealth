@@ -37,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
-            <artifactId>opensaml</artifactId>
+            <artifactId>opensaml-core</artifactId>
             <version>${opensaml.version}</version>
         </dependency>
         <dependency>

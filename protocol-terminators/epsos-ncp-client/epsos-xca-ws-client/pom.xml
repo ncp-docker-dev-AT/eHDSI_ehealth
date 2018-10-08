@@ -76,7 +76,7 @@
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
-            <artifactId>opensaml</artifactId>
+            <artifactId>opensaml-core</artifactId>
         </dependency>
         <!-- tests -->
         <dependency>

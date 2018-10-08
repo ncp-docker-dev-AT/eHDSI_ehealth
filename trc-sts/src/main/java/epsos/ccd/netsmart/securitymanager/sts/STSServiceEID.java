@@ -8,10 +8,10 @@ import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.sts.util.STSUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.ConfigurationException;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -97,8 +97,8 @@ public class STSServiceEID implements Provider<SOAPMessage> {
         }
 
         try {
-            DefaultBootstrap.bootstrap();
-        } catch (ConfigurationException ex) {
+            InitializationService.initialize();
+        } catch (InitializationException ex) {
             LOGGER.error(null, ex);
         }
         try {
@@ -141,7 +141,8 @@ public class STSServiceEID implements Provider<SOAPMessage> {
                     authnInstant, sessionNotOnOrAfter, idaReference);
 
             Document signedDoc = builder.newDocument();
-            Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
+            //Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
 
             SOAPMessage resp = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
             resp.getSOAPBody().addDocument(STSUtils.createRSTRC(signedDoc));

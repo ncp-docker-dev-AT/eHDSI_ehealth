@@ -75,6 +75,10 @@
                     <artifactId>xercesImpl</artifactId>
                     <groupId>xerces</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>xmltooling</artifactId>
+                    <groupId>org.opensaml</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

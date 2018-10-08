@@ -9,7 +9,7 @@ import eu.epsos.pt.cc.stub.*;
 import eu.epsos.util.IheConstants;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pt.spms.epsos.utils.logging.LoggingSlf4j;

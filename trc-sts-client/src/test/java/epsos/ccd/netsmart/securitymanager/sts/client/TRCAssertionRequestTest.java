@@ -4,17 +4,17 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 import mockit.Mocked;
 import mockit.NonStrictExpectations;
 import mockit.integration.junit4.JMockit;
+import net.shibboleth.utilities.java.support.xml.BasicParserPool;
+import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.opensaml.Configuration;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.io.Marshaller;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.opensaml.xml.io.UnmarshallingException;
-import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.parse.XMLParserException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.Marshaller;
+import org.opensaml.core.xml.io.Unmarshaller;
+import org.opensaml.core.xml.io.UnmarshallerFactory;
+import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
@@ -89,7 +89,8 @@ public class TRCAssertionRequestTest {
         System.setProperties(systemProps);
         //for localhost testing only
 
-        DefaultBootstrap.bootstrap();
+        //DefaultBootstrap.bootstrap();
+        InitializationService.initialize();
     }
 
     @AfterClass
@@ -174,6 +175,7 @@ public class TRCAssertionRequestTest {
     }
 
     private Assertion loadSamlAssertionAsResource(String filename) {
+
         Assertion hcpIdentityAssertion = null;
         try {
             BasicParserPool ppMgr = new BasicParserPool();
@@ -183,7 +185,8 @@ public class TRCAssertionRequestTest {
             Document samlas = ppMgr.parse(in);
             Element samlasRoot = samlas.getDocumentElement();
             // Get apropriate unmarshaller
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            //UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(samlasRoot);
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
             hcpIdentityAssertion = (Assertion) unmarshaller.unmarshall(samlasRoot);

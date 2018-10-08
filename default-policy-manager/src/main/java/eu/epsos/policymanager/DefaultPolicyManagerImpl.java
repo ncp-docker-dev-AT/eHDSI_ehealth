@@ -2,8 +2,8 @@ package eu.epsos.policymanager;
 
 import eu.epsos.assertionvalidator.*;
 import org.apache.commons.lang3.StringUtils;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.XMLObject;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;

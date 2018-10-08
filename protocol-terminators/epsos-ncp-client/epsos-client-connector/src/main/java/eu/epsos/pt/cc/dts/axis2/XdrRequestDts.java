@@ -21,7 +21,7 @@ package eu.epsos.pt.cc.dts.axis2;
 
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 import tr.com.srdc.epsos.util.Constants;
 

@@ -13,14 +13,11 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.opensaml.xml.io.UnmarshallingException;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.*;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -54,9 +51,6 @@ import java.util.UUID;
 @BindingType(value = "http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 public class STSService implements Provider<SOAPMessage> {
 
-    private final Logger logger = LoggerFactory.getLogger(STSService.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     private static final QName Messaging_To = new QName("http://www.w3.org/2005/08/addressing", "To");
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion"; // What
     // can be only requested from the STS
@@ -71,6 +65,16 @@ public class STSService implements Provider<SOAPMessage> {
     private static final String WS_SEC_UTIL_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     private static final String WS_SEC_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 
+    static {
+        try {
+            InitializationService.initialize();
+        } catch (InitializationException e) {
+            //logger.error("OpenSAML module cannot be initialized: '{}'", e.getMessage(), e);
+        }
+    }
+
+    private final Logger logger = LoggerFactory.getLogger(STSService.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     @Resource
     private WebServiceContext context;
 
@@ -93,11 +97,11 @@ public class STSService implements Provider<SOAPMessage> {
             throw new WebServiceException("Cannot get Soap Message Parts", ex);
         }
 
-        try {
-            DefaultBootstrap.bootstrap();
-        } catch (ConfigurationException ex) {
-            logger.error(null, ex);
-        }
+//        try {
+//            DefaultBootstrap.bootstrap();
+//        } catch (ConfigurationException ex) {
+//            logger.error(null, ex);
+//        }
         try {
             if (!SUPPORTED_ACTION_URI.equals(getRSTAction(body))) {
                 throw new WebServiceException("Only ISSUE action is supported");
@@ -141,7 +145,10 @@ public class STSService implements Provider<SOAPMessage> {
             }
 
             Document signedDoc = builder.newDocument();
-            Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
+            //Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
+
+            MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
+            marshallerFactory.getMarshaller(trc).marshall(trc, signedDoc);
 
             SOAPMessage response = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
             response.getSOAPBody().addDocument(STSUtils.createRSTRC(signedDoc));
@@ -214,7 +221,8 @@ public class STSService implements Provider<SOAPMessage> {
                     throw new WSTrustException("Error validating SAML Assertion signature", ex);
                 }
             }
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            //UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
             return (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
 

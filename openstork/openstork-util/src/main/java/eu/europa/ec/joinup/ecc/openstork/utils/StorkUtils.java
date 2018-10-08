@@ -10,7 +10,7 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import eu.stork.peps.auth.commons.IPersonalAttributeList;
 import eu.stork.peps.auth.commons.PersonalAttribute;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

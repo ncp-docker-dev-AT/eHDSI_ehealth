@@ -48,23 +48,28 @@ import org.htmlcleaner.PrettyXmlSerializer;
 import org.htmlcleaner.TagNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.Configuration;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.common.SAMLObjectBuilder;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.common.SignableSAMLObject;
-import org.opensaml.saml2.core.*;
-import org.opensaml.saml2.core.impl.AssertionMarshaller;
-import org.opensaml.saml2.core.impl.IssuerBuilder;
-import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.XMLObjectBuilder;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.schema.XSString;
-import org.opensaml.xml.schema.XSURI;
-import org.opensaml.xml.security.BasicSecurityConfiguration;
-import org.opensaml.xml.security.SecurityHelper;
-import org.opensaml.xml.security.credential.Credential;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.XSURI;
+import org.opensaml.saml.common.SAMLObjectBuilder;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.common.SignableSAMLObject;
+import org.opensaml.saml.saml2.core.*;
+import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
+import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
+import org.opensaml.security.credential.Credential;
+import org.opensaml.security.credential.CredentialSupport;
+import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.X509Data;
+import org.opensaml.xmlsec.signature.support.SignatureException;
+import org.opensaml.xmlsec.signature.support.Signer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
@@ -145,6 +150,15 @@ public class EpsosHelperService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EpsosHelperService.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final Base64 decode = new Base64();
+
+    static {
+        try {
+            InitializationService.initialize();
+        } catch (InitializationException e) {
+            LOGGER.error("InitializationException: '{}'", e.getMessage(), e);
+
+        }
+    }
 
     private EpsosHelperService() {
         super();
@@ -850,56 +864,95 @@ public class EpsosHelperService {
         return lines;
     }
 
-    private static void signSAMLAssertion(SignableSAMLObject as, String keyAlias) throws Exception {
+    /**
+     * Mock Utility method providing as signed Assertion from the Portal
+     *
+     * @param signableSAMLObject
+     * @param keyAlias
+     * @throws Exception
+     */
+    private static void signSAMLAssertion(SignableSAMLObject signableSAMLObject, String keyAlias) throws Exception {
 
-        String KEYSTORE_LOCATION = Constants.NCP_SIG_KEYSTORE_PATH;
-        String KEY_STORE_PASS = Constants.NCP_SIG_KEYSTORE_PASSWORD;
-        String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-        String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
+        LOGGER.info("method signSAMLAssertion('{}')", keyAlias);
+
+        String ncpSigKeystorePath = Constants.NCP_SIG_KEYSTORE_PATH;
+        String ncpSigKeystorePassword = Constants.NCP_SIG_KEYSTORE_PASSWORD;
+        String ncpSigPrivatekeyAlias = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
+        String ncpSigPrivatekeyPassword = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
 
         KeyStoreManager keyManager = new DefaultKeyStoreManager();
         X509Certificate cert;
         PrivateKey privateKey = null;
+
         if (keyAlias == null) {
             cert = (X509Certificate) keyManager.getDefaultCertificate();
         } else {
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            File file = new File(KEYSTORE_LOCATION);
-            keyStore.load(new FileInputStream(file), KEY_STORE_PASS.toCharArray());
-            privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
+            File file = new File(ncpSigKeystorePath);
+            keyStore.load(new FileInputStream(file), ncpSigKeystorePassword.toCharArray());
+            privateKey = (PrivateKey) keyStore.getKey(ncpSigPrivatekeyAlias, ncpSigPrivatekeyPassword.toCharArray());
             cert = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
 
-        org.opensaml.xml.signature.Signature sig = (org.opensaml.xml.signature.Signature) Configuration
-                .getBuilderFactory().getBuilder(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME)
-                .buildObject(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME);
-        Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
+        LOGGER.info("Keystore & Signature Certificate loaded: '{}'", cert.getSerialNumber());
+
+        Signature sig = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory()
+                .getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
+        Credential signingCredential = CredentialSupport.getSimpleCredential(cert, privateKey);
 
         sig.setSigningCredential(signingCredential);
-        sig.setSignatureAlgorithm(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256);
-        sig.setCanonicalizationAlgorithm(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+        sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        sig.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
 
-        BasicSecurityConfiguration secConfig = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-        secConfig.setSignatureReferenceDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256);
+
+        KeyInfo keyInfo = (KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME).buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
+        X509Data data = (X509Data) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(X509Data.DEFAULT_ELEMENT_NAME).buildObject(X509Data.DEFAULT_ELEMENT_NAME);
+        org.opensaml.xmlsec.signature.X509Certificate x509Certificate = (org.opensaml.xmlsec.signature.X509Certificate) XMLObjectProviderRegistrySupport.getBuilderFactory()
+                .getBuilder(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME).buildObject(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
+
+        String value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
+        x509Certificate.setValue(value);
+        data.getX509Certificates().add(x509Certificate);
+        keyInfo.getX509Datas().add(data);
+        sig.setKeyInfo(keyInfo);
+
+
+//        KeyInfo keyInfo = (KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME)
+//                .buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
+//
+//        X509Data data = (X509Data) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(X509Data.DEFAULT_ELEMENT_NAME)
+//                .buildObject(X509Data.DEFAULT_ELEMENT_NAME);
+        //X509Certificate cert = (X509Certificate) buildXMLObject(X509Certificate.DEFAULT_ELEMENT_NAME);
+        //String value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
+        //cert.setValue(value);
+//        data.getX509Certificates().add((org.opensaml.xmlsec.signature.X509Certificate) ((BasicX509Credential) signingCredential).getEntityCertificate());
+//
+//        keyInfo.getX509Datas().add(data);
+//        sig.setKeyInfo(keyInfo);
+        //SignatureSigningConfiguration signingConfiguration = SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
+
+//        SecurityConfigurationSupport secConfig = (BasicSecurityConfiguration) XMLObjectProviderRegistrySupport.();
+//        secConfig.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
+//        BasicSecurityConfiguration config = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
+//        config.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
+//        SignatureSigningConfiguration secConfig = SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
+//        try {
+//            SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
+//
+//
+//        } catch (SecurityException e) {
+//            throw new SMgrException(e.getMessage(), e);
+//        }
+        //Signer.signObject(sig);
+
+        signableSAMLObject.setSignature(sig);
+        XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(signableSAMLObject).marshall(signableSAMLObject);
 
         try {
-            SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
-
-
-        } catch (SecurityException e) {
-            throw new SMgrException(e.getMessage(), e);
-        }
-
-        as.setSignature(sig);
-        try {
-            Configuration.getMarshallerFactory().getMarshaller(as).marshall(as);
-        } catch (MarshallingException e) {
-            throw new SMgrException(e.getMessage(), e);
-        }
-        try {
-            org.opensaml.xml.signature.Signer.signObject(sig);
-        } catch (Exception e) {
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            Signer.signObject(sig);
+        } catch (SignatureException e) {
+            LOGGER.error("SignatureException: '{}'", e.getMessage(), e);
+            throw new Exception(e);
         }
     }
 
@@ -1306,7 +1359,7 @@ public class EpsosHelperService {
 
     private static <T> T create(Class<T> cls, QName qname) {
 
-        return (T) (Configuration.getBuilderFactory().getBuilder(qname)).buildObject(qname);
+        return (T) (XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(qname)).buildObject(qname);
     }
 
     private static Assertion createAssertion(String username, String role, String organization, String organizationId,
@@ -1335,8 +1388,8 @@ public class EpsosHelperService {
 
         Assertion assertion = null;
         try {
-            DefaultBootstrap.bootstrap();
-            XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+
+            XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
             // Create the NameIdentifier
             SAMLObjectBuilder nameIdBuilder = (SAMLObjectBuilder) builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME);
@@ -1456,7 +1509,7 @@ public class EpsosHelperService {
 
             LOGGER.info("AssertionId: '{}'", assertion.getID());
 
-        } catch (ConfigurationException e) {
+        } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return assertion;
@@ -2289,7 +2342,7 @@ public class EpsosHelperService {
     /**
      * @param input
      * @param lang
-     * @param commonstyle
+     * @param commonStyle
      * @param actionUrl
      * @param showNarrative
      * @return

@@ -68,13 +68,8 @@
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
-            <artifactId>opensaml</artifactId>
+            <artifactId>opensaml-saml-api</artifactId>
             <version>${opensaml.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>xmltooling</artifactId>
-            <version>${xmltooling.version}</version>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>

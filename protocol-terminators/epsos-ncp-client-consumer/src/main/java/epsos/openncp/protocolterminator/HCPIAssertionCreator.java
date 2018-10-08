@@ -20,15 +20,15 @@ import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.*;
-import org.opensaml.saml2.core.impl.AudienceBuilder;
-import org.opensaml.saml2.core.impl.AudienceRestrictionBuilder;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.Namespace;
-import org.opensaml.xml.XMLObjectBuilder;
-import org.opensaml.xml.io.Marshaller;
-import org.opensaml.xml.schema.XSAny;
+import org.opensaml.core.xml.Namespace;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.Marshaller;
+import org.opensaml.core.xml.schema.XSAny;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.*;
+import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
+import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -67,7 +67,7 @@ public class HCPIAssertionCreator {
 
         SAML saml = new SAML();
 
-        org.opensaml.saml2.core.Subject subject = saml.createSubject("physician",
+        Subject subject = saml.createSubject("physician",
                 "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", "sender-vouches");
 
         // Create assertion
@@ -108,13 +108,8 @@ public class HCPIAssertionCreator {
         AttributeStatement attributeStatement = saml.create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
 
         // Namespaces
-        Namespace ns1 = new Namespace();
-        ns1.setNamespacePrefix("xs");
-        ns1.setNamespaceURI("http://www.w3.org/2001/XMLSchema");
-
-        Namespace ns2 = new Namespace();
-        ns2.setNamespacePrefix("xsi");
-        ns2.setNamespaceURI("http://www.w3.org/2001/XMLSchema-instance");
+        Namespace ns1 = new Namespace("http://www.w3.org/2001/XMLSchema", "xs");
+        Namespace ns2 = new Namespace("http://www.w3.org/2001/XMLSchema-instance", "xsi");
 
         // Set HCP Identifier
         if (true) {
@@ -123,13 +118,13 @@ public class HCPIAssertionCreator {
             att.setName("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("physician the");
 
-            attVal.getNamespaceManager().registerNamespace(ns1);
-            attVal.getNamespaceManager().registerNamespace(ns2);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
@@ -144,14 +139,12 @@ public class HCPIAssertionCreator {
             att.setName("urn:oasis:names:tc:xacml:2.0:subject:role");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
-
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("physician");
 
-            attVal.getNamespaceManager().registerNamespace(ns1);
-            attVal.getNamespaceManager().registerNamespace(ns2);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
@@ -166,14 +159,13 @@ public class HCPIAssertionCreator {
             att.setName("urn:epsos:names:wp3.4:subject:clinical-speciality");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("UNKNOWN");
 
-            attVal.getNamespaceManager().registerNamespace(ns1);
-            attVal.getNamespaceManager().registerNamespace(ns2);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
@@ -188,14 +180,13 @@ public class HCPIAssertionCreator {
             att.setName("urn:oasis:names:tc:xspa:1.0:subject:organization");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("MemberState");
 
-            attVal.getNamespaceManager().registerNamespace(ns1);
-            attVal.getNamespaceManager().registerNamespace(ns2);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
@@ -232,14 +223,13 @@ public class HCPIAssertionCreator {
             att.setName("urn:oasis:names:tc:xspa:1.0:subject:organization-id");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("urn:oid:1.2.3.4.5.6.7");
 
-            attVal.getNamespaceManager().registerNamespace(ns1);
-            attVal.getNamespaceManager().registerNamespace(ns2);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
             QName value = new QName("http://www.w3.org/2001/XMLSchema", "anyURI", "xs");
             attVal.getUnknownAttributes().put(attributeName, value);
@@ -255,12 +245,12 @@ public class HCPIAssertionCreator {
             att.setName("urn:epsos:names:wp3.4:subject:healthcare-facility-type");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("Resident Physician");
-            attVal.getNamespaceManager().registerNamespace(ns1);
-            attVal.getNamespaceManager().registerNamespace(ns2);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
@@ -275,14 +265,13 @@ public class HCPIAssertionCreator {
             att.setName("urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("TREATMENT");
 
-            attVal.getNamespaceManager().registerNamespace(ns1);
-            attVal.getNamespaceManager().registerNamespace(ns2);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
@@ -297,14 +286,13 @@ public class HCPIAssertionCreator {
             att.setName("urn:oasis:names:tc:xspa:1.0:environment:locality");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("Vienna, Austria");
 
-            attVal.getNamespaceManager().registerNamespace(ns1);
-            attVal.getNamespaceManager().registerNamespace(ns2);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
@@ -333,13 +321,13 @@ public class HCPIAssertionCreator {
             };
 
             for (String permission : permissions) {
-                XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
+                XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
                 XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
 
                 attVal.setTextContent("urn:oasis:names:tc:xspa:1.0:subject:hl7:permission:" + permission);
-                attVal.getNamespaceManager().registerNamespace(ns1);
-                attVal.getNamespaceManager().registerNamespace(ns2);
+                attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+                attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
                 QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
                 attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
@@ -354,16 +342,14 @@ public class HCPIAssertionCreator {
         // Set Signature
         try {
             // Set assertion.DOM
-            Marshaller marshaller = Configuration.getMarshallerFactory().getMarshaller(assertion);
+            Marshaller marshaller = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion);
             Element elem;
             elem = marshaller.marshall(assertion);
             assertion.setDOM(elem);
 
             // Set factory
-            String providerName = System.getProperty
-                    ("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
-            factory = XMLSignatureFactory.getInstance("DOM",
-                    (Provider) Class.forName(providerName).newInstance());
+            String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+            factory = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
 
             // Set keyStore
             try (FileInputStream is = new FileInputStream(Constants.SC_KEYSTORE_PATH)) {
