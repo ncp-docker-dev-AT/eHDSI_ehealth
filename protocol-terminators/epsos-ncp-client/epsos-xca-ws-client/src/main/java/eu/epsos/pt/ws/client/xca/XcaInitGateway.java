@@ -10,6 +10,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
@@ -61,7 +62,7 @@ public class XcaInitGateway {
                                                   final Assertion idAssertion, final Assertion trcAssertion, String service) throws XCAException {
 
 
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             LOGGER_CLINICAL.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
                     documentCode.getValue(), idAssertion.getID(), trcAssertion.getID(), service);
         }

@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.evidence.utils;
 
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
@@ -135,7 +136,7 @@ public class EvidenceEmitterHandlerUtils {
 
         Element envAsDom = XMLUtils.toDOM(env);
         Document envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             LOGGER_CLINICAL.debug("Pretty printing canonicalized:\n{}", XMLUtil.prettyPrint(envCanonicalized));
         }
         return envCanonicalized;

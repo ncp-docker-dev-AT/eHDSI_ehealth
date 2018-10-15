@@ -12,6 +12,7 @@ import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -243,7 +244,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
             String logRequestBody;
             try {
-                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                     String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
                     loggerClinical.debug(XCPDConstants.LOG.OUTGOING_XCPD_MESSAGE + System.getProperty("line.separator") + logRequestMsg);
                 }
@@ -366,7 +367,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             /* Log soap response */
             String logResponseBody;
             try {
-                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                     String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv));
                     loggerClinical.debug(XCPDConstants.LOG.INCOMING_XCPD_MESSAGE + System.getProperty("line.separator") + logResponseMsg);
                 }

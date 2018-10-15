@@ -3,6 +3,7 @@ package epsos.ccd.netsmart.securitymanager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -200,7 +201,7 @@ public class SamlTRCIssuer {
      */
     public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
                                    List<Attribute> attrValuePair) throws SMgrException {
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             loggerClinical.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
                     hcpIdentityAssertion.getID(), patientID, purposeOfUse);
         }

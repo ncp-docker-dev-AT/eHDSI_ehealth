@@ -14,6 +14,7 @@ import epsos.ccd.posam.tsam.util.CodedElement;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public class TransformationService implements ITransformationService, TMConstant
 
         logger.info("Transforming OpenNCP CDA Document toEpsosPivot [START]");
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             try {
                 loggerClinical.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {
@@ -78,7 +79,7 @@ public class TransformationService implements ITransformationService, TMConstant
 
         logger.info("Translating OpenNCP CDA Document [START]");
         TMResponseStructure responseStructure = process(epSosCDA, targetLanguageCode, false);
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             try {
                 loggerClinical.debug("Translate CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {

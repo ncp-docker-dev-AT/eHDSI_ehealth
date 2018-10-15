@@ -1,6 +1,7 @@
 package eu.epsos.util;
 
 import eu.esens.abb.nonrep.*;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.herasaf.xacml.core.SyntaxException;
 import org.herasaf.xacml.core.api.PDP;
@@ -49,10 +50,41 @@ public class EvidenceUtils {
     private EvidenceUtils() {
     }
 
+    /**
+     * @param messageType
+     * @return
+     */
     private static boolean checkCorrectnessofIHEXCA(final MessageType messageType) {
         return true;
     }
 
+    /**
+     * @param incomingMsg
+     * @param issuerKeyStorePath
+     * @param issuerKeyPassword
+     * @param issuerCertAlias
+     * @param senderKeyStorePath
+     * @param senderKeyPassword
+     * @param senderCertAlias
+     * @param recipientKeyStorePath
+     * @param recipientKeyPassword
+     * @param recipientCertAlias
+     * @param eventType
+     * @param submissionTime
+     * @param status
+     * @param title
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws TOElementException
+     * @throws EnforcePolicyException
+     * @throws ObligationDischargeException
+     * @throws TransformerException
+     * @throws SyntaxException
+     * @throws KeyStoreException
+     * @throws NoSuchAlgorithmException
+     * @throws CertificateException
+     * @throws UnrecoverableKeyException
+     */
     public static void createEvidenceREMNRR(Document incomingMsg, String issuerKeyStorePath, String issuerKeyPassword,
                                             String issuerCertAlias, String senderKeyStorePath, String senderKeyPassword,
                                             String senderCertAlias, String recipientKeyStorePath, String recipientKeyPassword,
@@ -62,7 +94,7 @@ public class EvidenceUtils {
             TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException,
             UnrecoverableKeyException {
 
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'",
                     XMLUtil.documentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
@@ -86,6 +118,34 @@ public class EvidenceUtils {
                 eventType, submissionTime, status, title, msguuid);
     }
 
+    /**
+     * @param incomingMsg
+     * @param issuerKeyStorePath
+     * @param issuerKeyPassword
+     * @param issuerCertAlias
+     * @param senderKeyStorePath
+     * @param senderKeyPassword
+     * @param senderCertAlias
+     * @param recipientKeyStorePath
+     * @param recipientKeyPassword
+     * @param recipientCertAlias
+     * @param eventType
+     * @param submissionTime
+     * @param status
+     * @param title
+     * @param msguuid
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws TOElementException
+     * @throws EnforcePolicyException
+     * @throws ObligationDischargeException
+     * @throws TransformerException
+     * @throws SyntaxException
+     * @throws KeyStoreException
+     * @throws NoSuchAlgorithmException
+     * @throws CertificateException
+     * @throws UnrecoverableKeyException
+     */
     public static void createEvidenceREMNRR(Document incomingMsg, String issuerKeyStorePath, String issuerKeyPassword,
                                             String issuerCertAlias, String senderKeyStorePath, String senderKeyPassword,
                                             String senderCertAlias, String recipientKeyStorePath, String recipientKeyPassword,
@@ -95,7 +155,7 @@ public class EvidenceUtils {
             ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException,
             NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
                     XMLUtil.documentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
@@ -198,19 +258,36 @@ public class EvidenceUtils {
         }
     }
 
+    /**
+     * @param incomingSoap
+     * @param issuerKeyStorePath
+     * @param issuerKeyPassword
+     * @param issuerCertAlias
+     * @param senderKeyStorePath
+     * @param senderKeyPassword
+     * @param senderCertAlias
+     * @param recipientKeyStorePath
+     * @param recipientKeyPassword
+     * @param recipientCertAlias
+     * @param eventType
+     * @param submissionTime
+     * @param status
+     * @param title
+     * @throws Exception
+     */
     public static void createEvidenceREMNRO(Document incomingSoap, String issuerKeyStorePath, String issuerKeyPassword,
                                             String issuerCertAlias, String senderKeyStorePath, String senderKeyPassword,
                                             String senderCertAlias, String recipientKeyStorePath, String recipientKeyPassword,
                                             String recipientCertAlias, String eventType, DateTime submissionTime, String status,
                                             String title) throws Exception {
 
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRO()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'",
                     XMLUtil.documentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType, submissionTime, status, title);
         }
-        MessageType messageType = null;
+        MessageType messageType;
         String msguuid;
         try {
             MessageInspector messageInspector = new MessageInspector(incomingSoap);
@@ -218,10 +295,10 @@ public class EvidenceUtils {
             msguuid = messageInspector.getMessageUUID();
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
-            UnknownMessageType umt = new UnknownMessageType(incomingSoap);
-            messageType = umt;
+            messageType = new UnknownMessageType(incomingSoap);
             msguuid = UUID.randomUUID().toString();
         }
+        LOGGER.info("Evidences for MessageType: '{}'", messageType.getClass());
         createEvidenceREMNRO(incomingSoap, issuerKeyStorePath, issuerKeyPassword,
                 issuerCertAlias, senderKeyStorePath, senderKeyPassword,
                 senderCertAlias, recipientKeyStorePath, recipientKeyPassword,
@@ -229,13 +306,31 @@ public class EvidenceUtils {
 
     }
 
+    /**
+     * @param incomingSoap
+     * @param issuerKeyStorePath
+     * @param issuerKeyPassword
+     * @param issuerCertAlias
+     * @param senderKeyStorePath
+     * @param senderKeyPassword
+     * @param senderCertAlias
+     * @param recipientKeyStorePath
+     * @param recipientKeyPassword
+     * @param recipientCertAlias
+     * @param eventType
+     * @param submissionTime
+     * @param status
+     * @param title
+     * @param msguuid
+     * @throws Exception
+     */
     public static void createEvidenceREMNRO(Document incomingSoap, String issuerKeyStorePath, String issuerKeyPassword,
                                             String issuerCertAlias, String senderKeyStorePath, String senderKeyPassword,
                                             String senderCertAlias, String recipientKeyStorePath, String recipientKeyPassword,
                                             String recipientCertAlias, String eventType, DateTime submissionTime,
                                             String status, String title, String msguuid) throws Exception {
 
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRO()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
                     XMLUtil.documentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
@@ -348,6 +443,9 @@ public class EvidenceUtils {
         }
     }
 
+    /**
+     * @return
+     */
     private static String getPath() {
 
         String exportPath = System.getenv("EPSOS_PROPS_PATH");
@@ -356,11 +454,23 @@ public class EvidenceUtils {
         return evidencesPath;
     }
 
+    /**
+     * @param uuid
+     * @param title
+     * @return
+     */
     private static String getDocumentTitle(String uuid, String title) {
 
         return DateUtil.getCurrentTimeGMT() + "_" + uuid + "_" + title;
     }
 
+    /**
+     * @param file
+     * @return
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
     public static Document readMessage(String file) throws ParserConfigurationException, SAXException, IOException {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -369,6 +479,16 @@ public class EvidenceUtils {
         return db.parse(new File(file));
     }
 
+    /**
+     * @param keyStorePath
+     * @param keyPassword
+     * @param certAlias
+     * @return
+     * @throws KeyStoreException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws CertificateException
+     */
     private static X509Certificate getCertificate(String keyStorePath, String keyPassword, String certAlias)
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
 
@@ -379,6 +499,17 @@ public class EvidenceUtils {
         return (X509Certificate) ks.getCertificate(certAlias);
     }
 
+    /**
+     * @param keyStorePath
+     * @param keyPassword
+     * @param certAlias
+     * @return
+     * @throws KeyStoreException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws CertificateException
+     * @throws UnrecoverableKeyException
+     */
     private static PrivateKey getSigningKey(String keyStorePath, String keyPassword, String certAlias)
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 

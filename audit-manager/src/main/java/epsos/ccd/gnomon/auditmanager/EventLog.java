@@ -3,6 +3,7 @@ package epsos.ccd.gnomon.auditmanager;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -559,7 +560,7 @@ public class EventLog {
         el.setSourceip(NullToEmptyString(sourceip));
         el.setTargetip(NullToEmptyString(targetip));
         el.ncpSide = ncpSide;
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             LOGGER_CLINICAL.info("'{}'", el.toString());
         }
         return el;

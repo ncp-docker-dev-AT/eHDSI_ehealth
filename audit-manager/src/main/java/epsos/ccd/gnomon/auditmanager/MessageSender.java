@@ -7,6 +7,7 @@ import epsos.ccd.gnomon.utils.Utils;
 import eu.epsos.util.audit.AuditLogSerializer;
 import eu.europa.ec.sante.ehdsi.openncp.audit.Configuration;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import net.RFC3881.AuditMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -66,7 +67,7 @@ public class MessageSender extends Thread {
         try {
             logger.info("'{}' - Try to construct the message", auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode());
             String auditmsg = AuditTrailUtils.constructMessage(auditmessage, true);
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                 loggerClinical.debug("Audit Message sent:\n{}", auditmsg);
             }
 

@@ -9,6 +9,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
@@ -132,7 +133,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 eventLog.setSC_UserID(clientDN);
 
                 eventLog.setTargetip(req.getServerName());
-                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                     loggerClinical.info("[Audit Debug] Requester: ParticipantId: '{}'\nObjectDetail: '{}'",
                             getMessageID(msgContext.getEnvelope()), msgContext.getEnvelope().getHeader().toString());
                     loggerClinical.debug("Incoming XCA Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
@@ -166,7 +167,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
                     }
 
-                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                         loggerClinical.debug("Response Header:\n{}", envelope.getHeader().toString());
                         loggerClinical.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
@@ -200,7 +201,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
-                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                         loggerClinical.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
 

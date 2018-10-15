@@ -4,6 +4,7 @@ import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import fi.kela.se.epsos.data.model.ConsentDocumentMetaData;
 import fi.kela.se.epsos.data.model.DocumentAssociation;
 import fi.kela.se.epsos.data.model.EDDocumentMetaData;
@@ -46,7 +47,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
             logger.error("TransformerException while submitDispensation(): '{}'", e.getMessage(), e);
             throwDocumentProcessingException("Cannot parse dispensation!", "4106");
         }
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             loggerClinical.info("eDispensation document content: '{}'", dispensation);
         }
 
@@ -100,7 +101,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
             logger.error("TransformerException: '{}'", e.getMessage(), e);
             throwDocumentProcessingException("Cannot parse consent!", "4106");
         }
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             loggerClinical.info("Patient consent content: '{}'", consent);
         }
     }
@@ -123,7 +124,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
             logger.error("TransformerException: '{}'", e.getMessage(), e);
             throwDocumentProcessingException("Cannot parse HCER!", "4106");
         }
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             loggerClinical.info("HCER document content: '{}'", consent);
         }
     }

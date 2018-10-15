@@ -28,16 +28,15 @@ import java.util.TreeMap;
  */
 public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
 
-    private final Logger logger = LoggerFactory.getLogger(AutomaticDataCollector.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     // Path to the factory.xslt
     private static final String PATH_XSLT_FACTORY = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
             + "EADC_resources" + File.separator + "xslt" + File.separator + "factory.xslt";
     // Path to the config.xml
     private static final String PATH_XML_CONFIG = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
             + "EADC_resources" + File.separator + "config" + File.separator + "config.xml";
-
+    private static final String NCP_SERVER_MODE = "server.ehealth.mode";
+    private final Logger logger = LoggerFactory.getLogger(AutomaticDataCollector.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     // map with one intermediateTransformer per CDA-classcode
     private final TreeMap<String, EasyXsltTransformer> intermediateTransformerList;
     // DOM structure for caching the factory.xslt
@@ -64,8 +63,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     }
 
     /**
-     * Processes a transaction, extracts data according to config.xml and stores
-     * it into the database
+     * Processes a transaction, extracts data according to config.xml and stores it into the database
      *
      * @param transaction    The transaction-xml-structure as specified by the
      *                       XML-Schema
@@ -76,18 +74,16 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
 
         logger.info("Processing a transaction object");
         String sqlInsertStatementList = this.extractDataAndCreateAccordingSqlInserts(transaction);
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(NCP_SERVER_MODE), "PROD")) {
             loggerClinical.info("Insert the following sql-queries:\n'{}'", sqlInsertStatementList);
         }
         this.runSqlScript(dataSourceName, sqlInsertStatementList);
     }
 
     /**
-     * Extracts data from a transaction and creates the according
-     * sql-insert-statements
+     * Extracts data from a transaction and creates the according sql-insert-statements
      *
-     * @param transaction The transaction xml-structure as specified by the
-     *                    XML-Schema
+     * @param transaction The transaction xml-structure as specified by the XML-Schema
      * @return A list of sql-insert-statements
      * @throws Exception
      */
@@ -98,7 +94,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
         String processedDocumentCodeSystem;
         String processedDocumentCodeAndCodeSystemCombination;
 
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(NCP_SERVER_MODE), "PROD")) {
             loggerClinical.debug("XML Document: {}", EadcUtil.convertXMLDocumentToString(transaction));
         }
 

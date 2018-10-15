@@ -17,6 +17,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -908,13 +909,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
         logger.debug("Transforming document, isTranscode: '{}' - Event Type: '{}'", isTranscode, eventLog.getEventType());
         if (eventLog.getReqM_PatricipantObjectDetail() != null) {
             String requester = new String(eventLog.getReqM_PatricipantObjectDetail());
-            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                 loggerClinical.info("Participant Requester: '{}'", requester);
             }
         }
         if (eventLog.getResM_PatricipantObjectDetail() != null) {
             String responder = new String(eventLog.getResM_PatricipantObjectDetail());
-            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                 loggerClinical.info("Participant Responser: '{}'", responder);
             }
         }

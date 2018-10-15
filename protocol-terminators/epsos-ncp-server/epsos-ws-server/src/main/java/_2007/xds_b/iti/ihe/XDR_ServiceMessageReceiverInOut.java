@@ -9,6 +9,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -122,7 +123,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 eventLog.setSC_UserID(clientDN);
                 eventLog.setTargetip(req.getServerName());
 
-                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                     loggerClinical.debug("Incoming XDR Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
                 }
 
@@ -155,7 +156,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateXDRMessage(responseMessage, NcpSide.NCP_A);
                     }
-                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                         loggerClinical.debug("Response Header:\n{}", envelope.getHeader().toString());
                         loggerClinical.debug("Outgoing XDR Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }

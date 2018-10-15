@@ -5,6 +5,7 @@ import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
 import eu.epsos.protocolterminators.ws.server.xcpd.XCPDServiceInterface;
 import eu.epsos.util.EvidenceUtils;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
@@ -578,7 +579,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     sb.append("<id>").append(patientId.getRoot()).append("</id>");
                     sb.append("<extension>").append(patientId.getExtension()).append("</extension>");
                     sb.append("</identifier>");
-                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                         loggerClinical.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
                         loggerClinical.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
                     }

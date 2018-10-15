@@ -6,6 +6,7 @@ import eu.europa.ec.sante.ehdsi.gazelle.validation.util.DetailedResultUnMarshall
 import eu.europa.ec.sante.ehdsi.gazelle.validation.util.ObjectType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.util.XdsModel;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import net.ihe.gazelle.jaxb.result.sante.DetailedResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -275,7 +276,7 @@ public class OpenNCPValidation {
     public static boolean isValidationEnable() {
 
         return ConfigurationManagerFactory.getConfigurationManager().getBooleanProperty("automated.validation") &&
-                !StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD");
+                !StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD");
     }
 
     public static boolean isRemoteValidationEnable() {

@@ -4,6 +4,7 @@ import epsos.ccd.gnomon.auditmanager.IHEEventType;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.util.xdr.XDRConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
@@ -180,7 +181,7 @@ public class EvidenceEmitterHandlerUtils {
 
         Element envAsDom = XMLUtils.toDOM(env);
         Document envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             loggerClinical.debug("Pretty printing canonicalized: \n" + XMLUtil.prettyPrint(envCanonicalized));
         }
         return envCanonicalized;
