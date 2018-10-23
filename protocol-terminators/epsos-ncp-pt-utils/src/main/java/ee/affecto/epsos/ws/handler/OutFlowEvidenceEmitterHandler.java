@@ -3,7 +3,6 @@ package ee.affecto.epsos.ws.handler;
 import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import eu.epsos.util.EvidenceUtils;
 import org.apache.axiom.soap.SOAPBody;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.Handler;
@@ -25,98 +24,99 @@ import org.w3c.dom.Document;
  */
 public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OutFlowEvidenceEmitterHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OutFlowEvidenceEmitterHandler.class);
 
     @Override
     public Handler.InvocationResponse invoke(MessageContext msgcontext) {
 
-        LOG.debug("OutFlow Evidence Emitter handler is executing");
+        LOGGER.debug("OutFlow Evidence Emitter handler is executing");
         EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
+        evidenceEmitterHandlerUtils.printClientCertificateDetails(msgcontext);
 
         /* I'll leave this here as it might be useful in the future */
 
 //        SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
 //        if (soapHeader != null) {
 //            Iterator<?> blocks = soapHeader.examineAllHeaderBlocks();
-//            LOG.debug("Iterating over soap headers");
+//            LOGGER.debug("Iterating over soap headers");
 //            while (blocks.hasNext()) {
-//                LOG.debug("Processing header");
+//                LOGGER.debug("Processing header");
 //                SOAPHeaderBlock block = (SOAPHeaderBlock)blocks.next();
-//                LOG.debug(block.toString());
+//                LOGGER.debug(block.toString());
 //                block.setProcessed();
 //            }
 //        }
 
-//        LOG.debug("LOGGING TEST VALUES");
-//        LOG.debug("MessageContext properties: " + msgcontext.getProperties());
-//        LOG.debug("MessageContext messageID: " + msgcontext.getMessageID());
+//        LOGGER.debug("LOGGING TEST VALUES");
+//        LOGGER.debug("MessageContext properties: " + msgcontext.getProperties());
+//        LOGGER.debug("MessageContext messageID: " + msgcontext.getMessageID());
 //        
 //        SessionContext sessionCtx = msgcontext.getSessionContext();
 //        if (sessionCtx != null) {
-//            LOG.debug("SessionContext CookieID: " + sessionCtx.getCookieID());
+//            LOGGER.debug("SessionContext CookieID: " + sessionCtx.getCookieID());
 //        } else {
-//            LOG.debug("SessionContext is null!");
+//            LOGGER.debug("SessionContext is null!");
 //        }
 
 //        OperationContext operationCtx = msgcontext.getOperationContext();
 //        if (operationCtx != null) {
-//            LOG.debug("OperationContext operationName: " + operationCtx.getOperationName());
-//            LOG.debug("OperationContext serviceGroupName: " + operationCtx.getServiceGroupName());
-//            LOG.debug("OperationContext serviceName; " + operationCtx.getServiceName());
-//            LOG.debug("OperationContext isComplete: " + operationCtx.isComplete());
+//            LOGGER.debug("OperationContext operationName: " + operationCtx.getOperationName());
+//            LOGGER.debug("OperationContext serviceGroupName: " + operationCtx.getServiceGroupName());
+//            LOGGER.debug("OperationContext serviceName; " + operationCtx.getServiceName());
+//            LOGGER.debug("OperationContext isComplete: " + operationCtx.isComplete());
 //        } else {
-//            LOG.debug("OperationContext is null!");
+//            LOGGER.debug("OperationContext is null!");
 //        }
 
 //        ServiceGroupContext serviceGroupCtx = msgcontext.getServiceGroupContext();
 //        if (serviceGroupCtx != null) {
-//            LOG.debug("ServiceGroupContext ID: " + serviceGroupCtx.getId());
+//            LOGGER.debug("ServiceGroupContext ID: " + serviceGroupCtx.getId());
 //            AxisServiceGroup axisServiceGroup = serviceGroupCtx.getDescription();
 //            Iterator<AxisService> itAxisService = axisServiceGroup.getServices();
 //            while (itAxisService.hasNext()) {
 //                AxisService axisService = itAxisService.next();
-//                LOG.debug("AxisService BindingName: " + axisService.getBindingName());
-//                LOG.debug("AxisService CustomSchemaNamePrefix: " + axisService.getCustomSchemaNamePrefix());
-//                LOG.debug("AxisService CustomSchemaNameSuffix: " + axisService.getCustomSchemaNameSuffix());
-//                LOG.debug("AxisService endpointName: " + axisService.getEndpointName());
+//                LOGGER.debug("AxisService BindingName: " + axisService.getBindingName());
+//                LOGGER.debug("AxisService CustomSchemaNamePrefix: " + axisService.getCustomSchemaNamePrefix());
+//                LOGGER.debug("AxisService CustomSchemaNameSuffix: " + axisService.getCustomSchemaNameSuffix());
+//                LOGGER.debug("AxisService endpointName: " + axisService.getEndpointName());
 //                Map<String,AxisEndpoint> axisEndpoints = axisService.getEndpoints();
 //                for (String key : axisEndpoints.keySet()) {
 //                    AxisEndpoint axisEndpoint = axisEndpoints.get(key);
-//                    LOG.debug("AxisEndpoint calculatedEndpointURL: " + axisEndpoint.calculateEndpointURL());
-//                    LOG.debug("AxisEndpoint alias: " + axisEndpoint.getAlias());
-//                    LOG.debug("AxisEndpoint endpointURL: " + axisEndpoint.getEndpointURL());
-//                    LOG.debug("AxisEndpoint active: " + axisEndpoint.isActive());
+//                    LOGGER.debug("AxisEndpoint calculatedEndpointURL: " + axisEndpoint.calculateEndpointURL());
+//                    LOGGER.debug("AxisEndpoint alias: " + axisEndpoint.getAlias());
+//                    LOGGER.debug("AxisEndpoint endpointURL: " + axisEndpoint.getEndpointURL());
+//                    LOGGER.debug("AxisEndpoint active: " + axisEndpoint.isActive());
 //                }
-//                LOG.debug("AxisService EPRs: " + Arrays.toString((String[]) axisService.getEPRs()));
-//                LOG.debug("AxisService name: " + axisService.getName());
-//                LOG.debug("AxisService isClientSide: " + axisService.isClientSide());
+//                LOGGER.debug("AxisService EPRs: " + Arrays.toString((String[]) axisService.getEPRs()));
+//                LOGGER.debug("AxisService name: " + axisService.getName());
+//                LOGGER.debug("AxisService isClientSide: " + axisService.isClientSide());
 //            } 
 //        } else {
-//            LOG.debug("ServiceGroupContext is null!");
+//            LOGGER.debug("ServiceGroupContext is null!");
 //        }
 
 //        ConfigurationContext configCtx = msgcontext.getRootContext();
 //        if (configCtx != null) {
-//            LOG.debug("ConfigurationContext contextRoot: " + configCtx.getContextRoot());
-//            LOG.debug("ConfigurationContext serviceGroupContextIDs: " + Arrays.toString((String[])configCtx.getServiceGroupContextIDs()));
-//            LOG.debug("ConfigurationContext servicePath: " + configCtx.getServicePath());
+//            LOGGER.debug("ConfigurationContext contextRoot: " + configCtx.getContextRoot());
+//            LOGGER.debug("ConfigurationContext serviceGroupContextIDs: " + Arrays.toString((String[])configCtx.getServiceGroupContextIDs()));
+//            LOGGER.debug("ConfigurationContext servicePath: " + configCtx.getServicePath());
 //        } else {
-//            LOG.debug("ConfigurationContext is null!");
+//            LOGGER.debug("ConfigurationContext is null!");
 //        }
 
         try {
-            /* Canonicalizing the full SOAP message */
+            // Canonicalization of the full SOAP message
             Document envCanonicalized = evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(msgcontext.getEnvelope());
 
-            SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
+            //SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
             SOAPBody soapBody = msgcontext.getEnvelope().getBody();
             String eventType;
             String title;
             String msgUUID = null;
             AxisService axisService = msgcontext.getServiceContext().getAxisService();
             boolean isClientSide = axisService.isClientSide();
-            LOG.debug("AxisService name: " + axisService.getName());
-            LOG.debug("AxisService isClientSide: " + isClientSide);
+            LOGGER.debug("AxisService name: '{}' - isClientSide: '{}'", axisService.getName(), isClientSide);
+
             if (isClientSide) {
                 /* NCP-B sends to NCP-A, e.g.: 
                     NRO
@@ -126,8 +126,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
                 eventType = evidenceEmitterHandlerUtils.getEventTypeFromMessage(soapBody);
                 title = "NCPB_" + evidenceEmitterHandlerUtils.getTransactionNameFromMessage(soapBody);
                 //msgUUID = null; It stays as null because it's fetched from soap msg
-                LOG.debug("eventType: " + eventType);
-                LOG.debug("title: " + title);
+                LOGGER.debug("Title: '{}' - eventType: '{}'", title, eventType);
 
                 EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
                         tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
@@ -144,7 +143,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                         title);
             } else {
-                LOG.debug("Server Side");
+                LOGGER.debug("Server Side");
                 /* NCP-A replies to NCP-B, e.g.: 
                     NRO
                     title = "NCPA_XCPD_RES"
@@ -162,9 +161,9 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //                eventType = this.evidenceEmitterHandlerUtils.getEventTypeFromMessage(soapBody);
 //                title = this.evidenceEmitterHandlerUtils.getServerSideTitle(soapBody);
 //                msgUUID = this.evidenceEmitterHandlerUtils.getMsgUUID(soapHeader, soapBody);
-//                LOG.debug("eventType: " + eventType);
-//                LOG.debug("title: " + title);
-//                LOG.debug("msgUUID: " + msgUUID);
+//                LOGGER.debug("eventType: " + eventType);
+//                LOGGER.debug("title: " + title);
+//                LOGGER.debug("msgUUID: " + msgUUID);
 //                
 //                if (msgUUID != null) {
 //                    // this is a Portal-NCPB interaction: msgUUID comes from IdA or is random

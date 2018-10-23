@@ -31,6 +31,7 @@ public class InFlowEvidenceEmitterHandler extends AbstractHandler {
 
         LOGGER.debug("InFlow Evidence Emitter handler is executing");
         EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
+        //HandlerUtil.printClientCertificateDetails(msgContext);
         SOAPHeader soapHeader = msgContext.getEnvelope().getHeader();
         SOAPBody soapBody = msgContext.getEnvelope().getBody();
 

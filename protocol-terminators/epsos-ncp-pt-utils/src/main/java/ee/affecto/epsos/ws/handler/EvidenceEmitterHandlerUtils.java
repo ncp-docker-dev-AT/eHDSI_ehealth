@@ -8,6 +8,8 @@ import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -19,6 +21,8 @@ import tr.com.srdc.epsos.securityman.helper.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.servlet.http.HttpServletRequest;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
@@ -27,10 +31,6 @@ import java.util.*;
  * @author jgoncalves
  */
 public class EvidenceEmitterHandlerUtils {
-
-    private final Logger logger = LoggerFactory.getLogger(EvidenceEmitterHandlerUtils.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
 
     private static final String CLIENT_CONNECTOR_XML_NAMESPACE = "http://clientconnector.protocolterminator.openncp.epsos/";
     private static final String CLIENT_CONNECTOR_SUBMIT_DOCUMENT_REQUEST = "submitDocument";
@@ -41,7 +41,6 @@ public class EvidenceEmitterHandlerUtils {
     private static final String CLIENT_CONNECTOR_QUERY_DOCUMENTS_RESPONSE = "queryDocumentsResponse";
     private static final String CLIENT_CONNECTOR_RETRIEVE_DOCUMENT_REQUEST = "retrieveDocument";
     private static final String CLIENT_CONNECTOR_RETRIEVE_DOCUMENT_RESPONSE = "retrieveDocumentResponse";
-
     private static final List<String> clientConnectorOperations;
     // maps the message type to its related IHE event
     private static final Map<String, String> iheEvents;
@@ -122,6 +121,9 @@ public class EvidenceEmitterHandlerUtils {
         transactionNames = Collections.unmodifiableMap(map);
     }
 
+    private final Logger logger = LoggerFactory.getLogger(EvidenceEmitterHandlerUtils.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
+
     public EvidenceEmitterHandlerUtils() {
     }
 
@@ -182,8 +184,65 @@ public class EvidenceEmitterHandlerUtils {
         Element envAsDom = XMLUtils.toDOM(env);
         Document envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
         if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
-            loggerClinical.debug("Pretty printing canonicalized: \n" + XMLUtil.prettyPrint(envCanonicalized));
+            loggerClinical.debug("Pretty printing canonicalized:\n'{}'", XMLUtil.prettyPrint(envCanonicalized));
         }
         return envCanonicalized;
+    }
+
+    public void printClientCertificateDetails(MessageContext messageContext) {
+
+        MessageContext msgCtx = MessageContext.getCurrentMessageContext();
+        HttpServletRequest obj = (HttpServletRequest) msgCtx.getProperty("transport.http.servletRequest");
+        if (obj != null) {
+            logger.info("HTTP: '{}'", obj.getPathInfo());
+            X509Certificate[] certs = (X509Certificate[]) obj.getAttribute("javax.servlet.request.X509Certificate");
+            if (certs != null) {
+                for (X509Certificate cert : certs) {
+                    logger.info(" Server certificate '{}':", cert.getSerialNumber());
+                    logger.info("  Subject DN: " + cert.getSubjectDN());
+                    logger.info("  Signature Algorithm: " + cert.getSigAlgName());
+                    logger.info("  Valid from: " + cert.getNotBefore());
+                    logger.info("  Valid until: " + cert.getNotAfter());
+                    logger.info("  Issuer: " + cert.getIssuerDN());
+                }
+            } else {
+                logger.info("NULL");
+            }
+        } else {
+            logger.error("HTTP Obj NULL");
+        }
+
+        Iterator<String> propertyNames = messageContext.getPropertyNames();
+
+        if (propertyNames != null) {
+            while (propertyNames.hasNext()) {
+                String info = propertyNames.next();
+                logger.info("Hey There: '{}'", info);
+            }
+            HttpServletRequest httpRequest = (HttpServletRequest) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+
+            if (httpRequest != null) {
+                X509Certificate[] certs = (X509Certificate[]) httpRequest.getAttribute("javax.servlet.request.X509Certificate");
+
+
+                if (certs != null) {
+                    for (int c = 0; c < certs.length; c++) {
+                        X509Certificate cert = certs[c];
+                        logger.info(" Server certificate '{}':", (c + 1));
+                        logger.info("  Subject DN: '{}'", cert.getSubjectDN());
+                        logger.info("  Signature Algorithm: '{}'", cert.getSigAlgName());
+                        logger.info("  Valid from: '{}'", cert.getNotBefore());
+                        logger.info("  Valid until: '{}'", cert.getNotAfter());
+                        logger.info("  Issuer: '{}'", cert.getIssuerDN());
+                    }
+                } else {
+                    logger.info("Certificate Chain from Client is null");
+                }
+            } else {
+                logger.info("HTTP Servlet Request has been null");
+            }
+        } else {
+            logger.error("Property Null");
+        }
     }
 }
