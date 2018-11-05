@@ -83,6 +83,13 @@
 
     <profiles>
         <profile>
+            <id>monitoring</id>
+            <properties>
+                <enable.monitoring.start/>
+                <enable.monitoring.stop/>
+            </properties>
+        </profile>
+        <profile>
             <id>headers</id>
             <build>
                 <plugins>
