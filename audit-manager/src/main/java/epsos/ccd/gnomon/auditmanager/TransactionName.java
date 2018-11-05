@@ -1,14 +1,24 @@
 package epsos.ccd.gnomon.auditmanager;
 
 /**
- * Enumeration for populating the EventType of the AuditMessage One of the
- * availbale epsos event ids epsos-11: epsosIdentificationService epsos-21:
- * epsosPatientService epsos-31: epsosOrderService epsos-41:
- * epsodDispensationServuceInitialize epsos-42: epsodDispensationServuceDiscard
- * epsos-51: epsodConsentServicePut epsos-52: epsodConsentServiceDiscard
- * epsos-53: epsodConsentServicePin epsos-91: epsosHcpAuthentication epsos-92:
- * epsosTRCAssertion epsos-93: epsosNCPTrustedServiceList epsos-94:
- * epsosPivotTranslation epsos-cf: epsosCommunicationFailure
+ * Enumeration for populating the EventType of the AuditMessage
+ * One of the available eHDSI event ids:
+ * <p>
+ * epsos-11:    epsosIdentificationService
+ * epsos-21:    epsosPatientService
+ * epsos-31:    epsosOrderService
+ * epsos-41:    epsodDispensationServuceInitialize
+ * epsos-42:    epsodDispensationServuceDiscard
+ * epsos-51:    epsodConsentServicePut
+ * epsos-52:    epsodConsentServiceDiscard
+ * epsos-53:    epsodConsentServicePin
+ * epsos-91:    epsosHcpAuthentication
+ * epsos-92:    epsosTRCAssertion
+ * epsos-93:    epsosNCPTrustedServiceList
+ * epsos-94:    epsosPivotTranslation
+ * epsos-cf:    epsosCommunicationFailure
+ * ehealth-193: SMP::Query
+ * ehealth-194: SMP::Push
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
