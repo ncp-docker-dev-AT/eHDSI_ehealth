@@ -7,11 +7,11 @@ package epsos.ccd.gnomon.auditmanager;
  * epsos-11:    epsosIdentificationService
  * epsos-21:    epsosPatientService
  * epsos-31:    epsosOrderService
- * epsos-41:    epsodDispensationServuceInitialize
- * epsos-42:    epsodDispensationServuceDiscard
- * epsos-51:    epsodConsentServicePut
- * epsos-52:    epsodConsentServiceDiscard
- * epsos-53:    epsodConsentServicePin
+ * epsos-41:    epsosDispensationServuceInitialize
+ * epsos-42:    epsosDispensationServuceDiscard
+ * epsos-51:    epsosConsentServicePut
+ * epsos-52:    epsosConsentServiceDiscard
+ * epsos-53:    epsosConsentServicePin
  * epsos-91:    epsosHcpAuthentication
  * epsos-92:    epsosTRCAssertion
  * epsos-93:    epsosNCPTrustedServiceList
