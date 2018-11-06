@@ -17,7 +17,9 @@ public class PersonBuilder {
         return create(null, id, country, fName, lName, sex, birthDate);
     }
 
-    public static Person create(String sessionId, String id, String country, String fName, String lName, String gender, String birthDate) {
+    public static Person create(String sessionId, String id, String country, String fName, String lName, String gender,
+                                String birthDate) {
+
         PatientDemographics patientDemographics = new PatientDemographics();
 
         PatientId patientId = new PatientId();
@@ -42,6 +44,7 @@ public class PersonBuilder {
     }
 
     public static Person create() {
-        return create("191212121212", "SE", "Tolvan", "Tolvansson", "M", "19121212");
+        return create("191212121212", "SE", "Tolvan", "Tolvansson",
+                "M", "19121212");
     }
 }
