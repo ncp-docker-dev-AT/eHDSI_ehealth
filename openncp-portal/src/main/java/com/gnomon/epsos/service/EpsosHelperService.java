@@ -1385,6 +1385,9 @@ public class EpsosHelperService {
             // Create and add AuthnContext
             AuthnContext ac = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
             AuthnContextClassRef accr = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
+            //  Default value for SAML Authentication method used by Liferay Portal:
+            //  urn:oasis:names:tc:SAML:2.0:ac:classes:Password
+            //  Based on National Requirements and implementation this value might need to be updated.
             accr.setAuthnContextClassRef(AuthnContext.PASSWORD_AUTHN_CTX);
             ac.setAuthnContextClassRef(accr);
             authStmt.setAuthnContext(ac);
