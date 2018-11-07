@@ -112,8 +112,9 @@ public class AssertionHandler implements Serializable {
         conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
         assertion.setConditions(conditions);
 
+        String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
         Issuer issuer = new IssuerBuilder().buildObject();
-        issuer.setValue("urn:idp:countryB");
+        issuer.setValue("urn:idp:" + countryCode + ":countryB");
         issuer.setNameQualifier("urn:epsos:wp34:assertions");
         assertion.setIssuer(issuer);
 
