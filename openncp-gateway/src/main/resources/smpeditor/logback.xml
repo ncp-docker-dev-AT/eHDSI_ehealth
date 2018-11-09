@@ -14,6 +14,18 @@
         </encoder>
     </appender>
 
+    <appender name="FILE_CLINICAL" class="ch.qos.logback.core.FileAppender">
+        <file>${catalina.base}/logs/openncp-gateway-clinical.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%class{0}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="LOGGER_CLINICAL" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE_CLINICAL"/>
+    </logger>
+
     <!-- Spring Web Service Payload Logging - Uncomment to enable MessageTracing Request/Response-->
     <!--<logger name="org.springframework.ws.client.MessageTracing" level="TRACE" additivity="false">-->
     <!--<appender-ref ref="FILE_CLINICAL"/>-->
@@ -46,5 +58,6 @@
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
+        <appender-ref ref="LOGGER_CLINICAL"/>
     </root>
 </configuration>
