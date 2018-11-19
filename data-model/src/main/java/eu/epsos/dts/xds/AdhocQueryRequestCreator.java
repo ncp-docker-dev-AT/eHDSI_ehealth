@@ -8,23 +8,36 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ValueListType;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 
+/**
+ *
+ */
 public class AdhocQueryRequestCreator {
 
+    /**
+     *
+     */
     private AdhocQueryRequestCreator() {
     }
 
+    /**
+     * @param id
+     * @param homeCommunityId
+     * @param docClassCode
+     * @return
+     */
     public static AdhocQueryRequest createAdhocQueryRequest(String id, String homeCommunityId, GenericDocumentCode docClassCode) {
-        AdhocQueryRequest aqr = new AdhocQueryRequest();
+
+        AdhocQueryRequest adhocQueryRequest = new AdhocQueryRequest();
 
         // Set AdhocQueryRequest/ResponseOption
         ResponseOptionType rot = new ResponseOptionType();
         rot.setReturnComposedObjects(true);
         rot.setReturnType(XCAConstants.AdHocQueryRequest.RESPONSE_OPTIONS_RETURN_TYPE);
-        aqr.setResponseOption(rot);
+        adhocQueryRequest.setResponseOption(rot);
 
         // Create AdhocQueryRequest
-        aqr.setAdhocQuery(new AdhocQueryType());
-        aqr.getAdhocQuery().setId(XCAConstants.AdHocQueryRequest.ID);
+        adhocQueryRequest.setAdhocQuery(new AdhocQueryType());
+        adhocQueryRequest.getAdhocQuery().setId(XCAConstants.AdHocQueryRequest.ID);
 
         // Set XDSDocumentEntryPatientId Slot
         SlotType1 patientId = new SlotType1();
@@ -32,7 +45,7 @@ public class AdhocQueryRequestCreator {
         ValueListType v1 = new ValueListType();
         v1.getValue().add("'" + id + "^^^&" + homeCommunityId + "&" + "ISO'");
         patientId.setValueList(v1);
-        aqr.getAdhocQuery().getSlot().add(patientId);
+        adhocQueryRequest.getAdhocQuery().getSlot().add(patientId);
 
         // Set XDSDocumentEntryStatus Slot
         SlotType1 entryStatus = new SlotType1();
@@ -40,7 +53,7 @@ public class AdhocQueryRequestCreator {
         ValueListType v2 = new ValueListType();
         v2.getValue().add(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_STATUS_SLOT_VALUE);
         entryStatus.setValueList(v2);
-        aqr.getAdhocQuery().getSlot().add(entryStatus);
+        adhocQueryRequest.getAdhocQuery().getSlot().add(entryStatus);
 
         // Set XDSDocumentEntryClassCode Slot
         SlotType1 entryClassCode = new SlotType1();
@@ -48,8 +61,8 @@ public class AdhocQueryRequestCreator {
         ValueListType v3 = new ValueListType();
         v3.getValue().add("('" + docClassCode.getValue() + "^^" + docClassCode.getSchema() + "')");
         entryClassCode.setValueList(v3);
-        aqr.getAdhocQuery().getSlot().add(entryClassCode);
+        adhocQueryRequest.getAdhocQuery().getSlot().add(entryClassCode);
 
-        return aqr;
+        return adhocQueryRequest;
     }
 }
