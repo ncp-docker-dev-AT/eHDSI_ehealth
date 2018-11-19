@@ -157,7 +157,7 @@ public class AssertionsConverter {
         }
 
         orgName = "TRILLIUM GATEWAY";
-        String poc = "POC";
+        String poc = "POC Trillium Bidge";
         // fixed for consent creation AuthorInstitution Validation problem
         String orgId = "TRILLIUMGATEWAY.1";
         String orgType;
