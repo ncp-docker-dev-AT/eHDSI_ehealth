@@ -119,10 +119,6 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
