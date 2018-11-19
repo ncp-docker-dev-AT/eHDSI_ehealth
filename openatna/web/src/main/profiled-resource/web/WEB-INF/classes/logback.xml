@@ -35,7 +35,7 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
-    <logger name="org.openhealthtools.openatna" level="DEBUG" additivity="false">
+    <logger name="org.openhealthtools.openatna" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -43,7 +43,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="org.openhealthtools.openatna" level="DEBUG" additivity="false">
+    <logger name="org.openhealthtools.openatna" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

@@ -14,6 +14,18 @@
         </encoder>
     </appender>
 
+    <appender name="FILE_CLINICAL" class="ch.qos.logback.core.FileAppender">
+        <file>${catalina.base}/logs/openncp-web-portal-clinical.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%class{0}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="LOGGER_CLINICAL" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE_CLINICAL"/>
+    </logger>
+
     <!-- Spring Web Service Payload Logging - Uncomment to enable MessageTracing Request/Response-->
     <!--<logger name="org.springframework.ws.client.MessageTracing" level="TRACE" additivity="false">-->
     <!--<appender-ref ref="FILE_CLINICAL"/>-->
@@ -23,23 +35,23 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
-    <logger name="eu" level="DEBUG" additivity="false">
+    <logger name="eu" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="epsos" level="DEBUG" additivity="false">
+    <logger name="epsos" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="tr" level="DEBUG" additivity="false">
+    <logger name="tr" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="fi.kela.se" level="DEBUG" additivity="false">
+    <logger name="fi.kela.se" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="se.sb.epsos.web" level="DEBUG" additivity="false">
+    <logger name="se.sb.epsos.web" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -47,11 +59,11 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="epsos.ccd.gnomon.configmanager" level="DEBUG" additivity="false">
+    <logger name="epsos.ccd.gnomon.configmanager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="DEBUG" additivity="false">
+    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

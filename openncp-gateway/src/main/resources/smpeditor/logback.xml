@@ -35,11 +35,11 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
-    <logger name="eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor" level="DEBUG" additivity="false">
+    <logger name="eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="DEBUG" additivity="false">
+    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -47,7 +47,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="epsos.ccd.gnomon.auditmanager" level="DEBUG" additivity="false">
+    <logger name="epsos.ccd.gnomon.auditmanager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

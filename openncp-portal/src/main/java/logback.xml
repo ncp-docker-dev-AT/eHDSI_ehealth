@@ -26,7 +26,7 @@
         <appender-ref ref="FILE_CLINICAL"/>
     </logger>
 
-    <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="DEBUG" additivity="false">
+    <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -39,7 +39,7 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
-    <logger name="com.gnomon.epsos" level="DEBUG" additivity="false">
+    <logger name="com.gnomon.epsos" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -47,7 +47,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="epsos.ccd.gnomon.auditmanager" level="DEBUG" additivity="false">
+    <logger name="epsos.ccd.gnomon.auditmanager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -55,23 +55,23 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="DEBUG" additivity="false">
+    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="eu.europa.ec.sante.ehdsi.openncp.configmanager" level="DEBUG" additivity="false">
+    <logger name="eu.europa.ec.sante.ehdsi.openncp.configmanager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="epsos.ccd.gnomon.configmanager" level="DEBUG" additivity="false">
+    <logger name="epsos.ccd.gnomon.configmanager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="eu.epsos.pt.cc" level="DEBUG" additivity="false">
+    <logger name="eu.epsos.pt.cc" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="epsos.ccd.netsmart.securitymanager.sts.client" level="DEBUG" additivity="false">
+    <logger name="epsos.ccd.netsmart.securitymanager.sts.client" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -79,7 +79,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="epsos.openncp.protocolterminator" level="DEBUG" additivity="false">
+    <logger name="epsos.openncp.protocolterminator" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
