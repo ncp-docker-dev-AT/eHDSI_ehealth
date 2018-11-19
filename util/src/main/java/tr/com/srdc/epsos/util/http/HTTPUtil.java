@@ -6,6 +6,7 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.security.x509.X500Name;
 import tr.com.srdc.epsos.util.Constants;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -39,7 +40,11 @@ public class HTTPUtil {
 
         if (certs != null && certs.length > 0) {
 
-            result = certs[0].getSubjectDN().getName();
+            try {
+                result = ((X500Name) certs[0].getSubjectDN()).getCommonName();
+            } catch (IOException e) {
+                result = "Warning!: No Client certificate found!";
+            }
         } else {
             if ("https".equals(request.getScheme())) {
                 LOGGER.warn("This was an HTTPS request, " + "but no client certificate is available");
@@ -81,7 +86,7 @@ public class HTTPUtil {
                 // Get the first certificate
                 if (certs != null && certs.length > 0) {
                     X509Certificate cert = (X509Certificate) certs[0];
-                    result = cert.getSubjectDN().getName();
+                    result = ((X500Name) cert.getSubjectDN()).getCommonName();
                 } else {
                     result = "Warning!: No Server certificate found!";
                 }
@@ -125,9 +130,9 @@ public class HTTPUtil {
                 cert = keystore.getCertificate(Constants.SC_PRIVATEKEY_ALIAS);
             }
             if (cert instanceof X509Certificate) {
-                X509Certificate x509cert = (X509Certificate) cert;
-                Principal principal = x509cert.getSubjectDN();
-                return principal.getName();
+                X509Certificate x509Certificate = (X509Certificate) cert;
+                Principal principal = x509Certificate.getSubjectDN();
+                return ((X500Name) principal).getCommonName();
             }
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
             LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
@@ -138,7 +143,7 @@ public class HTTPUtil {
     /**
      * @return
      */
-    public static boolean isProxyAnthenticationMandatory() {
+    public static boolean isProxyAuthenticationMandatory() {
 
         ConfigurationManager configService = ConfigurationManagerFactory.getConfigurationManager();
 
@@ -166,7 +171,7 @@ public class HTTPUtil {
     public CustomProxySelector setCustomProxyServerForURLConnection() {
 
         CustomProxySelector ps;
-        if (isProxyAnthenticationMandatory()) {
+        if (isProxyAuthenticationMandatory()) {
             ProxyCredentials proxyCredentials = getProxyCredentials();
             ps = new CustomProxySelector(ProxySelector.getDefault(), proxyCredentials);
             return ps;
