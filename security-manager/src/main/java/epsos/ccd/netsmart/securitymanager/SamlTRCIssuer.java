@@ -223,7 +223,7 @@ public class SamlTRCIssuer {
 
         DateTime nowUTC = new DateTime(DateTimeZone.UTC);
 
-        logger.info("Assertion validity: '{}' - '{}", hcpIdentityAssertion.getConditions().getNotBefore(),
+        logger.info("Assertion validity: '{}' - '{}'", hcpIdentityAssertion.getConditions().getNotBefore(),
                 hcpIdentityAssertion.getConditions().getNotOnOrAfter());
         if (hcpIdentityAssertion.getConditions().getNotBefore().isAfter(nowUTC.toDateTime())) {
             String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used before " +
@@ -239,6 +239,16 @@ public class SamlTRCIssuer {
         }
 
         auditDataMap.put("hcpIdAssertionID", hcpIdentityAssertion.getID());
+
+        if (hcpIdentityAssertion.getAttributeStatements() != null) {
+            for (AttributeStatement attributeStatement : hcpIdentityAssertion.getAttributeStatements()) {
+                for (Attribute attribute : attributeStatement.getAttributes()) {
+                    logger.info("[SAML] Attribute: '{}' - Friendly Name: '{}'", attribute.getName(), attribute.getFriendlyName());
+                }
+            }
+        } else {
+            logger.info("HCP Identity Assertion: '{}' - Attributes Statements Size: '{}'", hcpIdentityAssertion.getID(), hcpIdentityAssertion.getAttributeStatements().size());
+        }
 
         // Create the assertion
         Assertion trc = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
@@ -330,7 +340,6 @@ public class SamlTRCIssuer {
         //Creating the Attribute that holds the Purpose of Use
         Attribute attrPoU = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
         attrPoU.setFriendlyName("XSPA Purpose Of Use");
-
         // TODO: Is there a constant for that urn??
         attrPoU.setName("urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
         attrPoU.setNameFormat(Attribute.URI_REFERENCE);
@@ -338,7 +347,7 @@ public class SamlTRCIssuer {
             attrPoU = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                     "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
             if (attrPoU == null) {
-                throw new SMgrException("Puprose of use not found in the assertion and is not passed as a parameter");
+                throw new SMgrException("Purpose of Use not found in the assertion and is not passed as a parameter");
             }
         } else {
             XSString attrValPoU = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
@@ -347,28 +356,45 @@ public class SamlTRCIssuer {
         }
         attrStmt.getAttributes().add(attrPoU);
 
-        String poc = ((XSString) findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-                "urn:oasis:names:tc:xspa:1.0:subject:organization").getAttributeValues().get(0)).getValue();
+//        String poc = ((XSString) findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+//                "urn:oasis:names:tc:xspa:1.0:subject:organization").getAttributeValues().get(0)).getValue();
+        Attribute pointOfCareAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+                "urn:oasis:names:tc:xspa:1.0:subject:organization");
+        if (pointOfCareAttr != null) {
+            String poc = ((XSString) pointOfCareAttr.getAttributeValues().get(0)).getValue();
+            logger.info("Point of Care: '{}'", poc);
+            auditDataMap.put("pointOfCare", poc);
+        } else {
+            pointOfCareAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+                    "urn:oasis:names:tc:xspa:1.0:environment:locality");
+            String poc = ((XSString) pointOfCareAttr.getAttributeValues().get(0)).getValue();
+            logger.info("Point of Care XSPA Locality: '{}'", poc);
+            auditDataMap.put("pointOfCare", poc);
+        }
 
-        logger.info("Point of Care: {0}", poc);
-        auditDataMap.put("pointOfCare", poc);
-
-        String pocId = ((XSURI) findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-                "urn:oasis:names:tc:xspa:1.0:subject:organization-id").getAttributeValues().get(0)).getValue();
-
-        logger.info("Point of Care id: {0}", pocId);
-        auditDataMap.put("pointOfCareID", pocId);
+//        String pocId = ((XSURI) findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+//                "urn:oasis:names:tc:xspa:1.0:subject:organization-id").getAttributeValues().get(0)).getValue();
+        Attribute pointOfCareIdAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+                "urn:oasis:names:tc:xspa:1.0:subject:organization-id");
+        if (pointOfCareIdAttr != null) {
+            String pocId = ((XSString) pointOfCareIdAttr.getAttributeValues().get(0)).getValue();
+            logger.info("Point of Care id: '{}'", pocId);
+            auditDataMap.put("pointOfCareID", pocId);
+        } else {
+            logger.info("Point of Care: '{}'", "No Organization ID - POC information");
+            auditDataMap.put("pointOfCare", "No Organization ID - POC information");
+        }
 
         String hrRole = ((XSString) findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xacml:2.0:subject:role").getAttributeValues().get(0)).getValue();
 
-        logger.info("HR Role {0}", hrRole);
+        logger.info("HR Role '{}'", hrRole);
         auditDataMap.put("humanRequestorRole", hrRole);
 
         String facilityType = ((XSString) findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:epsos:names:wp3.4:subject:healthcare-facility-type").getAttributeValues().get(0)).getValue();
 
-        logger.info("Facility Type {0}", facilityType);
+        logger.info("Facility Type '{}'", facilityType);
         auditDataMap.put("facilityType", facilityType);
 
         sman.signSAMLAssertion(trc);
@@ -425,11 +451,14 @@ public class SamlTRCIssuer {
      */
     protected Attribute findStringInAttributeStatement(List<AttributeStatement> statements, String attrName) {
 
-        logger.info("Size:{0}", statements.size());
+        logger.info("Attribute Statement list size: '{}'", statements.size());
         for (AttributeStatement stmt : statements) {
+
             for (Attribute attribute : stmt.getAttributes()) {
+
                 if (attribute.getName().equals(attrName)) {
-                    logger.info("Attribute Name:{0}", attribute.getName());
+
+                    logger.info("Attribute Name: '{}'", attribute.getName());
                     Attribute attr = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
 
                     attr.setFriendlyName(attribute.getFriendlyName());
@@ -455,11 +484,11 @@ public class SamlTRCIssuer {
      */
     protected Attribute findURIInAttributeStatement(List<AttributeStatement> statements, String attrName) {
 
-        logger.info("Size:{0}", statements.size());
+        logger.info("Size: '{}'", statements.size());
         for (AttributeStatement stmt : statements) {
             for (Attribute attribute : stmt.getAttributes()) {
                 if (attribute.getName().equals(attrName)) {
-                    logger.info("Attribute Name:{0}", attribute.getName());
+                    logger.info("Attribute Name:'{}'", attribute.getName());
                     Attribute attr = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
 
                     attr.setFriendlyName(attribute.getFriendlyName());
@@ -486,9 +515,9 @@ public class SamlTRCIssuer {
     protected NameID findProperNameID(Subject subject) {
 
         String format = subject.getNameID().getFormat();
-        logger.info("is email?: {0}", format.equals(NameID.EMAIL));
-        logger.info("is x509 subject?: {0}", format.equals(NameID.X509_SUBJECT));
-        logger.info("is Unspecified?: {0}", format.equals(NameID.UNSPECIFIED));
+        logger.info("is email?: '{}'", format.equals(NameID.EMAIL));
+        logger.info("is x509 subject?: '{}'", format.equals(NameID.X509_SUBJECT));
+        logger.info("is Unspecified?: '{}'", format.equals(NameID.UNSPECIFIED));
         NameID n = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
         n.setFormat(format);
         n.setValue(subject.getNameID().getValue());
@@ -515,7 +544,7 @@ public class SamlTRCIssuer {
      * @return
      */
     public String getPointofCare() {
-        logger.info("Point Of Care: {0}", auditDataMap.get("pointOfCare"));
+        logger.info("Point Of Care: '{}'", auditDataMap.get("pointOfCare"));
         return auditDataMap.get("pointOfCare");
     }
 
@@ -523,7 +552,7 @@ public class SamlTRCIssuer {
      * @return
      */
     public String getPointofCareID() {
-        logger.info("Point Of Care ID: {0}", auditDataMap.get("pointOfCareID"));
+        logger.info("Point Of Care ID: '{}'", auditDataMap.get("pointOfCareID"));
         return auditDataMap.get("pointOfCareID");
     }
 
@@ -531,7 +560,7 @@ public class SamlTRCIssuer {
      * @return
      */
     public String getHumanRequestorNameId() {
-        logger.info("human Requestor NameID: {0}", auditDataMap.get("humanRequestorNameID"));
+        logger.info("human Requestor NameID: '{}'", auditDataMap.get("humanRequestorNameID"));
         return auditDataMap.get("humanRequestorNameID");
     }
 
@@ -539,7 +568,7 @@ public class SamlTRCIssuer {
      * @return
      */
     public String getHumanRequestorSubjectId() {
-        logger.info("human Requestor subjectID: {0}", auditDataMap.get("humanRequestorSubjectID"));
+        logger.info("human Requestor subjectID: '{}'", auditDataMap.get("humanRequestorSubjectID"));
         return auditDataMap.get("humanRequestorSubjectID");
     }
 
@@ -547,7 +576,7 @@ public class SamlTRCIssuer {
      * @return
      */
     public String getHRRole() {
-        logger.info("human Requestor Role: {0}", auditDataMap.get("humanRequestorRole"));
+        logger.info("human Requestor Role: '{}'", auditDataMap.get("humanRequestorRole"));
         return auditDataMap.get("humanRequestorRole");
     }
 
@@ -555,7 +584,7 @@ public class SamlTRCIssuer {
      * @return
      */
     public String getFacilityType() {
-        logger.info("Facility Type: {0}", auditDataMap.get("facilityType"));
+        logger.info("Facility Type: '{}'", auditDataMap.get("facilityType"));
         return auditDataMap.get("facilityType");
     }
 }

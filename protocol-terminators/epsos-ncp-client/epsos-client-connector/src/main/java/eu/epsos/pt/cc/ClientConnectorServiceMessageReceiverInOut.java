@@ -20,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml2.core.Attribute;
+import org.opensaml.saml2.core.AttributeStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -144,6 +146,26 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                     QueryPatientDocument wrappedParam = (QueryPatientDocument) fromOM(reqEnv.getBody().getFirstElement(),
                             QueryPatientDocument.class, getEnvelopeNamespaces(reqEnv));
 
+                    if (hcpAssertion != null && hcpAssertion.getAttributeStatements() != null) {
+                        LOGGER.info("Attribute Statements Size: '{}'", hcpAssertion.getAttributeStatements().size());
+                    }
+                    for (AttributeStatement attributeStatement : hcpAssertion.getAttributeStatements()) {
+
+                        for (Iterator<Attribute> attributeIterator = attributeStatement.getAttributes().iterator(); attributeIterator.hasNext(); ) {
+
+                            Attribute attribute = attributeIterator.next();
+                            LOGGER.info("[SAML] Attribute: '{}' - Friendly Name: '{}'", attribute.getName(), attribute.getFriendlyName());
+//                            if (StringUtils.equals(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:subject:organization") ||
+//                                    StringUtils.equals(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:subject:organization-id")) {
+//                                attributeIterator.remove();
+//                            }
+                        }
+                    }
+                    for (AttributeStatement attributeStatement : hcpAssertion.getAttributeStatements()) {
+                        for (Attribute attribute : attributeStatement.getAttributes()) {
+                            LOGGER.info("[SAML UPDATED] Attribute: '{}' - Friendly Name: '{}'", attribute.getName(), attribute.getFriendlyName());
+                        }
+                    }
                     QueryPatientResponseDocument queryPatientResponse13 = skel.queryPatient(wrappedParam, hcpAssertion);
                     envelope = toEnvelope(getSOAPFactory(msgContext), queryPatientResponse13);
                 }

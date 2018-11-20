@@ -9,17 +9,13 @@ import org.slf4j.LoggerFactory;
 import sun.security.x509.X500Name;
 import tr.com.srdc.epsos.util.Constants;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ProxySelector;
 import java.net.URL;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -55,6 +51,73 @@ public class HTTPUtil {
         }
         LOGGER.debug("Client Certificate: '{}'", result);
         return result;
+    }
+
+    public static String getTlsCertificateCommonName(String host) {
+
+        Certificate[] certificates = getSSLPeerCertificate(host, false);
+        if (certificates != null && certificates.length > 0) {
+            X509Certificate cert = (X509Certificate) certificates[0];
+            try {
+                return ((X500Name) cert.getSubjectDN()).getCommonName();
+            } catch (IOException e) {
+                LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            }
+        }
+        return "Warning!: No Server certificate found!";
+    }
+
+    public static Certificate[] getSSLPeerCertificate(String host, boolean sslValidation) {
+
+        HttpsURLConnection con = null;
+
+        if (!sslValidation) {
+            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                @Override
+                public void checkClientTrusted(X509Certificate[] arg0, String arg1) {
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] arg0, String arg1) {
+                }
+            }
+            };
+            // Install the all-trusting trust manager
+            SSLContext sc = null;
+            try {
+                sc = SSLContext.getInstance("TLSv1.2");
+
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
+            }
+            try {
+                URL url;
+                url = new URL(host);
+                con = (HttpsURLConnection) url.openConnection();
+                //TODO: not sustainable solution: EHNCP-1363
+                con.setHostnameVerifier((hostname, session) -> true);
+                // End EHNCP-1363
+                con.setSSLSocketFactory(sc.getSocketFactory());
+                con.connect();
+                return con.getServerCertificates();
+            } catch (IOException e) {
+                LOGGER.error("IOException: '{}'", e.getMessage(), e);
+            } finally {
+
+                if (con != null) {
+                    con.disconnect();
+                }
+            }
+        }
+        return new Certificate[]{};
     }
 
     /**
