@@ -136,8 +136,8 @@ public final class TMServices {
     }
 
     /**
-     * Handles errors resulted from the translation process. It currently only prints them to LOG,
-     * later to be replaced with portal answer.
+     * Handles errors resulted from the translation process. It currently only prints them to LOG, later to be
+     * replaced with portal answer.
      *
      * @param errors List of CDA transformation errors/warnings.
      */
@@ -149,7 +149,7 @@ public final class TMServices {
         LOGGER.debug("TRANSLATION PROCESS ERRORS:");
 
         for (ITMTSAMEror error : errors) {
-            LOGGER.info("Error: (Code: " + error.getCode() + ", Description: " + error.getDescription());
+            LOGGER.debug("Error: (Code: '{}', Description: '{}'", error.getCode(), error.getDescription());
             sb.append("Error: (Code: ").append(error.getCode()).append(", Description: ").append(error.getDescription());
             sb.append("\n");
         }
