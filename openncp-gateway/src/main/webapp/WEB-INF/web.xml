@@ -37,7 +37,7 @@
     <listener>
         <listener-class>net.bull.javamelody.SessionListener</listener-class>
     </listener>
-    ${enable.monitoring.start}
+    ${enable.monitoring.stop}
 
     <filter-mapping>
         <filter-name>springMultipartFilter</filter-name>
