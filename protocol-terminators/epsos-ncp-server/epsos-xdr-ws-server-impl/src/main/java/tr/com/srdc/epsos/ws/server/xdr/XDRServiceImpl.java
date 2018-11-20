@@ -109,8 +109,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
             LOGGER.error("DatatypeConfigurationException: {}", e.getMessage(), e);
         }
         if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
-            for (int i = 0; i < request.getSubmitObjectsRequest()
-                    .getRegistryObjectList().getIdentifiable().size(); i++) {
+
+            for (int i = 0; i < request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().size(); i++) {
                 if (!(request.getSubmitObjectsRequest().getRegistryObjectList()
                         .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
                     continue;
@@ -123,7 +123,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         documentId = eit.getValue();
                     }
                 }
-                eventLog.setET_ObjectID(documentId);
+                eventLog.getEventTargetParticipantObjectIds().add(documentId);
                 break;
             }
         }
@@ -167,14 +167,14 @@ public class XDRServiceImpl implements XDRServiceInterface {
         }
 
         if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
+
             for (int i = 0; i < request.getSubmitObjectsRequest()
                     .getRegistryObjectList().getIdentifiable().size(); i++) {
                 if (!(request.getSubmitObjectsRequest().getRegistryObjectList()
                         .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
                     continue;
                 }
-                ExtrinsicObjectType eot = (ExtrinsicObjectType) request
-                        .getSubmitObjectsRequest().getRegistryObjectList()
+                ExtrinsicObjectType eot = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
                         .getIdentifiable().get(i).getValue();
                 String documentId = "";
                 for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
@@ -182,7 +182,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         documentId = eit.getValue();
                     }
                 }
-                eventLog.setET_ObjectID(documentId);
+                eventLog.getEventTargetParticipantObjectIds().add(documentId);
                 break;
             }
         }
