@@ -1966,7 +1966,7 @@
                             <effectiveTime>
                                 <low value="20170415"/>
                             </effectiveTime>
-                            <value xsi:type="PQ" value="0.5" unit="{maço}/d"/>
+                            <value xsi:type="PQ" value="0.5" unit="{packs}/d"/>
                         </observation>
                     </entry>
                     <entry>
