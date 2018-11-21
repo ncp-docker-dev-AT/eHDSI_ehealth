@@ -72,8 +72,6 @@ public class HTTPUtil {
     private static Certificate[] getSSLPeerCertificate(String host, boolean sslValidation) {
 
         HttpsURLConnection con = null;
-        String clientKeystorePath = ConfigurationManagerFactory.getConfigurationManager().getProperty(Constants.SC_KEYSTORE_PATH);
-        String clientKeystorePwd = ConfigurationManagerFactory.getConfigurationManager().getProperty(Constants.SC_KEYSTORE_PASSWORD);
 
         if (!sslValidation) {
 
@@ -94,13 +92,13 @@ public class HTTPUtil {
             }
             };
 
-            try (InputStream is = getKeystoreInputStream(clientKeystorePath)) {
+            try (InputStream is = getKeystoreInputStream(Constants.SC_KEYSTORE_PATH)) {
 
                 // Install the all-trusting trust manager
                 KeyStore keyStore = KeyStore.getInstance("JKS");
-                keyStore.load(is, clientKeystorePwd.toCharArray());
+                keyStore.load(is, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
                 KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-                keyManagerFactory.init(keyStore, clientKeystorePwd.toCharArray());
+                keyManagerFactory.init(keyStore, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
 
                 // Install the all-trusting trust manager
                 SSLContext sc;
