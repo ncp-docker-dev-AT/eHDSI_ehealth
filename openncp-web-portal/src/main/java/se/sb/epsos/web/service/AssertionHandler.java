@@ -252,8 +252,8 @@ public class AssertionHandler implements Serializable {
         }
 
         String secHead = "[No security header provided]";
-        String reqm_participantObjectID = "urn:uuid:" + assertion.getID();
-        String resm_participantObjectID = "urn:uuid:" + assertion.getID();
+        String reqm_participantObjectID = Constants.UUID_PREFIX + assertion.getID();
+        String resm_participantObjectID = Constants.UUID_PREFIX + assertion.getID();
 
         InetAddress sourceIP;
         String sourceHost;
@@ -276,7 +276,7 @@ public class AssertionHandler implements Serializable {
         String SP_UserID = name;
 
         String AS_AuditSourceId = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-        String ET_ObjectID = "urn:uuid:" + assertion.getID();
+        String ET_ObjectID = Constants.UUID_PREFIX + assertion.getID();
 
         AuditService asd = getAuditService();
         GregorianCalendar c = new GregorianCalendar();
@@ -288,15 +288,11 @@ public class AssertionHandler implements Serializable {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog = EventLog.createEventLogHCPIdentity(
-                TransactionName.epsosHcpAuthentication,
-                EventActionCode.EXECUTE, date2,
-                EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID,
-                HR_UserID, HR_RoleID, HR_AlternativeUserID, SC_UserID,
-                SP_UserID, AS_AuditSourceId, ET_ObjectID,
-                reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                sourceHost, "N/A", NcpSide.NCP_B);
+        EventLog eventLog = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
+                date2, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
+                SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID,
+                secHead.getBytes(StandardCharsets.UTF_8), resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
+                sourceHost, sourceHost, NcpSide.NCP_B);
         eventLog.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog, "13", "2");
         LOGGER.debug("################################################");

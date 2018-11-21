@@ -1029,7 +1029,8 @@ public class EpsosHelperService {
                 } else {
                     auditPointOfCare = poc;
                 }
-                EpsosHelperService.sendAuditEpsos91(user.getFullName(), user.getEmailAddress(), auditPointOfCare, orgType, rolename, assertion.getID());
+                EpsosHelperService.handleHCPIdentificationAudit(user.getFullName(), user.getEmailAddress(), auditPointOfCare, orgType,
+                        rolename, assertion.getID());
             }
             // GUI-25
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
@@ -1148,7 +1149,7 @@ public class EpsosHelperService {
             if (assertion != null) {
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
                 LOGGER.debug("Sending epsos-91 audit message for '{}'", fullname);
-                EpsosHelperService.sendAuditEpsos91(fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
+                EpsosHelperService.handleHCPIdentificationAudit(fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
             }
             // GUI-25
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
@@ -1179,42 +1180,41 @@ public class EpsosHelperService {
     }
 
     /**
-     * @param fullname
+     * @param fullName
      * @param email
      * @param orgName
      * @param orgType
-     * @param rolename
+     * @param roleName
      * @param message
      */
-    public static void sendAuditEpsos91(String fullname, String email, String orgName, String orgType, String rolename,
-                                        String message) {
+    private static void handleHCPIdentificationAudit(String fullName, String email, String orgName, String orgType, String roleName,
+                                         String message) {
 
-        String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-        String KEYSTORE_LOCATION = Constants.NCP_SIG_KEYSTORE_PATH;
-        String KEY_STORE_PASS = Constants.NCP_SIG_KEYSTORE_PASSWORD;
-        LOGGER.info("KEY_ALIAS: '{}'", Constants.NCP_SIG_PRIVATEKEY_ALIAS);
+        String ncpKeyAlias = Constants.SC_PRIVATEKEY_ALIAS;
+        String ncpKeystorePath = Constants.SC_KEYSTORE_PATH;
+        String ncpKeystorePassword = Constants.SC_KEYSTORE_PASSWORD;
+        LOGGER.info("eHNCP Service Consumer KEY_ALIAS: '{}'", ncpKeyAlias);
 
-        if (Validator.isNull(KEY_ALIAS)) {
+        if (Validator.isNull(ncpKeyAlias)) {
             LOGGER.error("Problem reading configuration parameters");
             return;
         }
         java.security.cert.Certificate cert;
         String name = "N/A";
-        try (FileInputStream is = new FileInputStream(KEYSTORE_LOCATION)) {
+        try (FileInputStream is = new FileInputStream(ncpKeystorePath)) {
 
             // Load the keystore in the user's home directory
             KeyStore keystore = KeyStore.getInstance("JKS");
-            keystore.load(is, KEY_STORE_PASS.toCharArray());
-            LOGGER.info("Keystore loaded ...");
+            keystore.load(is, ncpKeystorePassword.toCharArray());
 
             // Get certificate
-            cert = keystore.getCertificate(KEY_ALIAS);
-            if (LOGGER.isInfoEnabled() && cert != null) {
-                LOGGER.info("Certificate loaded ... '{}'", cert.getPublicKey().toString());
-                java.security.cert.Certificate[] chain = keystore.getCertificateChain(KEY_ALIAS);
+            cert = keystore.getCertificate(ncpKeyAlias);
+            if (cert != null) {
+
+                java.security.cert.Certificate[] chain = keystore.getCertificateChain(ncpKeyAlias);
                 X509Certificate x509Certificate = ((X509Certificate) chain[0]);
                 name = ((X500Name) x509Certificate.getSubjectDN()).getCommonName();
-                LOGGER.info("Certificate Common Name: '{}'", name);
+                LOGGER.info("TLS Common Name: '{}'", name);
 
             }
         } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
@@ -1222,8 +1222,8 @@ public class EpsosHelperService {
         }
 
         String secHead = "[No security header provided]";
-        String reqm_participantObjectID = "urn:uuid:" + message;
-        String resm_participantObjectID = "urn:uuid:" + message;
+        String requestMsgParticipantObjectID = Constants.UUID_PREFIX + message;
+        String responseMsgParticipantObjectID = Constants.UUID_PREFIX + message;
 
         InetAddress sourceIP = null;
         try {
@@ -1235,37 +1235,37 @@ public class EpsosHelperService {
 
         String PC_UserID = orgName + "<saml:" + email + ">";
         String PC_RoleID = orgType;
-        String HR_UserID = fullname + "<saml:" + email + ">";
-        String HR_RoleID = rolename;
+        String HR_UserID = fullName + "<saml:" + email + ">";
+        String HR_RoleID = roleName;
         String HR_AlternativeUserID = "";
         String SC_UserID = name;
         String SP_UserID = name;
 
         String AS_AuditSourceId = Constants.COUNTRY_PRINCIPAL_SUBDIVISION;
-        String ET_ObjectID = "urn:uuid:" + message;
+        String ET_ObjectID = Constants.UUID_PREFIX + message;
 
         AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
-        XMLGregorianCalendar date2 = null;
+        XMLGregorianCalendar eventDateTime = null;
         try {
-            date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+            eventDateTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
-        EventLog eventLog1;
+        EventLog hcpIdentificationEventLog;
         String hostSource = "UnknownHost";
         if (sourceIP != null) {
             hostSource = sourceIP.getHostAddress();
         }
-        eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
-                date2, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
-                SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8), hostSource, "localhost", NcpSide.NCP_B);
+        hcpIdentificationEventLog = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
+                eventDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
+                SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, requestMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
+                responseMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8), hostSource, hostSource, NcpSide.NCP_B);
 
         LOGGER.info("The audit has been prepared");
-        eventLog1.setEventType(EventType.epsosHcpAuthentication);
-        asd.write(eventLog1, "13", "2");
+        hcpIdentificationEventLog.setEventType(EventType.epsosHcpAuthentication);
+        asd.write(hcpIdentificationEventLog, "13", "2");
     }
 
     private static Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String friendlyName, String oasisName) {
