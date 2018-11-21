@@ -11,8 +11,10 @@ import tr.com.srdc.epsos.util.Constants;
 
 import javax.net.ssl.*;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ProxySelector;
 import java.net.URL;
 import java.security.*;
@@ -67,11 +69,14 @@ public class HTTPUtil {
         return "Warning!: No Server certificate found!";
     }
 
-    public static Certificate[] getSSLPeerCertificate(String host, boolean sslValidation) {
+    private static Certificate[] getSSLPeerCertificate(String host, boolean sslValidation) {
 
         HttpsURLConnection con = null;
+        String clientKeystorePath = ConfigurationManagerFactory.getConfigurationManager().getProperty(Constants.SC_KEYSTORE_PATH);
+        String clientKeystorePwd = ConfigurationManagerFactory.getConfigurationManager().getProperty(Constants.SC_KEYSTORE_PASSWORD);
 
         if (!sslValidation) {
+
             TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
 
                 @Override
@@ -88,28 +93,32 @@ public class HTTPUtil {
                 }
             }
             };
-            // Install the all-trusting trust manager
-            SSLContext sc = null;
-            try {
-                sc = SSLContext.getInstance("TLSv1.2");
 
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            try (InputStream is = getKeystoreInputStream(clientKeystorePath)) {
+
+                // Install the all-trusting trust manager
+                KeyStore keyStore = KeyStore.getInstance("JKS");
+                keyStore.load(is, clientKeystorePwd.toCharArray());
+                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+                keyManagerFactory.init(keyStore, clientKeystorePwd.toCharArray());
+
+                // Install the all-trusting trust manager
+                SSLContext sc;
+                sc = SSLContext.getInstance("TLSv1.2");
+                sc.init(keyManagerFactory.getKeyManagers(), trustAllCerts, new java.security.SecureRandom());
                 HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
-            }
-            try {
+
                 URL url;
                 url = new URL(host);
                 con = (HttpsURLConnection) url.openConnection();
-                //TODO: not sustainable solution: EHNCP-1363
                 con.setHostnameVerifier((hostname, session) -> true);
-                // End EHNCP-1363
                 con.setSSLSocketFactory(sc.getSocketFactory());
                 con.connect();
                 return con.getServerCertificates();
-            } catch (IOException e) {
-                LOGGER.error("IOException: '{}'", e.getMessage(), e);
+
+            } catch (IOException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException
+                    | KeyManagementException | CertificateException e) {
+                LOGGER.error("Error: '{}'", e.getMessage(), e);
             } finally {
 
                 if (con != null) {
@@ -118,6 +127,24 @@ public class HTTPUtil {
             }
         }
         return new Certificate[]{};
+    }
+
+    private static InputStream getKeystoreInputStream(String location) {
+
+        try {
+            File file = new File(location);
+            if (file.exists()) {
+                return new FileInputStream(file);
+            }
+            URL url = new URL(location);
+            return url.openStream();
+
+        } catch (Exception e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+        }
+
+        LOGGER.warn("Could not open stream to: '{}'", location);
+        return null;
     }
 
     /**
