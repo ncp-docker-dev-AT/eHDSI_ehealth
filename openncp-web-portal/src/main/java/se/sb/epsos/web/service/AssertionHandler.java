@@ -267,7 +267,7 @@ public class AssertionHandler implements Serializable {
 
         String email = userDetails.getUserId() + "@" + configurationManager.getProperty("ncp.country");
 
-        String PC_UserID = userDetails.getOrganizationName() + "<saml:" + email + ">";
+        String PC_UserID = userDetails.getOrganizationName();
         String PC_RoleID = "Other";
         String HR_UserID = userDetails.getCommonName() + "<saml:" + email + ">";
         String HR_RoleID = AssertionHandlerConfigManager.getRoleDisplayName(userDetails.getRoles().get(0));

@@ -1188,7 +1188,7 @@ public class EpsosHelperService {
      * @param message
      */
     private static void handleHCPIdentificationAudit(String fullName, String email, String orgName, String orgType, String roleName,
-                                         String message) {
+                                                     String message) {
 
         String ncpKeyAlias = Constants.SC_PRIVATEKEY_ALIAS;
         String ncpKeystorePath = Constants.SC_KEYSTORE_PATH;
@@ -1233,7 +1233,7 @@ public class EpsosHelperService {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
 
-        String PC_UserID = orgName + "<saml:" + email + ">";
+        String PC_UserID = orgName;
         String PC_RoleID = orgType;
         String HR_UserID = fullName + "<saml:" + email + ">";
         String HR_RoleID = roleName;
