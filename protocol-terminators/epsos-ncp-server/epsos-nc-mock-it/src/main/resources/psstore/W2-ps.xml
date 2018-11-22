@@ -772,10 +772,10 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <id extension="493" root="2.4.5.0.2545055583.3.0.14"/>
-                                    <code code="J45" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"
-                                          codeSystemName="ICD-10" codeSystemVersion="2016"
-                                          displayName="Asthme">
-                                    </code>
+                                    <code code="404684003"
+                                          codeSystem="2.16.840.1.113883.6.96"
+                                          displayName="Clinical finding"
+                                          codeSystemName="SNOMED CT"/>
                                     <text><reference value="#problem0"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
@@ -806,11 +806,10 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <id extension="40930008" root="2.4.5.0.2545055583.3.0.14"/>
-                                    <code code="E03.9"
-                                          codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"
-                                          codeSystemName="ICD-10" codeSystemVersion="2016"
-                                          displayName="Hypothyroïdie, sans précision">
-                                    </code>
+                                    <code code="404684003"
+                                          codeSystem="2.16.840.1.113883.6.96"
+                                          displayName="Clinical finding"
+                                          codeSystemName="SNOMED CT"/>
                                     <text><reference value="#problem1"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
@@ -841,11 +840,10 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <id extension="42789" root="2.4.5.0.2545055583.3.0.14"/>
-                                    <code code="I49.8"
-                                          codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"
-                                          codeSystemName="ICD-10" codeSystemVersion="2016"
-                                          displayName="Autres arythmies cardiaques précisées">
-                                    </code>
+                                    <code code="404684003"
+                                          codeSystem="2.16.840.1.113883.6.96"
+                                          displayName="Clinical finding"
+                                          codeSystemName="SNOMED CT"/>
                                     <text><reference value="#problem2"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
@@ -877,10 +875,10 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <id extension="25000" root="2.4.5.0.2545055583.3.0.14"/>
-                                    <code code="E11" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"
-                                          codeSystemName="ICD-10" codeSystemVersion="2016"
-                                          displayName="Diabète sucré de type 2">
-                                    </code>
+                                    <code code="404684003"
+                                          codeSystem="2.16.840.1.113883.6.96"
+                                          displayName="Clinical finding"
+                                          codeSystemName="SNOMED CT"/>
                                     <text><reference value="#problem3"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
@@ -911,11 +909,10 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <id extension="6425" root="2.4.5.0.2545055583.3.0.14"/>
-                                    <code code="O14.1"
-                                          codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"
-                                          codeSystemName="ICD-10" codeSystemVersion="2016"
-                                          displayName="Prééclampsie sévère">
-                                    </code>
+                                    <code code="404684003"
+                                          codeSystem="2.16.840.1.113883.6.96"
+                                          displayName="Clinical finding"
+                                          codeSystemName="SNOMED CT"/>
                                     <text><reference value="#problem4"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
@@ -962,10 +959,10 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <id extension="59010" root="2.4.5.0.2545055583.3.0.14"/>
-                                    <code code="N10" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"
-                                          codeSystemName="ICD-10" codeSystemVersion="2016"
-                                          displayName="Néphrite tubulo-interstitielle aigüe">
-                                    </code>
+                                    <code code="404684003"
+                                          codeSystem="2.16.840.1.113883.6.96"
+                                          displayName="Clinical finding"
+                                          codeSystemName="SNOMED CT"/>
                                     <text><reference value="#problem5"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
@@ -2048,10 +2045,10 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <id root="2.7.0.2053903421.4.0.33"/>
-                                    <code code="C73" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"
-                                          codeSystemName="ICD-10" codeSystemVersion="2016"
-                                          displayName="Tumeur maligne de la thyroïde">
-                                    </code>
+                                    <code code="404684003"
+                                          codeSystem="2.16.840.1.113883.6.96"
+                                          displayName="Clinical finding"
+                                          codeSystemName="SNOMED CT"/>
                                     <text><reference value="#pastProblem0"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
@@ -2086,11 +2083,10 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <id root="2.7.0.2053903421.4.0.33"/>
-                                    <code code="O24.4"
-                                          codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"
-                                          codeSystemName="ICD-10" codeSystemVersion="2016"
-                                          displayName="Diabète sucré survenant au cours de la grossesse">
-                                    </code>
+                                    <code code="404684003"
+                                          codeSystem="2.16.840.1.113883.6.96"
+                                          displayName="Clinical finding"
+                                          codeSystemName="SNOMED CT"/>
                                     <text><reference value="#pastProblem1"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
