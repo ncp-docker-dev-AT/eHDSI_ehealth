@@ -382,7 +382,7 @@ public class SamlTRCIssuer {
             auditDataMap.put("pointOfCareID", pocId);
         } else {
             logger.info("Point of Care: '{}'", "No Organization ID - POC information");
-            auditDataMap.put("pointOfCare", "No Organization ID - POC information");
+            auditDataMap.put("pointOfCareID", "No Organization ID - POC information");
         }
 
         String hrRole = ((XSString) findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),

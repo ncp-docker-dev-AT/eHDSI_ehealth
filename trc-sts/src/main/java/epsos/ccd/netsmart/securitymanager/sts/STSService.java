@@ -172,8 +172,7 @@ public class STSService implements Provider<SOAPMessage> {
             sendTRCAuditMessage(samlTRCIssuer.getPointofCare(), samlTRCIssuer.getHumanRequestorNameId(),
                     samlTRCIssuer.getHumanRequestorSubjectId(), samlTRCIssuer.getHRRole(), patientID,
                     samlTRCIssuer.getFacilityType(), trc.getID(), sslCommonName, mid,
-                    strReqHeader.getBytes(StandardCharsets.UTF_8),
-                    getMessageIdFromHeader(response.getSOAPHeader()),
+                    strReqHeader.getBytes(StandardCharsets.UTF_8), getMessageIdFromHeader(response.getSOAPHeader()),
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
 
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
