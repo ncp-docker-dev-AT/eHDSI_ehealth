@@ -372,13 +372,10 @@ public class SamlTRCIssuer {
             auditDataMap.put("pointOfCare", poc);
         }
 
-//        String pocId = ((XSURI) findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-//                "urn:oasis:names:tc:xspa:1.0:subject:organization-id").getAttributeValues().get(0)).getValue();
-        //Attribute pointOfCareIdAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
         Attribute pointOfCareIdAttr = findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization-id");
         if (pointOfCareIdAttr != null) {
-            String pocId = ((XSString) pointOfCareIdAttr.getAttributeValues().get(0)).getValue();
+            String pocId = ((XSURI) pointOfCareIdAttr.getAttributeValues().get(0)).getValue();
             logger.info("Point of Care id: '{}'", pocId);
             auditDataMap.put("pointOfCareID", pocId);
         } else {

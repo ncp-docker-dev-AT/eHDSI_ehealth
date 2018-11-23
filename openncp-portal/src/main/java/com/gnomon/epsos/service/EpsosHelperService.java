@@ -1012,10 +1012,8 @@ public class EpsosHelperService {
                     orgType = "Hospital";
                 }
             }
-            String purposeOfUse = "TREATMENT";
-            if (isEmergency) {
-                purposeOfUse = "EMERGENCY";
-            }
+            String purposeOfUse = isEmergency ? "EMERGENCY" : "TREATMENT";
+
             assertion = EpsosHelperService.createAssertion(username, rolename, orgName, organizationId, orgType, purposeOfUse, poc, permissions);
 
             // send Audit message
@@ -1023,7 +1021,7 @@ public class EpsosHelperService {
             if (assertion != null) {
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
                 LOGGER.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
-                String auditPointOfCare = "";
+                String auditPointOfCare;
                 if (StringUtils.isNotBlank(orgName)) {
                     auditPointOfCare = orgName;
                 } else {
@@ -1591,8 +1589,6 @@ public class EpsosHelperService {
 
         String filename = "InternationalSearch.xml";
         try {
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            ExternalContext externalContext = facesContext.getExternalContext();
             String wi = Constants.EPSOS_PROPS_PATH;
             String path = wi + "forms" + File.separator + filename;
             File file = new File(path);
@@ -1601,10 +1597,10 @@ public class EpsosHelperService {
             Document doc = db.parse(file);
             doc.getDocumentElement().normalize();
             NodeList nodeLst = doc.getElementsByTagName("country");
-            String seperator = "";
+            String separator = "";
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 if (listOfCountries.length() > 1) {
-                    seperator = ",";
+                    separator = ",";
                 }
                 Element link = (Element) nodeLst.item(s);
                 String a1 = EpsosHelperService.getPortalTranslation(
@@ -1612,7 +1608,7 @@ public class EpsosHelperService {
                 List<SearchMask> v = getCountryIdsFromCS(link.getAttribute("code"));
                 SearchMask sm = v.get(0);
                 if (sm.getDomain() != null) {
-                    listOfCountries = listOfCountries + seperator + a1;
+                    listOfCountries = listOfCountries + separator + a1;
                 }
 
             }
@@ -2311,7 +2307,7 @@ public class EpsosHelperService {
     /**
      * @param input
      * @param lang
-     * @param commonstyle
+     * @param commonStyle
      * @param actionUrl
      * @param showNarrative
      * @return
@@ -2569,19 +2565,17 @@ public class EpsosHelperService {
         GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
         LOGGER.info("Document: '{}'-'{}'", documentid, doctype);
 
+        classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
         if (StringUtils.equals(doctype, "ep")) {
             classCode.setNodeRepresentation(Constants.EP_CLASSCODE);
-            classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.EP_TITLE);
         }
         if (StringUtils.equals(doctype, "ps")) {
             classCode.setNodeRepresentation(Constants.PS_CLASSCODE);
-            classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.PS_TITLE);
         }
         if (StringUtils.equals(doctype, "mro")) {
             classCode.setNodeRepresentation(Constants.MRO_CLASSCODE);
-            classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.MRO_TITLE);
         }
 
