@@ -374,7 +374,8 @@ public class SamlTRCIssuer {
 
 //        String pocId = ((XSURI) findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
 //                "urn:oasis:names:tc:xspa:1.0:subject:organization-id").getAttributeValues().get(0)).getValue();
-        Attribute pointOfCareIdAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+        //Attribute pointOfCareIdAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+        Attribute pointOfCareIdAttr = findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization-id");
         if (pointOfCareIdAttr != null) {
             String pocId = ((XSString) pointOfCareIdAttr.getAttributeValues().get(0)).getValue();
