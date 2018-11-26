@@ -167,8 +167,6 @@ public class STSService implements Provider<SOAPMessage> {
             }
 
             sslCommonName = HTTPUtil.getSubjectDN(false);
-            logger.info("TLS Common Name: '{}'", sslCommonName);
-
             sendTRCAuditMessage(samlTRCIssuer.getPointofCare(), samlTRCIssuer.getHumanRequestorNameId(),
                     samlTRCIssuer.getHumanRequestorSubjectId(), samlTRCIssuer.getHRRole(), patientID,
                     samlTRCIssuer.getFacilityType(), trc.getID(), sslCommonName, mid,
@@ -366,8 +364,7 @@ public class STSService implements Provider<SOAPMessage> {
         ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
         //TODO: Review Audit Trail specification - Identifying SC and SP as value of CN from TLS certificate.
         EventLog evLogTRC = EventLog.createEventLogTRCA(TransactionName.epsosTRCAssertion, EventActionCode.EXECUTE,
-                date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, cms.getProperty("ncp.country")
-                        + "<" + humanRequestorNameID + "@" + cms.getProperty("ncp.country") + ">", humanRequestorRole,
+                date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID, humanRequestorRole,
                 humanRequestorSubjectID, tls_cn, trcCommonName, cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"), patientID,
                 "urn:uuid:" + assertionId, reqMid, reqSecHeader, resMid, resSecHeader, STSUtils.getServerIP(),
                 getClientIP(), NcpSide.NCP_B);
