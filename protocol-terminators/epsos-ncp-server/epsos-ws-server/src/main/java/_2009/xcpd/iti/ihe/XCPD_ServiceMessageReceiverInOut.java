@@ -46,8 +46,6 @@ import java.util.*;
 public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
@@ -67,6 +65,8 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             wsContext = jc;
         }
     }
+
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private String getIPofSender(MessageContext messageContext) {
 
@@ -103,8 +103,8 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
             String clientDN = HTTPUtil.getClientCertificate(req);
             eventLog.setSC_UserID(clientDN);
-            eventLog.setTargetip(req.getServerName());
-
+            eventLog.setTargetip(HTTPUtil.getHostIpAddress(req.getServerName()));
+            
             if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                 loggerClinical.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
             }

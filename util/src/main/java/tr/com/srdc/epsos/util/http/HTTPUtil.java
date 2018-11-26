@@ -15,8 +15,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.ProxySelector;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -25,6 +27,14 @@ import java.security.cert.X509Certificate;
 public class HTTPUtil {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(HTTPUtil.class);
+
+    public static String getHostIpAddress(String host) {
+        try {
+            return InetAddress.getByName(host).getHostAddress();
+        } catch (UnknownHostException e) {
+            return "Server IP Unknown";
+        }
+    }
 
     /**
      * @param request
