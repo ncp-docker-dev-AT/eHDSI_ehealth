@@ -78,7 +78,9 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         } catch (DatatypeConfigurationException e) {
             logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
         }
-        eventLog.setHR_UserID(Constants.HR_ID_PREFIX + "<" + Helper.getUserID(sh) + "@" + Helper.getOrganization(sh) + ">");
+        String userIdAlias = Helper.getAssertionsSPProvidedId(sh);
+        eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + Helper.getUserID(sh)
+                + "@" + Helper.getAssertionsIssuer(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getRoleID(sh));
         // Add point of care to the event log for assertion purposes
@@ -695,7 +697,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);
             logger.error(e.getMessage(), e);
         } catch (Exception e) {
-            
+
             fillOutputMessage(outputMessage, e.getMessage(), ERROR_ANSWER_NOT_AVAILABLE);
             logger.error(e.getMessage(), e);
         }
