@@ -142,7 +142,6 @@ public class DynamicDiscoveryService {
         try {
             if (!refresh) {
                 try {
-                    testAudit();
                     return ConfigurationManagerFactory.getConfigurationManager().getProperty(key);
                 } catch (PropertyNotFoundException e) {
                     LOGGER.warn("PropertyNotFoundException: '{}'", e.getMessage());
@@ -265,32 +264,6 @@ public class DynamicDiscoveryService {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
             throw new ConfigurationManagerException(e);
         }
-    }
-
-    private void testAudit() {
-        //Audit vars
-        String ncp = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
-        String ncpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.email");
-        String country = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-        //Target Gateway ???
-        String remoteip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");
-        //Source Gateway ???
-        String localip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");
-        String smp = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT");
-        String smpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT_EMAIL");
-        //ET_ObjectID --> Base64 of url
-        //String objectID = getAddress().toString(); //ParticipantObjectID
-        String objectID = "ParticipantObjectID";
-        byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
-        if (encodedObjectID != null) {
-            LOGGER.info("encodedObjectID not NULL");
-        } else {
-            LOGGER.info("encodedObjectID NULL");
-        }
-        LOGGER.info("Sending audit trail");
-        //TODO: Request Audit SMP Query
-        sendAuditQuery(ncp, ncpemail, smp, smpemail, country, localip, remoteip, new String(encodedObjectID),
-                null, null);
     }
 
     private void storeEndpointCertificate(String endpointId, X509Certificate certificate) {
