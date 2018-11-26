@@ -269,7 +269,9 @@ public class AssertionHandler implements Serializable {
 
         String PC_UserID = userDetails.getOrganizationName();
         String PC_RoleID = "Other";
-        String HR_UserID = userDetails.getCommonName() + "<saml:" + email + ">";
+        String userIdAlias = assertion.getSubject().getNameID().getSPProvidedID();
+        String HR_UserID = StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + assertion.getSubject().getNameID().getValue()
+                + "@" + assertion.getIssuer().getValue() + ">";
         String HR_RoleID = AssertionHandlerConfigManager.getRoleDisplayName(userDetails.getRoles().get(0));
         String HR_AlternativeUserID = userDetails.getCommonName();
         String SC_UserID = name;
@@ -281,15 +283,15 @@ public class AssertionHandler implements Serializable {
         AuditService asd = getAuditService();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
-        XMLGregorianCalendar date2 = null;
+        XMLGregorianCalendar eventLogDateTime = null;
         try {
-            date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+            eventLogDateTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
         EventLog eventLog = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
-                date2, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
+                eventLogDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID,
                 secHead.getBytes(StandardCharsets.UTF_8), resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
                 sourceHost, sourceHost, NcpSide.NCP_B);
