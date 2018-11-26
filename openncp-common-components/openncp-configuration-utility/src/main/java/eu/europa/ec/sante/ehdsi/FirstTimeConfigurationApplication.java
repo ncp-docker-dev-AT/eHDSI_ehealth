@@ -1,6 +1,5 @@
 package eu.europa.ec.sante.ehdsi;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -20,7 +19,7 @@ public class FirstTimeConfigurationApplication {
     public FirstTimeConfigurationApplication() {
     }
 
-    public static void main(String[] args) throws ConfigurationException {
+    public static void main(String[] args) {
 
         LOGGER.info("Starting Import process...");
         ApplicationContext context = SpringApplication.run(FirstTimeConfigurationApplication.class, args);
