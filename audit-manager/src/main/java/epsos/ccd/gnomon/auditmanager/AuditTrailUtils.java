@@ -323,7 +323,7 @@ public enum AuditTrailUtils {
         if (am != null) {
             //  TODO: Audit - Event Target
             addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), null,
-                    "SMP", "eHealth Security", "SignedServiceMetadata");
+                    "SMP", "eHealth DSI Security", "SignedServiceMetadata");
         }
         return am;
     }
@@ -339,7 +339,7 @@ public enum AuditTrailUtils {
         AuditMessage am = createAuditTrailForEhealthSMPPush(eventLog);
         if (am != null) {
             addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), null,
-                    "SMP", "eHealth Security", "SignedServiceMetadata");
+                    "SMP", "eHealth DSI Security", "SignedServiceMetadata");
         }
         return am;
     }
