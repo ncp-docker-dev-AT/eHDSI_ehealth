@@ -84,9 +84,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getRoleID(sh));
         // Add point of care to the event log for assertion purposes
-        eventLog.setPC_UserID(Helper.getPC_UserID(sh));
+        eventLog.setPC_UserID(Helper.getPointOfCareUserId(sh));
         eventLog.setPC_RoleID(Helper.getPC_RoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
+
         II source_ii;
         II target_ii;
         if (!inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().isEmpty()) {

@@ -184,6 +184,8 @@ public class EventLogClientUtil {
         String humanReqUserId = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + idAssertion.getSubject().getNameID().getValue()
                 + "@" + idAssertion.getIssuer().getValue() + ">";
         eventLog.setHR_UserID(humanReqUserId);
+        boolean isOrganizationProvided = false;
+
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
             for (Attribute attribute : attributeStatement.getAttributes()) {
                 if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xacml:1.0:subject:subject-id")) {
@@ -192,7 +194,10 @@ public class EventLogClientUtil {
                     eventLog.setHR_RoleID(EventLogUtil.getAttributeValue(attribute));
                 } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:epsos:names:wp3.4:subject:healthcare-facility-type")) {
                     eventLog.setPC_RoleID(EventLogUtil.getAttributeValue(attribute));
-                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:environment:locality")) {
+                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:subject:organization")) {
+                    eventLog.setPC_UserID(EventLogUtil.getAttributeValue(attribute));
+                    isOrganizationProvided = true;
+                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:environment:locality") && !isOrganizationProvided) {
                     eventLog.setPC_UserID(EventLogUtil.getAttributeValue(attribute));
                 }
             }

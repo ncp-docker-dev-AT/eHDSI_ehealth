@@ -115,12 +115,20 @@ public class Helper {
         return result;
     }
 
-    public static String getPC_UserID(Element sh) {
+    /**
+     * Util method which return the Point of Care information related to the HCP assertions, based on the element provided
+     * Organization is the subject:Organization (Optional) value or if not present the environment:locality value (Required).
+     *
+     * @param sh
+     * @return
+     */
+    public static String getPointOfCareUserId(Element sh) {
+
         String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:organization", false);
         if (result == null) {
-            return "N/A";
+            result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:environment:locality", false);
         }
-        return result;
+        return StringUtils.isBlank(result) ? "N/A" : result;
     }
 
     public static String getOrganizationId(Element sh) {
