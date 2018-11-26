@@ -1029,7 +1029,7 @@ public class EpsosHelperService {
                 } else {
                     auditPointOfCare = poc;
                 }
-                EpsosHelperService.handleHCPIdentificationAudit(user.getFullName(), user.getEmailAddress(), auditPointOfCare, orgType,
+                EpsosHelperService.handleHCPIdentificationAudit(assertion, user.getFullName(), user.getEmailAddress(), auditPointOfCare, orgType,
                         rolename, assertion.getID());
             }
             // GUI-25
@@ -1149,7 +1149,7 @@ public class EpsosHelperService {
             if (assertion != null) {
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
                 LOGGER.debug("Sending epsos-91 audit message for '{}'", fullname);
-                EpsosHelperService.handleHCPIdentificationAudit(fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
+                EpsosHelperService.handleHCPIdentificationAudit(assertion, fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
             }
             // GUI-25
             if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
@@ -1187,8 +1187,8 @@ public class EpsosHelperService {
      * @param roleName
      * @param message
      */
-    private static void handleHCPIdentificationAudit(String fullName, String email, String orgName, String orgType, String roleName,
-                                                     String message) {
+    private static void handleHCPIdentificationAudit(Assertion assertion, String fullName, String email, String orgName,
+                                                     String orgType, String roleName, String message) {
 
         String ncpKeyAlias = Constants.SC_PRIVATEKEY_ALIAS;
         String ncpKeystorePath = Constants.SC_KEYSTORE_PATH;
@@ -1235,9 +1235,17 @@ public class EpsosHelperService {
 
         String PC_UserID = orgName;
         String PC_RoleID = orgType;
-        String HR_UserID = fullName + "<saml:" + email + ">";
+        String spProvidedID = assertion.getSubject().getNameID().getSPProvidedID();
+        String HR_UserID = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + assertion.getSubject().getNameID().getValue()
+                + "@" + assertion.getIssuer().getValue() + ">";
         String HR_RoleID = roleName;
-        String HR_AlternativeUserID = "";
+        //Human readable name of the HP as given in the Subject-ID attribute of the HP identity assertion
+
+        //String HR_AlternativeUserID = assertion.getAttributeStatements().get;
+        Attribute subjectIdAttr = findStringInAttributeStatement(assertion.getAttributeStatements(),
+                "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+        String HR_AlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
+        //String HR_AlternativeUserID = "";
         String SC_UserID = name;
         String SP_UserID = name;
 
@@ -1266,6 +1274,29 @@ public class EpsosHelperService {
         LOGGER.info("The audit has been prepared");
         hcpIdentificationEventLog.setEventType(EventType.epsosHcpAuthentication);
         asd.write(hcpIdentificationEventLog, "13", "2");
+    }
+
+    private static Attribute findStringInAttributeStatement(List<AttributeStatement> statements, String attrName) {
+
+        for (AttributeStatement stmt : statements) {
+            for (Attribute attribute : stmt.getAttributes()) {
+                if (attribute.getName().equals(attrName)) {
+                    
+                    Attribute attr = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
+                    attr.setFriendlyName(attribute.getFriendlyName());
+                    attr.setName(attribute.getNameFormat());
+                    attr.setNameFormat(attribute.getNameFormat());
+
+                    XMLObjectBuilder stringBuilder = org.opensaml.xml.Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
+                    XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
+                    attrVal.setValue(((XSString) attribute.getAttributeValues().get(0)).getValue());
+                    attr.getAttributeValues().add(attrVal);
+
+                    return attr;
+                }
+            }
+        }
+        return null;
     }
 
     private static Attribute createAttribute(XMLObjectBuilderFactory builderFactory, String friendlyName, String oasisName) {
