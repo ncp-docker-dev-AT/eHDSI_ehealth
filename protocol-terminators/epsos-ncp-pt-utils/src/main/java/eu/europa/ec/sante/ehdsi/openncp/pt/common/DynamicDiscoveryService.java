@@ -25,6 +25,7 @@ import org.oasis_open.docs.bdxr.ns.smp._2016._05.ServiceEndpointList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -82,20 +83,20 @@ public class DynamicDiscoveryService {
             } catch (DatatypeConfigurationException ex) {
                 LOGGER.error(null, ex);
             }
+            String smpServer = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");
+            String serviceConsumerUserId = HTTPUtil.getSubjectDN(false);
+            String serviceProviderUserId = HTTPUtil.getTlsCertificateCommonName(smpServer);
 
-            String sc_userid = sc_fullname + "<saml:" + sc_email + ">";
-            String sp_userid = sp_fullname + "<saml:" + sp_email + ">";
-
-            EventLog eventLog1 = EventLog.createEventLogPatientPrivacy(TransactionName.ehealthSMPQuery,
-                    EventActionCode.EXECUTE, date2, EventOutcomeIndicator.FULL_SUCCESS, null, null,
-                    null, sc_userid, sp_userid, partid, null, EM_PatricipantObjectID,
-                    EM_PatricipantObjectDetail, objectID, null, new byte[1],
-                    null, new byte[1], sourceip, targetip);
+            EventLog eventLog1 = EventLog.createEventLogPatientPrivacy(TransactionName.ehealthSMPQuery, EventActionCode.EXECUTE,
+                    date2, EventOutcomeIndicator.FULL_SUCCESS, null, null, null,
+                    serviceConsumerUserId, serviceProviderUserId, partid, null, EM_PatricipantObjectID,
+                    EM_PatricipantObjectDetail, objectID, null, new byte[1], null,
+                    new byte[1], sourceip, targetip);
             eventLog1.setNcpSide(NcpSide.NCP_B);
             eventLog1.setEventType(EventType.ehealthSMPQuery);
-            // facility = 13 --> log audit | severity = 2 --> Critical: critical
-            // conditions
+
             // According to https://tools.ietf.org/html/rfc5424 (Syslog Protocol)
+            // facility = 13 --> log audit | severity = 2 --> Critical: critical conditions
             asd.write(eventLog1, "13", "2");
 
         } catch (Exception e) {
@@ -141,9 +142,10 @@ public class DynamicDiscoveryService {
         try {
             if (!refresh) {
                 try {
+                    testAudit();
                     return ConfigurationManagerFactory.getConfigurationManager().getProperty(key);
                 } catch (PropertyNotFoundException e) {
-                    LOGGER.error("PropertyNotFoundException: '{}'", e.getMessage(), e);
+                    LOGGER.warn("PropertyNotFoundException: '{}'", e.getMessage());
                     lookup(countryCode, service.getUrn(), key);
                     return getAddress().toExternalForm();
                 }
@@ -263,6 +265,32 @@ public class DynamicDiscoveryService {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
             throw new ConfigurationManagerException(e);
         }
+    }
+
+    private void testAudit() {
+        //Audit vars
+        String ncp = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
+        String ncpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.email");
+        String country = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
+        //Target Gateway ???
+        String remoteip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");
+        //Source Gateway ???
+        String localip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");
+        String smp = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT");
+        String smpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT_EMAIL");
+        //ET_ObjectID --> Base64 of url
+        //String objectID = getAddress().toString(); //ParticipantObjectID
+        String objectID = "ParticipantObjectID";
+        byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
+        if (encodedObjectID != null) {
+            LOGGER.info("encodedObjectID not NULL");
+        } else {
+            LOGGER.info("encodedObjectID NULL");
+        }
+        LOGGER.info("Sending audit trail");
+        //TODO: Request Audit SMP Query
+        sendAuditQuery(ncp, ncpemail, smp, smpemail, country, localip, remoteip, new String(encodedObjectID),
+                null, null);
     }
 
     private void storeEndpointCertificate(String endpointId, X509Certificate certificate) {
