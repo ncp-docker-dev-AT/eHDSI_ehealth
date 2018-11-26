@@ -283,8 +283,17 @@ public class SamlTRCIssuer {
         nameID.setValue(hcpIdentityAssertion.getSubject().getNameID().getValue());
         trc.getSubject().setNameID(nameID);
 
-        auditDataMap.put("humanRequestorNameID", hcpIdentityAssertion.getSubject().getNameID().getValue());
-        auditDataMap.put("humanRequestorSubjectID", nameID.getValue());
+        String spProvidedID = hcpIdentityAssertion.getSubject().getNameID().getSPProvidedID();
+        String humanRequestorNameID = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + hcpIdentityAssertion.getSubject().getNameID().getValue()
+                + "@" + hcpIdentityAssertion.getIssuer().getValue() + ">";
+
+        auditDataMap.put("humanRequestorNameID", humanRequestorNameID);
+
+        Attribute subjectIdAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+                "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+        String HR_AlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
+        //nameID.getValue()
+        auditDataMap.put("humanRequestorSubjectID", HR_AlternativeUserID);
 
         //Create and add Subject Confirmation
         SubjectConfirmation subjectConf = create(SubjectConfirmation.class, SubjectConfirmation.DEFAULT_ELEMENT_NAME);
