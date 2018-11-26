@@ -996,10 +996,6 @@ public class EpsosHelperService {
             orgName = company.getName();
             String poc = getConfigProperty("PORTAL_XSPA_LOCALITY");
             String organizationId = Constants.OID_PREFIX + getConfigProperty(PORTAL_HOSPITAL_OID);
-            //TODO: TEST Organization and Organization Id
-            organizationId = "";
-            orgName = "";
-            LOGGER.info("HCP Information:\nXSPA Locality: '{}'\nOrganization ID: '{}'\nOrganization: '{}'", poc, organizationId, orgName);
 
             List depts = user.getOrganizations();
             String orgType;
@@ -1020,7 +1016,7 @@ public class EpsosHelperService {
             // GUI-27
             if (assertion != null) {
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
-                LOGGER.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
+                LOGGER_CLINICAL.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
                 String auditPointOfCare;
                 if (StringUtils.isNotBlank(orgName)) {
                     auditPointOfCare = orgName;
@@ -1279,7 +1275,7 @@ public class EpsosHelperService {
         for (AttributeStatement stmt : statements) {
             for (Attribute attribute : stmt.getAttributes()) {
                 if (attribute.getName().equals(attrName)) {
-                    
+
                     Attribute attr = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
                     attr.setFriendlyName(attribute.getFriendlyName());
                     attr.setName(attribute.getNameFormat());
