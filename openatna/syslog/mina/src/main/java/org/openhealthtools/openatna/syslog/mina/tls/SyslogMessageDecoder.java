@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Class Description Here...
@@ -43,23 +44,23 @@ import java.net.InetSocketAddress;
  */
 public class SyslogMessageDecoder implements MessageDecoder {
 
-    static Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.syslog.mina.tls.SyslogMessageDecoder");
-
+    private static final String ACTION_ENTER = "Enter";
+    private final Logger logger = LoggerFactory.getLogger("org.openhealthtools.openatna.syslog.mina.tls.SyslogMessageDecoder");
     private ByteBuffer msg = ByteBuffer.wrap(new byte[0]);
     private int headerLength = 0;
     private String error = null;
 
     public MessageDecoderResult decodable(IoSession ioSession, ByteBuffer byteBuffer) {
-        log.info("Enter");
+        logger.debug(ACTION_ENTER);
         return readHeader(byteBuffer);
     }
 
     public MessageDecoderResult decode(IoSession ioSession, ByteBuffer byteBuffer, ProtocolDecoderOutput protocolDecoderOutput) throws Exception {
-        log.info("Enter");
+        logger.debug(ACTION_ENTER);
         if (error != null) {
             SyslogException e = new SyslogException("Error reading message length.");
             e.setSourceIp(((InetSocketAddress) ioSession.getRemoteAddress()).getAddress().getHostAddress());
-            e.setBytes(error.getBytes("UTF-8"));
+            e.setBytes(error.getBytes(StandardCharsets.UTF_8));
             protocolDecoderOutput.write(e);
             ioSession.close();
             return MessageDecoderResult.OK;
@@ -93,7 +94,7 @@ public class SyslogMessageDecoder implements MessageDecoder {
 
 
     public void finishDecode(IoSession ioSession, ProtocolDecoderOutput protocolDecoderOutput) throws Exception {
-        log.info("Enter");
+        logger.debug(ACTION_ENTER);
     }
 
     private MessageDecoderResult readHeader(ByteBuffer byteBuffer) {
@@ -108,9 +109,9 @@ public class SyslogMessageDecoder implements MessageDecoder {
             byte b = byteBuffer.get(byteBuffer.position() + count);
             count++;
             char c = (char) (b & 0xff);
-            log.info("got character=|" + c + "|");
+            logger.debug("got character=|{}|", c);
             if (c == ' ') {
-                log.info("got a space character.");
+                logger.debug("got a space character.");
                 readSpace = true;
                 try {
                     int length = Integer.parseInt(total.toString());
@@ -138,7 +139,6 @@ public class SyslogMessageDecoder implements MessageDecoder {
     }
 
     /**
-     *
      * @param buff
      * @return
      * @throws SyslogException

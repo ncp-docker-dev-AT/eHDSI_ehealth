@@ -213,7 +213,7 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
                 if (c == ' ') {
                     count++;
                     String currHeader = new String(buff.array(), 0, buff.position(), Constants.ENC_UTF8);
-                    LOGGER.info("CurrHeader: '{}'", currHeader);
+                    LOGGER.debug("CurrHeader: '{}'", currHeader);
                     buff.clear();
                     switch (count) {
                         case 1:
