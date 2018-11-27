@@ -42,7 +42,7 @@ public class AuthSSLSocketFactory {
             this.truststore = truststore;
         }
         if (defaultTrustManager == null) {
-            LOGGER.info(" using sun default trust manager");
+            LOGGER.debug("Using SUN default trust manager");
             this.defaultTrustManager = KeystoreManager.getDefaultTrustManager();
         } else {
             this.defaultTrustManager = defaultTrustManager;
@@ -90,7 +90,7 @@ public class AuthSSLSocketFactory {
             throw new IllegalArgumentException("Keystore location may not be null");
         }
 
-        LOGGER.info("Initializing key store");
+        LOGGER.debug("Initializing key store");
         KeyStore keystore = KeyStore.getInstance(details.getKeystoreType());
 
         try (InputStream is = getKeystoreInputStream(details.getKeystoreLocation())) {
@@ -140,7 +140,7 @@ public class AuthSSLSocketFactory {
         if (keystore == null) {
             throw new IllegalArgumentException("Keystore may not be null");
         }
-        LOGGER.info("Initializing key manager");
+        LOGGER.debug("Initializing key manager");
         KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(details.getAlgType());
         String password = details.getKeyPassword();
         kmfactory.init(keystore, (password == null || password.length() == 0) ?
@@ -228,7 +228,7 @@ public class AuthSSLSocketFactory {
                 trustmanagers = createTrustManagers(truststore, keystore, defaultTrustManager);
             }
             if (trustmanagers == null) {
-                LOGGER.info("Created Trust Managers from the default...");
+                LOGGER.debug("Created Trust Managers from the default...");
                 trustmanagers = new TrustManager[]{defaultTrustManager};
             }
 

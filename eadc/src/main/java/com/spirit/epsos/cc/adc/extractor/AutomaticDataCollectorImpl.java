@@ -28,16 +28,14 @@ import java.util.TreeMap;
  */
 public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
 
-    private final Logger logger = LoggerFactory.getLogger(AutomaticDataCollector.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     // Path to the factory.xslt
     private static final String PATH_XSLT_FACTORY = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
             + "EADC_resources" + File.separator + "xslt" + File.separator + "factory.xslt";
     // Path to the config.xml
     private static final String PATH_XML_CONFIG = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
             + "EADC_resources" + File.separator + "config" + File.separator + "config.xml";
-
+    private final Logger logger = LoggerFactory.getLogger(AutomaticDataCollector.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     // map with one intermediateTransformer per CDA-classcode
     private final TreeMap<String, EasyXsltTransformer> intermediateTransformerList;
     // DOM structure for caching the factory.xslt
@@ -93,7 +91,9 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
      */
     private String extractDataAndCreateAccordingSqlInserts(Document transaction) throws Exception {
 
-        logger.info("--> method extractDataAndCreateAccordingSqlInserts({})", transaction);
+        if (logger.isDebugEnabled()) {
+            logger.debug("--> method extractDataAndCreateAccordingSqlInserts({})", transaction);
+        }
         String processedDocumentCode;
         String processedDocumentCodeSystem;
         String processedDocumentCodeAndCodeSystemCombination;
@@ -106,7 +106,6 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
         int numberOfCdaDocuments = clinicalDocumentNodeList.getLength();
         // Test, if the currently processed comes without a CDA-document
         if (numberOfCdaDocuments < 1) {
-            logger.info("No CDA Documents found.");
             processedDocumentCode = "N/A";
             processedDocumentCodeSystem = "N/A";
         } else {
@@ -116,7 +115,6 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
                 logger.error("Multiple CDA Documents were found within the Transaction");
                 throw new Exception("Multiple CDA Documents were found within the Transaction");
             }
-            logger.info("One CDA-document found");
             Node clinicalDocumentNode = clinicalDocumentNodeList.item(0);
             if (clinicalDocumentNode.getNodeType() != Element.ELEMENT_NODE) {
                 logger.error("The ClinicalDocument Node being found was not of type org.w3c.dom.Element");
@@ -133,7 +131,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
                 logger.error("The code node being found was not of type org.w3c.dom.Element");
                 throw new Exception("The code node being found was not of type org.w3c.dom.Element");
             }
-            logger.info("Code Element found");
+
             Element codeElement = (Element) codeNode;
             // Extracting the document's code
             processedDocumentCode = codeElement.getAttribute("code");
@@ -145,7 +143,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
                 logger.error("The code Attribute was either not specified or it was the empty string");
                 throw new Exception("The code Attribute was either not specified or it was the empty string");
             }
-            logger.info("code: '{}", processedDocumentCode);
+            logger.debug("code: '{}", processedDocumentCode);
             // Extracting the document's codeSystem
             processedDocumentCodeSystem = codeElement.getAttribute("codeSystem");
             if (processedDocumentCodeSystem == null) {
@@ -156,7 +154,6 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
                 logger.error("The codeSystemAttribute was either not specified or it was the empty string");
                 throw new Exception("The codeSystemAttribute was either not specified or it was the empty string");
             }
-            logger.info("codeSystem: '{}'", processedDocumentCode);
         }
         processedDocumentCodeAndCodeSystemCombination = processedDocumentCode + "\"" + processedDocumentCodeSystem;
         // Guarantee, that the cachedIntermediaTransformerList is being initialized only once.
@@ -168,8 +165,10 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
                 synchronized (this.intermediateTransformerList) {
                     currentTransformer = this.intermediateTransformerList.get(processedDocumentCodeAndCodeSystemCombination);
                     if (currentTransformer == null) {
-                        logger.info("Creating the XSLT-Transformer for code: '{}' and codeSystem: '{}'",
-                                processedDocumentCode, processedDocumentCodeSystem);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Creating the XSLT-Transformer for code: '{}' and codeSystem: '{}'",
+                                    processedDocumentCode, processedDocumentCodeSystem);
+                        }
                         ((Element) this.factoryXslt.getElementsByTagNameNS("http://www.w3.org/1999/XSL/Transform",
                                 "variable").item(0)).setAttribute("select", "'" + processedDocumentCode + "'");
                         ((Element) this.factoryXslt.getElementsByTagNameNS("http://www.w3.org/1999/XSL/Transform",
@@ -185,7 +184,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
                 throw new Exception("Unable to initialize the customized XSLT for processedDocumentCode:" + processedDocumentCode
                         + " and processedDocumentCodeSystem:" + processedDocumentCodeSystem, exception);
             }
-            logger.info("Current intermediaTransformer retrieved successfully");
+            logger.debug("Current intermediaTransformer retrieved successfully");
         }
         // Perform the data-extraction
         try {

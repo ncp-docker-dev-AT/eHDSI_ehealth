@@ -33,7 +33,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
                 || healthcareFacilityType.equals(HealthcareFacilityType.RESIDENT_PHYSICIAN.toString())
                 || healthcareFacilityType.equals(HealthcareFacilityType.PHARMACY.toString())
                 || healthcareFacilityType.equals(HealthcareFacilityType.OTHER.toString())) {
-            logger.info("HCP Identity Assertion Healthcare Facility Type: '{}'", healthcareFacilityType);
+            logger.debug("HCP Identity Assertion Healthcare Facility Type: '{}'", healthcareFacilityType);
         } else {
             logger.warn("InvalidFieldException: epSOS Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
             throw new InvalidFieldException("epSOS Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
@@ -50,7 +50,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
                 || onBehalfOfRole.equals(OnBehalfOf.PHARMACIST.toString())
                 || onBehalfOfRole.equals(OnBehalfOf.PHYSICIAN.toString())
                 || onBehalfOfRole.equals(OnBehalfOf.NURSE_MIDWIFE.toString())) {
-            logger.info("HCP Identity Assertion OnBehalfOf: '{}'", onBehalfOfRole);
+            logger.debug("HCP Identity Assertion OnBehalfOf: '{}'", onBehalfOfRole);
         } else {
             throw new InvalidFieldException("OnBehalfOf 'urn:epsos:names:wp3.4:subject:on-behalf-of' attribute in assertion should be one of followings {'dentist', 'nurse', 'pharmacist', 'physician', 'nurse midwife'}.");
         }
@@ -65,10 +65,10 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
                 || xspaRole.equals(XSPARole.PHYSICIAN.toString()) || xspaRole.equals(XSPARole.EPSOS_DOCTOR.toString())
                 || xspaRole.equals(XSPARole.NURSE_MIDWIFE.toString()) || xspaRole.equals(XSPARole.PATIENT.toString())) {
 
-            logger.info("HCP Identity Assertion XSPA Role: '{}'", xspaRole);
+            logger.debug("HCP Identity Assertion XSPA Role: '{}'", xspaRole);
         } else if (xspaRole.equals(XSPARole.ANCILLARY_SERVICES.toString()) || xspaRole.equals(XSPARole.CLINICAL_SERVICES.toString())) {
 
-            logger.info("HCP Identity Assertion XSPA Role: '{}'", xspaRole);
+            logger.debug("HCP Identity Assertion XSPA Role: '{}'", xspaRole);
             OnBehalfOfValidator(assertion, documentClass);
         } else {
 
@@ -105,7 +105,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
         String resourceId = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_PURPOSEOFUSE);
         if (resourceId.equals("TREATMENT") || resourceId.equals("EMERGENCY")) {
-            logger.info("HCP Identity Assertion XSPA Purpose of Use: '{}'", resourceId);
+            logger.debug("HCP Identity Assertion XSPA Purpose of Use: '{}'", resourceId);
         } else {
             logger.error("InsufficientRightsException: Purpose of Use provided is not supported");
             throw new InsufficientRightsException();
@@ -119,7 +119,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         if (environmentLocality.equals("")) {
             throw new InvalidFieldException("XSPA Locality 'urn:oasis:names:tc:xspa:1.0:environment:locality' attribute in assertion should be filled.");
         }
-        logger.info("HCP Identity Assertion XSPA Locality: '{}", environmentLocality);
+        logger.debug("HCP Identity Assertion XSPA Locality: '{}", environmentLocality);
     }
 
     @Override
@@ -127,9 +127,9 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         for (XMLObject permission : permissions) {
-            logger.info("HCP Identity Assertion XSPD Permission: '{}'", permission.getDOM().getTextContent());
+            logger.debug("HCP Identity Assertion XSPD Permission: '{}'", permission.getDOM().getTextContent());
             if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_006)) {
-                logger.info("Found permission for PRD-006 (Patient Identification and Lookup)");
+                logger.debug("Found permission for PRD-006 (Patient Identification and Lookup)");
                 return;
             }
         }
@@ -186,23 +186,23 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         //Check required permissions
         for (XMLObject permission : permissions) {
             permissionValue = permission.getDOM().getTextContent();
-            logger.info("HCP Identity Assertion XSPA Permission: '{}'", permissionValue);
+            logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permissionValue);
             switch (permissionValue) {
                 case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_003:
                     medicalHistory = true;
-                    logger.info("Found permission for PRD-003 (Review Medical History)");
+                    logger.debug("Found permission for PRD-003 (Review Medical History)");
                     break;
                 case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_005:
                     vitalSign = true;
-                    logger.info("Found permission for PRD-005 (Review Vital Signs/Patient Measurements)");
+                    logger.debug("Found permission for PRD-005 (Review Vital Signs/Patient Measurements)");
                     break;
                 case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_010:
                     patientMedications = true;
-                    logger.info("Found permission for PRD-010 (Review Patient Medications)");
+                    logger.debug("Found permission for PRD-010 (Review Patient Medications)");
                     break;
                 case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_016:
                     reviewProblem = true;
-                    logger.info("Found permission for PRD-016 (Review Problems)");
+                    logger.debug("Found permission for PRD-016 (Review Problems)");
                     break;
             }
         }
@@ -242,13 +242,13 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
         //Check required permissions
         for (XMLObject permission : permissions) {
-            logger.info("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
+            logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
             if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_004)) {
                 reviewExistingOrders = true;
-                logger.info("Found permission for PRD-004 (Review Existing Orders)");
+                logger.debug("Found permission for PRD-004 (Review Existing Orders)");
             } else if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_010)) {
                 patientMedications = true;
-                logger.info("Found permission for PRD-010 (Review Patient Medications)");
+                logger.debug("Found permission for PRD-010 (Review Patient Medications)");
             }
         }
 
@@ -319,10 +319,10 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
         //Check required permissions
         for (XMLObject permission : permissions) {
-            logger.info("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
+            logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
             if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_046)) {
                 recordMedicationAdministrationRecord = true;
-                logger.info("Found permission for PPD-046 (Record Medication Administration Record)");
+                logger.debug("Found permission for PPD-046 (Record Medication Administration Record)");
             }
         }
 
@@ -360,10 +360,10 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
         //  Check required permissions
         for (XMLObject permission : permissions) {
-            logger.info("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
+            logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
             if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_032)) {
                 recordMedicationAdministrationRecord = true;
-                logger.info("Found permission for PPD-032 (New Consents and Authorizations)");
+                logger.debug("Found permission for PPD-032 (New Consents and Authorizations)");
             }
         }
 
@@ -376,8 +376,8 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
     @Override
     public boolean isConsentGiven(String patientId, String countryId) {
         if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-            loggerClinical.info("Checking consent of patient '{}' for country '{}'", patientId, countryId);
-            loggerClinical.info("Consent is Valid by default of patient '{}' from country '{}'", patientId, countryId);
+            loggerClinical.debug("Checking consent of patient '{}' for country '{}'", patientId, countryId);
+            loggerClinical.debug("Consent is Valid by default of patient '{}' from country '{}'", patientId, countryId);
         }
         return true;
     }

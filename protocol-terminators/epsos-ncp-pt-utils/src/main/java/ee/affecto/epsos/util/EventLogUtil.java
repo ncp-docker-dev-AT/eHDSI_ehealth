@@ -127,7 +127,6 @@ public class EventLogUtil {
                 for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
 
                     if (eit.getIdentificationScheme().equals(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME)) {
-                        LOGGER.info("XDSDocumentEntry.uniqueId: '{}'", eit.getValue());
                         documentIds.add(eit.getValue());
                     }
                 }
@@ -145,7 +144,6 @@ public class EventLogUtil {
                     String documentType = slotType1.getValueList().getValue().get(0);
                     documentType = org.apache.commons.lang3.StringUtils.remove(documentType, "('");
                     documentType = org.apache.commons.lang3.StringUtils.remove(documentType, "')");
-                    LOGGER.warn("Type of document search is: '{}'", documentType);
                     eventLog.getEventTargetParticipantObjectIds().add(documentType);
                 }
             }
@@ -160,7 +158,6 @@ public class EventLogUtil {
                     String documentType = slotType1.getValueList().getValue().get(0);
                     documentType = org.apache.commons.lang3.StringUtils.remove(documentType, "('");
                     documentType = org.apache.commons.lang3.StringUtils.remove(documentType, "')");
-                    LOGGER.warn("Type of document search is: '{}'", documentType);
                     eventLog.getEventTargetParticipantObjectIds().add(documentType);
                 }
             }
@@ -249,7 +246,6 @@ public class EventLogUtil {
 
                         if (StringUtils.equals(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME, identifierType.getIdentificationScheme())) {
 
-                            LOGGER.info("XDSDocumentEntry.uniqueId: '{}'", identifierType.getValue());
                             documentUniqueId = identifierType.getValue();
                         }
                     }

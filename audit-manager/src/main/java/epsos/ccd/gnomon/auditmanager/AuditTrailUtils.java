@@ -62,7 +62,6 @@ public enum AuditTrailUtils {
     public static synchronized String constructMessage(AuditMessage auditmessage, boolean sign) {
 
         String auditMessage = "";
-        LOGGER.info("Constructing message");
         String eventTypeCode = "EventTypeCode(N/A)";
         try {
             eventTypeCode = auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode();
@@ -76,9 +75,8 @@ public enum AuditTrailUtils {
         } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        LOGGER.info("Message created");
         INSTANCE.writeTestAudits(auditmessage, auditMessage);
-        LOGGER.info("'{}' message constructed", eventTypeCode);
+        LOGGER.debug("Message constructed: '{}'", eventTypeCode);
 
         boolean validated = false;
         URL url = null;
@@ -89,25 +87,25 @@ public enum AuditTrailUtils {
         }
         try {
             validated = Utils.validateSchema(auditMessage, url);
-            LOGGER.info("'{}' Validating Schema", auditmessage.getEventIdentification().getEventID().getCode());
+            LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification().getEventID().getCode());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
         boolean forceWrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "true", true));
         if (!validated) {
-            LOGGER.info("'{}' Message not validated", auditmessage.getEventIdentification().getEventID().getCode());
+            LOGGER.debug("'{}' Message not validated", auditmessage.getEventIdentification().getEventID().getCode());
             if (!forceWrite) {
                 auditMessage = "";
             }
         }
         if (validated || forceWrite) {
             if (validated) {
-                LOGGER.info("'{}' Message validated", auditmessage.getEventIdentification().getEventID().getCode());
+                LOGGER.debug("'{}' Message validated", auditmessage.getEventIdentification().getEventID().getCode());
             } else {
-                LOGGER.info("'{}' message not validated", auditmessage.getEventIdentification().getEventID().getCode());
+                LOGGER.debug("'{}' message not validated", auditmessage.getEventIdentification().getEventID().getCode());
             }
             if (forceWrite && !validated) {
-                LOGGER.info("'{}' AuditManager is force to send the message. So trying ...",
+                LOGGER.debug("'{}' AuditManager is force to send the message. So trying ...",
                         auditmessage.getEventIdentification().getEventID().getCode());
             }
 
@@ -119,7 +117,7 @@ public enum AuditTrailUtils {
 
                     // Gnomon SecMan
                     auditMessage = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
-                    LOGGER.info("'{}' message signed", auditmessage.getEventIdentification().getEventID().getCode());
+                    LOGGER.debug("'{}' message signed", auditmessage.getEventIdentification().getEventID().getCode());
                 }
             } catch (Exception e) {
                 auditMessage = "";
@@ -161,7 +159,7 @@ public enum AuditTrailUtils {
      */
     public AuditMessage createAuditMessage(EventLog eventLog) {
 
-        LOGGER.info("createAuditMessage(EventLog '{}')", eventLog.getEventType());
+        LOGGER.debug("createAuditMessage(EventLog '{}')", eventLog.getEventType());
         //TODO: Check if the Audit Message return with a null value shall be considered as fatal?
         AuditMessage am = new AuditMessage();
         AuditTrailUtils au = AuditTrailUtils.getInstance();
@@ -245,7 +243,7 @@ public enum AuditTrailUtils {
                 LOGGER.error("Validation of the Audit Message cannot proceed on a Null value!!!");
             } else {
                 boolean validated = validateAuditMessage(eventLog, am);
-                LOGGER.info("Audit Message validated and  report generated: '{}'", validated);
+                LOGGER.debug("Audit Message validated and  report generated: '{}'", validated);
             }
         }
         return am;
@@ -869,7 +867,7 @@ public enum AuditTrailUtils {
                                         String codeSystem) {
 
         if (StringUtils.isBlank(PC_UserID)) {
-            LOGGER.info("This is service provider and doesn't need Point of Care");
+            LOGGER.debug("This is service provider and doesn't need Point of Care");
         } else {
             ActiveParticipant a = new ActiveParticipant();
             a.setUserID(PC_UserID);
@@ -982,7 +980,7 @@ public enum AuditTrailUtils {
         // Error Message handling for audit purpose
         if (StringUtils.isNotBlank(errorMessagePartObjectId)) {
 
-            LOGGER.info("Error Message Participant ID is: '{}'", errorMessagePartObjectId);
+            LOGGER.debug("Error Message Participant ID is: '{}'", errorMessagePartObjectId);
             CodedValueType codedValueType = new CodedValueType();
             codedValueType.setCode(errorMessageTypeCode);
 
@@ -1019,7 +1017,7 @@ public enum AuditTrailUtils {
     private AuditMessage addEventTarget(AuditMessage auditMessage, List<String> eventTargetObjectId, Short typeCode,
                                         Short typeCodeRole, String errorMessageCode, String action, Short objectDataLifeCycle) {
 
-        LOGGER.info("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", auditMessage, eventTargetObjectId,
+        LOGGER.debug("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", auditMessage, eventTargetObjectId,
                 typeCode, typeCodeRole, errorMessageCode, action, objectDataLifeCycle);
         for (String eventTargetId : eventTargetObjectId) {
 
@@ -1051,7 +1049,7 @@ public enum AuditTrailUtils {
     private AuditMessage addEventTarget(AuditMessage auditMessage, List<String> eventTargetObjectId, Short objectTypeCode,
                                         Short objectDataLifeCycle, String EM_Code, String EM_CodeSystemName, String EM_DisplayName) {
 
-        LOGGER.info("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", auditMessage, eventTargetObjectId,
+        LOGGER.debug("AuditMessage addEventTarget('{}','{}','{}','{}','{}','{}','{}')", auditMessage, eventTargetObjectId,
                 objectTypeCode, objectDataLifeCycle, EM_Code, EM_CodeSystemName, EM_DisplayName);
 
         for (String eventTargetId : eventTargetObjectId) {
@@ -1344,8 +1342,8 @@ public enum AuditTrailUtils {
                     "PatientTarget", "2", "RFC-3881", "Patient Number");
             addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
                     new Short("3"), "9", "errormsg");
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info(am.toString());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(am.toString());
             }
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
@@ -1360,9 +1358,9 @@ public enum AuditTrailUtils {
     private void writeTestAudits(AuditMessage auditmessage, String auditmsg) {
 
         String wta = Utils.getProperty("WRITE_TEST_AUDITS");
-        LOGGER.info("Writing test audits: '{}'", wta);
+        LOGGER.debug("Writing test audits: '{}'", wta);
         if (StringUtils.equals(wta, "true")) {
-            LOGGER.info("Writing test audits");
+
             String tap = Utils.getProperty("TEST_AUDITS_PATH");
             try {
                 Utils.writeXMLToFile(auditmsg, tap + (auditmessage.getEventIdentification().getEventTypeCode()
@@ -1402,7 +1400,7 @@ public enum AuditTrailUtils {
      */
     private boolean validateAuditMessage(EventLog eventLog, AuditMessage am) {
 
-        LOGGER.info("validateAuditMessage(EventLog '{}', AuditMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
+        LOGGER.debug("validateAuditMessage(EventLog '{}', AuditMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
                 am.getEventIdentification().getEventActionCode(), eventLog.getPC_UserID());
         try {
             // Infer model according to NCP Side and EventCode
