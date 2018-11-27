@@ -1,25 +1,3 @@
-/**
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * <p>
- * This file is part of SRDC epSOS NCP.
- * <p>
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- * <p>
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * <p>
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- * <p>
- * Modifications by Kela (The Social Insurance Institution of Finland) GNU
- * Public License v3
- */
 package tr.com.srdc.epsos.securityman.helper;
 
 import org.apache.commons.lang.StringUtils;
@@ -36,8 +14,9 @@ import tr.com.srdc.epsos.util.saml.SAML;
 import javax.xml.transform.dom.DOMSource;
 
 /**
- * TODO: improve the implementation by implementing a method which picks
- * attribute values by attribute names (avoid repetition in current methods)
+ * TODO: improve the implementation by implementing a method which picks attribute values by attribute names
+ * (avoid repetition in current methods)
+ * TODO: Wave 2 review source code Assertions
  */
 public class Helper {
 
@@ -50,15 +29,14 @@ public class Helper {
         try {
             // TODO: Since the XCA simulator sends this value in a wrong way, we are trying like this for the moment
             NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
-            //NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0","Security");
-            Element security = null;
+            Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
             } else {
                 throw (new MissingFieldException("Security element is required."));
             }
             NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "Assertion");
-            Element hcpAss = null;
+            Element hcpAss;
             Assertion hcpAssertion = null;
 
             if (assertionList.getLength() > 0) {
@@ -80,6 +58,26 @@ public class Helper {
         } catch (Exception e) {
             logger.debug("Exception: '{}'", e.getMessage(), e);
             return null;
+        }
+    }
+
+    public static String getAssertionsIssuer(Element sh) {
+
+        Assertion assertion = getHCPAssertion(sh);
+        if (assertion != null) {
+            return assertion.getIssuer().getValue();
+        } else {
+            return "Unknown idP";
+        }
+    }
+
+    public static String getAssertionsSPProvidedId(Element sh) {
+
+        Assertion assertion = getHCPAssertion(sh);
+        if (assertion != null) {
+            return assertion.getSubject().getNameID().getSPProvidedID();
+        } else {
+            return "";
         }
     }
 
@@ -117,12 +115,20 @@ public class Helper {
         return result;
     }
 
-    public static String getPC_UserID(Element sh) {
+    /**
+     * Util method which return the Point of Care information related to the HCP assertions, based on the element provided
+     * Organization is the subject:Organization (Optional) value or if not present the environment:locality value (Required).
+     *
+     * @param sh
+     * @return
+     */
+    public static String getPointOfCareUserId(Element sh) {
+
         String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:organization", false);
         if (result == null) {
-            return "N/A";
+            result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:environment:locality", false);
         }
-        return result;
+        return StringUtils.isBlank(result) ? "N/A" : result;
     }
 
     public static String getOrganizationId(Element sh) {
@@ -154,7 +160,8 @@ public class Helper {
      */
     public static Assertion getTRCAssertion(Element sh) {
         try {
-            NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+            NodeList securityList = sh.getElementsByTagNameNS(
+                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
             Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
@@ -209,7 +216,7 @@ public class Helper {
     private static String getXSPAAttributeByName(Element sh, String attributeName, boolean trc) {
 
         String result = null;
-        Assertion assertion = null;
+        Assertion assertion;
 
         try {
 

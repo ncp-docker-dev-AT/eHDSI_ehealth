@@ -10,18 +10,28 @@ public class DebugUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DebugUtils.class);
 
-    private static final boolean transactionDebugging = true;
-    private static final boolean verboseTransactionDebugging = true;
+    private static final boolean TRANSACTION_DEBUG = true;
+    private static final boolean VERBOSE_TRANSACTION_DEBUG = true;
 
     private DebugUtils() {
     }
 
+    /**
+     * @param message
+     */
     public static void showTransactionStatus(String message) {
-        LOGGER.info(((transactionActive()) ? "[+] " : "[-] ") + message);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(((transactionActive()) ? "[+] '{}'" : "[-] '{}'"), message);
+        }
     }
 
-    // Some guidance from: http://java.dzone.com/articles/monitoring-declarative-transac?page=0,1
+    /**
+     * @return
+     */
     public static boolean transactionActive() {
+
+        // Some guidance from: http://java.dzone.com/articles/monitoring-declarative-transac?page=0,1
         try {
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             Class tsmClass = contextClassLoader.loadClass("org.springframework.transaction.support.TransactionSynchronizationManager");
@@ -45,15 +55,19 @@ public class DebugUtils {
         throw new IllegalStateException("ServerUtils.transactionActive was unable to complete properly");
     }
 
+    /**
+     * @param message
+     */
     public static void transactionRequired(String message) {
+
         // Are we debugging transactions?
-        if (!transactionDebugging) {
+        if (!TRANSACTION_DEBUG) {
             // No, just return
             return;
         }
 
         // Are we doing verbose transaction debugging?
-        if (verboseTransactionDebugging) {
+        if (VERBOSE_TRANSACTION_DEBUG) {
             // Yes, show the status before we get to the possibility of throwing an exception
             showTransactionStatus(message);
         }

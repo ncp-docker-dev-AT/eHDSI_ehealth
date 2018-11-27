@@ -35,7 +35,7 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
-    <logger name="epsos.ccd.netsmart.securitymanager.sts" level="DEBUG" additivity="false">
+    <logger name="epsos.ccd.netsmart.securitymanager.sts" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -43,20 +43,21 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="epsos.ccd.gnomon.auditmanager" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="org.opensaml" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="DEBUG" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
+    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
+        <appender-ref ref="LOGGER_CLINICAL"/>
     </root>
 </configuration>

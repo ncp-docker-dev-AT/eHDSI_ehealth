@@ -1,15 +1,14 @@
 /***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
-*
-*    This file is part of epSOS-WEB.
-*
-*    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-*
-*    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
-**/package se.sb.epsos.web.livenesstest;
-
-import static org.junit.Assert.assertTrue;
+ *
+ *    This file is part of epSOS-WEB.
+ *
+ *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
+ **/
+package se.sb.epsos.web.livenesstest;
 
 import org.junit.After;
 import org.junit.Before;
@@ -19,13 +18,14 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import se.sb.epsos.web.integrationtest.EpsosWebIntegrationTestBase;
+
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractLivenessTest extends EpsosWebIntegrationTestBase {
 
-    private String timeToWait = "30000";
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractLivenessTest.class);
+    private String timeToWait = "30000";
 
     @Before
     @Override
@@ -67,7 +67,7 @@ public abstract class AbstractLivenessTest extends EpsosWebIntegrationTestBase {
             selenium.waitForCondition("!selenium.browserbot.getCurrentWindow().wicketAjaxBusy()", timeToWait);
         }
     }
-    
+
     protected void loginAsApotek() {
         selenium.open("/");
         selenium.waitForPageToLoad("3000");
@@ -80,46 +80,42 @@ public abstract class AbstractLivenessTest extends EpsosWebIntegrationTestBase {
             selenium.waitForCondition("!selenium.browserbot.getCurrentWindow().wicketAjaxBusy()", timeToWait);
         }
     }
-    
+
     protected void showPS() {
         clickOnElement(driver.findElement(By.linkText("Patientöversikt")));
-    	selenium.waitForPageToLoad(timeToWait);
-    	clickOnElement(driver.findElement(By.name("confirmButton")));
-    	if(System.getProperty("os.name").startsWith("Windows")) {
-    		selenium.waitForPageToLoad(timeToWait);
-    	}
-    	else {
-    		selenium.waitForCondition("!selenium.browserbot.getCurrentWindow().wicketAjaxBusy()", timeToWait);
-    	}      
-    	assertTrue(selenium.isTextPresent("Tillgängliga patientöversikter"));
+        selenium.waitForPageToLoad(timeToWait);
+        clickOnElement(driver.findElement(By.name("confirmButton")));
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            selenium.waitForPageToLoad(timeToWait);
+        } else {
+            selenium.waitForCondition("!selenium.browserbot.getCurrentWindow().wicketAjaxBusy()", timeToWait);
+        }
+        assertTrue(selenium.isTextPresent("Tillgängliga patientöversikter"));
         clickOnElement(driver.findElement(By.linkText("Visa")));
-    	if(System.getProperty("os.name").startsWith("Windows")) {
-    		selenium.waitForPageToLoad(timeToWait);
-    	}
-    	else {
-    		selenium.waitForCondition("!selenium.browserbot.getCurrentWindow().wicketAjaxBusy()", timeToWait);
-    	}     
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            selenium.waitForPageToLoad(timeToWait);
+        } else {
+            selenium.waitForCondition("!selenium.browserbot.getCurrentWindow().wicketAjaxBusy()", timeToWait);
+        }
         assertTrue(selenium.isTextPresent("Patientöversikt"));
     }
-    
+
     protected void showEP() {
         clickOnElement(driver.findElement(By.linkText("Recept")));
-    	selenium.waitForPageToLoad(timeToWait);
-    	clickOnElement(driver.findElement(By.name("confirmButton")));
-    	if(System.getProperty("os.name").startsWith("Windows")) {
-    		selenium.waitForPageToLoad(timeToWait);
-    	}
-    	else {
-    		selenium.waitForCondition("!selenium.browserbot.getCurrentWindow().wicketAjaxBusy()", timeToWait);
-    	}      
-    	assertTrue(selenium.isTextPresent("Tillgängliga recept"));
+        selenium.waitForPageToLoad(timeToWait);
+        clickOnElement(driver.findElement(By.name("confirmButton")));
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            selenium.waitForPageToLoad(timeToWait);
+        } else {
+            selenium.waitForCondition("!selenium.browserbot.getCurrentWindow().wicketAjaxBusy()", timeToWait);
+        }
+        assertTrue(selenium.isTextPresent("Tillgängliga recept"));
         clickOnElement(driver.findElement(By.linkText("Expediera")));
-    	if(System.getProperty("os.name").startsWith("Windows")) {
-    		selenium.waitForPageToLoad(timeToWait);
-    	}
-    	else {
-    		selenium.waitForCondition("!selenium.browserbot.getCurrentWindow().wicketAjaxBusy()", timeToWait);
-    	}     
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            selenium.waitForPageToLoad(timeToWait);
+        } else {
+            selenium.waitForCondition("!selenium.browserbot.getCurrentWindow().wicketAjaxBusy()", timeToWait);
+        }
         assertTrue(selenium.isTextPresent("Receptinformation"));
     }
 }

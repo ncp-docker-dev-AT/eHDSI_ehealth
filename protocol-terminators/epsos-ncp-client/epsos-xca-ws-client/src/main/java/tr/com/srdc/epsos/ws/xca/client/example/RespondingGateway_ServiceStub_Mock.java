@@ -288,7 +288,7 @@ public class RespondingGateway_ServiceStub_Mock {
 class DummyCDA {
 
     public static final String CDA = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> "
-            + "<ClinicalDocument xmlns=\"urn:hl7-org:v3\" xmlns:epsos=\"urn:epsos-org:ep:medication\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:hl7-org:v3 CDA.xsd\"> "
+            + "<ClinicalDocument xmlns=\"urn:hl7-org:v3\" xmlns:epsos=\"urn:epsos-org:ep:medication\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> "
             + "	<typeId extension=\"POCD_HD000040\" root=\"2.16.840.1.113883.1.3\" /> "
             + "	<templateId root='1.3.6.1.4.1.12559.11.10.1.3.1.1.3'/> "
             + "	<id root=\"2.16.17.710.820\"/> "

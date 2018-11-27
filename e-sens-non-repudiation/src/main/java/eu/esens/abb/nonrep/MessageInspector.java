@@ -18,7 +18,7 @@ public class MessageInspector {
     public static final String WS_ADDRESSING_NS = "http://www.w3.org/2005/08/addressing";
     public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
 
-    public final static Logger LOGGER = LoggerFactory.getLogger(MessageInspector.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(MessageInspector.class);
 
     private MessageType messageType;
     private String messageUUID;
@@ -85,10 +85,9 @@ public class MessageInspector {
                 IHEXCARetrieve xcaRetrieve = new IHEXCARetrieve(body);
                 this.setMessageType(xcaRetrieve);
             } else {
-                LOGGER.error("Action not recognized: " + actionText);
+                LOGGER.warn("Action not recognized: '{}'", actionText);
 
-                // I differentiate here, since one may do some other guesses, to see if it is a valid message
-                //TODO
+                //TODO: I differentiate here, since one may do some other guesses, to see if it is a valid message
                 UnknownMessageType umt = new UnknownMessageType(incomingMsg);
                 this.setMessageType(umt);
             }
@@ -104,7 +103,7 @@ public class MessageInspector {
                 this.messageUUID = uuidText;
             }
         } else {
-            LOGGER.error("The document passed is not a SOAP.");
+            LOGGER.warn("The document passed is not a SOAP.");
             UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             this.setMessageType(umt);
         }

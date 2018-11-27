@@ -13,24 +13,12 @@
         <property name="connection.pool_size">5</property>
         <!-- Enable Hibernate's automatic session context management -->
         <property name="current_session_context_class">thread</property>
-        <!-- Disable the second-level cache -->
-        <!-- <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property> -->
-        <!--<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>-->
-        <!--<property name="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</property>-->
         <property name="hibernate.cache.use_second_level_cache">false</property>
         <property name="hibernate.cache.use_query_cache">false</property>
         <!-- Echo all executed SQL to stdout -->
         <property name="show_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
-        <!-- C3P0 Connection Pool properties -->
-        <!-- <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property> -->
-        <!-- 		<property name="hibernate.c3p0.min_size">5</property> -->
-        <!-- 		<property name="hibernate.c3p0.max_size">20</property> -->
-        <!-- 		<property name="hibernate.c3p0.timeout">300</property> -->
-        <!-- 		<property name="hibernate.c3p0.max_statements">50</property> -->
-        <!-- 		<property name="hibernate.c3p0.idle_test_period">3000</property> -->
-        <mapping class="eu.epsos.configmanager.database.model.Property"/>
-        <class-cache class="eu.epsos.configmanager.database.model.Property" usage="read-write"/>
+        <mapping class="eu.europa.ec.sante.ehdsi.openncp.configmanager.domain.Property"/>
+        <class-cache class="eu.europa.ec.sante.ehdsi.openncp.configmanager.domain.Property" usage="read-write"/>
     </session-factory>
 </hibernate-configuration>
-

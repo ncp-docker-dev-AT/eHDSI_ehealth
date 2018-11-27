@@ -35,7 +35,7 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
-    <logger name="org.openhealthtools.openatna" level="DEBUG" additivity="false">
+    <logger name="org.openhealthtools.openatna" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -43,7 +43,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="org.openhealthtools.openatna" level="DEBUG" additivity="false">
+    <logger name="org.openhealthtools.openatna" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -56,10 +56,6 @@
     </logger>
 
     <logger name="org.apache" level="WARN" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="com.zaxxer.hikari" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -86,5 +82,6 @@
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
+        <appender-ref ref="LOGGER_CLINICAL"/>
     </root>
 </configuration>

@@ -108,71 +108,74 @@ public class ValidatorUtil {
         // Infer model according to NCP Side and EventCode
         if (ncpSide == NcpSide.NCP_A) {
             if (StringUtils.equals(eventType, "epsos-11")) {
-                // EHDSI_XDS_IDENTIFICATION_SERVICE_AUDIT_SP
-                //model = ValidatorUtil.EHDSI_AUDIT_IDENTIFICATION_SERVICE_AUDIT_SP;
+
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
             }
             if (StringUtils.equals(eventType, "epsos-94")) {
+
                 model = ValidatorUtil.EHDSI_AUDIT_PIVOT_TRANSLATION;
             }
             if (StringUtils.equals(eventType, "epsos-21") || StringUtils.equals(eventType, "epsos-22")
                     || StringUtils.equals(eventType, "epsos-31") || StringUtils.equals(eventType, "epsos-32")
-                    //|| StringUtils.equals(eventType, "epsos-94")
-                    || StringUtils.equals(eventType, "epsos-96")
-                    || StringUtils.equals(eventType, "ITI-38") || StringUtils.equals(eventType, "ITI-39")
-                    || StringUtils.equals(eventType, "epsos-95")) {
-                //EPSOS2_FETCH_DOC_SERVICE_SP
+                    || StringUtils.equals(eventType, "epsos-96") || StringUtils.equals(eventType, "ITI-38")
+                    || StringUtils.equals(eventType, "ITI-39") || StringUtils.equals(eventType, "epsos-95")) {
+
                 model = ValidatorUtil.EHDSI_AUDIT_FETCH_DOC_SERVICE_SP;
             }
             if (StringUtils.equals(eventType, "epsos-41") || StringUtils.equals(eventType, "epsos-51")) {
-                //EPSOS2_PROVIDE_DATA_SERVICE_SP
+
                 model = ValidatorUtil.EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
             }
             if (StringUtils.equals(eventType, "ehealth-193")) {
+
                 model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY;
             }
             if (StringUtils.equals(eventType, "ehealth-194")) {
+
                 model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH;
             }
         } else {
+
             if (StringUtils.equals(eventType, "epsos-11")) {
-                //EPSOS2_HCP_ASSURANCE_AUDIT
+
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
             }
             if (StringUtils.equals(eventType, "epsos-94")) {
+
                 model = ValidatorUtil.EHDSI_AUDIT_PIVOT_TRANSLATION;
             }
-            if (StringUtils.equals(eventType, "epsos-21") || StringUtils.equals(eventType, "epsos-22")
-                    //|| StringUtils.equals(eventType, "epsos-94")
-                    || StringUtils.equals(eventType, "epsos-96") || StringUtils.equals(eventType, "ITI-38")
+            if (StringUtils.equals(eventType, "epsos-96") || StringUtils.equals(eventType, "ITI-38")
                     || StringUtils.equals(eventType, "ITI-39") || StringUtils.equals(eventType, "epsos-95")) {
-                //EPSOS2_HCP_ASSURANCE_AUDIT
+
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE_AUDIT;
             }
-            if (StringUtils.equals(eventType, "epsos-31") || StringUtils.equals(eventType, "epsos-32")) {
-                //EPSOS2_FETCH_DOC_SERVICE_SC
+            if (StringUtils.equals(eventType, "epsos-21") || StringUtils.equals(eventType, "epsos-22")
+                    || StringUtils.equals(eventType, "epsos-31") || StringUtils.equals(eventType, "epsos-32")) {
+
                 model = ValidatorUtil.EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
             }
             if (StringUtils.equals(eventType, "epsos-41") || StringUtils.equals(eventType, "epsos-51")) {
-                //EPSOS2_PROVIDE_DATA_SERVICE_SC
+
                 model = ValidatorUtil.EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC;
             }
             if (StringUtils.equals(eventType, "epsos-91")) {
-                //EPSOS2_ISSUANCE_HCP_ASSERTION
+
                 model = ValidatorUtil.EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION;
             }
             if (StringUtils.equals(eventType, "epsos-92")) {
-                //EPSOS2_ISSUANCE_TRC_ASSERTION
+
                 model = ValidatorUtil.EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION;
             }
             if (StringUtils.equals(eventType, "epsos-93")) {
-                //EPSOS2_IMPORT_NCP_TRUSTED_LIST
+
                 model = ValidatorUtil.EHDSI_AUDIT_IMPORT_NCP_TRUSTED_LIST;
             }
             if (StringUtils.equals(eventType, "ehealth-193")) {
+
                 model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY;
             }
             if (StringUtils.equals(eventType, "ehealth-194")) {
+
                 model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH;
             }
         }
@@ -186,8 +189,7 @@ public class ValidatorUtil {
      * @param classCode         The document class code.
      * @param isPivot           The boolean flag stating if the document is pivot or
      *                          not.
-     * @param isScannedDocument The boolean flag stating if the document is a scanned document or
-     *                          not.
+     * @param isScannedDocument The boolean flag stating if the document is a scanned document or not.
      * @return the correspondent CDA model.
      */
     public static String obtainCdaModel(String classCode, boolean isPivot, boolean isScannedDocument) {

@@ -10,6 +10,7 @@
         <param-value>classpath:openatnaContext.xml</param-value>
     </context-param>
 
+    ${enable.monitoring.start}
     <filter>
         <filter-name>javamelody</filter-name>
         <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
@@ -26,6 +27,7 @@
     <listener>
         <listener-class>net.bull.javamelody.SessionListener</listener-class>
     </listener>
+    ${enable.monitoring.stop}
 
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>

@@ -6,16 +6,17 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "property")
+@Table(name = "EHNCP_PROPERTY")
 public class Property {
 
     @Id
-    @Column(name = "name")
+    @Column(name = "NAME")
     private String key;
 
+    @Column(name = "VALUE")
     private String value;
 
-    @Column(name = "is_smp")
+    @Column(name = "IS_SMP")
     private boolean smp;
 
     public Property() {
