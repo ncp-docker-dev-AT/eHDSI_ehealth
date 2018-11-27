@@ -70,8 +70,8 @@ public class AssertionHandler implements Serializable {
     public static void main(String[] args) {
         DateTime now = new DateTime();
         DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
-        LOGGER.info("NotBefore: '{}'", nowUTC.toDateTime().minusMinutes(1));
-        LOGGER.info("NotOnOrAfter: '{}'", nowUTC.toDateTime().plusHours(2));
+        LOGGER.debug("NotBefore: '{}'", nowUTC.toDateTime().minusMinutes(1));
+        LOGGER.debug("NotOnOrAfter: '{}'", nowUTC.toDateTime().plusHours(2));
     }
 
     Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws ConfigurationException {
