@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,12 +22,15 @@ import javax.xml.ws.handler.MessageContext;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 
-
+/**
+ *
+ */
 public class STSUtils {
 
+    public static final String NO_CLIENT_CERTIFICATE = "Unknown (No Client Certificate)";
     private static final Logger LOGGER = LoggerFactory.getLogger(STSUtils.class);
-
     // TRC Parameters Namespace
     private static final String TRC_NS = "http://epsos.eu/trc";
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion";
@@ -36,6 +40,10 @@ public class STSUtils {
     private STSUtils() {
     }
 
+    /**
+     * @param body
+     * @return
+     */
     public static String getPurposeOfUse(SOAPElement body) {
 
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
@@ -54,6 +62,10 @@ public class STSUtils {
         return purposeOfUse;
     }
 
+    /**
+     * @param assertion
+     * @return
+     */
     public static Document createRSTRC(Document assertion) {
 
         try {
@@ -100,6 +112,10 @@ public class STSUtils {
         }
     }
 
+    /**
+     * @param elem
+     * @return
+     */
     public static String domElementToString(Element elem) {
         try {
             TransformerFactory tf = TransformerFactory.newInstance();
@@ -113,6 +129,9 @@ public class STSUtils {
         }
     }
 
+    /**
+     * @return
+     */
     public static String getServerIP() {
 
         try {
@@ -124,20 +143,32 @@ public class STSUtils {
         }
     }
 
+    /**
+     * Util method retrieving the Client certificate used (it may work only in a 2ways SSL context).
+     *
+     * @param messageContext SOAP Message context of the TRC Assertions request
+     * @return TLS Common Name of the certificate used during the communication between client and TRC-STS Server
+     */
     public static String getSSLCertPeer(MessageContext messageContext) {
 
-        String user = "Unknown(No Client Certificate)";
+        ServletRequest servletRequest = (ServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST);
+        Enumeration<String> servletAttributes = servletRequest.getAttributeNames();
+        while (servletAttributes.hasMoreElements()) {
+            String attribute = servletAttributes.nextElement();
+            LOGGER.info("Servlet Attribute: '{}'", attribute);
+        }
+        if (servletRequest instanceof HttpServletRequest && servletRequest.isSecure()) {
 
-        javax.servlet.ServletRequest sreq = (javax.servlet.ServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST);
-
-        if (sreq instanceof HttpServletRequest && sreq.isSecure()) {
-            LOGGER.info("Secure and http");
-            HttpServletRequest hreq = (HttpServletRequest) sreq;
-            X509Certificate[] peerCert = (X509Certificate[]) hreq.getAttribute("javax.servlet.request.X509Certificate");
+            LOGGER.info("Secured Channel used for ServletRequest");
+            HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+            X509Certificate[] peerCert = (X509Certificate[]) httpServletRequest.getAttribute("javax.servlet.request.X509Certificate");
             if (peerCert != null) {
                 return peerCert[0].getSubjectDN().getName();
             }
+        } else {
+
+            LOGGER.info("Communication over a not secured channel");
         }
-        return user;
+        return NO_CLIENT_CERTIFICATE;
     }
 }

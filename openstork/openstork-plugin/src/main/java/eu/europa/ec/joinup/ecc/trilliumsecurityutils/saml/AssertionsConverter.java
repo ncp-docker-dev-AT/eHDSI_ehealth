@@ -157,7 +157,7 @@ public class AssertionsConverter {
         }
 
         orgName = "TRILLIUM GATEWAY";
-        String poc = "POC";
+        String poc = "POC Trillium Bidge";
         // fixed for consent creation AuthorInstitution Validation problem
         String orgId = "TRILLIUMGATEWAY.1";
         String orgType;
@@ -255,9 +255,12 @@ public class AssertionsConverter {
             Issuer issuer = new IssuerBuilder().buildObject();
 
             String confIssuer = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.trc.endpoint");
+
             if (confIssuer.isEmpty()) {
-                ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.trc.endpoint", "urn:initgw:countryB");
-                confIssuer = "urn:initgw:countryB";
+
+                String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
+                confIssuer = "urn:initgw:" + countryCode + ":countryB";
+                ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.trc.endpoint", confIssuer);
             }
             issuer.setValue(confIssuer);
             trc.setIssuer(issuer);
@@ -457,8 +460,9 @@ public class AssertionsConverter {
             conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
             assertion.setConditions(conditions);
 
+            String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
             Issuer issuer = new IssuerBuilder().buildObject();
-            issuer.setValue("urn:idp:countryB");
+            issuer.setValue("urn:idp:" + countryCode + ":countryB");
             issuer.setNameQualifier("urn:epsos:wp34:assertions");
             assertion.setIssuer(issuer);
 

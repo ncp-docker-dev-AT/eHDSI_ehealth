@@ -50,9 +50,9 @@ import java.util.List;
 @SessionScoped
 public class MyBean implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private final Logger logger = LoggerFactory.getLogger(MyBean.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-    private static final long serialVersionUID = 1L;
     private List<Country> countries;
     private String selectedCountry;
     private List<Identifier> identifiers;

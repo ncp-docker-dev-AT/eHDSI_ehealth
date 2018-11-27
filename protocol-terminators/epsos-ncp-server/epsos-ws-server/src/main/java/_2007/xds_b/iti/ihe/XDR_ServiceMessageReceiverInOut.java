@@ -120,7 +120,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
                 String clientDN = HTTPUtil.getClientCertificate(req);
                 eventLog.setSC_UserID(clientDN);
-                eventLog.setTargetip(req.getServerName());
+                eventLog.setTargetip(HTTPUtil.getHostIpAddress(req.getServerName()));
 
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
                     loggerClinical.debug("Incoming XDR Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));

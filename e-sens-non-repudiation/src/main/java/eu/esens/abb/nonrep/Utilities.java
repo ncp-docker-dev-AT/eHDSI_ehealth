@@ -102,8 +102,8 @@ public class Utilities {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         serialize(request, outputStream);
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-            LOGGER_CLINICAL.debug("Stream: '{}'", outputStream.toString());
+        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD") && LOGGER_CLINICAL.isDebugEnabled()) {
+            LOGGER_CLINICAL.debug("Stream:\n'{}'", outputStream.toString());
         }
     }
 

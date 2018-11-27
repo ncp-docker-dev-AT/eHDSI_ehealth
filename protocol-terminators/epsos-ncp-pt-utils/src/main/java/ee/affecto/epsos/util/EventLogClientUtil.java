@@ -17,6 +17,7 @@ import org.opensaml.saml2.core.Attribute;
 import org.opensaml.saml2.core.AttributeStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.net.ssl.HostnameVerifier;
@@ -31,6 +32,7 @@ import java.security.cert.X509Certificate;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+//TODO: Review OpenNCP-2.5.5
 public class EventLogClientUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventLogClientUtil.class);
@@ -38,6 +40,9 @@ public class EventLogClientUtil {
     private EventLogClientUtil() {
     }
 
+    /**
+     * @param stub
+     */
     public static void createDummyMustUnderstandHandler(org.apache.axis2.client.Stub stub) {
 
         HandlerDescription description = new HandlerDescription("DummyMustUnderstandHandler");
@@ -55,6 +60,10 @@ public class EventLogClientUtil {
         axisConfiguration.setInFaultPhases(phasesList);
     }
 
+    /**
+     * @param epr
+     * @return
+     */
     public static String getServerCertificateDN(String epr) {
 
         String dn = null;
@@ -83,6 +92,9 @@ public class EventLogClientUtil {
         return dn;
     }
 
+    /**
+     * @return
+     */
     public static String getLocalIpAddress() {
 
         // TODO A.R. should be changed for multihomed hosts... It's better to get address from AXIS2 actual socket but how?
@@ -96,6 +108,10 @@ public class EventLogClientUtil {
         return ipAddress;
     }
 
+    /**
+     * @param epr
+     * @return
+     */
     public static String getServerIpAddress(String epr) {
 
         URL url;
@@ -109,6 +125,12 @@ public class EventLogClientUtil {
         return ipAddress;
     }
 
+    /**
+     * @param msgContext
+     * @param soapEnvelope
+     * @param address
+     * @return
+     */
     public static EventLog prepareEventLog(MessageContext msgContext, SOAPEnvelope soapEnvelope, String address) {
 
         EventLog eventLog = new EventLog();
@@ -152,11 +174,18 @@ public class EventLogClientUtil {
         return eventLog;
     }
 
+    /**
+     * @param eventLog
+     * @param idAssertion
+     */
     public static void logIdAssertion(EventLog eventLog, Assertion idAssertion) {
 
-        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
-        eventLog.setHR_UserID(cms.getProperty("ncp.country") + "<" + idAssertion.getSubject().getNameID().getValue() +
-                "@" + cms.getProperty("ncp.country") + ">");
+        String spProvidedID = idAssertion.getSubject().getNameID().getSPProvidedID();
+        String humanReqUserId = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + idAssertion.getSubject().getNameID().getValue()
+                + "@" + idAssertion.getIssuer().getValue() + ">";
+        eventLog.setHR_UserID(humanReqUserId);
+        boolean isOrganizationProvided = false;
+
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
             for (Attribute attribute : attributeStatement.getAttributes()) {
                 if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xacml:1.0:subject:subject-id")) {
@@ -165,13 +194,20 @@ public class EventLogClientUtil {
                     eventLog.setHR_RoleID(EventLogUtil.getAttributeValue(attribute));
                 } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:epsos:names:wp3.4:subject:healthcare-facility-type")) {
                     eventLog.setPC_RoleID(EventLogUtil.getAttributeValue(attribute));
-                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:environment:locality")) {
+                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:subject:organization")) {
+                    eventLog.setPC_UserID(EventLogUtil.getAttributeValue(attribute));
+                    isOrganizationProvided = true;
+                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:environment:locality") && !isOrganizationProvided) {
                     eventLog.setPC_UserID(EventLogUtil.getAttributeValue(attribute));
                 }
             }
         }
     }
 
+    /**
+     * @param eventLog
+     * @param idAssertion
+     */
     public static void logTrcAssertion(EventLog eventLog, Assertion idAssertion) {
 
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
@@ -184,15 +220,22 @@ public class EventLogClientUtil {
         }
     }
 
+    /**
+     * @param eventLog
+     */
     public static void sendEventLog(EventLog eventLog) {
 
         AuditServiceFactory.getInstance().write(eventLog, "", "1");
     }
 
+    /**
+     * @param uuid
+     * @return
+     */
     public static String appendUrnUuid(String uuid) {
 
-        if (uuid == null || uuid.isEmpty() || uuid.startsWith("urn:uuid:")) {
+        if (uuid == null || uuid.isEmpty() || uuid.startsWith(Constants.UUID_PREFIX)) {
             return uuid;
-        } else return "urn:uuid:" + uuid;
+        } else return Constants.UUID_PREFIX + uuid;
     }
 }

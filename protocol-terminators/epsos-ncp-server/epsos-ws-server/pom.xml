@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
         <artifactId>openncp-ncp-server</artifactId>
-        <version>2.5.4</version>
+        <version>2.5.5</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server</groupId>
@@ -255,6 +255,14 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>monitoring</id>
+            <properties>
+                <enable.monitoring.start/>
+                <enable.monitoring.stop/>
+            </properties>
+        </profile>
+
         <profile>
             <!-- This profile bundles the mock National Connector implementation -->
             <id>national-connector-mock</id>

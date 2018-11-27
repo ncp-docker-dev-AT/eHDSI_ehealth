@@ -427,8 +427,7 @@ public class CDAUtils {
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         sb.append("\r\n");
 
-        sb.append("<ClinicalDocument xmlns=\"urn:hl7-org:v3\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                + "xsi:schemaLocation=\"urn:hl7-org:v3 CDA.xsd\">");
+        sb.append("<ClinicalDocument xmlns=\"urn:hl7-org:v3\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">");
         sb.append("\r\n");
         sb.append("<typeId root=\"2.16.840.1.113883.1.3\" extension=\"POCD_MT000040\"/>");
         sb.append("\r\n");
@@ -590,8 +589,7 @@ public class CDAUtils {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         sb.append("\r\n");
-        sb.append("<ClinicalDocument xmlns:epsos=\"urn:epsos-org:ep:medication\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:hl7-org:v3\" "
-                + "xsi:schemaLocation=\"urn:hl7-org:v3\">");
+        sb.append("<ClinicalDocument xmlns:epsos=\"urn:epsos-org:ep:medication\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:hl7-org:v3\">");
         sb.append("\r\n");
         sb.append("<typeId root=\"2.16.840.1.113883.1.3\" extension=\"POCD_HD000040\"/>");
         sb.append("\r\n");

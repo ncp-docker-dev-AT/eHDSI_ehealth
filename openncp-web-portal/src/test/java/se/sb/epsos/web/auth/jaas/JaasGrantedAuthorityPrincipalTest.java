@@ -4,23 +4,14 @@ import org.junit.Test;
 
 import java.security.Principal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-/**
- * Created:
- * Date: 2013-09-19
- * Time: 08:49
- */
 public class JaasGrantedAuthorityPrincipalTest {
 
     @Test
-    public void shouldReturnValidData(){
-        Principal principal = new Principal() {
-            @Override
-            public String getName() {
-                return "Donald.Duck@apse.se;Donald;Duck;Apoteket;987123567123";
-            }
-        };
+    public void shouldReturnValidData() {
+        Principal principal = () -> "Donald.Duck@apse.se;Donald;Duck;Apoteket;987123567123";
         JaasGrantedAuthorityPrincipal grantedAuthorityPrincipal = new JaasGrantedAuthorityPrincipal(principal);
         assertEquals(grantedAuthorityPrincipal.getId(), "Donald.Duck@apse.se");
         assertEquals(grantedAuthorityPrincipal.getFirstName(), "Donald");
@@ -31,29 +22,19 @@ public class JaasGrantedAuthorityPrincipalTest {
     }
 
     @Test
-    public void shouldReturnInValidDataWhenTooFewFields(){
-        Principal principal = new Principal() {
-            @Override
-            public String getName() {
-                return "Donald.Duck@apse.se;Donald;Duck;Apoteket";
-            }
-        };
+    public void shouldReturnInValidDataWhenTooFewFields() {
+        Principal principal = () -> "Donald.Duck@apse.se;Donald;Duck;Apoteket";
         JaasGrantedAuthorityPrincipal grantedAuthorityPrincipal = new JaasGrantedAuthorityPrincipal(principal);
-        assertEquals(grantedAuthorityPrincipal.getId(), null);
-        assertEquals(grantedAuthorityPrincipal.getFirstName(), null);
-        assertEquals(grantedAuthorityPrincipal.getLastName(), null);
-        assertEquals(grantedAuthorityPrincipal.getCommonName(), null);
-        assertEquals(grantedAuthorityPrincipal.getOrganizationName(), null);
+        assertNull(grantedAuthorityPrincipal.getId());
+        assertNull(grantedAuthorityPrincipal.getFirstName());
+        assertNull(grantedAuthorityPrincipal.getLastName());
+        assertNull(grantedAuthorityPrincipal.getCommonName());
+        assertNull(grantedAuthorityPrincipal.getOrganizationName());
     }
 
     @Test
-    public void shouldReturnValidDataWhenTooManyFields(){
-        Principal principal = new Principal() {
-            @Override
-            public String getName() {
-                return "Donald.Duck@apse.se;Donald;Duck;Apoteket;987123567123;extra field";
-            }
-        };
+    public void shouldReturnValidDataWhenTooManyFields() {
+        Principal principal = () -> "Donald.Duck@apse.se;Donald;Duck;Apoteket;987123567123;extra field";
         JaasGrantedAuthorityPrincipal grantedAuthorityPrincipal = new JaasGrantedAuthorityPrincipal(principal);
         assertEquals(grantedAuthorityPrincipal.getId(), "Donald.Duck@apse.se");
         assertEquals(grantedAuthorityPrincipal.getFirstName(), "Donald");
@@ -62,5 +43,4 @@ public class JaasGrantedAuthorityPrincipalTest {
         assertEquals(grantedAuthorityPrincipal.getOrganizationName(), "Apoteket");
         assertEquals(grantedAuthorityPrincipal.getOrganizationId(), "987123567123");
     }
-
 }

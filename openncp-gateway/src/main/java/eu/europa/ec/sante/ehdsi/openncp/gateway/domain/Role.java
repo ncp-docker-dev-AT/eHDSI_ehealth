@@ -3,18 +3,18 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.domain;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "role")
+@Table(name = "EHNCP_ROLE")
 public class Role {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String role;
+    private String name;
 
     private String description;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return id;
     }
@@ -23,12 +23,13 @@ public class Role {
         this.id = id;
     }
 
-    public String getRole() {
-        return role;
+    @Column(nullable = false, unique = true)
+    public String getName() {
+        return name;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {

@@ -29,7 +29,7 @@ public class UserPrincipal implements UserDetails {
         Hibernate.initialize(user.getRoles());
         // Build user's authorities
         for (Role role : user.getRoles()) {
-            setAuths.add(new SimpleGrantedAuthority(role.getRole()));
+            setAuths.add(new SimpleGrantedAuthority(role.getName()));
         }
 
         return new ArrayList<>(setAuths);

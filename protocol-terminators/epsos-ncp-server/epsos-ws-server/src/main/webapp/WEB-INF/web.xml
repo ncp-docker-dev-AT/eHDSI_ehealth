@@ -14,17 +14,18 @@
         </init-param>
     </filter>
 
-    <filter>
-        <filter-name>javamelody</filter-name>
-        <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
-        <async-supported>true</async-supported>
-    </filter>
-
     <filter-mapping>
         <filter-name>ParameterValidationFilter</filter-name>
         <url-pattern>*.jsp</url-pattern>
     </filter-mapping>
 
+    ${enable.monitoring.start}
+    <filter>
+        <filter-name>javamelody</filter-name>
+        <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
+        <async-supported>true</async-supported>
+    </filter>
+    
     <filter-mapping>
         <filter-name>javamelody</filter-name>
         <url-pattern>/*</url-pattern>
@@ -35,6 +36,7 @@
     <listener>
         <listener-class>net.bull.javamelody.SessionListener</listener-class>
     </listener>
+    ${enable.monitoring.stop}
 
     <servlet>
         <servlet-name>AxisServlet</servlet-name>

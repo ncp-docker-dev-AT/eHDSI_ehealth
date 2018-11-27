@@ -167,27 +167,18 @@ public class XcaInitGateway {
             }
             //TODO: review this try - catch - finally mechanism and the transformation/translation mechanism.
             try {
-                LOGGER.info("******************************************");
-                /* Validate CDA epSOS Pivot */
-//                Element elementNormalize = TMServices.byteToDocument(queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement();
-//                elementNormalize.normalize();
-//                cdaValidationService.validateModel(XMLUtils.toOM(elementNormalize).toString(), CdaModel.obtainCdaModel(document.getClassCode().getValue(), true), NcpSide.NCP_B);
-                //String cdaModel = CdaModel.obtainCdaModel(document.getClassCode().getValue(), true);
+
+                //  Validate CDA Pivot
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(TMServices.byteToDocument(
                             queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
                             NcpSide.NCP_B, document.getClassCode().getValue(), true);
                 }
-//                //Resets the response document to a translated version.
+                //  Resets the response document to a translated version.
                 queryResponse.getDocumentResponse().get(0).setDocument(TMServices.transformDocument(
                         queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage));
-//
-                /* Validate CDA epSOS Friendly-B */
-//                cdaValidationService.validateModel(XMLUtils.toOM(TMServices.byteToDocument(
-//                        queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
-//                        CdaModel.obtainCdaModel(document.getClassCode().getValue(), false), NcpSide.NCP_B);
 
-                //String cdaModel2 = CdaModel.obtainCdaModel(document.getClassCode().getValue(), false);
+                //  Validate CDA Friendly-B
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(TMServices.byteToDocument(
                             queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
@@ -232,8 +223,8 @@ public class XcaInitGateway {
                     String location = error.getLocation();
                     String severity = error.getSeverity();
                     String codeContext = error.getCodeContext();
-                    LOGGER.error("errorCode=" + errorCode + "\ncodeContext=" + codeContext
-                            + "\nlocation=" + location + "\nseverity=" + severity + "\n" + value + "\n");
+                    LOGGER.error("errorCode='{}'\ncodeContext='{}'\nlocation='{}'\nseverity='{}'\n'{}'\n",
+                            errorCode, codeContext, location, severity, value);
 
                     // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/2.
                     // (Needs to be revised according to new error communication strategy to the portal).

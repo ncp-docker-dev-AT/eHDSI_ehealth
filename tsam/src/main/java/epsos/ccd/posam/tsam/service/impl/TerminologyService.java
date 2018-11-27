@@ -70,7 +70,7 @@ public class TerminologyService implements ITerminologyService {
 
         } catch (TSAMException e) {
             response.addError(e.getReason(), epSOSRefConcept.toString());
-            LOGGER.warn("{}, {}", epSOSRefConcept, e);
+            LOGGER.debug("No '{}' Translation available - {}", targetLanguageCode, epSOSRefConcept);
         } catch (Exception e) {
             response.addError(TSAMError.ERROR_PROCESSING_ERROR, epSOSRefConcept.toString());
             LOGGER.error(epSOSRefConcept.toString(), e);

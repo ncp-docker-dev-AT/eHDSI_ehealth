@@ -67,7 +67,7 @@ public class PacRepBean implements Serializable {
     private String queryDocumentsException;
     private boolean showPS;
     private boolean consentExists;
-    private Map<String, String> ltrlanguages = new HashMap<>();
+    private Map<String, String> ltrlanguages;
     private Map<String, String> repuser = new HashMap<>();
     private String repUserString;
     private boolean enablePacRep;
@@ -113,7 +113,7 @@ public class PacRepBean implements Serializable {
             EpsosHelperService.printAssertion(onBehalf);
             onbehalfdemographicsattrs = StorkUtils.getRepresentedDemographics(authnResponse);
             patientIdentifiers = StorkUtils.getRepresentedEidentifiers(authnResponse, selectedCountry);
-            LOGGER.info("PATIENT IDENTIFIERS SIZE: " + patientIdentifiers.size());
+            LOGGER.info("PATIENT IDENTIFIERS SIZE: '{}'", patientIdentifiers.size());
             for (tr.com.srdc.epsos.data.model.PatientId patientIdentifier : patientIdentifiers) {
                 LOGGER.info("#################" + patientIdentifier.getRoot() + "-" + patientIdentifier.getExtension());
             }
@@ -122,15 +122,15 @@ public class PacRepBean implements Serializable {
                 LOGGER.info("#################" + entry.getKey() + "/" + entry.getValue());
             }
             LOGGER.info("ASSERTION ID: " + onBehalf.getID());
-            LOGGER.info("ASSERTION ATTRIBUTES: " + onbehalfdemographicsattrs.size());
-            LOGGER.info("ASSERTION GIVENNAME :" + onbehalfdemographicsattrs.get("patient.data.givenname"));
-            LOGGER.info("ASSERTION EIDENTIFIER :" + patientIdentifiers.get(0).getRoot() + " " + patientIdentifiers.get(0).getExtension());
+            LOGGER.info("ASSERTION ATTRIBUTES: '{}'", onbehalfdemographicsattrs.size());
+            LOGGER.info("ASSERTION GIVENNAME: '{}'", onbehalfdemographicsattrs.get("patient.data.givenname"));
+            LOGGER.info("ASSERTION EIDENTIFIER: '{}'-'{}'", patientIdentifiers.get(0).getRoot(), patientIdentifiers.get(0).getExtension());
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
-        LOGGER.debug("Response is :" + USER_samlResponseXML);
-        LOGGER.info("Selected Country: " + selectedCountry);
+        LOGGER.debug("Response is: '{}'", USER_samlResponseXML);
+        LOGGER.info("Selected Country: '{}'", selectedCountry);
         identifiers = new ArrayList<>();
         demographics = new ArrayList<>();
         ltrlanguages = EpsosHelperService.getLTRLanguages();
@@ -176,7 +176,7 @@ public class PacRepBean implements Serializable {
             String domain = patientIdentifiers.get(l).getRoot();
             id.setDomain(domain);
             String idvalue = patientIdentifiers.get(l).getExtension();
-            LOGGER.info("Identifiers: " + domain + "_" + idvalue);
+            LOGGER.info("Identifiers: '{}_{}'", domain, idvalue);
 
             id.setUserValue(idvalue);
             identifiers.add(id);
@@ -195,9 +195,8 @@ public class PacRepBean implements Serializable {
             demographics.add(dd);
         }
 
-        LOGGER.info("Selected Country: " + selectedCountry);
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Country", selectedCountry));
+        LOGGER.info("Selected Country: '{}'", selectedCountry);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Country", selectedCountry));
         LiferayUtils.storeToSession("selectedCountry", selectedCountry);
         User user = LiferayUtils.getPortalUser();
         LOGGER.info("STORING USER TO SESSION " + user.getScreenName());
@@ -247,20 +246,20 @@ public class PacRepBean implements Serializable {
             PatientDemographics pd = EpsosHelperService.
                     createPatientDemographicsForQuery(identifiers, demographics);
 
-            LOGGER.info("Running client connector : " + serviceUrl);
+            LOGGER.info("Running client connector: '{}'", serviceUrl);
             ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
             LOGGER.info("Test Assertions: "
                     + EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS));
             boolean testAssertion = GetterUtil.getBoolean(
                     EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS), true);
-            Assertion ass = null;
+            Assertion ass;
             if (testAssertion) {
                 ass = new HCPIAssertionCreator().createHCPIAssertion();
             } else {
                 ass = hcpAssertion;
             }
-            LOGGER.info("Searching for patients in " + selectedCountry);
-            LOGGER.info("Assertion id: " + ass.getID());
+            LOGGER.info("Searching for patients in '{}'", selectedCountry);
+            LOGGER.info("Assertion id: '{}'", ass.getID());
             try {
                 LOGGER.info("PD : " + pd.getPatientIdArray(0));
             } catch (Exception e) {
@@ -289,7 +288,7 @@ public class PacRepBean implements Serializable {
                 }
             }
             queryPatientsException = LiferayUtils.getPortalTranslation("patient.list.no.patient");
-            LOGGER.info("Found " + i + " patients");
+            LOGGER.info("Found '{}' patients", i);
             showPatientList = true;
         } catch (Exception ex) {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
@@ -436,8 +435,8 @@ public class PacRepBean implements Serializable {
     public boolean getShowConfirmation() {
 
         LOGGER.debug("### GET SHOW CONFIRMATION ###");
-        LOGGER.debug("trcassertionexists: " + trcassertionexists);
-        LOGGER.debug("consentExists: " + consentExists);
+        LOGGER.debug("trcassertionexists: '{}'", trcassertionexists);
+        LOGGER.debug("consentExists: '{}'", consentExists);
         return !trcassertionexists;
     }
 
@@ -478,7 +477,6 @@ public class PacRepBean implements Serializable {
                 try {
                     document.setCreationDate(sdf.format(cal.getTime()));
                 } catch (Exception e) {
-                    //document.setCreationDate(aux.getCreationDate()+"");
                     LOGGER.error("Problem converting date" + aux.getCreationDate());
                 }
                 document.setDescription(aux.getDescription());
@@ -519,10 +517,12 @@ public class PacRepBean implements Serializable {
             patientId.setExtension(selectedPatient.getExtension());
             patientId.setRoot(selectedPatient.getRoot());
             this.purposeOfUse = purposeOfUse;
-            LOGGER.info("TRCA: Creating trca for hcpAssertion : " + hcpAssertion.getID() + " for patient " + patientId.getRoot() + ". Purpose of use is : " + purposeOfUse);
+            LOGGER.info("TRCA: Creating trca for hcpAssertion: '{}' for patient '{}'. Purpose of use is: '{}'",
+                    hcpAssertion.getID(), patientId.getRoot(), purposeOfUse);
             trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, hcpAssertion, patientId);
-            LOGGER.info("TRCA: Created " + trcAssertion.getID() + " for : " + hcpAssertion.getID() + " for patient " + patientId.getRoot() + "_" + patientId.getExtension() + ". Purpose of use is : " + purposeOfUse);
-            LOGGER.info("TRCA:" + trcAssertion);
+            LOGGER.info("TRCA: Created '{}' for: '{}' for patient: '{}_{}'. Purpose of use is: '{}'",
+                    trcAssertion.getID(), hcpAssertion.getID(), purposeOfUse, patientId.getRoot(), patientId.getExtension(), purposeOfUse);
+            LOGGER.info("TRCA: '{}'", trcAssertion);
             trcassertionexists = true;
             trcassertionnotexists = false;
             // get patient documents

@@ -1,19 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package epsos.openncp.protocolterminator;
 
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
@@ -124,7 +108,6 @@ public class HCPIAssertionCreator {
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
             XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
-
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("physician the");
 
@@ -144,9 +127,7 @@ public class HCPIAssertionCreator {
             att.setName("urn:oasis:names:tc:xacml:2.0:subject:role");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
-
+            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("medical doctor");
 
@@ -166,12 +147,9 @@ public class HCPIAssertionCreator {
             att.setName("urn:epsos:names:wp3.4:subject:clinical-speciality");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
-
+            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("UNKNOWN");
-
             attVal.getNamespaceManager().registerNamespace(ns1);
             attVal.getNamespaceManager().registerNamespace(ns2);
             QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
@@ -204,37 +182,13 @@ public class HCPIAssertionCreator {
         }
 
         // Set Healthcare Professional Organisation ID
-//		if(true)
-//		{
-//			Attribute att = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
-//			att.setFriendlyName("XSPA Organization Id");
-//			att.setName("urn:oasis:names:tc:xspa:1.0:subject:organization-id");
-//			att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
-//			
-//			XMLObjectBuilder<?> builder = Configuration.getBuilderFactory ()
-//			.getBuilder (XSAny.TYPE_NAME);
-//
-//			XSAny attVal = (XSAny) builder.buildObject (AttributeValue.DEFAULT_ELEMENT_NAME);
-//			attVal.setTextContent ("urn:oid:1.2.3.4.5.6.7");
-//			
-//			attVal.getNamespaceManager().registerNamespace(ns1);
-//			attVal.getNamespaceManager().registerNamespace(ns2);
-//			QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
-//			attVal.getUnknownAttributes().put(attributeName, "xs:string");
-//			
-//			att.getAttributeValues ().add (attVal);	
-//			attributeStatement.getAttributes().add(att);
-//		}
-//
         if (true) {
             Attribute att = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
             att.setFriendlyName("XSPA Organization Id");
             att.setName("urn:oasis:names:tc:xspa:1.0:subject:organization-id");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory()
-                    .getBuilder(XSAny.TYPE_NAME);
-
+            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("urn:oid:1.2.3.4.5.6.7");
 

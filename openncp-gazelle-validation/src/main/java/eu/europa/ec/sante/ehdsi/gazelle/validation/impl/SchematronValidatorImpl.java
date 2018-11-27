@@ -2,8 +2,8 @@ package eu.europa.ec.sante.ehdsi.gazelle.validation.impl;
 
 import eu.europa.ec.sante.ehdsi.gazelle.validation.GazelleValidationException;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.SchematronValidator;
-import net.ihe.gazelle.jaxb.schematron.sante.ValidateObject;
-import net.ihe.gazelle.jaxb.schematron.sante.ValidateObjectResponse;
+import net.ihe.gazelle.jaxb.schematron.sante.ValidateBase64Document;
+import net.ihe.gazelle.jaxb.schematron.sante.ValidateBase64DocumentResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ws.client.WebServiceClientException;
@@ -21,14 +21,14 @@ public class SchematronValidatorImpl extends AbstractValidator implements Schema
 
         logger.info("Schematron Validator: validateObject('{}','{}')", xmlReferencedStandard, xmlMetadata);
 
-        ValidateObject request = new ValidateObject();
-        request.setBase64ObjectToValidate(base64Object);
-        request.setXmlReferencedStandard(xmlReferencedStandard);
-        request.setXmlMetadata(xmlMetadata);
+        ValidateBase64Document request = new ValidateBase64Document();
+        request.setBase64Document(base64Object);
+        request.setValidator(xmlReferencedStandard);
+        request.setValidator(xmlMetadata);
 
         try {
-            ValidateObjectResponse response = (ValidateObjectResponse) webServiceTemplate.marshalSendAndReceive(request);
-            return response.getValidationResult();
+            ValidateBase64DocumentResponse response = (ValidateBase64DocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
+            return response.getReturn();
 
         } catch (WebServiceClientException e) {
             logger.error("An error occurred during validation process of the SchematronValidator. " +
