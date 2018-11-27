@@ -1016,7 +1016,9 @@ public class EpsosHelperService {
             // GUI-27
             if (assertion != null) {
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
-                LOGGER_CLINICAL.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
+                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    LOGGER_CLINICAL.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
+                }
                 String auditPointOfCare;
                 if (StringUtils.isNotBlank(orgName)) {
                     auditPointOfCare = orgName;
