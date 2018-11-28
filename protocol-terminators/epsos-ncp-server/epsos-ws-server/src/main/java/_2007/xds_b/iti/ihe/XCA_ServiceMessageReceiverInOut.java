@@ -53,9 +53,6 @@ import java.util.UUID;
 public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCA_ServiceMessageReceiverInOut.class);
-
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     private static final JAXBContext wsContext;
 
     static {
@@ -78,6 +75,8 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             wsContext = jc;
         }
     }
+
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private String getIPofSender(MessageContext messageContext) {
 
@@ -131,8 +130,8 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
                 String clientDN = HTTPUtil.getClientCertificate(req);
                 eventLog.setSC_UserID(clientDN);
+                eventLog.setTargetip(HTTPUtil.getHostIpAddress(req.getServerName()));
 
-                eventLog.setTargetip(req.getServerName());
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                     loggerClinical.info("[Audit Debug] Requester: ParticipantId: '{}'\nObjectDetail: '{}'",
                             getMessageID(msgContext.getEnvelope()), msgContext.getEnvelope().getHeader().toString());

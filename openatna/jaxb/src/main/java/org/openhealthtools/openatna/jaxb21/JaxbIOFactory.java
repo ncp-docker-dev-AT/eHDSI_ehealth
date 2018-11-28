@@ -137,8 +137,8 @@ public class JaxbIOFactory implements AtnaIOFactory {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         transform(doc, bout);
         byte[] bytes = bout.toByteArray();
-        if (logger.isInfoEnabled()) {
-            logger.info("\n{}", new String(bytes));
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n{}", new String(bytes));
         }
         return new ProvisionalMessage(bytes);
     }
@@ -252,7 +252,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
 
     private AtnaMessageObject createObject(ParticipantObjectIdentificationType obj) throws AtnaException {
 
-        logger.info("Display NAME: '{}'", obj.getParticipantObjectIDTypeCode().displayName);
+        logger.debug("Display NAME: '{}'", obj.getParticipantObjectIDTypeCode().displayName);
         if (obj.getParticipantObjectIDTypeCode() == null) {
             throw new AtnaException("object has no Id type code");
         }

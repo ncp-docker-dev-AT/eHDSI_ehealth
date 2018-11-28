@@ -104,7 +104,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
             String clientDN = HTTPUtil.getClientCertificate(req);
             eventLog.setSC_UserID(clientDN);
-            eventLog.setTargetip(req.getServerName());
+            eventLog.setTargetip(HTTPUtil.getHostIpAddress(req.getServerName()));
 
             if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                 loggerClinical.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));

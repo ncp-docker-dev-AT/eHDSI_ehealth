@@ -1,5 +1,6 @@
 package eu.epsos.protocolterminators.integrationtest.common;
 
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.joda.time.DateTime;
 import org.opensaml.core.xml.Namespace;
@@ -59,8 +60,9 @@ public class TRCAssertionCreator {
         // Create assertion
         Assertion assertion = saml.createAssertion(subject);
 
+        String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
         Issuer issuer = saml.create(Issuer.class, Issuer.DEFAULT_ELEMENT_NAME);
-        issuer.setValue("urn:initgw:countryB");
+        issuer.setValue("urn:initgw:" + countryCode + ":countryB");
         issuer.setFormat("urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified");
         issuer.setNameQualifier("urn:epsos:wp34:assertions");
         assertion.setIssuer(issuer);

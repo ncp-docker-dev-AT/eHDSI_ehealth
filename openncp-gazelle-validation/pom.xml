@@ -175,7 +175,7 @@
                             </xjbSources>
                             <sourceType>wsdl</sourceType>
                             <sources>
-                                <source>src/main/wsdl/schematron-validator/GazelleObjectValidator.wsdl</source>
+                                <source>src/main/wsdl/schematron-validator/SchematronValidator.wsdl</source>
                             </sources>
                             <clearOutputDir>false</clearOutputDir>
                         </configuration>

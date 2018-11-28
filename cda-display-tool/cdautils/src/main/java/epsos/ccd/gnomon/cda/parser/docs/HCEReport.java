@@ -55,7 +55,6 @@ public class HCEReport extends ClinicalDocument {
         String ns = "xmlns=\"urn:hl7-org:v3\" "
                 + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
                 + "xmlns:epsos=\"urn:epsos-org:ep:medication\" "
-                + "xsi:schemaLocation=\"urn:hl7-org:v3 CDA_extended.xsd\" "
                 + "classCode=\"DOCCLIN\" "
                 + "moodCode=\"EVN\"";
         context.append(ns);

@@ -1,6 +1,6 @@
-create table IF NOT EXISTS property (
-  name varchar(255) not null,
-  value varchar(255),
-  is_smp bit DEFAULT 0,
-  primary key (name)
+CREATE TABLE IF NOT EXISTS EHNCP_PROPERTY (
+  NAME varchar(255) NOT NULL,
+  VALUE varchar(255),
+  IS_SMP bit DEFAULT 0,
+  PRIMARY KEY (NAME)
 );

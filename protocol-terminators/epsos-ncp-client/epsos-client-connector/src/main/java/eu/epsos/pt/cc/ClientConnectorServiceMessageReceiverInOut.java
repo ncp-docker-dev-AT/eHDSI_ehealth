@@ -203,8 +203,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                     RetrieveDocumentResponseDocument retrieveDocumentResponse19;
                     RetrieveDocumentDocument1 wrappedParam;
                     wrappedParam = (RetrieveDocumentDocument1) fromOM(reqEnv.getBody().getFirstElement(),
-                            RetrieveDocumentDocument1.class,
-                            getEnvelopeNamespaces(reqEnv));
+                            RetrieveDocumentDocument1.class, getEnvelopeNamespaces(reqEnv));
                     retrieveDocumentResponse19 = skel.retrieveDocument(wrappedParam, hcpAssertion, trcAssertion);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), retrieveDocumentResponse19);

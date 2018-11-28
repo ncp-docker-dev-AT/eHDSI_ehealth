@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ClinicalDocument xmlns:epsos="urn:epsos-org:ep:medication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xmlns="urn:hl7-org:v3"
-                  xsi:schemaLocation="urn:hl7-org:v3 CDA_extended.xsd">
+<ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:epsos="urn:epsos-org:ep:medication" classCode="DOCCLIN" moodCode="EVN">
     <typeId extension="POCD_HD000040" root="2.16.840.1.113883.1.3"/>
     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.3"/>
     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.1"/>
@@ -2189,7 +2188,7 @@
                             <text><reference value="#social0"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
-                                    <low value="20170415"/>
+                                <low value="20170415"/>
                             </effectiveTime>
                             <value xsi:type="ST">0,5 {maço}/d</value>
                         </observation>
@@ -2213,7 +2212,7 @@
                             <text><reference value="#social1"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
-                                    <low value="20160415"/>
+                                <low value="20160415"/>
                             </effectiveTime>
                             <value xsi:type="ST">4 {copo}/d</value>
                         </observation>

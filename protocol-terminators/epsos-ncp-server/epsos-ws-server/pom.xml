@@ -256,6 +256,14 @@
 
     <profiles>
         <profile>
+            <id>monitoring</id>
+            <properties>
+                <enable.monitoring.start/>
+                <enable.monitoring.stop/>
+            </properties>
+        </profile>
+
+        <profile>
             <!-- This profile bundles the mock National Connector implementation -->
             <id>national-connector-mock</id>
             <dependencies>

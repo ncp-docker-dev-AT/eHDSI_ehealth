@@ -23,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import sun.security.x509.X500Name;
+import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -37,9 +39,14 @@ import javax.xml.soap.*;
 import javax.xml.ws.*;
 import javax.xml.ws.Service.Mode;
 import javax.xml.ws.handler.MessageContext;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.util.Base64;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
@@ -85,10 +92,7 @@ public class STSService implements Provider<SOAPMessage> {
         if (logger.isDebugEnabled()) {
             logger.debug("Incoming SOAP Message request: '{}'", source);
             log(source);
-            String value = System.getProperty("javax.net.ssl.key.alias");
-            logger.debug("Certificate Alias: '{}'", value);
         }
-
         SOAPBody body;
         SOAPHeader header;
         try {
@@ -158,18 +162,22 @@ public class STSService implements Provider<SOAPMessage> {
             String strRespHeader = STSUtils.domElementToString(response.getSOAPHeader());
             String strReqHeader = STSUtils.domElementToString(header);
 
-            String tls_cn = STSUtils.getSSLCertPeer(context.getMessageContext());
-            logger.info("tls_cn: '{}'", tls_cn);
+
+            String sslCommonName;
 
             if (context.getUserPrincipal() != null) {
-                tls_cn = context.getUserPrincipal().getName();
+
+                sslCommonName = context.getUserPrincipal().getName();
+                logger.info("WebServiceContext JAX-WS User: '{}'", sslCommonName);
+            } else {
+                logger.info("WebServiceContext JAX-WS - No User authenticated");
             }
 
-            audit(samlTRCIssuer.getPointofCare(), samlTRCIssuer.getHumanRequestorNameId(),
+            sslCommonName = HTTPUtil.getSubjectDN(false);
+            sendTRCAuditMessage(samlTRCIssuer.getPointofCare(), samlTRCIssuer.getHumanRequestorNameId(),
                     samlTRCIssuer.getHumanRequestorSubjectId(), samlTRCIssuer.getHRRole(), patientID,
-                    samlTRCIssuer.getFacilityType(), trc.getID(), tls_cn, mid,
-                    strReqHeader.getBytes(StandardCharsets.UTF_8),
-                    getMessageIdFromHeader(response.getSOAPHeader()),
+                    samlTRCIssuer.getFacilityType(), trc.getID(), sslCommonName, mid,
+                    strReqHeader.getBytes(StandardCharsets.UTF_8), getMessageIdFromHeader(response.getSOAPHeader()),
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
 
             if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
@@ -184,6 +192,42 @@ public class STSService implements Provider<SOAPMessage> {
         }
     }
 
+    private String getCertificateCommonName(Assertion hcpIdAssertion) {
+
+        //TODO: Test Certificate CN retrieve
+        KeyInfo hcpSignature = hcpIdAssertion.getSignature().getKeyInfo();
+        for (X509Data x509Data : hcpSignature.getX509Datas()) {
+            for (X509Certificate x509Certificate : x509Data.getX509Certificates()) {
+                logger.info("[SAML] Signature certificate:\n'{}' ", x509Certificate.getValue());
+
+                byte[] encodedCert = Base64.getDecoder().decode(removeDisplayCharacter(x509Certificate.getValue()));
+                InputStream inputStream = new ByteArrayInputStream(encodedCert);
+
+                CertificateFactory certFactory;
+                try {
+                    certFactory = CertificateFactory.getInstance("X.509");
+                    java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) certFactory
+                            .generateCertificate(inputStream);
+                    logger.info(((X500Name) cert.getSubjectDN()).getCommonName());
+                    return ((X500Name) cert.getSubjectDN()).getCommonName();
+                } catch (CertificateException e) {
+                    logger.error("CertificateException: '{}'", e.getMessage());
+                } catch (IOException e) {
+                    logger.error("IOException: '{}'", e.getMessage());
+                }
+            }
+        }
+        return STSUtils.NO_CLIENT_CERTIFICATE;
+    }
+
+    private String removeDisplayCharacter(String certificateValue) {
+
+        String certificatePEM = StringUtils.removeAll(certificateValue, "-----BEGIN CERTIFICATE-----");
+        certificatePEM = StringUtils.removeAll(certificatePEM, "-----END CERTIFICATE-----");
+        certificatePEM = StringUtils.removeAll(certificatePEM, StringUtils.LF);
+        certificatePEM = StringUtils.removeAll(certificatePEM, StringUtils.CR);
+        return certificatePEM;
+    }
 
     private String getPatientID(SOAPElement body) {
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
@@ -297,9 +341,23 @@ public class STSService implements Provider<SOAPMessage> {
 
     }
 
-    private void audit(String pointOfCareID, String humanRequestorNameID, String humanRequestorSubjectID,
-                       String humanRequestorRole, String patientID, String facilityType, String assertionId,
-                       String tls_cn, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
+    /**
+     * @param pointOfCareID
+     * @param humanRequestorNameID
+     * @param humanRequestorSubjectID
+     * @param humanRequestorRole
+     * @param patientID
+     * @param facilityType
+     * @param assertionId
+     * @param tls_cn
+     * @param reqMid
+     * @param reqSecHeader
+     * @param resMid
+     * @param resSecHeader
+     */
+    private void sendTRCAuditMessage(String pointOfCareID, String humanRequestorNameID, String humanRequestorSubjectID,
+                                     String humanRequestorRole, String patientID, String facilityType, String assertionId,
+                                     String tls_cn, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
 
         AuditService auditService = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
@@ -310,20 +368,22 @@ public class STSService implements Provider<SOAPMessage> {
         } catch (DatatypeConfigurationException ex) {
             logger.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
-
+        String trcCommonName = HTTPUtil.getTlsCertificateCommonName(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
         ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
-
+        //TODO: Review Audit Trail specification - Identifying SC and SP as value of CN from TLS certificate.
         EventLog evLogTRC = EventLog.createEventLogTRCA(TransactionName.epsosTRCAssertion, EventActionCode.EXECUTE,
-                date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, cms.getProperty("ncp.country")
-                        + "<" + humanRequestorNameID + "@" + cms.getProperty("ncp.country") + ">", humanRequestorRole,
-                humanRequestorSubjectID, tls_cn, STSUtils.getServerIP(), cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
-                patientID, "urn:uuid:" + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
-                STSUtils.getServerIP(), getClientIP(), NcpSide.NCP_B);
+                date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID, humanRequestorRole,
+                humanRequestorSubjectID, tls_cn, trcCommonName, cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"), patientID,
+                "urn:uuid:" + assertionId, reqMid, reqSecHeader, resMid, resSecHeader, STSUtils.getServerIP(),
+                getClientIP(), NcpSide.NCP_B);
 
         evLogTRC.setEventType(EventType.epsosTRCAssertion);
         auditService.write(evLogTRC, "13", "2");
     }
 
+    /**
+     * @return
+     */
     private String getClientIP() {
 
         MessageContext mc = context.getMessageContext();
@@ -331,6 +391,9 @@ public class STSService implements Provider<SOAPMessage> {
         return req.getRemoteAddr();
     }
 
+    /**
+     * @param message
+     */
     private void log(SOAPMessage message) {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -341,7 +404,7 @@ public class STSService implements Provider<SOAPMessage> {
                 loggerClinical.error("Exception: '{}'", e.getMessage(), e);
             }
         }
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD") && loggerClinical.isInfoEnabled()) {
             loggerClinical.info("SOAPMessage:\n{}", out.toString());
         }
     }

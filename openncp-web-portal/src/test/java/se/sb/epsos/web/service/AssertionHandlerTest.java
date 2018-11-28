@@ -69,7 +69,7 @@ public class AssertionHandlerTest extends TestCase {
         when(userDetailsMock.getUsername()).thenReturn("username");
         when(userDetailsMock.getOrganizationId()).thenReturn("organizationId");
         when(userDetailsMock.getOrganizationName()).thenReturn("organizationName");
-        when(userDetailsMock.getRoles()).thenReturn(Arrays.asList(new String[]{"ROLE_PHARMACIST"}));
+        when(userDetailsMock.getRoles()).thenReturn(Arrays.asList("ROLE_PHARMACIST"));
     }
 
     @Override
@@ -82,20 +82,16 @@ public class AssertionHandlerTest extends TestCase {
         Assertion assertion = assertionHandler.createSAMLAssertion(userDetailsMock);
         assertNotNull(assertion);
         assertNotNull(assertion.getIssuer().getValue());
-        assertEquals(assertion.getIssuer().getValue(), "urn:idp:countryB");
+        assertEquals(assertion.getIssuer().getValue(), "urn:idp:EU:countryB");
         assertNotNull(assertion.getSubject().getNameID().getValue());
         assertEquals(assertion.getSubject().getNameID().getValue(), "username");
-        assertEquals(assertion.getID().startsWith("_"), true);
+        assertTrue(assertion.getID().startsWith("_"));
         assertEquals(assertion.getVersion(), SAMLVersion.VERSION_20);
-
-//		assertionHandler.signSAMLAssertion(assertion);
-//		assertNotNull(assertion.getSignature());
-//		assertNotNull(assertion.getSignature().getKeyInfo().getX509Datas().get(0).getX509Certificates().get(0).getValue());
-//		assertEquals(assertion.getSignature().getSigningCredential().getPrivateKey().getAlgorithm(), "RSA");
     }
 
     public void testSendAuditEpsos91() {
 
+    public void testSendAuditEpsos91() {
         assertionHandler.sendAuditEpsos91(userDetailsMock, assertionMock);
     }
 }

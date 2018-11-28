@@ -63,9 +63,9 @@ public class MessageSender extends Thread {
     public void run() {
 
         boolean sent = false;
-        logger.info("Try to construct the message");
+
         try {
-            logger.info("'{}' - Try to construct the message", auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode());
+            logger.info("Try to construct the Audit Message type: '{}'", auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode());
             String auditmsg = AuditTrailUtils.constructMessage(auditmessage, true);
             if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
                 loggerClinical.debug("Audit Message sent:\n{}", auditmsg);
@@ -74,7 +74,7 @@ public class MessageSender extends Thread {
             if (!Utils.isEmpty(auditmsg)) {
                 long timeout = Long.parseLong(Utils.getProperty("audit.time.to.try", "60000", true));
                 boolean timeouted;
-                logger.info("Try to send the message for '{}' msec", timeout);
+                logger.debug("Try to send the message for '{}' msec", timeout);
                 timeout += System.currentTimeMillis();
 
                 do {

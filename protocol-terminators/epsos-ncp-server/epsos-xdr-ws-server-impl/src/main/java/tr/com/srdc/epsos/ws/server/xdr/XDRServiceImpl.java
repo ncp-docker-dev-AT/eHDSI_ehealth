@@ -109,8 +109,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
             LOGGER.error("DatatypeConfigurationException: {}", e.getMessage(), e);
         }
         if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
-            for (int i = 0; i < request.getSubmitObjectsRequest()
-                    .getRegistryObjectList().getIdentifiable().size(); i++) {
+
+            for (int i = 0; i < request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().size(); i++) {
                 if (!(request.getSubmitObjectsRequest().getRegistryObjectList()
                         .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
                     continue;
@@ -123,7 +123,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         documentId = eit.getValue();
                     }
                 }
-                eventLog.setET_ObjectID(documentId);
+                eventLog.getEventTargetParticipantObjectIds().add(documentId);
                 break;
             }
         }
@@ -134,7 +134,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         }
 
-        eventLog.setHR_UserID(Constants.HR_ID_PREFIX + "<" + Helper.getUserID(sh) + "@" + Helper.getOrganization(sh) + ">");
+        String userIdAlias = Helper.getAssertionsSPProvidedId(sh);
+        eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : ""
+                + "<" + Helper.getUserID(sh) + "@" + Helper.getAssertionsIssuer(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
@@ -167,14 +169,14 @@ public class XDRServiceImpl implements XDRServiceInterface {
         }
 
         if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
-            for (int i = 0; i < request.getSubmitObjectsRequest()
-                    .getRegistryObjectList().getIdentifiable().size(); i++) {
-                if (!(request.getSubmitObjectsRequest().getRegistryObjectList()
-                        .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
+
+            for (int i = 0; i < request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().size(); i++) {
+
+                if (!(request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().get(i).getValue()
+                        instanceof ExtrinsicObjectType)) {
                     continue;
                 }
-                ExtrinsicObjectType eot = (ExtrinsicObjectType) request
-                        .getSubmitObjectsRequest().getRegistryObjectList()
+                ExtrinsicObjectType eot = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
                         .getIdentifiable().get(i).getValue();
                 String documentId = "";
                 for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
@@ -182,7 +184,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         documentId = eit.getValue();
                     }
                 }
-                eventLog.setET_ObjectID(documentId);
+                eventLog.getEventTargetParticipantObjectIds().add(documentId);
                 break;
             }
         }
@@ -192,8 +194,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         } else {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         }
-
-        eventLog.setHR_UserID(Constants.HR_ID_PREFIX + "<" + Helper.getUserID(sh) + "@" + Helper.getOrganization(sh) + ">");
+        String userIdAlias = Helper.getAssertionsSPProvidedId(sh);
+        eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : ""
+                + "<" + Helper.getUserID(sh) + "@" + Helper.getAssertionsIssuer(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getRoleID(sh));
 
@@ -204,11 +207,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (response.getRegistryErrorList() != null) {
-            RegistryError re = response.getRegistryErrorList()
-                    .getRegistryError().get(0);
+            RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
             eventLog.setEM_PatricipantObjectID(re.getErrorCode());
-            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext()
-                    .getBytes());
+            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
         }
 
         LOGGER.debug("Event log prepared");
@@ -432,8 +433,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
                 } // TODO: check the right LOINC code, currently coded as in
                 // example 3.4.2 ver. 2.2 p. 82
-                else if (eot.getClassification().get(j).getNodeRepresentation()
-                        .compareTo(Constants.CONSENT_CLASSCODE) == 0) {
+                else if (eot.getClassification().get(j).getNodeRepresentation().compareTo(Constants.CONSENT_CLASSCODE) == 0) {
                     LOGGER.info("Processing a consent");
                     return saveConsent(request, sh, eventLog);
                 } else if (eot.getClassification().get(j).getNodeRepresentation()

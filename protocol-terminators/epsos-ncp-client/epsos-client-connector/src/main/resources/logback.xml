@@ -41,61 +41,61 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
-    <logger name="org.apache.http.client" level="DEBUG" additivity="false">
+    <logger name="org.apache.http.client" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="DEBUG" additivity="false">
+    <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="eu.europa.ec.dynamicdiscovery" level="DEBUG" additivity="false">
+    <logger name="eu.europa.ec.dynamicdiscovery" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="DEBUG" additivity="false">
+    <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="tr.com.srdc.epsos.ws.xca.client" level="DEBUG" additivity="false">
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="DB"/>
-    </logger>
-
-    <logger name="tr.com.srdc.epsos.ws.xcpd.client" level="DEBUG" additivity="false">
+    <logger name="tr.com.srdc.epsos.ws.xca.client" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
     </logger>
 
-    <logger name="tr.com.srdc.epsos.ws.xdr.client" level="DEBUG" additivity="false">
+    <logger name="tr.com.srdc.epsos.ws.xcpd.client" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
     </logger>
 
-    <logger name="ee.affecto.epsos.ws.handler" level="DEBUG" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="eu.esens.abb.nonrep" level="DEBUG" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="eu.epsos.pt.ws.client.xdr" level="DEBUG" additivity="false">
+    <logger name="tr.com.srdc.epsos.ws.xdr.client" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
     </logger>
 
-    <logger name="eu.epsos.pt.cc" level="DEBUG" additivity="false">
+    <logger name="ee.affecto.epsos.ws.handler" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="eu.esens.abb.nonrep" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="eu.epsos.pt.ws.client.xdr" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
     </logger>
 
-    <logger name="pt.spms.epsos.utils.logging" level="DEBUG" additivity="false">
+    <logger name="eu.epsos.pt.cc" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="DB"/>
     </logger>
 
-    <logger name="epsos.ccd.gnomon.auditmanager" level="DEBUG" additivity="false">
+    <logger name="pt.spms.epsos.utils.logging" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="DB"/>
+    </logger>
+
+    <logger name="epsos.ccd.gnomon.auditmanager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -108,27 +108,28 @@
         <appender-ref ref="DB"/>
     </logger>
 
-    <logger name="eu.epsos.util.net" level="DEBUG" additivity="false">
+    <logger name="eu.epsos.util.net" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="epsos.ccd.posam.tsam.service" level="DEBUG" additivity="false">
+    <logger name="epsos.ccd.posam.tsam.service" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="epsos.ccd.posam.tm.service" level="DEBUG" additivity="false">
+    <logger name="epsos.ccd.posam.tm.service" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
-    <logger name="eu.epsos.util.EvidenceUtils" level="DEBUG" additivity="false">
+    <logger name="eu.epsos.util.EvidenceUtils" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="eu.europa.ec.sante.ehdsi.openncp.configmanager" level="DEBUG" additivity="false">
+    <logger name="eu.europa.ec.sante.ehdsi.openncp.configmanager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
+        <appender-ref ref="LOGGER_CLINICAL"/>
     </root>
 </configuration>

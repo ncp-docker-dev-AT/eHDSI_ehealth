@@ -17,10 +17,13 @@ import org.hl7.v3.II;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml.saml2.core.Attribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -29,9 +32,16 @@ import java.util.UUID;
 // TODO A.R. Should be moved into openncp-util later to avoid duplication
 public class EventLogUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventLogUtil.class);
+
     private EventLogUtil() {
     }
 
+    /**
+     * @param eventLog
+     * @param request
+     * @param response
+     */
     public static void prepareXCPDCommonLog(EventLog eventLog, PRPAIN201305UV02 request, PRPAIN201306UV02 response) {
 
         // Set Event Identification
@@ -62,9 +72,9 @@ public class EventLogUtil {
         String st2 = "";
         if (!response.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().isEmpty()) {
 
-            II target_ii = response.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
-            if (target_ii.getExtension() != null && target_ii.getRoot() != null) {
-                st2 = target_ii.getExtension() + "^^^&" + target_ii.getRoot() + "&ISO";
+            II instanceIdentifier = response.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
+            if (instanceIdentifier.getExtension() != null && instanceIdentifier.getRoot() != null) {
+                st2 = instanceIdentifier.getExtension() + "^^^&" + instanceIdentifier.getRoot() + "&ISO";
             }
         }
         eventLog.setPT_PatricipantObjectID(st2);
@@ -78,6 +88,12 @@ public class EventLogUtil {
         }
     }
 
+    /**
+     * @param eventLog
+     * @param request
+     * @param response
+     * @param classCode
+     */
     public static void prepareXCACommonLogQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, String classCode) {
 
         switch (classCode) {
@@ -99,38 +115,52 @@ public class EventLogUtil {
         eventLog.setEI_EventActionCode(EventActionCode.READ);
 
         if (response.getRegistryObjectList() != null) {
-            for (int i = 0; i < response.getRegistryObjectList().getIdentifiable().size(); i++) {
-                if (!(response.getRegistryObjectList().getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
+
+            List<String> documentIds = new ArrayList<>();
+            List<JAXBElement<? extends IdentifiableType>> registryObjectList = response.getRegistryObjectList().getIdentifiable();
+            for (JAXBElement<? extends IdentifiableType> identifiable : registryObjectList) {
+
+                if (!(identifiable.getValue() instanceof ExtrinsicObjectType)) {
                     continue;
                 }
-                ExtrinsicObjectType eot = (ExtrinsicObjectType) response.getRegistryObjectList().getIdentifiable().get(i).getValue();
-                String documentId = "";
+                ExtrinsicObjectType eot = (ExtrinsicObjectType) identifiable.getValue();
                 for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
 
                     if (eit.getIdentificationScheme().equals(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME)) {
-                        documentId = eit.getValue();
+                        documentIds.add(eit.getValue());
                     }
                 }
-                // PT-237 add safely the urn:uuid prefix
-                if (!StringUtils.startsWith(documentId, "urn:uuid:") && isUUIDValid(documentId)) {
-
-                    documentId = "urn:uuid:" + documentId;
-                }
-                //eventLog.setET_ObjectID(EventLogClientUtil.appendUrnUuid(Constants.UUID_PREFIX + documentId));
-                eventLog.setET_ObjectID(documentId);
-                break;
             }
+            //TODO: Audit - Event Target
+            eventLog.setEventTargetParticipantObjectIds(documentIds);
         }
 
+        // Set Audit Operation status
         if (response.getRegistryObjectList() == null) {
 
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
+            for (SlotType1 slotType1 : request.getAdhocQuery().getSlot()) {
+                if (org.apache.commons.lang.StringUtils.equals(slotType1.getName(), "$XDSDocumentEntryClassCode")) {
+                    String documentType = slotType1.getValueList().getValue().get(0);
+                    documentType = org.apache.commons.lang3.StringUtils.remove(documentType, "('");
+                    documentType = org.apache.commons.lang3.StringUtils.remove(documentType, "')");
+                    eventLog.getEventTargetParticipantObjectIds().add(documentType);
+                }
+            }
         } else if (response.getRegistryErrorList() == null) {
 
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         } else {
 
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.TEMPORAL_FAILURE);
+            for (SlotType1 slotType1 : request.getAdhocQuery().getSlot()) {
+                if (org.apache.commons.lang.StringUtils.equals(slotType1.getName(), "$XDSDocumentEntryClassCode")) {
+                    String documentType = slotType1.getValueList().getValue().get(0);
+                    documentType = org.apache.commons.lang3.StringUtils.remove(documentType, "('");
+                    documentType = org.apache.commons.lang3.StringUtils.remove(documentType, "')");
+                    eventLog.getEventTargetParticipantObjectIds().add(documentType);
+                }
+            }
         }
 
         if (response.getRegistryErrorList() != null) {
@@ -141,6 +171,12 @@ public class EventLogUtil {
         }
     }
 
+    /**
+     * @param eventLog
+     * @param request
+     * @param response
+     * @param classCode
+     */
     public static void prepareXCACommonLogRetrieve(EventLog eventLog, RetrieveDocumentSetRequestType request, RetrieveDocumentSetResponseType response, String classCode) {
 
         switch (classCode) {
@@ -159,7 +195,8 @@ public class EventLogUtil {
         }
 
         eventLog.setEI_EventActionCode(EventActionCode.READ);
-        eventLog.setET_ObjectID(Constants.UUID_PREFIX + request.getDocumentRequest().get(0).getDocumentUniqueId());
+        //  TODO: Audit - Event Target
+        eventLog.getEventTargetParticipantObjectIds().add(request.getDocumentRequest().get(0).getDocumentUniqueId());
 
         if (response.getDocumentResponse() == null || response.getDocumentResponse().isEmpty() || response.getDocumentResponse().get(0).getDocument() == null) {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
@@ -184,6 +221,11 @@ public class EventLogUtil {
         }
     }
 
+    /**
+     * @param eventLog
+     * @param request
+     * @param rel
+     */
     public static void prepareXDRCommonLog(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request, RegistryErrorList rel) {
 
         String id = null;
@@ -191,14 +233,27 @@ public class EventLogUtil {
         String eventCode = null;
         String countryCode = null;
         String patientId = null;
+        String documentUniqueId = "N/A";
 
-        List<JAXBElement<? extends IdentifiableType>> identifList = request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable();
-        if (identifList != null) {
-            for (JAXBElement<? extends IdentifiableType> identif : identifList) {
-                if (!(identif.getValue() instanceof ExtrinsicObjectType)) {
+        List<JAXBElement<? extends IdentifiableType>> registryObjectList = request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable();
+        if (registryObjectList != null) {
+            for (JAXBElement<? extends IdentifiableType> identifiable : registryObjectList) {
+
+                //EHNCP-1631
+                if (identifiable.getValue() instanceof ExtrinsicObjectType) {
+
+                    for (ExternalIdentifierType identifierType : ((ExtrinsicObjectType) identifiable.getValue()).getExternalIdentifier()) {
+
+                        if (StringUtils.equals(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME, identifierType.getIdentificationScheme())) {
+
+                            documentUniqueId = identifierType.getValue();
+                        }
+                    }
+
+                } else if (!(identifiable.getValue() instanceof ExtrinsicObjectType)) {
                     continue;
                 }
-                ExtrinsicObjectType eot = (ExtrinsicObjectType) identif.getValue();
+                ExtrinsicObjectType eot = (ExtrinsicObjectType) identifiable.getValue();
                 id = eot.getId();
                 for (ClassificationType classif : eot.getClassification()) {
                     switch (classif.getClassificationScheme()) {
@@ -239,10 +294,12 @@ public class EventLogUtil {
             eventLog.setEI_TransactionName(TransactionName.epsosDispensationServiceInitialize);
             eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
         }
-        // TODO: support dispensation revoke operation
-        // TODO: Only id of one document (because of audit manager limitation) is included - extend to as many as needed.
-        eventLog.setET_ObjectID(Constants.UUID_PREFIX + request.getDocument().get(0).getId());
 
+        //  TODO: support dispensation revoke operation
+        //  TODO: Audit - Event Target
+        eventLog.getEventTargetParticipantObjectIds().add(documentUniqueId);
+
+        // Set Event status of the operation
         if (rel == null || rel.getRegistryError() == null || rel.getRegistryError().isEmpty()) {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         } else {
@@ -253,6 +310,10 @@ public class EventLogUtil {
         }
     }
 
+    /**
+     * @param envelope
+     * @return
+     */
     public static String getMessageID(SOAPEnvelope envelope) {
 
         Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(new QName("http://www.w3.org/2005/08/addressing", "MessageID"));
@@ -290,6 +351,10 @@ public class EventLogUtil {
         return "$XDSDocumentEntryPatientId Not Found!";
     }
 
+    /**
+     * @param message
+     * @return
+     */
     private static boolean isUUIDValid(String message) {
         try {
             UUID.fromString(message);

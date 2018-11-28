@@ -77,6 +77,8 @@ public class ReportBuilder {
             LOGGER.error("The specified validation result object is null. Assigning empty String to validation result.");
             validationTestResult = "";
         } else {
+            LOGGER.info("Validation Result: '{}'", validationResult.getValidationResultsOverview() != null ?
+                    validationResult.getValidationResultsOverview().getValidationTestResult() : "Validation Test Result Not available");
             validationTestResult = validationResult.getValidationResultsOverview().getValidationTestResult();
         }
         if (StringUtils.isEmpty(validationResponse)) {
