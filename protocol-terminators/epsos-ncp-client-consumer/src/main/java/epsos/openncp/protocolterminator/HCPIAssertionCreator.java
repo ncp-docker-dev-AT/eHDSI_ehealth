@@ -184,8 +184,7 @@ public class HCPIAssertionCreator {
             att.setFriendlyName("XSPA Organization Id");
             att.setName("urn:oasis:names:tc:xspa:1.0:subject:organization-id");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
-
-            XMLObjectBuilder<?> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+            
             XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);

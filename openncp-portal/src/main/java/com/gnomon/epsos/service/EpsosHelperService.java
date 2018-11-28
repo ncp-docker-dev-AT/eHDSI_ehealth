@@ -29,7 +29,6 @@ import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -1337,7 +1336,7 @@ public class EpsosHelperService {
                     attr.setName(attribute.getNameFormat());
                     attr.setNameFormat(attribute.getNameFormat());
 
-                    XMLObjectBuilder stringBuilder = org.opensaml.xml.Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
+                    XMLObjectBuilder stringBuilder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
                     XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
                     attrVal.setValue(((XSString) attribute.getAttributeValues().get(0)).getValue());
                     attr.getAttributeValues().add(attrVal);
