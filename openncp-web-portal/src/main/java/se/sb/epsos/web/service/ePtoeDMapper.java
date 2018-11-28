@@ -30,13 +30,11 @@ import se.sb.epsos.web.util.DateUtil;
 import se.sb.epsos.web.util.EpsosWebConstants;
 import se.sb.epsos.web.util.FileHelper;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
@@ -515,7 +513,10 @@ public class ePtoeDMapper {
         StreamResult result = new StreamResult(xmlAsWriter);
 
         try {
-            TransformerFactory.newInstance().newTransformer().transform(source, result);
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.transform(source, result);
         } catch (TransformerConfigurationException e) {
             LOGGER.error("TransformerConfigurationException: ", e);
         } catch (TransformerException e) {

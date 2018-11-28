@@ -20,6 +20,7 @@ import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.saml.SAML;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -292,6 +293,7 @@ public class AssertionUtils {
         try {
             DOMSource domSource = new DOMSource(doc);
             TransformerFactory tf = TransformerFactory.newInstance();
+            tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             Transformer transformer = tf.newTransformer();
             String omit;
             if (header) {

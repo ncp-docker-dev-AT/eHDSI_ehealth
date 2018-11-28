@@ -9,6 +9,7 @@ import org.w3c.dom.Element;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.SOAPElement;
@@ -119,6 +120,7 @@ public class STSUtils {
     public static String domElementToString(Element elem) {
         try {
             TransformerFactory tf = TransformerFactory.newInstance();
+            tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             Transformer trans = tf.newTransformer();
             StringWriter sw = new StringWriter();
             trans.transform(new DOMSource(elem), new StreamResult(sw));

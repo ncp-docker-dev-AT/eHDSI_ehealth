@@ -32,6 +32,7 @@ import java.util.List;
  */
 public class JaxbIOFactory implements AtnaIOFactory {
 
+    private static final String NCP_SERVER_MODE = "server.ehealth.mode";
     private static JAXBContext jaxbContext;
 
     static {
@@ -45,7 +46,6 @@ public class JaxbIOFactory implements AtnaIOFactory {
 
     private final Logger logger = LoggerFactory.getLogger(JaxbIOFactory.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-    private static final String NCP_SERVER_MODE = "server.ehealth.mode";
 
     public AtnaMessage read(InputStream in) throws AtnaException {
 
@@ -112,9 +112,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            Transformer transformer;
-
-            transformer = transformerFactory.newTransformer();
+            Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");

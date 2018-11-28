@@ -16,6 +16,6 @@ import org.opensaml.saml.saml2.core.Assertion;
 public class TrcServiceHandler {
 
     public TRCAssertionRequest buildTrcRequest(Assertion assertion, String patientId, String purposeOfUse) throws Exception {
-        return new TRCAssertionRequest.Builder(assertion, patientId).PurposeOfUse(purposeOfUse).build();
+        return new TRCAssertionRequest.Builder(assertion, patientId).purposeOfUse(purposeOfUse).build();
     }
 }

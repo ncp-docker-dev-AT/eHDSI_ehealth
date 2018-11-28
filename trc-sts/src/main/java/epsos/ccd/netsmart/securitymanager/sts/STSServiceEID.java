@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -396,9 +397,8 @@ public class STSServiceEID implements Provider<SOAPMessage> {
         md.reset();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer;
-
-        transformer = tf.newTransformer();
+        tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "false");
         transformer.setOutputProperty(OutputKeys.INDENT, "false");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
@@ -411,10 +411,8 @@ public class STSServiceEID implements Provider<SOAPMessage> {
     private String convertDocumentToString(Document doc) throws TransformerException {
 
         TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer;
-
-        transformer = tf.newTransformer();
-        // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(doc), new StreamResult(writer));

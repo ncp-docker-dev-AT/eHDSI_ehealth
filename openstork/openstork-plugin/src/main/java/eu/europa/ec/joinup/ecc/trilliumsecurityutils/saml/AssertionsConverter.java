@@ -82,22 +82,8 @@ public class AssertionsConverter {
         LOGGER.info("TRCA Patient ID : '{}'", pat);
         LOGGER.info("Assertion ID: '{}'", idAs.getID());
         LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
-        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).PurposeOfUse(purpose).build();
+        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).purposeOfUse(purpose).build();
         trc = req1.request();
-
-        AssertionMarshaller marshaller = new AssertionMarshaller();
-        Element element;
-        element = marshaller.marshall(trc);
-
-
-        if (LOGGER.isDebugEnabled()) {
-            Document document = element.getOwnerDocument();
-            //String trca = Util.getDocumentAsXml(document, false);
-            LOGGER.info("#### TRCA Start");
-            //LOGGER.info(trca);
-            LOGGER.info("#### TRCA End");
-        }
-
         LOGGER.debug("TRCA CREATED: '{}'", trc.getID());
         LOGGER.debug("TRCA WILL BE STORED TO SESSION: '{}'", trc.getID());
         return trc;
@@ -130,7 +116,7 @@ public class AssertionsConverter {
         if (isPhysician) {
             rolename = "physician";
             String doctor_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_DOCTOR_PERMISSIONS);
-            String p[] = doctor_perms.split(",");
+            String[] p = doctor_perms.split(",");
             for (String aP : p) {
                 permissions.add(prefix + aP);
             }
@@ -138,7 +124,7 @@ public class AssertionsConverter {
         if (isPharmacist) {
             rolename = "pharmacist";
             String pharm_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PHARMACIST_PERMISSIONS);
-            String p1[] = pharm_perms.split(",");
+            String[] p1 = pharm_perms.split(",");
             for (String aP1 : p1) {
                 permissions.add(prefix + aP1);
             }
@@ -146,7 +132,7 @@ public class AssertionsConverter {
         if (isNurse) {
             rolename = "nurse";
             String nurse_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_NURSE_PERMISSIONS);
-            String p1[] = nurse_perms.split(",");
+            String[] p1 = nurse_perms.split(",");
             for (String aP1 : p1) {
                 permissions.add(prefix + aP1);
             }
@@ -154,7 +140,7 @@ public class AssertionsConverter {
         if (isPatient) {
             rolename = "patient";
             String patient_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PATIENT_PERMISSIONS);
-            String p1[] = patient_perms.split(",");
+            String[] p1 = patient_perms.split(",");
             for (String aP1 : p1) {
                 permissions.add(prefix + aP1);
             }
@@ -162,7 +148,7 @@ public class AssertionsConverter {
         if (isAdministrator) {
             rolename = "administrator";
             String admin_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_ADMIN_PERMISSIONS);
-            String p1[] = admin_perms.split(",");
+            String[] p1 = admin_perms.split(",");
             for (String aP1 : p1) {
                 permissions.add(prefix + aP1);
             }
@@ -435,7 +421,6 @@ public class AssertionsConverter {
         try {
 
             XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
-            SAMLObjectBuilder<Assertion> builder = (SAMLObjectBuilder<Assertion>) builderFactory.getBuilder(Assertion.DEFAULT_ELEMENT_NAME);
 
             // Create the NameIdentifier
             SAMLObjectBuilder nameIdBuilder = (SAMLObjectBuilder) builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME);
@@ -689,7 +674,7 @@ public class AssertionsConverter {
 
         if (permissions == null || permissions.isEmpty()) {
             LOGGER.error("Provided list is null or empty.");
-            return null;
+            return new ArrayList<>();
         }
 
         List<String> result = new ArrayList<>();

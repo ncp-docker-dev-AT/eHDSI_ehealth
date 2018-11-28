@@ -82,6 +82,7 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.XMLConstants;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -1902,7 +1903,7 @@ public class EpsosHelperService {
         }
         LOGGER.info("Assertion ID: '{}'", idAs.getID());
         LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
-        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).PurposeOfUse(purpose).build();
+        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).purposeOfUse(purpose).build();
         LOGGER.info("TRCAssertionRequest: '{}", req1);
         trc = req1.request();
 
@@ -2821,7 +2822,9 @@ public class EpsosHelperService {
             }
 
             // Create and setup transformer
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 
             if (omitXmlDeclaration) {

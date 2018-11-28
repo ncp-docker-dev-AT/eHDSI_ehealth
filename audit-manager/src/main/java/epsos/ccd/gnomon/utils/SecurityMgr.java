@@ -211,8 +211,8 @@ public class SecurityMgr {
                 // output the resulting document
                 bas = new ByteArrayOutputStream();
                 TransformerFactory factory = TransformerFactory.newInstance();
-                Transformer trans = factory.newTransformer();
                 factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+                Transformer trans = factory.newTransformer();
                 trans.transform(new DOMSource(doc), new StreamResult(bas));
                 signed = bas.toString();
             }

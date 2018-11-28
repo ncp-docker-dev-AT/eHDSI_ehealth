@@ -3,6 +3,7 @@ package eu.europa.ec.sante.ehdsi.gazelle.validation.reporting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -40,7 +41,9 @@ public class ReportTransformer {
         StreamResult out = new StreamResult(writer);
 
         TransformerFactory factory = TransformerFactory.newInstance();
+
         try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             Transformer transformer = factory.newTransformer(xsl);
             transformer.transform(in, out);
         } catch (TransformerException e) {
