@@ -9,16 +9,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
-import org.opensaml.core.xml.io.MarshallingException;
-import org.opensaml.core.xml.io.Unmarshaller;
-import org.opensaml.core.xml.io.UnmarshallerFactory;
-import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.core.xml.io.*;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import tr.com.srdc.epsos.util.Constants;
 
 import javax.net.ssl.*;
 import javax.xml.namespace.QName;
@@ -79,21 +77,26 @@ public class TRCAssertionRequest {
     private final SOAPMessage rstMsg;
     private final String messageId;
     private final DocumentBuilder builder;
-    private final URL STSLocation;
+    private final URL location;
 
-    private TRCAssertionRequest(Builder b) throws Exception {
+    /**
+     * The builder is the only class that can call the constructor and for that, the following will be surely initialized.
+     *
+     * @param builder
+     * @throws Exception
+     */
+    private TRCAssertionRequest(Builder builder) throws Exception {
 
-        // The builder is the only class that can call the constructor and for that, the following will be surely initialized.
-        this.idAssert = b.idAssert;
-        this.patientId = b.patientId;
-        this.purposeOfUse = b.puproseOfUse;
-        this.STSLocation = b.STSLocation;
+        this.idAssert = builder.idAssert;
+        this.patientId = builder.patientId;
+        this.purposeOfUse = builder.purposeOfUse;
+        this.location = builder.location;
 
         this.messageId = createMessageId();
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        builder = dbf.newDocumentBuilder();
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
+        this.builder = documentBuilderFactory.newDocumentBuilder();
 
         try {
             rstMsg = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
@@ -106,38 +109,51 @@ public class TRCAssertionRequest {
     }
 
     private String createMessageId() {
-        return "uuid:" + UUID.randomUUID().toString();
+        return Constants.UUID_PREFIX + UUID.randomUUID().toString();
     }
 
-    private Element convertAssertionToElement(Assertion as) {
+    private Element convertAssertionToElement(Assertion assertion) {
 
         try {
             Document doc = builder.newDocument();
-            //Configuration.getMarshallerFactory().getMarshaller(as).marshall(as, doc);
-            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(as).marshall(as, doc);
+            Marshaller marshaller = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion);
+            if (marshaller == null) {
+                LOGGER.error("SAML Marshalling is NULL");
+                return null;
+            }
+            marshaller.marshall(assertion, doc);
             return doc.getDocumentElement();
-        } catch (MarshallingException ex) {
-            LOGGER.error(null, ex);
+        } catch (MarshallingException e) {
+            LOGGER.error("MarshallingException: '{}", e.getMessage(), e);
+            return null;
         }
-        return null;
-
     }
 
-    private Assertion convertElementToAssertion(Element e) {
+    /**
+     * @param element
+     * @return
+     */
+    private Assertion convertElementToAssertion(Element element) {
 
+        // Unmarshalling using the document root element, an EntitiesDescriptor in this case
         try {
-//            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
-//            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(e);
-            Unmarshaller unmarshaller = XMLObjectProviderRegistrySupport.getUnmarshallerFactory().getUnmarshaller(e);
-            // Unmarshalling using the document root element, an EntitiesDescriptor in this case
-            return (Assertion) unmarshaller.unmarshall(e);
-        } catch (UnmarshallingException ex) {
-            LOGGER.error(null, ex);
-        }
-        return null;
 
+            Unmarshaller unmarshaller = XMLObjectProviderRegistrySupport.getUnmarshallerFactory().getUnmarshaller(element);
+            if (unmarshaller == null) {
+                LOGGER.error("SAML Unmarshalling is NULL");
+                return null;
+            }
+            return (Assertion) unmarshaller.unmarshall(element);
+
+        } catch (UnmarshallingException e) {
+            LOGGER.error("UnmarshallingException: '{}", e.getMessage(), e);
+            return null;
+        }
     }
 
+    /**
+     * @param header
+     */
     private void createRSTHeader(SOAPHeader header) {
 
         try {
@@ -156,6 +172,9 @@ public class TRCAssertionRequest {
         }
     }
 
+    /**
+     * @param body
+     */
     private void createRSTBody(SOAPBody body) {
 
         try {
@@ -198,7 +217,7 @@ public class TRCAssertionRequest {
 
         try {
             LOGGER.info("TRC-STS client request Assertion");
-            HttpURLConnection httpConnection = (HttpURLConnection) STSLocation.openConnection();
+            HttpURLConnection httpConnection = (HttpURLConnection) location.openConnection();
             //Set headers
             httpConnection.setRequestProperty("Content-Type", "application/soap+xml");
             httpConnection.setRequestProperty("SOAPAction", "");
@@ -206,7 +225,7 @@ public class TRCAssertionRequest {
             httpConnection.setDoInput(true);
             httpConnection.setDoOutput(true);
 
-            LOGGER.info("CHECK_FOR_HOSTNAME SSL");
+            LOGGER.info("Checking SSL Hostname Verifier: '{}'", CHECK_FOR_HOSTNAME);
             if (httpConnection instanceof HttpsURLConnection) {  // Going SSL
                 ((HttpsURLConnection) httpConnection).setSSLSocketFactory(getEpsosSSLSocketFactory());
                 if (StringUtils.equals(CHECK_FOR_HOSTNAME, "false"))
@@ -258,7 +277,6 @@ public class TRCAssertionRequest {
                 return null;
             }
 
-            //UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
             UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
 
@@ -300,23 +318,20 @@ public class TRCAssertionRequest {
     }
 
     /**
-     * The Builder class is responsible for the creation of the final
-     * TRCAssertionRequest Object. It is used to incrementaly create the
-     * TRCAssertionRequest and then when calling #build returns the final
-     * immutable object
+     * The Builder class is responsible for the creation of the final TRCAssertionRequest Object.
+     * It is used to incrementally create the TRCAssertionRequest and then when calling #build returns the final immutable object
      */
     public static class Builder {
 
-        //required
+        //  Required attributes
         private final Assertion idAssert;
         private final String patientId;
-        //optional
-        private String puproseOfUse = "TREATMENT";
-        private URL STSLocation = null;
+        //  Optional attributes
+        private String purposeOfUse = "TREATMENT";
+        private URL location = null;
 
         /**
-         * The Builder class constructor. Its parameters are the required fields
-         * of the TRCAssertionRequest Object.
+         * The Builder class constructor. Its parameters are the required fields of the TRCAssertionRequest Object.
          *
          * @param idAssert  The OpenSAML Identity Assertion
          * @param patientId the relevant patient id.
@@ -327,39 +342,38 @@ public class TRCAssertionRequest {
             this.patientId = patientId;
             try {
 
-                this.STSLocation = new URL(DEFAULT_STS_URL);
+                this.location = new URL(DEFAULT_STS_URL);
             } catch (MalformedURLException ex) {
                 LOGGER.error(null, ex);
             }
         }
 
         /**
-         * method to incrementaly add the Pupropse Of Use parameter of the TRC Request
+         * Method to incrementally add the Purpose Of Use parameter of the TRC Request.
          *
-         * @param pou Purpose Of use. Either TREATMENT or EMERGENCY
+         * @param purposeOfUse Purpose Of use. Either TREATMENT or EMERGENCY
          * @return the Builder object for further initialization
          */
-        public Builder PurposeOfUse(String pou) {
+        public Builder purposeOfUse(String purposeOfUse) {
 
-            this.puproseOfUse = pou;
+            this.purposeOfUse = purposeOfUse;
             return this;
         }
 
         /**
          * method to incrementally add the STS URL the request. If not added, the builder will use the one that exists
-         * in the secman.sts.url parameter of the epsos.properties file (see ConfigurationManagerService)
+         * in the secman.sts.url parameter of the OpenNCP database properties.
          *
          * @param url the URL of the STS that the client will make the request
          * @return the Builder object for further initialization
          */
-        public Builder STSLocation(String url) {
+        public Builder location(String url) {
 
             try {
-                this.STSLocation = new URL(url);
+                this.location = new URL(url);
             } catch (MalformedURLException ex) {
                 LOGGER.error(null, ex);
             }
-
             return this;
         }
 

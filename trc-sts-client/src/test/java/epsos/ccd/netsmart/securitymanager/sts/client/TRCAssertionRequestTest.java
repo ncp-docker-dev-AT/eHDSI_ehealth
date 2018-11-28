@@ -121,10 +121,7 @@ public class TRCAssertionRequestTest {
             //makeRequest - with SSL
             Assertion idAs = loadSamlAssertionAsResource("SampleIdAssertion.xml");
 
-            TRCAssertionRequest req = new TRCAssertionRequest.Builder(idAs, "anId")
-                    .PurposeOfUse("TREATMENT")
-                    .build();
-
+            TRCAssertionRequest req = new TRCAssertionRequest.Builder(idAs, "anId").purposeOfUse("TREATMENT").build();
             Assertion trc = req.request();
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -151,8 +148,8 @@ public class TRCAssertionRequestTest {
             Assertion idAs = loadSamlAssertionAsResource("SampleIdAssertion.xml");
 
             TRCAssertionRequest req = new TRCAssertionRequest.Builder(idAs, "TestId2")
-                    .STSLocation("http://localhost:8080/TRC-STS/SecurityTokenService")
-                    .PurposeOfUse("EMERGENCY")
+                    .location("http://localhost:8080/TRC-STS/SecurityTokenService")
+                    .purposeOfUse("EMERGENCY")
                     .build();
 
             Assertion trc = req.request();
@@ -185,7 +182,6 @@ public class TRCAssertionRequestTest {
             Document samlas = ppMgr.parse(in);
             Element samlasRoot = samlas.getDocumentElement();
             // Get apropriate unmarshaller
-            //UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
             UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(samlasRoot);
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
