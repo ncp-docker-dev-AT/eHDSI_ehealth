@@ -4,7 +4,6 @@ import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import eu.epsos.util.EvidenceUtils;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.Handler;
 import org.apache.axis2.handlers.AbstractHandler;
@@ -26,9 +25,10 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(OutFlowEvidenceEmitterHandler.class);
 
     @Override
-    public Handler.InvocationResponse invoke(MessageContext msgcontext) throws AxisFault {
+    public Handler.InvocationResponse invoke(MessageContext msgcontext) {
 
-        LOGGER.debug("OutFlow Evidence Emitter handler is executing");
+        LOGGER.info("MASSIMILIANO");
+        LOGGER.info("OutFlow Evidence Emitter handler is executing");
         EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
 
         /* I'll leave this here as it might be useful in the future */

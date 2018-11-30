@@ -4,14 +4,12 @@ import epsos.ccd.gnomon.auditmanager.IHEEventType;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.util.xdr.XDRConstants;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,7 +120,6 @@ public class EvidenceEmitterHandlerUtils {
     }
 
     private final Logger logger = LoggerFactory.getLogger(EvidenceEmitterHandlerUtils.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     public EvidenceEmitterHandlerUtils() {
     }
@@ -182,11 +179,7 @@ public class EvidenceEmitterHandlerUtils {
     public Document canonicalizeAxiomSoapEnvelope(SOAPEnvelope env) throws Exception {
 
         Element envAsDom = XMLUtils.toDOM(env);
-        Document envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
-            loggerClinical.debug("Pretty printing canonicalized:\n'{}'", XMLUtil.prettyPrint(envCanonicalized));
-        }
-        return envCanonicalized;
+        return XMLUtil.canonicalize(envAsDom.getOwnerDocument());
     }
 
     public void printClientCertificateDetails(MessageContext messageContext) {

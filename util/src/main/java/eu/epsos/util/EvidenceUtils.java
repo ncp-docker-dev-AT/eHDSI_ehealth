@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.FileUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 
@@ -32,9 +31,9 @@ import java.net.URISyntaxException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author karkaletsis
@@ -249,9 +248,9 @@ public class EvidenceUtils {
             Utilities.serialize(oh.getMessage().getDocumentElement());
             String oblString = XMLUtil.documentToString(oh.getMessage());
             if (title == null || title.isEmpty()) {
-                title = getPath() + "nrr/" + getDocumentTitle(msguuid, oh.toString()) + ".xml";
+                title = getPath() + "nrr" + File.separator + getDocumentTitle(msguuid, oh.toString()) + ".xml";
             } else {
-                title = getPath() + "nrr/" + getDocumentTitle(msguuid, title) + ".xml";
+                title = getPath() + "nrr" + File.separator + getDocumentTitle(msguuid, title) + ".xml";
             }
             LOGGER.info("MSGUUID: '{}'  NRR TITLE: '{}'", msguuid, title);
             FileUtil.constructNewFile(title, oblString.getBytes());
@@ -434,9 +433,9 @@ public class EvidenceUtils {
             Utilities.serialize(handler.getMessage().getDocumentElement());
             String oblString = XMLUtil.documentToString(handler.getMessage());
             if (title == null || title.isEmpty()) {
-                title = getPath() + "nro/" + getDocumentTitle(msguuid, handler.toString()) + ".xml";
+                title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, handler.toString()) + ".xml";
             } else {
-                title = getPath() + "nro/" + getDocumentTitle(msguuid, title) + ".xml";
+                title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, title) + ".xml";
             }
             LOGGER.info("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
             FileUtil.constructNewFile(title, oblString.getBytes());
@@ -449,7 +448,7 @@ public class EvidenceUtils {
     private static String getPath() {
 
         String exportPath = System.getenv("EPSOS_PROPS_PATH");
-        String evidencesPath = exportPath + "obligations/";
+        String evidencesPath = exportPath + "obligations" + File.separator;
         LOGGER.debug("Evidences Path: '{}'", evidencesPath);
         return evidencesPath;
     }
@@ -461,7 +460,11 @@ public class EvidenceUtils {
      */
     private static String getDocumentTitle(String uuid, String title) {
 
-        return DateUtil.getCurrentTimeGMT() + "_" + uuid + "_" + title;
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        //ISO 8601 format: 2017-11-25T10:59:53Z
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        df.setTimeZone(tz);
+        return df.format(new Date()) + "_" + (StringUtils.isNotBlank(uuid) ? uuid : "NO-INFO") + "_" + title;
     }
 
     /**

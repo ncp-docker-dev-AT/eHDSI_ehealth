@@ -2,15 +2,19 @@ package ee.affecto.epsos.ws.handler;
 
 import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import eu.epsos.util.EvidenceUtils;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.Handler;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.XMLUtil;
 
 /**
  * OutFlowEvidenceEmitter
@@ -24,100 +28,102 @@ import org.w3c.dom.Document;
  */
 public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OutFlowEvidenceEmitterHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(OutFlowEvidenceEmitterHandler.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     @Override
-    public Handler.InvocationResponse invoke(MessageContext msgcontext) {
+    public Handler.InvocationResponse invoke(MessageContext messageContext) {
 
-        LOGGER.debug("OutFlow Evidence Emitter handler is executing");
+        logger.info("[NRO] OutFlow Evidence Emitter handler is executing");
         EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
-        evidenceEmitterHandlerUtils.printClientCertificateDetails(msgcontext);
+        evidenceEmitterHandlerUtils.printClientCertificateDetails(messageContext);
 
         /* I'll leave this here as it might be useful in the future */
 
 //        SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
 //        if (soapHeader != null) {
 //            Iterator<?> blocks = soapHeader.examineAllHeaderBlocks();
-//            LOGGER.debug("Iterating over soap headers");
+//            logger.debug("Iterating over soap headers");
 //            while (blocks.hasNext()) {
-//                LOGGER.debug("Processing header");
+//                logger.debug("Processing header");
 //                SOAPHeaderBlock block = (SOAPHeaderBlock)blocks.next();
-//                LOGGER.debug(block.toString());
+//                logger.debug(block.toString());
 //                block.setProcessed();
 //            }
 //        }
 
-//        LOGGER.debug("LOGGING TEST VALUES");
-//        LOGGER.debug("MessageContext properties: " + msgcontext.getProperties());
-//        LOGGER.debug("MessageContext messageID: " + msgcontext.getMessageID());
+//        logger.debug("LOGGING TEST VALUES");
+//        logger.debug("MessageContext properties: " + msgcontext.getProperties());
+//        logger.debug("MessageContext messageID: " + msgcontext.getMessageID());
 //        
 //        SessionContext sessionCtx = msgcontext.getSessionContext();
 //        if (sessionCtx != null) {
-//            LOGGER.debug("SessionContext CookieID: " + sessionCtx.getCookieID());
+//            logger.debug("SessionContext CookieID: " + sessionCtx.getCookieID());
 //        } else {
-//            LOGGER.debug("SessionContext is null!");
+//            logger.debug("SessionContext is null!");
 //        }
 
 //        OperationContext operationCtx = msgcontext.getOperationContext();
 //        if (operationCtx != null) {
-//            LOGGER.debug("OperationContext operationName: " + operationCtx.getOperationName());
-//            LOGGER.debug("OperationContext serviceGroupName: " + operationCtx.getServiceGroupName());
-//            LOGGER.debug("OperationContext serviceName; " + operationCtx.getServiceName());
-//            LOGGER.debug("OperationContext isComplete: " + operationCtx.isComplete());
+//            logger.debug("OperationContext operationName: " + operationCtx.getOperationName());
+//            logger.debug("OperationContext serviceGroupName: " + operationCtx.getServiceGroupName());
+//            logger.debug("OperationContext serviceName; " + operationCtx.getServiceName());
+//            logger.debug("OperationContext isComplete: " + operationCtx.isComplete());
 //        } else {
-//            LOGGER.debug("OperationContext is null!");
+//            logger.debug("OperationContext is null!");
 //        }
 
 //        ServiceGroupContext serviceGroupCtx = msgcontext.getServiceGroupContext();
 //        if (serviceGroupCtx != null) {
-//            LOGGER.debug("ServiceGroupContext ID: " + serviceGroupCtx.getId());
+//            logger.debug("ServiceGroupContext ID: " + serviceGroupCtx.getId());
 //            AxisServiceGroup axisServiceGroup = serviceGroupCtx.getDescription();
 //            Iterator<AxisService> itAxisService = axisServiceGroup.getServices();
 //            while (itAxisService.hasNext()) {
 //                AxisService axisService = itAxisService.next();
-//                LOGGER.debug("AxisService BindingName: " + axisService.getBindingName());
-//                LOGGER.debug("AxisService CustomSchemaNamePrefix: " + axisService.getCustomSchemaNamePrefix());
-//                LOGGER.debug("AxisService CustomSchemaNameSuffix: " + axisService.getCustomSchemaNameSuffix());
-//                LOGGER.debug("AxisService endpointName: " + axisService.getEndpointName());
+//                logger.debug("AxisService BindingName: " + axisService.getBindingName());
+//                logger.debug("AxisService CustomSchemaNamePrefix: " + axisService.getCustomSchemaNamePrefix());
+//                logger.debug("AxisService CustomSchemaNameSuffix: " + axisService.getCustomSchemaNameSuffix());
+//                logger.debug("AxisService endpointName: " + axisService.getEndpointName());
 //                Map<String,AxisEndpoint> axisEndpoints = axisService.getEndpoints();
 //                for (String key : axisEndpoints.keySet()) {
 //                    AxisEndpoint axisEndpoint = axisEndpoints.get(key);
-//                    LOGGER.debug("AxisEndpoint calculatedEndpointURL: " + axisEndpoint.calculateEndpointURL());
-//                    LOGGER.debug("AxisEndpoint alias: " + axisEndpoint.getAlias());
-//                    LOGGER.debug("AxisEndpoint endpointURL: " + axisEndpoint.getEndpointURL());
-//                    LOGGER.debug("AxisEndpoint active: " + axisEndpoint.isActive());
+//                    logger.debug("AxisEndpoint calculatedEndpointURL: " + axisEndpoint.calculateEndpointURL());
+//                    logger.debug("AxisEndpoint alias: " + axisEndpoint.getAlias());
+//                    logger.debug("AxisEndpoint endpointURL: " + axisEndpoint.getEndpointURL());
+//                    logger.debug("AxisEndpoint active: " + axisEndpoint.isActive());
 //                }
-//                LOGGER.debug("AxisService EPRs: " + Arrays.toString((String[]) axisService.getEPRs()));
-//                LOGGER.debug("AxisService name: " + axisService.getName());
-//                LOGGER.debug("AxisService isClientSide: " + axisService.isClientSide());
+//                logger.debug("AxisService EPRs: " + Arrays.toString((String[]) axisService.getEPRs()));
+//                logger.debug("AxisService name: " + axisService.getName());
+//                logger.debug("AxisService isClientSide: " + axisService.isClientSide());
 //            } 
 //        } else {
-//            LOGGER.debug("ServiceGroupContext is null!");
+//            logger.debug("ServiceGroupContext is null!");
 //        }
 
 //        ConfigurationContext configCtx = msgcontext.getRootContext();
 //        if (configCtx != null) {
-//            LOGGER.debug("ConfigurationContext contextRoot: " + configCtx.getContextRoot());
-//            LOGGER.debug("ConfigurationContext serviceGroupContextIDs: " + Arrays.toString((String[])configCtx.getServiceGroupContextIDs()));
-//            LOGGER.debug("ConfigurationContext servicePath: " + configCtx.getServicePath());
+//            logger.debug("ConfigurationContext contextRoot: " + configCtx.getContextRoot());
+//            logger.debug("ConfigurationContext serviceGroupContextIDs: " + Arrays.toString((String[])configCtx.getServiceGroupContextIDs()));
+//            logger.debug("ConfigurationContext servicePath: " + configCtx.getServicePath());
 //        } else {
-//            LOGGER.debug("ConfigurationContext is null!");
+//            logger.debug("ConfigurationContext is null!");
 //        }
 
         try {
             // Canonicalization of the full SOAP message
-            Document envCanonicalized = evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(msgcontext.getEnvelope());
-
-            //SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
-            SOAPBody soapBody = msgcontext.getEnvelope().getBody();
+            Document canonicalDocument = evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(messageContext.getEnvelope());
+            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                loggerClinical.debug("Pretty printing canonicalized:\n'{}'", XMLUtil.prettyPrint(canonicalDocument));
+            }
+            SOAPBody soapBody = messageContext.getEnvelope().getBody();
             String eventType;
             String title;
-            String msgUUID = null;
-            AxisService axisService = msgcontext.getServiceContext().getAxisService();
+            AxisService axisService = messageContext.getServiceContext().getAxisService();
             boolean isClientSide = axisService.isClientSide();
-            LOGGER.debug("AxisService name: '{}' - isClientSide: '{}'", axisService.getName(), isClientSide);
+            logger.debug("AxisService name: '{}' - isClientSide: '{}'", axisService.getName(), isClientSide);
 
             if (isClientSide) {
+                logger.info("[NRO] Evidence Emitter - NCP-B");
                 /* NCP-B sends to NCP-A, e.g.: 
                     NRO
                     title = "NCPB_XCPD_REQ"
@@ -126,24 +132,15 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
                 eventType = evidenceEmitterHandlerUtils.getEventTypeFromMessage(soapBody);
                 title = "NCPB_" + evidenceEmitterHandlerUtils.getTransactionNameFromMessage(soapBody);
                 //msgUUID = null; It stays as null because it's fetched from soap msg
-                LOGGER.debug("Title: '{}' - eventType: '{}'", title, eventType);
+                logger.debug("Title: '{}' - eventType: '{}'", title, eventType);
 
-                EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
-                        tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
-                        eventType,
-                        new DateTime(),
-                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+                EvidenceUtils.createEvidenceREMNRO(canonicalDocument, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                        Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SC_KEYSTORE_PATH, Constants.SC_KEYSTORE_PASSWORD,
+                        Constants.SC_PRIVATEKEY_ALIAS, Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
+                        Constants.SP_PRIVATEKEY_ALIAS, eventType, new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                         title);
             } else {
-                LOGGER.debug("Server Side");
+                logger.info("[NRO] Evidence Emitter - NCP-A");
                 /* NCP-A replies to NCP-B, e.g.: 
                     NRO
                     title = "NCPA_XCPD_RES"
@@ -161,22 +158,22 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //                eventType = this.evidenceEmitterHandlerUtils.getEventTypeFromMessage(soapBody);
 //                title = this.evidenceEmitterHandlerUtils.getServerSideTitle(soapBody);
 //                msgUUID = this.evidenceEmitterHandlerUtils.getMsgUUID(soapHeader, soapBody);
-//                LOGGER.debug("eventType: " + eventType);
-//                LOGGER.debug("title: " + title);
-//                LOGGER.debug("msgUUID: " + msgUUID);
+//                logger.debug("eventType: " + eventType);
+//                logger.debug("title: " + title);
+//                logger.debug("msgUUID: " + msgUUID);
 //                
 //                if (msgUUID != null) {
 //                    // this is a Portal-NCPB interaction: msgUUID comes from IdA or is random
 //                    EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                Constants.NCP_SIG_KEYSTORE_PATH,
+//                                Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                Constants.SC_KEYSTORE_PATH,
+//                                Constants.SC_KEYSTORE_PASSWORD,
+//                                Constants.SC_PRIVATEKEY_ALIAS,
+//                                Constants.NCP_SIG_KEYSTORE_PATH,
+//                                Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                Constants.NCP_SIG_PRIVATEKEY_ALIAS,
 //                                eventType,
 //                                new DateTime(),
 //                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
@@ -185,15 +182,15 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //                } else {
 //                    // this isn't a Portal-NCPB interaction (it's NCPB-NCPA), so msgUUID is retrieved from the soap header
 //                    EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                                tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
-//                                tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
-//                                tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
-//                                tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
+//                                Constants.NCP_SIG_KEYSTORE_PATH,
+//                                Constants.NCP_SIG_KEYSTORE_PASSWORD,
+//                                Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+//                                Constants.SP_KEYSTORE_PATH,
+//                                Constants.SP_KEYSTORE_PASSWORD,
+//                                Constants.SP_PRIVATEKEY_ALIAS,
+//                                Constants.SC_KEYSTORE_PATH,
+//                                Constants.SC_KEYSTORE_PASSWORD,
+//                                Constants.SC_PRIVATEKEY_ALIAS,
 //                                eventType,
 //                                new DateTime(),
 //                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
