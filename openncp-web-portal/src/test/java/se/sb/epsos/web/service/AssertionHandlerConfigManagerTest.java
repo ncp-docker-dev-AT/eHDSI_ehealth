@@ -57,8 +57,7 @@ public class AssertionHandlerConfigManagerTest {
     public void testGetRoleDisplayName_ROLE_DOCTOR() {
         String role = AssertionHandlerConfigManager.getRoleDisplayName("ROLE_DOCTOR");
         assertNotNull(role);
-        assertEquals("medical doctor", role);
-        assertEquals("physician",role);
+        assertEquals("physician", role);
     }
 
     @Test
