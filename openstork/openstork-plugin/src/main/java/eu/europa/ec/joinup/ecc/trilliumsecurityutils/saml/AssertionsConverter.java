@@ -11,7 +11,6 @@ import eu.epsos.assertionvalidator.PolicyManagerInterface;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.common.impl.SecureRandomIdentifierGenerator;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.XMLObject;
@@ -35,7 +34,6 @@ import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
 import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.namespace.QName;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -206,7 +204,6 @@ public class AssertionsConverter {
             //initializing the map
             auditDataMap.clear();
             XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
-            SecureRandomIdentifierGenerator randomGen = new SecureRandomIdentifierGenerator();
 
             //Doing an indirect copy so, because when cloning, signatures are lost.
             SignatureManager sman = new SignatureManager(ksm);
@@ -235,7 +232,6 @@ public class AssertionsConverter {
             if (patientID == null) {
                 throw new SMgrException("Patiend ID cannot be null");
             }
-
             auditDataMap.put("patientID", patientID);
             DateTime now = new DateTime();
             DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
@@ -365,7 +361,7 @@ public class AssertionsConverter {
 
             sman.signSAMLAssertion(trc);
             return trc;
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (Exception ex) {
             LOGGER.error(null, ex);
             throw new SMgrException(ex.getMessage());
         }
