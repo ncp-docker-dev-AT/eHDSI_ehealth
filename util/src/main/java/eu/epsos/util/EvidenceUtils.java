@@ -112,6 +112,7 @@ public class EvidenceUtils {
             messageType = umt;
             msguuid = UUID.randomUUID().toString();
         }
+
         createEvidenceREMNRR(incomingMsg, issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
                 senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias,
                 eventType, submissionTime, status, title, msguuid);
@@ -154,6 +155,7 @@ public class EvidenceUtils {
             ObligationDischargeException, TransformerException, SyntaxException, KeyStoreException,
             NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
+
         if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
@@ -161,6 +163,8 @@ public class EvidenceUtils {
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title, msguuid);
         }
+        LOGGER.info("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingMsg));
+        LOGGER.info("MSGUUID: '{}'", msguuid);
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
             statusmsg = "success";
@@ -248,11 +252,12 @@ public class EvidenceUtils {
             Utilities.serialize(oh.getMessage().getDocumentElement());
             String oblString = XMLUtil.documentToString(oh.getMessage());
             if (title == null || title.isEmpty()) {
-                title = getPath() + "nrr" + File.separator + getDocumentTitle(msguuid, oh.toString()) + ".xml";
+                title = getPath() + "nrr" + File.separator + getDocumentTitle(msguuid, oh.toString(), "NRR") + ".xml";
             } else {
-                title = getPath() + "nrr" + File.separator + getDocumentTitle(msguuid, title) + ".xml";
+                title = getPath() + "nrr" + File.separator + getDocumentTitle(msguuid, title, "NRR") + ".xml";
             }
             LOGGER.info("MSGUUID: '{}'  NRR TITLE: '{}'", msguuid, title);
+            LOGGER.info("NRR:\n'{}'", oblString);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
     }
@@ -297,12 +302,12 @@ public class EvidenceUtils {
             messageType = new UnknownMessageType(incomingSoap);
             msguuid = UUID.randomUUID().toString();
         }
+        LOGGER.info("MSGUUID: '{}'", msguuid);
         LOGGER.info("Evidences for MessageType: '{}'", messageType.getClass());
         createEvidenceREMNRO(incomingSoap, issuerKeyStorePath, issuerKeyPassword,
                 issuerCertAlias, senderKeyStorePath, senderKeyPassword,
                 senderCertAlias, recipientKeyStorePath, recipientKeyPassword,
                 recipientCertAlias, eventType, submissionTime, status, title, msguuid);
-
     }
 
     /**
@@ -336,7 +341,8 @@ public class EvidenceUtils {
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title, msguuid);
         }
-
+        LOGGER.info("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingSoap));
+        LOGGER.info("MSGUUID: '{}'", msguuid);
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
 
@@ -357,7 +363,7 @@ public class EvidenceUtils {
         polrep.deploy(PolicyMarshaller.unmarshal(inputStream));
 
         // Read the message as it arrives at the facade
-        MessageType messageType = null;
+        MessageType messageType;
         try {
             MessageInspector messageInspector = new MessageInspector(incomingSoap);
             messageType = messageInspector.getMessageType();
@@ -433,11 +439,12 @@ public class EvidenceUtils {
             Utilities.serialize(handler.getMessage().getDocumentElement());
             String oblString = XMLUtil.documentToString(handler.getMessage());
             if (title == null || title.isEmpty()) {
-                title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, handler.toString()) + ".xml";
+                title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, handler.toString(), "NRO") + ".xml";
             } else {
-                title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, title) + ".xml";
+                title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, title, "NRO") + ".xml";
             }
             LOGGER.info("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
+            LOGGER.info("NRO:\n'{}'", oblString);
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
     }
@@ -458,13 +465,13 @@ public class EvidenceUtils {
      * @param title
      * @return
      */
-    private static String getDocumentTitle(String uuid, String title) {
+    private static String getDocumentTitle(String uuid, String title, String evidenceType) {
 
         TimeZone tz = TimeZone.getTimeZone("UTC");
         //ISO 8601 format: 2017-11-25T10:59:53Z
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         df.setTimeZone(tz);
-        return df.format(new Date()) + "_" + (StringUtils.isNotBlank(uuid) ? uuid : "NO-INFO") + "_" + title;
+        return df.format(new Date()) + "_" + evidenceType + "_" + (StringUtils.isNotBlank(uuid) ? uuid : "NO-INFO") + "_" + title;
     }
 
     /**

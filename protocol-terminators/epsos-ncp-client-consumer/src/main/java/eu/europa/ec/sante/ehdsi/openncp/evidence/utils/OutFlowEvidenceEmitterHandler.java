@@ -11,12 +11,12 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import tr.com.srdc.epsos.util.Constants;
 
 /**
  * EvidenceEmitterHandler
  * Generates all NROs for the Portal
- * Currently supporting the generation of evidences in the following cases:
- * Portal sends request to NCP-B *
+ * Currently supporting the generation of evidences in the following cases: Portal sends request to NCP-B
  *
  * @author jgoncalves
  */
@@ -27,7 +27,6 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
     @Override
     public Handler.InvocationResponse invoke(MessageContext msgcontext) {
 
-        LOGGER.info("MASSIMILIANO");
         LOGGER.info("OutFlow Evidence Emitter handler is executing");
         EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
 
@@ -103,7 +102,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //        }
 
         try {
-            /* Canonicalizing the full SOAP message */
+            /* Canonicalize the full SOAP message */
             Document envCanonicalized = evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(msgcontext.getEnvelope());
 
             SOAPHeader soapHeader = msgcontext.getEnvelope().getHeader();
@@ -116,21 +115,11 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
             LOGGER.debug("msgUUID: '{}", msgUUID);
 
             /* Portal sends request to NCP-B*/
-            EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                    tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PATH,
-                    tr.com.srdc.epsos.util.Constants.SC_KEYSTORE_PASSWORD,
-                    tr.com.srdc.epsos.util.Constants.SC_PRIVATEKEY_ALIAS,
-                    eventType,
-                    new DateTime(),
-                    EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                    title,
-                    msgUUID);
+            EvidenceUtils.createEvidenceREMNRO(envCanonicalized, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                    Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                    Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SC_KEYSTORE_PATH, Constants.SC_KEYSTORE_PASSWORD,
+                    Constants.SC_PRIVATEKEY_ALIAS, eventType, new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+                    title, msgUUID);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
