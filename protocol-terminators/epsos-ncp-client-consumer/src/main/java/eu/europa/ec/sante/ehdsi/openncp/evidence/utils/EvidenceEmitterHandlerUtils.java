@@ -1,11 +1,11 @@
 package eu.europa.ec.sante.ehdsi.openncp.evidence.utils;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +136,7 @@ public class EvidenceEmitterHandlerUtils {
 
         Element envAsDom = XMLUtils.toDOM(env);
         Document envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD") && LOGGER_CLINICAL.isDebugEnabled()) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("Pretty printing canonicalized:\n{}", XMLUtil.prettyPrint(envCanonicalized));
         }
         return envCanonicalized;

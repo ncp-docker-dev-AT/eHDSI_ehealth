@@ -1,7 +1,8 @@
 package eu.epsos.util;
 
 import eu.esens.abb.nonrep.*;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang3.StringUtils;
 import org.herasaf.xacml.core.SyntaxException;
 import org.herasaf.xacml.core.api.PDP;
@@ -93,7 +94,7 @@ public class EvidenceUtils {
             TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException,
             UnrecoverableKeyException {
 
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'",
                     XMLUtil.documentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
@@ -156,15 +157,17 @@ public class EvidenceUtils {
             NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
 
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
                     XMLUtil.documentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title, msguuid);
         }
-        LOGGER.info("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingMsg));
-        LOGGER.info("MSGUUID: '{}'", msguuid);
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isInfoEnabled()) {
+            LOGGER_CLINICAL.info("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingMsg));
+            LOGGER_CLINICAL.info("MSGUUID: '{}'", msguuid);
+        }
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
             statusmsg = "success";
@@ -256,8 +259,10 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nrr" + File.separator + getDocumentTitle(msguuid, title, "NRR") + ".xml";
             }
-            LOGGER.info("MSGUUID: '{}'  NRR TITLE: '{}'", msguuid, title);
-            LOGGER.info("NRR:\n'{}'", oblString);
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isInfoEnabled()) {
+                LOGGER_CLINICAL.info("MSGUUID: '{}'  NRR TITLE: '{}'", msguuid, title);
+                LOGGER_CLINICAL.info("NRR:\n'{}'", oblString);
+            }
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
     }
@@ -285,7 +290,7 @@ public class EvidenceUtils {
                                             String recipientCertAlias, String eventType, DateTime submissionTime, String status,
                                             String title) throws Exception {
 
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRO()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'",
                     XMLUtil.documentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
@@ -302,8 +307,10 @@ public class EvidenceUtils {
             messageType = new UnknownMessageType(incomingSoap);
             msguuid = UUID.randomUUID().toString();
         }
-        LOGGER.info("MSGUUID: '{}'", msguuid);
-        LOGGER.info("Evidences for MessageType: '{}'", messageType.getClass());
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+            LOGGER_CLINICAL.info("MSGUUID: '{}'", msguuid);
+            LOGGER_CLINICAL.info("Evidences for MessageType: '{}'", messageType.getClass());
+        }
         createEvidenceREMNRO(incomingSoap, issuerKeyStorePath, issuerKeyPassword,
                 issuerCertAlias, senderKeyStorePath, senderKeyPassword,
                 senderCertAlias, recipientKeyStorePath, recipientKeyPassword,
@@ -334,15 +341,17 @@ public class EvidenceUtils {
                                             String recipientCertAlias, String eventType, DateTime submissionTime,
                                             String status, String title, String msguuid) throws Exception {
 
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRO()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
                     XMLUtil.documentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title, msguuid);
         }
-        LOGGER.info("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingSoap));
-        LOGGER.info("MSGUUID: '{}'", msguuid);
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+            LOGGER_CLINICAL.info("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingSoap));
+            LOGGER_CLINICAL.info("MSGUUID: '{}'", msguuid);
+        }
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
 
@@ -443,8 +452,10 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, title, "NRO") + ".xml";
             }
-            LOGGER.info("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
-            LOGGER.info("NRO:\n'{}'", oblString);
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isInfoEnabled()) {
+                LOGGER_CLINICAL.info("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
+                LOGGER_CLINICAL.info("NRO:\n'{}'", oblString);
+            }
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
     }
@@ -471,7 +482,7 @@ public class EvidenceUtils {
         //ISO 8601 format: 2017-11-25T10:59:53Z
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         df.setTimeZone(tz);
-        return df.format(new Date()) + "_" + evidenceType + "_" + (StringUtils.isNotBlank(uuid) ? uuid : "NO-INFO") + "_" + title;
+        return df.format(new Date()) + "_" + evidenceType + "_" + (StringUtils.isNotBlank(uuid) ? uuid : "NO-UUID") + "_" + title;
     }
 
     /**

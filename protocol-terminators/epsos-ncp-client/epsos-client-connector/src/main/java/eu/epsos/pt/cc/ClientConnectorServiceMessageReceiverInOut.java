@@ -3,7 +3,8 @@ package eu.epsos.pt.cc;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMXMLBuilderFactory;
@@ -58,7 +59,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         /*
          * Log soap request
          */
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             try {
                 String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv));
                 loggerClinical.debug("Incoming '{}' request message from portal:\n{}", operationName, logRequestMsg);
@@ -226,7 +227,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 /*
                  * Log soap request
                  */
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     try {
                         String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope));
                         loggerClinical.debug("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);

@@ -34,7 +34,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     // Path to the config.xml
     private static final String PATH_XML_CONFIG = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
             + "EADC_resources" + File.separator + "config" + File.separator + "config.xml";
-    private static final String NCP_SERVER_MODE = "server.ehealth.mode";
+    private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
     private final Logger logger = LoggerFactory.getLogger(AutomaticDataCollector.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     // map with one intermediateTransformer per CDA-classcode
@@ -74,7 +74,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
 
         logger.info("Processing a transaction object");
         String sqlInsertStatementList = this.extractDataAndCreateAccordingSqlInserts(transaction);
-        if (!StringUtils.equals(System.getProperty(NCP_SERVER_MODE), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
             loggerClinical.info("Insert the following sql-queries:\n'{}'", sqlInsertStatementList);
         }
         this.runSqlScript(dataSourceName, sqlInsertStatementList);
@@ -96,7 +96,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
         String processedDocumentCodeSystem;
         String processedDocumentCodeAndCodeSystemCombination;
 
-        if (!StringUtils.equals(System.getProperty(NCP_SERVER_MODE), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
             loggerClinical.debug("XML Document: {}", EadcUtil.convertXMLDocumentToString(transaction));
         }
 

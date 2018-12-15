@@ -7,8 +7,6 @@ import eu.epsos.util.xdr.XDRConstants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -19,8 +17,6 @@ import tr.com.srdc.epsos.securityman.helper.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
-import javax.servlet.http.HttpServletRequest;
-import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
@@ -180,62 +176,5 @@ public class EvidenceEmitterHandlerUtils {
 
         Element envAsDom = XMLUtils.toDOM(env);
         return XMLUtil.canonicalize(envAsDom.getOwnerDocument());
-    }
-
-    public void printClientCertificateDetails(MessageContext messageContext) {
-
-        MessageContext msgCtx = MessageContext.getCurrentMessageContext();
-        HttpServletRequest obj = (HttpServletRequest) msgCtx.getProperty("transport.http.servletRequest");
-        if (obj != null) {
-            logger.info("HTTP: '{}'", obj.getPathInfo());
-            X509Certificate[] certs = (X509Certificate[]) obj.getAttribute("javax.servlet.request.X509Certificate");
-            if (certs != null) {
-                for (X509Certificate cert : certs) {
-                    logger.info(" Server certificate '{}':", cert.getSerialNumber());
-                    logger.info("  Subject DN: " + cert.getSubjectDN());
-                    logger.info("  Signature Algorithm: " + cert.getSigAlgName());
-                    logger.info("  Valid from: " + cert.getNotBefore());
-                    logger.info("  Valid until: " + cert.getNotAfter());
-                    logger.info("  Issuer: " + cert.getIssuerDN());
-                }
-            } else {
-                logger.info("NULL");
-            }
-        } else {
-            logger.error("HTTP Obj NULL");
-        }
-
-        Iterator<String> propertyNames = messageContext.getPropertyNames();
-
-        if (propertyNames != null) {
-            while (propertyNames.hasNext()) {
-                String info = propertyNames.next();
-                logger.info("Hey There: '{}'", info);
-            }
-            HttpServletRequest httpRequest = (HttpServletRequest) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
-
-            if (httpRequest != null) {
-                X509Certificate[] certs = (X509Certificate[]) httpRequest.getAttribute("javax.servlet.request.X509Certificate");
-
-
-                if (certs != null) {
-                    for (int c = 0; c < certs.length; c++) {
-                        X509Certificate cert = certs[c];
-                        logger.info(" Server certificate '{}':", (c + 1));
-                        logger.info("  Subject DN: '{}'", cert.getSubjectDN());
-                        logger.info("  Signature Algorithm: '{}'", cert.getSigAlgName());
-                        logger.info("  Valid from: '{}'", cert.getNotBefore());
-                        logger.info("  Valid until: '{}'", cert.getNotAfter());
-                        logger.info("  Issuer: '{}'", cert.getIssuerDN());
-                    }
-                } else {
-                    logger.info("Certificate Chain from Client is null");
-                }
-            } else {
-                logger.info("HTTP Servlet Request has been null");
-            }
-        } else {
-            logger.error("Property Null");
-        }
     }
 }

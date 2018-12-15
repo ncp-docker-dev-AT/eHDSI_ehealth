@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class JaxbIOFactory implements AtnaIOFactory {
 
-    private static final String NCP_SERVER_MODE = "server.ehealth.mode";
+    private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
     private static JAXBContext jaxbContext;
 
     static {
@@ -58,7 +58,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
             if (doc.getDocumentElement().getTagName().equalsIgnoreCase("IHEYr4")) {
                 return createProv(doc);
             }
-            if (!StringUtils.equals(System.getProperty(NCP_SERVER_MODE), "PROD")) {
+            if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
                 loggerClinical.debug("Read Input Document: '{}'", XMLUtils.getFullTextChildrenFromElement(doc.getDocumentElement()));
             }
             Unmarshaller u = jaxbContext.createUnmarshaller();
@@ -70,7 +70,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
                 Marshaller marshaller = jaxbContext.createMarshaller();
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                 marshaller.marshal(a, bout);
-                if (!StringUtils.equals(System.getProperty(NCP_SERVER_MODE), "PROD")) {
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
                     loggerClinical.info("\n{}", new String(bout.toByteArray()));
                     if (loggerClinical.isDebugEnabled() && am != null) {
                         loggerClinical.debug("Event Outcome: '{}'", am.getEventOutcome());
@@ -161,7 +161,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
                 marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
             }
             marshaller.marshal(jmessage, out);
-            if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(NCP_SERVER_MODE), "PROD")) {
+            if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 marshaller.marshal(jmessage, bout);

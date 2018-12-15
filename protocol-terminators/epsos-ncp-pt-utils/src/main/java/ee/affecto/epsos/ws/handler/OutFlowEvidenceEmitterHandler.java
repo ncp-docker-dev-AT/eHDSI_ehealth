@@ -2,13 +2,13 @@ package ee.affecto.epsos.ws.handler;
 
 import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import eu.epsos.util.EvidenceUtils;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.Handler;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,6 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 
         logger.info("[NRO] OutFlow Evidence Emitter handler is executing");
         EvidenceEmitterHandlerUtils evidenceEmitterHandlerUtils = new EvidenceEmitterHandlerUtils();
-        evidenceEmitterHandlerUtils.printClientCertificateDetails(messageContext);
 
         /* I'll leave this here as it might be useful in the future */
 
@@ -112,8 +111,8 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
         try {
             // Canonicalization of the full SOAP message
             Document canonicalDocument = evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(messageContext.getEnvelope());
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
-                loggerClinical.debug("Pretty printing canonicalized:\n'{}'", XMLUtil.prettyPrint(canonicalDocument));
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+                loggerClinical.debug("Pretty printing Canonicalize:\n'{}'", XMLUtil.prettyPrint(canonicalDocument));
             }
             SOAPBody soapBody = messageContext.getEnvelope().getBody();
             String eventType;

@@ -60,7 +60,7 @@ public class ConnectionCertificateHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("org.openhealthtools.openatna.net.ConnectionCertificateHandler");
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
-    private static final String NCP_SERVER_MODE = "server.ehealth.mode";
+    private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
 
 
     /**
@@ -72,7 +72,7 @@ public class ConnectionCertificateHandler {
             throw new IllegalArgumentException("Keystore url may not be null");
         }
         LOGGER.debug("Initializing key store");
-        KeyStore keystore = null;
+        KeyStore keystore;
         if (url.getFile().endsWith(".p12")) {
             keystore = KeyStore.getInstance("pkcs12");
         } else {
@@ -142,7 +142,7 @@ public class ConnectionCertificateHandler {
                         message.append("\n  Issuer: ").append(x509Certificate.getIssuerDN());
                     }
                 }
-                if (!StringUtils.equals(System.getProperty(NCP_SERVER_MODE), "PROD")) {
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
                     LOGGER_CLINICAL.info(message.toString());
                 }
             }
@@ -171,7 +171,7 @@ public class ConnectionCertificateHandler {
                 message += "\n  Valid until: " + cert.getNotAfter();
                 message += "\n  Issuer: " + cert.getIssuerDN();
             }
-            if (!StringUtils.equals(System.getProperty(NCP_SERVER_MODE), "PROD")) {
+            if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
                 LOGGER_CLINICAL.info(message);
             }
         }
@@ -203,7 +203,7 @@ public class ConnectionCertificateHandler {
                         message.append("\n  Issuer: ").append(x509Certificate.getIssuerDN());
                     }
                 }
-                if (!StringUtils.equals(System.getProperty(NCP_SERVER_MODE), "PROD")) {
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
                     LOGGER_CLINICAL.info(message.toString());
                 }
             }

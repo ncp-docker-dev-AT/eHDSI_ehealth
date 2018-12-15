@@ -28,7 +28,8 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -352,7 +353,7 @@ public class EpsosHelperService {
             cda.setDispensationId("D-" + CDAUtils.getRelativePrescriptionBarcode(epDoc));
             edDoc = CDAUtils.createDispensation(epDoc, cda, eDuuid);
             Document document = XMLUtil.parseContent(edDoc);
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("### DISPENSATION START ###\n'{}'\n ### DISPENSATION END ###",
                         XMLUtil.prettyPrintForValidation(document.getDocumentElement()));
             }
@@ -391,7 +392,7 @@ public class EpsosHelperService {
 
             properties.put(IHtmlToPdfTransformer.PDF_RENDERER_CLASS, IHtmlToPdfTransformer.FLYINGSAUCER_PDF_RENDERER);
             properties.put(IHtmlToPdfTransformer.FOP_TTF_FONT_PATH, fontPath);
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("Converted CDA for Servlet:\n{}", cleanCDA);
             }
             converter.convertToPdf(cleanCDA, IHtmlToPdfTransformer.A4P, headerFooterList, uri, out, properties);
@@ -1070,7 +1071,7 @@ public class EpsosHelperService {
             // GUI-27
             if (assertion != null) {
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
-                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     LOGGER_CLINICAL.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
                 }
                 String auditPointOfCare;
@@ -1091,7 +1092,7 @@ public class EpsosHelperService {
 
                 Document document = element.getOwnerDocument();
 
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     String hcpa = Utils.getDocumentAsXml(document, false);
                     LOGGER_CLINICAL.info("#### HCPA Start\n '{}' \n#### HCPA End", hcpa);
                 }
@@ -1211,7 +1212,7 @@ public class EpsosHelperService {
                 AssertionMarshaller marshaller = new AssertionMarshaller();
                 Element element = marshaller.marshall(assertion);
                 Document document = element.getOwnerDocument();
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     String hcpa = Utils.getDocumentAsXml(document, false);
                     LOGGER_CLINICAL.debug("#### HCPA Start\n{}\n#### HCPA End", hcpa);
                 }
@@ -1882,7 +1883,7 @@ public class EpsosHelperService {
         Element element;
         element = marshaller.marshall(ass);
         Document document = element.getOwnerDocument();
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             String asstring = Utils.getDocumentAsXml(document, false);
 
             LOGGER_CLINICAL.info("##################### ASSERTION Start");
@@ -1894,11 +1895,11 @@ public class EpsosHelperService {
     public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
 
         Assertion trc;
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("Try to create TRCA for patient: '{}'", patient.getExtension());
         }
         String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.info("TRCA Patient ID: '{}'", pat);
         }
         LOGGER.info("Assertion ID: '{}'", idAs.getID());
@@ -1910,7 +1911,7 @@ public class EpsosHelperService {
         AssertionMarshaller marshaller = new AssertionMarshaller();
         Element element = marshaller.marshall(trc);
         Document document = element.getOwnerDocument();
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             String trca = Utils.getDocumentAsXml(document, false);
 
             LOGGER_CLINICAL.info("#### TRCA Start");
@@ -1937,7 +1938,7 @@ public class EpsosHelperService {
             Node pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
             if (pdfNode != null) {
                 String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                 }
                 result = base64EncodedPdfString;
@@ -1947,7 +1948,7 @@ public class EpsosHelperService {
                 pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
                 if (pdfNode != null) {
                     String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                    if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                         LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                     }
                     result = base64EncodedPdfString;
@@ -1979,7 +1980,7 @@ public class EpsosHelperService {
             if (pdfNode != null) {
 
                 String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                 }
                 result = decode.decode(base64EncodedPdfString.getBytes());
@@ -1989,7 +1990,7 @@ public class EpsosHelperService {
                 pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
                 if (pdfNode != null) {
                     String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                    if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                         LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                     }
                     result = decode.decode(base64EncodedPdfString.getBytes());
@@ -2496,7 +2497,7 @@ public class EpsosHelperService {
                 String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
                 LOGGER.info("CONNECTOR URL IS: '{}'", serviceUrl);
                 ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     LOGGER_CLINICAL.info("Searching for patients in '{}'", country);
                     LOGGER_CLINICAL.info("Assertion id: '{}'", assertion.getID());
                     LOGGER_CLINICAL.info("PD:\n'{}'", pd.toString());
@@ -2548,11 +2549,11 @@ public class EpsosHelperService {
             classCode.setNodeRepresentation(Constants.PS_CLASSCODE);
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.PS_TITLE); // Patient
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("PS QUERY: Getting ps documents for: '{}' from: '{}'", patientId.getExtension(), country);
             }
             List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(assertion, trca, country, patientId, classCode);
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("PS QUERY: Found: '{}' for: '{}-{}' from: '{}'", queryDocuments.size(), patientId.getRoot(), patientId.getExtension(), country);
             }
             for (EpsosDocument1 aux : queryDocuments) {
@@ -2596,11 +2597,11 @@ public class EpsosHelperService {
             classCode.setNodeRepresentation(Constants.EP_CLASSCODE);
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.EP_TITLE); // Patient
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("EP QUERY: Getting ep documents for: '{}' from: '{}'", patientId.getExtension(), country);
             }
             List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(assertion, trca, country, patientId, classCode);
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("EP QUERY: Found: '{}' for: '{}' from: '{}'", queryDocuments.size(), patientId.getExtension(), country);
             }
             for (EpsosDocument1 aux : queryDocuments) {
@@ -2686,7 +2687,7 @@ public class EpsosHelperService {
             selectedEpsosDocument.setTitle(eps.getTitle());
 
             xmlfile = new String(eps.getBase64Binary(), "UTF-8");
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.debug("#### CDA XML Start");
                 LOGGER_CLINICAL.debug(xmlfile);
                 LOGGER_CLINICAL.debug("#### CDA XML End");
@@ -2725,7 +2726,7 @@ public class EpsosHelperService {
 
     public static Patient populatePatient(PatientDemographics aux) {
 
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("PatientDemographics:\n'{}'", aux.toString());
         }
         Patient patient = new Patient();
@@ -2758,7 +2759,7 @@ public class EpsosHelperService {
             id.setRoot(identifiers.get(i).getDomain());
             id.setExtension(identifiers.get(i).getUserValue());
             idArray[i] = id;
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info(identifiers.get(i).getDomain() + ": " + identifiers.get(i).getUserValue());
             }
         }

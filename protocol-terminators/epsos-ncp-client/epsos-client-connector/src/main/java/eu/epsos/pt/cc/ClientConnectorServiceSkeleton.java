@@ -7,9 +7,9 @@ import eu.epsos.exceptions.XdrException;
 import eu.epsos.pt.cc.dts.axis2.*;
 import eu.epsos.pt.cc.stub.*;
 import eu.epsos.util.IheConstants;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
-import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +68,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             QueryPatientRequest arg0 = queryPatient.getQueryPatient().getArg0();
             PatientDemographics pDemographic = arg0.getPatientDemographics();
             request = eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(pDemographic);
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.info("Patient Demographics: '{}', '{}', '{}'",
                         ((pDemographic.getPatientIdArray() == null) ? "N/A" : pDemographic.getPatientIdArray()[0]),
                         pDemographic.getBirthDate(), pDemographic.getGivenName());

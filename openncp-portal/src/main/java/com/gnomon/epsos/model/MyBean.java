@@ -12,7 +12,8 @@ import com.liferay.portal.model.User;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstant;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import net.shibboleth.utilities.java.support.xml.BasicParserPool;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -452,11 +453,11 @@ public class MyBean implements Serializable {
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             // Patient Summary ClassCode.
             classCode.setValue(Constants.MRO_TITLE);
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.info("MRO QUERY: Getting mro documents for: '{}' from '{}'", patientId.getExtension(), selectedCountry);
             }
             List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion, selectedCountry, patientId, classCode);
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.info("MRO QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(), patientId.getExtension(), selectedCountry);
             }
 
@@ -466,7 +467,7 @@ public class MyBean implements Serializable {
                 patientDocuments.add(document);
             }
             queryDocumentsException = LiferayUtils.getPortalTranslation("report.list.no.document");
-            logger.debug("Selected Country: " + LiferayUtils.getFromSession("selectedCountry"));
+            logger.debug("Selected Country: '{}'", LiferayUtils.getFromSession("selectedCountry"));
 
         } catch (Exception ex) {
 
@@ -474,7 +475,7 @@ public class MyBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "DOCUMENT QUERY", LiferayUtils.getPortalTranslation(ex.getMessage())));
             if (patientId != null) {
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     loggerClinical.error("MRO QUERY: Error getting ps documents for: '{}' from: '{}'\n{}",
                             patientId.getExtension(), selectedCountry, ex.getMessage());
                 }
@@ -512,7 +513,7 @@ public class MyBean implements Serializable {
                 classCode.setNodeRepresentation(Constants.PS_CLASSCODE);
                 classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
                 classCode.setValue(Constants.PS_TITLE);
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     loggerClinical.info("PS QUERY: Getting ps documents for: '{}' from '{}'", patientId.getExtension(), selectedCountry);
                     loggerClinical.info("HCP ASSERTION IS : " + hcpAssertion.getID());
                     loggerClinical.info("TRCA ASSERTION IS : " + trcAssertion.getID());
@@ -522,7 +523,7 @@ public class MyBean implements Serializable {
                 }
                 List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion,
                         selectedCountry, patientId, classCode);
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     loggerClinical.info("PS QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(), patientId.getExtension(), selectedCountry);
                 }
                 showPS = true;
@@ -572,7 +573,7 @@ public class MyBean implements Serializable {
             patientId.setExtension(selectedPatient.getExtension());
             patientId.setRoot(selectedPatient.getRoot());
             this.purposeOfUse = purposeOfUse;
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.info("TRCA: Creating trca for hcpAssertion: '{}' for patient: '{}'. Purpose of use is: '{}'",
                         hcpAssertion.getID(), patientId.getRoot(), purposeOfUse);
             }
@@ -580,7 +581,7 @@ public class MyBean implements Serializable {
                 logger.info("demo running so TRCA not created");
             } else if (getSignedTRC() == null) {
                 trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, hcpAssertion, patientId);
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     loggerClinical.info("TRCA: Created: '{}' for: '{}' for patient: '{}_{}'. Purpose of use is: '{}'",
                             trcAssertion.getID(), hcpAssertion.getID(), patientId.getRoot(), patientId.getExtension(), purposeOfUse);
                 }
@@ -617,7 +618,7 @@ public class MyBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "TRCA ERROR", LiferayUtils.getPortalTranslation(e.getMessage())));
             if (patientId != null) {
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     loggerClinical.error("TRCA: Error creating trca for patient: '{}' with hcpAssetion: '{}'. " +
                                     "Purpose of use is: '{} - '{}", patientId.getExtension(), hcpAssertion.getID(), purposeOfUse,
                             e.getMessage(), e);
@@ -776,12 +777,12 @@ public class MyBean implements Serializable {
             classCode.setNodeRepresentation(Constants.EP_CLASSCODE);
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.EP_TITLE);
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.info("EP QUERY: Getting ePrescription documents for: {} from {}.",
                         patientId.getExtension(), selectedCountry);
             }
             List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion, selectedCountry, patientId, classCode);
-            if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.info("EP QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(),
                         patientId.getExtension(), selectedCountry);
             }
@@ -1154,7 +1155,7 @@ public class MyBean implements Serializable {
 
     public void setSignedTRC(String signedTRC) throws Exception {
 
-        if (!StringUtils.equals(System.getProperty(OpenNCPConstant.NCP_SERVER_MODE), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.info("signedTRC: '{}'", signedTRC);
         }
         if (signedTRC != null && !signedTRC.isEmpty()) {
