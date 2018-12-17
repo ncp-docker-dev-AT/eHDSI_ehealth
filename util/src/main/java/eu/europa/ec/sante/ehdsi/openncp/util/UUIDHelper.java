@@ -14,7 +14,7 @@ public class UUIDHelper {
     private UUIDHelper() {
     }
 
-    public static String getUrnEncodedUUID(String uuid) {
+    public static String encodeAsURN(String uuid) {
 
         uuid = StringUtils.removeAll(uuid, "urn:uuid:");
         uuid = StringUtils.removeAll(uuid, "_");

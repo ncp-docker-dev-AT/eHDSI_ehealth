@@ -789,7 +789,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             //  passing a XML document. We're passing data like:"SearchCriteria: {patientId = 12445ASD}".
             //  So we provided a XML representation of such data.
             Assertion assertionTRC = Helper.getTRCAssertion(shElement);
-            String messageUUID = UUIDHelper.getUrnEncodedUUID(assertionTRC.getID()) + "_" + assertionTRC.getIssueInstant();
+            String messageUUID = UUIDHelper.encodeAsURN(assertionTRC.getID()) + "_" + assertionTRC.getIssueInstant();
 
             EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
                     Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
