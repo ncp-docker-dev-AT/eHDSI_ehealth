@@ -10,6 +10,7 @@ This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Ver
 ### Changed
 - OpenSAML framework upgrade from 2.6.X (not supported anymore) to 3.3.1.
 - OpenNCP Portal language properties files are now directly stored in ASCII.
+- CDA DisplayTool is now showing original language of the CDA instead of user language
 
 ### Deprecated
 - N/A
