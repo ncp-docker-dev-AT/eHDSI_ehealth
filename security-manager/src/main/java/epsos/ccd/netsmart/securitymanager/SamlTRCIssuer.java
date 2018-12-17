@@ -4,17 +4,19 @@ import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.*;
-import org.opensaml.saml2.core.impl.IssuerBuilder;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.XMLObjectBuilder;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.schema.XSString;
-import org.opensaml.xml.schema.XSURI;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.XSURI;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.*;
+import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +54,7 @@ public class SamlTRCIssuer {
     }
 
     /**
-     * Helper Funciton that makes it easy to create a new OpenSAML Obejct, using
+     * Helper Function that makes it easy to create a new OpenSAML Object, using
      * the default namespace prefixes.
      *
      * @param <T>   The Type of OpenSAML Class that will be created
@@ -61,7 +63,7 @@ public class SamlTRCIssuer {
      * @return the new OpenSAML object of type T
      */
     public static <T> T create(Class<T> cls, QName qname) {
-        return (T) Configuration.getBuilderFactory().getBuilder(qname).buildObject(qname);
+        return (T) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(qname).buildObject(qname);
     }
 
     /**
@@ -80,7 +82,7 @@ public class SamlTRCIssuer {
 
         try {
             //initializing the map
-            XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+            XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
             // Create the assertion
             Assertion trc = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
@@ -194,7 +196,7 @@ public class SamlTRCIssuer {
      * The Identity of the HCP is provided by the hcpIdentityAssertion. The identity of the patient is inferred from the patientID.
      *
      * @param hcpIdentityAssertion The health care professional Identity SAML Assertion. The method validates
-     *                             the assertion using the {@link SignatureManager#verifySAMLAssertion(org.opensaml.saml2.core.Assertion)}.
+     *                             the assertion using the {@link SignatureManager#verifySAMLAssertion(org.opensaml.saml.saml2.core.Assertion)}.
      * @param patientID            The Patient Id that is required for the TRC Assertion
      * @param purposeOfUse         Purpose of use Variables (e.g. TREATMENT)
      * @param attrValuePair        SAML {@link Attribute} that will be added to the assertion
@@ -202,14 +204,13 @@ public class SamlTRCIssuer {
      */
     public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
                                    List<Attribute> attrValuePair) throws SMgrException {
-
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
                     hcpIdentityAssertion.getID(), patientID, purposeOfUse);
         }
         //initializing the map
         auditDataMap.clear();
-        XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+        XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
         //Doing an indirect copy so, because when cloning, signatures are lost.
         SignatureManager sman = new SignatureManager(ksm);
@@ -401,7 +402,7 @@ public class SamlTRCIssuer {
      * @param trcAssertion         The Assertion that is to be validated.
      * @param hcpIdentityAssertion The health care professional Identity SAML
      *                             Assertion. The method validates the assertion using the
-     *                             {@link SignatureManager#verifySAMLAssertion(org.opensaml.saml2.core.Assertion)}.
+     *                             {@link SignatureManager#verifySAMLAssertion(org.opensaml.saml.saml2.core.Assertion)}.
      * @param patientID            The Patient Id that is required for the TRC Assertion
      * @throws SMgrException when the verification fails.
      */
@@ -426,7 +427,9 @@ public class SamlTRCIssuer {
         attr.setName(name);
         attr.setNameFormat(nameFormat);
 
-        XMLObjectBuilder stringBuilder = Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
+        //XMLObjectBuilder stringBuilder = Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
+        XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+        XMLObjectBuilder stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
         XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
         attrVal.setValue(value);
         attr.getAttributeValues().add(attrVal);
@@ -451,7 +454,9 @@ public class SamlTRCIssuer {
                     attr.setName(attribute.getName());
                     attr.setNameFormat(attribute.getNameFormat());
 
-                    XMLObjectBuilder stringBuilder = Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
+                    //XMLObjectBuilder stringBuilder = Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
+                    XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+                    XMLObjectBuilder stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
                     XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
                     attrVal.setValue(((XSString) attribute.getAttributeValues().get(0)).getValue());
                     attr.getAttributeValues().add(attrVal);
@@ -479,7 +484,8 @@ public class SamlTRCIssuer {
                     attr.setName(attribute.getNameFormat());
                     attr.setNameFormat(attribute.getNameFormat());
 
-                    XMLObjectBuilder uriBuilder = Configuration.getBuilderFactory().getBuilder(XSURI.TYPE_NAME);
+                    //XMLObjectBuilder uriBuilder = Configuration.getBuilderFactory().getBuilder(XSURI.TYPE_NAME);
+                    XMLObjectBuilder uriBuilder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSURI.TYPE_NAME);
                     XSURI attrVal = (XSURI) uriBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSURI.TYPE_NAME);
 
                     attrVal.setValue(((XSURI) attribute.getAttributeValues().get(0)).getValue());
@@ -567,7 +573,7 @@ public class SamlTRCIssuer {
      * @return
      */
     public String getFacilityType() {
-        
+
         return auditDataMap.get("facilityType");
     }
 }

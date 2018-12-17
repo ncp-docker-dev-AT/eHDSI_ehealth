@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -52,25 +53,22 @@ public class DataWriter {
 
     private static StreamResult transform(Document doc, OutputStream out, boolean indent) throws IOException {
 
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer t = null;
+        StreamResult sr = new StreamResult(out);
+
         try {
-            t = tf.newTransformer();
-            if (indent) {
-                t.setOutputProperty(OutputKeys.INDENT, "yes");
-            } else {
-                t.setOutputProperty(OutputKeys.INDENT, "no");
-            }
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer t = transformerFactory.newTransformer();
+            t.setOutputProperty(OutputKeys.INDENT, indent ? "yes" : "no");
             t.setOutputProperty(OutputKeys.METHOD, "xml");
             t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+            DOMSource doms = new DOMSource(doc);
+
+            t.transform(doms, sr);
         } catch (TransformerConfigurationException tce) {
             LOGGER.error("TransformerConfigurationException: '{}'", tce.getMessage(), tce);
             assert (false);
-        }
-        DOMSource doms = new DOMSource(doc);
-        StreamResult sr = new StreamResult(out);
-        try {
-            t.transform(doms, sr);
         } catch (TransformerException te) {
             LOGGER.error("TransformerException: '{}'", te.getMessage(), te);
             throw new IOException(te.getMessage());

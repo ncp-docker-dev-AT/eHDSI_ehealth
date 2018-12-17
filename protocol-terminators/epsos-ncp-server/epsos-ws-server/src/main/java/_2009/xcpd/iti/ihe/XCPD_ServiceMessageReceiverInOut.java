@@ -9,6 +9,8 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -46,6 +48,8 @@ import java.util.*;
 public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
+
     private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
@@ -65,8 +69,6 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             wsContext = jc;
         }
     }
-
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private String getIPofSender(MessageContext messageContext) {
 
@@ -104,8 +106,8 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             String clientDN = HTTPUtil.getClientCertificate(req);
             eventLog.setSC_UserID(clientDN);
             eventLog.setTargetip(HTTPUtil.getHostIpAddress(req.getServerName()));
-            
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
             }
 
@@ -152,7 +154,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
-                    if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                         loggerClinical.debug("Outgoing XCPD Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
 

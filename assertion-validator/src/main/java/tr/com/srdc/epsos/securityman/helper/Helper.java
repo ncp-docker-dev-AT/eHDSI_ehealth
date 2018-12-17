@@ -1,9 +1,9 @@
 package tr.com.srdc.epsos.securityman.helper;
 
 import org.apache.commons.lang.StringUtils;
-import org.opensaml.common.xml.SAMLSchemaBuilder;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.Attribute;
+import org.opensaml.saml.common.xml.SAMLSchemaBuilder;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Attribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -25,7 +25,12 @@ public class Helper {
     private Helper() {
     }
 
+    /**
+     * @param sh
+     * @return
+     */
     public static Assertion getHCPAssertion(Element sh) {
+
         try {
             // TODO: Since the XCA simulator sends this value in a wrong way, we are trying like this for the moment
             NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
@@ -42,7 +47,9 @@ public class Helper {
             if (assertionList.getLength() > 0) {
                 for (int i = 0; i < assertionList.getLength(); i++) {
                     hcpAss = (Element) assertionList.item(i);
-                    SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(hcpAss));
+                    //SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(hcpAss));
+                    SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                    schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(hcpAss));
 
                     hcpAssertion = (Assertion) SAML.fromElement(hcpAss);
                     if (hcpAssertion.getAdvice() == null) {
@@ -159,6 +166,7 @@ public class Helper {
      * @author Konstantin.Hypponen@kela.fi
      */
     public static Assertion getTRCAssertion(Element sh) {
+
         try {
             NodeList securityList = sh.getElementsByTagNameNS(
                     "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
@@ -200,6 +208,7 @@ public class Helper {
      * @return Patient ID in XDS format
      */
     public static String getDocumentEntryPatientIdFromTRCAssertion(Element sh) {
+
         String patientId = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xacml:1.0:resource:resource-id", true);
         if (patientId == null) {
             logger.error("Patient ID not found in TRC assertion");

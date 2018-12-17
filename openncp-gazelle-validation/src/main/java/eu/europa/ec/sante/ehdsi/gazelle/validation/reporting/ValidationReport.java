@@ -18,7 +18,11 @@ public class ValidationReport {
     private static final String FILE_NAME_DELIMITER = "_";
     private static final String CLEANUP_VALIDATION_DIR_AFTER_TEST = "automated.validation.cleanup.dir";
 
+    private ValidationReport() {
+    }
+
     public static String build(NcpSide ncpSide, boolean cleanupDir) {
+
         /* METHOD ATTRIBUTES */
         String path;
         File folder;
@@ -26,7 +30,7 @@ public class ValidationReport {
         StringBuilder sb;
 
         /* ATTRIBUTES INITIALIZATION */
-        path = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + "/" + ncpSide.getName();
+        path = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + File.separator + ncpSide.getName();
         folder = new File(path);
         listOfFiles = folder.listFiles();
         sb = new StringBuilder();
@@ -42,11 +46,11 @@ public class ValidationReport {
             return null;
         }
         if (!folder.canRead()) {
-            LOG.error("Cannot read from specified folder. (" + path + ")");
+            LOG.error("Cannot read from specified folder. ('{}')", path);
             return null;
         }
         if (listOfFiles.length == 0) {
-            LOG.error("The specified folder is empty. (" + path + ")");
+            LOG.error("The specified folder is empty. ('{}'", path);
             return null;
         }
 
@@ -79,7 +83,7 @@ public class ValidationReport {
         File[] listOfFiles;
 
         /* ATTRIBUTES INITIALIZATION */
-        path = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + "/" + ncpSide.getName();
+        path = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + File.separator + ncpSide.getName();
         folder = new File(path);
         listOfFiles = folder.listFiles();
 
@@ -167,7 +171,7 @@ public class ValidationReport {
     }
 
     public static void cleanValidationDir(NcpSide ncpSide) {
-        cleanValidationDir(new File(Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + "/" + ncpSide.getName()));
+        cleanValidationDir(new File(Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + File.separator + ncpSide.getName()));
     }
 
     private static String processFile(File file) {

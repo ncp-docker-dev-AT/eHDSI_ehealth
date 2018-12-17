@@ -3,6 +3,8 @@ package epsos.ccd.gnomon.auditmanager;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,7 +158,7 @@ public class EventLog {
         // Setup Event Identification information
         eventLog.setNcpSide(ncpSide);
 
-        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("EventLog Details: '{}'", eventLog.toString());
         }
         return eventLog;
@@ -214,7 +216,7 @@ public class EventLog {
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
 
-        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
         }
         return eventLog;
@@ -271,7 +273,7 @@ public class EventLog {
         eventLog.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         eventLog.setTargetip(nullToEmptyString(targetip));
 
-        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
         }
         return eventLog;
@@ -479,7 +481,7 @@ public class EventLog {
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
 
-        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
         }
         return eventLog;
@@ -643,7 +645,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
         eventLog.ncpSide = ncpSide;
 
-        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog.toString());
         }
         return eventLog;
@@ -727,7 +729,7 @@ public class EventLog {
         eventLog.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
-        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
         }
         return eventLog;
@@ -803,7 +805,7 @@ public class EventLog {
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
 
-        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
         }
         return eventLog;

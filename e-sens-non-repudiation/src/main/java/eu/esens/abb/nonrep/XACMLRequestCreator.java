@@ -1,21 +1,21 @@
 package eu.esens.abb.nonrep;
 
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.xacml.ctx.*;
 import org.opensaml.xacml.ctx.impl.*;
-import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.w3c.dom.Element;
 
 import java.util.List;
 
 public class XACMLRequestCreator {
 
-    private static final XMLObjectBuilderFactory bf = org.opensaml.xml.Configuration.getBuilderFactory();
-
     static {
         try {
-            org.opensaml.DefaultBootstrap.bootstrap();
-        } catch (ConfigurationException e) {
+            InitializationService.initialize();
+        } catch (InitializationException e) {
             throw new IllegalStateException("Unable to bootstrap OpenSAML!!! Did you endorse the XML libraries?", e);
         }
     }
@@ -24,15 +24,24 @@ public class XACMLRequestCreator {
     private final AttributeValueTypeImplBuilder avtib;
     private Element request;
 
+    /**
+     * @param messageType
+     * @param subjectAttributes
+     * @param resourceAttributes
+     * @param actionAttributes
+     * @param environmentAttributes
+     * @throws TOElementException
+     */
     public XACMLRequestCreator(MessageType messageType, List<XACMLAttributes> subjectAttributes, List<XACMLAttributes> resourceAttributes,
                                List<XACMLAttributes> actionAttributes, List<XACMLAttributes> environmentAttributes)
             throws TOElementException {
 
+        XMLObjectBuilderFactory bf = XMLObjectProviderRegistrySupport.getBuilderFactory();
         atib = (AttributeTypeImplBuilder) bf.getBuilder(AttributeType.DEFAULT_ELEMENT_NAME);
         avtib = (AttributeValueTypeImplBuilder) bf.getBuilder(AttributeValueType.DEFAULT_ELEMENT_NAME);
 
         RequestTypeImplBuilder rtb = (RequestTypeImplBuilder) bf.getBuilder(RequestType.DEFAULT_ELEMENT_NAME);
-        RequestType request = rtb.buildObject();
+        RequestType requestType = rtb.buildObject();
 
         SubjectTypeImplBuilder stib = (SubjectTypeImplBuilder) bf.getBuilder(SubjectType.DEFAULT_ELEMENT_NAME);
         SubjectType subject = stib.buildObject();
@@ -46,10 +55,10 @@ public class XACMLRequestCreator {
         EnvironmentTypeImplBuilder etib = (EnvironmentTypeImplBuilder) bf.getBuilder(EnvironmentType.DEFAULT_ELEMENT_NAME);
         EnvironmentType environment = etib.buildObject();
 
-        request.getSubjects().add(subject);
-        request.getResources().add(resource);
-        request.setAction(action);
-        request.setEnvironment(environment);
+        requestType.getSubjects().add(subject);
+        requestType.getResources().add(resource);
+        requestType.setAction(action);
+        requestType.setEnvironment(environment);
 
         if (subjectAttributes != null) {
 
@@ -107,7 +116,7 @@ public class XACMLRequestCreator {
             }
         }
 
-        this.request = Utilities.toElement(request);
+        this.request = Utilities.toElement(requestType);
     }
 
     public Element getRequest() {

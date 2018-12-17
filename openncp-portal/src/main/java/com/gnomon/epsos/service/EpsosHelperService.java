@@ -28,7 +28,8 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -48,23 +49,28 @@ import org.htmlcleaner.PrettyXmlSerializer;
 import org.htmlcleaner.TagNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.Configuration;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.common.SAMLObjectBuilder;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.common.SignableSAMLObject;
-import org.opensaml.saml2.core.*;
-import org.opensaml.saml2.core.impl.AssertionMarshaller;
-import org.opensaml.saml2.core.impl.IssuerBuilder;
-import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.XMLObjectBuilder;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.schema.XSString;
-import org.opensaml.xml.schema.XSURI;
-import org.opensaml.xml.security.BasicSecurityConfiguration;
-import org.opensaml.xml.security.SecurityHelper;
-import org.opensaml.xml.security.credential.Credential;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.XSURI;
+import org.opensaml.saml.common.SAMLObjectBuilder;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.common.SignableSAMLObject;
+import org.opensaml.saml.saml2.core.*;
+import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
+import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
+import org.opensaml.security.credential.Credential;
+import org.opensaml.security.credential.CredentialSupport;
+import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.X509Data;
+import org.opensaml.xmlsec.signature.support.SignatureException;
+import org.opensaml.xmlsec.signature.support.Signer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
@@ -77,6 +83,7 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.XMLConstants;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -145,6 +152,15 @@ public class EpsosHelperService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EpsosHelperService.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final Base64 decode = new Base64();
+
+    static {
+        try {
+            InitializationService.initialize();
+        } catch (InitializationException e) {
+            LOGGER.error("InitializationException: '{}'", e.getMessage(), e);
+
+        }
+    }
 
     private EpsosHelperService() {
         super();
@@ -337,7 +353,7 @@ public class EpsosHelperService {
             cda.setDispensationId("D-" + CDAUtils.getRelativePrescriptionBarcode(epDoc));
             edDoc = CDAUtils.createDispensation(epDoc, cda, eDuuid);
             Document document = XMLUtil.parseContent(edDoc);
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("### DISPENSATION START ###\n'{}'\n ### DISPENSATION END ###",
                         XMLUtil.prettyPrintForValidation(document.getDocumentElement()));
             }
@@ -376,7 +392,7 @@ public class EpsosHelperService {
 
             properties.put(IHtmlToPdfTransformer.PDF_RENDERER_CLASS, IHtmlToPdfTransformer.FLYINGSAUCER_PDF_RENDERER);
             properties.put(IHtmlToPdfTransformer.FOP_TTF_FONT_PATH, fontPath);
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("Converted CDA for Servlet:\n{}", cleanCDA);
             }
             converter.convertToPdf(cleanCDA, IHtmlToPdfTransformer.A4P, headerFooterList, uri, out, properties);
@@ -851,56 +867,95 @@ public class EpsosHelperService {
         return lines;
     }
 
-    private static void signSAMLAssertion(SignableSAMLObject as, String keyAlias) throws Exception {
+    /**
+     * Mock Utility method providing as signed Assertion from the Portal
+     *
+     * @param signableSAMLObject
+     * @param keyAlias
+     * @throws Exception
+     */
+    private static void signSAMLAssertion(SignableSAMLObject signableSAMLObject, String keyAlias) throws Exception {
 
-        String KEYSTORE_LOCATION = Constants.NCP_SIG_KEYSTORE_PATH;
-        String KEY_STORE_PASS = Constants.NCP_SIG_KEYSTORE_PASSWORD;
-        String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-        String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
+        LOGGER.info("method signSAMLAssertion('{}')", keyAlias);
+
+        String ncpSigKeystorePath = Constants.NCP_SIG_KEYSTORE_PATH;
+        String ncpSigKeystorePassword = Constants.NCP_SIG_KEYSTORE_PASSWORD;
+        String ncpSigPrivatekeyAlias = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
+        String ncpSigPrivatekeyPassword = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
 
         KeyStoreManager keyManager = new DefaultKeyStoreManager();
         X509Certificate cert;
         PrivateKey privateKey = null;
+
         if (keyAlias == null) {
             cert = (X509Certificate) keyManager.getDefaultCertificate();
         } else {
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            File file = new File(KEYSTORE_LOCATION);
-            keyStore.load(new FileInputStream(file), KEY_STORE_PASS.toCharArray());
-            privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
+            File file = new File(ncpSigKeystorePath);
+            keyStore.load(new FileInputStream(file), ncpSigKeystorePassword.toCharArray());
+            privateKey = (PrivateKey) keyStore.getKey(ncpSigPrivatekeyAlias, ncpSigPrivatekeyPassword.toCharArray());
             cert = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
 
-        org.opensaml.xml.signature.Signature sig = (org.opensaml.xml.signature.Signature) Configuration
-                .getBuilderFactory().getBuilder(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME)
-                .buildObject(org.opensaml.xml.signature.Signature.DEFAULT_ELEMENT_NAME);
-        Credential signingCredential = SecurityHelper.getSimpleCredential(cert, privateKey);
+        LOGGER.info("Keystore & Signature Certificate loaded: '{}'", cert.getSerialNumber());
+
+        Signature sig = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory()
+                .getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
+        Credential signingCredential = CredentialSupport.getSimpleCredential(cert, privateKey);
 
         sig.setSigningCredential(signingCredential);
-        sig.setSignatureAlgorithm(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256);
-        sig.setCanonicalizationAlgorithm(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+        sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        sig.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
 
-        BasicSecurityConfiguration secConfig = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-        secConfig.setSignatureReferenceDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256);
+
+        KeyInfo keyInfo = (KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME).buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
+        X509Data data = (X509Data) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(X509Data.DEFAULT_ELEMENT_NAME).buildObject(X509Data.DEFAULT_ELEMENT_NAME);
+        org.opensaml.xmlsec.signature.X509Certificate x509Certificate = (org.opensaml.xmlsec.signature.X509Certificate) XMLObjectProviderRegistrySupport.getBuilderFactory()
+                .getBuilder(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME).buildObject(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
+
+        String value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
+        x509Certificate.setValue(value);
+        data.getX509Certificates().add(x509Certificate);
+        keyInfo.getX509Datas().add(data);
+        sig.setKeyInfo(keyInfo);
+
+
+//        KeyInfo keyInfo = (KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME)
+//                .buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
+//
+//        X509Data data = (X509Data) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(X509Data.DEFAULT_ELEMENT_NAME)
+//                .buildObject(X509Data.DEFAULT_ELEMENT_NAME);
+        //X509Certificate cert = (X509Certificate) buildXMLObject(X509Certificate.DEFAULT_ELEMENT_NAME);
+        //String value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
+        //cert.setValue(value);
+//        data.getX509Certificates().add((org.opensaml.xmlsec.signature.X509Certificate) ((BasicX509Credential) signingCredential).getEntityCertificate());
+//
+//        keyInfo.getX509Datas().add(data);
+//        sig.setKeyInfo(keyInfo);
+        //SignatureSigningConfiguration signingConfiguration = SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
+
+//        SecurityConfigurationSupport secConfig = (BasicSecurityConfiguration) XMLObjectProviderRegistrySupport.();
+//        secConfig.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
+//        BasicSecurityConfiguration config = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
+//        config.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
+//        SignatureSigningConfiguration secConfig = SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
+//        try {
+//            SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
+//
+//
+//        } catch (SecurityException e) {
+//            throw new SMgrException(e.getMessage(), e);
+//        }
+        //Signer.signObject(sig);
+
+        signableSAMLObject.setSignature(sig);
+        XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(signableSAMLObject).marshall(signableSAMLObject);
 
         try {
-            SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
-
-
-        } catch (SecurityException e) {
-            throw new SMgrException(e.getMessage(), e);
-        }
-
-        as.setSignature(sig);
-        try {
-            Configuration.getMarshallerFactory().getMarshaller(as).marshall(as);
-        } catch (MarshallingException e) {
-            throw new SMgrException(e.getMessage(), e);
-        }
-        try {
-            org.opensaml.xml.signature.Signer.signObject(sig);
-        } catch (Exception e) {
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            Signer.signObject(sig);
+        } catch (SignatureException e) {
+            LOGGER.error("SignatureException: '{}'", e.getMessage(), e);
+            throw new Exception(e);
         }
     }
 
@@ -947,8 +1002,8 @@ public class EpsosHelperService {
             String prefix = "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission:";
 
             if (isPhysician) {
-                rolename = "medical doctor";
 
+                rolename = "physician";
                 String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
                 String[] p = doctor_perms.split(",");
                 for (String aP : p) {
@@ -1016,7 +1071,7 @@ public class EpsosHelperService {
             // GUI-27
             if (assertion != null) {
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
-                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     LOGGER_CLINICAL.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
                 }
                 String auditPointOfCare;
@@ -1037,7 +1092,7 @@ public class EpsosHelperService {
 
                 Document document = element.getOwnerDocument();
 
-                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     String hcpa = Utils.getDocumentAsXml(document, false);
                     LOGGER_CLINICAL.info("#### HCPA Start\n '{}' \n#### HCPA End", hcpa);
                 }
@@ -1083,7 +1138,7 @@ public class EpsosHelperService {
             String prefix = "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission:";
 
             if (isPhysician) {
-                rolename = "medical doctor";
+                rolename = "physician";
 
                 String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
                 String[] p = doctor_perms.split(",");
@@ -1157,7 +1212,7 @@ public class EpsosHelperService {
                 AssertionMarshaller marshaller = new AssertionMarshaller();
                 Element element = marshaller.marshall(assertion);
                 Document document = element.getOwnerDocument();
-                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     String hcpa = Utils.getDocumentAsXml(document, false);
                     LOGGER_CLINICAL.debug("#### HCPA Start\n{}\n#### HCPA End", hcpa);
                 }
@@ -1283,7 +1338,7 @@ public class EpsosHelperService {
                     attr.setName(attribute.getNameFormat());
                     attr.setNameFormat(attribute.getNameFormat());
 
-                    XMLObjectBuilder stringBuilder = org.opensaml.xml.Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
+                    XMLObjectBuilder stringBuilder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
                     XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
                     attrVal.setValue(((XSString) attribute.getAttributeValues().get(0)).getValue());
                     attr.getAttributeValues().add(attrVal);
@@ -1343,8 +1398,8 @@ public class EpsosHelperService {
     }
 
     private static <T> T create(Class<T> cls, QName qname) {
-        return (T) (Configuration.getBuilderFactory()
-                .getBuilder(qname)).buildObject(qname);
+
+        return (T) (XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(qname)).buildObject(qname);
     }
 
     private static Assertion createAssertion(String username, String role, String organization, String organizationId,
@@ -1374,20 +1429,20 @@ public class EpsosHelperService {
                                                   String organizationId, String facilityType, String purposeOfUse,
                                                   String xspaLocality, List<String> permissions, String onBehalfId) {
         // assertion
-        LOGGER.info("username: '{}'", username);
+        LOGGER.info("Username: '{}'", username);
         LOGGER.info("FullName: '{}'", fullName);
         LOGGER.info("Email: '{}'", email);
-        LOGGER.info("role: '{}'", role);
-        LOGGER.info("organization: '{}'", organization);
-        LOGGER.info("organizationId: '{}'", organizationId);
-        LOGGER.info("facilityType: '{}'", facilityType);
-        LOGGER.info("purposeOfUse: '{}'", purposeOfUse);
-        LOGGER.info("xspaLocality: '{}'", xspaLocality);
+        LOGGER.info("Role: '{}'", role);
+        LOGGER.info("Organization: '{}'", organization);
+        LOGGER.info("OrganizationId: '{}'", organizationId);
+        LOGGER.info("FacilityType: '{}'", facilityType);
+        LOGGER.info("PurposeOfUse: '{}'", purposeOfUse);
+        LOGGER.info("XSPALocality: '{}'", xspaLocality);
 
         Assertion assertion = null;
         try {
-            DefaultBootstrap.bootstrap();
-            XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+
+            XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
             // Create the NameIdentifier
             SAMLObjectBuilder nameIdBuilder = (SAMLObjectBuilder) builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME);
@@ -1505,7 +1560,7 @@ public class EpsosHelperService {
 
             LOGGER.info("AssertionId: '{}'", assertion.getID());
 
-        } catch (ConfigurationException e) {
+        } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
         return assertion;
@@ -1828,7 +1883,7 @@ public class EpsosHelperService {
         Element element;
         element = marshaller.marshall(ass);
         Document document = element.getOwnerDocument();
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             String asstring = Utils.getDocumentAsXml(document, false);
 
             LOGGER_CLINICAL.info("##################### ASSERTION Start");
@@ -1840,23 +1895,23 @@ public class EpsosHelperService {
     public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
 
         Assertion trc;
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("Try to create TRCA for patient: '{}'", patient.getExtension());
         }
         String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.info("TRCA Patient ID: '{}'", pat);
         }
         LOGGER.info("Assertion ID: '{}'", idAs.getID());
         LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
-        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).PurposeOfUse(purpose).build();
+        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).purposeOfUse(purpose).build();
         LOGGER.info("TRCAssertionRequest: '{}", req1);
         trc = req1.request();
 
         AssertionMarshaller marshaller = new AssertionMarshaller();
         Element element = marshaller.marshall(trc);
         Document document = element.getOwnerDocument();
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             String trca = Utils.getDocumentAsXml(document, false);
 
             LOGGER_CLINICAL.info("#### TRCA Start");
@@ -1883,7 +1938,7 @@ public class EpsosHelperService {
             Node pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
             if (pdfNode != null) {
                 String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                 }
                 result = base64EncodedPdfString;
@@ -1893,7 +1948,7 @@ public class EpsosHelperService {
                 pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
                 if (pdfNode != null) {
                     String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                    if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                         LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                     }
                     result = base64EncodedPdfString;
@@ -1925,7 +1980,7 @@ public class EpsosHelperService {
             if (pdfNode != null) {
 
                 String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                 }
                 result = decode.decode(base64EncodedPdfString.getBytes());
@@ -1935,7 +1990,7 @@ public class EpsosHelperService {
                 pdfNode = (Node) pdfTag.evaluate(dom, XPathConstants.NODE);
                 if (pdfNode != null) {
                     String base64EncodedPdfString = pdfNode.getTextContent().trim();
-                    if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                         LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
                     }
                     result = decode.decode(base64EncodedPdfString.getBytes());
@@ -2442,7 +2497,7 @@ public class EpsosHelperService {
                 String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
                 LOGGER.info("CONNECTOR URL IS: '{}'", serviceUrl);
                 ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
-                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                     LOGGER_CLINICAL.info("Searching for patients in '{}'", country);
                     LOGGER_CLINICAL.info("Assertion id: '{}'", assertion.getID());
                     LOGGER_CLINICAL.info("PD:\n'{}'", pd.toString());
@@ -2494,11 +2549,11 @@ public class EpsosHelperService {
             classCode.setNodeRepresentation(Constants.PS_CLASSCODE);
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.PS_TITLE); // Patient
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("PS QUERY: Getting ps documents for: '{}' from: '{}'", patientId.getExtension(), country);
             }
             List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(assertion, trca, country, patientId, classCode);
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("PS QUERY: Found: '{}' for: '{}-{}' from: '{}'", queryDocuments.size(), patientId.getRoot(), patientId.getExtension(), country);
             }
             for (EpsosDocument1 aux : queryDocuments) {
@@ -2542,11 +2597,11 @@ public class EpsosHelperService {
             classCode.setNodeRepresentation(Constants.EP_CLASSCODE);
             classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
             classCode.setValue(Constants.EP_TITLE); // Patient
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("EP QUERY: Getting ep documents for: '{}' from: '{}'", patientId.getExtension(), country);
             }
             List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(assertion, trca, country, patientId, classCode);
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info("EP QUERY: Found: '{}' for: '{}' from: '{}'", queryDocuments.size(), patientId.getExtension(), country);
             }
             for (EpsosDocument1 aux : queryDocuments) {
@@ -2632,7 +2687,7 @@ public class EpsosHelperService {
             selectedEpsosDocument.setTitle(eps.getTitle());
 
             xmlfile = new String(eps.getBase64Binary(), "UTF-8");
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.debug("#### CDA XML Start");
                 LOGGER_CLINICAL.debug(xmlfile);
                 LOGGER_CLINICAL.debug("#### CDA XML End");
@@ -2671,7 +2726,7 @@ public class EpsosHelperService {
 
     public static Patient populatePatient(PatientDemographics aux) {
 
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("PatientDemographics:\n'{}'", aux.toString());
         }
         Patient patient = new Patient();
@@ -2704,7 +2759,7 @@ public class EpsosHelperService {
             id.setRoot(identifiers.get(i).getDomain());
             id.setExtension(identifiers.get(i).getUserValue());
             idArray[i] = id;
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.info(identifiers.get(i).getDomain() + ": " + identifiers.get(i).getUserValue());
             }
         }
@@ -2768,7 +2823,9 @@ public class EpsosHelperService {
             }
 
             // Create and setup transformer
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 
             if (omitXmlDeclaration) {

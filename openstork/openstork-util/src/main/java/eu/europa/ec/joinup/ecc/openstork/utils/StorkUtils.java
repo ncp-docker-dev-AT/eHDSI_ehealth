@@ -10,7 +10,7 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import eu.stork.peps.auth.commons.IPersonalAttributeList;
 import eu.stork.peps.auth.commons.PersonalAttribute;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -28,6 +28,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.FileSystems;
@@ -49,8 +50,8 @@ public class StorkUtils {
 
     /**
      * Converts a given STORK Authentication Response into an epSOS Assertion.
-     * In the current implementation only Role (extracted from STORK response)
-     * and Permissions (taken from database) are taken into account.
+     * In the current implementation only Role (extracted from STORK response) and Permissions (taken from database)
+     * are taken into account.
      *
      * @param storkResponse
      * @return
@@ -347,8 +348,7 @@ public class StorkUtils {
      */
 
     /**
-     * Utility method to obtain role based on the HCP flag and the citizen's
-     * title.
+     * Utility method to obtain role based on the HCP flag and the citizen's title.
      *
      * @param storkResponse
      * @return
@@ -356,17 +356,17 @@ public class StorkUtils {
     public static HcpRole obtainHcpRole(STORKAuthnResponse storkResponse) {
 
         final String IS_HCP_ATTR_NAME = "isHealthCareProfessional";
-        Boolean isHcpProfessional = false;
-        String tittle = StringPool.BLANK;
+        boolean isHcpProfessional = false;
+        String title = StringPool.BLANK;
 
         if (getPersonalAttribute(storkResponse, IS_HCP_ATTR_NAME) != null) {
             isHcpProfessional = Boolean.parseBoolean(getPersonalAttribute(storkResponse, IS_HCP_ATTR_NAME).getValue().get(0));
         }
         if (getPersonalAttribute(storkResponse, IS_HCP_ATTR_NAME) != null) {
-            tittle = getPersonalAttribute(storkResponse, IS_HCP_ATTR_NAME).getValue().get(0);
+            title = getPersonalAttribute(storkResponse, IS_HCP_ATTR_NAME).getValue().get(0);
         }
 
-        return obtainHcpRole(isHcpProfessional, tittle);
+        return obtainHcpRole(isHcpProfessional, title);
     }
 
     public static HcpRole obtainRole(IPersonalAttributeList attrs) {
@@ -385,8 +385,7 @@ public class StorkUtils {
     }
 
     /**
-     * Utility method to obtain role based on the HCP flag and the citizen's
-     * title.
+     * Utility method to obtain role based on the HCP flag and the citizen's title.
      *
      * @param isHcpProfessional
      * @param title
@@ -398,8 +397,8 @@ public class StorkUtils {
         if (isHcpProfessional) {
             if (title.equals(HcpRole.ADMINISTRATOR.toString())) {
                 result = HcpRole.ADMINISTRATOR;
-            } else if (title.equals(HcpRole.MEDICAL_DOCTOR.toString())) {
-                result = HcpRole.MEDICAL_DOCTOR;
+            } else if (title.equals(HcpRole.PHYSICIAN.toString())) {
+                result = HcpRole.PHYSICIAN;
             } else if (title.equals(HcpRole.PHARMACIST.toString())) {
                 result = HcpRole.PHARMACIST;
             } else if (title.equals(HcpRole.NURSE.toString())) {
@@ -412,8 +411,7 @@ public class StorkUtils {
     }
 
     /**
-     * This helper method will obtain the user permissions, based on the role
-     * and on database properties.
+     * This helper method will obtain the user permissions, based on the role and on database properties.
      *
      * @param role
      * @return
@@ -432,7 +430,7 @@ public class StorkUtils {
             case ADMINISTRATOR:
                 result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_ADMIN_PERMISSIONS));
                 break;
-            case MEDICAL_DOCTOR:
+            case PHYSICIAN:
                 result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_DOCTOR_PERMISSIONS));
                 break;
             case NURSE:
@@ -443,6 +441,11 @@ public class StorkUtils {
                 break;
             case PHARMACIST:
                 result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PHARMACIST_PERMISSIONS));
+                break;
+            default:
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("No Permissions found for the role: '{}'", role.getXspaRole().toString());
+                }
                 break;
         }
 
@@ -553,7 +556,7 @@ public class StorkUtils {
         Map<String, String> result;
 
         FILE_NAME = "InternationalSearch_" + countryCode + ".xml";
-        FILE_PATH = System.getenv("EPSOS_PROPS_PATH") + FILE_FOLDER + "/";
+        FILE_PATH = System.getenv("EPSOS_PROPS_PATH") + FILE_FOLDER + File.separator;
         result = new HashMap<>();
 
         /* READ SEARCH MASK FILE CONTENT TO DOM OBJECT */

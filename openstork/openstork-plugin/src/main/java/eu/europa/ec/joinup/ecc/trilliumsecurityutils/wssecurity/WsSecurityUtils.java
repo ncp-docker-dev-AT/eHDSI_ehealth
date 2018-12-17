@@ -5,11 +5,11 @@ import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.xerces.dom.DocumentImpl;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.ws.wssecurity.KeyIdentifier;
-import org.opensaml.ws.wssecurity.SecurityTokenReference;
-import org.opensaml.xml.signature.KeyInfo;
-import org.opensaml.xml.signature.impl.KeyInfoBuilder;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.soap.wssecurity.KeyIdentifier;
+import org.opensaml.soap.wssecurity.SecurityTokenReference;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.impl.KeyInfoBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -58,7 +58,7 @@ public class WsSecurityUtils {
     public static KeyInfo keyInfoSecurityTokenRefBuilder(final String assertionId) {
 
         final KeyInfoBuilder keyInfoBuilder;
-        final org.opensaml.xml.signature.KeyInfo keyInfo;
+        final KeyInfo keyInfo;
 
         keyInfoBuilder = new KeyInfoBuilder();
         keyInfo = keyInfoBuilder.buildObject();

@@ -22,6 +22,7 @@ import se.sb.epsos.web.model.Prescription;
 import se.sb.epsos.web.model.PrescriptionRow;
 import se.sb.epsos.web.model.QuantityVO;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
@@ -139,7 +140,7 @@ public class CdaHelper {
                                     "hl7:substanceAdministration/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:name");
                             Node materialName = (Node) nameExpr.evaluate(entryNode, XPathConstants.NODE);
                             String name = "";
-                            if(materialName != null) {
+                            if (materialName != null) {
                                 name = materialName.getTextContent().trim();
                             }
 
@@ -772,7 +773,9 @@ public class CdaHelper {
     private String transformNodeContentToString(Node node) throws TransformerFactoryConfigurationError, TransformerException {
 
         if (node != null && node.hasChildNodes()) {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             StringWriter stw = new StringWriter();
@@ -785,6 +788,9 @@ public class CdaHelper {
     }
 
     public static class Validator {
+
+        private Validator() {
+        }
 
         public static boolean isNull(String str) {
             return (str == null || str.isEmpty());

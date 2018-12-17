@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -53,6 +54,7 @@ public class EpsosXSLTransformer {
         StreamSource xslSource = new StreamSource(xslStream);
         xslSource.setSystemId(systemId);
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         transformer = transformerFactory.newTransformer(xslSource);
         checkLanguageFiles();
     }

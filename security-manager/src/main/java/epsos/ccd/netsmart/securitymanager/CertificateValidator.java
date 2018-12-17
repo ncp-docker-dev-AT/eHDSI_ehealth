@@ -80,13 +80,13 @@ public final class CertificateValidator extends KeySelector {
         }
     }
 
-    public void validateCertificate(org.opensaml.xml.signature.KeyInfo keyInfo) throws SMgrException {
+    public void validateCertificate(org.opensaml.xmlsec.signature.KeyInfo keyInfo) throws SMgrException {
 
-        for (org.opensaml.xml.signature.X509Data object : keyInfo.getX509Datas()) {
+        for (org.opensaml.xmlsec.signature.X509Data object : keyInfo.getX509Datas()) {
             if (object != null) {
                 for (Object o : object.getX509Certificates()) {
                     // check X509Certificate
-                    if (o instanceof org.opensaml.xml.signature.X509Certificate) {
+                    if (o instanceof org.opensaml.xmlsec.signature.X509Certificate) {
                         X509Certificate xcert = (X509Certificate) o;
                         validateCertificate(xcert);
                         cert = xcert;

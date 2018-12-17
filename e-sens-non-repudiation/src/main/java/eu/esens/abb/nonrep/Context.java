@@ -1,7 +1,7 @@
 package eu.esens.abb.nonrep;
 
 import org.joda.time.DateTime;
-import org.opensaml.xml.XMLObject;
+import org.opensaml.core.xml.XMLObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -60,12 +60,12 @@ public class Context {
         return incomingMsg;
     }
 
-    public void setIncomingMsg(Document incomingMsg) {
-        this.icomingMsgAsDocument = incomingMsg;
-    }
-
     public void setIncomingMsg(SOAPMessage incomingMsg) {
         this.incomingMsg = incomingMsg;
+    }
+
+    public void setIncomingMsg(Document incomingMsg) {
+        this.icomingMsgAsDocument = incomingMsg;
     }
 
     public Document getIncomingMsgAsDocument() {

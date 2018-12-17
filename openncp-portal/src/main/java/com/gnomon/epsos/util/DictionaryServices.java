@@ -88,7 +88,7 @@ public class DictionaryServices {
             log.info("Trying to read the epsos problem codes from the file: " + EPSOS_REPOSITORY_PATH + "/SNOMEDCT.xml");
 
             //Reading codes from the local SNOMED CT file
-            File snomedct = new File(EPSOS_REPOSITORY_PATH + "/" + filename);
+            File snomedct = new File(EPSOS_REPOSITORY_PATH + File.separator + filename);
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -165,7 +165,7 @@ public class DictionaryServices {
             log.info("Trying to read the epsos problem codes from the file: " + EPSOS_REPOSITORY_PATH + "/SNOMEDCT.xml");
 
             //Reading codes from the local SNOMED CT file
-            File snomedct = new File(EPSOS_REPOSITORY_PATH + "/" + filename);
+            File snomedct = new File(EPSOS_REPOSITORY_PATH + File.separator + filename);
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();

@@ -1,16 +1,20 @@
 package tr.com.srdc.epsos.util.saml;
 
+import net.shibboleth.utilities.java.support.security.SecureRandomIdentifierGenerationStrategy;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.common.impl.SecureRandomIdentifierGenerator;
-import org.opensaml.saml2.core.*;
-import org.opensaml.xml.*;
-import org.opensaml.xml.io.Marshaller;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.io.UnmarshallingException;
-import org.opensaml.xml.schema.XSAny;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.Marshaller;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.core.xml.schema.XSAny;
+import org.opensaml.saml.saml2.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -26,7 +30,6 @@ import javax.xml.transform.TransformerException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +38,7 @@ public class SAML {
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML.class);
 
     private static final String CM_PREFIX = "urn:oasis:names:tc:SAML:2.0:cm:";
-    private static SecureRandomIdentifierGenerator generator;
+    private static SecureRandomIdentifierGenerationStrategy generator;
 
     /*
      *Any use of this class assures that OpenSAML is bootstrapped.
@@ -43,12 +46,10 @@ public class SAML {
      */
     static {
         try {
-            DefaultBootstrap.bootstrap();
-            generator = new SecureRandomIdentifierGenerator();
-        } catch (ConfigurationException e) {
+            InitializationService.initialize();
+            generator = new SecureRandomIdentifierGenerationStrategy();
+        } catch (InitializationException e) {
             LOGGER.error("ConfigurationException: '{}'", e.getMessage(), e);
-        } catch (NoSuchAlgorithmException e) {
-            LOGGER.error("NoSuchAlgorithmException: '{}'", e.getMessage(), e);
         }
     }
 
@@ -75,10 +76,7 @@ public class SAML {
             factory.setNamespaceAware(true);
             builder = factory.newDocumentBuilder();
             this.issuerURL = issuerURL;
-            DefaultBootstrap.bootstrap();
 
-        } catch (ConfigurationException e) {
-            LOGGER.error("ConfigurationException: '{}'", e.getMessage(), e);
         } catch (ParserConfigurationException e) {
             LOGGER.error("ParserConfigurationException: '{}'", e.getMessage(), e);
         }
@@ -130,7 +128,7 @@ public class SAML {
      */
     public static Element addToElement(XMLObject object, Element parent) throws MarshallingException {
 
-        Marshaller out = Configuration.getMarshallerFactory().getMarshaller(object);
+        Marshaller out = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(object);
         return out.marshall(object, parent);
     }
 
@@ -139,7 +137,7 @@ public class SAML {
      */
     public static XMLObject fromElement(Element element) throws UnmarshallingException {
 
-        return Configuration.getUnmarshallerFactory().getUnmarshaller(element).unmarshall(element);
+        return XMLObjectProviderRegistrySupport.getUnmarshallerFactory().getUnmarshaller(element).unmarshall(element);
     }
 
     /**
@@ -149,7 +147,7 @@ public class SAML {
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> cls, QName qname) {
 
-        XMLObjectBuilderFactory xobf = Configuration.getBuilderFactory();
+        XMLObjectBuilderFactory xobf = XMLObjectProviderRegistrySupport.getBuilderFactory();
         XMLObjectBuilder xob = xobf.getBuilder(qname);
         XMLObject xo = xob.buildObject(qname);
         return (T) xo;
@@ -161,7 +159,7 @@ public class SAML {
     public Document asDOMDocument(XMLObject object) throws MarshallingException {
 
         Document document = builder.newDocument();
-        Marshaller out = Configuration.getMarshallerFactory().getMarshaller(object);
+        Marshaller out = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(object);
         out.marshall(object, document);
 
         return document;
@@ -226,11 +224,9 @@ public class SAML {
         subject.setNameID(nameID);
 
         if (confirmationMethod != null) {
-            SubjectConfirmation confirmation = create
-                    (SubjectConfirmation.class,
-                            SubjectConfirmation.DEFAULT_ELEMENT_NAME);
-            confirmation.setMethod(CM_PREFIX + confirmationMethod);
 
+            SubjectConfirmation confirmation = create(SubjectConfirmation.class, SubjectConfirmation.DEFAULT_ELEMENT_NAME);
+            confirmation.setMethod(CM_PREFIX + confirmationMethod);
             subject.getSubjectConfirmations().add(confirmation);
         }
 
@@ -323,7 +319,7 @@ public class SAML {
      */
     public Response createResponse(Assertion assertion, String inResponseTo) {
 
-        Response response = createResponse(StatusCode.SUCCESS_URI, inResponseTo);
+        Response response = createResponse(StatusCode.SUCCESS, inResponseTo);
         response.getAssertions().add(assertion);
 
         return response;
@@ -368,7 +364,7 @@ public class SAML {
     public void addAttribute(AttributeStatement statement, String name, String value) {
 
         // Build attribute values as XMLObjects, there is an AttributeValue interface, but it's apparently dead code
-        final XMLObjectBuilder xmlObjectBuilder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+        final XMLObjectBuilder xmlObjectBuilder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
         XSAny valueElement = (XSAny) xmlObjectBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
         valueElement.setTextContent(value);

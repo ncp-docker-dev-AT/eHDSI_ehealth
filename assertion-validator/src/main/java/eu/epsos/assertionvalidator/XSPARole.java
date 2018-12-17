@@ -1,13 +1,12 @@
 package eu.epsos.assertionvalidator;
 
 /**
- * Structural Role of the HCP - From WP3.4 Deliberable D.3.4.2
+ * Structural Role of the HCP - From WP3.4 Deliverable D.3.4.2
  * FriendlyName:  XSPA Role
  * Name:  urn:oasis:names:tc:xacml:2.0:subject:role
  */
 public enum XSPARole {
 
-    EPSOS_DOCTOR("medical doctor"),
     DENTIST("dentist"),
     NURSE("nurse"),
     PHARMACIST("pharmacist"),

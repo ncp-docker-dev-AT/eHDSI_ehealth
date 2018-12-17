@@ -2,9 +2,9 @@ package eu.epsos.protocolterminators.integrationtest.common;
 
 import eu.epsos.assertionvalidator.XSPARole;
 import eu.epsos.util.IheConstants;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.impl.AssertionMarshaller;
-import org.opensaml.xml.io.MarshallingException;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -102,6 +102,7 @@ public class SimpleSoapClient {
      * @return SOAPElement
      */
     public SOAPElement call(Document document, Collection<Assertion> assertions) throws SOAPFaultException {
+
         SOAPElement returnElement = null;
         try {
             // construct message

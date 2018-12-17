@@ -4,22 +4,24 @@ import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
-import org.opensaml.common.SignableSAMLObject;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.security.SAMLSignatureProfileValidator;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.security.BasicSecurityConfiguration;
-import org.opensaml.xml.security.SecurityException;
-import org.opensaml.xml.security.SecurityHelper;
-import org.opensaml.xml.security.credential.Credential;
-import org.opensaml.xml.security.keyinfo.KeyInfoHelper;
-import org.opensaml.xml.security.x509.BasicX509Credential;
-import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.SignatureConstants;
-import org.opensaml.xml.signature.SignatureValidator;
-import org.opensaml.xml.signature.Signer;
-import org.opensaml.xml.validation.ValidationException;
+import org.opensaml.core.config.ConfigurationService;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistry;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.MarshallerFactory;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.saml.common.SignableSAMLObject;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.security.impl.SAMLSignatureProfileValidator;
+import org.opensaml.security.credential.Credential;
+import org.opensaml.security.credential.CredentialSupport;
+import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.xmlsec.keyinfo.KeyInfoSupport;
+import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.support.SignatureConstants;
+import org.opensaml.xmlsec.signature.support.SignatureException;
+import org.opensaml.xmlsec.signature.support.SignatureValidator;
+import org.opensaml.xmlsec.signature.support.Signer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -41,6 +43,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -98,14 +101,19 @@ public class SignatureManager {
             Signature sig = assertion.getSignature();
             try {
                 profileValidator.validate(sig);
-            } catch (ValidationException e) {
+            } catch (SignatureException e) {
                 // Indicates signature did not conform to SAML Signature profile
                 LOGGER.error("ValidationException: '{}'", e.getMessage(), e);
                 throw new SMgrException("SAML Signature Profile Validation: " + e.getMessage());
             }
 
             X509Certificate cert;
-            List<X509Certificate> certificates = KeyInfoHelper.getCertificates(sig.getKeyInfo());
+            //List<X509Certificate> certificates = KeyInfoHelper.getCertificates(sig.getKeyInfo());
+            List<X509Certificate> certificates = KeyInfoSupport.getCertificates(sig.getKeyInfo());
+            for (X509Certificate certificate : certificates) {
+                LOGGER.info("Certificate: '{}'", certificate.getIssuerX500Principal().getName());
+            }
+            //List<X509Certificate> certificates = KeyInfoHelper.getCertificates(sig.getKeyInfo());
             if (certificates.size() == 1) {
                 cert = certificates.get(0);
                 // Mustafa: When not called through https, we can use the country code of the signature cert
@@ -116,14 +124,21 @@ public class SignatureManager {
                 throw new SMgrException("More than one certificate found in keyinfo");
             }
 
-            BasicX509Credential verificationCredential = new BasicX509Credential();
-            verificationCredential.setEntityCertificate(cert);
-            SignatureValidator sigValidator = new SignatureValidator(verificationCredential);
+            BasicX509Credential verificationCredential = new BasicX509Credential(cert);
+            //BasicX509Credential verificationCredential = new BasicX509Credential();
+            //verificationCredential.setEntityCertificate(cert);
+            //SignatureValidator sigValidator = new SignatureValidator(verificationCredential);
+            LOGGER.info("[Security] SAML certificate validation");
+
+
+            //verificationCredential.setEntityCertificate(cert);
+            //SignatureValidator sigValidator = new SignatureValidator(verificationCredential);
             try {
-                sigValidator.validate(sig);
-            } catch (ValidationException e) {
+                //sigValidator.validate(sig);
+                SignatureValidator.validate(sig, verificationCredential);
+            } catch (SignatureException e) {
                 // Indicates signature was not cryptographically valid, or possibly a processing error
-                LOGGER.error("ValidationException: '{}'", e.getMessage(), e);
+                LOGGER.error("SignatureException: '{}'", e.getMessage(), e);
                 throw new SMgrException("Signature Validation: " + e.getMessage());
             }
             CertificateValidator cv = new CertificateValidator(keyManager.getTrustStore());
@@ -185,7 +200,7 @@ public class SignatureManager {
      * @param keyAlias    The NCP Trust Store Key Alias of the private key that will be used for signing.
      * @param keyPassword Password of the Signature certificate Key.
      * @throws SMgrException When signing fails
-     * @see org.opensaml.common.SignableSAMLObject
+     * @see org.opensaml.saml.common.SignableSAMLObject
      */
     public void signSAMLAssertion(SignableSAMLObject as, String keyAlias, char[] keyPassword) throws SMgrException {
 
@@ -201,32 +216,48 @@ public class SignatureManager {
             cert = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
 
-        Signature sig = (Signature) Configuration.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME)
-                .buildObject(Signature.DEFAULT_ELEMENT_NAME);
+        //Signature sig = (Signature) Configuration.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
+        XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
-        Credential signingCredential = SecurityHelper.getSimpleCredential(cert, kp.getPrivate());
+        Signature sig = (Signature) builderFactory.getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
+
+        //Credential signingCredential = SecurityHelper.getSimpleCredential(cert, kp.getPrivate());
+        Credential signingCredential = CredentialSupport.getSimpleCredential(cert, kp.getPrivate());
 
         sig.setSigningCredential(signingCredential);
         sig.setSignatureAlgorithm(signatureAlgorithm);
         sig.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_WITH_COMMENTS);
 
-        BasicSecurityConfiguration securityConfiguration = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-        securityConfiguration.setSignatureReferenceDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256);
+//        BasicSecurityConfiguration securityConfiguration = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
+//        securityConfiguration.setSignatureReferenceDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256);
+        org.opensaml.xmlsec.signature.KeyInfo keyInfo = (org.opensaml.xmlsec.signature.KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(org.opensaml.xmlsec.signature.KeyInfo.DEFAULT_ELEMENT_NAME).buildObject(org.opensaml.xmlsec.signature.KeyInfo.DEFAULT_ELEMENT_NAME);
+        org.opensaml.xmlsec.signature.X509Data data = (org.opensaml.xmlsec.signature.X509Data) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(org.opensaml.xmlsec.signature.X509Data.DEFAULT_ELEMENT_NAME).buildObject(org.opensaml.xmlsec.signature.X509Data.DEFAULT_ELEMENT_NAME);
+        org.opensaml.xmlsec.signature.X509Certificate x509Certificate = (org.opensaml.xmlsec.signature.X509Certificate) XMLObjectProviderRegistrySupport.getBuilderFactory()
+                .getBuilder(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME).buildObject(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
+
+        String value;
         try {
-            SecurityHelper.prepareSignatureParams(sig, signingCredential, securityConfiguration, null);
-        } catch (SecurityException e) {
+            value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
+        } catch (CertificateEncodingException e) {
+            LOGGER.error("CertificateEncodingException: '{}'", e.getMessage(), e);
             throw new SMgrException(e.getMessage(), e);
         }
+        x509Certificate.setValue(value);
+        data.getX509Certificates().add(x509Certificate);
+        keyInfo.getX509Datas().add(data);
+        sig.setKeyInfo(keyInfo);
 
         as.setSignature(sig);
         try {
-            Configuration.getMarshallerFactory().getMarshaller(as).marshall(as);
+            MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
+            marshallerFactory.getMarshaller(as).marshall(as);
         } catch (MarshallingException e) {
+            LOGGER.error("MarshallingException: '{}'", e.getMessage(), e);
             throw new SMgrException(e.getMessage(), e);
         }
         try {
             Signer.signObject(sig);
-        } catch (org.opensaml.xml.signature.SignatureException ex) {
+        } catch (SignatureException ex) {
             throw new SMgrException(ex.getMessage(), ex);
         }
     }
@@ -304,7 +335,7 @@ public class SignatureManager {
      *
      * @param trc The Signable SAML Object that is going to be signed. Usually a SAML Assertion.
      * @throws SMgrException When signing fails
-     * @see org.opensaml.common.SignableSAMLObject
+     * @see org.opensaml.saml.common.SignableSAMLObject
      */
     public void signSAMLAssertion(Assertion trc) throws SMgrException {
         signSAMLAssertion(trc, null, null);

@@ -5,9 +5,9 @@ import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import junit.framework.TestCase;
 import org.mockito.MockSettings;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.ConfigurationException;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.Assertion;
 import se.sb.epsos.web.auth.AuthenticatedUser;
 
 import java.util.Arrays;
@@ -77,7 +77,7 @@ public class AssertionHandlerTest extends TestCase {
         super.tearDown();
     }
 
-    public void testCreateAssertion() throws ConfigurationException {
+    public void testCreateAssertion() throws InitializationException, SecurityException {
 
         Assertion assertion = assertionHandler.createSAMLAssertion(userDetailsMock);
         assertNotNull(assertion);
@@ -90,6 +90,7 @@ public class AssertionHandlerTest extends TestCase {
     }
 
     public void testSendAuditEpsos91() {
+
         assertionHandler.sendAuditEpsos91(userDetailsMock, assertionMock);
     }
 }

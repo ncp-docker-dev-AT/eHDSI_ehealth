@@ -10,20 +10,19 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.opensaml.xml.io.UnmarshallingException;
-import org.opensaml.xml.signature.KeyInfo;
-import org.opensaml.xml.signature.X509Certificate;
-import org.opensaml.xml.signature.X509Data;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.*;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.X509Certificate;
+import org.opensaml.xmlsec.signature.X509Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -77,6 +76,15 @@ public class STSService implements Provider<SOAPMessage> {
     // Namespace
     private static final String WS_SEC_UTIL_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     private static final String WS_SEC_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+
+    static {
+        try {
+            InitializationService.initialize();
+        } catch (InitializationException e) {
+            //logger.error("OpenSAML module cannot be initialized: '{}'", e.getMessage(), e);
+        }
+    }
+
     private final Logger logger = LoggerFactory.getLogger(STSService.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     @Resource
@@ -98,11 +106,11 @@ public class STSService implements Provider<SOAPMessage> {
             throw new WebServiceException("Cannot get Soap Message Parts", ex);
         }
 
-        try {
-            DefaultBootstrap.bootstrap();
-        } catch (ConfigurationException ex) {
-            logger.error(null, ex);
-        }
+//        try {
+//            DefaultBootstrap.bootstrap();
+//        } catch (ConfigurationException ex) {
+//            logger.error(null, ex);
+//        }
         try {
             if (!SUPPORTED_ACTION_URI.equals(getRSTAction(body))) {
                 throw new WebServiceException("Only ISSUE action is supported");
@@ -146,7 +154,10 @@ public class STSService implements Provider<SOAPMessage> {
             }
 
             Document signedDoc = builder.newDocument();
-            Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
+            //Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
+
+            MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
+            marshallerFactory.getMarshaller(trc).marshall(trc, signedDoc);
 
             SOAPMessage response = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
             response.getSOAPBody().addDocument(STSUtils.createRSTRC(signedDoc));
@@ -173,7 +184,7 @@ public class STSService implements Provider<SOAPMessage> {
                     strReqHeader.getBytes(StandardCharsets.UTF_8), getMessageIdFromHeader(response.getSOAPHeader()),
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
 
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.debug("Outgoing SOAP Message response: '{}'", response);
                 log(response);
             }
@@ -259,7 +270,8 @@ public class STSService implements Provider<SOAPMessage> {
                     throw new WSTrustException("Error validating SAML Assertion signature", ex);
                 }
             }
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            //UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
             return (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
 
@@ -392,11 +404,11 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             message.writeTo(out);
         } catch (IOException | SOAPException e) {
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.error("Exception: '{}'", e.getMessage(), e);
             }
         }
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD") && loggerClinical.isInfoEnabled()) {
+       if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.info("SOAPMessage:\n{}", out.toString());
         }
     }

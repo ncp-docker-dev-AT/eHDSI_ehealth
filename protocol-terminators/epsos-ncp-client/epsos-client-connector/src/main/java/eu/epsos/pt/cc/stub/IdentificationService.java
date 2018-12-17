@@ -2,7 +2,7 @@ package eu.epsos.pt.cc.stub;
 
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.pt.ws.client.xcpd.XcpdInitGateway;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 
 import java.util.List;

@@ -22,6 +22,7 @@
                   select="/n1:ClinicalDocument/n1:effectiveTime"/>
     <xsl:variable name="lastUpdate"
                   select="/n1:ClinicalDocument/n1:documentationOf/n1:serviceEvent/n1:effectiveTime/n1:high"/>
+    <xsl:variable name="documentLanguageCode" select="/n1:ClinicalDocument/n1:languageCode/@code"/>
 
     <xsl:template name="basicCdaHeader">
         <table class="header_table">
@@ -49,18 +50,13 @@
                             <xsl:with-param name="datetime" select="$lastUpdate"/>
                         </xsl:call-template>
                     </td>
-                    <th>
-                        <!-- Language:-->
-                        Language
-                    </th>
-                    <td>
-                        <xsl:value-of select="$userLang"/>
-                    </td>
+                    <!-- CDA Language of origin:-->
+                    <th>Original Document Language</th>
+                    <td><xsl:value-of select="$documentLanguageCode"/></td>
                 </tr>
             </tbody>
         </table>
     </xsl:template>
-
     <xsl:template name="patientBlock">
         <table class="header_table">
             <tbody>
@@ -88,15 +84,9 @@
                                 </th>
                             </tr>
                             <tr>
-                                <td>
-                                    <xsl:value-of select="$prefix"/>&#160;
-                                </td>
-                                <td>
-                                    <xsl:value-of select="$familyName"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="$givenName"/>&#160;
-                                </td>
+                                <td><xsl:value-of select="$prefix"/>&#160;</td>
+                                <td><xsl:value-of select="$familyName"/></td>
+                                <td><xsl:value-of select="$givenName"/>&#160;</td>
                             </tr>
                         </tbody>
                     </table>

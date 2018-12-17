@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -151,9 +152,10 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
                             if (!extensionTypes.isEmpty()) {
                                 Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
 
-                                DOMSource source = new DOMSource(document.getElementsByTagNameNS("http://ec.europa.eu/sante/ehncp/ism",
-                                        "patientSearch").item(0));
+                                DOMSource source = new DOMSource(document.getElementsByTagNameNS(
+                                        "http://ec.europa.eu/sante/ehncp/ism", "patientSearch").item(0));
                                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                                transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
                                 Transformer transformer = transformerFactory.newTransformer();
                                 transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
                                 transformer.setOutputProperty(OutputKeys.METHOD, "xml");

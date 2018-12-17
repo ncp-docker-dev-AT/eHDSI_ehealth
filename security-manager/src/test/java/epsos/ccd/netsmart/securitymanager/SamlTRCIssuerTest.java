@@ -1,18 +1,18 @@
 package epsos.ccd.netsmart.securitymanager;
 
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
+import net.shibboleth.utilities.java.support.xml.BasicParserPool;
+import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import org.junit.*;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.common.SAMLObject;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.Attribute;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.opensaml.xml.io.UnmarshallingException;
-import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.parse.XMLParserException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.io.Unmarshaller;
+import org.opensaml.core.xml.io.UnmarshallerFactory;
+import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.common.SAMLObject;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Attribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -22,7 +22,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class SamlTRCIssuerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        DefaultBootstrap.bootstrap();
+        InitializationService.initialize();
     }
 
     @AfterClass
@@ -57,12 +56,10 @@ public class SamlTRCIssuerTest {
 
     /**
      * Test of issueTrcToken method, of class SamlTRCIssuer.
-     *
-     * @throws java.io.IOException
      */
     @Ignore
     @Test
-    public void testIssueTrcToken() throws IOException {
+    public void testIssueTrcToken() {
 
         try {
             LOGGER.info("issueTrcToken");
@@ -74,8 +71,9 @@ public class SamlTRCIssuerTest {
             //InputStream in = ClassLoader.getSystemResourceAsStream("SAMLSignedIdentityAssertion.xml");
             Document samlas = ppMgr.parse(in);
             Element samlasRoot = samlas.getDocumentElement();
-            // Get apropriate unmarshaller
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            // Get appropriate unmarshaller
+            //UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(samlasRoot);
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
             Assertion hcpIdentityAssertion = (Assertion) unmarshaller.unmarshall(samlasRoot);
@@ -89,7 +87,8 @@ public class SamlTRCIssuerTest {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             Document signedDoc = dbf.newDocumentBuilder().newDocument();
-            Configuration.getMarshallerFactory().getMarshaller(result).marshall(result, signedDoc);
+            //Configuration.getMarshallerFactory().getMarshaller(result).marshall(result, signedDoc);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(result).marshall(result, signedDoc);
 
             XMLUtils.sendXMLtoStream(signedDoc, new FileOutputStream("trc.xml"));
 
@@ -179,7 +178,7 @@ public class SamlTRCIssuerTest {
             Document samlas = ppMgr.parse(in);
             Element samlasRoot = samlas.getDocumentElement();
             // Get apropriate unmarshaller
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(samlasRoot);
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
             hcpIdentityAssertion = (Assertion) unmarshaller.unmarshall(samlasRoot);
@@ -197,7 +196,7 @@ public class SamlTRCIssuerTest {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             Document signedDoc = dbf.newDocumentBuilder().newDocument();
-            Configuration.getMarshallerFactory().getMarshaller(so).marshall(so, signedDoc);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(so).marshall(so, signedDoc);
             XMLUtils.sendXMLtoStream(signedDoc, new FileOutputStream(f));
         } catch (FileNotFoundException | MarshallingException | ParserConfigurationException ex) {
             LOGGER.error(null, ex);
