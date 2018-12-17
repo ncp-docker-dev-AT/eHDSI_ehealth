@@ -12,6 +12,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -189,6 +190,7 @@ public class Audit {
             DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
             Document doc = builder.parse(stream);
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             Transformer transformer = transformerFactory.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(sw));
 

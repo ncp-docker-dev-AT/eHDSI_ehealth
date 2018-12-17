@@ -46,7 +46,7 @@ public class MessageController extends MultiActionController {
         this.auditLoggerPluginManager = auditLoggerPluginManager;
     }
 
-    public ModelAndView query(HttpServletRequest request, HttpServletResponse response, QueryBean queryBean) throws Exception {
+    public ModelAndView query(HttpServletRequest request, HttpServletResponse response, QueryBean queryBean) {
 
         try {
             ModelMap modelMap = new ModelMap();
@@ -92,7 +92,8 @@ public class MessageController extends MultiActionController {
         }
     }
 
-    private Map<String, String> getBeanMap(QueryBean qb) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private Map<String, String> getBeanMap(QueryBean qb) throws IllegalAccessException, InvocationTargetException,
+            NoSuchMethodException {
 
         Map<String, String> fields = BeanUtils.describe(qb);
         Map<String, String> ret = new HashMap<>();

@@ -3,6 +3,23 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [3.0.0.RC1] - 11-12-2018
+### Added
+- Support for Wave 2 CDA Implementation Guidelines.
+
+### Changed
+- OpenSAML framework upgrade from 2.6.X (not supported anymore) to 3.3.1.
+- OpenNCP Portal language properties files are now directly stored in ASCII.
+- CDA DisplayTool is now showing original language of the CDA instead of user language
+
+### Deprecated
+- N/A
+
+### Removed
+- XSPA role "medical doctor" has been removed from the HCP Assertion generator, the role is still accepted by the
+default policy.
+- Remove generated JAXB class from Evidence Emitter ETSI-REM (created on the fly).
+
 ## [2.5.5] - 27-11-2018
 ### Added
 - Audit messages are now supporting multiple ParticipantObjectId (i.e. List of Documents Ids provided).

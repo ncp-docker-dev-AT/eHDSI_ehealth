@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -72,7 +73,7 @@ public class ReportConfig extends HashMap<String, Object> {
             OBJECTS,
             NETWORK_ACCESS_POINTS
     };
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportConfig.class);
 
     public ReportConfig() {
@@ -182,25 +183,19 @@ public class ReportConfig extends HashMap<String, Object> {
 
     private static StreamResult transform(Document doc, OutputStream out, boolean indent) throws IOException {
 
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer t = null;
+        StreamResult sr = new StreamResult(out);
         try {
-            t = tf.newTransformer();
-            if (indent) {
-                t.setOutputProperty(OutputKeys.INDENT, "yes");
-            } else {
-                t.setOutputProperty(OutputKeys.INDENT, "no");
-            }
+            TransformerFactory tf = TransformerFactory.newInstance();
+            tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer t = tf.newTransformer();
+            t.setOutputProperty(OutputKeys.INDENT, indent ? "yes" : "no");
             t.setOutputProperty(OutputKeys.METHOD, "xml");
             t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            DOMSource doms = new DOMSource(doc);
+            t.transform(doms, sr);
         } catch (TransformerConfigurationException e) {
             LOGGER.error("TransformerConfigurationException: '{}'", e.getMessage(), e);
             assert (false);
-        }
-        DOMSource doms = new DOMSource(doc);
-        StreamResult sr = new StreamResult(out);
-        try {
-            t.transform(doms, sr);
         } catch (TransformerException e) {
             LOGGER.error("TransformerException: '{}'", e.getMessage(), e);
             throw new IOException(e.getMessage());

@@ -2,7 +2,13 @@ package eu.esens.abb.nonrep;
 
 import com.sun.xml.messaging.saaj.soap.ver1_2.SOAPMessageFactory1_2Impl;
 import org.apache.commons.lang.StringUtils;
-import org.opensaml.Configuration;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.Marshaller;
+import org.opensaml.core.xml.io.MarshallerFactory;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.schema.XSDateTime;
+import org.opensaml.core.xml.schema.impl.XSDateTimeMarshaller;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.policy.impl.PolicySetTypeMarshaller;
@@ -11,17 +17,13 @@ import org.opensaml.xacml.profile.saml.XACMLAuthzDecisionQueryType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyStatementType;
 import org.opensaml.xacml.profile.saml.impl.XACMLAuthzDecisionQueryTypeMarshaller;
 import org.opensaml.xacml.profile.saml.impl.XACMLPolicyStatementTypeMarshaller;
-import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.io.Marshaller;
-import org.opensaml.xml.io.MarshallerFactory;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.schema.impl.XSDateTimeMarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import javax.xml.XMLConstants;
 import javax.xml.soap.*;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -53,7 +55,8 @@ public class Utilities {
 
     public static Element toElement(XMLObject a) throws TOElementException {
 
-        MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
+        //MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
+        MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
 
         if (marshallerFactory == null) {
             throw new TOElementException("No MarshallerFactory available. Did you endorse "
@@ -67,7 +70,7 @@ public class Utilities {
                 new XACMLAuthzDecisionQueryTypeMarshaller());
         marshallerFactory.registerMarshaller(PolicySetType.DEFAULT_ELEMENT_NAME, new PolicySetTypeMarshaller());
         marshallerFactory.registerMarshaller(PolicyType.DEFAULT_ELEMENT_NAME, new PolicyTypeMarshaller());
-        marshallerFactory.registerMarshaller(org.opensaml.xml.schema.XSDateTime.TYPE_NAME, new XSDateTimeMarshaller());
+        marshallerFactory.registerMarshaller(XSDateTime.TYPE_NAME, new XSDateTimeMarshaller());
 
         Marshaller marshaller = marshallerFactory.getMarshaller(a);
 
@@ -121,6 +124,7 @@ public class Utilities {
         StreamResult result = new StreamResult(out);
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "no");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");

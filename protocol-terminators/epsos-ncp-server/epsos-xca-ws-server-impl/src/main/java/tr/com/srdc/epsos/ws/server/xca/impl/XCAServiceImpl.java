@@ -17,6 +17,9 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
+import eu.europa.ec.sante.ehdsi.openncp.util.UUIDHelper;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -31,6 +34,7 @@ import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.DateTime;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -780,30 +784,24 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
 
         // Evidence for call to NI for XCA List
-        /* Joao: we MUST generate NRO when NCPA sends to NI. This was throwing errors because we were not passing a XML document.
-        We're passing data like:
-        "SearchCriteria: {patientId = 12445ASD}"
-        So we provided a XML representation of such data */
         try {
+            //  e-Sens: we MUST generate NRO when NCPA sends to NI. This was throwing errors because we were not
+            //  passing a XML document. We're passing data like:"SearchCriteria: {patientId = 12445ASD}".
+            //  So we provided a XML representation of such data.
+            Assertion assertionTRC = Helper.getTRCAssertion(shElement);
+            String messageUUID = UUIDHelper.encodeAsURN(assertionTRC.getID()) + "_" + assertionTRC.getIssueInstant();
+
             EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                    tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
-                    tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
-                    tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                    tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                    IHEEventType.epsosPatientServiceList.getCode(),
-                    new DateTime(),
-                    EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                    "NI_XCA_LIST_REQ",
-                    Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
+                    Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                    Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS,
+                    Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                    IHEEventType.epsosPatientServiceList.getCode(), new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+                    "NI_XCA_LIST_REQ", messageUUID);
         } catch (Exception e) {
             logger.error(ExceptionUtils.getStackTrace(e));
         }
 
+        // Handling of the Response Status message and Errors.
         if (!rel.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(rel);
             response.setStatus(AdhocQueryResponseStatus.FAILURE);
@@ -921,13 +919,17 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         }
                     }
                 }
-//                // Evidence for response from NI for XCA List in case of success
-                /* Joao: This should be NRR of NCPA receiving from NI.
+
+                // Evidence Emitter processing for the response from NI for XCA List in case of success
+
+                    /*
+                    e-Sens: This should be NRR of NCPA receiving from NI.
                     This was throwing errors because we were not passing a XML document.
-                    We're passing data like:
-                    "SearchCriteria: {patientId = 12445ASD}"
-                    So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
-                    This NRR is optional as per the CP. So we leave this commented*/
+                    We're passing data like: "SearchCriteria: {patientId = 12445ASD}"
+                    So we provided a XML representation of such data. Still, evidence is generated based on request data,
+                    not response. This NRR is optional as per the CP. So we leave this commented
+                    */
+
 //                try {
 //                    EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
 //                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
@@ -993,13 +995,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
         logger.debug("Transforming document, isTranscode: '{}' - Event Type: '{}'", isTranscode, eventLog.getEventType());
         if (eventLog.getReqM_PatricipantObjectDetail() != null) {
             String requester = new String(eventLog.getReqM_PatricipantObjectDetail());
-            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                 loggerClinical.info("Participant Requester: '{}'", requester);
             }
         }
         if (eventLog.getResM_PatricipantObjectDetail() != null) {
             String responder = new String(eventLog.getResM_PatricipantObjectDetail());
-            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                 loggerClinical.info("Participant Responder: '{}'", responder);
             }
         }

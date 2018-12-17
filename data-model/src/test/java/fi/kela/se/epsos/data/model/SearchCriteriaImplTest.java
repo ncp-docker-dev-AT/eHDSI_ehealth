@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -33,6 +34,7 @@ public class SearchCriteriaImplTest {
     private static String convertElementToString(Element elem) throws TransformerException {
 
         TransformerFactory transFactory = TransformerFactory.newInstance();
+        transFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = transFactory.newTransformer();
         StringWriter buffer = new StringWriter();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");

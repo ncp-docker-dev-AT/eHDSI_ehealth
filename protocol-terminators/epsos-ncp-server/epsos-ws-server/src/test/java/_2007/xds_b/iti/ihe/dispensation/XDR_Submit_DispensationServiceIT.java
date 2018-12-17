@@ -24,7 +24,7 @@ import eu.epsos.pt.server.it.ServerGenericIT;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 
 import java.util.Collection;
 

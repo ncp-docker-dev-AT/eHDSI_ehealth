@@ -141,7 +141,7 @@ public class CodedElementList implements InitializingBean, TMConstants {
 
             Element root = doc.getDocumentElement();
             NodeList codedElements = root.getElementsByTagName(CODED_ELEMENT);
-            log.info("Coded Element count: " + codedElements.getLength());
+            log.info("Coded Element count: '{}'", codedElements.getLength());
             // fill collections
 
             Element codedElement;

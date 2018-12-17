@@ -15,17 +15,17 @@
     </bean>
 
     <bean id="tsamDatasource" class="org.apache.commons.dbcp2.BasicDataSource">
-        <property name="driverClassName" value="${ltr.db.driverClass}"/>
-        <property name="url" value="${ltr.db.url}"/>
-        <property name="username" value="${ltr.db.user}"/>
-        <property name="password" value="${ltr.db.password}"/>
+        <property name="driverClassName" value="${tsam.db.driverClass}"/>
+        <property name="url" value="${tsam.db.url}"/>
+        <property name="username" value="${tsam.db.user}"/>
+        <property name="password" value="${tsam.db.password}"/>
     </bean>
 
     <bean id="tsamSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <property name="dataSource" ref="tsamDatasource"/>
         <property name="hibernateProperties">
             <props>
-                <prop key="hibernate.dialect">${ltr.hibernate.dialect}</prop>
+                <prop key="hibernate.dialect">${tsam.hibernate.dialect}</prop>
                 <prop key="hibernate.show_sql">true</prop>
                 <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>

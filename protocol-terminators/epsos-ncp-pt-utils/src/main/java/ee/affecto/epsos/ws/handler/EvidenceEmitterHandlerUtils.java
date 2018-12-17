@@ -8,8 +8,7 @@ import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -27,10 +26,6 @@ import java.util.*;
  */
 public class EvidenceEmitterHandlerUtils {
 
-    private final Logger logger = LoggerFactory.getLogger(EvidenceEmitterHandlerUtils.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
-
     private static final String CLIENT_CONNECTOR_XML_NAMESPACE = "http://clientconnector.protocolterminator.openncp.epsos/";
     private static final String CLIENT_CONNECTOR_SUBMIT_DOCUMENT_REQUEST = "submitDocument";
     private static final String CLIENT_CONNECTOR_SUBMIT_DOCUMENT_RESPONSE = "submitDocumentResponse";
@@ -40,7 +35,6 @@ public class EvidenceEmitterHandlerUtils {
     private static final String CLIENT_CONNECTOR_QUERY_DOCUMENTS_RESPONSE = "queryDocumentsResponse";
     private static final String CLIENT_CONNECTOR_RETRIEVE_DOCUMENT_REQUEST = "retrieveDocument";
     private static final String CLIENT_CONNECTOR_RETRIEVE_DOCUMENT_RESPONSE = "retrieveDocumentResponse";
-
     private static final List<String> clientConnectorOperations;
     // maps the message type to its related IHE event
     private static final Map<String, String> iheEvents;
@@ -121,6 +115,8 @@ public class EvidenceEmitterHandlerUtils {
         transactionNames = Collections.unmodifiableMap(map);
     }
 
+    private final Logger logger = LoggerFactory.getLogger(EvidenceEmitterHandlerUtils.class);
+
     public EvidenceEmitterHandlerUtils() {
     }
 
@@ -179,10 +175,6 @@ public class EvidenceEmitterHandlerUtils {
     public Document canonicalizeAxiomSoapEnvelope(SOAPEnvelope env) throws Exception {
 
         Element envAsDom = XMLUtils.toDOM(env);
-        Document envCanonicalized = XMLUtil.canonicalize(envAsDom.getOwnerDocument());
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-            loggerClinical.debug("Pretty printing canonicalized: \n" + XMLUtil.prettyPrint(envCanonicalized));
-        }
-        return envCanonicalized;
+        return XMLUtil.canonicalize(envAsDom.getOwnerDocument());
     }
 }

@@ -8,10 +8,10 @@ import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.sts.util.STSUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.ConfigurationException;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -97,8 +98,8 @@ public class STSServiceEID implements Provider<SOAPMessage> {
         }
 
         try {
-            DefaultBootstrap.bootstrap();
-        } catch (ConfigurationException ex) {
+            InitializationService.initialize();
+        } catch (InitializationException ex) {
             LOGGER.error(null, ex);
         }
         try {
@@ -141,7 +142,8 @@ public class STSServiceEID implements Provider<SOAPMessage> {
                     authnInstant, sessionNotOnOrAfter, idaReference);
 
             Document signedDoc = builder.newDocument();
-            Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
+            //Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
 
             SOAPMessage resp = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
             resp.getSOAPBody().addDocument(STSUtils.createRSTRC(signedDoc));
@@ -395,9 +397,8 @@ public class STSServiceEID implements Provider<SOAPMessage> {
         md.reset();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer;
-
-        transformer = tf.newTransformer();
+        tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "false");
         transformer.setOutputProperty(OutputKeys.INDENT, "false");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
@@ -410,10 +411,8 @@ public class STSServiceEID implements Provider<SOAPMessage> {
     private String convertDocumentToString(Document doc) throws TransformerException {
 
         TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer;
-
-        transformer = tf.newTransformer();
-        // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(doc), new StreamResult(writer));

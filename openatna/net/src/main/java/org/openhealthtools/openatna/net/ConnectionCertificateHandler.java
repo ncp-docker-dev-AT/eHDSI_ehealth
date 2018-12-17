@@ -60,6 +60,7 @@ public class ConnectionCertificateHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("org.openhealthtools.openatna.net.ConnectionCertificateHandler");
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
 
 
     /**
@@ -71,7 +72,7 @@ public class ConnectionCertificateHandler {
             throw new IllegalArgumentException("Keystore url may not be null");
         }
         LOGGER.debug("Initializing key store");
-        KeyStore keystore = null;
+        KeyStore keystore;
         if (url.getFile().endsWith(".p12")) {
             keystore = KeyStore.getInstance("pkcs12");
         } else {
@@ -122,26 +123,27 @@ public class ConnectionCertificateHandler {
      * @throws KeyStoreException If the keystore is broken.
      */
     public static String getKeyCertDN(KeyStore keystore) throws KeyStoreException {
+
         Enumeration<String> aliases = keystore.aliases();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
             Certificate[] certs = keystore.getCertificateChain(alias);
             if (certs != null) {
-                String message = "Certificate chain '" + alias + "':";
+                StringBuilder message = new StringBuilder("Certificate chain '" + alias + "':");
                 int i = 1;
                 for (Certificate cert : certs) {
                     if (cert instanceof X509Certificate) {
-                        X509Certificate Xcert = (X509Certificate) cert;
-                        message += "\n Certificate " + i++ + ":";
-                        message += "\n  Subject DN: " + Xcert.getSubjectDN();
-                        message += "\n  Signature Algorithm: " + Xcert.getSigAlgName();
-                        message += "\n  Valid from: " + Xcert.getNotBefore();
-                        message += "\n  Valid until: " + Xcert.getNotAfter();
-                        message += "\n  Issuer: " + Xcert.getIssuerDN();
+                        X509Certificate x509Certificate = (X509Certificate) cert;
+                        message.append("\n Certificate ").append(i++).append(":");
+                        message.append("\n  Subject DN: ").append(x509Certificate.getSubjectDN());
+                        message.append("\n  Signature Algorithm: ").append(x509Certificate.getSigAlgName());
+                        message.append("\n  Valid from: ").append(x509Certificate.getNotBefore());
+                        message.append("\n  Valid until: ").append(x509Certificate.getNotAfter());
+                        message.append("\n  Issuer: ").append(x509Certificate.getIssuerDN());
                     }
                 }
-                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                    LOGGER_CLINICAL.info(message);
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
+                    LOGGER_CLINICAL.info(message.toString());
                 }
             }
         }
@@ -155,12 +157,13 @@ public class ConnectionCertificateHandler {
      * @throws KeyStoreException If the keystore is broken.
      */
     public static void printTrustCerts(KeyStore keystore) throws KeyStoreException {
+
         Enumeration<String> aliases = keystore.aliases();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
             String message = "Trusted certificate '" + alias + "':";
             Certificate trustedcert = keystore.getCertificate(alias);
-            if (trustedcert != null && trustedcert instanceof X509Certificate) {
+            if (trustedcert instanceof X509Certificate) {
                 X509Certificate cert = (X509Certificate) trustedcert;
                 message += "\n  Subject DN: " + cert.getSubjectDN();
                 message += "\n  Signature Algorithm: " + cert.getSigAlgName();
@@ -168,7 +171,7 @@ public class ConnectionCertificateHandler {
                 message += "\n  Valid until: " + cert.getNotAfter();
                 message += "\n  Issuer: " + cert.getIssuerDN();
             }
-            if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+            if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
                 LOGGER_CLINICAL.info(message);
             }
         }
@@ -181,34 +184,35 @@ public class ConnectionCertificateHandler {
      * @throws KeyStoreException If the keystore is broken.
      */
     public static void printKeyCertificates(KeyStore keystore) throws KeyStoreException {
+
         Enumeration<String> aliases = keystore.aliases();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
             Certificate[] certs = keystore.getCertificateChain(alias);
             if (certs != null) {
-                String message = "Certificate chain '" + alias + "':";
+                StringBuilder message = new StringBuilder("Certificate chain '" + alias + "':");
                 int i = 1;
                 for (Certificate cert : certs) {
                     if (cert instanceof X509Certificate) {
-                        X509Certificate Xcert = (X509Certificate) cert;
-                        message += "\n Certificate " + i++ + ":";
-                        message += "\n  Subject DN: " + Xcert.getSubjectDN();
-                        message += "\n  Signature Algorithm: " + Xcert.getSigAlgName();
-                        message += "\n  Valid from: " + Xcert.getNotBefore();
-                        message += "\n  Valid until: " + Xcert.getNotAfter();
-                        message += "\n  Issuer: " + Xcert.getIssuerDN();
+                        X509Certificate x509Certificate = (X509Certificate) cert;
+                        message.append("\n Certificate ").append(i++).append(":");
+                        message.append("\n  Subject DN: ").append(x509Certificate.getSubjectDN());
+                        message.append("\n  Signature Algorithm: ").append(x509Certificate.getSigAlgName());
+                        message.append("\n  Valid from: ").append(x509Certificate.getNotBefore());
+                        message.append("\n  Valid until: ").append(x509Certificate.getNotAfter());
+                        message.append("\n  Issuer: ").append(x509Certificate.getIssuerDN());
                     }
                 }
-                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
-                    LOGGER_CLINICAL.info(message);
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
+                    LOGGER_CLINICAL.info(message.toString());
                 }
             }
         }
     }
 
     public static void main(String[] args) {
+
         try {
-            //ConnectionCertificateHandler cch = new ConnectionCertificateHandler();
             KeyStore ks = ConnectionCertificateHandler.createKeyStore(new URL("file:certs/keystore"), "password");
             ConnectionCertificateHandler.printKeyCertificates(ks);
             KeyManager[] kms = ConnectionCertificateHandler.createKeyManagers(ks, "password");

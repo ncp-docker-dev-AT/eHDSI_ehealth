@@ -19,7 +19,7 @@
  */
 package tr.com.srdc.epsos.data.model;
 
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 
 /**
  * @author erdem

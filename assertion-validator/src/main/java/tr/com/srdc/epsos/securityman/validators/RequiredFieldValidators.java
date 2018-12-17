@@ -1,6 +1,6 @@
 package tr.com.srdc.epsos.securityman.validators;
 
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
 
 public class RequiredFieldValidators {

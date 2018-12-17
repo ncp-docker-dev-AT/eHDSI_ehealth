@@ -10,20 +10,18 @@
     </bean>
 
     <bean id="tsamDatasource" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiName" value="java:comp/env/jdbc/TSAM"/>
+        <property name="jndiName" value="${tsam.hibernate.datasource}"/>
     </bean>
 
     <bean id="tsamSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <property name="dataSource" ref="tsamDatasource"/>
         <property name="hibernateProperties">
             <props>
-                <prop key="hibernate.dialect">${ltr.hibernate.dialect}</prop>
-                <prop key="hibernate.show_sql">false</prop>
-                <prop key="hibernate.cache.use_query_cache">false</prop>
+                <prop key="hibernate.dialect">${tsam.hibernate.dialect}</prop>
+                <prop key="hibernate.show_sql">${tsam.hibernate.show_sql}</prop>
+                <prop key="hibernate.generate_statistics">${tsam.hibernate.generate_statistics}</prop>
+                <!--Configuration Second Level Cache using EhCache  -->
                 <prop key="hibernate.cache.use_second_level_cache">false</prop>
-                <!--<prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>-->
-                <!--<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>-->
-                <prop key="hibernate.generate_statistics">true</prop>
                 <prop key="hibernate.cache.use_structured_entries">true</prop>
             </props>
         </property>

@@ -22,7 +22,7 @@ package eu.epsos.pt.ws.client.xcpd;
 import eu.epsos.dts.xcpd.RespondingGateway_RequestReceiver;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import org.hl7.v3.PRPAIN201306UV02;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.ws.xcpd.client.RespondingGateway_RequestSender;
 

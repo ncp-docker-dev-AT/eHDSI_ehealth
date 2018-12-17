@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.w3c.dom.Document;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -134,7 +135,6 @@ public class ServiceMetadataLocatorManager {
 
         ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(PARTICIPANT_IDENTIFIER, "ehealth-participantid-qns");
         DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
-        //DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:ISM::internationalsearchmask##ehealth-107", "ehealth-resid-qns");
         List<DocumentIdentifier> documentIdentifiers = smpClient.getServiceGroup(participantIdentifier).getDocumentIdentifiers();
         for (DocumentIdentifier identifier : documentIdentifiers) {
             LOGGER.info("Identifiers: '{}'-'{}'", identifier.getFullIdentifier(), identifier.getIdentifier());
@@ -157,6 +157,7 @@ public class ServiceMetadataLocatorManager {
 
                 StringWriter sw = new StringWriter();
                 TransformerFactory tf = TransformerFactory.newInstance();
+                tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
                 Transformer transformer = tf.newTransformer();
                 transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
                 transformer.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -164,13 +165,12 @@ public class ServiceMetadataLocatorManager {
                 transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 
                 transformer.transform(new DOMSource(document), new StreamResult(sw));
-                //LOGGER.info(sw.toString());
             }
         } catch (TechnicalException | TransformerException e) {
             LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
         ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList();
-        //smpClient.getServiceMetadata(participantIdentifier, documentIdentifier).getOriginalServiceMetadata().getServiceMetadata().get;
+
         for (ProcessType processType : processListType.getProcess()) {
 
             LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier().getScheme());

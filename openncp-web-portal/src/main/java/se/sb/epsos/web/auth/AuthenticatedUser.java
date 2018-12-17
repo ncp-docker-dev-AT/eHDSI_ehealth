@@ -1,6 +1,6 @@
 package se.sb.epsos.web.auth;
 
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import se.sb.epsos.web.model.TRC;

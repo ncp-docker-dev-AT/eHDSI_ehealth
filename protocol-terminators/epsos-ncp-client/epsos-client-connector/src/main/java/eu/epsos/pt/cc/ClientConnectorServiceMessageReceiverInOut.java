@@ -3,6 +3,8 @@ package eu.epsos.pt.cc;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMXMLBuilderFactory;
@@ -19,7 +21,7 @@ import org.apache.axis2.xmlbeans.XmlBeansXMLReader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -57,7 +59,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         /*
          * Log soap request
          */
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             try {
                 String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv));
                 loggerClinical.debug("Incoming '{}' request message from portal:\n{}", operationName, logRequestMsg);
@@ -225,7 +227,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 /*
                  * Log soap request
                  */
-                if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD")) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     try {
                         String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope));
                         loggerClinical.debug("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);

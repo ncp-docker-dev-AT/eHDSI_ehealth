@@ -1,6 +1,6 @@
 package eu.epsos.assertionvalidator;
 
-import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Assertion;
 import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
 import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
 import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
