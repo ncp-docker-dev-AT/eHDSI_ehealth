@@ -45,6 +45,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 import java.util.ServiceLoader;
 
 public class XDRServiceImpl implements XDRServiceInterface {
@@ -365,7 +366,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                                 new DateTime(),
                                 EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                                 "NI_XDR_DISP_REQ",
-                                Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement) + "__" + DateUtil.getCurrentTimeGMT());
+                                Objects.requireNonNull(Helper.getTRCAssertion(shElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
                     } catch (Exception e) {
                         LOGGER.error(ExceptionUtils.getStackTrace(e));
                     }
@@ -534,7 +535,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                             new DateTime(),
                             EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                             "NI_XDR_CONSENT_REQ",
-                            Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement) + "__" + DateUtil.getCurrentTimeGMT());
+                            Objects.requireNonNull(Helper.getTRCAssertion(shElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
                 } catch (Exception e) {
                     LOGGER.error(ExceptionUtils.getStackTrace(e));
                 }
