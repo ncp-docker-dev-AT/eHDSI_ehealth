@@ -29,10 +29,7 @@ import tr.com.srdc.epsos.util.DateUtil;
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author erdem
@@ -500,10 +497,10 @@ public class XDSbRepositoryServiceInvoker {
 
         for (Attribute attr : attrs) {
             if (attr.getName().equals("urn:oasis:names:tc:xspa:1.0:subject:organization")) {
-                organization = attr.getAttributeValues().get(0).getDOM().getTextContent();
+                organization = Objects.requireNonNull(attr.getAttributeValues().get(0).getDOM()).getTextContent();
             }
             if (attr.getName().equals("urn:oasis:names:tc:xspa:1.0:subject:organization-id")) {
-                organizationId = attr.getAttributeValues().get(0).getDOM().getTextContent();
+                organizationId = Objects.requireNonNull(attr.getAttributeValues().get(0).getDOM()).getTextContent();
             }
         }
 
@@ -540,22 +537,21 @@ public class XDSbRepositoryServiceInvoker {
         if (attrStatements.size() != 1) {
             return null;
         }
-
         attrs = attrStatements.get(0).getAttributes();
 
         for (Attribute attr : attrs) {
             if (attr.getName().equals("urn:oasis:names:tc:xacml:1.0:subject:subject-id")) {
-                authorIdentifier = attr.getAttributeValues().get(0).getDOM().getTextContent();
+                authorIdentifier = Objects.requireNonNull(attr.getAttributeValues().get(0).getDOM()).getTextContent();
             }
             if (attr.getName().equals("urn:oasis:names:tc:xspa:1.0:subject:organization-id")) {
-                assigningAuthorityId = attr.getAttributeValues().get(0).getDOM().getTextContent();
+                assigningAuthorityId = Objects.requireNonNull(attr.getAttributeValues().get(0).getDOM()).getTextContent();
             }
         }
 
-        if (assigningAuthorityId.startsWith("urn:oid:")) {
-            result = authorIdentifier + "&amp;" + assigningAuthorityId.split(":")[2] + "&amp;ISO";
+        if (assigningAuthorityId.startsWith(Constants.OID_PREFIX)) {
+            result = authorIdentifier + "&" + assigningAuthorityId.split(":")[2] + "&ISO";
         } else {
-            result = authorIdentifier + "&amp;" + assigningAuthorityId + "&amp;ISO";
+            result = authorIdentifier + "&" + assigningAuthorityId + "&ISO";
         }
 
         return result;
