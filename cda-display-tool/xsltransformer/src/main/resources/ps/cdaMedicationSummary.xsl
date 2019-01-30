@@ -294,7 +294,16 @@
                                     </xsl:choose>
                                 </td>
                                 <td>
-                                    <xsl:value-of select="$medRouteAdministration/@displayName"/>
+                                    <xsl:choose>
+                                        <xsl:when test="not ($medRouteAdministration/@nullFlavor)">
+                                            <xsl:value-of select="$medRouteAdministration/@displayName"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:call-template name="show-nullFlavor">
+                                                <xsl:with-param name="code" select="$medRouteAdministration/@nullFlavor"/>
+                                            </xsl:call-template>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </td>
                                 <td>
                                     <xsl:call-template name="show-time">
