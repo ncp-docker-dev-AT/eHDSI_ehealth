@@ -207,9 +207,14 @@
         <xsl:for-each
                 select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']">
 
-            <xsl:variable name="medActiveIngredientNode" select="epsos:ingredient/epsos:code"/>
-            <xsl:variable name="medActiveIngredient" select="epsos:ingredient/epsos:code/@displayName"/>
-            <xsl:variable name="medActiveIngredientID" select="epsos:ingredient/epsos:code/@code"/>
+            <xsl:variable name="medActiveIngredientNode" select="epsos:ingredient"/>
+            <xsl:variable name="medActiveIngredientNodeCode" select = "$medActiveIngredientNode/epsos:code"/>
+            <xsl:variable name="medActiveIngredient" select="$medActiveIngredientNodeCode/@displayName"/>
+            <xsl:variable name="medActiveIngredientTranslation1"
+                          select="epsos:ingredient/epsos:code/epsos:translation/epsos:translation/@displayName"/>
+            <xsl:variable name="medActiveIngredientTranslation2"
+                          select="epsos:ingredient/epsos:code/epsos:translation/@displayName"/>
+            <xsl:variable name="medActiveIngredientID" select="$medActiveIngredientNodeCode/@code"/>
 
             <xsl:variable name="medStrengthNumerator" select="epsos:quantity/epsos:numerator"/>
             <xsl:variable name="medStrengthDenominator" select="epsos:quantity/epsos:denominator"/>
@@ -218,10 +223,25 @@
             <xsl:choose>
                 <xsl:when test="not($medAct/@nullFlavor)">
                     <!-- no info scenario code is one of the three values -->
+                    <xsl:choose>
+                        <xsl:when
+                                test="($medCode='182849000' or $medCode='408350003' or $medCode='182904002')">
+                            <tr>
+                                <td colspan="6">
+                                    <span class="tdtext">
+                                        <xsl:call-template name="show-codeNoMedication">
+                                            <xsl:with-param name="code" select="$medCode"/>
+                                        </xsl:call-template>
+                                    </span>
+                                    <br/>
+                                </td>
+                            </tr>
+                        </xsl:when>
+                        <xsl:otherwise>
                             <tr>
                                 <td>
                                     <xsl:choose>
-                                        <xsl:when test="not ($medActiveIngredientNode/@nullFlavor)">
+                                        <xsl:when test="not ($medActiveIngredientNodeCode/@nullFlavor)">
                                             <xsl:choose>
                                                 <xsl:when test="$medActiveIngredient">
                                                     <xsl:value-of select="$medActiveIngredient"/>
@@ -232,20 +252,27 @@
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <!-- uncoded element Problem -->
-                                                    <xsl:if test="$medActiveIngredientNode/n1:originalText/n1:reference/@value">
+                                                    <xsl:if test="$medActiveIngredientNodeCode/n1:originalText/n1:reference/@value">
                                                         <xsl:call-template name="show-uncodedElement">
                                                             <xsl:with-param name="code"
-                                                                            select="$medActiveIngredientNode/n1:originalText/n1:reference/@value"/>
+                                                                            select="$medActiveIngredientNodeCode/n1:originalText/n1:reference/@value"/>
                                                         </xsl:call-template>
                                                     </xsl:if>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </xsl:when>
                                         <xsl:otherwise>
-                                            <xsl:call-template name="show-nullFlavor">
-                                                <xsl:with-param name="code"
-                                                                select="$medActiveIngredientNode/@nullFlavor"/>
-                                            </xsl:call-template>
+                                            <xsl:choose>
+                                                <xsl:when test="$medActiveIngredientNode/epsos:name">
+                                                    <xsl:value-of select="$medActiveIngredientNode/epsos:name"/>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:call-template name="show-nullFlavor">
+                                                        <xsl:with-param name="code"
+                                                                        select="$medActiveIngredientNodeCode/@nullFlavor"/>
+                                                    </xsl:call-template>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </td>
@@ -317,6 +344,8 @@
                                     &#160;
                                 </td>
                             </tr>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
                     <tr>
