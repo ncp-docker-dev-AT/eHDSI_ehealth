@@ -30,7 +30,6 @@ import org.opensaml.xmlsec.signature.support.Signer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.sb.epsos.web.auth.AuthenticatedUser;
-import se.sb.epsos.web.pages.KeyStoreInitializationException;
 import se.sb.epsos.web.pages.KeyStoreManager;
 import se.sb.epsos.web.pages.KeyStoreManagerImpl;
 import se.sb.epsos.web.util.CdaHelper.Validator;
@@ -68,8 +67,8 @@ public class AssertionHandler implements Serializable {
     public static void main(String[] args) {
         DateTime now = new DateTime();
         DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
-        LOGGER.debug("NotBefore: '{}'", nowUTC.toDateTime().minusMinutes(1));
-        LOGGER.debug("NotOnOrAfter: '{}'", nowUTC.toDateTime().plusHours(2));
+        LOGGER.debug("NotBefore: '{}'", nowUTC.toDateTime());
+        LOGGER.debug("NotOnOrAfter: '{}'", nowUTC.toDateTime().plusHours(4));
     }
 
     Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws InitializationException {
@@ -106,8 +105,8 @@ public class AssertionHandler implements Serializable {
 
         Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
 
-        conditions.setNotBefore(nowUTC.toDateTime().minusMinutes(1));
-        conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
+        conditions.setNotBefore(nowUTC.toDateTime());
+        conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(4));
         assertion.setConditions(conditions);
 
         String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
