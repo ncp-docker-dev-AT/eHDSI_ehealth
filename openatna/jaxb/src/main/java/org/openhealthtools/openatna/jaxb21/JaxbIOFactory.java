@@ -161,7 +161,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
                 marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
             }
             marshaller.marshal(jmessage, out);
-            if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
+            if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 marshaller.marshal(jmessage, bout);
