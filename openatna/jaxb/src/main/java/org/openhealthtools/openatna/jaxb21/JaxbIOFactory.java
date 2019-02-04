@@ -58,7 +58,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
             if (doc.getDocumentElement().getTagName().equalsIgnoreCase("IHEYr4")) {
                 return createProv(doc);
             }
-            if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
+            if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
                 loggerClinical.debug("Read Input Document: '{}'", XMLUtils.getFullTextChildrenFromElement(doc.getDocumentElement()));
             }
             Unmarshaller u = jaxbContext.createUnmarshaller();
@@ -70,7 +70,7 @@ public class JaxbIOFactory implements AtnaIOFactory {
                 Marshaller marshaller = jaxbContext.createMarshaller();
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                 marshaller.marshal(a, bout);
-                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
                     loggerClinical.info("\n{}", new String(bout.toByteArray()));
                     if (loggerClinical.isDebugEnabled() && am != null) {
                         loggerClinical.debug("Event Outcome: '{}'", am.getEventOutcome());
