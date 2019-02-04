@@ -4,9 +4,7 @@ import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
-import org.opensaml.core.config.ConfigurationService;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
-import org.opensaml.core.xml.config.XMLObjectProviderRegistry;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.MarshallerFactory;
 import org.opensaml.core.xml.io.MarshallingException;
@@ -108,12 +106,10 @@ public class SignatureManager {
             }
 
             X509Certificate cert;
-            //List<X509Certificate> certificates = KeyInfoHelper.getCertificates(sig.getKeyInfo());
             List<X509Certificate> certificates = KeyInfoSupport.getCertificates(sig.getKeyInfo());
             for (X509Certificate certificate : certificates) {
                 LOGGER.info("Certificate: '{}'", certificate.getIssuerX500Principal().getName());
             }
-            //List<X509Certificate> certificates = KeyInfoHelper.getCertificates(sig.getKeyInfo());
             if (certificates.size() == 1) {
                 cert = certificates.get(0);
                 // Mustafa: When not called through https, we can use the country code of the signature cert
@@ -125,17 +121,11 @@ public class SignatureManager {
             }
 
             BasicX509Credential verificationCredential = new BasicX509Credential(cert);
-            //BasicX509Credential verificationCredential = new BasicX509Credential();
-            //verificationCredential.setEntityCertificate(cert);
-            //SignatureValidator sigValidator = new SignatureValidator(verificationCredential);
             LOGGER.info("[Security] SAML certificate validation");
 
-
-            //verificationCredential.setEntityCertificate(cert);
-            //SignatureValidator sigValidator = new SignatureValidator(verificationCredential);
             try {
-                //sigValidator.validate(sig);
                 SignatureValidator.validate(sig, verificationCredential);
+
             } catch (SignatureException e) {
                 // Indicates signature was not cryptographically valid, or possibly a processing error
                 LOGGER.error("SignatureException: '{}'", e.getMessage(), e);
@@ -216,20 +206,14 @@ public class SignatureManager {
             cert = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
 
-        //Signature sig = (Signature) Configuration.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
         XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
-
         Signature sig = (Signature) builderFactory.getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
-
-        //Credential signingCredential = SecurityHelper.getSimpleCredential(cert, kp.getPrivate());
         Credential signingCredential = CredentialSupport.getSimpleCredential(cert, kp.getPrivate());
 
         sig.setSigningCredential(signingCredential);
         sig.setSignatureAlgorithm(signatureAlgorithm);
-        sig.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_WITH_COMMENTS);
+        sig.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
 
-//        BasicSecurityConfiguration securityConfiguration = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-//        securityConfiguration.setSignatureReferenceDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256);
         org.opensaml.xmlsec.signature.KeyInfo keyInfo = (org.opensaml.xmlsec.signature.KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(org.opensaml.xmlsec.signature.KeyInfo.DEFAULT_ELEMENT_NAME).buildObject(org.opensaml.xmlsec.signature.KeyInfo.DEFAULT_ELEMENT_NAME);
         org.opensaml.xmlsec.signature.X509Data data = (org.opensaml.xmlsec.signature.X509Data) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(org.opensaml.xmlsec.signature.X509Data.DEFAULT_ELEMENT_NAME).buildObject(org.opensaml.xmlsec.signature.X509Data.DEFAULT_ELEMENT_NAME);
         org.opensaml.xmlsec.signature.X509Certificate x509Certificate = (org.opensaml.xmlsec.signature.X509Certificate) XMLObjectProviderRegistrySupport.getBuilderFactory()

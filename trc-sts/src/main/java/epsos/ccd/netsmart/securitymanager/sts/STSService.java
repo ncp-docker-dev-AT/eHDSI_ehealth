@@ -106,11 +106,6 @@ public class STSService implements Provider<SOAPMessage> {
             throw new WebServiceException("Cannot get Soap Message Parts", ex);
         }
 
-//        try {
-//            DefaultBootstrap.bootstrap();
-//        } catch (ConfigurationException ex) {
-//            logger.error(null, ex);
-//        }
         try {
             if (!SUPPORTED_ACTION_URI.equals(getRSTAction(body))) {
                 throw new WebServiceException("Only ISSUE action is supported");
@@ -154,8 +149,6 @@ public class STSService implements Provider<SOAPMessage> {
             }
 
             Document signedDoc = builder.newDocument();
-            //Configuration.getMarshallerFactory().getMarshaller(trc).marshall(trc, signedDoc);
-
             MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
             marshallerFactory.getMarshaller(trc).marshall(trc, signedDoc);
 
@@ -270,7 +263,6 @@ public class STSService implements Provider<SOAPMessage> {
                     throw new WSTrustException("Error validating SAML Assertion signature", ex);
                 }
             }
-            //UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
             UnmarshallerFactory unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
             return (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
@@ -408,7 +400,7 @@ public class STSService implements Provider<SOAPMessage> {
                 loggerClinical.error("Exception: '{}'", e.getMessage(), e);
             }
         }
-       if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.info("SOAPMessage:\n{}", out.toString());
         }
     }
