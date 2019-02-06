@@ -3,6 +3,26 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [3.0.0.RC2] - 06-02-2019
+### Added
+- eHDSI Gazelle platform updated: all the validators are now labelled according the Wave & Specification version. 
+
+### Changed
+- Identity HCP Assertions validity has been extended to 4 hours instead of 2 hours (conformance to specification).
+- Removing Personal Data (Patient ID) from the NRO evidences file produced during the Dispense (XDR).
+- CDA DisplayTool improvements and alignment to eHDSI Specification (Change Proposal 09).
+- Server Monitoring (Javamelody) and Running Mode (PAT messages) tools have been fixed (minor issue).
+- Bug fix on the HCP Assertions signature (wrong Canonicalization method). 
+- Bug fix on XDR Request message: field authorPerson was not correct (HTML escape character).
+- Member State HomeCommunityId list updated (pn-oid.xml).
+  
+### Deprecated
+- N/A
+
+### Removed
+- eID confirmation button has been removed from the OpenNCP Demo Portal.
+- OpenATNA logs have been cleaned (verbose and useless information removed). 
+
 ## [3.0.0.RC1] - 11-12-2018
 ### Added
 - Support for Wave 2 CDA Implementation Guidelines.
