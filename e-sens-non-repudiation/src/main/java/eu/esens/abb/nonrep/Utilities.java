@@ -40,6 +40,7 @@ public class Utilities {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utilities.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
 
     private Utilities() {
     }
@@ -105,7 +106,7 @@ public class Utilities {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         serialize(request, outputStream);
-        if (!StringUtils.equals(System.getProperty("server.ehealth.mode"), "PROD") && LOGGER_CLINICAL.isDebugEnabled()) {
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("Stream:\n'{}'", outputStream.toString());
         }
     }

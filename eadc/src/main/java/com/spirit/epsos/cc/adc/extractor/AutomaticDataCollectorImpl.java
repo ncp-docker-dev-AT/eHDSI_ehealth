@@ -74,7 +74,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
 
         logger.info("Processing a transaction object");
         String sqlInsertStatementList = this.extractDataAndCreateAccordingSqlInserts(transaction);
-        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
             loggerClinical.info("Insert the following sql-queries:\n'{}'", sqlInsertStatementList);
         }
         this.runSqlScript(dataSourceName, sqlInsertStatementList);
@@ -96,7 +96,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
         String processedDocumentCodeSystem;
         String processedDocumentCodeAndCodeSystemCombination;
 
-        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
             loggerClinical.debug("XML Document: {}", EadcUtil.convertXMLDocumentToString(transaction));
         }
 

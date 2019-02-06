@@ -1,6 +1,5 @@
 package org.openhealthtools.openatna.syslog.protocol;
 
-import org.openhealthtools.openatna.syslog.Constants;
 import org.openhealthtools.openatna.syslog.LogMessage;
 import org.openhealthtools.openatna.syslog.SyslogException;
 import org.openhealthtools.openatna.syslog.SyslogMessage;
@@ -10,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -85,7 +85,7 @@ public class ProtocolMessage<M> extends SyslogMessage {
     public void write(OutputStream out) throws SyslogException {
 
         try {
-            OutputStreamWriter writer = new OutputStreamWriter(out, Constants.ENC_UTF8);
+            OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
             writer.write(getHeader());
             if (!structuredElement.isEmpty()) {
                 for (StructuredElement element : structuredElement) {

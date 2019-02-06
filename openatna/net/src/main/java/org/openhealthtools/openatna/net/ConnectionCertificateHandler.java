@@ -142,7 +142,7 @@ public class ConnectionCertificateHandler {
                         message.append("\n  Issuer: ").append(x509Certificate.getIssuerDN());
                     }
                 }
-                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
                     LOGGER_CLINICAL.info(message.toString());
                 }
             }
@@ -171,7 +171,7 @@ public class ConnectionCertificateHandler {
                 message += "\n  Valid until: " + cert.getNotAfter();
                 message += "\n  Issuer: " + cert.getIssuerDN();
             }
-            if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
+            if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
                 LOGGER_CLINICAL.info(message);
             }
         }
@@ -203,7 +203,7 @@ public class ConnectionCertificateHandler {
                         message.append("\n  Issuer: ").append(x509Certificate.getIssuerDN());
                     }
                 }
-                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PROD")) {
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
                     LOGGER_CLINICAL.info(message.toString());
                 }
             }

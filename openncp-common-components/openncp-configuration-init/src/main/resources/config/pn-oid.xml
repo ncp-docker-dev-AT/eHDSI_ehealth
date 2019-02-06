@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <mappings>
     <mapping country="be" domainId="1.3.6.1.4.1.48336"/>
-    <mapping country="bg" domainId="2.16.17.710.812.1000.990.1"/>
+    <mapping country="bg" domainId="2.16.17.710.824.1000.990.1"/>
     <mapping country="cz" domainId="2.16.17.710.804.1000.990.1"/>
     <mapping country="dk" domainId="2.16.17.710.802.1000.990.1"/>
     <mapping country="de" domainId="2.16.17.710.803.1000.990.1"/>
@@ -24,10 +24,9 @@
     <mapping country="pt" domainId="2.16.17.710.820.1000.990.1"/>
     <mapping country="ro" domainId="2.16.17.710.821.1000.990.1"/>
     <mapping country="si" domainId="2.16.17.710.822.1000.990.1"/>
-    <mapping country="sk" domainId="2.16.17.710.805.1000.990.1"/>
+    <mapping country="sk" domainId="2.16.17.710.823.1000.990.1"/>
     <mapping country="fi" domainId="1.2.246.556.12001.4.1000.990.1"/>
     <mapping country="se" domainId="2.16.17.710.807.1000.990.1"/>
-    <mapping country="gb" domainId="2.16.17.710.809.1000.990.1"/>
-    <mapping country="ch" domainId="2.16.17.710.814.1000.990.1"/>
     <mapping country="eu" domainId="2.16.17.710.850.1000.990.1"/>
+    <mapping country="ihe" domainId="2.16.17.710.812.1000.990.1"/>
 </mappings>
