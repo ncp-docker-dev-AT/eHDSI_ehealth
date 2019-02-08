@@ -66,17 +66,6 @@
             <version>${saaj-impl.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>openws</artifactId>
-            <version>${openws.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>xmltooling</artifactId>
-                    <groupId>org.opensaml</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.owasp.esapi</groupId>
             <artifactId>esapi</artifactId>
             <version>${esapi.version}</version>
