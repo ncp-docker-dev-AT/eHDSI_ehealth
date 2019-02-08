@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.cc.dts.axis2;
 
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
@@ -34,8 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This is an Data Transformation Service. This provide functions to transform
- * data into a Document object.
+ * This is an Data Transformation Service. This provide functions to transform data into a Document object.
  *
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
@@ -101,7 +81,7 @@ public class DocumentDts {
          * PRE-CONDITIONS
          */
         if (documentAssociation == null || documentAssociation.isEmpty()) {
-            return null;
+            return new EpsosDocument1[0];
         }
 
         /*
@@ -114,8 +94,8 @@ public class DocumentDts {
             EpsosDocument1 pdfDoc = DocumentDts.newInstance(doc.getCdaPDF());
 
             if (xmlDoc != null && pdfDoc != null) {
-                xmlDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{pdfDoc});
-                pdfDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{xmlDoc});
+                pdfDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{pdfDoc});
+                xmlDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{xmlDoc});
                 resultList.add(xmlDoc);
                 resultList.add(pdfDoc);
             }
@@ -151,8 +131,7 @@ public class DocumentDts {
     }
 
     /**
-     * Converts a string containing a date in the yyyyMMddHHmmss format to a
-     * Calendar instance.
+     * Converts a string containing a date in the yyyyMMddHHmmss format to a Calendar instance.
      *
      * @param dateString a String representation of the Date.
      * @return a Calendar instance, with the given String values.
