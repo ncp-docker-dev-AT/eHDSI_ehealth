@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>3.0.0.RC2</version>
+        <version>3.0.0.RC3</version>
     </parent>
 
     <artifactId>openncp-evidence-emitter</artifactId>
@@ -64,17 +64,6 @@
             <groupId>com.sun.xml.messaging.saaj</groupId>
             <artifactId>saaj-impl</artifactId>
             <version>${saaj-impl.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>openws</artifactId>
-            <version>${openws.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>xmltooling</artifactId>
-                    <groupId>org.opensaml</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.owasp.esapi</groupId>

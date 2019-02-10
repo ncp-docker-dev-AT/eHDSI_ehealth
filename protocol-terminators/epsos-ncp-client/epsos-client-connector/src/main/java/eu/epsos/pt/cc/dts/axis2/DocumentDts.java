@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.cc.dts.axis2;
 
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
@@ -34,10 +15,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This is an Data Transformation Service. This provide functions to transform
- * data into a Document object.
+ * This is an Data Transformation Service. This provide functions to transform data into a Document object.
  *
- * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @author Marcelo Fonseca - <marcelo.fonseca@iuz.pt>
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class DocumentDts {
@@ -77,12 +57,20 @@ public class DocumentDts {
         result.setAuthor(document.getAuthorPerson());
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
-            if (result.getClassCode().getNodeRepresentation().equals(Constants.PS_CLASSCODE)) {
-                result.setTitle(Constants.PS_TITLE);
-            } else if (result.getClassCode().getNodeRepresentation().equals(Constants.EP_CLASSCODE)) {
-                result.setTitle(Constants.EP_TITLE);
-            } else if (result.getClassCode().getNodeRepresentation().equals(Constants.ED_CLASSCODE)) {
-                result.setTitle(Constants.ED_TITLE);
+            switch (result.getClassCode().getNodeRepresentation()) {
+                case Constants.PS_CLASSCODE:
+                    result.setTitle(Constants.PS_TITLE);
+                    break;
+                case Constants.EP_CLASSCODE:
+                    result.setTitle(Constants.EP_TITLE);
+                    break;
+                case Constants.ED_CLASSCODE:
+                    result.setTitle(Constants.ED_TITLE);
+                    break;
+                default:
+                    // Document Type not supported
+                    result.setTitle(Constants.UNKNOWN_TITLE);
+                    break;
             }
         }
 
@@ -101,7 +89,7 @@ public class DocumentDts {
          * PRE-CONDITIONS
          */
         if (documentAssociation == null || documentAssociation.isEmpty()) {
-            return null;
+            return new EpsosDocument1[0];
         }
 
         /*
@@ -113,14 +101,18 @@ public class DocumentDts {
             EpsosDocument1 xmlDoc = DocumentDts.newInstance(doc.getCdaXML());
             EpsosDocument1 pdfDoc = DocumentDts.newInstance(doc.getCdaPDF());
 
-            if (xmlDoc != null && pdfDoc != null) {
-                xmlDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{pdfDoc});
-                pdfDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{xmlDoc});
-                resultList.add(xmlDoc);
+            // Adding the reference to the L1 CDA document
+            if (pdfDoc != null) {
+                pdfDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{pdfDoc});
                 resultList.add(pdfDoc);
             }
-        }
 
+            // Adding the reference to the L3 CDA document
+            if (xmlDoc != null) {
+                xmlDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{xmlDoc});
+                resultList.add(xmlDoc);
+            }
+        }
         return resultList.toArray(new EpsosDocument1[resultList.size()]);
     }
 
@@ -151,8 +143,7 @@ public class DocumentDts {
     }
 
     /**
-     * Converts a string containing a date in the yyyyMMddHHmmss format to a
-     * Calendar instance.
+     * Converts a string containing a date in the yyyyMMddHHmmss format to a Calendar instance.
      *
      * @param dateString a String representation of the Date.
      * @return a Calendar instance, with the given String values.

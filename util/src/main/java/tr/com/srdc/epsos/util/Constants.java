@@ -50,6 +50,7 @@ public class Constants {
     public static final String EP_TITLE = "ePrescription";
     public static final String ED_TITLE = "eDispensation";
     public static final String CONSENT_TITLE = "Privacy Policy Acknowledgement Document";
+    public static final String UNKNOWN_TITLE = "Unknown Document Type";
 
     public static final String CONSENT_PUT_SUFFIX = ".2.4.1.1";
     public static final String CONSENT_DISCARD_SUFFIX = ".2.4.1.2";

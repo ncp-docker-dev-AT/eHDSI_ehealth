@@ -32,11 +32,10 @@ import java.util.List;
  */
 public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSkeletonInterface {
 
-    private final Logger logger = LoggerFactory.getLogger(ClientConnectorServiceSkeleton.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     private static final String UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION = "Unsupported Class Code scheme: ";
     private static final String UNSUPPORTED_CLASS_CODE_EXCEPTION = "Unsupported Class Code: ";
+    private final Logger logger = LoggerFactory.getLogger(ClientConnectorServiceSkeleton.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     /*
      * XCPD
