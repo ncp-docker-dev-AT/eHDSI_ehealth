@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * This is an Data Transformation Service. This provide functions to transform data into a Document object.
  *
- * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
+ * @author Marcelo Fonseca - <marcelo.fonseca@iuz.pt>
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class DocumentDts {
@@ -57,12 +57,20 @@ public class DocumentDts {
         result.setAuthor(document.getAuthorPerson());
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
-            if (result.getClassCode().getNodeRepresentation().equals(Constants.PS_CLASSCODE)) {
-                result.setTitle(Constants.PS_TITLE);
-            } else if (result.getClassCode().getNodeRepresentation().equals(Constants.EP_CLASSCODE)) {
-                result.setTitle(Constants.EP_TITLE);
-            } else if (result.getClassCode().getNodeRepresentation().equals(Constants.ED_CLASSCODE)) {
-                result.setTitle(Constants.ED_TITLE);
+            switch (result.getClassCode().getNodeRepresentation()) {
+                case Constants.PS_CLASSCODE:
+                    result.setTitle(Constants.PS_TITLE);
+                    break;
+                case Constants.EP_CLASSCODE:
+                    result.setTitle(Constants.EP_TITLE);
+                    break;
+                case Constants.ED_CLASSCODE:
+                    result.setTitle(Constants.ED_TITLE);
+                    break;
+                default:
+                    // Document Type not supported
+                    result.setTitle(Constants.UNKNOWN_TITLE);
+                    break;
             }
         }
 
@@ -93,14 +101,18 @@ public class DocumentDts {
             EpsosDocument1 xmlDoc = DocumentDts.newInstance(doc.getCdaXML());
             EpsosDocument1 pdfDoc = DocumentDts.newInstance(doc.getCdaPDF());
 
-            if (xmlDoc != null && pdfDoc != null) {
+            // Adding the reference to the L1 CDA document
+            if (pdfDoc != null) {
                 pdfDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{pdfDoc});
-                xmlDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{xmlDoc});
-                resultList.add(xmlDoc);
                 resultList.add(pdfDoc);
             }
-        }
 
+            // Adding the reference to the L3 CDA document
+            if (xmlDoc != null) {
+                xmlDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{xmlDoc});
+                resultList.add(xmlDoc);
+            }
+        }
         return resultList.toArray(new EpsosDocument1[resultList.size()]);
     }
 
