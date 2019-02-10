@@ -3,6 +3,19 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [3.0.0.RC3] - 10-02-2019
+### Added
+- N/A
+
+### Changed
+- N/A
+  
+### Deprecated
+- N/A
+
+### Removed
+- Dependency openws.jar has been removed from the component Evidence Emitter to prevent classloading issue [EHNCP-1697]
+
 ## [3.0.0.RC2] - 06-02-2019
 ### Added
 - eHDSI Gazelle platform updated: all the validators are now labelled according the Wave & Specification version. 
