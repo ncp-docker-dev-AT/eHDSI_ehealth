@@ -14,7 +14,7 @@
     <setId root="1.2.246.10.11535721.93.2009.15721945355354912" />
     <recordTarget contextControlCode="OP" typeCode="RCT">
         <patientRole classCode="PAT">
-            <id extension="W2-ep-multi" root="1.2.246.21" />
+            <id extension="1-2345-W2" root="1.2.246.21" />
             <addr>
                 <country>FI</country>
             </addr>
