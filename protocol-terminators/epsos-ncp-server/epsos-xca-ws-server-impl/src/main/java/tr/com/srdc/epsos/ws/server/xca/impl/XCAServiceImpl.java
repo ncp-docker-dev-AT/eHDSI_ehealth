@@ -1283,32 +1283,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                 }
 
-                logger.info("Error Registry: Failure '{}'", failure);
-
-                // If the registryErrorList is empty or contains only Warning, the status of the request is SUCCESS
-                if (!registryErrorList.getChildElements().hasNext()) {
-                    logger.info("XCA Retrieve Document - Transformation Status: '{}'\nDefault Case", AdhocQueryResponseStatus.SUCCESS);
-                    registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                            AdhocQueryResponseStatus.SUCCESS));
-                } else {
-                    if (checkIfOnlyWarnings(registryErrorList)) {
-                        logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning", AdhocQueryResponseStatus.SUCCESS);
-                        registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                                AdhocQueryResponseStatus.SUCCESS));
-                    } else if (failure) {
-                        // If there is a failure during the request process, the status is FAILURE
-                        logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning Failure: '{}'", AdhocQueryResponseStatus.FAILURE, failure);
-                        registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                                AdhocQueryResponseStatus.FAILURE));
-                    } else {
-                        //  Otherwise the status is PARTIAL SUCCESS
-                        logger.info("XCA Retrieve Document - Transformation Status: '{}'\nOtherwise...", AdhocQueryResponseStatus.PARTIAL_SUCCESS);
-                        registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                                AdhocQueryResponseStatus.PARTIAL_SUCCESS));
-                    }
-                }
-
                 // If there is no failure during the process, the CDA document has been attached to the response
+                logger.info("Error Registry: Failure '{}'", failure);
                 if (!failure) {
                     ByteArrayDataSource dataSource = null;
                     if (doc != null) {
@@ -1325,11 +1301,35 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     documentReturned = true;
                 }
             } catch (Exception e) {
+                failure = true;
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                registryResponse.addAttribute(factory.createOMAttribute("status", null, AdhocQueryResponseStatus.FAILURE));
                 registryErrorList.addChild(createErrorOMMessage(ns, "", e.getMessage(), "", false));
             }
         }
+
+        // If the registryErrorList is empty or contains only Warning, the status of the request is SUCCESS
+        if (!registryErrorList.getChildElements().hasNext()) {
+            logger.info("XCA Retrieve Document - Transformation Status: '{}'\nDefault Case", AdhocQueryResponseStatus.SUCCESS);
+            registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                    AdhocQueryResponseStatus.SUCCESS));
+        } else {
+            if (checkIfOnlyWarnings(registryErrorList)) {
+                logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning", AdhocQueryResponseStatus.SUCCESS);
+                registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                        AdhocQueryResponseStatus.SUCCESS));
+            } else if (failure) {
+                // If there is a failure during the request process, the status is FAILURE
+                logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning Failure: '{}'", AdhocQueryResponseStatus.FAILURE, failure);
+                registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                        AdhocQueryResponseStatus.FAILURE));
+            } else {
+                //  Otherwise the status is PARTIAL SUCCESS
+                logger.info("XCA Retrieve Document - Transformation Status: '{}'\nOtherwise...", AdhocQueryResponseStatus.PARTIAL_SUCCESS);
+                registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                        AdhocQueryResponseStatus.PARTIAL_SUCCESS));
+            }
+        }
+
         logger.info("Preparing Event Log of the Response:");
         try {
             boolean errorsDiscovered = registryErrorList.getChildElements().hasNext();
