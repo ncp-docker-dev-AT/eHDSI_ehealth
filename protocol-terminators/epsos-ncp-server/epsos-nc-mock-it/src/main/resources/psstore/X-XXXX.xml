@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ClinicalDocument xmlns:epsos="urn:epsos-org:ep:medication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xmlns="urn:hl7-org:v3"
-                  xsi:schemaLocation="urn:hl7-org:v3 CDA_extended.xsd">
+                  xmlns="urn:hl7-org:v3">
     <typeId extension="POCD_HD000040" root="2.16.840.1.113883.1.3"/>
     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.3"/>
+    <!-- OpenNCP - epSOS Patient Summary -->
     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.1"/>
-    <id extension="1001" root="2.16.620.1.101.10.3.29.54259"/>
-    <code code="60591-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" codeSystemVersion="2.34"
-          displayName="Patient Summary"/>
-    <title>Patient Summary</title>
-    <effectiveTime value="20150316135535+0000"/>
+    <id extension="1001.1" root="2.16.620.1.101.10.3.29.54259"/>
+    <code code="60591-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" codeSystemVersion="2.59"
+          displayName="Patient summary">
+        <translation code="60591-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                     displayName="Patient Summary"/>
+    </code>
+    <title>Dossier Patient</title>
+    <effectiveTime value="20170601120000+0000"/>
     <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25" codeSystemName="Confidentiality"
-                         codeSystemVersion="913-20091020" displayName="normal"/>
-    <languageCode code="en-GB"/>
+                         codeSystemVersion="913-20091020" displayName="normal">
+        <translation code="N" codeSystem="2.16.840.1.113883.5.25" codeSystemName="Confidentiality"
+                     displayName="normale"/>
+    </confidentialityCode>
+    <languageCode code="fr-BE"/>
     <recordTarget>
         <patientRole>
-            <id extension="1" root="2.16.620.1.101.10.1.1"/>
+            <id extension="X-XXXX" root="2.16.620.1.101.10.1.1"/>
             <addr>
                 <country>BE</country>
                 <postalCode>B-1040</postalCode>
@@ -24,15 +30,18 @@
             <telecom nullFlavor="NI"/>
             <patient>
                 <name>
-                    <family>Doe</family>
-                    <given>Jane</given>
+                    <family>Schuman</family>
+                    <given>Robert</given>
                 </name>
-                <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"
+                <administrativeGenderCode code="M" codeSystem="2.16.840.1.113883.5.1"
                                           codeSystemName="AdministrativeGender" codeSystemVersion="913-20091020"
-                                          displayName="Female">
-                    <translation displayName="Female"/>
+                                          displayName="Male">
                 </administrativeGenderCode>
-                <birthTime value="19790506"/>
+                <birthTime value="18860629"/>
+                <languageCommunication>
+                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.2.1"/>
+                    <languageCode code="en-GB"/>
+                </languageCommunication>
             </patient>
             <providerOrganization>
                 <id root="2.16.620.1.101.10.1"/>
@@ -44,6 +53,11 @@
         <time value="20150316135535+0000"/>
         <assignedAuthor>
             <id extension="90647" root="2.16.620.1.101.10.2.5"/>
+            <addr>
+                <country>BE</country>
+                <postalCode>B-1000 Bruxelles</postalCode>
+                <streetAddressLine>5 Rue des Fleurs</streetAddressLine>
+            </addr>
             <telecom use="WP" value="tel:+3223456543"/>
             <assignedPerson>
                 <name>
@@ -54,6 +68,7 @@
             <representedOrganization>
                 <id extension="54259" root="2.16.620.1.101.10.3.29"/>
                 <name>Erasme Hostpital</name>
+                <telecom use="WP" value="tel:+3223456543"/>
                 <addr>
                     <country>BE</country>
                     <postalCode>B-1000 Bruxelles</postalCode>
@@ -81,6 +96,12 @@
         <signatureCode code="S"/>
         <assignedEntity>
             <id extension="54259" root="2.16.620.1.101.10.3.29"/>
+            <addr>
+                <streetAddressLine>Hospital Street</streetAddressLine>
+                <city>Nicosia</city>
+                <postalCode>1234</postalCode>
+                <country>CY</country>
+            </addr>
             <telecom use="WP" value="tel:+3229579760"/>
             <assignedPerson>
                 <name>
@@ -111,7 +132,6 @@
                 <streetAddressLine>5 Rue des Fleurs</streetAddressLine>
             </addr>
             <telecom use="WP" value="tel:+351219579760"/>
-            <telecom nullFlavor="NI"/>
             <associatedPerson>
                 <name>
                     <family>Mikolic</family>
@@ -120,20 +140,28 @@
             </associatedPerson>
         </associatedEntity>
     </participant>
-    <documentationOf>
-        <serviceEvent classCode="PCPR">
+    <documentationOf typeCode="DOC">
+        <serviceEvent moodCode="EVN" classCode="PCPR">
             <effectiveTime>
                 <low value="20150316135535+0000"/>
                 <high value="20150316135535+0000"/>
             </effectiveTime>
             <performer typeCode="PRF">
                 <templateId root="1.3.6.1.4.1.19376.1.5.3.1.2.3"/>
+                <functionCode code="221" codeSystem="2.16.840.1.113883.2.9.6.2.7" codeSystemName="ISCO"
+                              displayName="Medical doctors"/>
                 <time>
                     <low value="20150316135535+0000"/>
                     <high value="20150316135535+0000"/>
                 </time>
                 <assignedEntity classCode="ASSIGNED">
                     <id extension="0" root="2.16.620.1.101.10.2"/>
+                    <addr>
+                        <streetAddressLine>Hospital Street</streetAddressLine>
+                        <city>Nicosia</city>
+                        <postalCode>1234</postalCode>
+                        <country>CY</country>
+                    </addr>
                     <telecom use="WP" value="tel:+351219579760"/>
                     <assignedPerson>
                         <name>
@@ -167,21 +195,20 @@
                     <templateId root="2.16.840.1.113883.10.20.1.2"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.13"/>
                     <code code="48765-2" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
-                          codeSystemVersion="2.59" displayName="Allergies, adverse reactions, alerts"/>
-                    <title>Allergies, adverse reactions, alerts</title>
-                    <text>
-                        <content ID="noallergy">No known allergies.</content>
-                    </text>
+                          codeSystemVersion="2.59" displayName="Allergies, adverse reactions, alerts">
+                        <translation code="48765-2" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                                     displayName="Allergies, effets indésirables, alertes"/>
+                    </code>
+                    <title>Allergies, effets indésirables, alertes</title>
+                    <text><content ID="noallergy">No known allergies.</content></text>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3"/>
-                            <id root="5f971af4-c818-41e5-87c7-602617079dd8"/>
+                            <id root="5F971AF4-C818-41E5-87C7-602617079DD8"/>
                             <code code="NA" nullFlavor="NA"/>
-                            <text>
-                                <reference value="#noallergy"/>
-                            </text>
+                            <text><reference value="#noallergy"/></text>
                             <statusCode code="active"/>
                             <effectiveTime>
                                 <low nullFlavor="NA"/>
@@ -192,13 +219,11 @@
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.6"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <templateId root="2.16.840.1.113883.10.20.1.28"/>
-                                    <id root="af58c270-6f80-477a-ab05-47bcffbc62f7"/>
+                                    <id root="AF58C270-6F80-477A-AB05-47BCFFBC62F7"/>
                                     <code code="419199007" codeSystem="2.16.840.1.113883.6.96"
                                           codeSystemName="SNOMED CT" codeSystemVersion="2016-07"
                                           displayName="Allergy to substance"/>
-                                    <text>
-                                        <reference value="#noallergy"/>
-                                    </text>
+                                    <text><reference value="#noallergy"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low nullFlavor="UNK"/>
@@ -206,9 +231,6 @@
                                     <value code="716186003" codeSystem="2.16.840.1.113883.6.96"
                                            codeSystemName="SNOMED CT" codeSystemVersion="2016-07"
                                            displayName="No known allergy" xsi:type="CD"/>
-                                    <!--<value code="160244002" codeSystem="2.16.840.1.113883.6.96"-->
-                                    <!--codeSystemName="SNOMED CT" codeSystemVersion="2016-07"-->
-                                    <!--displayName="No known allergies" xsi:type="CD"/>-->
                                     <participant nullFlavor="NA" typeCode="CSM">
                                         <participantRole classCode="MANU">
                                             <playingEntity classCode="MMAT" nullFlavor="NA">
@@ -229,22 +251,17 @@
                     <code code="10160-0" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
                           codeSystemVersion="2.59" displayName="History of medication use"/>
                     <title>History of medical device use</title>
-                    <text>
-                        <content ID="nomedicationdescription">No known drug allergies</content>
-                    </text>
+                    <text><content ID="nomedicationdescription">No known drug allergies</content></text>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="EVN">
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
-                            <id root="ee9f61cb-5b8c-4f73-8ddc-e802cf5a44e8"/>
+                            <id root="EE9F61CB-5B8C-4F73-8DDC-E802CF5A44E8"/>
                             <code code="182904002" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
                                   codeSystemVersion="2016-07" displayName="Drug treatment unknown">
-                                <originalText>
-                                    <reference value="#nomedicationdescription"/>
-                                </originalText>
-                                <translation displayName="Tratamento desconhecido"/>
+                                <originalText><reference value="#nomedicationdescription"/></originalText>
                             </code>
                             <statusCode code="completed"/>
                             <effectiveTime xsi:type="IVL_TS">
@@ -255,12 +272,11 @@
                             <doseQuantity nullFlavor="NI"/>
                             <consumable>
                                 <manufacturedProduct>
-                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2"/>
-                                    <templateId root="2.16.840.1.113883.10.20.1.53"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
-                                        <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
                                         <code nullFlavor="NA"/>
                                         <name nullFlavor="NA"/>
+                                        <epsos:formCode nullFlavor="NP"/>
                                         <epsos:ingredient classCode="ACTI" nullFlavor="NA">
                                             <epsos:quantity>
                                                 <epsos:numerator nullFlavor="NA" xsi:type="epsos:PQ"/>
@@ -282,19 +298,15 @@
                     <templateId root="2.16.840.1.113883.10.20.1.11"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.6"/>
                     <code code="11450-4" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
-                          codeSystemVersion="2.59" displayName="Problem list">
-                        <translation displayName="Lista de problemas activos"/>
-                    </code>
+                          codeSystemVersion="2.59" displayName="Problem list"/>
                     <title>Problem list</title>
-                    <text>
-                        <content ID="actnoproblem">No current problems or disability</content>
-                    </text>
+                    <text><content ID="actnoproblem">No current problems or disability</content></text>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
-                            <id root="0e96e8d4-56b1-4c85-8953-251b828ea429"/>
+                            <id root="0E96E8D4-56B1-4C85-8953-251B828EA429"/>
                             <code code="NA" nullFlavor="NA"/>
                             <statusCode code="active"/>
                             <effectiveTime>
@@ -306,9 +318,7 @@
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5"/>
                                     <id root="2.25.204676361010975441454110131417885024444"/>
                                     <code nullFlavor="NA"/>
-                                    <text>
-                                        <reference value="#actnoproblem"/>
-                                    </text>
+                                    <text><reference value="#actnoproblem"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime>
                                         <low nullFlavor="UNK"/>
@@ -317,10 +327,7 @@
                                     <value code="160245001" codeSystem="2.16.840.1.113883.6.96"
                                            codeSystemName="SNOMED CT" codeSystemVersion="2016-07"
                                            displayName="No current problems or disability" xsi:type="CD">
-                                        <originalText>
-                                            <reference value="#actnoproblem"/>
-                                        </originalText>
-                                        <translation displayName="Não existem problemas activos"/>
+                                        <originalText><reference value="#actnoproblem"/></originalText>
                                     </value>
                                 </observation>
                             </entryRelationship>
@@ -336,16 +343,20 @@
                     <code code="47519-4" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
                           codeSystemVersion="2.59" displayName="History of Procedures"/>
                     <title>History of Procedures</title>
-                    <text>
-                        <content ID="surgeries">No medical history.</content>
-                    </text>
+                    <text><content ID="surgeries">No medical history.</content></text>
                     <entry>
-                        <procedure classCode="PROC" moodCode="EVN" nullFlavor="NA">
+                        <procedure classCode="PROC" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>
                             <templateId root="2.16.840.1.113883.10.20.1.29"/>
-                            <id root="5f971af4-c818-41e5-87c7-602617079dd8"/>
-                            <code code="NA" nullFlavor="NA"/>
+                            <id nullFlavor="NA"/>
+                            <code code="112802009" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"
+                                  codeSystemVersion="2016-07" displayName="Cardiovascular surgical procedure">
+                                <translation code="80286-8" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
+                                             displayName="History of Surgical procedures of cardiovascular system"/>
+                            </code>
+                            <text><reference value="#surgeries"/></text>
                             <statusCode code="completed"/>
+                            <effectiveTime value="20130201"/>
                         </procedure>
                     </entry>
                 </section>
@@ -358,13 +369,11 @@
                     <code code="46264-8" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"
                           codeSystemVersion="2.59" displayName="History of medical device use"/>
                     <title>History of medical device use</title>
-                    <text>
-                        <content ID="nomedicalequipment">Medical history unknown</content>
-                    </text>
+                    <text><content ID="nomedicalequipment">Medical history unknown</content></text>
                     <entry>
                         <supply classCode="SPLY" moodCode="EVN" nullFlavor="NA">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.5"/>
-                            <effectiveTime nullFlavor="NA"/>
+                            <effectiveTime nullFlavor="NA" xsi:type="IVL_TS"/>
                             <participant typeCode="DEV">
                                 <participantRole classCode="MANU">
                                     <playingDevice classCode="DEV" determinerCode="INSTANCE">

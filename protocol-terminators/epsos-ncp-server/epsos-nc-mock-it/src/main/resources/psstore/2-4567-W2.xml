@@ -14,7 +14,7 @@
     <languageCode code="fr-BE"/>
     <recordTarget>
         <patientRole>
-            <id extension="2-4567" root="2.16.620.1.101.10.1.1"/>
+            <id extension="2-4567-W2" root="2.16.620.1.101.10.1.1"/>
             <addr>
                 <country>BE</country>
                 <postalCode>B-1040</postalCode>

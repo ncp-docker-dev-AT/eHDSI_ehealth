@@ -15,7 +15,7 @@
     <languageCode code="pt-PT"/>
     <recordTarget>
         <patientRole>
-            <id extension="W1-ps" root="2.16.17.710.820.1000.990.1"/>
+            <id extension="2-1234-W2" root="2.16.17.710.820.1000.990.1"/>
             <addr use="HP">
                 <streetAddressLine>PRACETA PCT D LEONOR MASCARENHAS 39 1 ESQ</streetAddressLine>
                 <postalCode>2800-0</postalCode>
@@ -1141,10 +1141,7 @@
                             <code code="72506001" codeSystem="2.16.840.1.113883.6.96"
                                   codeSystemName="SNOMED CT" displayName="Desfibrilador implantável"/>
                             <text><reference value="#medicalDevice0"/></text>
-                            <effectiveTime xsi:type="IVL_TS">
-                                <low value="20141020"/>
-                                <high nullFlavor="UNK"/>
-                            </effectiveTime>
+                            <effectiveTime value="20141020"/>
                             <participant typeCode="DEV">
                                 <participantRole classCode="MANU">
                                     <playingDevice classCode="DEV" determinerCode="INSTANCE">
