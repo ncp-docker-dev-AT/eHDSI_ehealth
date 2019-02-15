@@ -81,7 +81,7 @@ public class STSService implements Provider<SOAPMessage> {
         try {
             InitializationService.initialize();
         } catch (InitializationException e) {
-            //logger.error("OpenSAML module cannot be initialized: '{}'", e.getMessage(), e);
+            // SAML Framework cannot be initialized correctly.
         }
     }
 
@@ -93,10 +93,11 @@ public class STSService implements Provider<SOAPMessage> {
     @Override
     public SOAPMessage invoke(SOAPMessage source) {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Incoming SOAP Message request: '{}'", source);
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            loggerClinical.debug("Incoming SOAP Message request: '{}'", source);
             log(source);
         }
+
         SOAPBody body;
         SOAPHeader header;
         try {
