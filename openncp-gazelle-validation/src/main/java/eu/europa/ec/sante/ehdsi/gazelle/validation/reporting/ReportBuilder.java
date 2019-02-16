@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.gazelle.validation.reporting;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.GazelleConfiguration;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import net.ihe.gazelle.jaxb.result.sante.DetailedResult;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -27,9 +28,11 @@ public class ReportBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportBuilder.class);
     private static final String REPORT_FILES_FOLDER = "validation";
     private static final boolean GAZELLE_HTML_REPORT;
+    private static final boolean GAZELLE_FORMATTED_REPORT;
 
     static {
         GAZELLE_HTML_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfiguration().getProperty("GAZELLE_HTML_REPORT"));
+        GAZELLE_FORMATTED_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfiguration().getProperty("GAZELLE_FORMATTED_REPORT"));
     }
 
     private ReportBuilder() {
@@ -120,20 +123,25 @@ public class ReportBuilder {
             }
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(reportFile.getAbsoluteFile()))) {
 
-                bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-                bw.write("\n");
-                bw.write("<validationReport>");
-                bw.write("\n");
-                bw.write("<validatedObject>");
-                bw.write("<![CDATA[\"" + (Base64.isBase64(validationObject) ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) : validationObject) + "\"]]>");
-                bw.write("</validatedObject>");
-                bw.write("\n");
-                bw.write("<validationResult>");
-                bw.write("<![CDATA[\"" + validationBody + "\"]]>");
-                bw.write("</validationResult>");
-                bw.write("\n");
-                bw.write("</validationReport>");
-
+                if (!OpenNCPValidation.isRemoteValidationEnable() && !GAZELLE_FORMATTED_REPORT) {
+                    bw.write((Base64.isBase64(validationObject) ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) : validationObject));
+                } else {
+                    bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+                    bw.write("\n");
+                    bw.write("<validationReport>");
+                    bw.write("\n");
+                    bw.write("<validatedObject>");
+                    bw.write("<![CDATA[\"" + (Base64.isBase64(validationObject) ?
+                            new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) :
+                            validationObject) + "\"]]>");
+                    bw.write("</validatedObject>");
+                    bw.write("\n");
+                    bw.write("<validationResult>");
+                    bw.write("<![CDATA[\"" + validationBody + "\"]]>");
+                    bw.write("</validationResult>");
+                    bw.write("\n");
+                    bw.write("</validationReport>");
+                }
                 return true;
 
             } catch (IOException ex) {
