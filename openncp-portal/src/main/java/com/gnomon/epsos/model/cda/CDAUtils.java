@@ -36,6 +36,7 @@ public class CDAUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CDAUtils.class);
 
+    private static final String XML_EMPTY_NAMESPACE = "xmlns=\"\"";
     private static final String XML_LOINC_SYSTEM = "LOINC";
     private static final String XML_LOINC_CODESYSTEM = "2.16.840.1.113883.6.1";
     private static final String XML_PRESCRIPTION_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.1.1";
@@ -71,7 +72,8 @@ public class CDAUtils {
 
     public static String createDispensation(Document epDoc, CDAHeader cda, String eDuuid) {
 
-        return CDAModelToEDXML(epDoc, cda, eDuuid);
+        String dispense = CDAModelToEDXML(epDoc, cda, eDuuid);
+        return StringUtils.removeAll(dispense, XML_EMPTY_NAMESPACE);
     }
 
     private static Document readEpXML(String xml) throws ParserConfigurationException, SAXException, IOException {
@@ -313,7 +315,7 @@ public class CDAUtils {
             org.dom4j.Node manufacturedProduct = xpath.selectSingleNode(doc);
             if (manufacturedProduct != null) {
                 //Getting the string representation of the node
-                context = StringUtils.removeAll(manufacturedProduct.asXML(), "xmlns=\"\"");
+                context = StringUtils.removeAll(manufacturedProduct.asXML(), XML_EMPTY_NAMESPACE);
             }
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -738,7 +740,7 @@ public class CDAUtils {
             org.dom4j.Document clone;
             try {
                 //Cloning the ePrescription document
-                String source = Utils.getDocumentAsXml(epDoc, true).replaceAll("xmlns=\"\"", "");
+                String source = StringUtils.removeAll(Utils.getDocumentAsXml(epDoc, true), XML_EMPTY_NAMESPACE);
                 clone = org.dom4j.DocumentHelper.parseText(source);
 
                 //Getting the substituted fields, if any
@@ -746,7 +748,9 @@ public class CDAUtils {
                 String product = detail.getMedicineCommercialName();
                 String unit = detail.getDispensedQuantityUnit(); //Even in a substitution we getting null
                 String quantity = detail.getDispensedQuantity();
-                LOGGER.info("### EDDetails: {}", detail.toString());
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("### EDDetails: {}", detail.toString());
+                }
                 //Adding the relative product line updated with the substituted data, if any
                 sb.append(getSubstitutedRelativeProductLineFromEP(clone, id, product, unit, quantity));
 

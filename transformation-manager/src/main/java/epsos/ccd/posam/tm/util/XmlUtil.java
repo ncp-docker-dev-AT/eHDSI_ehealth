@@ -1,6 +1,5 @@
 package epsos.ccd.posam.tm.util;
 
-import org.apache.commons.lang.StringUtils;
 import org.jaxen.JaxenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -228,9 +227,9 @@ public class XmlUtil implements TMConstants {
      */
     public static Document removeEmptyXmlns(Document input) throws SAXException, ParserConfigurationException, IOException {
 
-        String s = xmlToString(input);
-        s = StringUtils.replace(s, EMPTY_XMLNS, EMPTY_STRING);
-        return stringToDom(s);
+        String documentToString = xmlToString(input);
+        documentToString = org.apache.commons.lang3.StringUtils.removeAll(documentToString, EMPTY_XMLNS);
+        return stringToDom(documentToString);
     }
 
     /**

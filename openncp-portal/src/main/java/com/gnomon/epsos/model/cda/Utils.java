@@ -197,8 +197,14 @@ public class Utils {
         return sb.toString();
     }
 
+    /**
+     * @param doc
+     * @param header
+     * @return
+     */
     public static String getDocumentAsXml(org.w3c.dom.Document doc, boolean header) {
 
+        //TODO: check Namespaces feature.
         String resp = "";
         try {
             DOMSource domSource = new DOMSource(doc);

@@ -352,8 +352,9 @@ public class EpsosHelperService {
             cda.setPrescriptionBarcode(CDAUtils.getRelativePrescriptionBarcode(epDoc));
             cda.setDispensationId("D-" + CDAUtils.getRelativePrescriptionBarcode(epDoc));
             edDoc = CDAUtils.createDispensation(epDoc, cda, eDuuid);
-            Document document = XMLUtil.parseContent(edDoc);
+
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+                Document document = XMLUtil.parseContent(edDoc);
                 LOGGER_CLINICAL.info("### DISPENSATION START ###\n'{}'\n ### DISPENSATION END ###",
                         XMLUtil.prettyPrintForValidation(document.getDocumentElement()));
             }
