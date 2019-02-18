@@ -7,6 +7,7 @@ import com.liferay.portal.kernel.util.Validator;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.portal.DispenseException;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -312,7 +313,7 @@ public class CDAUtils {
             org.dom4j.Node manufacturedProduct = xpath.selectSingleNode(doc);
             if (manufacturedProduct != null) {
                 //Getting the string representation of the node
-                context = manufacturedProduct.asXML().replaceAll("xmlns=\"\"", "");
+                context = StringUtils.removeAll(manufacturedProduct.asXML(), "xmlns=\"\"");
             }
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
