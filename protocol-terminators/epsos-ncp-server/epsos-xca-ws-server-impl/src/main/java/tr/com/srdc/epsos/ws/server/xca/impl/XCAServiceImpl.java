@@ -1087,7 +1087,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             String documentId = request.getDocumentRequest().get(0).getDocumentUniqueId();
             String patientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(soapHeaderElement));
             String repositoryId = getRepositoryUniqueId(request);
-
+            logger.info("Retrieving Document with criteria: '{}' '{}' '{}'", patientId, documentId, repositoryId);
             //try getting country code from the certificate
             String countryCode = null;
             String DN = eventLog.getSC_UserID();
@@ -1130,17 +1130,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 So we provided a XML representation of such data */
             try {
                 EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        IHEEventType.epsosPatientServiceRetrieve.getCode(),
-                        new DateTime(),
+                        Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                        Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS,
+                        Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                        IHEEventType.epsosPatientServiceRetrieve.getCode(), new DateTime(),
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XCA_RETRIEVE_REQ",
                         Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {
@@ -1242,16 +1235,17 @@ public class XCAServiceImpl implements XCAServiceInterface {
             documentResponse.addChild(mimeType);
 
             OMElement document = factory.createOMElement("Document", factory.createOMNamespace("urn:ihe:iti:xds-b:2007", ""));
-
+            logger.info("XCA Retrieve Response has been created.");
             try {
                 Document doc = epsosDoc.getDocument();
-                logger.debug("Client userID: '{}'", eventLog.getSC_UserID());
+                logger.info("Client userID: '{}'", eventLog.getSC_UserID());
 
                 if (doc != null) {
-
+                    logger.info("[National Infrastructure] CDA Document:\n'{}'", XMLUtil.documentToString(epsosDoc.getDocument()));
                     /* Validate CDA eHDSI Friendly */
                     if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
+                        //XMLUtils.toOM(doc.getDocumentElement()).toString()
+                        OpenNCPValidation.validateCdaDocument(XMLUtil.documentToString(epsosDoc.getDocument()),
                                 NcpSide.NCP_A, epsosDoc.getClassCode(), false);
                     }
                     // Transcode to eHDSI Pivot
