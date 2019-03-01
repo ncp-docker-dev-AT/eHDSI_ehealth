@@ -1180,6 +1180,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 //                } catch (Exception e) {
 //                    logger.error(ExceptionUtils.getStackTrace(e));
 //                }
+                logger.error("[National Connector] No document returned by the National Infrastructure");
                 registryErrorList.addChild(createErrorOMMessage(ns, "XDSMissingDocument", "Requested document not found.", "", false));
                 break processLabel;
             }
