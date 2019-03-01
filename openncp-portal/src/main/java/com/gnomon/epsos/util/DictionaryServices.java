@@ -1,43 +1,34 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.gnomon.epsos.util;
 
 import com.gnomon.epsos.model.DictionaryTerm;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.util.*;
+
 /**
- *
  * @author kostaskarkaletsis
  */
 public class DictionaryServices {
 
     // define path of epsos configuration
     private static final String HOME_PATH = System.getenv("EPSOS_PROPS_PATH");
+    private static final Logger log = LoggerFactory.getLogger("DictionaryServices");
     private static String EPSOS_REPOSITORY_PATH = HOME_PATH + "EpsosRepository";
     private static Map<String, Map<String, String>> problemsDictionary;
     private static Map<String, Map<String, String>> proceduresDictionary;
     private static Map<String, Map<String, String>> allergiesDictionary;
     private static Map<String, Map<String, String>> familyRolesDictionary;
-
     private static Map<String, List<DictionaryTerm>> problemsDictionaryTerms;
     private static Map<String, List<DictionaryTerm>> allergiesDictionaryTerms;
     private static Map<String, List<DictionaryTerm>> familyRolesDictionaryTerms;
     private static Map<String, List<DictionaryTerm>> proceduresDictionaryTerms;
-
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger("DictionaryServices");
 
     static {
 
@@ -51,6 +42,9 @@ public class DictionaryServices {
         problemsDictionaryTerms = getDictionary("ICD-10.xml", "ICD-10Entry", "epSOSIllnessesandDisorders");
         familyRolesDictionaryTerms = getDictionary("RoleCode.xml", "RoleCodeEntry", "epSOSPersonalRelationship");
 
+    }
+
+    private DictionaryServices() {
     }
 
     public static Map<String, Map<String, String>> getProblemsDictionary() {
@@ -77,11 +71,9 @@ public class DictionaryServices {
         DictionaryServices.allergiesDictionary = allergiesDictionary;
     }
 
-    public static Map<String, List<DictionaryTerm>> getDictionary(
-            String filename,
-            String entrypath,
-            String namespace) {
-        Map<String, List<DictionaryTerm>> snomedDictionary = new HashMap<String, List<DictionaryTerm>>();
+    public static Map<String, List<DictionaryTerm>> getDictionary(String filename, String entrypath, String namespace) {
+
+        Map<String, List<DictionaryTerm>> snomedDictionary = new HashMap<>();
 
         try {
             //Logging a short info message
@@ -137,7 +129,7 @@ public class DictionaryServices {
                             snomedDictionary.get(lang).add(term);
                         } else {
                             //Creating an empty hash map
-                            Map<String, String> map = new HashMap<String, String>();
+                            Map<String, String> map = new HashMap<>();
 
                             //Adding the next code and display name
                             map.put(display, code);
@@ -158,7 +150,8 @@ public class DictionaryServices {
     }
 
     private static Map<String, Map<String, String>> getDictionaryForNamespace(String filename, String entrypath, String namespace) {
-        Map<String, Map<String, String>> snomedDictionary = new HashMap<String, Map<String, String>>();
+
+        Map<String, Map<String, String>> snomedDictionary = new HashMap<>();
 
         try {
             //Logging a short info message
@@ -266,5 +259,4 @@ public class DictionaryServices {
     public static void setProceduresDictionaryTerms(Map<String, List<DictionaryTerm>> proceduresDictionaryTerms) {
         DictionaryServices.proceduresDictionaryTerms = proceduresDictionaryTerms;
     }
-
 }

@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 /**
@@ -41,7 +40,7 @@ public class ResourceList {
         for (URL element : classPathElements) {
             try {
                 if (!element.toString().contains("mock")) continue;
-                logger.debug("Found URL " + element);
+                logger.debug("Found URL '{}'", element);
                 retval.addAll(getResources(element.toURI(), pattern));
             } catch (URISyntaxException e) {
                 logger.debug("Could not convert URL " + element + " into URI");
@@ -50,8 +49,7 @@ public class ResourceList {
         return retval;
     }
 
-    private static Collection<String> getResources(URI element,
-                                                   Pattern pattern) {
+    private static Collection<String> getResources(URI element, Pattern pattern) {
 
         ArrayList<String> retval = new ArrayList<>();
         File file = new File(element);
@@ -63,15 +61,12 @@ public class ResourceList {
         return retval;
     }
 
-    private static Collection<String> getResourcesFromJarFile(File file,
-                                                              Pattern pattern) {
+    private static Collection<String> getResourcesFromJarFile(File file, Pattern pattern) {
 
         ArrayList<String> retval = new ArrayList<>();
         ZipFile zf;
         try {
             zf = new ZipFile(file);
-        } catch (ZipException e) {
-            throw new Error(e);
         } catch (IOException e) {
             throw new Error(e);
         }
@@ -92,8 +87,7 @@ public class ResourceList {
         return retval;
     }
 
-    private static Collection<String> getResourcesFromDirectory(File directory,
-                                                                Pattern pattern) {
+    private static Collection<String> getResourcesFromDirectory(File directory, Pattern pattern) {
 
         ArrayList<String> retval = new ArrayList<>();
         File[] fileList = directory.listFiles();

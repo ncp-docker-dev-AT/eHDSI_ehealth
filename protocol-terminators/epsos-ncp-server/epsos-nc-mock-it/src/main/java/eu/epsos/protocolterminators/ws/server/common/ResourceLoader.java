@@ -12,7 +12,7 @@ import java.io.*;
  */
 public class ResourceLoader {
 
-    private final static Logger logger = LoggerFactory.getLogger(ResourceLoader.class);
+    private final Logger logger = LoggerFactory.getLogger(ResourceLoader.class);
 
     /**
      * Locates and loads file for the specified filename. Returns contents as a String.
