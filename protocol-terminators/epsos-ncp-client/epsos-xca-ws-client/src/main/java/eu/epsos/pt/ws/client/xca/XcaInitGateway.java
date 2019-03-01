@@ -21,7 +21,6 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.util.XMLUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,7 @@ import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.ws.xca.client.RespondingGateway_ServiceStub;
 import tr.com.srdc.epsos.ws.xca.client.retrieve.RetrieveDocumentSetRequestTypeCreator;
 
+import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -114,11 +114,11 @@ public class XcaInitGateway {
 
             /* Request */
             RetrieveDocumentSetRequestType queryRequest;
-            queryRequest = new RetrieveDocumentSetRequestTypeCreator().createRetrieveDocumentSetRequestType(document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
+            queryRequest = new RetrieveDocumentSetRequestTypeCreator().createRetrieveDocumentSetRequestType(
+                    document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
 
             /* Stub */
-            RespondingGateway_ServiceStub stub;
-            stub = new RespondingGateway_ServiceStub();
+            RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub();
             DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
             String epr;
             if (service.equals(Constants.MroService)) {
@@ -143,6 +143,9 @@ public class XcaInitGateway {
                 case Constants.MroService:
                     classCode = Constants.MRO_CLASSCODE;
                     break;
+                default:
+                    LOGGER.error("Service Not Supported");
+                    //TODO: Has to be managed as an error.
             }
 
             /* Request */
@@ -165,34 +168,36 @@ public class XcaInitGateway {
             if (queryResponse.getDocumentResponse().size() > 1) {
                 LOGGER.error("More than one documents where retrieved for the current request with parameters document ID: '{}' " +
                         "- homeCommunityId: '{}' - registry: ", document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
+                //TODO: Shall be a fatal ERROR
             }
             //TODO: review this try - catch - finally mechanism and the transformation/translation mechanism.
+            byte[] pivotDocument = queryResponse.getDocumentResponse().get(0).getDocument();
+            byte[] friendlyDocument;
+            LOGGER.info("Pivot CDA:\n'{}'", new String(pivotDocument, StandardCharsets.UTF_8));
             try {
 
                 //  Validate CDA Pivot
                 if (OpenNCPValidation.isValidationEnable()) {
-                    OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(TMServices.byteToDocument(
-                            queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
+                    OpenNCPValidation.validateCdaDocument(new String(pivotDocument, StandardCharsets.UTF_8),
+                            //XMLUtils.toOM(TMServices.byteToDocument(pivotDocument).getDocumentElement()).toString(),
                             NcpSide.NCP_B, document.getClassCode().getValue(), true);
                 }
                 //  Resets the response document to a translated version.
-                queryResponse.getDocumentResponse().get(0).setDocument(TMServices.transformDocument(
-                        queryResponse.getDocumentResponse().get(0).getDocument(), targetLanguage));
-
-                //  Validate CDA Friendly-B
-                if (OpenNCPValidation.isValidationEnable()) {
-                    OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(TMServices.byteToDocument(
-                            queryResponse.getDocumentResponse().get(0).getDocument()).getDocumentElement()).toString(),
-                            NcpSide.NCP_B, document.getClassCode().getValue(), false);
-                }
+                friendlyDocument = TMServices.transformDocument(pivotDocument, targetLanguage);
+                queryResponse.getDocumentResponse().get(0).setDocument(friendlyDocument);
 
             } catch (DocumentTransformationException e) {
                 LOGGER.warn("DocumentTransformationException: document cannot be translated:\n{}", e.getMessage());
-            } catch (Exception e) {
-                LOGGER.error("Exception: '{}'", e.getMessage(), e);
             } finally {
                 LOGGER.debug("[XCA Init Gateway] Returns Original Document");
+                //  Validate CDA Friendly-B
+                if (OpenNCPValidation.isValidationEnable()) {
+                    OpenNCPValidation.validateCdaDocument(
+                            new String(queryResponse.getDocumentResponse().get(0).getDocument(), StandardCharsets.UTF_8),
+                            NcpSide.NCP_B, document.getClassCode().getValue(), false);
+                }
                 //  Returns the original document, even if the translation process fails.
+                LOGGER.info("Pivot CDA:\n'{}'", new String(queryResponse.getDocumentResponse().get(0).getDocument(), StandardCharsets.UTF_8));
                 result = queryResponse.getDocumentResponse().get(0);
             }
         }
