@@ -311,7 +311,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         String oid = "";
         if (document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").getLength() > 0) {
             Node id = document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").item(0);
-            if (id.getAttributes().getNamedItem( "root") != null) {
+            if (id.getAttributes().getNamedItem("root") != null) {
                 oid = oid + id.getAttributes().getNamedItem("root").getTextContent();
             }
             if (id.getAttributes().getNamedItem(CONSTANT_EXTENSION) != null) {
@@ -368,8 +368,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         Element nonXMLBody = doc.createElementNS(EHDSI_HL7_NAMESPACE, "nonXMLBody");
         Element text = doc.createElementNS(EHDSI_HL7_NAMESPACE, "text");
 
-        text.setAttributeNS(EHDSI_HL7_NAMESPACE, "mediaType", "application/pdf");
-        text.setAttributeNS(EHDSI_HL7_NAMESPACE, "representation", "B64");
+        text.setAttribute("mediaType", "application/pdf");
+        text.setAttribute("representation", "B64");
         text.setTextContent(new String(Base64.encodeBase64(pdf)));
 
         nonXMLBody.appendChild(text);
@@ -389,10 +389,10 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
         if (document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").getLength() > 0) {
             Element id = (Element) document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").item(0);
-            if (id.hasAttributeNS(EHDSI_HL7_NAMESPACE, CONSTANT_EXTENSION)) {
-                id.setAttributeNS(EHDSI_HL7_NAMESPACE, CONSTANT_EXTENSION, id.getAttributeNS(EHDSI_HL7_NAMESPACE, CONSTANT_EXTENSION) + "." + format);
+            if (id.hasAttribute(CONSTANT_EXTENSION)) {
+                id.setAttribute(CONSTANT_EXTENSION, id.getAttribute(CONSTANT_EXTENSION) + "." + format);
             } else {
-                id.setAttributeNS(EHDSI_HL7_NAMESPACE, CONSTANT_EXTENSION, Integer.toString(format));
+                id.setAttribute(CONSTANT_EXTENSION, Integer.toString(format));
             }
             try {
                 LOGGER.info("CDA:\n'{}'", XMLUtil.prettyPrint(document));
