@@ -20,16 +20,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.helpers.NamespaceSupport;
+import org.w3c.dom.*;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
+import javax.xml.XMLConstants;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.transform.TransformerException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -109,7 +107,7 @@ public class TransformationService implements ITransformationService, TMConstant
         if (nodeList.size() == 1) {
             Element docTypeCodeElement = (Element) nodeList.get(0);
             docTypeCode = docTypeCodeElement.getAttribute(CODE);
-            logger.debug("docTypeCode: '{}'", docTypeCode);
+            logger.info("CDA Document Type Code: '{}'", docTypeCode);
             if (docTypeCode == null || docTypeCode.length() == 0) {
                 throw new TMException(TMError.ERROR_DOCUMENT_CODE_NOT_EXIST);
             }
@@ -157,7 +155,12 @@ public class TransformationService implements ITransformationService, TMConstant
         return docTypeConstant;
     }
 
-
+    /**
+     * @param inputDocument
+     * @param targetLanguageCode
+     * @param isTranscode
+     * @return
+     */
     private TMResponseStructure process(Document inputDocument, String targetLanguageCode, boolean isTranscode) {
 
         logger.info("Processing CDA Document: '{}', Target Language: '{}', Transcoding: '{}'", inputDocument.toString(), targetLanguageCode, isTranscode);
@@ -227,7 +230,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 } else {
                     logger.info("Schematron validation disabled");
                 }
-
+                logger.info(isTranscode ? "Transcoding of the CDA Document: '{}'" : "Translating of the CDA Document: '{}'", cdaDocumentType);
                 // transcode/translate document
                 status = isTranscode ? transcodeDocument(namespaceNotAwareDoc, errors, warnings,
                         cdaDocumentType) : translateDocument(namespaceNotAwareDoc, targetLanguageCode,
@@ -270,12 +273,14 @@ public class TransformationService implements ITransformationService, TMConstant
                 }
             }
         } catch (TMException e) {
+            logger.error("TMException: '{}'", e, e.getMessage());
             status = STATUS_FAILURE;
             errors.add(e.getReason());
             responseStructure = new TMResponseStructure(inputDocument, status, errors, warnings);
             // log ERROR
             logger.error(e.getReason().toString(), e);
         } catch (Exception e) {
+            logger.error("Exception: '{}'", e, e.getMessage());
             // write ERROR to ResponseStructure
             status = STATUS_FAILURE;
             errors.add(TMError.ERROR_PROCESSING_ERROR);
@@ -446,9 +451,7 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param codedElement
      */
     @SuppressWarnings("unused")
-    private void checkRememberReference(
-            HashMap<String, String> hmReffIdDisplayName, String displayName,
-            Element codedElement) {
+    private void checkRememberReference(HashMap<String, String> hmReffIdDisplayName, String displayName, Element codedElement) {
         try {
             // find Elements with tagname "originalText"
             NodeList texts = codedElement.getElementsByTagName(TMConstants.ORIGINAL_TEXT);
@@ -565,17 +568,14 @@ public class TransformationService implements ITransformationService, TMConstant
                         for (Node aNodeList : nodeList) {
                             // iterate elements for processing
                             originalElement = (Element) aNodeList;
-
+                            logger.info("Original Node:\n'{}'", originalElement.getTextContent());
                             // check if xsi:type is "CE" or "CD"
-                            checkType(originalElement, warnings);
+                            checkCodedElementType(originalElement, warnings);
 
-                            // call tsam transcode/translate method for each coded
-                            // element
-                            isProcessingSuccesful = (isTranscode ? transcodeElement(
-                                    originalElement, document, hmReffId_DisplayName, null,
-                                    null, errors, warnings) : translateElement(
-                                    originalElement, document, targetLanguageCode,
-                                    hmReffId_DisplayName, null, null, errors, warnings));
+                            // call tsam transcode/translate method for each coded element
+                            isProcessingSuccesful = (isTranscode ?
+                                    transcodeElement(originalElement, document, hmReffId_DisplayName, null, null, errors, warnings)
+                                    : translateElement(originalElement, document, targetLanguageCode, hmReffId_DisplayName, null, null, errors, warnings));
 
                             // if is required & processing is unsuccessful,
                             // report ERROR
@@ -609,7 +609,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     continue;
                 }
                 // check if xsi:type is "CE" or "CD"
-                checkType(originalElement, warnings);
+                checkCodedElementType(originalElement, warnings);
 
                 // call TSAM transcode/translate method for each coded element
                 isProcessingSuccesful = (isTranscode ?
@@ -625,42 +625,105 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param originalElement
      * @param warnings
      */
-    private void checkType(Element originalElement, List<ITMTSAMEror> warnings) {
+    private void checkCodedElementType(Element originalElement, List<ITMTSAMEror> warnings) {
 
         if (originalElement != null && StringUtils.isNotBlank(originalElement.getAttribute(XSI_TYPE))) {
 
-            String[] parts = new String[3];
-            NamespaceSupport support = new NamespaceSupport();
-            support.pushContext();
-            // TODO: this method has to be optimized and managed carefully the parser to manage the namespaces used.
-            support.declarePrefix("urn", "urn:hl7-org:v3");
-            parts = support.processName(originalElement.getAttributeNode(XSI_TYPE).getValue(), parts, false);
+            logger.info("CheckTypes: '{}'-'{}'\n'{}'", originalElement.getLocalName(), originalElement.getNodeName(), originalElement.getTextContent());
+            //NamedNodeMap namedNodeMap = originalElement.getAttributes();
+//            if (namedNodeMap != null) {
+//                int length = namedNodeMap.getLength();
+//                for (int i = 0; i < length; i++) {
+//                    Node attr = namedNodeMap.item(i);
+//                    logger.info("NodeName: '{}' - LocalName: '{}' - NodeType: '{}' - Prefix: '{}' - NodeValue: '{}'\nTextContent: '{}'",
+//                            attr.getNodeName(), attr.getLocalName(), attr.getNodeType(), attr.getPrefix(), attr.getNodeValue(), attr.getTextContent());
+//                }
+//            }
+            Attr attr = originalElement.getAttributeNodeNS(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type");
+            //Attr attr = originalElement.getAttributeNode("type");
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Namespace URI: '{}' - Local Name: '{}' - Raw Name: '{}'", parts[0], parts[1], parts[2]);
+            if (attr != null) {
+                logger.info("XSI Type: '{}'-'{}'", attr.getName(), attr.getValue());
+                String prefix;
+                String suffix;
+                int colon = attr.getValue().indexOf(':');
+                if (colon == -1) {
+                    prefix = "";
+                    suffix = attr.getValue();
+                } else {
+                    prefix = attr.getValue().substring(0, colon);
+                    suffix = attr.getValue().substring(colon + 1);
+                }
+                logger.info("xsi:type for is uri: " + prefix + " localName: " + suffix);
+                if (!StringUtils.equals(suffix, CE) && !StringUtils.equals(suffix, CD)) {
+                    logger.warn("TSAM Warning: '{}-'{}''", TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE.getCode(), TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE.getDescription());
+                    warnings.add(TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE);
+                }
+            } else {
+                logger.info("Element not checked: '{}'", originalElement.getTextContent());
             }
-            if (!StringUtils.equals(parts[1], CE) && !StringUtils.equals(parts[1], CD)) {
-                warnings.add(TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE);
-            }
+//                int startIndex = attr.getValue().indexOf(":");
+//                int stopIndex = attr.getValue().length();
+//                StringBuilder builder = new StringBuilder(attr.getValue());
+//                builder.delete(startIndex, stopIndex-1);
+//                if(startIndex > -1) {
+//                    attr.getValue().substring(0, StringUtils.indexOf(attr.getValue())
+//                }
         }
+//            String[] parts = new String[3];
+//            try {
+//                NamespaceSupport support = new NamespaceSupport();
+//                support.pushContext();
+//                // TODO: this method has to be optimized and managed carefully the parser to manage the namespaces used.
+//                support.declarePrefix("ns1", "urn:hl7-org:v3");
+//                parts = support.processName(originalElement.getAttributeNodeNS(HL7_NAMESPACE, XSI_TYPE).getValue(), parts, false);
+//            } catch (Exception e) {
+//                logger.error("NamespaceSupport Exception: '{}'", e.getMessage());
+//            }
+//            if (logger.isInfoEnabled()) {
+//                logger.info("Namespace URI: '{}' - Local Name: '{}' - Raw Name: '{}'", parts[0], parts[1], parts[2]);
+//            }
+
+//            if (!StringUtils.equals(parts[1], CE) && !StringUtils.equals(parts[1], CD)) {
+//                logger.warn("TSAM Warning: '{}-'{}''", TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE.getCode(), TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE.getDescription());
+//                warnings.add(TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE);
+//            }
     }
 
-    private boolean translateElement(Element originalElement,
-                                     Document document, String targetLanguageCode,
-                                     HashMap<String, String> hmReffIdDisplayName, String valueSet,
-                                     String valueSetVersion, List<ITMTSAMEror> errors,
-                                     List<ITMTSAMEror> warnings) {
+    /**
+     * @param originalElement
+     * @param document
+     * @param targetLanguageCode
+     * @param hmReffIdDisplayName
+     * @param valueSet
+     * @param valueSetVersion
+     * @param errors
+     * @param warnings
+     * @return
+     */
+    private boolean translateElement(Element originalElement, Document document, String targetLanguageCode,
+                                     HashMap<String, String> hmReffIdDisplayName, String valueSet, String valueSetVersion,
+                                     List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings) {
 
-        return processElement(originalElement, document, targetLanguageCode,
-                hmReffIdDisplayName, valueSet, valueSetVersion, false, errors,
-                warnings);
+        return processElement(originalElement, document, targetLanguageCode, hmReffIdDisplayName, valueSet,
+                valueSetVersion, false, errors, warnings);
     }
 
-    private boolean processElement(Element originalElement, Document document,
-                                   String targetLanguageCode,
-                                   HashMap<String, String> hmReffIdDisplayName, String valueSet,
-                                   String valueSetVersion, boolean isTranscode,
-                                   List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings) {
+    /**
+     * @param originalElement
+     * @param document
+     * @param targetLanguageCode
+     * @param hmReffIdDisplayName
+     * @param valueSet
+     * @param valueSetVersion
+     * @param isTranscode
+     * @param errors
+     * @param warnings
+     * @return
+     */
+    private boolean processElement(Element originalElement, Document document, String targetLanguageCode,
+                                   HashMap<String, String> hmReffIdDisplayName, String valueSet, String valueSetVersion,
+                                   boolean isTranscode, List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings) {
 
         //TODO: Update the translation Node while the translation/transcoding process
         try {
@@ -677,10 +740,8 @@ public class TransformationService implements ITransformationService, TMConstant
             // hladanie vnoreneho elementu translation
             Node oldTranslationElement = findOldTranslation(originalElement);
 
-            TSAMResponseStructure tsamResponse = isTranscode ? tsamApi
-                    .getEpSOSConceptByCode(codedElement)
-                    : tsamApi.getDesignationByEpSOSConcept(
-                    codedElement, targetLanguageCode);
+            TSAMResponseStructure tsamResponse = isTranscode ? tsamApi.getEpSOSConceptByCode(codedElement)
+                    : tsamApi.getDesignationByEpSOSConcept(codedElement, targetLanguageCode);
 
             if (tsamResponse.isStatusSuccess()) {
                 logger.debug("processing successful '{}'", codedElement);
@@ -795,12 +856,11 @@ public class TransformationService implements ITransformationService, TMConstant
         if (nodeList.getLength() > 0) {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    if (TMConstants.TRANSLATION.equals(node.getLocalName())) {
-                        oldTranslationElement = node;
-                        logger.debug("Old translation found");
-                        break;
-                    }
+                if (node.getNodeType() == Node.ELEMENT_NODE && StringUtils.equals(TMConstants.TRANSLATION, node.getLocalName())) {
+
+                    oldTranslationElement = node;
+                    logger.debug("Old translation found");
+                    break;
                 }
             }
         }
@@ -812,8 +872,7 @@ public class TransformationService implements ITransformationService, TMConstant
      *
      * @param originalElement
      * @param warnings
-     * @return Vrati true ak je povolene nemat povinne atributy, false ak nie,
-     * null ak je vsetko ok
+     * @return Returns true if it is allowed not to have mandatory attributes, false if not, null if everything is ok
      */
     private Boolean checkAttributes(Element originalElement, List<ITMTSAMEror> warnings) {
 
@@ -886,6 +945,11 @@ public class TransformationService implements ITransformationService, TMConstant
      */
     private String getOIDFromDocument(Document doc) {
 
+        try {
+            logger.info("getOIDFromDocument()\n'{}'", XMLUtil.documentToString(doc));
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        }
         String oid = "";
         if (doc.getElementsByTagName("id").getLength() > 0) {
             Node id = doc.getElementsByTagName("id").item(0);

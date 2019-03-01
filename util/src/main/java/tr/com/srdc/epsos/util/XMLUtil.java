@@ -6,6 +6,7 @@ import org.apache.xml.security.c14n.Canonicalizer;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.jaxen.JaxenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -35,9 +36,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class XMLUtil {
 
@@ -339,5 +338,18 @@ public class XMLUtil {
         } catch (SAXException | ParserConfigurationException e) {
             return null;
         }
+    }
+
+    public static List<Node> getNodeList(Node node, String xpathexpression) {
+
+        List<Node> result;
+        try {
+            NoNsXpath xpath = new NoNsXpath(xpathexpression);
+            result = xpath.selectNodes(node);
+        } catch (JaxenException e) {
+            LOGGER.error("xpath: " + xpathexpression + ", node: " + node, e);
+            return new ArrayList<>();
+        }
+        return result;
     }
 }

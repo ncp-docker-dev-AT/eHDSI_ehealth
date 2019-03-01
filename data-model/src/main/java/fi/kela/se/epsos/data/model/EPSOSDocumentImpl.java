@@ -1,12 +1,15 @@
 package fi.kela.se.epsos.data.model;
 
+import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
-
 public class EPSOSDocumentImpl implements EPSOSDocument {
 
+    private static final String HL7_NAMESPACE = "urn:hl7-org:v3";
+    private final Logger logger = LoggerFactory.getLogger(EPSOSDocumentImpl.class);
     private String patientId;
     private String classCode;
     private Document document;
@@ -33,35 +36,37 @@ public class EPSOSDocumentImpl implements EPSOSDocument {
     }
 
     private String getDocumentId() {
+
         String oid = "";
-        if (document != null && document.getElementsByTagName("id").getLength() > 0) {
-            Node id = document.getElementsByTagName("id").item(0);
-            if (id.getAttributes().getNamedItem("root") != null) {
-                oid = oid + id.getAttributes().getNamedItem("root").getTextContent();
+        if (document != null && document.getElementsByTagNameNS(HL7_NAMESPACE, "id").getLength() > 0) {
+            Node id = document.getElementsByTagNameNS(HL7_NAMESPACE, "id").item(0);
+            if (id.getAttributes().getNamedItemNS(HL7_NAMESPACE, "root") != null) {
+                oid = oid + id.getAttributes().getNamedItemNS(HL7_NAMESPACE, "root").getTextContent();
             }
-            if (id.getAttributes().getNamedItem("extension") != null) {
-                oid = oid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
+            if (id.getAttributes().getNamedItemNS(HL7_NAMESPACE, "extension") != null) {
+                oid = oid + "^" + id.getAttributes().getNamedItemNS(HL7_NAMESPACE, "extension").getTextContent();
             }
         }
-
+        logger.info("Document ID: '{}'", oid);
         return oid;
     }
 
     @Override
     public boolean matchesCriteria(SearchCriteria sc) {
+
         String patientId = sc.getCriteriaValue(Criteria.PatientId);
         String documentId = sc.getCriteriaValue(Criteria.DocumentId);
 
         if (patientId != null && !patientId.isEmpty()) {
             return patientId.equals(this.patientId) && documentId != null && documentId.equals(getDocumentId());
-        } else 
-        {
+        } else {
             return documentId != null && documentId.equals(getDocumentId());
         }
     }
 
     @Override
     public String toString() {
+
         return "EPSOSDocumentImpl [patientId = " + patientId + ", document=" + document + "]";
     }
 }
