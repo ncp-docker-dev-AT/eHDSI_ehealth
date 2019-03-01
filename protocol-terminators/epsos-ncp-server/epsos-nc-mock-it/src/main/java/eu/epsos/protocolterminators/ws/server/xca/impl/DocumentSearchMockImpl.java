@@ -311,11 +311,11 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         String oid = "";
         if (document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").getLength() > 0) {
             Node id = document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").item(0);
-            if (id.getAttributes().getNamedItemNS(EHDSI_HL7_NAMESPACE, "root") != null) {
-                oid = oid + id.getAttributes().getNamedItemNS(EHDSI_HL7_NAMESPACE, "root").getTextContent();
+            if (id.getAttributes().getNamedItem( "root") != null) {
+                oid = oid + id.getAttributes().getNamedItem("root").getTextContent();
             }
-            if (id.getAttributes().getNamedItemNS(EHDSI_HL7_NAMESPACE, CONSTANT_EXTENSION) != null) {
-                oid = oid + "^" + id.getAttributes().getNamedItemNS(EHDSI_HL7_NAMESPACE, CONSTANT_EXTENSION).getTextContent();
+            if (id.getAttributes().getNamedItem(CONSTANT_EXTENSION) != null) {
+                oid = oid + "^" + id.getAttributes().getNamedItem(CONSTANT_EXTENSION).getTextContent();
             }
         }
         LOGGER.info("CDA Document ID: '{}'", oid);

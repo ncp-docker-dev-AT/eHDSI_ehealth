@@ -40,11 +40,11 @@ public class EPSOSDocumentImpl implements EPSOSDocument {
         String oid = "";
         if (document != null && document.getElementsByTagNameNS(HL7_NAMESPACE, "id").getLength() > 0) {
             Node id = document.getElementsByTagNameNS(HL7_NAMESPACE, "id").item(0);
-            if (id.getAttributes().getNamedItemNS(HL7_NAMESPACE, "root") != null) {
-                oid = oid + id.getAttributes().getNamedItemNS(HL7_NAMESPACE, "root").getTextContent();
+            if (id.getAttributes().getNamedItem("root") != null) {
+                oid = oid + id.getAttributes().getNamedItem("root").getTextContent();
             }
-            if (id.getAttributes().getNamedItemNS(HL7_NAMESPACE, "extension") != null) {
-                oid = oid + "^" + id.getAttributes().getNamedItemNS(HL7_NAMESPACE, "extension").getTextContent();
+            if (id.getAttributes().getNamedItem("extension") != null) {
+                oid = oid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
             }
         }
         logger.info("Document ID: '{}'", oid);
