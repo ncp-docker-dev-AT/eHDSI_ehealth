@@ -1241,7 +1241,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 logger.info("Client userID: '{}'", eventLog.getSC_UserID());
 
                 if (doc != null) {
-                    logger.info("[National Infrastructure] CDA Document:\n'{}'", XMLUtil.documentToString(epsosDoc.getDocument()));
+                    logger.info("[National Infrastructure] CDA Document:\n'{}'", epsosDoc.getClassCode());
                     /* Validate CDA eHDSI Friendly */
                     if (OpenNCPValidation.isValidationEnable()) {
                         //XMLUtils.toOM(doc.getDocumentElement()).toString()

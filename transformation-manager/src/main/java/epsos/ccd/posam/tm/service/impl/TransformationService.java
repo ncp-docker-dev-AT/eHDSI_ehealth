@@ -27,7 +27,6 @@ import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.xml.XMLConstants;
 import javax.xml.datatype.DatatypeFactory;
-import javax.xml.transform.TransformerException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -434,13 +433,11 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param errors
      * @return boolean - true if SUCCES otherwise false
      */
-    private boolean transcodeElement(Element originalElement,
-                                     Document document, HashMap<String, String> hmReffIdDisplayName,
-                                     String valueSet, String valueSetVersion, List<ITMTSAMEror> errors,
-                                     List<ITMTSAMEror> warnings) {
-        return processElement(originalElement, document, null,
-                hmReffIdDisplayName, valueSet, valueSetVersion, true, errors,
-                warnings);
+    private boolean transcodeElement(Element originalElement, Document document, HashMap<String, String> hmReffIdDisplayName,
+                                     String valueSet, String valueSetVersion, List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings) {
+
+        return processElement(originalElement, document, null, hmReffIdDisplayName, valueSet,
+                valueSetVersion, true, errors, warnings);
     }
 
     /**
@@ -535,8 +532,8 @@ public class TransformationService implements ITransformationService, TMConstant
             while (iProcessed.hasNext()) {
 
                 codedElementListItem = iProcessed.next();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Looking for: '{}'", codedElementListItem);
+                if (logger.isInfoEnabled()) {
+                    logger.info("Looking for element required: '{}' - '{}'", codedElementListItem.isRequired(), codedElementListItem.getxPath());
                 }
                 xPathExpression = codedElementListItem.getxPath();
                 isRequired = codedElementListItem.isRequired();
@@ -568,11 +565,13 @@ public class TransformationService implements ITransformationService, TMConstant
                         for (Node aNodeList : nodeList) {
                             // iterate elements for processing
                             originalElement = (Element) aNodeList;
-                            logger.info("Original Node:\n'{}'", originalElement.getTextContent());
+                            logger.info("Original Node:\n'{}'", originalElement.getNodeName());
                             // check if xsi:type is "CE" or "CD"
                             checkCodedElementType(originalElement, warnings);
 
                             // call tsam transcode/translate method for each coded element
+                            // Transformation process: Transcoding or Translation for each coded elements configured according the CDA type.
+                            logger.info("Transformation Service: Transcoding: '{}' - CDA Element: '{}'", isTranscode, originalElement.getNodeName());
                             isProcessingSuccesful = (isTranscode ?
                                     transcodeElement(originalElement, document, hmReffId_DisplayName, null, null, errors, warnings)
                                     : translateElement(originalElement, document, targetLanguageCode, hmReffId_DisplayName, null, null, errors, warnings));
@@ -744,7 +743,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     : tsamApi.getDesignationByEpSOSConcept(codedElement, targetLanguageCode);
 
             if (tsamResponse.isStatusSuccess()) {
-                logger.debug("processing successful '{}'", codedElement);
+                logger.debug("Processing successful '{}'", codedElement);
                 // +++++ Element editing BEGIN +++++
 
                 // NEW TRANSLATION element
@@ -945,11 +944,6 @@ public class TransformationService implements ITransformationService, TMConstant
      */
     private String getOIDFromDocument(Document doc) {
 
-        try {
-            logger.info("getOIDFromDocument()\n'{}'", XMLUtil.documentToString(doc));
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        }
         String oid = "";
         if (doc.getElementsByTagName("id").getLength() > 0) {
             Node id = doc.getElementsByTagName("id").item(0);
@@ -960,6 +954,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 oid = oid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
             }
         }
+        logger.info("Document OID: '{}'", oid);
         return oid;
     }
 }
