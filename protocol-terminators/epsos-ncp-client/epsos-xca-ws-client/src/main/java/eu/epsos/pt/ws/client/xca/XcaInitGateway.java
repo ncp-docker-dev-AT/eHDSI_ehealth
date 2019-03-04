@@ -173,7 +173,7 @@ public class XcaInitGateway {
             //TODO: review this try - catch - finally mechanism and the transformation/translation mechanism.
             byte[] pivotDocument = queryResponse.getDocumentResponse().get(0).getDocument();
             byte[] friendlyDocument;
-            LOGGER.info("Pivot CDA:\n'{}'", new String(pivotDocument, StandardCharsets.UTF_8));
+            //  LOGGER.info("Pivot CDA:\n'{}'", new String(pivotDocument, StandardCharsets.UTF_8));
             try {
 
                 //  Validate CDA Pivot
@@ -197,7 +197,7 @@ public class XcaInitGateway {
                             NcpSide.NCP_B, document.getClassCode().getValue(), false);
                 }
                 //  Returns the original document, even if the translation process fails.
-                LOGGER.info("Pivot CDA:\n'{}'", new String(queryResponse.getDocumentResponse().get(0).getDocument(), StandardCharsets.UTF_8));
+                //  LOGGER.info("Pivot CDA:\n'{}'", new String(queryResponse.getDocumentResponse().get(0).getDocument(), StandardCharsets.UTF_8));
                 result = queryResponse.getDocumentResponse().get(0);
             }
         }
