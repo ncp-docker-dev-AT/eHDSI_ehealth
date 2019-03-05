@@ -124,11 +124,8 @@
     <!-- foreach entry of the section -->
     <xsl:template name="vaccinationsSectionEntry">
         <!-- Defining all needed variables -->
-        <xsl:variable name="vaccinationsNode"
+        <xsl:variable name="vaccination"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:code"/>
-
-        <xsl:variable name="vaccinations"
-                      select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:code/@displayName"/>
 
         <xsl:variable name="vaccinationsBrandName"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:name"/>
@@ -136,41 +133,17 @@
         <xsl:variable name="vaccinationsDate"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:effectiveTime"/>
 
-        <xsl:variable name="nullEntry" select="."/>
-
         <xsl:variable name="vacAct" select="n1:substanceAdministration"/>
         <!-- End definition of variables -->
 
-        <!-- nullflavored act -->
         <xsl:choose>
             <xsl:when test="not($vacAct/@nullFlavor)">
                 <tr>
                     <td>
-                        <xsl:choose>
-                            <xsl:when test="not ($vaccinationsNode/@nullFlavor)">
-                                <xsl:choose>
-                                    <xsl:when test="$vaccinations">
-                                        <xsl:value-of select="$vaccinations"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <!-- uncoded element Problem -->
-                                        <xsl:if
-                                                test="$vaccinationsNode/n1:originalText/n1:reference/@value">
-                                            <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="code"
-                                                                select="$vaccinationsNode/n1:originalText/n1:reference/@value"/>
-                                            </xsl:call-template>
-                                        </xsl:if>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:call-template name="show-nullFlavor">
-                                    <xsl:with-param name="code"
-                                                    select="$vaccinationsNode/@nullFlavor"/>
-                                </xsl:call-template>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <!-- Display vaccination -->
+                        <xsl:call-template name="show-element">
+                            <xsl:with-param name="node" select="$vaccination"/>
+                        </xsl:call-template>
                     </td>
                     <td>
                         <xsl:value-of select="$vaccinationsBrandName"/>
