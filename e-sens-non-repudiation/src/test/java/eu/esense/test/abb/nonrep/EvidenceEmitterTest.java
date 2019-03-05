@@ -35,26 +35,27 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+
 public class EvidenceEmitterTest {
 
-    public static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
-    public static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
-    public static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
+    private static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
+    private static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
+    private static final String IHE_ITI_XCA_RETRIEVE = "urn:ihe:iti:2007:CrossGatewayRetrieve";
     private static final Logger LOGGER = LoggerFactory.getLogger(EvidenceEmitterTest.class);
     private static PDP simplePDP;
     private static X509Certificate cert;
     private static PrivateKey key;
 
+    /**
+     * @throws Exception
+     */
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
 
-        /*
-         * the polrep is here because an adHoc implementation can have more
-         * requirements than the default from herasaf, if needed
-         */
+        // The Policy Repository is here because an adHoc implementation can have more requirements than the default
+        // from HERESAF, if needed.
         simplePDP = SimplePDPFactory.getSimplePDP();
-        UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP
-                .getPolicyRepository();
+        UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP.getPolicyRepository();
 
         // Populate the policy repository
         Document policy = readMessage("src/test/testData/samplePolicy.xml");
@@ -67,8 +68,15 @@ public class EvidenceEmitterTest {
         org.apache.xml.security.Init.init();
     }
 
-    private static Document readMessage(String file)
-            throws ParserConfigurationException, SAXException, IOException {
+    /**
+     * @param file
+     * @return
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    private static Document readMessage(String file) throws ParserConfigurationException, SAXException, IOException {
+
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -76,8 +84,7 @@ public class EvidenceEmitterTest {
     }
 
     /**
-     * This test reads a sample message from the eHealth domain (XCA) and will
-     * issue an ATNA-specific audit trail.
+     * This test reads a sample message from the eHealth domain (XCA) and will issue an ATNA specific audit trail.
      *
      * @throws ParserConfigurationException
      * @throws IOException
@@ -87,18 +94,16 @@ public class EvidenceEmitterTest {
      * @throws TOElementException
      * @throws EnforcePolicyException
      * @throws ObligationDischargeException
-     * @throws SOAPException
      */
     public void testGenerateATNA() throws ParserConfigurationException, SAXException, IOException, MalformedIHESOAPException,
-            URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, SOAPException,
+            URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException,
             TransformerException {
 
         testGenerateAtna();
     }
 
     /**
-     * (Muhammet) I had to add this method because I need the message, but Junit
-     * does not like non-void test methods.
+     * I had to add this method because I need the message, but Junit does not like non-void test methods.
      *
      * @return
      * @throws ParserConfigurationException
@@ -115,52 +120,37 @@ public class EvidenceEmitterTest {
             MalformedIHESOAPException, URISyntaxException, TOElementException, EnforcePolicyException,
             ObligationDischargeException, TransformerException {
 
-        /*
-         * AlternativeUserID = IP of the machine NetworkAccessPointID = IP of
-         * the machine UserName = user from the SAML assertion
-         *
-         * NetworkAccessPointID = IP of the remote
-         *
-         * UserId = Subject of the assertion UserName = subject-id
-         *
-         * ParticipantObjectID = xdsb:RepositoryUniqueId ParticipantObjectID =
-         * xdsb:DocumentUniqueId
-         */
+        // AlternativeUserID = IP of the machine
+        // NetworkAccessPointID = IP of the machine
+        // UserName = user from the SAML assertion
+        // NetworkAccessPointID = IP of the remote
+        // UserId = Subject of the assertion UserName = subject-id
+        // ParticipantObjectID = xdsb:RepositoryUniqueId ParticipantObjectID = xdsb:DocumentUniqueId
 
-        /*
-         * The flow is as follows (imagine that the PEP is a facade in front of
-         * the Corner). The message is inspected, the relevant information is
-         * retrieved and placed into the XACML request. The PDP evaluates the
-         * request and returns the pointer of the obligation handler.
-         */
-        // Configure Log4j
-        //BasicConfigurator.configure();
+        // The flow is as follows (imagine that the PEP is a facade in front of the Corner).
+        // The message is inspected, the relevant information is retrieved and placed into the XACML request.
+        // The PDP evaluates the request and returns the pointer of the obligation handler.
 
         // Read the message as it arrives at the facade
         Document incomingMsg = readMessage("src/test/testData/audit.xml");
-        /*
-         * Instantiate the message inspector, to see which type of message is
-         */
+
+        // Instantiate the message inspector, to see which type of message it is.
         MessageInspector messageInspector = new MessageInspector(incomingMsg);
         MessageType messageType = messageInspector.getMessageType();
         assertNotNull(messageType);
 
-        /*
-         * In this mock, we have an IHE
-         */
-        checkCorrectnessofIHEXCA(messageType);
+        // IHE Mock message.
+        checkCorrectnessOfIHEXCA(messageType);
 
-        /*
-         * Now create the XACML request
-         */
-        LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
+        // Now create the XACML request
+        LinkedList<XACMLAttributes> actionList = new LinkedList<>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
         action.setIdentifier(new URI("urn:oasis:names:tc:xacml:1.0:action:action-id"));
         actionList.add(action);
-        action.setValue(messageType instanceof IHEXCARetrieve ? "IHE_ITI_XCA_RETRIEVE" : "UNKNOWN");
+        action.setValue(messageType instanceof IHEXCARetrieve ? IHE_ITI_XCA_RETRIEVE : "UNKNOWN");
 
-        LinkedList<XACMLAttributes> environmentList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
         environment.setDataType(new URI(DATATYPE_DATETIME));
         environment.setIdentifier(new URI("urn:esens:2014:event"));
@@ -173,14 +163,10 @@ public class EvidenceEmitterTest {
         Element request = requestCreator.getRequest();
         assertNotNull(request);
 
-        // just some printouts
+        // Logger
         Utilities.serialize(request);
 
-        /*
-         * Call the XACML engine.
-         *
-         * The policy has been deployed in the setupBeforeClass.
-         */
+        // Call the XACML engine: The policy has been deployed in the setupBeforeClass.
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
 
         enforcePolicy.decide(request);
@@ -193,9 +179,9 @@ public class EvidenceEmitterTest {
 
         Context context = new Context();
         context.setIncomingMsg(incomingMsg);
-        context.setRequest(request); // here I pass the XML in order to give to
-        // the developers the possibility to use their own implementation. Although an object is easier to get
-        // the relevant types (e.g., action environment
+        // Here I pass the XML in order to give to the developers the possibility to use their own implementation.
+        // Although an object is easier to get the relevant types (e.g., action environment).
+        context.setRequest(request);
         context.setEnforcer(enforcePolicy);
         context.setUsername("demo2");
         context.setCurrentHost("127.0.0.1");
@@ -204,7 +190,7 @@ public class EvidenceEmitterTest {
         ObligationHandlerFactory handlerFactory = ObligationHandlerFactory.getInstance();
         List<ObligationHandler> handlers = handlerFactory.createHandler(messageType, obligations, context);
 
-        // Here I discharge manually. This behavior is to let free an implementation to still decide which handler to trigger
+        // Manual discharge. This behavior is to let free an implementation to still decide which handler to trigger.
         handlers.get(0).discharge();
         handlers.get(1).discharge();
 
@@ -212,15 +198,14 @@ public class EvidenceEmitterTest {
         assertNotNull(handlers.get(0).getMessage());
         Utilities.serialize(handlers.get(0).getMessage().getDocumentElement());
 
-        // I think I need to return handler.getMessage() which will be the audit the audit will go to the server and get
-        // validated by another wrapper
+        // Return handler.getMessage() which will be the audit, then go to the server and validated by another wrapper.
         return handlers.get(0).getMessage();
     }
 
     @Test
     public void testGenerateRemNRO() throws ParserConfigurationException, SAXException, IOException, MalformedIHESOAPException,
             URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, SOAPException,
-            MalformedMIMEMessageException, TransformerException {
+            TransformerException {
 
         testGenerateREMNRO();
     }
@@ -245,10 +230,9 @@ public class EvidenceEmitterTest {
             TransformerException {
 
         /*
-         * The flow is as follows (imagine that the PEP is a facade in front of
-         * the Corner). The message is inspected, the relevant information is
-         * retrieved and placed into the XACML request. The PDP evaluates the
-         * request and returns the pointer of the obligation handler.
+         * The flow is as follows (imagine that the PEP is a facade in front of the Corner).
+         * The message is inspected, the relevant information is retrieved and placed into the XACML request.
+         * The PDP evaluates the request and returns the pointer of the obligation handler.
          */
         // Read the message as it arrives at the facade
         Document incomingMsg = readMessage("src/test/testData/incomingMsg.xml");
@@ -263,15 +247,11 @@ public class EvidenceEmitterTest {
         assertNotNull(messageInspector.getMessageUUID());
         assertEquals("uuid:C3F5A03D-1A0C-4F62-ADC7-F3C007CD50CF", messageInspector.getMessageUUID());
 
-        /*
-         * In this mock, we have an IHE
-         */
-        checkCorrectnessofIHEXCA(messageType);
+        // IHE Mock message.
+        checkCorrectnessOfIHEXCA(messageType);
 
-        /*
-         * Now create the XACML request
-         */
-        LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
+        // Now create the XACML request
+        LinkedList<XACMLAttributes> actionList = new LinkedList<>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
         action.setIdentifier(new URI("urn:eSENS:outcome"));
@@ -280,7 +260,7 @@ public class EvidenceEmitterTest {
         // Here I imagine a table lookup or similar
         action.setValue("success");
 
-        LinkedList<XACMLAttributes> environmentList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
         environment.setDataType(new URI(DATATYPE_DATETIME));
         environment.setIdentifier(new URI("urn:esens:2014:event"));
@@ -293,21 +273,16 @@ public class EvidenceEmitterTest {
         Element request = requestCreator.getRequest();
         assertNotNull(request);
 
-        // just some printouts
+        // Logger
         Utilities.serialize(request);
 
-        /*
-         * Call the XACML engine.
-         *
-         * The policy has been deployed in the setupBeforeClass.
-         */
+        // Call the XACML engine: The policy has been deployed in the setupBeforeClass.
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
 
         enforcePolicy.decide(request);
         assertNotNull(enforcePolicy.getResponseAsDocument());
         assertNotNull(enforcePolicy.getResponseAsObject());
-        Utilities.serialize(enforcePolicy.getResponseAsDocument()
-                .getDocumentElement());
+        Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
 
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
         assertNotNull(obligations);
@@ -323,41 +298,33 @@ public class EvidenceEmitterTest {
 
         context.setMessageUUID(messageInspector.getMessageUUID());
         context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
-        context.setRequest(request); // here I pass the XML in order to give to
-        // the developers the posisbility
-        // to use their own implementation. Although an object is easier to get
-        // the relevant types (e.g., action
-        // environment
+        // Here I pass the XML in order to give to the developers the possibility to use their own implementation.
+        // Although an object is easier to get the relevant types (e.g., action environment).
+        context.setRequest(request);
         context.setEnforcer(enforcePolicy);
         context.setUsername("demo2");
         context.setCurrentHost("127.0.0.1");
         context.setRemoteHost("192.168.10.1");
 
-        ObligationHandlerFactory handlerFactory = ObligationHandlerFactory
-                .getInstance();
-        List<ObligationHandler> handlers = handlerFactory.createHandler(
-                messageType, obligations, context);
+        ObligationHandlerFactory handlerFactory = ObligationHandlerFactory.getInstance();
+        List<ObligationHandler> handlers = handlerFactory.createHandler(messageType, obligations, context);
 
-        // Here I discharge manually. This behavior is to let free an
-        // implementation
-        // to still decide which handler to trigger
+        // Manual discharge. This behavior is to let free an implementation to still decide which handler to trigger.
         handlers.get(0).discharge();
-//        handlers.get(1).discharge();
 
         // Give me the ATNA, it's an ATNA test
         assertNotNull(handlers.get(0).getMessage());
         Utilities.serialize(handlers.get(0).getMessage().getDocumentElement());
 
-        // I think I need to return handler.getMessage() which will be the audit
-        // the audit will go to the server and get validated by another wrapper
+        // Return handler.getMessage() which will be the audit, then go to the server and validated by another wrapper.
         return handlers.get(0).getMessage();
     }
 
     @Test
-    public void testGenerateRemNRR() throws ParserConfigurationException,
-            SAXException, IOException, MalformedIHESOAPException,
-            URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException, TransformerException {
+    public void testGenerateRemNRR() throws ParserConfigurationException, SAXException, IOException, MalformedIHESOAPException,
+            URISyntaxException, TOElementException, EnforcePolicyException, ObligationDischargeException, SOAPException,
+            SyntaxException, TransformerException {
+
         testGenerateREMNRR();
     }
 
@@ -374,24 +341,19 @@ public class EvidenceEmitterTest {
      * @throws EnforcePolicyException
      * @throws ObligationDischargeException
      * @throws SOAPException
-     * @throws MalformedMIMEMessageException
      * @throws SyntaxException
      */
-    public Document testGenerateREMNRR() throws ParserConfigurationException,
-            SAXException, IOException, MalformedIHESOAPException,
-            URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException, TransformerException {
-
+    public Document testGenerateREMNRR() throws ParserConfigurationException, SAXException, IOException,
+            MalformedIHESOAPException, URISyntaxException, TOElementException, EnforcePolicyException,
+            ObligationDischargeException, SOAPException, SyntaxException, TransformerException {
 
         /*
-         * The flow is as follows (imagine that the PEP is a facade in front of
-         * the Corner). The message is inspected, the relevant information is
-         * retrieved and placed into the XACML request. The PDP evaluates the
-         * request and returns the pointer of the obligation handler.
+         * The flow is as follows (imagine that the PEP is a facade in front of the Corner).
+         * The message is inspected, the relevant information is retrieved and placed into the XACML request.
+         * The PDP evaluates the request and returns the pointer of the obligation handler.
          */
         simplePDP = SimplePDPFactory.getSimplePDP();
-        UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP
-                .getPolicyRepository();
+        UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP.getPolicyRepository();
 
         JAXBMarshallerConfiguration conf = new JAXBMarshallerConfiguration();
         conf.setValidateParsing(false);
@@ -400,14 +362,10 @@ public class EvidenceEmitterTest {
 
         // Populate the policy repository
         Document policy = readMessage("src/test/testData/samplePolicyNRR.xml");
-
         polrep.deploy(PolicyMarshaller.unmarshal(policy));
 
-        // Configure Log4j
-        //BasicConfigurator.configure();
 
         // Read the message as it arrives at the facade
-//		Document incomingMsg = readMessage("test/testData/audit.xml");
         Document incomingMsg = readMessage("src/test/testData/incomingMsg.xml");
 
         SOAPMessage message = Utilities.toSoap(incomingMsg, null);
@@ -418,28 +376,21 @@ public class EvidenceEmitterTest {
         MessageInspector messageInspector = new MessageInspector(message);
         MessageType messageType = messageInspector.getMessageType();
         assertNotNull(messageType);
-        //	assertNotNull(messageInspector.getMessageUUID());
-//		assertEquals("uuid:C3F5A03D-1A0C-4F62-ADC7-F3C007CD50CF",messageInspector.getMessageUUID());
 
-        /*
-         * In this mock, we have an IHE
-         */
-        //	checkCorrectnessofIHEXCA(messageType);
+        // IHE Mock message.
+        // checkCorrectnessOfIHEXCA(messageType);
 
-        /*
-         * Now create the XACML request
-         */
-        LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
+        // Now create the XACML request
+        LinkedList<XACMLAttributes> actionList = new LinkedList<>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
-        action.setIdentifier(new URI(
-                "urn:eSENS:outcome"));
+        action.setIdentifier(new URI("urn:eSENS:outcome"));
         actionList.add(action);
 
         // Here I imagine a table lookup or similar
         action.setValue("success");
 
-        LinkedList<XACMLAttributes> environmentList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
         environment.setDataType(new URI(DATATYPE_DATETIME));
         environment.setIdentifier(new URI("urn:esens:2014:event"));
@@ -452,21 +403,16 @@ public class EvidenceEmitterTest {
         Element request = requestCreator.getRequest();
         assertNotNull(request);
 
-        // just some printouts
+        // Logger
         Utilities.serialize(request);
 
-        /*
-         * Call the XACML engine.
-         *
-         * The policy has been deployed in the setupBeforeClass.
-         */
+        // Call the XACML engine: The policy has been deployed in the setupBeforeClass.
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
 
         enforcePolicy.decide(request);
         assertNotNull(enforcePolicy.getResponseAsDocument());
         assertNotNull(enforcePolicy.getResponseAsObject());
-        Utilities.serialize(enforcePolicy.getResponseAsDocument()
-                .getDocumentElement());
+        Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
 
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
         assertNotNull(obligations);
@@ -481,43 +427,47 @@ public class EvidenceEmitterTest {
         context.setEvent("epSOS-31");
         context.setMessageUUID(messageInspector.getMessageUUID());
         context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
-        context.setRequest(request); // here I pass the XML in order to give to
-        // the developers the posisbility
-        // to use their own implementation. Although an object is easier to get
-        // the relevant types (e.g., action
-        // environment
+        // Here I pass the XML in order to give to the developers the possibility to use their own implementation.
+        // Although an object is easier to get the relevant types (e.g., action environment).
+        context.setRequest(request);
         context.setEnforcer(enforcePolicy);
-//		context.setUsername("demo2");
-//		context.setCurrentHost("127.0.0.1");
-//		context.setRemoteHost("192.168.10.1");
 
         ObligationHandlerFactory handlerFactory = ObligationHandlerFactory
                 .getInstance();
         List<ObligationHandler> handlers = handlerFactory.createHandler(
                 messageType, obligations, context);
 
-        // Here I discharge manually. This behavior is to let free an
-        // implementation
-        // to still decide which handler to trigger
+        // Manual discharge. This behavior is to let free an implementation to still decide which handler to trigger
         LOGGER.info(handlers.get(0).getClass().getName());
 
         handlers.get(0).discharge();
-        //	handlers.get(1).discharge();
 
         // Give me the ATNA, it's an ATNA test
         assertNotNull(handlers.get(0).getMessage());
         Utilities.serialize(handlers.get(0).getMessage().getDocumentElement());
 
-        // I think I need to return handler.getMessage() which will be the audit
-        // the audit will go to the server and get validated by another wrapper
+        // Return handler.getMessage() which will be the audit, then go to the server and validated by another wrapper.
         return handlers.get(0).getMessage();
     }
 
+    /**
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws MalformedIHESOAPException
+     * @throws URISyntaxException
+     * @throws TOElementException
+     * @throws EnforcePolicyException
+     * @throws ObligationDischargeException
+     * @throws SOAPException
+     * @throws SyntaxException
+     * @throws TransformerException
+     */
     @Test
-    public void testGenerateRemNRD() throws ParserConfigurationException,
-            SAXException, IOException, MalformedIHESOAPException,
-            URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException, TransformerException {
+    public void testGenerateRemNRD() throws ParserConfigurationException, SAXException, IOException,
+            MalformedIHESOAPException, URISyntaxException, TOElementException, EnforcePolicyException,
+            ObligationDischargeException, SOAPException, SyntaxException, TransformerException {
+
         testGenerateREMNRD();
     }
 
@@ -534,24 +484,19 @@ public class EvidenceEmitterTest {
      * @throws EnforcePolicyException
      * @throws ObligationDischargeException
      * @throws SOAPException
-     * @throws MalformedMIMEMessageException
      * @throws SyntaxException
      */
-    public Document testGenerateREMNRD() throws ParserConfigurationException,
-            SAXException, IOException, MalformedIHESOAPException,
-            URISyntaxException, TOElementException, EnforcePolicyException,
-            ObligationDischargeException, SOAPException, MalformedMIMEMessageException, SyntaxException, TransformerException {
-
+    public Document testGenerateREMNRD() throws ParserConfigurationException, SAXException, IOException,
+            MalformedIHESOAPException, URISyntaxException, TOElementException, EnforcePolicyException,
+            ObligationDischargeException, SOAPException, SyntaxException, TransformerException {
 
         /*
-         * The flow is as follows (imagine that the PEP is a facade in front of
-         * the Corner). The message is inspected, the relevant information is
-         * retrieved and placed into the XACML request. The PDP evaluates the
-         * request and returns the pointer of the obligation handler.
+         * The flow is as follows (imagine that the PEP is a facade in front of the Corner).
+         * The message is inspected, the relevant information is retrieved and placed into the XACML request.
+         * The PDP evaluates the request and returns the pointer of the obligation handler.
          */
         simplePDP = SimplePDPFactory.getSimplePDP();
-        UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP
-                .getPolicyRepository();
+        UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP.getPolicyRepository();
 
         JAXBMarshallerConfiguration conf = new JAXBMarshallerConfiguration();
         conf.setValidateParsing(false);
@@ -563,12 +508,7 @@ public class EvidenceEmitterTest {
 
         polrep.deploy(PolicyMarshaller.unmarshal(policy));
 
-        // Configure Log4j
-        //        BasicConfigurator.configure();
-        //BasicConfigurator.configure();
-
         // Read the message as it arrives at the facade
-//		Document incomingMsg = readMessage("test/testData/audit.xml");
         Document incomingMsg = readMessage("src/test/testData/incomingMsg.xml");
 
         SOAPMessage message = Utilities.toSoap(incomingMsg, null);
@@ -579,28 +519,21 @@ public class EvidenceEmitterTest {
         MessageInspector messageInspector = new MessageInspector(message);
         MessageType messageType = messageInspector.getMessageType();
         assertNotNull(messageType);
-        //	assertNotNull(messageInspector.getMessageUUID());
-//		assertEquals("uuid:C3F5A03D-1A0C-4F62-ADC7-F3C007CD50CF",messageInspector.getMessageUUID());
 
-        /*
-         * In this mock, we have an IHE
-         */
-        //	checkCorrectnessofIHEXCA(messageType);
+        // IHE Mock message.
+        // checkCorrectnessOfIHEXCA(messageType);
 
-        /*
-         * Now create the XACML request
-         */
-        LinkedList<XACMLAttributes> actionList = new LinkedList<XACMLAttributes>();
+        // Now create the XACML request
+        LinkedList<XACMLAttributes> actionList = new LinkedList<>();
         XACMLAttributes action = new XACMLAttributes();
         action.setDataType(new URI(DATATYPE_STRING));
-        action.setIdentifier(new URI(
-                "urn:eSENS:outcome"));
+        action.setIdentifier(new URI("urn:eSENS:outcome"));
         actionList.add(action);
 
         // Here I imagine a table lookup or similar
         action.setValue("success");
 
-        LinkedList<XACMLAttributes> environmentList = new LinkedList<XACMLAttributes>();
+        LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
         environment.setDataType(new URI(DATATYPE_DATETIME));
         environment.setIdentifier(new URI("urn:esens:2014:event"));
@@ -613,21 +546,16 @@ public class EvidenceEmitterTest {
         Element request = requestCreator.getRequest();
         assertNotNull(request);
 
-        // just some printouts
+        // Logger
         Utilities.serialize(request);
 
-        /*
-         * Call the XACML engine.
-         *
-         * The policy has been deployed in the setupBeforeClass.
-         */
+        // Call the XACML engine: The policy has been deployed in the setupBeforeClass.
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
 
         enforcePolicy.decide(request);
         assertNotNull(enforcePolicy.getResponseAsDocument());
         assertNotNull(enforcePolicy.getResponseAsObject());
-        Utilities.serialize(enforcePolicy.getResponseAsDocument()
-                .getDocumentElement());
+        Utilities.serialize(enforcePolicy.getResponseAsDocument().getDocumentElement());
 
         List<ESensObligation> obligations = enforcePolicy.getObligationList();
         assertNotNull(obligations);
@@ -641,18 +569,14 @@ public class EvidenceEmitterTest {
         context.setRecipientCertificate(cert);
         context.setSigningKey(key);
         context.setSubmissionTime(new DateTime());
-        context.setEvent("epSOS-31"); // TODO, change to setEventCode
+        // TODO: change to setEventCode
+        context.setEvent("epSOS-31");
         context.setMessageUUID(messageInspector.getMessageUUID());
         context.setAuthenticationMethod("http://uri.etsi.org/REM/AuthMethod#Strong");
-        context.setRequest(request); // here I pass the XML in order to give to
-        // the developers the posisbility
-        // to use their own implementation. Although an object is easier to get
-        // the relevant types (e.g., action
-        // environment
+        // Here I pass the XML in order to give to the developers the possibility to use their own implementation.
+        // Although an object is easier to get the relevant types (e.g., action environment).
+        context.setRequest(request);
         context.setEnforcer(enforcePolicy);
-//		context.setUsername("demo2");
-//		context.setCurrentHost("127.0.0.1");
-//		context.setRemoteHost("192.168.10.1");
         LinkedList<String> namesPostalAddress = new LinkedList<>();
         namesPostalAddress.add("Test");
         namesPostalAddress.add("Test2");
@@ -660,33 +584,31 @@ public class EvidenceEmitterTest {
         context.setRecipientNamePostalAddress(namesPostalAddress);
 
         context.setRecipientNamePostalAddress(namesPostalAddress);
-        LinkedList<String> sendernamesPostalAddress = new LinkedList<>();
-        sendernamesPostalAddress.add("SenderTest");
-        sendernamesPostalAddress.add("SenderTest2");
-        context.setSenderNamePostalAddress(sendernamesPostalAddress);
-        ObligationHandlerFactory handlerFactory = ObligationHandlerFactory
-                .getInstance();
-        List<ObligationHandler> handlers = handlerFactory.createHandler(
-                messageType, obligations, context);
+        LinkedList<String> senderNamesPostalAddress = new LinkedList<>();
+        senderNamesPostalAddress.add("SenderTest");
+        senderNamesPostalAddress.add("SenderTest2");
+        context.setSenderNamePostalAddress(senderNamesPostalAddress);
+        ObligationHandlerFactory handlerFactory = ObligationHandlerFactory.getInstance();
+        List<ObligationHandler> handlers = handlerFactory.createHandler(messageType, obligations, context);
 
-        // Here I discharge manually. This behavior is to let free an
-        // implementation
-        // to still decide which handler to trigger
+        // Manual discharge. This behavior is to let free an implementation to still decide which handler to trigger
         LOGGER.info(handlers.get(0).getClass().getName());
 
         handlers.get(0).discharge();
-        //	handlers.get(1).discharge();
 
         // Give me the ATNA, it's an ATNA test
         assertNotNull(handlers.get(0).getMessage());
         Utilities.serialize(handlers.get(0).getMessage().getDocumentElement());
 
-        // I think I need to return handler.getMessage() which will be the audit
-        // the audit will go to the server and get validated by another wrapper
+        // Return handler.getMessage() which will be the audit, then go to the server and validated by another wrapper.
         return handlers.get(0).getMessage();
     }
 
-    private void checkCorrectnessofIHEXCA(final MessageType messageType) {
+    /**
+     * @param messageType
+     */
+    private void checkCorrectnessOfIHEXCA(final MessageType messageType) {
+
         assertTrue(messageType instanceof IHEXCARetrieve);
 
         IHEXCARetrieve xca = (IHEXCARetrieve) messageType;
@@ -694,10 +616,8 @@ public class EvidenceEmitterTest {
         assertNotNull(xca.getHomeCommunityID());
         assertNotNull(xca.getRepositoryUniqueId());
 
-        assertEquals("urn:oid:2.16.840.1.113883.3.42.10001.100001.19",
-                xca.getHomeCommunityID());
+        assertEquals("urn:oid:2.16.840.1.113883.3.42.10001.100001.19", xca.getHomeCommunityID());
         assertEquals("2.16.840.1.113883.3.333.1", xca.getRepositoryUniqueId());
-        assertEquals("4eb38f09-78da-43a8-a5b4-92b115c74add",
-                xca.getDocumentUniqueId());
+        assertEquals("4eb38f09-78da-43a8-a5b4-92b115c74add", xca.getDocumentUniqueId());
     }
 }

@@ -30,24 +30,34 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.UUID;
 
-public class EpSOSREMEvidence {
+public class EpSOSREMEvidenceTest {
 
-    private static final String SHA256 = "http://www.w3.org/2001/04/xmlenc#sha256";
-    private static final String xadesNs = "http://uri.etsi.org/01903/v1.3.2#";
-    private static final String dsigNs = "http://www.w3.org/2000/09/xmldsig#";
     private static X509Certificate cert;
     private static PrivateKey key;
 
+    /**
+     * @throws Exception
+     */
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
 
         KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(new FileInputStream("test/testData/s1.keystore"), "spirit".toCharArray());
+        ks.load(new FileInputStream("src/test/testData/s1.keystore"), "spirit".toCharArray());
         cert = (X509Certificate) ks.getCertificate("server1");
         key = (PrivateKey) ks.getKey("server1", "spirit".toCharArray());
         org.apache.xml.security.Init.init();
     }
 
+    /**
+     * @throws JAXBException
+     * @throws CertificateEncodingException
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
+     * @throws DatatypeConfigurationException
+     * @throws TransformerException
+     * @throws XMLSecurityException
+     */
     @Test
     public void testNRO() throws JAXBException, CertificateEncodingException, ParserConfigurationException, IOException,
             SAXException, DatatypeConfigurationException, TransformerException, XMLSecurityException {
@@ -63,10 +73,7 @@ public class EpSOSREMEvidence {
         adt.setAuthenticationMethod("TLS");
         type.setSenderAuthenticationDetails(adt);
 
-        /*
-         * ISO Token mappings
-         */
-        // This is the Pol field of the ISO13888 token
+        // ISO Token mappings: This is the Pol field of the ISO13888 token
         EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
         eipid.getPolicyIDs().add("urn:oid:1.2.3.4");
         type.setEvidenceIssuerPolicyID(eipid);
@@ -94,15 +101,13 @@ public class EpSOSREMEvidence {
 
         // This is the T_g field
         DateTime dt = new DateTime();
-        //type.setEventTime(new XMLGregorianCalendarImpl(dt.toGregorianCalendar()));
         type.setEventTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(dt.toGregorianCalendar()));
 
         // This is the T_1 field
         DateTime dt1 = new DateTime();
-        //type.setSubmissionTime(new XMLGregorianCalendarImpl(dt1.toGregorianCalendar()));
         type.setSubmissionTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(dt1.toGregorianCalendar()));
 
-        // This is mandated by REM. If this is the full message, we can avoid to build up the NROT Token as text||z_1||sa(z_1)
+        // This is mandated by REM. If this is the full message, we can avoid to build up the NRO Token as text||z_1||sa(z_1)
         MessageDetailsType mdt = new MessageDetailsType();
         DigestMethod dm = new DigestMethod();
         dm.setAlgorithm("SHA256");
@@ -126,9 +131,7 @@ public class EpSOSREMEvidence {
 
         Utilities.serialize(doc.getDocumentElement());
 
-        /*
-         * Sign it
-         */
+        // Signing Document
         String BaseURI = f.toURI().toURL().toString();
         XMLSignature sig = new XMLSignature(doc, BaseURI, XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256);
         doc.getDocumentElement().appendChild(sig.getElement());
@@ -145,6 +148,16 @@ public class EpSOSREMEvidence {
         Utilities.serialize(doc.getDocumentElement());
     }
 
+    /**
+     * @throws JAXBException
+     * @throws CertificateEncodingException
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
+     * @throws DatatypeConfigurationException
+     * @throws TransformerException
+     * @throws XMLSecurityException
+     */
     @Test
     public void testNRD() throws JAXBException, CertificateEncodingException, ParserConfigurationException, IOException,
             SAXException, DatatypeConfigurationException, TransformerException, XMLSecurityException {
@@ -160,10 +173,7 @@ public class EpSOSREMEvidence {
         adt.setAuthenticationMethod("TLS");
         type.setSenderAuthenticationDetails(adt);
 
-        /*
-         * ISO Token mappings
-         */
-        // This is the Pol field of the ISO13888 token
+        // ISO Token mappings: This is the Pol field of the ISO13888 token
         EvidenceIssuerPolicyID eipid = new EvidenceIssuerPolicyID();
         eipid.getPolicyIDs().add("urn:oid:1.2.3.4");
         type.setEvidenceIssuerPolicyID(eipid);
@@ -191,16 +201,13 @@ public class EpSOSREMEvidence {
 
         // This is the T_g field
         DateTime dt = new DateTime();
-        //type.setEventTime(new XMLGregorianCalendarImpl(dt.toGregorianCalendar()));
         type.setEventTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(dt.toGregorianCalendar()));
 
         // This is the T_1 field
         DateTime dt1 = new DateTime();
-        //type.setSubmissionTime(new XMLGregorianCalendarImpl(dt1.toGregorianCalendar()));
         type.setSubmissionTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(dt1.toGregorianCalendar()));
 
-        // This is mandated by REM. If this is the full message,
-        // we can avoid to build up the NROT Token as text||z_1||sa(z_1)
+        // This is mandated by REM. If this is the full message, we can avoid to build up the NRO Token as text||z_1||sa(z_1)
         MessageDetailsType mdt = new MessageDetailsType();
         DigestMethod dm = new DigestMethod();
         dm.setAlgorithm("SHA256");
@@ -225,9 +232,7 @@ public class EpSOSREMEvidence {
 
         Utilities.serialize(doc.getDocumentElement());
 
-        /*
-         * Sign it
-         */
+        // Signng Document
         String BaseURI = f.toURI().toURL().toString();
         XMLSignature sig = new XMLSignature(doc, BaseURI, XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256);
         doc.getDocumentElement().appendChild(sig.getElement());
