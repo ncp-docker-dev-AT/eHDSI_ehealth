@@ -165,16 +165,10 @@
                     <td>
                         <xsl:choose>
                             <xsl:when test="(not($negationInd) or $negationInd='false')">
-                                <div class="tooltip">
                                     <i class="fa fa-check" style="color:#085a9f" aria-hidden="true"/>
-                                    <span class="tooltiptext">Administered</span>
-                                </div>
                             </xsl:when>
                             <xsl:otherwise>
-                                <div class="tooltip">
                                     <i class="fa fa-ban" style="color:#085a9f" aria-hidden="true"/>
-                                    <span class="tooltiptext">Not administered</span>
-                                </div>
                             </xsl:otherwise>
                         </xsl:choose>
                     </td>
