@@ -97,6 +97,11 @@
                                                                     <xsl:with-param name="code" select="'80'"/>
                                                                 </xsl:call-template>
                                                             </th>
+                                                            <th>
+                                                                <!-- Received -->
+                                                                <!-- TODO Make this header part of the epsosDisplayLabel value set -->
+                                                                Administered
+                                                            </th>
                                                         </tr>
                                                         <xsl:for-each select="n1:entry">
                                                             <xsl:call-template name="vaccinationsSectionEntry">
@@ -133,6 +138,9 @@
         <xsl:variable name="vaccinationsDate"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:effectiveTime"/>
 
+        <xsl:variable name="negationInd"
+                      select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../@negationInd"/>
+
         <xsl:variable name="vacAct" select="n1:substanceAdministration"/>
         <!-- End definition of variables -->
 
@@ -153,6 +161,22 @@
                             <xsl:with-param name="datetime" select="$vaccinationsDate"/>
                         </xsl:call-template>
                         &#160;
+                    </td>
+                    <td>
+                        <xsl:choose>
+                            <xsl:when test="(not($negationInd) or $negationInd='false')">
+                                <div class="tooltip">
+                                    <i class="fa fa-check" style="color:#085a9f" aria-hidden="true"/>
+                                    <span class="tooltiptext">Administered</span>
+                                </div>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <div class="tooltip">
+                                    <i class="fa fa-ban" style="color:#085a9f" aria-hidden="true"/>
+                                    <span class="tooltiptext">Not administered</span>
+                                </div>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </td>
                 </tr>
             </xsl:when>
