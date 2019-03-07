@@ -124,6 +124,11 @@
                                                                         <xsl:with-param name="code" select="'45'"/>
                                                                     </xsl:call-template>
                                                                 </th>
+                                                                <th>
+                                                                    <!-- Severity -->
+                                                                    <!-- TODO Add Severity to the epSOSDisplayLabel value set -->
+                                                                    Severity
+                                                                </th>
                                                             </tr>
                                                         </xsl:if>
                                                         <xsl:for-each select="n1:entry">
@@ -154,7 +159,7 @@
     <xsl:template name="alertSectionEntry">
         <!-- Defining all needed variables -->
         <xsl:variable name="reactionType"
-                      select="n1:act/n1:templateId[@root= '2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:code"/>
+                      select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:code"/>
 
         <xsl:variable name="clinicalManifestation"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:entryRelationship[@typeCode='MFST']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value"/>
@@ -164,6 +169,9 @@
 
         <xsl:variable name="onSetDate"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:effectiveTime/n1:low"/>
+
+        <xsl:variable name="severity"
+                      select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:entryRelationship/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.1']/../n1:value"/>
 
         <!-- observation value code -->
         <!-- not sure if we have to filter with root and template ids-->
@@ -218,6 +226,12 @@
                                 <!-- OnSet Date -->
                                 <xsl:call-template name="show-time">
                                     <xsl:with-param name="datetime" select="$onSetDate"/>
+                                </xsl:call-template>
+                            </td>
+                            <td>
+                                <!-- Severity -->
+                                <xsl:call-template name="show-element">
+                                    <xsl:with-param name="node" select="$severity"/>
                                 </xsl:call-template>
                             </td>
                         </tr>
