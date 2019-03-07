@@ -1363,7 +1363,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private boolean checkIfOnlyWarnings(OMElement registryErrorList) {
 
-        logger.info("Method checkIfOnlyWarnings()");
         boolean onlyWarnings = true;
         OMElement element;
         Iterator it = registryErrorList.getChildElements();
@@ -1375,7 +1374,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
             logger.info("[TEST eHDSI PIVOT] Checking Elements and Attributes\n{}\n{}", element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
                     "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error");
             if (StringUtils.equals(element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
-                    "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error")) {
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR)) {
+                logger.debug("Error has been detected for Element: '{}'", element.getText());
                 onlyWarnings = false;
             }
         }

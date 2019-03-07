@@ -187,7 +187,7 @@ public class XcaInitGateway {
                 queryResponse.getDocumentResponse().get(0).setDocument(friendlyDocument);
 
             } catch (DocumentTransformationException e) {
-                LOGGER.warn("DocumentTransformationException: document cannot be translated:\n{}", e.getMessage());
+                LOGGER.warn("DocumentTransformationException: CDA cannot be translated: Please check the TM result");
             } finally {
                 LOGGER.debug("[XCA Init Gateway] Returns Original Document");
                 //  Validate CDA Friendly-B
@@ -205,13 +205,10 @@ public class XcaInitGateway {
     }
 
     /**
-     * Processes registry errors from the {@link AdhocQueryResponse} message, by
-     * reporting them to the logging system.
+     * Processes registry errors from the {@link AdhocQueryResponse} message, by reporting them to the logging system.
      *
-     * @param registryErrorList the list of errors from the
-     *                          {@link AdhocQueryResponse} message.
-     * @throws Exception thrown when an error has a severity of
-     *                   "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error" type.
+     * @param registryErrorList the list of errors from the {@link AdhocQueryResponse} message.
+     * @throws Exception thrown when an error has a severity of type "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".
      */
     private static void processRegistryErrors(RegistryErrorList registryErrorList) throws XCAException {
         // A.R. ++ Error processing. For retrieve. Is it needed?
@@ -229,10 +226,10 @@ public class XcaInitGateway {
                     String location = error.getLocation();
                     String severity = error.getSeverity();
                     String codeContext = error.getCodeContext();
-                    LOGGER.error("errorCode='{}'\ncodeContext='{}'\nlocation='{}'\nseverity='{}'\n'{}'\n",
+                    LOGGER.debug("\nerrorCode='{}'\ncodeContext='{}'\nlocation='{}'\nseverity='{}'\n'{}'\n",
                             errorCode, codeContext, location, severity, value);
 
-                    // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/2.
+                    // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/1102.
                     // (Needs to be revised according to new error communication strategy to the portal).
                     if ("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".equals(severity) || errorCode.equals("1101") || errorCode.equals("1102")) {
                         msg.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
