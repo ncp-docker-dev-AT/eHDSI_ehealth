@@ -24,7 +24,6 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -393,11 +392,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 id.setAttribute(CONSTANT_EXTENSION, id.getAttribute(CONSTANT_EXTENSION) + "." + format);
             } else {
                 id.setAttribute(CONSTANT_EXTENSION, Integer.toString(format));
-            }
-            try {
-                LOGGER.info("CDA:\n'{}'", XMLUtil.prettyPrint(document));
-            } catch (TransformerException e) {
-                LOGGER.error("TransformerException: '{}'", e.getMessage());
             }
         }
     }
