@@ -63,7 +63,6 @@ import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
 import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
-import org.opensaml.security.credential.Credential;
 import org.opensaml.security.credential.CredentialSupport;
 import org.opensaml.security.x509.BasicX509Credential;
 import org.opensaml.xmlsec.signature.KeyInfo;
@@ -171,8 +170,8 @@ public class EpsosHelperService {
         Map<String, String> langs = new HashMap<>();
         List<String> ltrLanguages = new ArrayList<>();
         try {
-            ITransformationService tService = MyServletContextListener.getTransformationService();
-            ltrLanguages = tService.getLtrLanguages();
+            ITransformationService transformationService = MyServletContextListener.getTransformationService();
+            ltrLanguages = transformationService.getLtrLanguages();
 
             for (int i = 0; i < ltrLanguages.size(); i++) {
                 String language = ltrLanguages.get(i);
@@ -193,10 +192,8 @@ public class EpsosHelperService {
 
         Map<String, String> langs = new HashMap<>();
         try {
-            ITransformationService tService = MyServletContextListener
-                    .getTransformationService();
-
-            List<String> ltrLanguages = tService.getLtrLanguages();
+            ITransformationService transformationService = MyServletContextListener.getTransformationService();
+            List<String> ltrLanguages = transformationService.getLtrLanguages();
 
             for (String ltrLanguage : ltrLanguages) {
                 langs.put(ltrLanguage.trim(), ltrLanguage.trim());
@@ -885,24 +882,24 @@ public class EpsosHelperService {
         String ncpSigPrivatekeyPassword = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
 
         KeyStoreManager keyManager = new DefaultKeyStoreManager();
-        X509Certificate cert;
+        X509Certificate signatureCertificate;
         PrivateKey privateKey = null;
 
         if (keyAlias == null) {
-            cert = (X509Certificate) keyManager.getDefaultCertificate();
+            signatureCertificate = (X509Certificate) keyManager.getDefaultCertificate();
         } else {
             KeyStore keyStore = KeyStore.getInstance("JKS");
             File file = new File(ncpSigKeystorePath);
             keyStore.load(new FileInputStream(file), ncpSigKeystorePassword.toCharArray());
             privateKey = (PrivateKey) keyStore.getKey(ncpSigPrivatekeyAlias, ncpSigPrivatekeyPassword.toCharArray());
-            cert = (X509Certificate) keyManager.getCertificate(keyAlias);
+            signatureCertificate = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
 
-        LOGGER.info("Keystore & Signature Certificate loaded: '{}'", cert.getSerialNumber());
+        LOGGER.info("Keystore & Signature Certificate loaded: '{}'", signatureCertificate.getSerialNumber());
 
         Signature sig = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory()
                 .getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
-        Credential signingCredential = CredentialSupport.getSimpleCredential(cert, privateKey);
+        BasicX509Credential signingCredential = CredentialSupport.getSimpleCredential(signatureCertificate, privateKey);
 
         sig.setSigningCredential(signingCredential);
         sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
@@ -914,40 +911,11 @@ public class EpsosHelperService {
         org.opensaml.xmlsec.signature.X509Certificate x509Certificate = (org.opensaml.xmlsec.signature.X509Certificate) XMLObjectProviderRegistrySupport.getBuilderFactory()
                 .getBuilder(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME).buildObject(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
 
-        String value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
+        String value = org.apache.xml.security.utils.Base64.encode(signingCredential.getEntityCertificate().getEncoded());
         x509Certificate.setValue(value);
         data.getX509Certificates().add(x509Certificate);
         keyInfo.getX509Datas().add(data);
         sig.setKeyInfo(keyInfo);
-
-
-//        KeyInfo keyInfo = (KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME)
-//                .buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
-//
-//        X509Data data = (X509Data) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(X509Data.DEFAULT_ELEMENT_NAME)
-//                .buildObject(X509Data.DEFAULT_ELEMENT_NAME);
-        //X509Certificate cert = (X509Certificate) buildXMLObject(X509Certificate.DEFAULT_ELEMENT_NAME);
-        //String value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
-        //cert.setValue(value);
-//        data.getX509Certificates().add((org.opensaml.xmlsec.signature.X509Certificate) ((BasicX509Credential) signingCredential).getEntityCertificate());
-//
-//        keyInfo.getX509Datas().add(data);
-//        sig.setKeyInfo(keyInfo);
-        //SignatureSigningConfiguration signingConfiguration = SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
-
-//        SecurityConfigurationSupport secConfig = (BasicSecurityConfiguration) XMLObjectProviderRegistrySupport.();
-//        secConfig.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
-//        BasicSecurityConfiguration config = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-//        config.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
-//        SignatureSigningConfiguration secConfig = SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
-//        try {
-//            SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
-//
-//
-//        } catch (SecurityException e) {
-//            throw new SMgrException(e.getMessage(), e);
-//        }
-        //Signer.signObject(sig);
 
         signableSAMLObject.setSignature(sig);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(signableSAMLObject).marshall(signableSAMLObject);
@@ -2377,10 +2345,10 @@ public class EpsosHelperService {
 
     public static Document translateDoc(Document doc, String lang) {
 
-        ITransformationService tService = MyServletContextListener.getTransformationService();
-        if (Validator.isNotNull(tService)) {
+        ITransformationService transformationService = MyServletContextListener.getTransformationService();
+        if (Validator.isNotNull(transformationService)) {
             LOGGER.info("The Transformation Service started correctly. Translating to {}", lang);
-            TMResponseStructure tmResponse = tService.translate(doc, lang);
+            TMResponseStructure tmResponse = transformationService.translate(doc, lang);
             return tmResponse.getResponseCDA();
 
         } else {
@@ -2629,7 +2597,7 @@ public class EpsosHelperService {
     }
 
     public static String getDocument(Assertion assertion, Assertion trca, String country, String repositoryid,
-                                     String homecommunityid, String documentid, String doctype, String lang) throws UnsupportedEncodingException {
+                                     String homecommunityid, String documentid, String doctype, String lang) {
 
         EpsosDocument selectedEpsosDocument = new EpsosDocument();
         ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
@@ -2687,7 +2655,7 @@ public class EpsosHelperService {
             selectedEpsosDocument.setDescription(eps.getDescription());
             selectedEpsosDocument.setTitle(eps.getTitle());
 
-            xmlfile = new String(eps.getBase64Binary(), "UTF-8");
+            xmlfile = new String(eps.getBase64Binary(), StandardCharsets.UTF_8);
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.debug("#### CDA XML Start");
                 LOGGER_CLINICAL.debug(xmlfile);
