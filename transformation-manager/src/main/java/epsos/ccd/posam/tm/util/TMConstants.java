@@ -91,6 +91,7 @@ public interface TMConstants {
     String XPATH_ALL_ELEMENTS_WITH_ID_ATTR = "//*/*[@ID]";
     String XPATH_TRANSLATION = "translation";
 
+    String EHDSI_HL7_NAMESPACE = "urn:hl7-org:v3";
     //XmlUtil Constants
     String EMPTY_XMLNS = "xmlns=\"\"";
     String EMPTY_STRING = "";
