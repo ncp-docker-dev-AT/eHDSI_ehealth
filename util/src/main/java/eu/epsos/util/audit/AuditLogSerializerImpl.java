@@ -10,33 +10,36 @@ import java.util.List;
 public class AuditLogSerializerImpl implements AuditLogSerializer {
 
     private static final Logger log = LoggerFactory.getLogger(AuditLogSerializer.class);
-    private static Type type;
+    private Type type;
 
     public AuditLogSerializerImpl(Type type) {
-        AuditLogSerializerImpl.type = type;
+        this.type = type;
     }
 
     public List<File> listFiles() {
+
         List<File> files = new ArrayList<>();
         File path = getPath();
         if (isPathValid(path)) {
-            File[] srcfiles = path.listFiles();
-            for (File file : srcfiles) {
+            File[] srcFiles = path.listFiles();
+            if (srcFiles == null) {
+                return new ArrayList<>();
+            }
+            for (File file : srcFiles) {
                 if (isAuditLogBackupWriterFile(file)) {
                     files.add(file);
                 }
             }
         }
-
         return files;
     }
 
     public Serializable readObjectFromFile(File inFile) throws IOException, ClassNotFoundException {
-        InputStream file = null;
+
         InputStream buffer = null;
         ObjectInput input = null;
-        try {
-            file = new FileInputStream(inFile);
+        try (InputStream file = new FileInputStream(inFile)) {
+
             buffer = new BufferedInputStream(file);
             input = new ObjectInputStream(buffer);
             return (Serializable) input.readObject();
@@ -49,25 +52,22 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
                 }
             }
             close(buffer);
-            close(file);
         }
     }
 
     public void writeObjectToFile(Serializable message) {
 
-        OutputStream file = null;
+        String path = System.getenv("EPSOS_PROPS_PATH") + type.getNewFileName();
         OutputStream buffer = null;
         ObjectOutput output = null;
-        try {
-            if (message != null) {
-                //String path = System.getenv("EPSOS_PROPS_PATH") + File.separatorChar + type.getNewFileName();
-                String path = System.getenv("EPSOS_PROPS_PATH") + type.getNewFileName();
 
-                file = new FileOutputStream(path);
+        try (OutputStream file = new FileOutputStream(path)) {
+
+            if (message != null) {
+
                 buffer = new BufferedOutputStream(file);
                 output = new ObjectOutputStream(buffer);
                 output.writeObject(message);
-
                 log.error("Error occurred while writing AuditLog to OpenATNA! AuditLog saved to: '{}'", path);
             }
         } catch (Exception e) {
@@ -81,22 +81,22 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
                 }
             }
             close(buffer);
-            close(file);
         }
     }
 
     private File getPath() {
 
-        //return new File(System.getenv("EPSOS_PROPS_PATH") + File.separatorChar + type.getDir());
         return new File(System.getenv("EPSOS_PROPS_PATH") + type.getDir());
     }
 
     private boolean isAuditLogBackupWriterFile(File file) {
+
         String fileName = file.getName();
         return fileName.startsWith(type.getFilePrefix()) && fileName.endsWith(type.getFileSuffix());
     }
 
     private boolean isPathValid(File path) {
+
         if (!path.exists()) {
             log.error("Source path ('{}') does not exist!", path);
             return false;
@@ -109,6 +109,7 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
     }
 
     private void close(Closeable c) {
+
         try {
             if (c != null) {
                 c.close();
