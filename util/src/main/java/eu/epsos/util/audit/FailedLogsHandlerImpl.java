@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.List;
 
 public class FailedLogsHandlerImpl implements FailedLogsHandler {
@@ -41,7 +43,9 @@ public class FailedLogsHandlerImpl implements FailedLogsHandler {
 
     private void handleSentMessage(File file) {
 
-        if (!file.delete()) {
+        try {
+            Files.delete(file.toPath());
+        } catch (IOException e) {
             LOGGER.error("Unable to delete successfully re-sent log backup ('{}')!", file.getAbsolutePath());
         }
     }
