@@ -51,6 +51,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -1259,15 +1260,21 @@ public class EpsosHelperService {
         String HR_UserID = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + assertion.getSubject().getNameID().getValue()
                 + "@" + assertion.getIssuer().getValue() + ">";
         String HR_RoleID = roleName;
-        //Human readable name of the HP as given in the Subject-ID attribute of the HP identity assertion
 
-        //String HR_AlternativeUserID = assertion.getAttributeStatements().get;
+        //Human readable name of the HP as given in the Subject-ID attribute of the HP identity assertion
+        String HR_AlternativeUserID = "Not Provided";
         Attribute subjectIdAttr = findStringInAttributeStatement(assertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
-        String HR_AlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
-        //String HR_AlternativeUserID = "";
-        String SC_UserID = name;
-        String SP_UserID = name;
+        if (subjectIdAttr != null) {
+            List<XMLObject> attributesSaml = subjectIdAttr.getAttributeValues();
+            if (!attributesSaml.isEmpty()) {
+                HR_AlternativeUserID = ((XSString) attributesSaml.get(0)).getValue();
+            }
+
+        }
+        // String HR_AlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
+        String serviceConsumerUserId = name;
+        String serviceProviderUserId = name;
 
         String AS_AuditSourceId = Constants.COUNTRY_PRINCIPAL_SUBDIVISION;
         String ET_ObjectID = Constants.UUID_PREFIX + message;
@@ -1288,8 +1295,9 @@ public class EpsosHelperService {
         }
         hcpIdentificationEventLog = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
                 eventDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
-                SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, requestMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                responseMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8), hostSource, hostSource, NcpSide.NCP_B);
+                serviceConsumerUserId, serviceProviderUserId, AS_AuditSourceId, ET_ObjectID, requestMsgParticipantObjectID,
+                secHead.getBytes(StandardCharsets.UTF_8), responseMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
+                hostSource, hostSource, NcpSide.NCP_B);
 
         LOGGER.info("The audit has been prepared");
         hcpIdentificationEventLog.setEventType(EventType.epsosHcpAuthentication);

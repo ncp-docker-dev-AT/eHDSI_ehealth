@@ -12,6 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -844,7 +845,6 @@ public enum AuditTrailUtils {
             eit.getEventID().setDisplayName("SMP::Push");
         }
 
-        // eit.setEventID(eventID);
         eit.setEventActionCode(EventActionCode);
         eit.setEventDateTime(EventDateTime);
         eit.setEventOutcomeIndicator(EventOutcomeIndicator); // (0,1,4,8)
@@ -1357,7 +1357,7 @@ public enum AuditTrailUtils {
      */
     private void writeTestAudits(AuditMessage auditmessage, String auditmsg) {
 
-        String wta = Utils.getProperty("WRITE_TEST_AUDITS");
+        String wta = Utils.getProperty(Constants.WRITE_TEST_AUDITS);
         LOGGER.debug("Writing test audits: '{}'", wta);
         if (StringUtils.equals(wta, "true")) {
 
