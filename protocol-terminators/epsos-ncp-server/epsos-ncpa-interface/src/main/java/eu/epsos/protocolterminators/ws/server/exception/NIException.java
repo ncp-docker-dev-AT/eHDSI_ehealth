@@ -25,9 +25,9 @@ public class NIException extends Exception {
         this.codeSystem = codeSystem;
     }
 
+    @Override
     public String getMessage() {
         return message;
-
     }
 
     public void setMessage(String message) {
