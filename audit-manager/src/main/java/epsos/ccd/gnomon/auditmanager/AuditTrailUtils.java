@@ -1357,7 +1357,7 @@ public enum AuditTrailUtils {
      */
     private void writeTestAudits(AuditMessage auditmessage, String auditmsg) {
 
-        String wta = Utils.getProperty(Constants.WRITE_TEST_AUDITS);
+        String wta = Constants.WRITE_TEST_AUDITS;
         LOGGER.debug("Writing test audits: '{}'", wta);
         if (StringUtils.equals(wta, "true")) {
 
