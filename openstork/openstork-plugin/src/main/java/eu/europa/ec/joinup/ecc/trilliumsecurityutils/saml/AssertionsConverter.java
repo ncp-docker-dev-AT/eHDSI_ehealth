@@ -22,12 +22,9 @@ import org.opensaml.core.xml.schema.XSURI;
 import org.opensaml.saml.common.SAMLObjectBuilder;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.*;
-import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
 import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
 import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
@@ -85,110 +82,6 @@ public class AssertionsConverter {
         LOGGER.debug("TRCA CREATED: '{}'", trc.getID());
         LOGGER.debug("TRCA WILL BE STORED TO SESSION: '{}'", trc.getID());
         return trc;
-    }
-
-    public static Assertion createEpsosAssertion(Assertion kpAssertion) throws Exception {
-
-        // TODO get more attributes from the assertion and fill the new one, like role, treatment ...
-        String role = AssertionUtils.getRoleFromKPAssertion(kpAssertion);
-        boolean isPhysician = role.equalsIgnoreCase("doctor");
-        boolean isPharmacist = role.equalsIgnoreCase("pharmacist");
-        boolean isNurse = role.equalsIgnoreCase("nurse");
-        boolean isAdministrator = role.equalsIgnoreCase("admin");
-        boolean isPatient = role.equalsIgnoreCase("patient");
-
-        if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
-            LOGGER.info("The role is one of the expected. Continuing ...");
-        } else {
-            LOGGER.error("The portal role is NOT one of the expected. Break");
-            return null;
-        }
-
-        String orgName;
-        List<String> permissions = new ArrayList<>();
-
-        String username = "TRILLIUM GATEWAY";
-        String rolename = "";
-        String prefix = "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission:";
-
-        if (isPhysician) {
-            rolename = "physician";
-            String doctor_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_DOCTOR_PERMISSIONS);
-            String[] p = doctor_perms.split(",");
-            for (String aP : p) {
-                permissions.add(prefix + aP);
-            }
-        }
-        if (isPharmacist) {
-            rolename = "pharmacist";
-            String pharm_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PHARMACIST_PERMISSIONS);
-            String[] p1 = pharm_perms.split(",");
-            for (String aP1 : p1) {
-                permissions.add(prefix + aP1);
-            }
-        }
-        if (isNurse) {
-            rolename = "nurse";
-            String nurse_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_NURSE_PERMISSIONS);
-            String[] p1 = nurse_perms.split(",");
-            for (String aP1 : p1) {
-                permissions.add(prefix + aP1);
-            }
-        }
-        if (isPatient) {
-            rolename = "patient";
-            String patient_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PATIENT_PERMISSIONS);
-            String[] p1 = patient_perms.split(",");
-            for (String aP1 : p1) {
-                permissions.add(prefix + aP1);
-            }
-        }
-        if (isAdministrator) {
-            rolename = "administrator";
-            String admin_perms = ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_ADMIN_PERMISSIONS);
-            String[] p1 = admin_perms.split(",");
-            for (String aP1 : p1) {
-                permissions.add(prefix + aP1);
-            }
-        }
-
-        orgName = "TRILLIUM GATEWAY";
-        String poc = "POC Trillium Bidge";
-        // fixed for consent creation AuthorInstitution Validation problem
-        String orgId = "TRILLIUMGATEWAY.1";
-        String orgType;
-        if (isPharmacist) {
-            orgType = "Pharmacy";
-        } else {
-            orgType = "Hospital";
-        }
-        Assertion assertion = createEpsosAssertion(username, rolename, orgName, orgId, orgType, "TREATMENT",
-                poc, permissions);
-
-        LOGGER.debug("Getting config manager");
-        String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-        LOGGER.debug("KEY ALIAS: '{}'", KEY_ALIAS);
-        String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
-
-        AssertionUtils.signSAMLAssertion(assertion, KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
-        AssertionMarshaller marshaller = new AssertionMarshaller();
-
-        Element element;
-        element = marshaller.marshall(assertion);
-
-        Document document = element.getOwnerDocument();
-        String hcpa = AssertionUtils.getDocumentAsXml(document, false);
-        LOGGER.info("#### HCPA Start");
-        LOGGER.info(hcpa);
-        LOGGER.info("#### HCPA End");
-
-        if (assertion != null) {
-            LOGGER.info("The assertion has been created with id: '{}'", assertion.getID());
-        } else {
-            LOGGER.error("########### Error creating assertion");
-        }
-
-        return assertion;
     }
 
     public static Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
