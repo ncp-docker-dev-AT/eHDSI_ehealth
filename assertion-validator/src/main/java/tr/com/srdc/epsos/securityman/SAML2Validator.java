@@ -167,7 +167,7 @@ public class SAML2Validator {
 
         try {
             NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
-            Element security = null;
+            Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
             } else {
