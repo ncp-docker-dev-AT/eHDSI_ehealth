@@ -54,14 +54,14 @@ public class ServiceMetadataLocatorManager {
 
     private final Environment environment;
 
-    @Autowired
-    private ResourceLoader resourceLoader;
+    private final ResourceLoader resourceLoader;
 
     @Autowired
-    public ServiceMetadataLocatorManager(Environment environment) {
+    public ServiceMetadataLocatorManager(Environment environment, ResourceLoader resourceLoader) {
 
         Assert.notNull(environment, "environment must not be null");
         this.environment = environment;
+        this.resourceLoader = resourceLoader;
     }
 
     /**
