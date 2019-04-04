@@ -1244,7 +1244,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     logger.info("[National Infrastructure] CDA Document:\n'{}'", epsosDoc.getClassCode());
                     /* Validate CDA eHDSI Friendly */
                     if (OpenNCPValidation.isValidationEnable()) {
-                        //XMLUtils.toOM(doc.getDocumentElement()).toString()
+
                         OpenNCPValidation.validateCdaDocument(XMLUtil.documentToString(epsosDoc.getDocument()),
                                 NcpSide.NCP_A, epsosDoc.getClassCode(), false);
                     }
