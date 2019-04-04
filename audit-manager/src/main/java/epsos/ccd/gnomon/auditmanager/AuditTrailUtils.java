@@ -243,8 +243,7 @@ public enum AuditTrailUtils {
             if (am == null) {
                 LOGGER.error("Validation of the Audit Message cannot proceed on a Null value!!!");
             } else {
-                boolean validated = validateAuditMessage(eventLog, am);
-                LOGGER.debug("Audit Message validated and  report generated: '{}'", validated);
+                validateAuditMessage(eventLog, am);
             }
         }
         return am;
@@ -1398,7 +1397,7 @@ public enum AuditTrailUtils {
      * @param eventLog an EventLog object containing information about the audit message.
      * @return the Audit Message Model
      */
-    private boolean validateAuditMessage(EventLog eventLog, AuditMessage am) {
+    private void validateAuditMessage(EventLog eventLog, AuditMessage am) {
 
         LOGGER.debug("validateAuditMessage(EventLog '{}', AuditMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
                 am.getEventIdentification().getEventActionCode(), eventLog.getPC_UserID());
@@ -1409,12 +1408,9 @@ public enum AuditTrailUtils {
             if (StringUtils.equals(eventLog.getEventType(), "epsos-cf")) {
                 throw new UnsupportedOperationException("EventCode not supported.");
             }
-
-
-            return OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(am), eventLog.getEventType(), ncpSide);
+            OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(am), eventLog.getEventType(), ncpSide);
         } catch (JAXBException e) {
             LOGGER.error("JAXBException: {}", e.getMessage(), e);
-            return false;
         }
     }
 }

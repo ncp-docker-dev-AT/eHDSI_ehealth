@@ -1,6 +1,5 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation.impl;
 
-import eu.europa.ec.sante.ehdsi.gazelle.validation.GazelleValidationException;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.SchematronValidator;
 import net.ihe.gazelle.jaxb.schematron.sante.ValidateBase64Document;
 import net.ihe.gazelle.jaxb.schematron.sante.ValidateBase64DocumentResponse;
@@ -17,7 +16,7 @@ public class SchematronValidatorImpl extends AbstractValidator implements Schema
         super(webServiceTemplate);
     }
 
-    public String validateObject(String base64Object, String xmlReferencedStandard, String xmlMetadata) throws GazelleValidationException {
+    public String validateObject(String base64Object, String xmlReferencedStandard, String xmlMetadata) {
 
         logger.info("Schematron Validator: validateObject('{}','{}')", xmlReferencedStandard, xmlMetadata);
 
@@ -33,7 +32,8 @@ public class SchematronValidatorImpl extends AbstractValidator implements Schema
         } catch (WebServiceClientException e) {
             logger.error("An error occurred during validation process of the SchematronValidator. " +
                     "Please check the stack trace for more details.", e);
-            throw new GazelleValidationException(e.getMessage(), e);
+            //throw new GazelleValidationException(e.getMessage(), e);
+            return "";
         }
     }
 }
