@@ -8,11 +8,15 @@ import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.service.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp.ReferenceCollection;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPType;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.AuditManager;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.DynamicDiscoveryClient;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -27,9 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.w3c.dom.Document;
@@ -62,9 +66,9 @@ import java.util.Set;
 @SessionAttributes("smpdelete")
 public class SMPDeleteFileController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SMPDeleteFileController.class);
-
-    private ReadSMPProperties readProperties = new ReadSMPProperties();
+    private static final String ALERT_BACKGROUND_COLOR = "#f2dede";
+    private final Logger logger = LoggerFactory.getLogger(SMPDeleteFileController.class);
+    private ReadSMPProperties readProperties;
     private Environment env;
 
     @Autowired
@@ -79,9 +83,9 @@ public class SMPDeleteFileController {
      * @param model
      * @return
      */
-    @RequestMapping(value = "/smpeditor/deletesmpfile", method = RequestMethod.GET)
+    @GetMapping(value = "/smpeditor/deletesmpfile")
     public String deleteFile(Model model) {
-        LOGGER.debug("\n==== in deleteFile ====");
+        logger.debug("\n==== in deleteFile ====");
         model.addAttribute("smpdelete", new SMPHttp());
 
         return "smpeditor/deletesmpfile";
@@ -95,15 +99,16 @@ public class SMPDeleteFileController {
      * @param redirectAttributes
      * @return
      */
-    @RequestMapping(value = "smpeditor/deletesmpfile", method = RequestMethod.POST)
+    @PostMapping(value = "smpeditor/deletesmpfile")
     public String postDelete(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model, final RedirectAttributes redirectAttributes) {
-        LOGGER.debug("\n==== in postDelete ====");
+
+        logger.debug("Processing SMP delete action...");
         model.addAttribute("smpdelete", smpdelete);
 
-        String partID = "urn:ehealth:" + smpdelete.getCountry().name() + ":ncp-idp"; //SPECIFICATION
+        String partID = "urn:ehealth:" + smpdelete.getCountry().name() + ":ncp-idp";
         String partScheme = env.getProperty("ParticipantIdentifier.Scheme");
 
-        Boolean success = true;
+        boolean success = true;
         String errorType = "";
         ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(partID, partScheme);
         DynamicDiscovery smpClient = null;
@@ -113,9 +118,9 @@ public class SMPDeleteFileController {
         } catch (ConnectionException ex) {
             success = false;
             errorType = "ConnectionException";
-            LOGGER.error("\n ConnectionException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n ConnectionException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (TechnicalException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
-            LOGGER.error("Technical Exception: '{}'", e.getMessage(), e);
+            logger.error("Technical Exception: '{}'", e.getMessage(), e);
         }
 
         List<DocumentIdentifier> documentIdentifiers = new ArrayList<>();
@@ -124,7 +129,7 @@ public class SMPDeleteFileController {
         } catch (TechnicalException ex) {
             success = false;
             errorType = "TechnicalException";
-            LOGGER.error("TechnicalException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("TechnicalException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
         URI serviceGroup = null;
@@ -137,16 +142,14 @@ public class SMPDeleteFileController {
             for (Object aSet2 : set2) {
                 Map.Entry mentry2 = (Map.Entry) aSet2;
                 if (StringUtils.equalsIgnoreCase(documentIdentifiers.get(i).getIdentifier(), mentry2.getKey().toString())) {
-                    //if (documentIdentifiers.get(i).getIdentifier().equals(mentry2.getKey().toString())) {
-                    //urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55
                     String[] docs = mentry2.getValue().toString().split("\\.");
                     documentID = docs[0];
                     break;
                 }
             }
             String smpType = documentID;
-            LOGGER.debug("\n******** DOC ID - '{}'", documentIdentifiers.get(i).getIdentifier());
-            LOGGER.debug("\n******** SMP Type - '{}'", smpType);
+            logger.debug("\n******** DOC ID - '{}'", documentIdentifiers.get(i).getIdentifier());
+            logger.debug("\n******** SMP Type - '{}'", smpType);
 
             for (SMPType smptype1 : SMPType.getALL()) {
                 if (smptype1.name().equals(smpType)) {
@@ -161,7 +164,7 @@ public class SMPDeleteFileController {
             } catch (TechnicalException ex) {
                 success = false;
                 errorType = "TechnicalException";
-                LOGGER.error("\n TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             }
             URI uri = smpClient.getService().getMetadataProvider().resolveServiceMetadata(smpURI, participantIdentifier, documentIdentifiers.get(i));
             ReferenceCollection reference = new ReferenceCollection(uri.toString(), smptype, i);
@@ -172,37 +175,28 @@ public class SMPDeleteFileController {
         smpdelete.setReferenceCollection(referenceCollection);
 
         //Audit
-        ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
-        String ncp = configurationManager.getProperty(StandardProperties.NCP_COUNTRY);
-        String ncpemail = configurationManager.getProperty(StandardProperties.NCP_EMAIL);
-        String country = configurationManager.getProperty(StandardProperties.NCP_COUNTRY_PRINCIPAL_SUBDIVISION);
-        String localip = smpdelete.getSmpURI();
-        String remoteip = configurationManager.getProperty(StandardProperties.NCP_SERVER);
-        String smp = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT);
-        String smpemail = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT_EMAIL);
-        //ET_ObjectID --> Base64 of url
         String objectID = serviceGroup.toString();
         byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
-
+        logger.info("DNS: '{}'", smpdelete.getSmpURI());
         if (success) {
             //Audit Success
-            Audit.sendAuditQuery(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
-                    new String(encodedObjectID), null, null);
+            AuditManager.handleDynamicDiscoveryQuery(smpdelete.getSmpURI(), new String(encodedObjectID), null, null);
+
         } else {
             //Audit Error
-            Audit.sendAuditQuery(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
-                    new String(encodedObjectID), "500", errorType.getBytes());//TODO
+            AuditManager.handleDynamicDiscoveryQuery(smpdelete.getSmpURI(), new String(encodedObjectID), "500", errorType.getBytes());
         }
 
         if (referenceCollection.isEmpty()) {
-            String message = env.getProperty("error.nodoc"); //messages.properties
+            //  messages.properties
+            String message = env.getProperty("error.nodoc");
             Alert alert = new Alert(message, Alert.alertType.warning);
             smpdelete.setAlert(alert);
             redirectAttributes.addFlashAttribute("alert", alert);
             return "redirect:/smpeditor/deletesmpinfo";
         }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("\n********* MODEL - '{}'", model.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n********* MODEL - '{}'", model.toString());
         }
         return "redirect:/smpeditor/deletesmpinfo";
     }
@@ -215,14 +209,15 @@ public class SMPDeleteFileController {
      * @param redirectAttributes
      * @return
      */
-    @RequestMapping(value = "smpeditor/deletesmpinfo", method = RequestMethod.GET)
+    @GetMapping(value = "smpeditor/deletesmpinfo")
     public String deleteInfo(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model, final RedirectAttributes redirectAttributes) {
-        LOGGER.debug("\n==== in deleteInfo ====");
+        logger.debug("\n==== in deleteInfo ====");
 
         /* Builds html colors and alerts */
         if (smpdelete.getStatusCode() == 400) {
-            String messag = env.getProperty("http.failure");//messages.properties
-            Alert status = new Alert(messag, Alert.fontColor.red, "#f2dede");
+            //  messages.properties
+            String messag = env.getProperty("http.failure");
+            Alert status = new Alert(messag, Alert.fontColor.red, ALERT_BACKGROUND_COLOR);
             smpdelete.setStatus(status);
             if (smpdelete.getBusinessCode().equals("OTHER_ERROR")) {
                 String message = "400 (OTHER_ERROR): " + env.getProperty("http.400.OTHER_ERROR");//messages.properties
@@ -232,7 +227,7 @@ public class SMPDeleteFileController {
 
         } else if (smpdelete.getStatusCode() == 404) {
             String messag = env.getProperty("http.failure");//messages.properties
-            Alert status = new Alert(messag, Alert.fontColor.red, "#f2dede");
+            Alert status = new Alert(messag, Alert.fontColor.red, ALERT_BACKGROUND_COLOR);
             smpdelete.setStatus(status);
 
             String message = "404: " + env.getProperty("http.404"); //messages.properties
@@ -241,7 +236,7 @@ public class SMPDeleteFileController {
 
         } else if (smpdelete.getStatusCode() == 500) {
             String messag = env.getProperty("http.failure");//messages.properties
-            Alert status = new Alert(messag, Alert.fontColor.red, "#f2dede");
+            Alert status = new Alert(messag, Alert.fontColor.red, ALERT_BACKGROUND_COLOR);
             smpdelete.setStatus(status);
 
             String message = "500: " + env.getProperty("http.500"); //messages.properties
@@ -249,12 +244,11 @@ public class SMPDeleteFileController {
             smpdelete.setAlert(alert);
         }
 
-
         model.addAttribute("smpdelete", smpdelete);
         model.addAttribute("referenceCollection", smpdelete.getReferenceCollection());
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("\n********* MODEL - '{}'", model.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n********* MODEL - '{}'", model.toString());
         }
         return "smpeditor/deletesmpinfo";
     }
@@ -267,9 +261,10 @@ public class SMPDeleteFileController {
      * @param redirectAttributes
      * @return
      */
-    @RequestMapping(value = "smpeditor/deletesmpinfo", method = RequestMethod.POST)
+    @PostMapping(value = "smpeditor/deletesmpinfo")
     public String deletePost(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model, final RedirectAttributes redirectAttributes) {
-        LOGGER.debug("\n==== in deletePost ====");
+
+        logger.debug("\n==== in deletePost ====");
         model.addAttribute("smpdelete", smpdelete);
 
         ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
@@ -287,17 +282,15 @@ public class SMPDeleteFileController {
 
         List<SMPHttp> allItems = new ArrayList<>();
 
-    /*
-      Iterate through all references selected to delete
-    */
+        //  Iterate through all references selected to delete
         for (int i = 0; i < referencesSelected.size(); i++) {
             SMPHttp itemDelete = new SMPHttp();
 
-            LOGGER.debug("\n ************** referencesSelected.get(i) - " + referencesSelected.get(i));
+            logger.debug("\n ************** referencesSelected.get(i) - " + referencesSelected.get(i));
             String[] refs = referencesSelected.get(i).split("&&");
 
-            LOGGER.debug("\n ************** SMPTYPEEEE - '{}'", refs[1]);
-            LOGGER.debug("\n ************** reference - '{}'", refs[0]);
+            logger.debug("\n ************** SMPTYPEEEE - '{}'", refs[1]);
+            logger.debug("\n ************** reference - '{}'", refs[0]);
             itemDelete.setSmptype(refs[1]);
 
             String reference = refs[0];
@@ -309,22 +302,18 @@ public class SMPDeleteFileController {
             try {
                 reference = java.net.URLDecoder.decode(reference, "UTF-8");
             } catch (UnsupportedEncodingException ex) {
-                LOGGER.error("\n UnsupportedEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n UnsupportedEncodingException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             }
-            LOGGER.debug("\n ************** referencesSelected - {}", reference);
+            logger.debug("\n ************** referencesSelected - {}", reference);
 
             URI uri = null;
             try {
-                uri = new URIBuilder()
-                        .setScheme("https")
-                        .setHost(urlServer)
-                        .setPath(reference)
-                        .build();
+                uri = new URIBuilder().setScheme("https").setHost(urlServer).setPath(reference).build();
             } catch (URISyntaxException e) {
-                LOGGER.error("URISyntaxException", e);
+                logger.error("URISyntaxException", e);
             }
 
-            LOGGER.debug("\n ************** URI - {}", uri);
+            logger.debug("\n ************** URI - {}", uri);
 
             PrivateKeyStrategy privatek = (map, socket) -> configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_ALIAS);
 
@@ -341,17 +330,17 @@ public class SMPDeleteFileController {
                                 new TrustSelfSignedStrategy())
                         .build();
             } catch (NoSuchAlgorithmException ex) {
-                LOGGER.error("\n NoSuchAlgorithmException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n NoSuchAlgorithmException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (KeyStoreException ex) {
-                LOGGER.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (CertificateException ex) {
-                LOGGER.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (IOException ex) {
-                LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (KeyManagementException ex) {
-                LOGGER.error("\n KeyManagementException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n KeyManagementException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (UnrecoverableKeyException ex) {
-                LOGGER.error("\n UnrecoverableKeyException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n UnrecoverableKeyException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
             }
 
             //DELETE
@@ -361,7 +350,7 @@ public class SMPDeleteFileController {
             try {
                 response = DynamicDiscoveryService.buildHttpClient(sslcontext).execute(httpdelete);
             } catch (IOException ex) {
-                LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 String message = env.getProperty("error.server.failed"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 return "redirect:/smpeditor/deletesmpfile";
@@ -371,17 +360,11 @@ public class SMPDeleteFileController {
             itemDelete.setStatusCode(response.getStatusLine().getStatusCode());
             org.apache.http.HttpEntity entity = response.getEntity();
 
-            LOGGER.debug("\n ************ RESPONSE DELETE - {}", response.getStatusLine().getStatusCode());
-            LOGGER.debug("\n ************ RESPONSE REASON - {}", response.getStatusLine().getReasonPhrase());
+            logger.debug("\n ************ RESPONSE DELETE - {}", response.getStatusLine().getStatusCode());
+            logger.debug("\n ************ RESPONSE REASON - {}", response.getStatusLine().getReasonPhrase());
 
             //Audit vars
-            String ncp = configurationManager.getProperty("ncp.country");
-            String ncpemail = configurationManager.getProperty("ncp.email");
-            String country = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-            String remoteip = configurationManager.getProperty("SERVER_IP");//Target Gateway
-            String localip = configurationManager.getProperty(StandardProperties.SMP_SML_ADMIN_URL);
-            String smp = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT);
-            String smpemail = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT_EMAIL);
+            String remoteIp = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");
             //ET_ObjectID --> Base64 of url
             String objectID = uri.toString();
             byte[] encodedObjectID = Base64.encodeBase64(objectID.getBytes());
@@ -391,20 +374,16 @@ public class SMPDeleteFileController {
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 //Audit error
                 byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
-                //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
-                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
-                        new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
-
+                AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
+                        Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
                 return "redirect:/smpeditor/deletesmpfile";
             } else if (itemDelete.getStatusCode() == 401) {
                 String message = env.getProperty("error.nouser"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 //Audit error
                 byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
-                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
-                        //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
-                        new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
-
+                AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
+                        Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
                 return "redirect:/smpeditor/deletesmpfile";
             }
 
@@ -416,9 +395,9 @@ public class SMPDeleteFileController {
                 try {
                     org.apache.commons.io.IOUtils.copy(entity.getContent(), baos);
                 } catch (IOException ex) {
-                    LOGGER.error("\n IOException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("\n IOException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (UnsupportedOperationException ex) {
-                    LOGGER.error("\n UnsupportedOperationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("\n UnsupportedOperationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
                 byte[] bytes = baos.toByteArray();
 
@@ -441,35 +420,33 @@ public class SMPDeleteFileController {
                         }
                     }
                 } catch (ParserConfigurationException ex) {
-                    LOGGER.error("\n ParserConfigurationException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("\n ParserConfigurationException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (SAXException ex) {
-                    LOGGER.error("\n SAXException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("\n SAXException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (IOException ex) {
-                    LOGGER.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
 
                 /*transform xml to string in order to send in Audit*/
-                String errorResult = Audit.prepareEventLog(bytes);
-                LOGGER.debug("\n ***************** ERROR RESULT - '{}'", errorResult);
+                String errorResult = AuditManager.prepareEventLog(bytes);
+                logger.debug("\n ***************** ERROR RESULT - '{}'", errorResult);
                 //Audit error
-                //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
-                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
-                        new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), errorResult.getBytes());
+                AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
+                        Integer.toString(response.getStatusLine().getStatusCode()), errorResult.getBytes());
             }
 
             if (itemDelete.getStatusCode() == 200 || itemDelete.getStatusCode() == 201) {
                 //Audit Success
-                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
-                        //Audit.sendAuditPush(smp, smpemail, ncp, ncpemail, country, localip, remoteip,
-                        new String(encodedObjectID), null, null);
+                AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
+                        null, null);
             }
             itemDelete.setId(i);
             allItems.add(i, itemDelete);
         }
         smpdelete.setAllItems(allItems);
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("\n********* MODEL - " + model.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Web Model:\n'{}'", model.toString());
         }
         return "redirect:/smpeditor/deletesmpresult";
     }
@@ -481,9 +458,9 @@ public class SMPDeleteFileController {
      * @param model
      * @return
      */
-    @RequestMapping(value = "smpeditor/deletesmpresult", method = RequestMethod.GET)
+    @GetMapping(value = "smpeditor/deletesmpresult")
     public String postInfo(@ModelAttribute("smpdelete") SMPHttp smpdelete, Model model) {
-        LOGGER.debug("\n==== in deletesmpresult ====");
+        logger.debug("\n==== in deletesmpresult ====");
 
         /* Builds html colors and alerts */
         for (int i = 0; i < smpdelete.getAllItems().size(); i++) {
@@ -494,7 +471,7 @@ public class SMPDeleteFileController {
 
             } else if (smpdelete.getAllItems().get(i).getStatusCode() == 400) {
                 String messag = env.getProperty("http.failure");//messages.properties
-                Alert status = new Alert(messag, Alert.fontColor.red, "#f2dede");
+                Alert status = new Alert(messag, Alert.fontColor.red, ALERT_BACKGROUND_COLOR);
                 smpdelete.getAllItems().get(i).setStatus(status);
                 if ("OTHER_ERROR".equals(smpdelete.getAllItems().get(i).getBusinessCode())) {
                     String message = "400 (OTHER_ERROR): " + env.getProperty("http.400.OTHER_ERROR");//messages.properties
@@ -504,7 +481,7 @@ public class SMPDeleteFileController {
 
             } else if (smpdelete.getAllItems().get(i).getStatusCode() == 404) {
                 String messag = env.getProperty("http.failure");//messages.properties
-                Alert status = new Alert(messag, Alert.fontColor.red, "#f2dede");
+                Alert status = new Alert(messag, Alert.fontColor.red, ALERT_BACKGROUND_COLOR);
                 smpdelete.getAllItems().get(i).setStatus(status);
 
                 String message = "404: " + env.getProperty("http.404"); //messages.properties
@@ -513,7 +490,7 @@ public class SMPDeleteFileController {
 
             } else if (smpdelete.getAllItems().get(i).getStatusCode() == 500) {
                 String messag = env.getProperty("http.failure");//messages.properties
-                Alert status = new Alert(messag, Alert.fontColor.red, "#f2dede");
+                Alert status = new Alert(messag, Alert.fontColor.red, ALERT_BACKGROUND_COLOR);
                 smpdelete.getAllItems().get(i).setStatus(status);
 
                 String message = "500: " + env.getProperty("http.500"); //messages.properties
@@ -524,8 +501,8 @@ public class SMPDeleteFileController {
         model.addAttribute("smpdelete", smpdelete);
         model.addAttribute("items", smpdelete.getAllItems());
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("\n********* MODEL - {}", model.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Model: {}", model.toString());
         }
         return "smpeditor/deletesmpresult";
     }

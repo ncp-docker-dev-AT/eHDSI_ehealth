@@ -32,7 +32,7 @@ public class DynamicDiscoveryClient {
     private DynamicDiscoveryClient() {
     }
 
-    public synchronized static DynamicDiscovery getInstance() throws KeyStoreException, IOException, CertificateException,
+    public static synchronized DynamicDiscovery getInstance() throws KeyStoreException, IOException, CertificateException,
             NoSuchAlgorithmException, TechnicalException {
 
         LOGGER.info("DynamicDiscovery getInstance()");

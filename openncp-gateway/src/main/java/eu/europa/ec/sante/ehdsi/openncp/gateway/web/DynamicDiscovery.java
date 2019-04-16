@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.web;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerException;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.service.DynamicDiscoveryService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class DynamicDiscovery {
         for (String s : countries) {
             logger.info("Fetching ISM for MS: '{}'", s);
             try {
-                ConfigurationManagerFactory.getConfigurationManager().fetchInternationalSearchMask(s);
+                DynamicDiscoveryService.fetchInternationalSearchMask(s);
                 synchronizedCountry.add(s);
 
             } catch (ConfigurationManagerException e) {
