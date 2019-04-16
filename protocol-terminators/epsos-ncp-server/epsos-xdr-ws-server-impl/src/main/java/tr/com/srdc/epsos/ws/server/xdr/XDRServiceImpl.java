@@ -4,6 +4,7 @@ import epsos.ccd.gnomon.auditmanager.*;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
+import eu.epsos.protocolterminators.ws.server.exception.NationalInfrastructureException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
@@ -30,6 +31,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import tr.com.srdc.epsos.securityman.SAML2Validator;
 import tr.com.srdc.epsos.securityman.exceptions.AssertionValidationException;
 import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
@@ -50,7 +52,8 @@ import java.util.ServiceLoader;
 
 public class XDRServiceImpl implements XDRServiceInterface {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(XDRServiceImpl.class);
+    private static final String HL7_NAMESPACE = "urn:hl7-org:v3";
+    private final Logger logger = LoggerFactory.getLogger(XDRServiceImpl.class);
     private oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
     private ServiceLoader<DocumentSubmitInterface> serviceLoader;
     private DocumentSubmitInterface documentSubmitService;
@@ -59,11 +62,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         serviceLoader = ServiceLoader.load(DocumentSubmitInterface.class);
         try {
-            LOGGER.info("Loading National implementation of DocumentSubmitInterface...");
+            logger.info("Loading National implementation of DocumentSubmitInterface...");
             documentSubmitService = serviceLoader.iterator().next();
-            LOGGER.info("Successfully loaded documentSubmitService");
+            logger.info("Successfully loaded documentSubmitService");
         } catch (Exception e) {
-            LOGGER.error("Failed to load implementation of documentSubmitService: " + e.getMessage(), e);
+            logger.error("Failed to load implementation of documentSubmitService: " + e.getMessage(), e);
             throw e;
         }
 
@@ -75,21 +78,26 @@ public class XDRServiceImpl implements XDRServiceInterface {
         this.ofRs = ofRs;
     }
 
-    private RegistryError createErrorMessage(String errorCode, String codeContext, String value, boolean isWarning) {
+    private RegistryError createErrorMessage(String errorCode, String codeContext, String value, String location, boolean isWarning) {
 
         RegistryError re = ofRs.createRegistryError();
         re.setErrorCode(errorCode);
-        re.setLocation(getLocation());
+        re.setLocation(location);
         re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error"));
         re.setCodeContext(codeContext);
         re.setValue(value);
-
         return re;
+
+    }
+
+    private RegistryError createErrorMessage(String errorCode, String codeContext, String value, boolean isWarning) {
+
+        return createErrorMessage(errorCode, codeContext, value, getLocation(), isWarning);
     }
 
     protected String getLocation() {
 
-        //  Returning HOME COMMUNITY ID insteand of RegisteredService.CONSENT_SERVICE
+        //  Returning HOME COMMUNITY ID instead of RegisteredService.CONSENT_SERVICE
         return "urn:oid:" + Constants.HOME_COMM_ID;
     }
 
@@ -107,7 +115,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
-            LOGGER.error("DatatypeConfigurationException: {}", e.getMessage(), e);
+            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
         }
         if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
 
@@ -149,7 +157,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             eventLog.setEM_PatricipantObjectID(re.getErrorCode());
             eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
         }
-        LOGGER.debug("Event log prepared");
+        logger.debug("Event log prepared");
     }
 
     /**
@@ -166,7 +174,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         } catch (DatatypeConfigurationException e) {
-            LOGGER.error("DatatypeConfigurationException: {}", e.getMessage(), e);
+            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
         }
 
         if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
@@ -213,7 +221,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
         }
 
-        LOGGER.debug("Event log prepared");
+        logger.debug("Event log prepared");
     }
 
     private String getDocumentEntryPatientId(ProvideAndRegisterDocumentSetRequestType request) {
@@ -238,7 +246,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 }
             }
         }
-        LOGGER.error("Could not locate the patient id of the XDR request.");
+        logger.error("Could not locate the patient id of the XDR request.");
         return patientId;
     }
 
@@ -250,12 +258,12 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     /**
      * @param request
-     * @param sh
+     * @param soapHeader
      * @param eventLog
      * @return
      * @throws Exception
      */
-    public RegistryResponseType saveDispensation(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader sh,
+    public RegistryResponseType saveDispensation(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader soapHeader,
                                                  EventLog eventLog) throws Exception {
 
         RegistryResponseType response = new RegistryResponseType();
@@ -263,9 +271,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         Element shElement;
         try {
-            shElement = XMLUtils.toDOM(sh);
+            shElement = XMLUtils.toDOM(soapHeader);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            logger.error(e.getMessage());
             throw e;
         }
         documentSubmitService.setSOAPHeader(shElement);
@@ -275,19 +283,18 @@ public class XDRServiceImpl implements XDRServiceInterface {
             sigCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.ED_CLASSCODE);
 
         } catch (InsufficientRightsException e) {
-            LOGGER.error("InsufficientRightsException: '{}'", e.getMessage(), e);
+            logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
-            LOGGER.error("AssertionValidationException: '{}'", e.getMessage(), e);
+            logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
-            LOGGER.error("SMgrException: '{}'", e.getMessage(), e);
+            logger.error("SMgrException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
         }
 
-        //  String documentId = request.getDocument().get(0).getId();
         String patientId = getPatientId(request);
-        LOGGER.info("Received an eDispensation document for patient: '{}'", patientId);
+        logger.info("Received an eDispensation document for patient: '{}'", patientId);
         String countryCode = "";
         String DN = eventLog.getSC_UserID();
         int cIndex = DN.indexOf("C=");
@@ -299,16 +306,16 @@ public class XDRServiceImpl implements XDRServiceInterface {
         // In this case, we check the country code of the signature certificate that ships within the HCP assertion.
         // TODO: Might be necessary to remove later, although it does no harm in reality!
         else {
-            LOGGER.info("Could not get client country code from the service consumer certificate. " +
+            logger.info("Could not get client country code from the service consumer certificate. " +
                     "The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
             if (sigCountryCode != null) {
-                LOGGER.info("Found the client country code via the signature certificate.");
+                logger.info("Found the client country code via the signature certificate.");
                 countryCode = sigCountryCode;
             }
         }
-        LOGGER.info("The client country code to be used by the PDP: '{}'", countryCode);
+        logger.info("The client country code to be used by the PDP: '{}'", countryCode);
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
-            LOGGER.debug("No consent given, throwing InsufficientRightsException");
+            logger.debug("No consent given, throwing InsufficientRightsException");
             InsufficientRightsException e = new InsufficientRightsException(4701);
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         }
@@ -317,60 +324,57 @@ public class XDRServiceImpl implements XDRServiceInterface {
             response.setStatus(AdhocQueryResponseStatus.FAILURE);
         } else {
             try {
-                shElement = XMLUtils.toDOM(sh);
+                shElement = XMLUtils.toDOM(soapHeader);
             } catch (Exception e) {
-                LOGGER.error(e.getMessage());
+                logger.error(e.getMessage());
                 throw e;
             }
 
             for (int i = 0; i < request.getDocument().size(); i++) {
+
                 Document doc = request.getDocument().get(i);
+                String documentId = "";
                 byte[] docBytes = doc.getValue();
                 try {
 
-                    /* Validate CDA epSOS Pivot */
+                    //  Validate CDA epSOS Pivot.
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8),
                                 NcpSide.NCP_A, obtainClassCode(request), true);
                     }
 
-                    //Resets the response document to a translated version.
+                    //  Reset the response document to a translated version.
                     docBytes = TMServices.transformDocument(docBytes, Constants.LANGUAGE_CODE);
 
-                    /* Validate CDA epSOS Pivot */
+                    // Validate CDA epSOS Pivot
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8), NcpSide.NCP_A,
                                 obtainClassCode(request), false);
                     }
 
                 } catch (DocumentTransformationException ex) {
-                    LOGGER.error(ex.getLocalizedMessage(), ex);
+                    logger.error(ex.getLocalizedMessage(), ex);
                 }
+
                 try {
                     org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
                     EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.ED_CLASSCODE, domDocument);
                     // Evidence for call to NI for XDR submit (dispensation)
                     // Joao: here we have a Document so we can generate the mandatory NRO
                     try {
-                        EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(),
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                                tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                IHEEventType.epsosDispensationServiceInitialize.getCode(),
-                                new DateTime(),
-                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                                "NI_XDR_DISP_REQ",
+                        EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(), Constants.NCP_SIG_KEYSTORE_PATH,
+                                Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                                Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
+                                Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH,
+                                Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                                IHEEventType.epsosDispensationServiceInitialize.getCode(), new DateTime(),
+                                EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XDR_DISP_REQ",
                                 Objects.requireNonNull(Helper.getTRCAssertion(shElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
                     } catch (Exception e) {
-                        LOGGER.error(ExceptionUtils.getStackTrace(e));
+                        logger.error(ExceptionUtils.getStackTrace(e));
                     }
                     // Call to National Connector
+                    documentId = getDocumentId(epsosDocument.getDocument());
                     documentSubmitService.submitDispensation(epsosDocument);
 
                     // Evidence for response from NI for XDR submit (dispensation)
@@ -387,13 +391,16 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                                "NI_XDR_DISP_RES",
 //                                Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement) + "__" + DateUtil.getCurrentTimeGMT());
 //                    } catch (Exception e) {
-//                        LOGGER.error(ExceptionUtils.getStackTrace(e));
+//                        logger.error(ExceptionUtils.getStackTrace(e));
 //                    }
+                } catch (NationalInfrastructureException e) {
+                    logger.error("DocumentSubmitException: '{}'-'{}'", e.getCode(), e.getMessage());
+                    rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", documentId, false));
                 } catch (NIException e) {
-                    LOGGER.error("NIException: '{}'", e.getMessage(), e);
+                    logger.error("NIException: '{}'", e.getMessage());
                     rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
                 } catch (Exception e) {
-                    LOGGER.error("Exception: '{}'", e.getMessage(), e);
+                    logger.error("Generic Exception: '{}'", e.getMessage(), e);
                     rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
                 }
             }
@@ -409,37 +416,44 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return response;
     }
 
+    /**
+     * @param request
+     * @param sh
+     * @param eventLog
+     * @return
+     * @throws Exception
+     */
     public RegistryResponseType saveDocument(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader sh,
                                              EventLog eventLog) throws Exception {
 
         // Traverse all ExtrinsicObjects
-        for (int i = 0; i < request.getSubmitObjectsRequest()
-                .getRegistryObjectList().getIdentifiable().size(); i++) {
+        for (int i = 0; i < request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().size(); i++) {
+
             if (!(request.getSubmitObjectsRequest().getRegistryObjectList()
                     .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
                 continue;
             }
-            ExtrinsicObjectType eot = (ExtrinsicObjectType) request
-                    .getSubmitObjectsRequest().getRegistryObjectList()
+            ExtrinsicObjectType eot = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
                     .getIdentifiable().get(i).getValue();
-            // Traverse all Classification blocks in the ExtrinsicObject
-            // selected
-            for (int j = 0; j < eot.getClassification().size(); j++) {
-                // If classified as eDispensation, process as eDispensation
-                if (eot.getClassification().get(j).getNodeRepresentation()
-                        .compareTo(Constants.ED_CLASSCODE) == 0) {
-                    LOGGER.info("Processing an eDispensation message");
 
+            // Traverse all Classification blocks in the ExtrinsicObject selected
+            for (int j = 0; j < eot.getClassification().size(); j++) {
+
+                // If classified as eDispensation, process as eDispensation
+                if (eot.getClassification().get(j).getNodeRepresentation().compareTo(Constants.ED_CLASSCODE) == 0) {
+
+                    logger.info("Processing an eDispensation message");
                     return saveDispensation(request, sh, eventLog);
 
                 } // TODO: check the right LOINC code, currently coded as in
                 // example 3.4.2 ver. 2.2 p. 82
                 else if (eot.getClassification().get(j).getNodeRepresentation().compareTo(Constants.CONSENT_CLASSCODE) == 0) {
-                    LOGGER.info("Processing a consent");
+
+                    logger.info("Processing a consent");
                     return saveConsent(request, sh, eventLog);
-                } else if (eot.getClassification().get(j).getNodeRepresentation()
-                        .equals(Constants.HCER_CLASSCODE)) {
-                    LOGGER.info("Processing HCER document");
+                } else if (eot.getClassification().get(j).getNodeRepresentation().equals(Constants.HCER_CLASSCODE)) {
+
+                    logger.info("Processing HCER document");
                     return saveHCER(request, sh, eventLog);
                 }
             }
@@ -449,6 +463,12 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return reportDocumentTypeError(request);
     }
 
+    /**
+     * @param request
+     * @param sh
+     * @param eventLog
+     * @return
+     */
     public RegistryResponseType saveConsent(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader sh, EventLog eventLog) {
 
         RegistryResponseType response = new RegistryResponseType();
@@ -458,7 +478,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         try {
             shElement = XMLUtils.toDOM(sh);
         } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            logger.error("Exception: '{}'", e.getMessage(), e);
         }
         documentSubmitService.setSOAPHeader(shElement);
 
@@ -467,26 +487,26 @@ public class XDRServiceImpl implements XDRServiceInterface {
             sigCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.CONSENT_CLASSCODE);
 
         } catch (InsufficientRightsException e) {
-            LOGGER.error("InsufficientRightsException: '{}'", e.getMessage(), e);
+            logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
-            LOGGER.error("AssertionValidationException: '{}'", e.getMessage(), e);
+            logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
-            LOGGER.error("SMgrException: '{}'", e.getMessage(), e);
+            logger.error("SMgrException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
-        LOGGER.info("Received a consent document for patient: '{}'", patientId);
+        logger.info("Received a consent document for patient: '{}'", patientId);
         /*
-         * Here PDP checks and related calls are skipped, necessary checks to be
-         * performed in the NI while processing the consent document.
+         * Here PDP checks and related calls are skipped, necessary checks to be performed in the NI while processing
+         * the consent document.
          */
         try {
             shElement = XMLUtils.toDOM(sh);
         } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            logger.error("Exception: '{}'", e.getMessage(), e);
         }
 
         for (int i = 0; i < request.getDocument().size(); i++) {
@@ -510,9 +530,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 }
 
             } catch (DocumentTransformationException ex) {
-                LOGGER.error(ex.getLocalizedMessage(), ex);
+                logger.error(ex.getLocalizedMessage(), ex);
             } catch (Exception ex) {
-                LOGGER.error(null, ex);
+                logger.error(null, ex);
             }
             try {
                 org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
@@ -521,23 +541,15 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 // Evidence for call to NI for XDR submit (patient consent)
                 // Joao: here we have a Document so we can generate the mandatory NRO
                 try {
-                    EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(),
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            IHEEventType.epsosConsentServicePut.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            "NI_XDR_CONSENT_REQ",
+                    EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(), Constants.NCP_SIG_KEYSTORE_PATH,
+                            Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SP_KEYSTORE_PATH,
+                            Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH,
+                            Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                            IHEEventType.epsosConsentServicePut.getCode(), new DateTime(),
+                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XDR_CONSENT_REQ",
                             Objects.requireNonNull(Helper.getTRCAssertion(shElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
                 } catch (Exception e) {
-                    LOGGER.error(ExceptionUtils.getStackTrace(e));
+                    logger.error(ExceptionUtils.getStackTrace(e));
                 }
 
                 documentSubmitService.submitPatientConsent(epsosDocument);
@@ -555,14 +567,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                            "NI_XDR_CONSENT_RES",
 //                            Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement) + "__" + DateUtil.getCurrentTimeGMT());
 //                } catch (Exception e) {
-//                    LOGGER.error(ExceptionUtils.getStackTrace(e));
+//                    logger.error(ExceptionUtils.getStackTrace(e));
 //                }
-
             } catch (DocumentProcessingException e) {
-                LOGGER.error("DocumentProcessingException: '{}'", e.getMessage(), e);
+                logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
                 rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
             } catch (Exception e) {
-                LOGGER.error("Exception: '{}'", e.getMessage(), e);
+                logger.error("Exception: '{}'", e.getMessage(), e);
                 rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
             }
         }
@@ -576,16 +587,24 @@ public class XDRServiceImpl implements XDRServiceInterface {
         try {
             prepareEventLogForConsentPut(eventLog, request, response, shElement);
         } catch (Exception ex) {
-            LOGGER.error(null, ex);
+            logger.error(null, ex);
             // Is this fatal?
         }
         return response;
     }
 
-    protected String validateXDRHeader(Element sh, String classCode) throws MissingFieldException, InvalidFieldException, SMgrException, InsufficientRightsException {
+    protected String validateXDRHeader(Element sh, String classCode) throws MissingFieldException, InvalidFieldException,
+            SMgrException, InsufficientRightsException {
+
         return SAML2Validator.validateXDRHeader(sh, classCode);
     }
 
+    /**
+     * @param request
+     * @param sh
+     * @param eventLog
+     * @return
+     */
     public RegistryResponseType saveHCER(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader sh, EventLog eventLog) {
 
         RegistryResponseType response = new RegistryResponseType();
@@ -595,7 +614,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         try {
             shElement = XMLUtils.toDOM(sh);
         } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            logger.error("Exception: '{}'", e.getMessage(), e);
         }
         documentSubmitService.setSOAPHeader(shElement);
 
@@ -603,21 +622,21 @@ public class XDRServiceImpl implements XDRServiceInterface {
         try {
             sigCountryCode = validateXDRHeader(shElement, Constants.HCER_CLASSCODE);
         } catch (InsufficientRightsException e) {
-            LOGGER.error("InsufficientRightsException: '{}'", e.getMessage(), e);
+            logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
-            LOGGER.error("AssertionValidationException: '{}'", e.getMessage(), e);
+            logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
-            LOGGER.error("SMgrException: '{}'", e.getMessage(), e);
+            logger.error("SMgrException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
-        LOGGER.info("Received a HCER document for patient: '{}' ", patientId);
+        logger.info("Received a HCER document for patient: '{}' ", patientId);
         /*
-         * Here PDP checks and related calls are skipped, necessary checks to be
-         * performed in the NI while processing the consent document.
+         * Here PDP checks and related calls are skipped, necessary checks to be performed in the NI while processing
+         * the consent document.
          */
         for (int i = 0; i < request.getDocument().size(); i++) {
             Document doc = request.getDocument().get(i);
@@ -640,13 +659,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.HCER_CLASSCODE, domDocument);
                 documentSubmitService.submitHCER(epsosDocument);
             } catch (DocumentProcessingException e) {
-                LOGGER.error("DocumentProcessingException: '{}'", e.getMessage(), e);
+                logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
                 rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
             } catch (DocumentTransformationException e) {
-                LOGGER.error("DocumentTransformationException: '{}'", e.getMessage(), e);
+                logger.error("DocumentTransformationException: '{}'", e.getMessage(), e);
                 rel.getRegistryError().add(createErrorMessage(e.getErrorCode(), e.getCodeContext(), e.getMessage(), false));
             } catch (Exception e) {
-                LOGGER.error("Exception: '{}'", e.getMessage(), e);
+                logger.error("Exception: '{}'", e.getMessage(), e);
                 rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
             }
         }
@@ -684,23 +703,24 @@ public class XDRServiceImpl implements XDRServiceInterface {
     private String obtainClassCode(final ProvideAndRegisterDocumentSetRequestType request) {
 
         if (request == null) {
-            LOGGER.error("The provided request message in order to extract the classcode is null.");
+            logger.error("The provided request message in order to extract the classcode is null.");
             return null;
         }
 
         final String CLASS_SCHEME = XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME;
         String result = "";
 
-        for (int i = 0; i < request.getSubmitObjectsRequest()
-                .getRegistryObjectList().getIdentifiable().size(); i++) {
-            if (!(request.getSubmitObjectsRequest().getRegistryObjectList()
-                    .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
+        for (int i = 0; i < request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().size(); i++) {
+
+            if (!(request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().get(i).getValue()
+                    instanceof ExtrinsicObjectType)) {
                 continue;
             }
-            ExtrinsicObjectType eot = (ExtrinsicObjectType) request
-                    .getSubmitObjectsRequest().getRegistryObjectList()
+            ExtrinsicObjectType eot = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
                     .getIdentifiable().get(i).getValue();
+
             for (int j = 0; j < eot.getClassification().size(); j++) {
+
                 if (eot.getClassification().get(j).getClassificationScheme().equals(CLASS_SCHEME)) {
                     result = eot.getClassification().get(j).getNodeRepresentation();
                     break;
@@ -709,7 +729,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         }
 
         if (result.isEmpty()) {
-            LOGGER.warn("No class code was found in request object.");
+            logger.warn("No class code was found in request object.");
         }
         return result;
     }
@@ -731,5 +751,21 @@ public class XDRServiceImpl implements XDRServiceInterface {
         }
 
         return result;
+    }
+
+    private String getDocumentId(org.w3c.dom.Document document) {
+
+        String oid = "";
+        if (document != null && document.getElementsByTagNameNS(HL7_NAMESPACE, "id").getLength() > 0) {
+            Node id = document.getElementsByTagNameNS(HL7_NAMESPACE, "id").item(0);
+            if (id.getAttributes().getNamedItem("root") != null) {
+                oid = oid + id.getAttributes().getNamedItem("root").getTextContent();
+            }
+            if (id.getAttributes().getNamedItem("extension") != null) {
+                oid = oid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
+            }
+        }
+        logger.info("Document ID: '{}'", oid);
+        return oid;
     }
 }
