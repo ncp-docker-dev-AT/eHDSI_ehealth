@@ -125,11 +125,18 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         }
     }
 
-    public PRPAIN201306UV02 queryPatient(PRPAIN201305UV02 pRPA_IN201305UV02, SOAPHeader sh, EventLog eventLog) throws Exception {
+    /**
+     * @param request
+     * @param soapHeader
+     * @param eventLog
+     * @return
+     * @throws Exception
+     */
+    public PRPAIN201306UV02 queryPatient(PRPAIN201305UV02 request, SOAPHeader soapHeader, EventLog eventLog) throws Exception {
 
-        PRPAIN201306UV02 result = of.createPRPAIN201306UV02();
-        pRPAIN201306UV02Builder(pRPA_IN201305UV02, result, sh, eventLog);
-        return result;
+        PRPAIN201306UV02 response = of.createPRPAIN201306UV02();
+        pRPAIN201306UV02Builder(request, response, soapHeader, eventLog);
+        return response;
     }
 
     private PRPAIN201306UV02MFMIMT700711UV01Subject1 getSubjectByPatientDemographic(PatientDemographics pd) {
@@ -466,6 +473,13 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         return pd;
     }
 
+    /**
+     * @param inputMessage
+     * @param outputMessage
+     * @param sh
+     * @param eventLog
+     * @throws Exception
+     */
     private void pRPAIN201306UV02Builder(PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, SOAPHeader sh, EventLog eventLog) throws Exception {
 
         String sigCountryCode;
@@ -491,7 +505,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
         // Set creation time
         outputMessage.setCreationTime(of.createTS());
-        outputMessage.getCreationTime().setValue(DateUtil.getDateByDateFormat("yyyyMMddHHmmss.SSSZZZZ"));
+        outputMessage.getCreationTime().setValue(DateUtil.getCurrentTimeUTC());
 
         // Set ITSVersion element
         outputMessage.setITSVersion("XML_1.0");
@@ -592,37 +606,26 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 sb.append("</patient>");
                 logger.debug("patientIdList.size: '{}'", patientIdList.size());
 
-                // call to NI
+
                 // Joao: we have an adhoc XML document, so we can generate this evidence correctly
                 try {
                     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                     factory.setNamespaceAware(true);
                     DocumentBuilder builder = factory.newDocumentBuilder();
                     Document doc = builder.parse(new InputSource(new StringReader(sb.toString())));
-                    EvidenceUtils.createEvidenceREMNRO(doc,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
-                            new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-                            "NI_XCPD_REQ",
+                    EvidenceUtils.createEvidenceREMNRO(doc, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                            Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
+                            Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
+                            Constants.NCP_SIG_PRIVATEKEY_ALIAS, IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
+                            new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XCPD_REQ",
                             Helper.getHCPAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
                 } catch (Exception e) {
                     logger.error(ExceptionUtils.getStackTrace(e));
                 }
+
+                // call to NI
                 List<PatientDemographics> pdList = patientSearchService.getPatientDemographics(patientIdList);
-//                PatientDemographics demographics = pdList.get(0);
-//                demographics.setFamilyName("FAKE Schuman");
-//                demographics.setGivenName("FAKE Robert");
-//                demographics.setId("8-4567");
-//                pdList.add(demographics);
+
                 // Joao: the NRR is being generated based on the request data, not on the response. This NRR is optional as per the CP, so it's left commented
 //                try {
 //                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
