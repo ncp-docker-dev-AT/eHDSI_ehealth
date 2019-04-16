@@ -28,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 public class CDAServlet extends HttpServlet {
 
@@ -107,7 +108,7 @@ public class CDAServlet extends HttpServlet {
             selectedEpsosDocument.setDescription(eps.getDescription());
             selectedEpsosDocument.setTitle(eps.getTitle());
 
-            String xmlfile = new String(eps.getBase64Binary(), "UTF-8");
+            String xmlfile = new String(eps.getBase64Binary(), StandardCharsets.UTF_8);
             LOGGER.debug("#### CDA XML Start");
             LOGGER.debug(xmlfile);
             LOGGER.debug("#### CDA XML End");
