@@ -740,7 +740,7 @@
         <xsl:param name="codeSystem"/>
         <xsl:variable name="dirFile" select="concat($epsosLangDir,'/',$xmlFile)"/>
         <xsl:variable name="foundKey"
-                      select="document(concat('file://', $dirFile))/ValueSet/concept[@code=$code and @codeSystem=$codeSystem]"/>
+                      select="document(concat('file:///', translate($dirFile,'\','/')))/ValueSet/concept[@code=$code and @codeSystem=$codeSystem]"/>
         <xsl:variable name="foundKeyLang" select="$foundKey/designation[@lang=$userLang]"/>
         <xsl:variable name="defFoundKeyLang" select="$foundKey/designation[@lang=$defaultUserLang]"/>
         <xsl:choose>
@@ -759,7 +759,7 @@
         <xsl:variable name="dirFile"
                       select="concat($epsosLangDir,'/1.3.6.1.4.1.12559.11.10.1.3.1.42.46.xml')"/>
         <xsl:variable name="foundKey"
-                      select="document(concat('file://', $dirFile))/ValueSet/concept[@code=$code]"/>
+                      select="document(concat('file:///', translate($dirFile,'\','/')))/ValueSet/concept[@code=$code]"/>
         <xsl:variable name="foundKeyLang"
                       select="$foundKey/designation[@lang=$userLang]"/>
         <xsl:variable name="defFoundKeyLang"

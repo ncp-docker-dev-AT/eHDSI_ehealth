@@ -618,7 +618,7 @@
                     </tr>
                     <tr>
                         <td style="background-color:#ffffcc" colspan="{6+count($manufacturedMaterialStrength)}">
-                            <!-- HOTFIX - Has to be replaced with a value from the epSOSDisplayLabel value set -->
+                            <!-- TODO - Has to be replaced with a value from the epSOSDisplayLabel value set -->
                             *  If substitution of brand name is marked as not allowed, pharmacists may still consider dispensing the national equivalent even though the brand name might be slightly different.<br/>
                             &#160;&#160;This is a known situation: the same pharmaceutical company is marketing the same medicinal product in different countries with slightly different names due to marketing reasons.<br/>
                             &#160;&#160;If the pharmacist is certain that this is the case, the systems allows the input of the new brand name.<br/>

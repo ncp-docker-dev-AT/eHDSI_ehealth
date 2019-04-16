@@ -344,6 +344,46 @@ input[type='checkbox'] {
     opacity: 1;
 }
 
+.tooltip-right {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-right .tooltiptext {
+    visibility: hidden;
+    width: 350px;
+    background-color: white;
+    color: #3871A9;
+    text-align: center;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #3871A9;
+    border-width: 1px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: 105%;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip-right .tooltiptext::after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    right: 100%; /* To the left of the tooltip */
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #3871A9 transparent transparent ;
+}
+
+.tooltip-right:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
 .narrative {
     color: #085a9f;
 }

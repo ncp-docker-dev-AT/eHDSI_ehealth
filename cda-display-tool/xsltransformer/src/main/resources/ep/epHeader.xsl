@@ -42,7 +42,7 @@
                             </xsl:call-template>
                         </th>
                         <th>
-                            <!--   Regional/National Health ID: -->
+                            <!--  Regional/National Health ID: -->
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'66'"/>
                             </xsl:call-template>
