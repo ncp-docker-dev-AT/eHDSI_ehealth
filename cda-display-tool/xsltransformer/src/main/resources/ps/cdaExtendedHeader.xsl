@@ -14,7 +14,6 @@
             name="patientWholeAddress"
             select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole"/>
 
-
     <xsl:variable
             name="patientStreet"
             select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:addr/n1:streetAddressLine"/>
@@ -724,27 +723,20 @@
                     </td>
                 </tr>
 
-
                 <!-- Legal Authenticator -->
-
                 <tr>
                     <th>
                         <!-- Legal Authenticator-->
-
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'40'"/>
                         </xsl:call-template>
                     </th>
                     <td>
-
                         <xsl:value-of select="$LegalAuthenticator/n1:name/n1:given"/>&#160;
                         <xsl:value-of select="$LegalAuthenticator/n1:name/n1:family"/>&#160;
-                        <xsl:if test="$LegalAuthenticator2/n1:name">
+                        <xsl:if test="$LegalAuthenticator2/n1:name and not($LegalAuthenticator2/n1:name/@nullFlavor)">
                             ,<xsl:value-of select="$LegalAuthenticator2/n1:name"/>&#160;
-
                         </xsl:if>
-
-
                     </td>
                 </tr>
                 <tr>
@@ -783,8 +775,6 @@
                         </xsl:call-template>
                     </th>
                     <td>
-
-
                         <xsl:for-each
                                 select="/n1:ClinicalDocument/n1:participant/n1:functionCode[not(@code='PCP')]/../n1:associatedEntity[@classCode='PRS']/n1:associatedPerson">
                             <xsl:value-of select="n1:name/n1:given"/>&#160;
@@ -816,14 +806,11 @@
 
 
                         <ul>
-                            <xsl:for-each
-                                    select="/n1:ClinicalDocument/n1:participant/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.2.4']/../n1:associatedEntity">
-
-                                <xsl:if test="n1:associatedPerson or n1:scopingOrganization">
+                            <xsl:for-each select="/n1:ClinicalDocument/n1:participant/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.2.4']/../n1:associatedEntity">
+                                <xsl:if test="n1:associatedPerson/n1:name/* or n1:scopingOrganization">
                                     <li><xsl:value-of select="n1:associatedPerson/n1:name/n1:given"/>&#160;
                                         <xsl:value-of select="n1:associatedPerson/n1:name/n1:family"/>&#160;
                                         <xsl:value-of select="n1:scopingOrganization/n1:name"/>&#160;
-
                                     </li>
                                 </xsl:if>
                             </xsl:for-each>
