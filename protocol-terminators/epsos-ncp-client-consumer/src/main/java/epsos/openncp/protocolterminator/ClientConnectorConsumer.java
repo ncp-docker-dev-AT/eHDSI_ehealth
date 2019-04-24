@@ -147,10 +147,11 @@ public class ClientConnectorConsumer {
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode, String targetLanguage) {
 
         LOGGER.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}', targetLanguage:'{}')", countryCode, homeCommunityId, targetLanguage);
-        ClientConnectorServiceServiceStub stub = initializeServiceStub();
+        ClientConnectorServiceServiceStub clientConnectorStub = initializeServiceStub();
 
         try {
-            addAssertions(stub, idAssertion, trcAssertion);
+
+            addAssertions(clientConnectorStub, idAssertion, trcAssertion);
             RetrieveDocumentDocument1 retrieveDocumentDocument = RetrieveDocumentDocument1.Factory.newInstance();
             RetrieveDocument1 retrieveDocument = retrieveDocumentDocument.addNewRetrieveDocument();
 
@@ -161,7 +162,8 @@ public class ClientConnectorConsumer {
             retrieveDocumentRequest.setClassCode(classCode);
             retrieveDocumentRequest.setTargetLanguage(targetLanguage);
 
-            RetrieveDocumentResponseDocument retrieveDocumentResponseDocument = stub.retrieveDocument(retrieveDocumentDocument);
+            RetrieveDocumentResponseDocument retrieveDocumentResponseDocument = clientConnectorStub.retrieveDocument(retrieveDocumentDocument);
+
             return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
         } catch (Exception ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
@@ -210,10 +212,10 @@ public class ClientConnectorConsumer {
         LOGGER.debug("Initializing Client Connector Stub Services");
 
         try {
-            ClientConnectorServiceServiceStub stub = new ClientConnectorServiceServiceStub(epr);
-            stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
-            this.registerEvidenceEmitterHandler(stub);
-            return stub;
+            ClientConnectorServiceServiceStub clientConnectorStub = new ClientConnectorServiceServiceStub(epr);
+            clientConnectorStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
+            this.registerEvidenceEmitterHandler(clientConnectorStub);
+            return clientConnectorStub;
         } catch (AxisFault ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
