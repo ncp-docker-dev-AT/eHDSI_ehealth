@@ -12,6 +12,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +106,7 @@ public class ClientConnectorConsumer {
         ClientConnectorServiceServiceStub stub = initializeServiceStub();
 
         try {
+            trim(pd);
             addAssertions(stub, idAssertion, null);
             QueryPatientRequest queryPatientRequest = QueryPatientRequest.Factory.newInstance();
 
@@ -219,6 +221,19 @@ public class ClientConnectorConsumer {
         } catch (AxisFault ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
+        }
+    }
+
+    private void trim(PatientDemographics patientDemographics) {
+
+        patientDemographics.setAdministrativeGender(StringUtils.trim(patientDemographics.getAdministrativeGender()));
+        patientDemographics.setFamilyName(StringUtils.trim(patientDemographics.getFamilyName()));
+        patientDemographics.setGivenName(StringUtils.trim(patientDemographics.getGivenName()));
+
+        for (PatientId patientId : patientDemographics.getPatientIdArray()) {
+
+            patientId.setExtension(StringUtils.trim(patientId.getExtension()));
+            patientId.setRoot(StringUtils.trim(patientId.getRoot()));
         }
     }
 }
