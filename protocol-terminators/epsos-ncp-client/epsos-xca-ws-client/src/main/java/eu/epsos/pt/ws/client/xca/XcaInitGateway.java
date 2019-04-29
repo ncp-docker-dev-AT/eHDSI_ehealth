@@ -167,19 +167,18 @@ public class XcaInitGateway {
         if (!queryResponse.getDocumentResponse().isEmpty()) {
             if (queryResponse.getDocumentResponse().size() > 1) {
                 LOGGER.error("More than one documents where retrieved for the current request with parameters document ID: '{}' " +
-                        "- homeCommunityId: '{}' - registry: ", document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
+                        "- homeCommunityId: '{}' - registry: '{}'", document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
                 //TODO: Shall be a fatal ERROR
             }
             //TODO: review this try - catch - finally mechanism and the transformation/translation mechanism.
             byte[] pivotDocument = queryResponse.getDocumentResponse().get(0).getDocument();
             byte[] friendlyDocument;
-            //  LOGGER.info("Pivot CDA:\n'{}'", new String(pivotDocument, StandardCharsets.UTF_8));
+
             try {
 
                 //  Validate CDA Pivot
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(new String(pivotDocument, StandardCharsets.UTF_8),
-                            //XMLUtils.toOM(TMServices.byteToDocument(pivotDocument).getDocumentElement()).toString(),
                             NcpSide.NCP_B, document.getClassCode().getValue(), true);
                 }
                 //  Resets the response document to a translated version.
@@ -197,7 +196,6 @@ public class XcaInitGateway {
                             NcpSide.NCP_B, document.getClassCode().getValue(), false);
                 }
                 //  Returns the original document, even if the translation process fails.
-                //  LOGGER.info("Pivot CDA:\n'{}'", new String(queryResponse.getDocumentResponse().get(0).getDocument(), StandardCharsets.UTF_8));
                 result = queryResponse.getDocumentResponse().get(0);
             }
         }
@@ -243,7 +241,9 @@ public class XcaInitGateway {
 
                     //Throw all the remaining errors
                     if (hasError) {
-                        LOGGER.error(msg.toString());
+                        if (LOGGER.isErrorEnabled()) {
+                            LOGGER.error("Registry Errors: '{}'", msg.toString());
+                        }
                         throw new XCAException(errorCode);
                     }
                 }
@@ -254,8 +254,8 @@ public class XcaInitGateway {
     /**
      * This method will check if a given code is related to the document transformation errors
      *
-     * @param errorCode
-     * @return
+     * @param errorCode Error Code associated to the action performed.
+     * @return True | false according the Error Codes List.
      */
     private static boolean checkTransformationErrors(String errorCode) {
 
