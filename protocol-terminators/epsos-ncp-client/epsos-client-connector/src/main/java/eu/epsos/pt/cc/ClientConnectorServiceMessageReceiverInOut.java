@@ -89,7 +89,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                         + "should specified via the SOAP Action to use the RawXMLProvider");
             }
 
-            java.lang.String methodName;
+            String methodName;
             if ((op.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(op.getName().getLocalPart())) != null)) {
 
                 /*
@@ -137,11 +137,9 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                         }
                     }
 
-                    //TODO: implement new Gazelle Validator
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
                     }
-                    //  END: implement new Gazelle Validator
 
                     QueryPatientDocument wrappedParam = (QueryPatientDocument) fromOM(reqEnv.getBody().getFirstElement(),
                             QueryPatientDocument.class, getEnvelopeNamespaces(reqEnv));
@@ -225,15 +223,15 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 }
 
                 /*
-                 * Log soap request
+                 * Log SOAP response
                  */
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     try {
                         String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope));
-                        loggerClinical.debug("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);
+                        loggerClinical.info("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);
 
                     } catch (Exception ex) {
-                        LOGGER.debug(ex.getLocalizedMessage(), ex);
+                        LOGGER.error(ex.getLocalizedMessage(), ex);
                     }
                 }
                 newMsgContext.setEnvelope(envelope);
