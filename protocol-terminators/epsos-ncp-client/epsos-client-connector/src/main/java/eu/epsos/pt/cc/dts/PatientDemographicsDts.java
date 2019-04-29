@@ -1,32 +1,13 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.cc.dts;
 
-import java.text.ParseException;
-
+import org.apache.commons.lang3.StringUtils;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;
 
+import java.text.ParseException;
+
 /**
- * This is an Data Transformation Service. This provide functions to transform
- * data into a PatientDemographics object.
+ * This is an Data Transformation Service. This provide functions to transform data into a PatientDemographics object.
  *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
@@ -34,62 +15,62 @@ import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;
 public final class PatientDemographicsDts {
 
     /**
+     * Private constructor to disable class instantiation.
+     */
+    private PatientDemographicsDts() {
+    }
+
+    /**
      * Converts a QueryPatientDocument object into a PatienDemographics Object.
      *
-     * @param patientDemographis representing a QueryPatientDocument.
+     * @param patientDemographics representing a QueryPatientDocument.
      * @return a PatientDemographics object.
      * @throws ParseException
-     *
      * @see PatientDemographics
-     * @see QueryPatientDocument
+     * @see epsos.openncp.protocolterminator.clientconnector.QueryPatientDocument
      */
-    public static PatientDemographics newInstance(final epsos.openncp.protocolterminator.clientconnector.PatientDemographics patientDemographis) throws ParseException {
-        if (patientDemographis == null) {
+    public static PatientDemographics newInstance(final epsos.openncp.protocolterminator.clientconnector.PatientDemographics patientDemographics) throws ParseException {
+
+        if (patientDemographics == null) {
             return null;
         }
 
         final PatientDemographics result = new PatientDemographics();
 
-        if (patientDemographis.getAdministrativeGender() != null && !patientDemographis.getAdministrativeGender().isEmpty()) {
-            result.setAdministrativeGender(Gender.parseGender(patientDemographis.getAdministrativeGender()));
+        if (StringUtils.isNotBlank(patientDemographics.getAdministrativeGender())) {
+            result.setAdministrativeGender(Gender.parseGender(StringUtils.trim(patientDemographics.getAdministrativeGender())));
         }
-        if (patientDemographis.getBirthDate() != null) {
-            result.setBirthDate(patientDemographis.getBirthDate().getTime());
+        if (patientDemographics.getBirthDate() != null) {
+            result.setBirthDate(patientDemographics.getBirthDate().getTime());
         }
-        if (patientDemographis.getCity() != null && !patientDemographis.getCity().isEmpty()) {
-            result.setCity(patientDemographis.getCity());
+        if (StringUtils.isNotBlank(patientDemographics.getCity())) {
+            result.setCity(StringUtils.trim(patientDemographics.getCity()));
         }
-        if (patientDemographis.getCountry() != null && !patientDemographis.getCountry().isEmpty()) {
-            result.setCountry(patientDemographis.getCountry());
+        if (StringUtils.isNotBlank(patientDemographics.getCountry())) {
+            result.setCountry(StringUtils.trim(patientDemographics.getCountry()));
         }
-        if (patientDemographis.getEmail() != null && !patientDemographis.getEmail().isEmpty()) {
-            result.setEmail(patientDemographis.getEmail());
+        if (StringUtils.isNotBlank(patientDemographics.getEmail())) {
+            result.setEmail(StringUtils.trim(patientDemographics.getEmail()));
         }
-        if (patientDemographis.getFamilyName() != null && !patientDemographis.getFamilyName().isEmpty()) {
-            result.setFamilyName(patientDemographis.getFamilyName());
+        if (StringUtils.isNotBlank(patientDemographics.getFamilyName())) {
+            result.setFamilyName(StringUtils.trim(patientDemographics.getFamilyName()));
         }
-        if (patientDemographis.getGivenName() != null && !patientDemographis.getGivenName().isEmpty()) {
-            result.setGivenName(patientDemographis.getGivenName());
+        if (StringUtils.isNotBlank(patientDemographics.getGivenName())) {
+            result.setGivenName(StringUtils.trim(patientDemographics.getGivenName()));
         }
-        if (patientDemographis.getPatientIdArray() != null) {
-            result.setIdList(PatientIdDts.newInstance(patientDemographis.getPatientIdArray()));
+        if (patientDemographics.getPatientIdArray() != null) {
+            result.setIdList(PatientIdDts.newInstance(patientDemographics.getPatientIdArray()));
         }
-        if (patientDemographis.getPostalCode() != null && !patientDemographis.getPostalCode().isEmpty()) {
-            result.setPostalCode(patientDemographis.getPostalCode());
+        if (StringUtils.isNotBlank(patientDemographics.getPostalCode())) {
+            result.setPostalCode(StringUtils.trim(patientDemographics.getPostalCode()));
         }
-        if (patientDemographis.getStreetAddress() != null && !patientDemographis.getStreetAddress().isEmpty()) {
-            result.setStreetAddress(patientDemographis.getStreetAddress());
+        if (StringUtils.isNotBlank(patientDemographics.getStreetAddress())) {
+            result.setStreetAddress(StringUtils.trim(patientDemographics.getStreetAddress()));
         }
-        if (patientDemographis.getTelephone() != null && !patientDemographis.getTelephone().isEmpty()) {
-            result.setTelephone(patientDemographis.getTelephone());
+        if (StringUtils.isNotBlank(patientDemographics.getTelephone())) {
+            result.setTelephone(StringUtils.trim(patientDemographics.getTelephone()));
         }
 
         return result;
-    }
-
-    /**
-     * Private constructor to disable class instantiation.
-     */
-    private PatientDemographicsDts() {
     }
 }
