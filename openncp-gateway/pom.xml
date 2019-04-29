@@ -208,6 +208,9 @@
     <build>
         <resources>
             <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
                 <directory>${basedir}/src/main/resources/smpeditor/</directory>
                 <includes>
                     <include>bdx-smp-201605.xsd</include>
