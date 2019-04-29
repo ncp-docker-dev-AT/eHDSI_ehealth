@@ -3,6 +3,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPFieldProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.util.DateTimeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.*;
 import org.slf4j.Logger;
@@ -15,14 +16,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,10 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import java.io.*;
 import java.lang.Object;
 import java.nio.charset.StandardCharsets;
@@ -43,7 +36,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Scanner;
 
 /**
  * Service responsible for converting the data introduced by the user to a xml file.
@@ -64,24 +59,15 @@ public class SMPConverter {
     }
 
     private final Logger logger = LoggerFactory.getLogger(SMPConverter.class);
-    Boolean isSignedServiceMetadata;
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
+    private Boolean isSignedServiceMetadata;
     private String certificateSubjectName;
     private File generatedFile;
     private boolean nullExtension = false;
 
-    public static void validate(String xmlString) throws Exception {
-
-        String xsdFile = "//somewhere/myxsd.xsd";
-        try (InputStream includeInputStream = SMPConverter.class.getClassLoader().getResource("include.xsd").openStream()) {
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = schemaFactory.newSchema(new Source[]{new StreamSource(new File(xsdFile))});
-
-            StringReader stringReader = new StringReader(xmlString);
-            schema.newValidator().validate(new StreamSource(stringReader));
-            stringReader.close();
-        }
+    @Autowired
+    public SMPConverter(Environment environment) {
+        this.environment = environment;
     }
 
     /**
@@ -137,41 +123,15 @@ public class SMPConverter {
             /*
              * Dates parse to Calendar
              */
-            Calendar calad = Calendar.getInstance();
-            calad.setTime(servActDate);
-            int yearad = calad.get(Calendar.YEAR);
-            int monthad = calad.get(Calendar.MONTH);
-            int dayad = calad.get(Calendar.DAY_OF_MONTH);
-            int hourat = calad.get(Calendar.HOUR_OF_DAY);
-            int minat = calad.get(Calendar.MINUTE);
-
-            GregorianCalendar calendarAD = new GregorianCalendar(yearad, monthad, dayad, hourat, minat);
-            try {
-                XMLGregorianCalendar xmlGregorianCalendarAD = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarAD);
-                endpointType.setServiceActivationDate(xmlGregorianCalendarAD);//Set by user
-            } catch (DatatypeConfigurationException e) {
-                logger.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
-            }
+            endpointType.setServiceActivationDate(DateTimeUtil.toXMLGregorianCalendar(servActDate));
 
 
             if (servExpDate == null) {
+
                 endpointType.setServiceExpirationDate(null);
             } else {
-                Calendar caled = Calendar.getInstance();
-                caled.setTime(servExpDate);
-                int yeared = caled.get(Calendar.YEAR);
-                int monthed = caled.get(Calendar.MONTH);
-                int dayed = caled.get(Calendar.DAY_OF_MONTH);
-                int houret = caled.get(Calendar.HOUR_OF_DAY);
-                int minet = caled.get(Calendar.MINUTE);
 
-                GregorianCalendar calendarED = new GregorianCalendar(yeared, monthed, dayed, houret, minet);
-                try {
-                    XMLGregorianCalendar xmlGregorianCalendarED = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarED);
-                    endpointType.setServiceExpirationDate(xmlGregorianCalendarED);//Set by user
-                } catch (DatatypeConfigurationException e) {
-                    logger.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
-                }
+                endpointType.setServiceExpirationDate(DateTimeUtil.toXMLGregorianCalendar(servExpDate));
             }
 
             //  Parsing Certificate
@@ -257,10 +217,7 @@ public class SMPConverter {
                 try {
                     String content = new Scanner(extension.getInputStream()).useDelimiter("\\Z").next();
                     logger.info("XML Extension Content:\n'{}'", content);
-                    //docOriginal = parseDocument(content);
                     docOriginal = parseStringToDocument(content);
-                    boolean isIsmValid = XMLValidator.validate(content, "/ehdsi-ism-2018.xsd");
-                    logger.info("SMP: International Search Mask valid: '{}'", isIsmValid);
 
                     if (nullExtension) {
                         //Does not add extension
@@ -346,16 +303,14 @@ public class SMPConverter {
 
         //Type of SMP File -> Redirect | Service Information
         if ("Redirect".equals(type)) {
-      /*
-       Redirect SMP Type
-       */
+
+            //  Redirect SMP Type
             logger.debug("Type Redirect");
             RedirectType redirectType = objectFactory.createRedirectType();
-
             redirectType.setCertificateUID(certificateUID);
             redirectType.setHref(redirectHref);
-
             serviceMetadata.setRedirect(redirectType);
+
         } else {
 
             //  ServiceInformation SMP Type
@@ -394,41 +349,14 @@ public class SMPConverter {
             /*
              * Dates parse to Calendar
              */
-            Calendar calad = Calendar.getInstance();
-            calad.setTime(servActDate);
-            int yearad = calad.get(Calendar.YEAR);
-            int monthad = calad.get(Calendar.MONTH);
-            int dayad = calad.get(Calendar.DAY_OF_MONTH);
-            int hourat = calad.get(Calendar.HOUR_OF_DAY);
-            int minat = calad.get(Calendar.MINUTE);
-
-            GregorianCalendar calendarAD = new GregorianCalendar(yearad, monthad, dayad, hourat, minat);
-            try {
-                XMLGregorianCalendar xmlGregorianCalendarAD = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarAD);
-                endpointType.setServiceActivationDate(xmlGregorianCalendarAD);//Set by user
-            } catch (DatatypeConfigurationException e) {
-                logger.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
-            }
-
+            endpointType.setServiceActivationDate(DateTimeUtil.toXMLGregorianCalendar(servActDate));
 
             if (servExpDate == null) {
+
                 endpointType.setServiceExpirationDate(null);
             } else {
-                Calendar caled = Calendar.getInstance();
-                caled.setTime(servExpDate);
-                int yeared = caled.get(Calendar.YEAR);
-                int monthed = caled.get(Calendar.MONTH);
-                int dayed = caled.get(Calendar.DAY_OF_MONTH);
-                int houret = caled.get(Calendar.HOUR_OF_DAY);
-                int minet = caled.get(Calendar.MINUTE);
 
-                GregorianCalendar calendarED = new GregorianCalendar(yeared, monthed, dayed, houret, minet);
-                try {
-                    XMLGregorianCalendar xmlGregorianCalendarED = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendarED);
-                    endpointType.setServiceExpirationDate(xmlGregorianCalendarED);//Set by user
-                } catch (DatatypeConfigurationException e) {
-                    logger.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
-                }
+                endpointType.setServiceExpirationDate(DateTimeUtil.toXMLGregorianCalendar(servExpDate));
             }
 
             // Parsing TLS certificate
@@ -667,7 +595,7 @@ public class SMPConverter {
         logger.info("Generate XML SMP file: '{}'", serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue());
 
         // Generates the final SMP XML file
-        XMLStreamWriter xsw = null;
+        XMLStreamWriter xsw;
 
         try (FileOutputStream generatedFileOS = new FileOutputStream(generatedFile)) {
 
@@ -695,27 +623,12 @@ public class SMPConverter {
             jaxbMarshaller.marshal(serviceMetadata, generatedFileOS);
             jaxbMarshaller.marshal(serviceMetadata, stringWriter);
 
-            logger.info("JAXB Class: '{}'", jaxbContext.getClass());
             logger.info("Service Metadata:\n{}", stringWriter);
 
             generatedFileOS.flush();
 
-        } catch (JAXBException ex) {
-            logger.error("\n JAXBException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-        } catch (FileNotFoundException ex) {
-            logger.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-        } catch (IOException ex) {
-            logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-        } catch (XMLStreamException ex) {
-            logger.error("\n XMLStreamException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-        } finally {
-            if (xsw != null) {
-                try {
-                    xsw.close();
-                } catch (XMLStreamException ex) {
-                    logger.error("\n XMLStreamException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-                }
-            }
+        } catch (JAXBException | IOException | XMLStreamException e) {
+            logger.error("Exception:'{}'", SimpleErrorHandler.printExceptionStackTrace(e));
         }
     }
 
