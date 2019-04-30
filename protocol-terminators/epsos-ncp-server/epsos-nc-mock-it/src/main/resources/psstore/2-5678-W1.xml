@@ -14,7 +14,7 @@
     <languageCode code="pt-PT"/>
     <recordTarget>
         <patientRole>
-            <id extension="2-4567-W1" root="2.16.17.710.850.1000.990.1"/>
+            <id extension="2-5678-W1" root="2.16.17.710.850.1000.990.1"/>
             <addr use="HP">
                 <streetAddressLine>PRACETA PCT D LEONOR MASCARENHAS 39 1 ESQ</streetAddressLine>
                 <postalCode>2800-0</postalCode>
