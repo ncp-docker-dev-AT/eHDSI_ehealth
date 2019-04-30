@@ -31,7 +31,7 @@ This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Ver
 - Eclipse Oomph setup removed.
 
 ### Removed
-- Dependency openws.jar has been removed from the component Evidence Emitter to prevent classloading issue [EHNCP-1697]
+- N/A
 
 ## [3.0.0.RC3] - 10-02-2019
 ### Added
