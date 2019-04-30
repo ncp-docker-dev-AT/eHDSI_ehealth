@@ -31,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -423,19 +422,24 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         return pdfInBytes;
     }
 
-    private ClinicalDocumentDocument1 getDispensationDocumentPDF(byte[] bytes, Dispensation dispensation, AuthenticatedUser user, String cdaIdExtension, String pdfIdExtension) throws Exception {
+    private ClinicalDocumentDocument1 getDispensationDocumentPDF(byte[] bytes, Dispensation dispensation,
+                                                                 AuthenticatedUser user, String cdaIdExtension,
+                                                                 String pdfIdExtension) throws Exception {
+
         ePtoeDMapper mapper = new ePtoeDMapper();
         return mapper.createDispensation_PDF(bytes, dispensation, user, cdaIdExtension, pdfIdExtension);
     }
 
-    private byte[] getDispensationDocument(Dispensation dispensation, AuthenticatedUser user, String cdaIdExtension, String pdfIdExtension) throws Exception {
+    private byte[] getDispensationDocument(Dispensation dispensation, AuthenticatedUser user, String cdaIdExtension,
+                                           String pdfIdExtension) throws Exception {
+
         ePtoeDMapper mapper = new ePtoeDMapper();
         return mapper.createDispensationFromPrescription(dispensation, user, cdaIdExtension, pdfIdExtension);
     }
 
-    private byte[] getDispensationAsByteArray(ClinicalDocumentDocument1 eD_Document) throws UnsupportedEncodingException {
+    private byte[] getDispensationAsByteArray(ClinicalDocumentDocument1 eD_Document) {
 
-        String xml = eD_Document.xmlText(new XmlOptions().setCharacterEncoding("UTF-8").setSavePrettyPrint());
+        String xml = eD_Document.xmlText(new XmlOptions().setCharacterEncoding(StandardCharsets.UTF_8.name()).setSavePrettyPrint());
         return xml.getBytes(StandardCharsets.UTF_8);
     }
 

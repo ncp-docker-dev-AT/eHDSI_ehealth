@@ -31,6 +31,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -69,7 +70,7 @@ public class DynamicDiscoveryService {
 
     private static void sendAuditQuery(String sc_fullname, String sc_email, String sp_fullname, String sp_email,
                                        String partid, String sourceip, String targetip, String objectID,
-                                       String EM_PatricipantObjectID, byte[] EM_PatricipantObjectDetail) {
+                                       String EM_PatricipantObjectID, byte[] EM_PatricipantObjectDetail, String smpServer) {
 
         LOGGER.info("sendAuditQuery('{}', '{}','{}','{}','{}','{}','{}','{}','{}','{}')", sc_fullname, sc_email,
                 sp_fullname, sp_email, partid, sourceip, targetip, objectID, "EM_PatricipantObjectID", "EM_PatricipantObjectDetail");
@@ -83,7 +84,6 @@ public class DynamicDiscoveryService {
             } catch (DatatypeConfigurationException ex) {
                 LOGGER.error(null, ex);
             }
-            String smpServer = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");
             String serviceConsumerUserId = HTTPUtil.getSubjectDN(false);
             String serviceProviderUserId = HTTPUtil.getTlsCertificateCommonName(smpServer);
 
@@ -240,7 +240,8 @@ public class DynamicDiscoveryService {
             String ncpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.email");
             String country = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
             //Target Gateway ???
-            String remoteip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");
+            //String remoteip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");
+
             //Source Gateway ???
             String localip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");
             String smp = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT");
@@ -257,7 +258,10 @@ public class DynamicDiscoveryService {
             }
             LOGGER.info("Sending audit trail");
             //TODO: Request Audit SMP Query
-            sendAuditQuery(ncp, ncpemail, smp, smpemail, country, localip, remoteip, new String(encodedObjectID), null, null);
+            URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
+            LOGGER.info("DNS: '{}'", smpURI);
+            sendAuditQuery(ncp, ncpemail, smp, smpemail, country, localip, smpURI.toASCIIString(), new String(encodedObjectID),
+                    null, null, smpURI.toASCIIString());
 
 
         } catch (Exception e) {

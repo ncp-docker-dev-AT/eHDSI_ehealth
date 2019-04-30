@@ -1,5 +1,7 @@
 package se.sb.epsos.web.service;
 
+import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
 import org.slf4j.Logger;
@@ -19,10 +21,10 @@ import java.util.TreeSet;
 
 public class RGBSOAPHandler implements SOAPHandler<SOAPMessageContext> {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(RGBSOAPHandler.class);
     private static final String SECURITY_NAMESPACE_URL = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     private static final String SECURITY_NAMESPACE_PREFIX = "wsse";
     private static final String SECURITY_NODENAME = "Security";
+    private final Logger logger = LoggerFactory.getLogger(RGBSOAPHandler.class);
     private AssertionHandler assertionHandler = new AssertionHandler();
     private AuthenticatedUser user;
 
@@ -38,7 +40,7 @@ public class RGBSOAPHandler implements SOAPHandler<SOAPMessageContext> {
      * @throws SOAPException
      * @throws IOException
      */
-    private static String getXmlFromSOAPMessage(SOAPMessage msg) throws SOAPException, IOException {
+    private String getXmlFromSOAPMessage(SOAPMessage msg) throws SOAPException, IOException {
 
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         msg.writeTo(byteArrayOS);
@@ -59,7 +61,7 @@ public class RGBSOAPHandler implements SOAPHandler<SOAPMessageContext> {
     public boolean handleMessage(SOAPMessageContext context) {
 
         Boolean outboundProperty = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-        if (outboundProperty.booleanValue()) {
+        if (outboundProperty) {
             SOAPMessage message = context.getMessage();
             try {
                 SOAPEnvelope envelope = message.getSOAPPart().getEnvelope();
@@ -73,12 +75,14 @@ public class RGBSOAPHandler implements SOAPHandler<SOAPMessageContext> {
                 if (assertion == null) {
                     assertion = assertionHandler.createSAMLAssertion(user);
                     assertionHandler.signSAMLAssertion(assertion);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateHCPAssertion(assertion, NcpSide.NCP_B);
+                    }
                     user.setAssertion(assertion);
                 }
+
                 AssertionMarshaller marshaller = new AssertionMarshaller();
-
                 SOAPElement security = header.addChildElement(SECURITY_NODENAME, SECURITY_NAMESPACE_PREFIX, SECURITY_NAMESPACE_URL);
-
                 SOAPFactory soapFactory = SOAPFactory.newInstance();
 
                 if (user.getTrcAssertion() != null) {
@@ -91,9 +95,9 @@ public class RGBSOAPHandler implements SOAPHandler<SOAPMessageContext> {
                 SOAPElement assertionSOAP = soapFactory.createElement(element);
                 security.addChildElement(assertionSOAP);
 
-                LOGGER.debug("Soap message: " + getXmlFromSOAPMessage(message));
+                logger.debug("Soap message: '{}'", getXmlFromSOAPMessage(message));
             } catch (Exception e) {
-                LOGGER.error("Failed to handling assertion", e);
+                logger.error("Failed to handling assertion: '{}'", e.getMessage(), e);
             }
         }
         return true;

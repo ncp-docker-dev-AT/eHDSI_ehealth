@@ -51,6 +51,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -63,7 +64,6 @@ import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
 import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
-import org.opensaml.security.credential.Credential;
 import org.opensaml.security.credential.CredentialSupport;
 import org.opensaml.security.x509.BasicX509Credential;
 import org.opensaml.xmlsec.signature.KeyInfo;
@@ -171,8 +171,8 @@ public class EpsosHelperService {
         Map<String, String> langs = new HashMap<>();
         List<String> ltrLanguages = new ArrayList<>();
         try {
-            ITransformationService tService = MyServletContextListener.getTransformationService();
-            ltrLanguages = tService.getLtrLanguages();
+            ITransformationService transformationService = MyServletContextListener.getTransformationService();
+            ltrLanguages = transformationService.getLtrLanguages();
 
             for (int i = 0; i < ltrLanguages.size(); i++) {
                 String language = ltrLanguages.get(i);
@@ -193,10 +193,8 @@ public class EpsosHelperService {
 
         Map<String, String> langs = new HashMap<>();
         try {
-            ITransformationService tService = MyServletContextListener
-                    .getTransformationService();
-
-            List<String> ltrLanguages = tService.getLtrLanguages();
+            ITransformationService transformationService = MyServletContextListener.getTransformationService();
+            List<String> ltrLanguages = transformationService.getLtrLanguages();
 
             for (String ltrLanguage : ltrLanguages) {
                 langs.put(ltrLanguage.trim(), ltrLanguage.trim());
@@ -352,8 +350,9 @@ public class EpsosHelperService {
             cda.setPrescriptionBarcode(CDAUtils.getRelativePrescriptionBarcode(epDoc));
             cda.setDispensationId("D-" + CDAUtils.getRelativePrescriptionBarcode(epDoc));
             edDoc = CDAUtils.createDispensation(epDoc, cda, eDuuid);
-            Document document = XMLUtil.parseContent(edDoc);
+
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+                Document document = XMLUtil.parseContent(edDoc);
                 LOGGER_CLINICAL.info("### DISPENSATION START ###\n'{}'\n ### DISPENSATION END ###",
                         XMLUtil.prettyPrintForValidation(document.getDocumentElement()));
             }
@@ -884,24 +883,24 @@ public class EpsosHelperService {
         String ncpSigPrivatekeyPassword = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
 
         KeyStoreManager keyManager = new DefaultKeyStoreManager();
-        X509Certificate cert;
+        X509Certificate signatureCertificate;
         PrivateKey privateKey = null;
 
         if (keyAlias == null) {
-            cert = (X509Certificate) keyManager.getDefaultCertificate();
+            signatureCertificate = (X509Certificate) keyManager.getDefaultCertificate();
         } else {
             KeyStore keyStore = KeyStore.getInstance("JKS");
             File file = new File(ncpSigKeystorePath);
             keyStore.load(new FileInputStream(file), ncpSigKeystorePassword.toCharArray());
             privateKey = (PrivateKey) keyStore.getKey(ncpSigPrivatekeyAlias, ncpSigPrivatekeyPassword.toCharArray());
-            cert = (X509Certificate) keyManager.getCertificate(keyAlias);
+            signatureCertificate = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
 
-        LOGGER.info("Keystore & Signature Certificate loaded: '{}'", cert.getSerialNumber());
+        LOGGER.info("Keystore & Signature Certificate loaded: '{}'", signatureCertificate.getSerialNumber());
 
         Signature sig = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory()
                 .getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
-        Credential signingCredential = CredentialSupport.getSimpleCredential(cert, privateKey);
+        BasicX509Credential signingCredential = CredentialSupport.getSimpleCredential(signatureCertificate, privateKey);
 
         sig.setSigningCredential(signingCredential);
         sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
@@ -913,40 +912,11 @@ public class EpsosHelperService {
         org.opensaml.xmlsec.signature.X509Certificate x509Certificate = (org.opensaml.xmlsec.signature.X509Certificate) XMLObjectProviderRegistrySupport.getBuilderFactory()
                 .getBuilder(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME).buildObject(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
 
-        String value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
+        String value = org.apache.xml.security.utils.Base64.encode(signingCredential.getEntityCertificate().getEncoded());
         x509Certificate.setValue(value);
         data.getX509Certificates().add(x509Certificate);
         keyInfo.getX509Datas().add(data);
         sig.setKeyInfo(keyInfo);
-
-
-//        KeyInfo keyInfo = (KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME)
-//                .buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
-//
-//        X509Data data = (X509Data) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(X509Data.DEFAULT_ELEMENT_NAME)
-//                .buildObject(X509Data.DEFAULT_ELEMENT_NAME);
-        //X509Certificate cert = (X509Certificate) buildXMLObject(X509Certificate.DEFAULT_ELEMENT_NAME);
-        //String value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
-        //cert.setValue(value);
-//        data.getX509Certificates().add((org.opensaml.xmlsec.signature.X509Certificate) ((BasicX509Credential) signingCredential).getEntityCertificate());
-//
-//        keyInfo.getX509Datas().add(data);
-//        sig.setKeyInfo(keyInfo);
-        //SignatureSigningConfiguration signingConfiguration = SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
-
-//        SecurityConfigurationSupport secConfig = (BasicSecurityConfiguration) XMLObjectProviderRegistrySupport.();
-//        secConfig.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
-//        BasicSecurityConfiguration config = (BasicSecurityConfiguration) Configuration.getGlobalSecurityConfiguration();
-//        config.setSignatureReferenceDigestMethod(SignatureConstants.ALGO_ID_DIGEST_SHA256);
-//        SignatureSigningConfiguration secConfig = SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
-//        try {
-//            SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
-//
-//
-//        } catch (SecurityException e) {
-//            throw new SMgrException(e.getMessage(), e);
-//        }
-        //Signer.signObject(sig);
 
         signableSAMLObject.setSignature(sig);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(signableSAMLObject).marshall(signableSAMLObject);
@@ -1290,15 +1260,21 @@ public class EpsosHelperService {
         String HR_UserID = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + assertion.getSubject().getNameID().getValue()
                 + "@" + assertion.getIssuer().getValue() + ">";
         String HR_RoleID = roleName;
-        //Human readable name of the HP as given in the Subject-ID attribute of the HP identity assertion
 
-        //String HR_AlternativeUserID = assertion.getAttributeStatements().get;
+        //Human readable name of the HP as given in the Subject-ID attribute of the HP identity assertion
+        String HR_AlternativeUserID = "Not Provided";
         Attribute subjectIdAttr = findStringInAttributeStatement(assertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
-        String HR_AlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
-        //String HR_AlternativeUserID = "";
-        String SC_UserID = name;
-        String SP_UserID = name;
+        if (subjectIdAttr != null) {
+            List<XMLObject> attributesSaml = subjectIdAttr.getAttributeValues();
+            if (!attributesSaml.isEmpty()) {
+                HR_AlternativeUserID = ((XSString) attributesSaml.get(0)).getValue();
+            }
+
+        }
+        // String HR_AlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
+        String serviceConsumerUserId = name;
+        String serviceProviderUserId = name;
 
         String AS_AuditSourceId = Constants.COUNTRY_PRINCIPAL_SUBDIVISION;
         String ET_ObjectID = Constants.UUID_PREFIX + message;
@@ -1319,8 +1295,9 @@ public class EpsosHelperService {
         }
         hcpIdentificationEventLog = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
                 eventDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
-                SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, requestMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                responseMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8), hostSource, hostSource, NcpSide.NCP_B);
+                serviceConsumerUserId, serviceProviderUserId, AS_AuditSourceId, ET_ObjectID, requestMsgParticipantObjectID,
+                secHead.getBytes(StandardCharsets.UTF_8), responseMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
+                hostSource, hostSource, NcpSide.NCP_B);
 
         LOGGER.info("The audit has been prepared");
         hcpIdentificationEventLog.setEventType(EventType.epsosHcpAuthentication);
@@ -2376,10 +2353,10 @@ public class EpsosHelperService {
 
     public static Document translateDoc(Document doc, String lang) {
 
-        ITransformationService tService = MyServletContextListener.getTransformationService();
-        if (Validator.isNotNull(tService)) {
+        ITransformationService transformationService = MyServletContextListener.getTransformationService();
+        if (Validator.isNotNull(transformationService)) {
             LOGGER.info("The Transformation Service started correctly. Translating to {}", lang);
-            TMResponseStructure tmResponse = tService.translate(doc, lang);
+            TMResponseStructure tmResponse = transformationService.translate(doc, lang);
             return tmResponse.getResponseCDA();
 
         } else {
@@ -2628,7 +2605,7 @@ public class EpsosHelperService {
     }
 
     public static String getDocument(Assertion assertion, Assertion trca, String country, String repositoryid,
-                                     String homecommunityid, String documentid, String doctype, String lang) throws UnsupportedEncodingException {
+                                     String homecommunityid, String documentid, String doctype, String lang) {
 
         EpsosDocument selectedEpsosDocument = new EpsosDocument();
         ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
@@ -2686,7 +2663,7 @@ public class EpsosHelperService {
             selectedEpsosDocument.setDescription(eps.getDescription());
             selectedEpsosDocument.setTitle(eps.getTitle());
 
-            xmlfile = new String(eps.getBase64Binary(), "UTF-8");
+            xmlfile = new String(eps.getBase64Binary(), StandardCharsets.UTF_8);
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
                 LOGGER_CLINICAL.debug("#### CDA XML Start");
                 LOGGER_CLINICAL.debug(xmlfile);
@@ -2794,6 +2771,9 @@ public class EpsosHelperService {
                     break;
                 case "patient.data.sex":
                     pd.setAdministrativeGender(dem.getUserValue());
+                    break;
+                default:
+                    LOGGER.warn("Identity Trait '{}' doesn't match to any Key", dem.getKey());
                     break;
             }
             LOGGER.info("{}: '{}'", dem.getKey(), dem.getUserValue());

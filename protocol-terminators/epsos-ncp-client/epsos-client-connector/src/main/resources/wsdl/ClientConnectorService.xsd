@@ -55,7 +55,7 @@
 
     <xs:complexType name="patientDemographics">
         <xs:sequence>
-            <xs:element name="administrativeGender" type="xs:string"/>
+            <xs:element name="administrativeGender" type="xs:string" minOccurs="0"/>
             <xs:element name="birthDate" type="xs:dateTime" minOccurs="0"/>
             <xs:element name="city" type="xs:string" minOccurs="0"/>
             <xs:element name="country" type="xs:string" minOccurs="0"/>

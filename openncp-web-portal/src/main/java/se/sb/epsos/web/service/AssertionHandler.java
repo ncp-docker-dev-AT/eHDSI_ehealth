@@ -21,11 +21,11 @@ import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
-import org.opensaml.security.credential.Credential;
 import org.opensaml.security.credential.CredentialSupport;
-import org.opensaml.xmlsec.SecurityConfigurationSupport;
-import org.opensaml.xmlsec.SignatureSigningConfiguration;
+import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.X509Data;
 import org.opensaml.xmlsec.signature.support.Signer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,9 +73,7 @@ public class AssertionHandler implements Serializable {
 
     Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws InitializationException {
 
-        LOGGER.debug("################################################");
-        LOGGER.debug("# createSAMLAssertion() - start                #");
-        LOGGER.debug("################################################");
+        LOGGER.info("[OpenNCP Web Portal] HCP Assertion Creation");
         InitializationService.initialize();
         XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
@@ -104,7 +102,6 @@ public class AssertionHandler implements Serializable {
         assertion.getSubject().getSubjectConfirmations().add(subjectConf);
 
         Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
-
         conditions.setNotBefore(nowUTC.toDateTime());
         conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(4));
         assertion.setConditions(conditions);
@@ -171,8 +168,6 @@ public class AssertionHandler implements Serializable {
         attributeStatement.getAttributes().add(attrPID_8);
 
         assertion.getStatements().add(attributeStatement);
-
-        LOGGER.debug("# createSAMLAssertion() - stop ");
 
         try {
             sendAuditEpsos91(userDetails, assertion);
@@ -348,32 +343,43 @@ public class AssertionHandler implements Serializable {
         return (T) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(qname).buildObject(qname);
     }
 
+    /**
+     * @param assertion
+     * @throws Exception
+     */
     public void signSAMLAssertion(SignableSAMLObject assertion) throws Exception {
 
-        LOGGER.debug("################################################");
-        LOGGER.debug("# signSAMLAssertion() - start                  #");
-        LOGGER.debug("################################################");
+        LOGGER.info("[OpenNCP Web Portal] Assertion Signature");
         KeyStoreManager keyManager = new KeyStoreManagerImpl();
         X509Certificate certificate = keyManager.getCertificate();
         KeyPair privateKeyPair = keyManager.getPrivateKey();
 
         PrivateKey privateKey = privateKeyPair.getPrivate();
 
-        Signature signature = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME)
-                .buildObject(Signature.DEFAULT_ELEMENT_NAME);
-        Credential signingCredential = CredentialSupport.getSimpleCredential(certificate, privateKey);
+        Signature signature = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory()
+                .getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
+        BasicX509Credential signingCredential = CredentialSupport.getSimpleCredential(certificate, privateKey);
         signature.setSigningCredential(signingCredential);
         signature.setSignatureAlgorithm(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256);
         signature.setCanonicalizationAlgorithm(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
 
-        SignatureSigningConfiguration securityConfiguration = SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
-        //SecurityHelper.prepareSignatureParams(signature, signingCredential, securityConfiguration, null);
+        KeyInfo keyInfo = (KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory()
+                .getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME).buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
+        X509Data data = (X509Data) XMLObjectProviderRegistrySupport.getBuilderFactory()
+                .getBuilder(X509Data.DEFAULT_ELEMENT_NAME).buildObject(X509Data.DEFAULT_ELEMENT_NAME);
+        org.opensaml.xmlsec.signature.X509Certificate x509Certificate = (org.opensaml.xmlsec.signature.X509Certificate) XMLObjectProviderRegistrySupport.getBuilderFactory()
+                .getBuilder(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME)
+                .buildObject(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
+
+        String value = org.apache.xml.security.utils.Base64.encode(signingCredential.getEntityCertificate().getEncoded());
+        x509Certificate.setValue(value);
+        data.getX509Certificates().add(x509Certificate);
+        keyInfo.getX509Datas().add(data);
+        signature.setKeyInfo(keyInfo);
 
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
-        //Signer.signObject(signature);
         Signer.signObject(signature);
-        LOGGER.debug("# signSAMLAssertion() - stop ");
     }
 
     public Assertion getAssertion() {

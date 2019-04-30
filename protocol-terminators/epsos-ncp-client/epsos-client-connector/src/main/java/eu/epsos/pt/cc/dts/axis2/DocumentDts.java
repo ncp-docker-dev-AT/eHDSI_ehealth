@@ -101,15 +101,19 @@ public class DocumentDts {
             EpsosDocument1 xmlDoc = DocumentDts.newInstance(doc.getCdaXML());
             EpsosDocument1 pdfDoc = DocumentDts.newInstance(doc.getCdaPDF());
 
+            //  If CDA L1 and L3 are existing then we shall create an association between the 2 documents.
+            if (xmlDoc != null && pdfDoc != null) {
+                pdfDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{xmlDoc});
+                xmlDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{pdfDoc});
+            }
+
             // Adding the reference to the L1 CDA document
             if (pdfDoc != null) {
-                pdfDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{pdfDoc});
                 resultList.add(pdfDoc);
             }
 
             // Adding the reference to the L3 CDA document
             if (xmlDoc != null) {
-                xmlDoc.setAssociatedDocumentsArray(new EpsosDocument1[]{xmlDoc});
                 resultList.add(xmlDoc);
             }
         }

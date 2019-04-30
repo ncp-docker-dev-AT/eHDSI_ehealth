@@ -1087,7 +1087,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             String documentId = request.getDocumentRequest().get(0).getDocumentUniqueId();
             String patientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(soapHeaderElement));
             String repositoryId = getRepositoryUniqueId(request);
-
+            logger.info("Retrieving Document with criteria: '{}' '{}' '{}'", patientId, documentId, repositoryId);
             //try getting country code from the certificate
             String countryCode = null;
             String DN = eventLog.getSC_UserID();
@@ -1130,17 +1130,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 So we provided a XML representation of such data */
             try {
                 EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.SP_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.SP_PRIVATEKEY_ALIAS,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        IHEEventType.epsosPatientServiceRetrieve.getCode(),
-                        new DateTime(),
+                        Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                        Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS,
+                        Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                        IHEEventType.epsosPatientServiceRetrieve.getCode(), new DateTime(),
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XCA_RETRIEVE_REQ",
                         Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {
@@ -1180,6 +1173,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 //                } catch (Exception e) {
 //                    logger.error(ExceptionUtils.getStackTrace(e));
 //                }
+                logger.error("[National Connector] No document returned by the National Infrastructure");
                 registryErrorList.addChild(createErrorOMMessage(ns, "XDSMissingDocument", "Requested document not found.", "", false));
                 break processLabel;
             }
@@ -1241,16 +1235,17 @@ public class XCAServiceImpl implements XCAServiceInterface {
             documentResponse.addChild(mimeType);
 
             OMElement document = factory.createOMElement("Document", factory.createOMNamespace("urn:ihe:iti:xds-b:2007", ""));
-
+            logger.info("XCA Retrieve Response has been created.");
             try {
                 Document doc = epsosDoc.getDocument();
-                logger.debug("Client userID: '{}'", eventLog.getSC_UserID());
+                logger.info("Client userID: '{}'", eventLog.getSC_UserID());
 
                 if (doc != null) {
-
+                    logger.info("[National Infrastructure] CDA Document:\n'{}'", epsosDoc.getClassCode());
                     /* Validate CDA eHDSI Friendly */
                     if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
+
+                        OpenNCPValidation.validateCdaDocument(XMLUtil.documentToString(epsosDoc.getDocument()),
                                 NcpSide.NCP_A, epsosDoc.getClassCode(), false);
                     }
                     // Transcode to eHDSI Pivot
@@ -1283,32 +1278,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                 }
 
-                logger.info("Error Registry: Failure '{}'", failure);
-
-                // If the registryErrorList is empty or contains only Warning, the status of the request is SUCCESS
-                if (!registryErrorList.getChildElements().hasNext()) {
-                    logger.info("XCA Retrieve Document - Transformation Status: '{}'\nDefault Case", AdhocQueryResponseStatus.SUCCESS);
-                    registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                            AdhocQueryResponseStatus.SUCCESS));
-                } else {
-                    if (checkIfOnlyWarnings(registryErrorList)) {
-                        logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning", AdhocQueryResponseStatus.SUCCESS);
-                        registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                                AdhocQueryResponseStatus.SUCCESS));
-                    } else if (failure) {
-                        // If there is a failure during the request process, the status is FAILURE
-                        logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning Failure: '{}'", AdhocQueryResponseStatus.FAILURE, failure);
-                        registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                                AdhocQueryResponseStatus.FAILURE));
-                    } else {
-                        //  Otherwise the status is PARTIAL SUCCESS
-                        logger.info("XCA Retrieve Document - Transformation Status: '{}'\nOtherwise...", AdhocQueryResponseStatus.PARTIAL_SUCCESS);
-                        registryResponse.addAttribute(factory.createOMAttribute("status", null,
-                                AdhocQueryResponseStatus.PARTIAL_SUCCESS));
-                    }
-                }
-
                 // If there is no failure during the process, the CDA document has been attached to the response
+                logger.info("Error Registry: Failure '{}'", failure);
                 if (!failure) {
                     ByteArrayDataSource dataSource = null;
                     if (doc != null) {
@@ -1325,11 +1296,35 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     documentReturned = true;
                 }
             } catch (Exception e) {
+                failure = true;
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                registryResponse.addAttribute(factory.createOMAttribute("status", null, AdhocQueryResponseStatus.FAILURE));
                 registryErrorList.addChild(createErrorOMMessage(ns, "", e.getMessage(), "", false));
             }
         }
+
+        // If the registryErrorList is empty or contains only Warning, the status of the request is SUCCESS
+        if (!registryErrorList.getChildElements().hasNext()) {
+            logger.info("XCA Retrieve Document - Transformation Status: '{}'\nDefault Case", AdhocQueryResponseStatus.SUCCESS);
+            registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                    AdhocQueryResponseStatus.SUCCESS));
+        } else {
+            if (checkIfOnlyWarnings(registryErrorList)) {
+                logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning", AdhocQueryResponseStatus.SUCCESS);
+                registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                        AdhocQueryResponseStatus.SUCCESS));
+            } else if (failure) {
+                // If there is a failure during the request process, the status is FAILURE
+                logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning Failure: '{}'", AdhocQueryResponseStatus.FAILURE, failure);
+                registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                        AdhocQueryResponseStatus.FAILURE));
+            } else {
+                //  Otherwise the status is PARTIAL SUCCESS
+                logger.info("XCA Retrieve Document - Transformation Status: '{}'\nOtherwise...", AdhocQueryResponseStatus.PARTIAL_SUCCESS);
+                registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                        AdhocQueryResponseStatus.PARTIAL_SUCCESS));
+            }
+        }
+
         logger.info("Preparing Event Log of the Response:");
         try {
             boolean errorsDiscovered = registryErrorList.getChildElements().hasNext();
@@ -1368,7 +1363,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private boolean checkIfOnlyWarnings(OMElement registryErrorList) {
 
-        logger.info("Method checkIfOnlyWarnings()");
         boolean onlyWarnings = true;
         OMElement element;
         Iterator it = registryErrorList.getChildElements();
@@ -1380,7 +1374,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
             logger.info("[TEST eHDSI PIVOT] Checking Elements and Attributes\n{}\n{}", element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
                     "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error");
             if (StringUtils.equals(element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
-                    "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error")) {
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR)) {
+                logger.debug("Error has been detected for Element: '{}'", element.getText());
                 onlyWarnings = false;
             }
         }

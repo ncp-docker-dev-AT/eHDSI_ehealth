@@ -92,7 +92,7 @@ public class TerminologyService implements ITerminologyService {
             String csVersion = localConcept.getVersion();
             String vsOid = localConcept.getVsOid();
             String vsVersion = localConcept.getValueSetVersion();
-
+            LOGGER.info("Searching Concept: '{}'-'{}'-'{}'-'{}'-'{}'-'{}'", code, csName, csOid, csVersion, vsOid, vsVersion);
             // obtain CodeSystem
             CodeSystem system = dao.getCodeSystem(csOid);
             checkCodeSystemName(system, csName, response);
@@ -139,9 +139,13 @@ public class TerminologyService implements ITerminologyService {
                 //TODO: Review this method
             }
         } catch (TSAMException e) {
+            // TSAM Exception considered as Warning
+            LOGGER.error("TSAMException: '{}'", e.getMessage());
             response.addError(e.getReason(), localConcept.toString());
             LOGGER.warn(localConcept + ", " + e.toString(), e);
         } catch (Exception e) {
+            // Other Exception considered as Error
+            LOGGER.error("Exception: '{}'", e.getMessage());
             response.addError(TSAMError.ERROR_PROCESSING_ERROR, localConcept.toString());
             LOGGER.error(localConcept.toString(), e);
         }

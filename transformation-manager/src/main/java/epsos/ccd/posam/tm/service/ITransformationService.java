@@ -7,15 +7,14 @@ import java.util.List;
 
 /**
  * Component responsibilities:<br>
- * <li>Translating and/or transcoding (if necessary) the original data compliant
- * to epSOS CDA syntax from the national language and possibly from the national
- * code system(s) in the document creator country (in most cases Country A) to
- * the epSOS Reference Terminology. From a functional point of view the
- * translation and transcoding are the same operation for the Transformation
- * Manager from the point of view of the document creator country (in most cases
- * Country A).</li> <li>Translating the coded data elements from the epSOS
- * Reference Terminology to the national language in document consumer country
- * (in most cases Country B).</li> *
+ * <li>Translating and/or transcoding (if necessary) the original data compliant to eHDSI CDA syntax from the national
+ * language and possibly from the national code system(s) in the document creator country (in most cases Country A) to
+ * the epSOS Reference Terminology.
+ * From a functional point of view the translation and transcoding are the same operation for the Transformation
+ * Manager from the point of view of the document creator country (in most cases Country A).
+ * </li>
+ * <li>Translating the coded data elements from the eHDSI Reference Terminology to the national language in document
+ * consumer country (in most cases Country B).</li>
  *
  * @author Frantisek Rudik
  * @author Organization: Posam
@@ -25,46 +24,34 @@ import java.util.List;
 public interface ITransformationService {
 
     /**
-     * After having received a toEpSOSPivot() request, this component takes the
-     * EpSOSOriginalData (already compliant to epSOS CDA syntax) and using the
-     * TSAM capabilities, accomplishes the eventual transcoding of the terms
-     * present in the epSOS value sets, while also keeping the original codes
-     * and display name. An epSOS pivot document with epSOS coded concepts is
-     * therefore produced. <br>
-     * <i>Exceptions:</i> in case of processing error or warning, the
-     * responseStatusStructure will be used to convey this information to the
-     * calling component with an appropriated error and warning code. A detailed
-     * list of the managed exceptions will be provided in the Detail Design
-     * Specification document. Each exception condition occurred will be logged
-     * (standard and audit), reporting both the exception code and its English
-     * description.
+     * After having received a toEpSOSPivot() request, this component takes the EpSOSOriginalData
+     * (already compliant to epSOS CDA syntax) and using the TSAM capabilities, accomplishes the eventual
+     * transcoding of the terms present in the epSOS value sets, while also keeping the original codes and display name.
+     * An epSOS pivot document with epSOS coded concepts is therefore produced. <br>
+     * <i>Exceptions:</i> in case of processing error or warning, the responseStatusStructure will be used to convey
+     * this information to the calling component with an appropriated error and warning code.
+     * A detailed list of the managed exceptions will be provided in the Detail Design Specification document.
+     * Each exception condition occurred will be logged (standard and audit), reporting both the exception code and
+     * its English description.
      * <br><br>
      * <b>Algorithm:</b>
-     * <li>1. Schema based validation of input CDA document. (Can be
-     * enabled/disabled through property <i>tm.schema.validation.enabled</i>)</li>
-     * <li>2. Checking document type.(Allowed/expected document types are
-     * configured through <i>tm.documenttype.patientsummary ;
-     * tm.documenttype.eprescription ; tm.documenttype.edispensation</i>
-     * properties) <br>
-     * Checking if document is structured or unstructured. (Level 3 or Level 1
-     * CDA document)</li> <li>3. Schematron based validation of input CDA
-     * document. (Can be enabled/disabled through property
-     * <i>tm.schematron.validation.enabled)</i></li> <li>4. Document processing
-     * - transcoding.<br>
-     * (During the processing are selected Coded Elements either acording
-     * CodedElementList or simply all elements with code and codeSystem
-     * attributes. This can be configured through property
-     * <i>tm.codedelementlist.enabled</i>)</li>
+     * <li>1. Schema based validation of input CDA document. (Can be enabled/disabled through property
+     * <i>tm.schema.validation.enabled</i>)</li>
+     * <li>2. Checking document type.(Allowed/expected document types are configured through <i>tm.documenttype.patientsummary ;
+     * tm.documenttype.eprescription ; tm.documenttype.edispensation</i> properties) <br>
+     * Checking if document is structured or unstructured. (Level 3 or Level 1 CDA document)</li> <li>3.
+     * Schematron based validation of input CDA document. (Can be enabled/disabled through property <i>tm.schematron.validation.enabled)</i></li> <li>4.
+     * Document processing - transcoding.<br>
+     * (During the processing are selected Coded Elements either acording CodedElementList or simply all elements with code and codeSystem attributes.
+     * This can be configured through property <i>tm.codedelementlist.enabled</i>)</li>
      * <li>5. Schematron based validation of output CDA
      * document. (Can be enabled/disabled through property
      * <i>tm.schematron.validation.enabled)</i></li>
      * <li>6. Writing Audit trail.(Can be enabled/disabled through property <i>tm.audittrail.enabled</i>)</li>
      *
-     * @param epSOSOriginalData Medical document in its original data format as provided from
-     *                          the NationalConnector to this component. The provided document
-     *                          is compliant with the epSOS pivot CDA (see D 3.5.2 Appendix C)
-     *                          unless the adoption of the element binding with the epSOS
-     *                          reference Value Sets. [Mandatory]
+     * @param epSOSOriginalData Medical document in its original data format as provided from the NationalConnector to
+     *                          this component. The provided document is compliant with the epSOS pivot CDA (see D 3.5.2 Appendix C)
+     *                          unless the adoption of the element binding with the epSOS reference Value Sets. [Mandatory]
      * @return - EpSOSCDA structure - Response structure including the epSOS
      * pivot CDA and the response status structure. The response status
      * structure provides information about the operation results,

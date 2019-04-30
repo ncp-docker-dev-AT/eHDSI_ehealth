@@ -21,7 +21,7 @@ public class MyServletContextListener implements ServletContextListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyServletContextListener.class);
     private static String runningMode;
     private static String encryptionKey;
-    private static ITransformationService tService;
+    private static ITransformationService transformationService;
     private static ClientConnectorConsumer clientConnectorConsumer;
     private ServletContext context = null;
 
@@ -31,7 +31,7 @@ public class MyServletContextListener implements ServletContextListener {
     }
 
     public static ITransformationService getTransformationService() {
-        return tService;
+        return transformationService;
     }
 
     public static ClientConnectorConsumer getClientConnectorConsumer() {
@@ -73,7 +73,7 @@ public class MyServletContextListener implements ServletContextListener {
 
         try {
             ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("ctx_tm.xml");
-            tService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
+            transformationService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
             LOGGER.info("Transformation Manager --> Initialized");
         } catch (Exception e) {
             LOGGER.error("#### ERROR INITIALIZING TM ####", e);

@@ -293,6 +293,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             }
             classCodeNode = classCode.getNodeRepresentation();
 
+            //TODO: CDA as input needs to be validated according XSD, Schematron or Validators.
             switch (classCodeNode) {
 
                 // call XDR Client for Consent
@@ -317,7 +318,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             LoggingSlf4j.error(logger, methodName);
             throw ex;
         }
-
         LoggingSlf4j.end(logger, methodName);
         return result;
     }

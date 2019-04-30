@@ -1,0 +1,1524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:ClinicalDocument xmlns:ns1="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <ns1:realmCode code="HR" />
+    <ns1:typeId extension="POCD_HD000040" root="2.16.840.1.113883.1.3" />
+    <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.3" />
+    <ns1:id extension="c3889acb-0a43-42da-8c04-e9db0da476c1" root="2.16.840.1.113883.2.7.37.100.1" />
+    <ns1:code code="60591-5" codeSystem="2.16.840.1.113883.6.1" displayName="Patient summary Document" />
+    <ns1:title>Sažetak medicinskih podataka</ns1:title>
+    <ns1:effectiveTime value="20190218" />
+    <ns1:confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25" />
+    <ns1:languageCode code="hr-HR" />
+    <ns1:recordTarget>
+        <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.100" />
+        <ns1:patientRole classCode="PAT">
+            <ns1:id assigningAuthorityName="MBO" extension="X-XXXX" root="2.16.840.1.113883.2.7.2.2" />
+            <ns1:addr nullFlavor="NI" />
+            <ns1:telecom nullFlavor="NI" />
+            <ns1:patient>
+                <ns1:name>
+                    <ns1:given>DOKTOR</ns1:given>
+                    <ns1:family>TESTNI OSMI</ns1:family>
+                </ns1:name>
+                <ns1:administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1" codeSystemName="AdministrativeGender" displayName="ženski" />
+                <ns1:birthTime value="19260802" />
+                <ns1:languageCommunication>
+                    <ns1:languageCode code="hr-HR" />
+                </ns1:languageCommunication>
+            </ns1:patient>
+        </ns1:patientRole>
+    </ns1:recordTarget>
+    <ns1:author>
+        <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.102" />
+        <ns1:time value="20190218" />
+        <ns1:assignedAuthor classCode="ASSIGNED">
+            <!-- LOM ID -->
+            <ns1:id extension="1254795" root="2.16.840.1.113883.2.7.1.1" />
+            <ns1:addr nullFlavor="NI" />
+            <ns1:telecom nullFlavor="NI" />
+            <ns1:assignedPerson>
+                <ns1:name>
+                    <ns1:given>Dragica</ns1:given>
+                    <ns1:family>STOKIĆ</ns1:family>
+                </ns1:name>
+            </ns1:assignedPerson>
+            <ns1:representedOrganization nullFlavor="NI" />
+        </ns1:assignedAuthor>
+    </ns1:author>
+    <ns1:custodian>
+        <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.104" />
+        <ns1:assignedCustodian>
+            <ns1:representedCustodianOrganization>
+                <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.111" />
+                <ns1:id extension="258902159" root="2.16.840.1.113883.2.7.3.1.3" />
+                <ns1:name>AMBULANTA DRVENIK DOM ZDRAVLJA MAKARSKA</ns1:name>
+                <ns1:telecom nullFlavor="NI" />
+                <ns1:addr nullFlavor="NI" />
+            </ns1:representedCustodianOrganization>
+        </ns1:assignedCustodian>
+    </ns1:custodian>
+    <ns1:legalAuthenticator>
+        <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.109" />
+        <ns1:time value="20190218" />
+        <ns1:signatureCode code="S" />
+        <ns1:assignedEntity>
+            <ns1:id extension="1254795" root="2.16.840.1.113883.2.7.1.1" />
+            <ns1:addr nullFlavor="NI" />
+            <ns1:telecom nullFlavor="NI" />
+            <ns1:assignedPerson>
+                <ns1:name>
+                    <ns1:given>Dragica</ns1:given>
+                    <ns1:family>STOKIĆ</ns1:family>
+                </ns1:name>
+            </ns1:assignedPerson>
+            <ns1:representedOrganization classCode="ORG" determinerCode="INSTANCE">
+                <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.111" />
+                <ns1:id extension="258902159" root="2.16.840.1.113883.2.7.3.1.3" />
+                <ns1:name>AMBULANTA DRVENIK DOM ZDRAVLJA MAKARSKA</ns1:name>
+                <ns1:telecom nullFlavor="NI" />
+                <ns1:addr nullFlavor="NI" />
+            </ns1:representedOrganization>
+        </ns1:assignedEntity>
+    </ns1:legalAuthenticator>
+    <!-- LOM -->
+    <ns1:participant typeCode="IND">
+        <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.2.4" />
+        <ns1:functionCode code="PCP" codeSystem="2.16.840.1.113883.5.88" displayName="HL7 ParticipationFunction" />
+        <ns1:time value="20181128" />
+        <ns1:associatedEntity classCode="PRS">
+            <ns1:id extension="1254795" root="2.16.840.1.113883.2.7.1.1" />
+            <ns1:addr nullFlavor="NI" />
+            <ns1:telecom nullFlavor="NI" />
+            <ns1:associatedPerson>
+                <ns1:name>
+                    <ns1:given>Dragica</ns1:given>
+                    <ns1:family>STOKIĆ</ns1:family>
+                </ns1:name>
+            </ns1:associatedPerson>
+        </ns1:associatedEntity>
+    </ns1:participant>
+    <!-- WHY THIS? -->
+    <ns1:documentationOf typeCode="DOC">
+        <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.106" />
+        <ns1:serviceEvent classCode="PCPR" moodCode="EVN">
+            <ns1:effectiveTime>
+                <ns1:low value="19260802" />
+                <ns1:high value="20190218" />
+            </ns1:effectiveTime>
+        </ns1:serviceEvent>
+    </ns1:documentationOf>
+    <!-- WHY THIS? -->
+    <ns1:relatedDocument typeCode="XFRM">
+        <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.107" />
+        <ns1:parentDocument>
+            <ns1:id nullFlavor="NI" />
+        </ns1:parentDocument>
+    </ns1:relatedDocument>
+    <ns1:component contextConductionInd="true" typeCode="COMP">
+        <ns1:structuredBody classCode="DOCBODY" moodCode="EVN">
+            <!-- Medication Summary -->
+            <ns1:component contextConductionInd="true" typeCode="COMP">
+                <ns1:section classCode="DOCSECT" moodCode="EVN">
+                    <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.3" />
+                    <ns1:templateId root="2.16.840.1.113883.10.20.1.8" />
+                    <ns1:code code="10160-0" codeSystem="2.16.840.1.113883.6.1" />
+                    <ns1:title>Sažetak lijekova (Medication Summary)</ns1:title>
+                    <ns1:text>
+                        <ns1:table>
+                            <ns1:thead>
+                                <ns1:tr>
+                                    <ns1:td>Datum početka uzimanja lijeka (Date of dispensing medication)</ns1:td>
+                                    <ns1:td>Način primjene lijeka (Route of administration)</ns1:td>
+                                    <ns1:td>Ĺ ifra lijeka (Medicinal product code)</ns1:td>
+                                    <ns1:td>Naziv lijeka (Brand name)</ns1:td>
+                                    <ns1:td>Generički naziv lijeka (Generic name)</ns1:td>
+                                    <ns1:td>Snaga lijeka (Free-text representation of the strength)</ns1:td>
+                                    <ns1:td>Oblik lijeka (Pharmaceutical dose form)</ns1:td>
+                                    <ns1:td>Oblik paketa (Package Form)</ns1:td>
+                                    <ns1:td>Veličina paketa (Medicinal product package size)</ns1:td>
+                                    <ns1:td>Instrukcije (Medication Instructions)</ns1:td>
+                                    <ns1:td>Aktivni sastojci lijeka (Active Ingredient)</ns1:td>
+                                </ns1:tr>
+                            </ns1:thead>
+                            <ns1:tbody>
+                                <ns1:tr>
+                                    <ns1:td>10.6.1997.</ns1:td>
+                                    <ns1:td>Oralnim putem</ns1:td>
+                                    <ns1:td>H03AA01145</ns1:td>
+                                    <ns1:td>Euthyrox 100</ns1:td>
+                                    <ns1:td>H03AA01 - levotiroksin</ns1:td>
+                                    <ns1:td>tbl. 50x100 mcg</ns1:td>
+                                    <ns1:td>Tableta</ns1:td>
+                                    <ns1:td>Spremnik tableta</ns1:td>
+                                    <ns1:td>50 1</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="instruction-1">jedna svako jutro</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>
+                                        <ns1:list>
+                                            <ns1:item>
+                                                <ns1:content>Aktivni sastojak (Active Ingredient): levotiroksin</ns1:content>
+                                                <ns1:content>Ĺ ifra aktivnog sastojka (Active Ingredient Code):
+                                                    H03AA01</ns1:content>
+                                                <ns1:content>Snaga (Strength): 100 ug / 1 1</ns1:content>
+                                            </ns1:item>
+                                        </ns1:list>
+                                    </ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>5.6.2017.</ns1:td>
+                                    <ns1:td>Oralnim putem</ns1:td>
+                                    <ns1:td>C09BB05162</ns1:td>
+                                    <ns1:td>Triapin</ns1:td>
+                                    <ns1:td>C09BB05 - ramipril + felodipin</ns1:td>
+                                    <ns1:td>tbl. s prod. oslob. 28x(5 mg +5 mg)</ns1:td>
+                                    <ns1:td>Tableta sa produljenim otpuštanjem</ns1:td>
+                                    <ns1:td>Spremnik tableta</ns1:td>
+                                    <ns1:td>28 1</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="instruction-2">jedna svako jutro</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>
+                                        <ns1:list>
+                                            <ns1:item>
+                                                <ns1:content>Aktivni sastojak (Active Ingredient): ramipril</ns1:content>
+                                                <ns1:content>Ĺ ifra aktivnog sastojka (Active Ingredient Code):
+                                                    C09AA05</ns1:content>
+                                                <ns1:content>Snaga (Strength): 5 mg / 1 1</ns1:content>
+                                            </ns1:item>
+                                            <ns1:item>
+                                                <ns1:content>Aktivni sastojak (Active Ingredient): felodipin</ns1:content>
+                                                <ns1:content>Ĺ ifra aktivnog sastojka (Active Ingredient Code):
+                                                    C08CA02</ns1:content>
+                                                <ns1:content>Snaga (Strength): 5mg / 1 1</ns1:content>
+                                            </ns1:item>
+                                        </ns1:list>
+                                    </ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>30.4.2012.</ns1:td>
+                                    <ns1:td>Oralnim putem</ns1:td>
+                                    <ns1:td>A10AE06061</ns1:td>
+                                    <ns1:td>Tresiba</ns1:td>
+                                    <ns1:td>A10AE06 - degludek inzulin</ns1:td>
+                                    <ns1:td>otop. za inj., brizg. napunj. FlexTouch 5x3 ml (100 i.j./ml)</ns1:td>
+                                    <ns1:td>Otopina za injekciju</ns1:td>
+                                    <ns1:td>Napunjena brizgalica</ns1:td>
+                                    <ns1:td>5 1</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="instruction-3">dnevno jedna doza</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>
+                                        <ns1:list>
+                                            <ns1:item>
+                                                <ns1:content>Aktivni sastojak (Active Ingredient): degludek inzulin</ns1:content>
+                                                <ns1:content>Ĺ ifra aktivnog sastojka (Active Ingredient Code):
+                                                    A10AE06</ns1:content>
+                                                <ns1:content>Snaga (Strength): 300 [iU] / 3 mL</ns1:content>
+                                            </ns1:item>
+                                        </ns1:list>
+                                    </ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>5.7.2017.</ns1:td>
+                                    <ns1:td>Oralnim putem</ns1:td>
+                                    <ns1:td>J01CR02108</ns1:td>
+                                    <ns1:td>Klavocin bid</ns1:td>
+                                    <ns1:td>J01CR02 - amoksicilin + klavulanska kiselina</ns1:td>
+                                    <ns1:td>tbl. film obl. 14x1 g (875 mg +125 mg)</ns1:td>
+                                    <ns1:td>Filmom obložena tableta</ns1:td>
+                                    <ns1:td>Spremnik</ns1:td>
+                                    <ns1:td>14 1</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="instruction-4">tri puta na dan</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>
+                                        <ns1:list>
+                                            <ns1:item>
+                                                <ns1:content>Aktivni sastojak (Active Ingredient): amoksicilin +
+                                                    klavulanska kiselina</ns1:content>
+                                                <ns1:content>Ĺ ifra aktivnog sastojka (Active Ingredient Code):
+                                                    J01CR02</ns1:content>
+                                                <ns1:content>Snaga (Strength): 1 1 / 1 1</ns1:content>
+                                            </ns1:item>
+                                        </ns1:list>
+                                    </ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>1.2.2015.</ns1:td>
+                                    <ns1:td>Inhalacija</ns1:td>
+                                    <ns1:td>R03BA02724</ns1:td>
+                                    <ns1:td>Budelin Novolizer</ns1:td>
+                                    <ns1:td>R03BA02 - budesonid</ns1:td>
+                                    <ns1:td>praš. za inhal. 200x200 mcg, umetak od 200 doza</ns1:td>
+                                    <ns1:td>Inhalacijski prah, prethodno razdijeljen</ns1:td>
+                                    <ns1:td>Kaseta</ns1:td>
+                                    <ns1:td>200 1</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="instruction-5">tri puta na dan</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>
+                                        <ns1:list>
+                                            <ns1:item>
+                                                <ns1:content>Aktivni sastojak (Active Ingredient): budesonid</ns1:content>
+                                                <ns1:content>Ĺ ifra aktivnog sastojka (Active Ingredient Code):
+                                                    R03BA02</ns1:content>
+                                                <ns1:content>Snaga (Strength): 200 ug / 1 1</ns1:content>
+                                            </ns1:item>
+                                        </ns1:list>
+                                    </ns1:td>
+                                </ns1:tr>
+                            </ns1:tbody>
+                        </ns1:table>
+                    </ns1:text>
+                    <ns1:entry contextConductionInd="true" typeCode="COMP">
+                        <ns1:substanceAdministration classCode="SBADM" moodCode="INT">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.24" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7" />
+                            <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4" />
+                            <!-- Prescription item ID -->
+                            <ns1:id extension="d77f13fc-82d9-41e5-9ea3-3b3b1e94f153" root="2.16.840.1.113883.2.7" />
+                            <ns1:statusCode code="active" />
+                            <ns1:effectiveTime xsi:type="ns1:IVL_TS">
+                                <!-- Date of onset of treatment (Date of dispensing medication) -->
+                                <ns1:low value="19970610" />
+                            </ns1:effectiveTime>
+                            <!-- Frequency of intakes -->
+                            <ns1:effectiveTime nullFlavor="NI" xsi:type="ns1:PIVL_TS" />
+                            <!-- Route of administration -->
+                            <ns1:routeCode code="20053000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Oralnim putem" />
+                            <!-- Number of units per intake -->
+                            <!-- doseQuantity-->
+                            <ns1:consumable typeCode="CSM">
+                                <ns1:manufacturedProduct xmlns:epsos="urn:epsos-org:ep:medication" classCode="MANU">
+                                    <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.53" />
+                                    <ns1:manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1" />
+                                        <!-- Medicinal product code -->
+                                        <ns1:code code="H03AA01145" codeSystem="2.16.840.1.113883.2.9.6.1.5" displayName="Euthyrox 100" />
+                                        <!-- Brand name -->
+                                        <ns1:name>Euthyrox 100</ns1:name>
+                                        <!-- Free-text representation of the strength. -->
+                                        <epsos:desc>tbl. 50x100 mcg</epsos:desc>
+                                        <!-- Pharmaceutical dose form -->
+                                        <epsos:formCode code="10219000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="tableta" />
+                                        <epsos:asContent classCode="CONT">
+                                            <epsos:containerPackagedMedicine classCode="CONT" determinerCode="INSTANCE">
+                                                <!-- Package Form -->
+                                                <epsos:formCode code="30066000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Spremnik tableta" />
+                                                <!-- Medicinal product package size -->
+                                                <epsos:capacityQuantity unit="1" value="50" />
+                                            </epsos:containerPackagedMedicine>
+                                        </epsos:asContent>
+                                        <epsos:asSpecializedKind classCode="GEN">
+                                            <epsos:generalizedMedicineClass classCode="MMAT">
+                                                <epsos:code code="H03AA01" codeSystem="2.16.840.1.113883.6.73" displayName="levotiroksin" />
+                                                <epsos:name>levotiroksin</epsos:name>
+                                            </epsos:generalizedMedicineClass>
+                                        </epsos:asSpecializedKind>
+                                        <epsos:ingredient classCode="ACTI">
+                                            <!-- Strength -->
+                                            <epsos:quantity>
+                                                <epsos:numerator unit="ug" value="100" xsi:type="epsos:PQ" />
+                                                <epsos:denominator unit="1" value="1" xsi:type="epsos:PQ" />
+                                            </epsos:quantity>
+                                            <epsos:ingredient classCode="MMAT" determinerCode="KIND">
+                                                <!-- Active ingredient code -->
+                                                <epsos:code code="H03AA01" codeSystem="2.16.840.1.113883.6.73" displayName="levotiroksin" />
+                                                <!-- Active ingredient -->
+                                                <epsos:name>levotiroksin</epsos:name>
+                                            </epsos:ingredient>
+                                        </epsos:ingredient>
+                                    </ns1:manufacturedMaterial>
+                                </ns1:manufacturedProduct>
+                            </ns1:consumable>
+                            <!-- Patient Instructions -->
+                            <ns1:entryRelationship inversionInd="true" typeCode="SUBJ">
+                                <ns1:act classCode="ACT" moodCode="INT">
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.3.1" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.43" />
+                                    <ns1:code code="FINSTRUCT" codeSystem="1.3.6.1.4.1.19376.1.5.3.2" />
+                                    <ns1:text>
+                                        <ns1:reference value="#instruction-1" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                </ns1:act>
+                            </ns1:entryRelationship>
+                        </ns1:substanceAdministration>
+                    </ns1:entry>
+                    <ns1:entry contextConductionInd="true" typeCode="COMP">
+                        <ns1:substanceAdministration classCode="SBADM" moodCode="INT">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.24" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7" />
+                            <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4" />
+                            <!-- Prescription item ID -->
+                            <ns1:id extension="2d0a7ba3-d5d6-4e76-b48c-a6bcf2c89988" root="2.16.840.1.113883.2.7" />
+                            <ns1:statusCode code="active" />
+                            <ns1:effectiveTime xsi:type="ns1:IVL_TS">
+                                <!-- Date of onset of treatment (Date of dispensing medication) -->
+                                <ns1:low value="20170605" />
+                            </ns1:effectiveTime>
+                            <!-- Frequency of intakes -->
+                            <ns1:effectiveTime nullFlavor="NI" xsi:type="ns1:PIVL_TS" />
+                            <!-- Route of administration -->
+                            <ns1:routeCode code="20053000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Oralnim putem" />
+                            <!-- Number of units per intake -->
+                            <!-- doseQuantity-->
+                            <ns1:consumable typeCode="CSM">
+                                <ns1:manufacturedProduct xmlns:epsos="urn:epsos-org:ep:medication" classCode="MANU">
+                                    <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.53" />
+                                    <ns1:manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1" />
+                                        <!-- Medicinal product code -->
+                                        <ns1:code code="C09BB05162" codeSystem="2.16.840.1.113883.2.9.6.1.5" displayName="Triapin" />
+                                        <!-- Brand name -->
+                                        <ns1:name>Triapin</ns1:name>
+                                        <!-- Free-text representation of the strength. -->
+                                        <epsos:desc>tbl. s prod. oslob. 28x(5 mg +5 mg)</epsos:desc>
+                                        <!-- Pharmaceutical dose form -->
+                                        <epsos:formCode code="10226000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Tableta sa produljenim otpuštanjem" />
+                                        <epsos:asContent classCode="CONT">
+                                            <epsos:containerPackagedMedicine classCode="CONT" determinerCode="INSTANCE">
+                                                <!-- Package Form -->
+                                                <epsos:formCode code="30066000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Spremnik tableta" />
+                                                <!-- Medicinal product package size -->
+                                                <epsos:capacityQuantity unit="1" value="28" />
+                                            </epsos:containerPackagedMedicine>
+                                        </epsos:asContent>
+                                        <epsos:asSpecializedKind classCode="GEN">
+                                            <epsos:generalizedMedicineClass classCode="MMAT">
+                                                <epsos:code code="C09BB05" codeSystem="2.16.840.1.113883.6.73" displayName="ramipril + felodipin" />
+                                                <epsos:name>ramipril + felodipin</epsos:name>
+                                            </epsos:generalizedMedicineClass>
+                                        </epsos:asSpecializedKind>
+                                        <epsos:ingredient classCode="ACTI">
+                                            <!-- Strength -->
+                                            <epsos:quantity>
+                                                <epsos:numerator unit="mg" value="5" xsi:type="epsos:PQ" />
+                                                <epsos:denominator unit="1" value="1" xsi:type="epsos:PQ" />
+                                            </epsos:quantity>
+                                            <epsos:ingredient classCode="MMAT" determinerCode="KIND">
+                                                <!-- Active ingredient code -->
+                                                <epsos:code code="C09AA05" codeSystem="2.16.840.1.113883.6.73" displayName="ramipril" />
+                                                <!-- Active ingredient -->
+                                                <epsos:name>ramipril</epsos:name>
+                                            </epsos:ingredient>
+                                        </epsos:ingredient>
+                                        <epsos:ingredient classCode="ACTI">
+                                            <!-- Strength -->
+                                            <epsos:quantity>
+                                                <epsos:numerator unit="mg" value="5" xsi:type="epsos:PQ" />
+                                                <epsos:denominator unit="1" value="1" xsi:type="epsos:PQ" />
+                                            </epsos:quantity>
+                                            <epsos:ingredient classCode="MMAT" determinerCode="KIND">
+                                                <!-- Active ingredient code -->
+                                                <epsos:code code="C08CA02" codeSystem="2.16.840.1.113883.6.73" displayName="felodipin" />
+                                                <!-- Active ingredient -->
+                                                <epsos:name>felodipin</epsos:name>
+                                            </epsos:ingredient>
+                                        </epsos:ingredient>
+                                    </ns1:manufacturedMaterial>
+                                </ns1:manufacturedProduct>
+                            </ns1:consumable>
+                            <!-- Patient Instructions -->
+                            <ns1:entryRelationship inversionInd="true" typeCode="SUBJ">
+                                <ns1:act classCode="ACT" moodCode="INT">
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.3.1" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.43" />
+                                    <ns1:code code="FINSTRUCT" codeSystem="1.3.6.1.4.1.19376.1.5.3.2" />
+                                    <ns1:text>
+                                        <ns1:reference value="#instruction-2" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                </ns1:act>
+                            </ns1:entryRelationship>
+                        </ns1:substanceAdministration>
+                    </ns1:entry>
+                    <ns1:entry contextConductionInd="true" typeCode="COMP">
+                        <ns1:substanceAdministration classCode="SBADM" moodCode="INT">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.24" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7" />
+                            <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4" />
+                            <!-- Prescription item ID -->
+                            <ns1:id extension="a21b43a5-59d1-4999-a76a-b3a66e797eb5" root="2.16.840.1.113883.2.7" />
+                            <ns1:statusCode code="active" />
+                            <ns1:effectiveTime xsi:type="ns1:IVL_TS">
+                                <!-- Date of onset of treatment (Date of dispensing medication) -->
+                                <ns1:low value="20120430" />
+                            </ns1:effectiveTime>
+                            <!-- Frequency of intakes -->
+                            <ns1:effectiveTime nullFlavor="NI" xsi:type="ns1:PIVL_TS" />
+                            <!-- Route of administration -->
+                            <ns1:routeCode code="20053000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Oralnim putem" />
+                            <!-- Number of units per intake -->
+                            <!-- doseQuantity-->
+                            <ns1:consumable typeCode="CSM">
+                                <ns1:manufacturedProduct xmlns:epsos="urn:epsos-org:ep:medication" classCode="MANU">
+                                    <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.53" />
+                                    <ns1:manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1" />
+                                        <!-- Medicinal product code -->
+                                        <ns1:code code="A10AE06061" codeSystem="2.16.840.1.113883.2.9.6.1.5" displayName="Tresiba" />
+                                        <!-- Brand name -->
+                                        <ns1:name>Tresiba</ns1:name>
+                                        <!-- Free-text representation of the strength. -->
+                                        <epsos:desc>otop. za inj., brizg. napunj. FlexTouch 5x3 ml (100 i.j./ml)</epsos:desc>
+                                        <!-- Pharmaceutical dose form -->
+                                        <epsos:formCode code="11201000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Otopina za injekciju" />
+                                        <epsos:asContent classCode="CONT">
+                                            <epsos:containerPackagedMedicine classCode="CONT" determinerCode="INSTANCE">
+                                                <!-- Package Form -->
+                                                <epsos:formCode code="30050000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Napunjena brizgalica" />
+                                                <!-- Medicinal product package size -->
+                                                <epsos:capacityQuantity unit="1" value="5" />
+                                            </epsos:containerPackagedMedicine>
+                                        </epsos:asContent>
+                                        <epsos:asSpecializedKind classCode="GEN">
+                                            <epsos:generalizedMedicineClass classCode="MMAT">
+                                                <epsos:code code="A10AE06" codeSystem="2.16.840.1.113883.6.73" displayName="degludek inzulin" />
+                                                <epsos:name>degludek inzulin</epsos:name>
+                                            </epsos:generalizedMedicineClass>
+                                        </epsos:asSpecializedKind>
+                                        <epsos:ingredient classCode="ACTI">
+                                            <!-- Strength -->
+                                            <epsos:quantity>
+                                                <epsos:numerator unit="[iU]" value="300" xsi:type="epsos:PQ" />
+                                                <epsos:denominator unit="mL" value="3" xsi:type="epsos:PQ" />
+                                            </epsos:quantity>
+                                            <epsos:ingredient classCode="MMAT" determinerCode="KIND">
+                                                <!-- Active ingredient code -->
+                                                <epsos:code code="A10AE06" codeSystem="2.16.840.1.113883.6.73" displayName="degludek inzulin" />
+                                                <!-- Active ingredient -->
+                                                <epsos:name>degludek inzulin</epsos:name>
+                                            </epsos:ingredient>
+                                        </epsos:ingredient>
+                                    </ns1:manufacturedMaterial>
+                                </ns1:manufacturedProduct>
+                            </ns1:consumable>
+                            <!-- Patient Instructions -->
+                            <ns1:entryRelationship inversionInd="true" typeCode="SUBJ">
+                                <ns1:act classCode="ACT" moodCode="INT">
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.3.1" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.43" />
+                                    <ns1:code code="FINSTRUCT" codeSystem="1.3.6.1.4.1.19376.1.5.3.2" />
+                                    <ns1:text>
+                                        <ns1:reference value="#instruction-3" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                </ns1:act>
+                            </ns1:entryRelationship>
+                        </ns1:substanceAdministration>
+                    </ns1:entry>
+                    <ns1:entry contextConductionInd="true" typeCode="COMP">
+                        <ns1:substanceAdministration classCode="SBADM" moodCode="INT">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.24" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7" />
+                            <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4" />
+                            <!-- Prescription item ID -->
+                            <ns1:id extension="b1ffd97e-ddb3-44c2-8bb2-1b21c82a8c7f" root="2.16.840.1.113883.2.7" />
+                            <ns1:statusCode code="active" />
+                            <ns1:effectiveTime xsi:type="ns1:IVL_TS">
+                                <!-- Date of onset of treatment (Date of dispensing medication) -->
+                                <ns1:low value="20150201" />
+                            </ns1:effectiveTime>
+                            <!-- Frequency of intakes -->
+                            <ns1:effectiveTime nullFlavor="NI" xsi:type="ns1:PIVL_TS" />
+                            <!-- Route of administration -->
+                            <ns1:routeCode code="20020000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Inhalacija" />
+                            <!-- Number of units per intake -->
+                            <!-- doseQuantity-->
+                            <ns1:consumable typeCode="CSM">
+                                <ns1:manufacturedProduct xmlns:epsos="urn:epsos-org:ep:medication" classCode="MANU">
+                                    <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.53" />
+                                    <ns1:manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1" />
+                                        <!-- Medicinal product code -->
+                                        <ns1:code code="R03BA02724" codeSystem="2.16.840.1.113883.2.9.6.1.5" displayName="Budelin Novolizer" />
+                                        <!-- Brand name -->
+                                        <ns1:name>Budelin Novolizer</ns1:name>
+                                        <!-- Free-text representation of the strength. -->
+                                        <epsos:desc>praš. za inhal. 200x200 mcg, umetak od 200 doza</epsos:desc>
+                                        <!-- Pharmaceutical dose form -->
+                                        <epsos:formCode code="11111000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Inhalacijski prah, prethodno razdijeljen" />
+                                        <epsos:asContent classCode="CONT">
+                                            <epsos:containerPackagedMedicine classCode="CONT" determinerCode="INSTANCE">
+                                                <!-- Package Form -->
+                                                <epsos:formCode code="30014000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Kaseta" />
+                                                <!-- Medicinal product package size -->
+                                                <epsos:capacityQuantity unit="1" value="200" />
+                                            </epsos:containerPackagedMedicine>
+                                        </epsos:asContent>
+                                        <epsos:asSpecializedKind classCode="GEN">
+                                            <epsos:generalizedMedicineClass classCode="MMAT">
+                                                <epsos:code code="R03BA02" codeSystem="2.16.840.1.113883.6.73" displayName="budesonid" />
+                                                <epsos:name>budesonid</epsos:name>
+                                            </epsos:generalizedMedicineClass>
+                                        </epsos:asSpecializedKind>
+                                        <epsos:ingredient classCode="ACTI">
+                                            <!-- Strength -->
+                                            <epsos:quantity>
+                                                <epsos:numerator unit="ug" value="200" xsi:type="epsos:PQ" />
+                                                <epsos:denominator unit="1" value="1" xsi:type="epsos:PQ" />
+                                            </epsos:quantity>
+                                            <epsos:ingredient classCode="MMAT" determinerCode="KIND">
+                                                <!-- Active ingredient code -->
+                                                <epsos:code code="R03BA02" codeSystem="2.16.840.1.113883.6.73" displayName="budesonid" />
+                                                <!-- Active ingredient -->
+                                                <epsos:name>budesonid</epsos:name>
+                                            </epsos:ingredient>
+                                        </epsos:ingredient>
+                                    </ns1:manufacturedMaterial>
+                                </ns1:manufacturedProduct>
+                            </ns1:consumable>
+                            <!-- Patient Instructions -->
+                            <ns1:entryRelationship inversionInd="true" typeCode="SUBJ">
+                                <ns1:act classCode="ACT" moodCode="INT">
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.3.1" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.43" />
+                                    <ns1:code code="FINSTRUCT" codeSystem="1.3.6.1.4.1.19376.1.5.3.2" />
+                                    <ns1:text>
+                                        <ns1:reference value="#instruction-4" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                </ns1:act>
+                            </ns1:entryRelationship>
+                        </ns1:substanceAdministration>
+                    </ns1:entry>
+                    <ns1:entry contextConductionInd="true" typeCode="COMP">
+                        <ns1:substanceAdministration classCode="SBADM" moodCode="INT">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.24" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7" />
+                            <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4" />
+                            <!-- Prescription item ID -->
+                            <ns1:id extension="04f47c39-631e-48a8-ba1d-0c6a5c1fd960" root="2.16.840.1.113883.2.7" />
+                            <ns1:statusCode code="active" />
+                            <ns1:effectiveTime xsi:type="ns1:IVL_TS">
+                                <!-- Date of onset of treatment (Date of dispensing medication) -->
+                                <ns1:low value="20170705" />
+                            </ns1:effectiveTime>
+                            <!-- Frequency of intakes -->
+                            <ns1:effectiveTime nullFlavor="NI" xsi:type="ns1:PIVL_TS" />
+                            <!-- Route of administration -->
+                            <ns1:routeCode code="20053000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Oralnim putem" />
+                            <!-- Number of units per intake -->
+                            <!-- doseQuantity-->
+                            <ns1:consumable typeCode="CSM">
+                                <ns1:manufacturedProduct xmlns:epsos="urn:epsos-org:ep:medication" classCode="MANU">
+                                    <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.53" />
+                                    <ns1:manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1" />
+                                        <!-- Medicinal product code -->
+                                        <ns1:code code="J01CR02108" codeSystem="2.16.840.1.113883.2.9.6.1.5" displayName="Klavocin bid" />
+                                        <!-- Brand name -->
+                                        <ns1:name>Klavocin bid</ns1:name>
+                                        <!-- Free-text representation of the strength. -->
+                                        <epsos:desc>tbl. film obl. 14x1 g (875 mg +125 mg)</epsos:desc>
+                                        <!-- Pharmaceutical dose form -->
+                                        <epsos:formCode code="10221000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Filmom obložena tableta" />
+                                        <epsos:asContent classCode="CONT">
+                                            <epsos:containerPackagedMedicine classCode="CONT" determinerCode="INSTANCE">
+                                                <!-- Package Form -->
+                                                <epsos:formCode code="30015500" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Spremnik" />
+                                                <!-- Medicinal product package size -->
+                                                <epsos:capacityQuantity unit="1" value="14" />
+                                            </epsos:containerPackagedMedicine>
+                                        </epsos:asContent>
+                                        <epsos:asSpecializedKind classCode="GEN">
+                                            <epsos:generalizedMedicineClass classCode="MMAT">
+                                                <epsos:code code="J01CR02" codeSystem="2.16.840.1.113883.6.73" displayName="amoksicilin + klavulanska kiselina" />
+                                                <epsos:name>amoksicilin + klavulanska kiselina</epsos:name>
+                                            </epsos:generalizedMedicineClass>
+                                        </epsos:asSpecializedKind>
+                                        <epsos:ingredient classCode="ACTI">
+                                            <!-- Strength -->
+                                            <epsos:quantity>
+                                                <epsos:numerator unit="1" value="1" xsi:type="epsos:PQ" />
+                                                <epsos:denominator unit="1" value="1" xsi:type="epsos:PQ" />
+                                            </epsos:quantity>
+                                            <epsos:ingredient classCode="MMAT" determinerCode="KIND">
+                                                <!-- Active ingredient code -->
+                                                <epsos:code code="J01CR02" codeSystem="2.16.840.1.113883.6.73" displayName="amoksicilin + klavulanska kiselina" />
+                                                <!-- Active ingredient -->
+                                                <epsos:name>amoksicilin + klavulanska kiselina</epsos:name>
+                                            </epsos:ingredient>
+                                        </epsos:ingredient>
+                                    </ns1:manufacturedMaterial>
+                                </ns1:manufacturedProduct>
+                            </ns1:consumable>
+                            <!-- Patient Instructions -->
+                            <ns1:entryRelationship inversionInd="true" typeCode="SUBJ">
+                                <ns1:act classCode="ACT" moodCode="INT">
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.3.1" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.43" />
+                                    <ns1:code code="FINSTRUCT" codeSystem="1.3.6.1.4.1.19376.1.5.3.2" />
+                                    <ns1:text>
+                                        <ns1:reference value="#instruction-5" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                </ns1:act>
+                            </ns1:entryRelationship>
+                        </ns1:substanceAdministration>
+                    </ns1:entry>
+                </ns1:section>
+            </ns1:component>
+            <!-- Allergies and Other Adverse Reactions -->
+            <ns1:component contextConductionInd="true" typeCode="COMP">
+                <ns1:section classCode="DOCSECT" moodCode="EVN">
+                    <ns1:templateId root="2.16.840.1.113883.10.20.1.2" />
+                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.13" />
+                    <ns1:code code="48765-2" codeSystem="2.16.840.1.113883.6.1" displayName="Allergies, adverse reactions, alerts" />
+                    <ns1:title>Alergije i druge reakcije (Allergies and Other Adverse Reactions)</ns1:title>
+                    <ns1:text>
+                        <ns1:table>
+                            <ns1:thead>
+                                <ns1:tr>
+                                    <ns1:td>Vrijeme (Onset Date)</ns1:td>
+                                    <ns1:td>Opis alergije (Allergy description)</ns1:td>
+                                </ns1:tr>
+                            </ns1:thead>
+                            <ns1:tbody>
+                                <ns1:tr>
+                                    <ns1:td>1.10.1990.</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="allergy-1">Alergijska reakcija na lateks - urticaria</ns1:content>
+                                    </ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>1.10.1990.</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="allergy-2">alergija na kivi - ekcem</ns1:content>
+                                    </ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>5.5.1983.</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="allergy-3">intolerancija na laktozu - dijareja</ns1:content>
+                                    </ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>3.10.1994.</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="allergy-4">alergija na aspirin - astma</ns1:content>
+                                    </ns1:td>
+                                </ns1:tr>
+                            </ns1:tbody>
+                        </ns1:table>
+                    </ns1:text>
+                    <ns1:entry>
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3" />
+                            <ns1:code nullFlavor="NA" />
+                            <ns1:statusCode code="completed" />
+                            <ns1:effectiveTime>
+                                <ns1:low value="19901001" />
+                            </ns1:effectiveTime>
+                            <!-- 1..* entry relationships identifying allergies of concern -->
+                            <ns1:entryRelationship inversionInd="false" typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.18" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.6" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <ns1:id root="2200D6DD-9A33-4302-B1AA-61C3FCEA5C6C" />
+                                    <!-- Allergy code -->
+                                    <ns1:code code="419199007" codeSystem="2.16.840.1.113883.6.96" displayName="Allergy to Substance" />
+                                    <!-- Allergy description -->
+                                    <ns1:text>
+                                        <ns1:reference value="#allergy-1" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <!-- Onset Date -->
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="19901001" />
+                                    </ns1:effectiveTime>
+                                    <ns1:value nullFlavor="NA" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3" />
+                            <ns1:code nullFlavor="NA" />
+                            <ns1:statusCode code="completed" />
+                            <ns1:effectiveTime>
+                                <ns1:low value="19901001" />
+                            </ns1:effectiveTime>
+                            <!-- 1..* entry relationships identifying allergies of concern -->
+                            <ns1:entryRelationship inversionInd="false" typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.18" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.6" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <ns1:id root="9AAAF5C1-ECBE-410C-A2BE-0F29E661E6E3" />
+                                    <!-- Allergy code -->
+                                    <ns1:code code="419199007" codeSystem="2.16.840.1.113883.6.96" displayName="Allergy to substance" />
+                                    <!-- Allergy description -->
+                                    <ns1:text>
+                                        <ns1:reference value="#allergy-2" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <!-- Onset Date -->
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="19901001" />
+                                    </ns1:effectiveTime>
+                                    <ns1:value nullFlavor="NA" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3" />
+                            <ns1:code nullFlavor="NA" />
+                            <ns1:statusCode code="completed" />
+                            <ns1:effectiveTime>
+                                <ns1:low value="19830505" />
+                            </ns1:effectiveTime>
+                            <!-- 1..* entry relationships identifying allergies of concern -->
+                            <ns1:entryRelationship inversionInd="false" typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.18" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.6" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <ns1:id root="B148CF55-EAB0-4807-985E-6B7C515C9FCC" />
+                                    <!-- Allergy code -->
+                                    <ns1:code code="419199007" codeSystem="2.16.840.1.113883.6.96" displayName="Allergy to substance" />
+                                    <!-- Allergy description -->
+                                    <ns1:text>
+                                        <ns1:reference value="#allergy-3" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <!-- Onset Date -->
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="19830505" />
+                                    </ns1:effectiveTime>
+                                    <ns1:value nullFlavor="NA" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3" />
+                            <ns1:code nullFlavor="NA" />
+                            <ns1:statusCode code="completed" />
+                            <ns1:effectiveTime>
+                                <ns1:low value="19941003" />
+                            </ns1:effectiveTime>
+                            <!-- 1..* entry relationships identifying allergies of concern -->
+                            <ns1:entryRelationship inversionInd="false" typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.18" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.6" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <ns1:id root="CE3EC0C4-00AEA-4D0E-AA3D-340DAC478D2C" />
+                                    <!-- Allergy code -->
+                                    <ns1:code code="419199007" codeSystem="2.16.840.1.113883.6.96" displayName="Allergy to substance" />
+                                    <!-- Allergy description -->
+                                    <ns1:text>
+                                        <ns1:reference value="#allergy-4" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <!-- Onset Date -->
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="19941003" />
+                                    </ns1:effectiveTime>
+                                    <ns1:value nullFlavor="NA" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                </ns1:section>
+            </ns1:component>
+            <!-- Immunizations -->
+            <ns1:component contextConductionInd="true" typeCode="COMP">
+                <ns1:section classCode="DOCSECT" moodCode="EVN">
+                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.23" />
+                    <ns1:templateId root="2.16.840.1.113883.10.20.1.6" />
+                    <ns1:code code="11369-6" codeSystem="2.16.840.1.113883.6.1" displayName="Immunizations" />
+                    <ns1:title>Cijepiva (Immunizations)</ns1:title>
+                    <ns1:text>
+                        <ns1:table>
+                            <ns1:thead>
+                                <ns1:tr>
+                                    <ns1:td>Cijepivo (Vaccine)</ns1:td>
+                                    <ns1:td>Vrijeme cijepljenja (Vaccination Date)</ns1:td>
+                                </ns1:tr>
+                            </ns1:thead>
+                            <ns1:tbody>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="immunization-1">cjepivo za hepatitis B</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>1.2.1983.</ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="immunization-2">Toksoidi difterije i tetanusa, cijepljenje
+                                            protiv pertusisa i dječje paralize</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>1.2.1983.</ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="immunization-3">Cijepljenje protiv bakterije Haemophilus
+                                            influenzae tipa b</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>1.2.1983.</ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="immunization-4">Cijepljenje protiv humanog papiloma virusa</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>20.5.1994.</ns1:td>
+                                </ns1:tr>
+                            </ns1:tbody>
+                        </ns1:table>
+                    </ns1:text>
+                    <ns1:entry>
+                        <ns1:substanceAdministration classCode="SBADM" moodCode="EVN" negationInd="false">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.24" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12" />
+                            <ns1:id root="679C8B52-ADBF-4482-A8D4-59F645BF5F43" />
+                            <ns1:code code="IMMUNIZ" codeSystem="1.3.5.1.4.1.19376.1.5.3.2" codeSystemName="IHEActCode" />
+                            <!-- Vaccine description -->
+                            <ns1:text>
+                                <ns1:reference value="#immunization-1" />
+                            </ns1:text>
+                            <ns1:statusCode code="completed" />
+                            <!-- Vaccination date -->
+                            <ns1:effectiveTime value="19830102" />
+                            <ns1:consumable typeCode="CSM">
+                                <ns1:manufacturedProduct classCode="MANU">
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.53" />
+                                    <ns1:manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.145" />
+                                        <ns1:code nullFlavor="NI" />
+                                        <!-- Vaccine brand name -->
+                                        <ns1:name nullFlavor="NI" />
+                                    </ns1:manufacturedMaterial>
+                                </ns1:manufacturedProduct>
+                            </ns1:consumable>
+                        </ns1:substanceAdministration>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <ns1:substanceAdministration classCode="SBADM" moodCode="EVN" negationInd="false">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.24" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12" />
+                            <ns1:id root="E88896D4-3E07-43FF-B8BD-DF0484641E48" />
+                            <ns1:code code="IMMUNIZ" codeSystem="1.3.5.1.4.1.19376.1.5.3.2" codeSystemName="IHEActCode" />
+                            <!-- Vaccine description -->
+                            <ns1:text>
+                                <ns1:reference value="#immunization-2" />
+                            </ns1:text>
+                            <ns1:statusCode code="completed" />
+                            <!-- Vaccination date -->
+                            <ns1:effectiveTime value="19830102" />
+                            <ns1:consumable typeCode="CSM">
+                                <ns1:manufacturedProduct classCode="MANU">
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.53" />
+                                    <ns1:manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.145" />
+                                        <ns1:code nullFlavor="NI" />
+                                        <!-- Vaccine brand name -->
+                                        <ns1:name nullFlavor="NI" />
+                                    </ns1:manufacturedMaterial>
+                                </ns1:manufacturedProduct>
+                            </ns1:consumable>
+                        </ns1:substanceAdministration>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <ns1:substanceAdministration classCode="SBADM" moodCode="EVN" negationInd="false">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.24" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12" />
+                            <ns1:id root="A6F0DA56-A40E-49C4-8212-61C125EE7E8E" />
+                            <ns1:code code="IMMUNIZ" codeSystem="1.3.5.1.4.1.19376.1.5.3.2" codeSystemName="IHEActCode" />
+                            <!-- Vaccine description -->
+                            <ns1:text>
+                                <ns1:reference value="#immunization-3" />
+                            </ns1:text>
+                            <ns1:statusCode code="completed" />
+                            <!-- Vaccination date -->
+                            <ns1:effectiveTime value="19830102" />
+                            <ns1:consumable typeCode="CSM">
+                                <ns1:manufacturedProduct classCode="MANU">
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.53" />
+                                    <ns1:manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.145" />
+                                        <!-- Vaccine code -->
+                                        <ns1:code nullFlavor="NI" />
+                                        <!-- Vaccine brand name -->
+                                        <ns1:name nullFlavor="NI" />
+                                    </ns1:manufacturedMaterial>
+                                </ns1:manufacturedProduct>
+                            </ns1:consumable>
+                        </ns1:substanceAdministration>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <ns1:substanceAdministration classCode="SBADM" moodCode="EVN" negationInd="false">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.24" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12" />
+                            <ns1:id root="CC9BA6B1-B063-451D-BBA3-EB6397466DDB" />
+                            <ns1:code code="IMMUNIZ" codeSystem="1.3.5.1.4.1.19376.1.5.3.2" codeSystemName="IHEActCode" />
+                            <!-- Vaccine description -->
+                            <ns1:text>
+                                <ns1:reference value="#immunization-4" />
+                            </ns1:text>
+                            <ns1:statusCode code="completed" />
+                            <!-- Vaccination date -->
+                            <ns1:effectiveTime value="19940520" />
+                            <ns1:consumable typeCode="CSM">
+                                <ns1:manufacturedProduct classCode="MANU">
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2" />
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.53" />
+                                    <ns1:manufacturedMaterial classCode="MMAT" determinerCode="KIND">
+                                        <ns1:templateId root="2.16.840.1.113883.3.1937.777.11.10.145" />
+                                        <ns1:code nullFlavor="NI" />
+                                        <!-- Vaccine brand name -->
+                                        <ns1:name nullFlavor="NI" />
+                                    </ns1:manufacturedMaterial>
+                                </ns1:manufacturedProduct>
+                            </ns1:consumable>
+                        </ns1:substanceAdministration>
+                    </ns1:entry>
+                </ns1:section>
+            </ns1:component>
+            <!-- Surgical Procedures -->
+            <ns1:component contextConductionInd="true" typeCode="COMP">
+                <ns1:section classCode="DOCSECT" moodCode="EVN">
+                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.12" />
+                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.11" />
+                    <ns1:code code="47519-4" codeSystem="2.16.840.1.113883.6.1" displayName="History of Procedures" />
+                    <ns1:title>Operacije (Coded List of Surgeries)</ns1:title>
+                    <ns1:text>
+                        <ns1:table>
+                            <ns1:thead>
+                                <ns1:tr>
+                                    <ns1:td>Vrijeme (Surgery date)</ns1:td>
+                                    <ns1:td>Opis procedure (Procedure description)</ns1:td>
+                                </ns1:tr>
+                            </ns1:thead>
+                            <ns1:tbody>
+                                <ns1:tr>
+                                    <ns1:td>20.10.2014.</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="procedure-1">Ugradnja kardioverter defibrilatora</ns1:content>
+                                    </ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>14.4.2012.</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="procedure-2">carski rez</ns1:content>
+                                    </ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>6.5.2017.</ns1:td>
+                                    <ns1:td>
+                                        <ns1:content ID="procedure-3">tireoidektomija</ns1:content>
+                                    </ns1:td>
+                                </ns1:tr>
+                            </ns1:tbody>
+                        </ns1:table>
+                    </ns1:text>
+                    <ns1:entry>
+                        <ns1:procedure classCode="PROC" moodCode="EVN">
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19" />
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.29" />
+                            <!-- see text of section -->
+                            <ns1:id nullFlavor="NA" />
+                            <!-- Procedure Id (code) -->
+                            <ns1:code codeSystem="2.16.840.1.113883.5.4" codeSystemName="ActCode" nullFlavor="NI" />
+                            <!-- Procedure description -->
+                            <ns1:text>
+                                <ns1:reference value="#procedure-1" />
+                            </ns1:text>
+                            <ns1:statusCode code="completed" />
+                            <!-- Procedure Date -->
+                            <ns1:effectiveTime>
+                                <ns1:high value="20141020" />
+                            </ns1:effectiveTime>
+                        </ns1:procedure>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <ns1:procedure classCode="PROC" moodCode="EVN">
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19" />
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.29" />
+                            <!-- see text of section -->
+                            <ns1:id nullFlavor="NA" />
+                            <!-- Procedure Id (code) -->
+                            <ns1:code codeSystem="2.16.840.1.113883.5.4" codeSystemName="ActCode" nullFlavor="NI" />
+                            <!-- Procedure description -->
+                            <ns1:text>
+                                <ns1:reference value="#procedure-2" />
+                            </ns1:text>
+                            <ns1:statusCode code="completed" />
+                            <!-- Procedure Date -->
+                            <ns1:effectiveTime>
+                                <ns1:high value="20120414" />
+                            </ns1:effectiveTime>
+                        </ns1:procedure>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <ns1:procedure classCode="PROC" moodCode="EVN">
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19" />
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.29" />
+                            <!-- see text of section -->
+                            <ns1:id nullFlavor="NA" />
+                            <!-- Procedure Id (code) -->
+                            <ns1:code codeSystem="2.16.840.1.113883.5.4" codeSystemName="ActCode" nullFlavor="NI" />
+                            <!-- Procedure description -->
+                            <ns1:text>
+                                <ns1:reference value="#procedure-3" />
+                            </ns1:text>
+                            <ns1:statusCode code="completed" />
+                            <!-- Procedure Date -->
+                            <ns1:effectiveTime>
+                                <ns1:high value="19970506" />
+                            </ns1:effectiveTime>
+                        </ns1:procedure>
+                    </ns1:entry>
+                </ns1:section>
+            </ns1:component>
+            <!-- Active Problems -->
+            <ns1:component contextConductionInd="true" typeCode="COMP">
+                <ns1:section classCode="DOCSECT" moodCode="EVN">
+                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.6" />
+                    <ns1:templateId root="2.16.840.1.113883.10.20.1.11" />
+                    <ns1:code code="11450-4" codeSystem="2.16.840.1.113883.6.1" displayName="Problem list" />
+                    <ns1:title>Aktivni problemi (Active Problems)</ns1:title>
+                    <ns1:text>
+                        <ns1:table>
+                            <ns1:thead>
+                                <ns1:tr>
+                                    <ns1:td>Dijagnoza (Diagnosis)</ns1:td>
+                                    <ns1:td>Vrijeme (Onset Time)</ns1:td>
+                                </ns1:tr>
+                            </ns1:thead>
+                            <ns1:tbody>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="active-problem-1">Alergijska astma</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>10.3.1994.</ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="active-problem-2">Hipotireoza nakon operacije raka štitnjače</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>10.6.1997.</ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="active-problem-3">Sindrom Brugada</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>1.9.2013.</ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="active-problem-4">Dijabetes tipa 2 razvijen nakon trudnoće</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>30.4.2012.</ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="active-problem-5">Teška preeklampsija</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>5.6.2017.</ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="active-problem-6">Akutni pijelonefritis</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>5.7.2017.</ns1:td>
+                                </ns1:tr>
+                            </ns1:tbody>
+                        </ns1:table>
+                    </ns1:text>
+                    <ns1:entry>
+                        <!-- Problem/Diagnosis -->
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2" />
+                            <ns1:id nullFlavor="NA" />
+                            <ns1:code nullFlavor="NA" />
+                            <!-- Problem/diagnosis Description -->
+                            <ns1:statusCode code="active" />
+                            <!-- 1..* entry relationships identifying problems of concern -->
+                            <ns1:entryRelationship typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <!-- Slucaj -->
+                                    <ns1:id root="06D5F309-B15F-4383-A31F-C060AAABC58A" />
+                                    <ns1:code code="64572001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Disease" />
+                                    <ns1:text>
+                                        <ns1:reference value="#active-problem-1" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="19940310" />
+                                    </ns1:effectiveTime>
+                                    <!-- Problem/diagnosis Id (Code) -->
+                                    <ns1:value code="J45.9" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10" displayName="Astma nespecificirana" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <!-- Problem/Diagnosis -->
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2" />
+                            <ns1:id nullFlavor="NA" />
+                            <ns1:code nullFlavor="NA" />
+                            <!-- Problem/diagnosis Description -->
+                            <ns1:statusCode code="active" />
+                            <!-- 1..* entry relationships identifying problems of concern -->
+                            <ns1:entryRelationship typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <!-- Slucaj -->
+                                    <ns1:id root="CF0A6AAB-5673-4315-9851-2B67CB75EADA" />
+                                    <ns1:code code="64572001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Disease" />
+                                    <ns1:text>
+                                        <ns1:reference value="#active-problem-2" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="19970610" />
+                                    </ns1:effectiveTime>
+                                    <!-- Problem/diagnosis Id (Code) -->
+                                    <ns1:value code="E03.9" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10" displayName="Hipotireoza, nespecificirana" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <!-- Problem/Diagnosis -->
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2" />
+                            <ns1:id nullFlavor="NA" />
+                            <ns1:code nullFlavor="NA" />
+                            <!-- Problem/diagnosis Description -->
+                            <ns1:statusCode code="active" />
+                            <!-- 1..* entry relationships identifying problems of concern -->
+                            <ns1:entryRelationship typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <!-- Slucaj -->
+                                    <ns1:id root="187B1D7E-449E-48C7-8DB2-AA7FDDECADC8" />
+                                    <ns1:code code="64572001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Disease" />
+                                    <ns1:text>
+                                        <ns1:reference value="#active-problem-3" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="20130901" />
+                                    </ns1:effectiveTime>
+                                    <!-- Problem/diagnosis Id (Code) -->
+                                    <ns1:value code="Q24.8" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10" displayName="Ostale označene prirođene malformacije srca" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <!-- Problem/Diagnosis -->
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2" />
+                            <ns1:id nullFlavor="NA" />
+                            <ns1:code nullFlavor="NA" />
+                            <!-- Problem/diagnosis Description -->
+                            <ns1:statusCode code="active" />
+                            <!-- 1..* entry relationships identifying problems of concern -->
+                            <ns1:entryRelationship typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <!-- Slucaj -->
+                                    <ns1:id root="615FB152-A6E3-4585-9926-50E345D583AE" />
+                                    <ns1:code code="64572001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Disease" />
+                                    <ns1:text>
+                                        <ns1:reference value="#active-problem-4" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="20120430" />
+                                    </ns1:effectiveTime>
+                                    <!-- Problem/diagnosis Id (Code) -->
+                                    <ns1:value code="E11" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10" displayName="Dijabetes melitus neovisan o inzulinu" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <!-- Problem/Diagnosis -->
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2" />
+                            <ns1:id nullFlavor="NA" />
+                            <ns1:code nullFlavor="NA" />
+                            <!-- Problem/diagnosis Description -->
+                            <ns1:statusCode code="active" />
+                            <!-- 1..* entry relationships identifying problems of concern -->
+                            <ns1:entryRelationship typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <!-- Slucaj -->
+                                    <ns1:id root="FBFC9775-9C18-475C-935B-641AF4527727" />
+                                    <ns1:code code="64572001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Disease" />
+                                    <ns1:text>
+                                        <ns1:reference value="#active-problem-4" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="20120430" />
+                                    </ns1:effectiveTime>
+                                    <!-- Problem/diagnosis Id (Code) -->
+                                    <ns1:value code="J45.9" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10" displayName="Astma nespecificirana" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <!-- Problem/Diagnosis -->
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2" />
+                            <ns1:id nullFlavor="NA" />
+                            <ns1:code nullFlavor="NA" />
+                            <!-- Problem/diagnosis Description -->
+                            <ns1:statusCode code="active" />
+                            <!-- 1..* entry relationships identifying problems of concern -->
+                            <ns1:entryRelationship typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <!-- Slucaj -->
+                                    <ns1:id root="5A3F11E2-EF6F-4607-AACD-5B54B9A84D1C" />
+                                    <ns1:code code="64572001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Disease" />
+                                    <ns1:text>
+                                        <ns1:reference value="#active-problem-5" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="20170605" />
+                                    </ns1:effectiveTime>
+                                    <!-- Problem/diagnosis Id (Code) -->
+                                    <ns1:value code="O15.9" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10" displayName="Eklampsija, u nespecificiranom razdoblju" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <!-- Problem/Diagnosis -->
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2" />
+                            <ns1:id nullFlavor="NA" />
+                            <ns1:code nullFlavor="NA" />
+                            <!-- Problem/diagnosis Description -->
+                            <ns1:statusCode code="active" />
+                            <!-- 1..* entry relationships identifying problems of concern -->
+                            <ns1:entryRelationship typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <!-- Slucaj -->
+                                    <ns1:id root="E50D8ACE-4074-4619-8BDC-59051DD9E990" />
+                                    <ns1:code code="64572001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Disease" />
+                                    <ns1:text>
+                                        <ns1:reference value="#active-problem-6" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="20170705" />
+                                    </ns1:effectiveTime>
+                                    <!-- Problem/diagnosis Id (Code) -->
+                                    <ns1:value code="N10" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10" displayName="Akutni tubulointersticijski nefritis" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                </ns1:section>
+            </ns1:component>
+            <!-- History of Past Illness -->
+            <ns1:component contextConductionInd="true" typeCode="COMP">
+                <ns1:section classCode="DOCSECT" moodCode="EVN">
+                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.8" />
+                    <ns1:code code="11348-0" codeSystem="2.16.840.1.113883.6.1" displayName="Problem list" />
+                    <ns1:title>Povijest bolesti (History of Past Illness)</ns1:title>
+                    <ns1:text>
+                        <ns1:table>
+                            <ns1:thead>
+                                <ns1:tr>
+                                    <ns1:td>Dijagnoza (Diagnosis code)</ns1:td>
+                                    <ns1:td>Vrijeme (Onset date)</ns1:td>
+                                </ns1:tr>
+                            </ns1:thead>
+                            <ns1:tbody>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="problem-1">Karcinom in situ: štitnjača i druge endokrine žlijezde</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>10.1.1997.-10.6.1997.</ns1:td>
+                                </ns1:tr>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="problem-2">Gestacijski dijabetes u trudnoći</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>10.12.2011.</ns1:td>
+                                </ns1:tr>
+                            </ns1:tbody>
+                        </ns1:table>
+                    </ns1:text>
+                    <ns1:entry>
+                        <!-- Problem/Diagnosis -->
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2" />
+                            <ns1:id nullFlavor="NA" />
+                            <ns1:code nullFlavor="NA" />
+                            <!-- Problem/diagnosis Description -->
+                            <ns1:statusCode code="active" />
+                            <!-- 1..* entry relationships identifying problems of concern -->
+                            <ns1:entryRelationship typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <ns1:id root="15E3CBF8-0E35-4931-A47A-8332E3FBA461" />
+                                    <ns1:code code="64572001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Disease" />
+                                    <ns1:text>
+                                        <ns1:reference value="#problem-1" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="19970110" />
+                                        <ns1:high value="19970610" />
+                                    </ns1:effectiveTime>
+                                    <!-- Problem/diagnosis Id (Code) -->
+                                    <ns1:value code="D09.3" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10" displayName="Carcinoma in situ of thyroid and other endocrine glands" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                    <ns1:entry>
+                        <!-- Problem/Diagnosis -->
+                        <ns1:act classCode="ACT" moodCode="EVN">
+                            <ns1:templateId root="2.16.840.1.113883.10.20.1.27" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1" />
+                            <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2" />
+                            <ns1:id nullFlavor="NA" />
+                            <ns1:code nullFlavor="NA" />
+                            <!-- Problem/diagnosis Description -->
+                            <ns1:statusCode code="active" />
+                            <!-- 1..* entry relationships identifying problems of concern -->
+                            <ns1:entryRelationship typeCode="SUBJ">
+                                <ns1:observation classCode="OBS" moodCode="EVN">
+                                    <ns1:templateId root="2.16.840.1.113883.10.20.1.28" />
+                                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5" />
+                                    <ns1:id root="456D4D6F-9FE6-4BEA-A050-D2A790E7ECDE" />
+                                    <ns1:code code="64572001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" displayName="Disease" />
+                                    <ns1:text>
+                                        <ns1:reference value="#problem-2" />
+                                    </ns1:text>
+                                    <ns1:statusCode code="completed" />
+                                    <ns1:effectiveTime>
+                                        <ns1:low value="20111210" />
+                                    </ns1:effectiveTime>
+                                    <!-- Problem/diagnosis Id (Code) -->
+                                    <ns1:value code="O24.4" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10" displayName="Gestacijski dijabetes u trudnoći" xsi:type="ns1:CD" />
+                                </ns1:observation>
+                            </ns1:entryRelationship>
+                        </ns1:act>
+                    </ns1:entry>
+                </ns1:section>
+            </ns1:component>
+            <!-- Medical Devices Coded -->
+            <ns1:component contextConductionInd="true" typeCode="COMP">
+                <ns1:section classCode="DOCSECT" moodCode="EVN">
+                    <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.4" />
+                    <ns1:templateId root="2.16.840.1.113883.10.20.1.7" />
+                    <ns1:templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.5.3.5" />
+                    <ns1:code code="46264-8" codeSystem="2.16.840.1.113883.6.1" displayName="History of medical device use" />
+                    <ns1:title>Medicinski uređaji (Medical Devices Coded)</ns1:title>
+                    <ns1:text>
+                        <ns1:table>
+                            <ns1:thead>
+                                <ns1:tr>
+                                    <ns1:td>Pomagalo (Medical Device or Implant)</ns1:td>
+                                    <ns1:td>Vrijeme implantiranja (Date of Implantation)</ns1:td>
+                                </ns1:tr>
+                            </ns1:thead>
+                            <ns1:tbody>
+                                <ns1:tr>
+                                    <ns1:td>
+                                        <ns1:content ID="device-1">Implantabilni defibrilator</ns1:content>
+                                    </ns1:td>
+                                    <ns1:td>20.10.2014.</ns1:td>
+                                </ns1:tr>
+                            </ns1:tbody>
+                        </ns1:table>
+                    </ns1:text>
+                    <ns1:entry>
+                        <ns1:supply classCode="SPLY" moodCode="EVN">
+                            <ns1:templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.5" />
+                            <ns1:id root="2.16.840.1.113883.19.811.3" />
+                            <!-- Medical Devices and Implants Description -->
+                            <ns1:text>
+                                <ns1:reference value="#device-1" />
+                            </ns1:text>
+                            <!-- Implant Date -->
+                            <ns1:effectiveTime value="20141020" />
+                            <ns1:participant typeCode="DEV">
+                                <ns1:participantRole classCode="MANU">
+                                    <ns1:playingDevice classCode="DEV" determinerCode="INSTANCE">
+                                        <ns1:code nullFlavor="NI" />
+                                    </ns1:playingDevice>
+                                </ns1:participantRole>
+                            </ns1:participant>
+                            <!-- ... -->
+                        </ns1:supply>
+                    </ns1:entry>
+                </ns1:section>
+            </ns1:component>
+        </ns1:structuredBody>
+    </ns1:component>
+</ns1:ClinicalDocument>

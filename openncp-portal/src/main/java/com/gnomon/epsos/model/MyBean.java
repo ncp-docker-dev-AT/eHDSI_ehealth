@@ -508,8 +508,7 @@ public class MyBean implements Serializable {
                 patientId = PatientId.Factory.newInstance();
                 patientId.setExtension(selectedPatient.getExtension());
                 patientId.setRoot(selectedPatient.getRoot());
-                GenericDocumentCode classCode = GenericDocumentCode.Factory
-                        .newInstance();
+                GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
                 classCode.setNodeRepresentation(Constants.PS_CLASSCODE);
                 classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
                 classCode.setValue(Constants.PS_TITLE);

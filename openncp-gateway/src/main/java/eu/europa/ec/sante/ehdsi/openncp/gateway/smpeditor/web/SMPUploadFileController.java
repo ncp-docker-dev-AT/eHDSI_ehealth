@@ -7,10 +7,15 @@ import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.service.AuditManager;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.service.DynamicDiscoveryService;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smp.BdxSmpValidator;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.DynamicDiscoveryClient;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SMPConverter;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -68,9 +73,7 @@ import java.util.regex.Pattern;
 public class SMPUploadFileController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SMPUploadFileController.class);
-
-    private SMPConverter smpconverter = new SMPConverter();
-
+    private SMPConverter smpconverter;
     private Environment env;
 
     @Autowired
@@ -105,7 +108,7 @@ public class SMPUploadFileController {
     @PostMapping(value = "smpeditor/uploadsmpfile")
     public String postUpload(@ModelAttribute("smpupload") SMPHttp smpupload, Model model, final RedirectAttributes redirectAttributes) throws Exception {
 
-        LOGGER.debug("Post Mapping for Upload");
+        LOGGER.info("[GTW Upload]Post Mapping for Upload");
         model.addAttribute("smpupload", smpupload);
 
         /*Iterate through all chosen files*/
@@ -125,7 +128,7 @@ public class SMPUploadFileController {
             }
 
             String contentFile = new String(Files.readAllBytes(Paths.get(convFile.getPath())));
-            boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
+            boolean valid = BdxSmpValidator.validateFile(contentFile);
             boolean fileDeleted;
 
             if (valid) {
@@ -234,7 +237,7 @@ public class SMPUploadFileController {
 
             URI uri = null;
             try {
-                
+
                 uri = new URIBuilder().setScheme("https").setHost(urlServer).setPath(serviceMetdataUrl).build();
             } catch (URISyntaxException ex) {
                 LOGGER.error("URISyntaxException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
@@ -307,7 +310,7 @@ public class SMPUploadFileController {
             String ncp = configurationManager.getProperty("ncp.country");
             String ncpemail = configurationManager.getProperty("ncp.email");
             String country = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-            String localip = configurationManager.getProperty(StandardProperties.SMP_SML_ADMIN_URL);//Source Gateway
+            String remoteIp = configurationManager.getProperty(StandardProperties.SMP_SML_ADMIN_URL);//Source Gateway
             String remoteip = configurationManager.getProperty("SERVER_IP");//Target Gateway
             String smp = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT);
             String smpemail = configurationManager.getProperty(StandardProperties.SMP_SML_SUPPORT_EMAIL);
@@ -321,9 +324,10 @@ public class SMPUploadFileController {
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 //Audit Error
                 byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
-
-                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
-                        new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
+                AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
+                        Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
+//                AuditManager.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
+//                        new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
 
                 return "redirect:/smpeditor/uploadsmpfile";
             } else if (itemUpload.getStatusCode() == 401) {
@@ -331,9 +335,10 @@ public class SMPUploadFileController {
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 //Audit Error
                 byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
-
-                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
-                        new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
+                AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
+                        Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
+//                AuditManager.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip,
+//                        new String(encodedObjectID), Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
 
                 return "redirect:/smpeditor/uploadsmpfile";
             }
@@ -379,21 +384,25 @@ public class SMPUploadFileController {
                 }
 
                 // Transform XML to String in order to send in Audit
-                String errorResult = Audit.prepareEventLog(bytes);
+                String errorResult = AuditManager.prepareEventLog(bytes);
                 LOGGER.debug("Error Result: '{}", errorResult);
                 //Audit error
-                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip, new String(encodedObjectID),
-                        Integer.toString(response.getStatusLine().getStatusCode()), errorResult.getBytes());
+                AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
+                        Integer.toString(response.getStatusLine().getStatusCode()), errorResult.getBytes(StandardCharsets.UTF_8));
+//                AuditManager.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip, new String(encodedObjectID),
+//                        Integer.toString(response.getStatusLine().getStatusCode()), errorResult.getBytes());
             }
 
             if (itemUpload.getStatusCode() == 200 || itemUpload.getStatusCode() == 201) {
                 //Audit Success
-                Audit.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip, new String(encodedObjectID),
+                AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
                         null, null);
+                // AuditManager.sendAuditPush(ncp, ncpemail, smp, smpemail, country, remoteip, localip, new String(encodedObjectID),
+                //  null, null);
             }
 
             //GET
-            Boolean success = true;
+            boolean success = true;
             String errorType = "";
             ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(partID, partScheme);
             DocumentIdentifier documentIdentifier = new DocumentIdentifier(docID, docScheme);

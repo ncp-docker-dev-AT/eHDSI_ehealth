@@ -2,7 +2,6 @@
 <codedElementList>
     <!-- Created based on eHDSI Semantic Implementation Guidelines and eHDSI PS and eP display documents -->
     <!-- Document Header -->
-
     <!-- Gender -->
     <codedElement>
         <elementPath>/ClinicalDocument/recordTarget/patientRole/patient/administrativeGenderCode</elementPath>
@@ -20,10 +19,9 @@
         </usage>
         <!-- epSOSAdministrativeGender -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.34</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Contact Relationship Type -->
     <codedElement>
         <elementPath>/ClinicalDocument/participant/associatedEntity/code</elementPath>
@@ -41,10 +39,9 @@
         </usage>
         <!-- HL7:PersonalRelationshipRoleType -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.38</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Profession -->
     <codedElement>
         <elementPath>//documentationOf/serviceEvent/performer/functionCode</elementPath>
@@ -62,10 +59,9 @@
         </usage>
         <!-- epSOSHealthcareProfessionalRoles -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.1</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <codedElement>
         <!-- Prescriber FunctionCode -->
         <elementPath>//author/functionCode</elementPath>
@@ -83,10 +79,9 @@
         </usage>
         <!-- epSOSHealthcareProfessionalRoles -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.1</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Clinical document code -->
     <codedElement>
         <elementPath>/ClinicalDocument/code</elementPath>
@@ -104,10 +99,9 @@
         </usage>
         <!-- epSOSDocumentCode -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.32</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Confidentiality code -->
     <codedElement>
         <elementPath>/ClinicalDocument/confidentialityCode</elementPath>
@@ -125,17 +119,53 @@
         </usage>
         <!-- epSOSConfidentiality (ConfidentialityByAccessKind) -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.31</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Document Body -->
-
+    <!-- Prescription - Classification of the substance -->
+    <codedElement>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/asSpecializedKind/generalizedMedicineClass/code</elementPath>
+        <usage>
+            <patientSummaryCDAl3>NA</patientSummaryCDAl3>
+            <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+            <ePrescriptionCDAl3>RNFA</ePrescriptionCDAl3>
+            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+            <eDispensationCDAl3>NA</eDispensationCDAl3>
+            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+            <HCERDocCDAl3>NA</HCERDocCDAl3>
+            <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+            <MRODocCDAl3>NA</MRODocCDAl3>
+            <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+        </usage>
+        <!-- epSOSActiveIngredient -->
+        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
+        <valueSetVersion />
+        <targetLanguageCode />
+    </codedElement>
+    <!-- Dispensation - Classification of the substance -->
+    <codedElement>
+        <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/asSpecializedKind/generalizedMedicineClass/code</elementPath>
+        <usage>
+            <patientSummaryCDAl3>NA</patientSummaryCDAl3>
+            <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+            <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+            <eDispensationCDAl3>RNFA</eDispensationCDAl3>
+            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+            <HCERDocCDAl3>NA</HCERDocCDAl3>
+            <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+            <MRODocCDAl3>NA</MRODocCDAl3>
+            <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+        </usage>
+        <!-- epSOSActiveIngredient -->
+        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
+        <valueSetVersion />
+        <targetLanguageCode />
+    </codedElement>
     <!-- Prescription - Active ingredient description -->
     <codedElement>
-        <elementPath>
-            //entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/code
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/code</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -150,15 +180,12 @@
         </usage>
         <!-- epSOSActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Dispensation - Active ingredient description -->
     <codedElement>
-        <elementPath>
-            //entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/code
-        </elementPath>
+        <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/code</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -173,15 +200,12 @@
         </usage>
         <!-- epSOSActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Medication Summary - Active ingredient description -->
     <codedElement>
-        <elementPath>
-            //entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/code
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/code</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -196,14 +220,12 @@
         </usage>
         <!-- epSOSActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Medication Summary - No medication -->
     <codedElement>
-        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/code
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -218,15 +240,12 @@
         </usage>
         <!-- epSOSCodeNoMedication -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.22</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Prescription - Sub ingredient description -->
     <codedElement>
-        <elementPath>
-            //entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/subIngredient/ingredient/code
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/subIngredient/ingredient/code</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -241,15 +260,12 @@
         </usage>
         <!-- epSOSActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Dispensation - Sub ingredient description -->
     <codedElement>
-        <elementPath>
-            //entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/subIngredient/ingredient/code
-        </elementPath>
+        <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/subIngredient/ingredient/code</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -264,15 +280,12 @@
         </usage>
         <!-- epSOSActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Medication Summary - Sub ingredient description -->
     <codedElement>
-        <elementPath>
-            //entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/subIngredient/ingredient/code
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/subIngredient/ingredient/code</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -287,15 +300,12 @@
         </usage>
         <!-- epSOSActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Prescription - Dose form description -->
     <codedElement>
-        <elementPath>
-            //entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/formCode
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/formCode</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -310,15 +320,12 @@
         </usage>
         <!-- epSOSDoseForm -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.2</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Dispensation - Dose form description -->
     <codedElement>
-        <elementPath>
-            //entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/formCode
-        </elementPath>
+        <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/formCode</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -333,15 +340,12 @@
         </usage>
         <!-- epSOSDoseForm -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.2</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Medication Summary - Dose form description -->
     <codedElement>
-        <elementPath>
-            //entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/formCode
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/formCode</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -356,14 +360,12 @@
         </usage>
         <!-- epSOSDoseForm -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.2</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Prescription - Route of administration -->
     <codedElement>
-        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/routeCode
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/routeCode</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -378,15 +380,12 @@
         </usage>
         <!-- epSOSRoutesofAdministration -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.12</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Dispensation - Route of administration -->
     <codedElement>
-        <elementPath>
-            //entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/entryRelationship[@typeCode='REFR']/substanceAdministration/routeCode
-        </elementPath>
+        <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/entryRelationship[@typeCode='REFR']/substanceAdministration/routeCode</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -401,14 +400,12 @@
         </usage>
         <!-- epSOSRoutesofAdministration -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.12</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Medication Summary - Route of administration -->
     <codedElement>
-        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/routeCode
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/routeCode</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -423,15 +420,12 @@
         </usage>
         <!-- epSOSRoutesofAdministration -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.12</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Prescription - Medicinal product package -->
     <codedElement>
-        <elementPath>
-            //entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/formCode
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/formCode</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -446,15 +440,12 @@
         </usage>
         <!-- epSOSPackage -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.3</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Dispensation - Medicinal product package -->
     <codedElement>
-        <elementPath>
-            //entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/formCode
-        </elementPath>
+        <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/formCode</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -469,15 +460,12 @@
         </usage>
         <!-- epSOSPackage -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.3</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Medication Summary - Medicinal product package -->
     <codedElement>
-        <elementPath>
-            //entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/formCode
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/formCode</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -492,15 +480,13 @@
         </usage>
         <!-- epSOSPackage -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.3</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Prescription - Substitution -->
     <codedElement>
-        <elementPath>
-            //entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/entryRelationship[@typeCode='SUBJ'][@inversionInd='true']/observation[@classCode='OBS'][code/@code='SUBST' and code/@codeSystem='2.16.840.1.113883.5.6']/value
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/entryRelationship[@typeCode='SUBJ'][@inversionInd='true']/observation[@classCode='OBS'][code/@code='SUBST'
+            and code/@codeSystem='2.16.840.1.113883.5.6']/value</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -515,15 +501,12 @@
         </usage>
         <!-- epSOSSubstitutionCode -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.7</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Alerts - Reaction type -->
     <codedElement>
-        <elementPath>
-            //entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/code
-        </elementPath>
+        <elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -538,15 +521,12 @@
         </usage>
         <!-- epSOSAdverseEventType -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.18</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Alerts - Clinical manifestation -->
     <codedElement>
-        <elementPath>
-            //entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='2.16.840.1.113883.10.20.1.54']/value
-        </elementPath>
+        <elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='2.16.840.1.113883.10.20.1.54']/value</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -561,15 +541,12 @@
         </usage>
         <!-- epSOSReactionAllergy -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.11</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Alerts - Code for problem description -->
     <codedElement>
-        <elementPath>
-            //entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='2.16.840.1.113883.10.20.1.54']/code
-        </elementPath>
+        <elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='2.16.840.1.113883.10.20.1.54']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -584,15 +561,12 @@
         </usage>
         <!-- epSOSCodeProb -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.23</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Alerts - Agent ID, Agent Description -->
     <codedElement>
-        <elementPath>
-            //entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/participant[@typeCode='CSM']/participantRole[@classCode='MANU']/playingEntity[@classCode='MMAT']/code
-        </elementPath>
+        <elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/participant[@typeCode='CSM']/participantRole[@classCode='MANU']/playingEntity[@classCode='MMAT']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -609,15 +583,12 @@
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
         <!-- epSOSAllergenNoDrugs -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.19</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Alerts - Unknown allergy -->
     <codedElement>
-        <elementPath>
-            //entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/value
-        </elementPath>
+        <elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/value</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -632,15 +603,12 @@
         </usage>
         <!-- epSOSUnknownInformation -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.17</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Current problems / Diagnosis - Active problem -->
     <codedElement>
-        <elementPath>
-            //entry/act[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/value
-        </elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/value</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -657,15 +625,12 @@
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.5</valueSet>
         <!-- epSOSUnknownInformation -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.17</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Current problems / Diagnosis - Code for problem description -->
     <codedElement>
-        <elementPath>
-            //entry/act[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/code
-        </elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -680,15 +645,12 @@
         </usage>
         <!-- epSOSCodeProb -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.23</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- History of past illnesses - Closed problem -->
     <codedElement>
-        <elementPath>
-            //entry/act[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/value
-        </elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/value</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -705,15 +667,12 @@
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.5</valueSet>
         <!-- epSOSUnknownInformation -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.17</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- History of past illnesses - Code for problem description -->
     <codedElement>
-        <elementPath>
-            //entry/act[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/code
-        </elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -728,10 +687,9 @@
         </usage>
         <!-- epSOSCodeProb -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.23</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Severity -->
     <codedElement>
         <elementPath>//observation/entryRelationship[@typeCode='SUBJ']/observation/value</elementPath>
@@ -749,15 +707,12 @@
         </usage>
         <!-- epSOSSeverity -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.13</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Clinical status  -->
     <codedElement>
-        <elementPath>
-            //entryRelationship[@typeCode='REFR']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.1.1']/value
-        </elementPath>
+        <elementPath>//entryRelationship[@typeCode='REFR']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.1.1']/value</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -772,15 +727,12 @@
         </usage>
         <!-- epSOSStatusCode -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.15</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Health status of concern -->
     <codedElement>
-        <elementPath>
-            //entryRelationship[@typeCode='REFR']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.1.2']/value
-        </elementPath>
+        <elementPath>//entryRelationship[@typeCode='REFR']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.1.2']/value</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -795,15 +747,12 @@
         </usage>
         <!-- epSOSResolutionOutcome -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.30</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Vaccinations - Vaccinations -->
     <codedElement>
-        <elementPath>
-            //entry/substanceAdministration[templateId/@root='2.16.840.1.113883.10.20.1.24'][templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.12']/consumable/manufacturedProduct/manufacturedMaterial/code
-        </elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='2.16.840.1.113883.10.20.1.24'][templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.12']/consumable/manufacturedProduct/manufacturedMaterial/code</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -818,10 +767,9 @@
         </usage>
         <!-- epSOSVaccine -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.28</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Surgical procedures - Procedure -->
     <codedElement>
         <elementPath>//entry/procedure[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.19']/code</elementPath>
@@ -839,15 +787,12 @@
         </usage>
         <!-- epSOSProcedures -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.10</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Medical devices and implants - Device and Implant  -->
     <codedElement>
-        <elementPath>
-            //entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/participant[@typeCode='DEV']/participantRole/playingDevice/code
-        </elementPath>
+        <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/participant[@typeCode='DEV']/participantRole/playingDevice/code</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -862,10 +807,9 @@
         </usage>
         <!-- epSOSMedicalDevices -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.8</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Social History - Observation type -->
     <codedElement>
         <elementPath>//entry/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/code</elementPath>
@@ -883,10 +827,9 @@
         </usage>
         <!-- epSOSSocialHistory -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.14</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Diagnostic tests - Blood group -->
     <codedElement>
         <elementPath>//entry/observation[code/@code='34530-6']/value</elementPath>
@@ -904,10 +847,9 @@
         </usage>
         <!-- epSOSBloodGroup -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.20</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Pregnancy history - Type of expected date -->
     <codedElement>
         <elementPath>//entry/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.5']/code</elementPath>
@@ -925,15 +867,12 @@
         </usage>
         <!-- epSOSPregnancyInformation -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.9</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Physical findings - Systolic / diastolic blood pressure -->
     <codedElement>
-        <elementPath>
-            //entry/organizer[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/component/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/code
-        </elementPath>
+        <elementPath>//entry/organizer[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/component/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -948,10 +887,9 @@
         </usage>
         <!-- epSOSBloodPressure -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.21</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
-
     <!-- Section title -->
     <codedElement>
         <elementPath>//component/section/code</elementPath>
@@ -969,7 +907,7 @@
         </usage>
         <!-- epSOSSections -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.26</valueSet>
-        <valueSetVersion/>
-        <targetLanguageCode/>
+        <valueSetVersion />
+        <targetLanguageCode />
     </codedElement>
 </codedElementList>

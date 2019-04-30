@@ -2,6 +2,8 @@ package eu.epsos.protocolterminators.ws.server.xdr.impl;
 
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
+import eu.epsos.protocolterminators.ws.server.exception.NationalInfrastructureException;
+import eu.epsos.protocolterminators.ws.server.exception.XDSErrorCode;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
@@ -10,7 +12,7 @@ import fi.kela.se.epsos.data.model.ConsentDocumentMetaData;
 import fi.kela.se.epsos.data.model.DocumentAssociation;
 import fi.kela.se.epsos.data.model.EDDocumentMetaData;
 import fi.kela.se.epsos.data.model.EPSOSDocument;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.PrettyPrinter;
@@ -41,29 +43,33 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
     @Override
     public void submitDispensation(EPSOSDocument dispensationDocument) throws NIException {
 
-        String dispensation = null;
+        String dispensation;
         try {
             dispensation = XMLUtil.prettyPrint(dispensationDocument.getDocument().getFirstChild());
+            loggerClinical.info("eDispense:\n'{}'", dispensation);
         } catch (TransformerException e) {
             logger.error("TransformerException while submitDispensation(): '{}'", e.getMessage(), e);
-            throwDocumentProcessingException("Cannot parse dispensation!", "4106");
+            throw new NationalInfrastructureException(XDSErrorCode.INVALID_DISPENSE);
         }
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.info("eDispensation document content: '{}'", dispensation);
         }
 
         if (dispensation == null || dispensation.isEmpty()) {
-            throwDocumentProcessingException("dispensation is null or empty!", "4106");
+
+            throw new NationalInfrastructureException(XDSErrorCode.INVALID_DISPENSE);
         }
 
-        if (StringUtils.contains(dispensation, "testSubmitNoEP")) {
+        if (StringUtils.contains(dispensation, "NO_MATCHING_EP")) {
+
             logger.error("Tried to submit dispensation with no matching ePrescription.");
-            throwDocumentProcessingException("testSubmitNoEP", "4105");
+            throw new NationalInfrastructureException(XDSErrorCode.NO_MATCHING_PRESCRIPTION);
         }
 
-        if (StringUtils.contains(dispensation, "testSubmitDispEP")) {
+        if (StringUtils.contains(dispensation, "INVALID_DISPENSE")) {
+
             logger.error("Tried to submit already dispensed ePrescription.");
-            throwDocumentProcessingException("testSubmitDispEP", "4106");
+            throw new NationalInfrastructureException(XDSErrorCode.INVALID_DISPENSE);
         }
     }
 

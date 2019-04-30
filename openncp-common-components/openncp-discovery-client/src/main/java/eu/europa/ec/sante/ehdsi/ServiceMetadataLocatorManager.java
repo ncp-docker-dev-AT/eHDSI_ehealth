@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.w3c.dom.Document;
@@ -28,6 +30,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -51,32 +54,57 @@ public class ServiceMetadataLocatorManager {
 
     private final Environment environment;
 
+    private final ResourceLoader resourceLoader;
+
     @Autowired
-    public ServiceMetadataLocatorManager(Environment environment) {
+    public ServiceMetadataLocatorManager(Environment environment, ResourceLoader resourceLoader) {
 
         Assert.notNull(environment, "environment must not be null");
         this.environment = environment;
+        this.resourceLoader = resourceLoader;
     }
 
-    public void validateOpenNCP() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, UnrecoverableEntryException {
+    /**
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws IOException
+     * @throws UnrecoverableEntryException
+     */
+    public void validateOpenNCP() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException,
+            UnrecoverableEntryException {
 
-        LOGGER.info("Validate  Signature Certificate: '{}'", loadSignatureCertificate(
-                environment.getRequiredProperty("openncp.signature.path"),
-                environment.getRequiredProperty("openncp.signature.alias"),
-                environment.getRequiredProperty("openncp.signature.password")).toString());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Validate  Signature Certificate: '{}'", loadSignatureCertificate(
+                    environment.getRequiredProperty("openncp.signature.path"),
+                    environment.getRequiredProperty("openncp.signature.alias"),
+                    environment.getRequiredProperty("openncp.signature.password")).toString());
 
-        LOGGER.info("Consumer Signature Certificate: '{}'", loadSignatureCertificate(
-                environment.getRequiredProperty("openncp.consumer.path"),
-                environment.getRequiredProperty("openncp.consumer.alias"),
-                environment.getRequiredProperty("openncp.consumer.password")).toString());
+            LOGGER.info("Consumer Signature Certificate: '{}'", loadSignatureCertificate(
+                    environment.getRequiredProperty("openncp.consumer.path"),
+                    environment.getRequiredProperty("openncp.consumer.alias"),
+                    environment.getRequiredProperty("openncp.consumer.password")).toString());
 
-        LOGGER.info("Provider  Signature Certificate: '{}'", loadSignatureCertificate(
-                environment.getRequiredProperty("openncp.provider.path"),
-                environment.getRequiredProperty("openncp.provider.alias"),
-                environment.getRequiredProperty("openncp.provider.password")).toString());
+            LOGGER.info("Provider  Signature Certificate: '{}'", loadSignatureCertificate(
+                    environment.getRequiredProperty("openncp.provider.path"),
+                    environment.getRequiredProperty("openncp.provider.alias"),
+                    environment.getRequiredProperty("openncp.provider.password")).toString());
+        }
     }
 
-    private java.security.cert.Certificate loadSignatureCertificate(String path, String alias, String password) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException {
+    /**
+     * @param path
+     * @param alias
+     * @param password
+     * @return
+     * @throws IOException
+     * @throws KeyStoreException
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException
+     * @throws UnrecoverableEntryException
+     */
+    private java.security.cert.Certificate loadSignatureCertificate(String path, String alias, String password)
+            throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException {
 
 
         KeyStore truststore = KeyStore.getInstance("JKS");
@@ -109,31 +137,36 @@ public class ServiceMetadataLocatorManager {
         return x509Certificate;
     }
 
+    /**
+     * @throws KeyStoreException
+     * @throws IOException
+     * @throws TechnicalException
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException
+     */
     public void lookup() throws KeyStoreException, IOException, TechnicalException, CertificateException, NoSuchAlgorithmException {
 
-        String KEYSTORE_PATH = environment.getRequiredProperty("openncp.truststore.path");
-        String KEYSTORE_PASSWORD = environment.getRequiredProperty("openncp.truststore.password");
-        String SML_DOMAIN = environment.getRequiredProperty("openncp.sml.domain");
-        String PARTICIPANT_IDENTIFIER = "urn:ehealth:" + environment.getRequiredProperty("openncp.sml.country")
-                + ":ncp-idp";
+        String trustStorePath = environment.getRequiredProperty("openncp.truststore.path");
+        String trustStorePassword = environment.getRequiredProperty("openncp.truststore.password");
+        String serviceMetadataLocatorDomain = environment.getRequiredProperty("openncp.sml.domain");
+        String participantIdentifierUrn = "urn:ehealth:" + environment.getRequiredProperty("openncp.sml.country") + ":ncp-idp";
 
-
-        LOGGER.info("Lookup: '{}'-'{}'", KEYSTORE_PATH, KEYSTORE_PASSWORD);
+        LOGGER.info("Lookup: '{}'-'{}'", trustStorePath, trustStorePassword);
         KeyStore truststore = KeyStore.getInstance("JKS");
 
-        LOGGER.info("Lookup Participant: '{}'", PARTICIPANT_IDENTIFIER);
+        LOGGER.info("Lookup Participant: '{}'", participantIdentifierUrn);
 
-        File file = new File(KEYSTORE_PATH);
+        File file = new File(trustStorePath);
         FileInputStream fileInputStream = new FileInputStream(file);
 
-        truststore.load(fileInputStream, KEYSTORE_PASSWORD.toCharArray());
+        truststore.load(fileInputStream, trustStorePassword.toCharArray());
 
         DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
-                .locator(new DefaultBDXRLocator(SML_DOMAIN, new DefaultDNSLookup()))
+                .locator(new DefaultBDXRLocator(serviceMetadataLocatorDomain, new DefaultDNSLookup()))
                 .reader(new DefaultBDXRReader(new DefaultSignatureValidator(truststore)))
                 .build();
 
-        ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(PARTICIPANT_IDENTIFIER, "ehealth-participantid-qns");
+        ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierUrn, PARTICIPANT_IDENTIFIER_SCHEME);
         DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
         List<DocumentIdentifier> documentIdentifiers = smpClient.getServiceGroup(participantIdentifier).getDocumentIdentifiers();
         for (DocumentIdentifier identifier : documentIdentifiers) {
@@ -149,6 +182,7 @@ public class ServiceMetadataLocatorManager {
             extensionTypeList = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier).getOriginalServiceMetadata().getServiceMetadata()
                     .getServiceInformation().getProcessList().getProcess().get(0).getServiceEndpointList()
                     .getEndpoint().get(0).getExtension();
+
             if (!extensionTypeList.isEmpty()) {
                 LOGGER.info("List<ExtensionType> '{}' - '{}'", extensionTypeList.size(), extensionTypeList.get(0).getClass());
                 LOGGER.info("Extension Any Class: '{}'", extensionTypeList.get(0).getAny().getClass());
@@ -177,149 +211,46 @@ public class ServiceMetadataLocatorManager {
             ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             for (EndpointType endpointType : serviceEndpointList.getEndpoint()) {
-                LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
 
-                LOGGER.info("ActivationDate: '{}'", format.format(endpointType.getServiceActivationDate().getTime()));
-                LOGGER.info("ExpirationDate: '{}'", format.format(endpointType.getServiceExpirationDate().getTime()));
-                LOGGER.info("Certificate:\n '{}'", endpointType.getCertificate());
-
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
+                    LOGGER.info("ActivationDate: '{}'", format.format(endpointType.getServiceActivationDate().getTime()));
+                    LOGGER.info("ExpirationDate: '{}'", format.format(endpointType.getServiceExpirationDate().getTime()));
+                    LOGGER.info("Certificate:\n '{}'", endpointType.getCertificate());
+                }
             }
-
-//            List<EndpointType> endpoints = serviceEndpointList.getEndpoint();
-//            for (EndpointType endpointType : endpoints) {
-//                LOGGER.info("Endpoint: '{}' - {}", endpointType.getExtension().size(), endpointType.getExtension().get(0).getClass());
-//                ExtensionType extensionType = endpointType.getExtension().get(0);
-//                LOGGER.info("ExtensionType: '{}' - '{}' \n '{}'", extensionType.getAny().getClass(),
-//                        ((ElementNSImpl) extensionType.getAny()).getLocalName(), extensionType.getExtensionID());
-//                Document document = ((ElementNSImpl) extensionType.getAny()).getOwnerDocument();
-//
-//                DOMSource source = new DOMSource(document.getElementsByTagName("patientSearch").item(0));
-//                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-//                Transformer transformer = transformerFactory.newTransformer();
-//                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-//                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-//                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-//                transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-//                StreamResult result = new StreamResult("/home/dg-sante/InternationalSearch_CH.xml");
-//                transformer.transform(source, result);
-//
-//                StringWriter sw = new StringWriter();
-//
-//                try {
-//                    TransformerFactory tf = TransformerFactory.newInstance();
-//                    Transformer transformer1 = tf.newTransformer();
-//                    transformer1.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-//                    transformer1.setOutputProperty(OutputKeys.METHOD, "xml");
-//                    transformer1.setOutputProperty(OutputKeys.INDENT, "yes");
-//                    transformer1.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-//                    transformer1.transform(new DOMSource(document), new StreamResult(sw));
-//                } catch (TransformerException e) {
-//                    LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
-//                }
-            //LOGGER.info("Extension: \n'{}'", sw.toString());
-            //       }
         }
-
-//        for(DocumentIdentifier identifier : smpClient.getDocumentIdentifiers(participantIdentifier)) {
-//            LOGGER.info("Identifier: '{}'", identifier.getIdentifier());
-//        }
-//
-//        for(ExtensionType extensionType : smpClient.getServiceGroup(participantIdentifier).getOriginalServiceGroup().getExtension()) {
-//
-//            LOGGER.info("ServiceGroup: '{}'", extensionType.getExtensionName());
-//        }
-//
-//        ProcessListType processListType = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier).getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList();
-//        for (ProcessType processType : processListType.getProcess()) {
-//
-//            LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier().getScheme());
-//            ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
-//            for(EndpointType endpointType : serviceEndpointList.getEndpoint()) {
-//                LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
-//
-//            }
-//        }
-//
-//
-//        List<DocumentIdentifier> documentIdentifiers = smpClient.getDocumentIdentifiers(participantIdentifier);
-//        LOGGER.info("Document Identifiers List: \n {}", documentIdentifiers);
-//
-//        URI uri = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
-//        LOGGER.info("URI: {}", uri.getHost());
-//
-//        //DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:ism::internationalsearchmask##ehealth-107", "ehealth-resid-qns");
-//        URI serviceGroup = smpClient.getService().getMetadataProvider().resolveDocumentIdentifiers(uri, participantIdentifier);
-//        URI serviceMetadataUri = smpClient.getService().getMetadataProvider().resolveServiceMetadata(uri, participantIdentifier, documentIdentifier);
-//
-//        if (LOGGER.isInfoEnabled()) {
-//            LOGGER.info("URI ASCII: '{}'", uri.toASCIIString());
-//            LOGGER.info("Service Group: '{}'", serviceGroup.toASCIIString());
-//            LOGGER.info("DocumentIdentifier: '{}'", serviceMetadataUri.toASCIIString());
-//        }
-//
-//        ServiceMetadata sm = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
-//        LOGGER.info("ServiceMetadata '{}'.", sm.toString());
-//        List<Endpoint> endpoints = sm.getEndpoints();
-//        LOGGER.info("Endpoints: '{}'", endpoints.size());
-//        LOGGER.info("Endpoints Class: '{}'", endpoints.get(0).getClass());
-//        for (Endpoint endpoint : endpoints) {
-//            LOGGER.info("Endpoint: '{}'", endpoint);
-//            LOGGER.info("Endpoint: '{}'", endpoint.getAddress());
-//        }
-//
-//
-//        ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
-//        for (ExtensionType extensionType : serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getExtension()) {
-//            LOGGER.info("EndpointType: '{}'", extensionType.getAny());
-//        }
-//        List<ExtensionType> extensionTypeList;
-//        try {
-//            extensionTypeList = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier).getOriginalServiceMetadata().getServiceMetadata()
-//                    .getServiceInformation().getProcessList().getProcess().get(0).getServiceEndpointList()
-//                    .getEndpoint().get(0).getExtension();
-//            if (!extensionTypeList.isEmpty()) {
-//                LOGGER.info("List<ExtensionType> '{}'", extensionTypeList.size());
-//            }
-//        } catch (TechnicalException e) {
-//            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
-//        }
-
-
-//            for (EndpointType endpointType : processType.getServiceEndpointList().getEndpoint().g) {
-//                LOGGER.info("EndpointType: '{}'", endpointType.getEndpointURI());
-//            }
-        //      LOGGER.info("Extension: '{}'", extensionType.getAny().toString());
-        //  }
-
     }
 
-    //  public void lookupOpenNCP(String countryCode, String documentType, String key) {
+    /**
+     *
+     */
     public void lookupOpenNCP() {
 
-        String KEYSTORE_PATH = environment.getRequiredProperty("openncp.truststore.path");
-        String KEYSTORE_PASSWORD = environment.getRequiredProperty("openncp.truststore.password");
-        String SML_DOMAIN = environment.getRequiredProperty("openncp.sml.domain");
-        String PARTICIPANT_IDENTIFIER = "urn:ehealth:" + environment.getRequiredProperty("openncp.sml.country") + ":ncp-idp";
+        String trustStorePath = environment.getRequiredProperty("openncp.truststore.path");
+        String trustStorePassword = environment.getRequiredProperty("openncp.truststore.password");
+        String serviceMetadataLocatorDomain = environment.getRequiredProperty("openncp.sml.domain");
+        String participantIdentifierUrn = "urn:ehealth:" + environment.getRequiredProperty("openncp.sml.country") + ":ncp-idp";
 
         try {
 
-            //String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
-            LOGGER.info("participantIdentifierValue '{}'.", PARTICIPANT_IDENTIFIER);
+            LOGGER.info("participantIdentifierValue '{}'.", participantIdentifierUrn);
             KeyStore ks = KeyStore.getInstance("JKS");
 
-            File file = new File(KEYSTORE_PATH);
-            try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                ks.load(fileInputStream, KEYSTORE_PASSWORD.toCharArray());
+            Resource resource = resourceLoader.getResource("classpath:" + trustStorePath);
+
+            try (InputStream inputStream = resource.getInputStream()) {
+                ks.load(inputStream, trustStorePassword.toCharArray());
 
                 DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
-                        .locator(new DefaultBDXRLocator(SML_DOMAIN, new DefaultDNSLookup()))
+                        .locator(new DefaultBDXRLocator(serviceMetadataLocatorDomain, new DefaultDNSLookup()))
                         .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
                         .build();
 
                 DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
-                //DocumentIdentifier documentIdentifier = new DocumentIdentifier(documentType, DOCUMENT_IDENTIFIER_SCHEME);
-                ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(PARTICIPANT_IDENTIFIER, PARTICIPANT_IDENTIFIER_SCHEME);
-
+                ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierUrn, PARTICIPANT_IDENTIFIER_SCHEME);
+                URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
+                LOGGER.info("DNS: '{}'", smpURI.toASCIIString());
                 ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
                 LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
                 ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation()
@@ -339,15 +270,14 @@ public class ServiceMetadataLocatorManager {
                      */
                     int size = endpoints.size();
                     if (size != 1) {
-                        throw new Exception(
+                        throw new DynamicDiscoveryClientException(
                                 "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
                     }
 
                     EndpointType e = endpoints.get(0);
                     String address = e.getEndpointURI();
                     if (address == null) {
-                        // throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
-                        throw new Exception("No address found for");
+                        throw new DynamicDiscoveryClientException("No address found for");
                     }
                     URL urlAddress = new URL(address);
 
@@ -356,31 +286,13 @@ public class ServiceMetadataLocatorManager {
                     X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
 
                     if (certificate == null) {
-                        throw new Exception("no certificate found for endpoint: " + e.getEndpointURI());
+                        throw new DynamicDiscoveryClientException("No certificate found for endpoint: " + e.getEndpointURI());
                     }
                     LOGGER.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
-//                setAddress(urlAddress);
-//                setCertificate(certificate);
                 }
-
-//            URL endpointUrl = getAddress();
-//            if (endpointUrl == null) {
-//                throw new PropertyNotFoundException("Property '" + key + "' not found!");
-//            }
-//
-//            String value = endpointUrl.toExternalForm();
-//            LOGGER.info("Storing endpoint to database: '{}' - '{}'", key, value);
-//            ConfigurationManagerFactory.getConfigurationManager().setProperty(key, value);
-//
-//            X509Certificate certificate = getCertificate();
-//            if (certificate != null) {
-//                String endpointId = countryCode.toLowerCase() + "_" + StringUtils.substringAfter(documentType, "##");
-//                storeEndpointCertificate(endpointId, certificate);
-//            }
             }
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
-            // throw new ConfigurationManagerException(e);
         }
     }
 }

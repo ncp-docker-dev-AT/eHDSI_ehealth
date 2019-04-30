@@ -12,6 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -242,8 +243,7 @@ public enum AuditTrailUtils {
             if (am == null) {
                 LOGGER.error("Validation of the Audit Message cannot proceed on a Null value!!!");
             } else {
-                boolean validated = validateAuditMessage(eventLog, am);
-                LOGGER.debug("Audit Message validated and  report generated: '{}'", validated);
+                validateAuditMessage(eventLog, am);
             }
         }
         return am;
@@ -844,7 +844,6 @@ public enum AuditTrailUtils {
             eit.getEventID().setDisplayName("SMP::Push");
         }
 
-        // eit.setEventID(eventID);
         eit.setEventActionCode(EventActionCode);
         eit.setEventDateTime(EventDateTime);
         eit.setEventOutcomeIndicator(EventOutcomeIndicator); // (0,1,4,8)
@@ -1357,7 +1356,7 @@ public enum AuditTrailUtils {
      */
     private void writeTestAudits(AuditMessage auditmessage, String auditmsg) {
 
-        String wta = Utils.getProperty("WRITE_TEST_AUDITS");
+        String wta = Constants.WRITE_TEST_AUDITS;
         LOGGER.debug("Writing test audits: '{}'", wta);
         if (StringUtils.equals(wta, "true")) {
 
@@ -1398,7 +1397,7 @@ public enum AuditTrailUtils {
      * @param eventLog an EventLog object containing information about the audit message.
      * @return the Audit Message Model
      */
-    private boolean validateAuditMessage(EventLog eventLog, AuditMessage am) {
+    private void validateAuditMessage(EventLog eventLog, AuditMessage am) {
 
         LOGGER.debug("validateAuditMessage(EventLog '{}', AuditMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
                 am.getEventIdentification().getEventActionCode(), eventLog.getPC_UserID());
@@ -1409,12 +1408,9 @@ public enum AuditTrailUtils {
             if (StringUtils.equals(eventLog.getEventType(), "epsos-cf")) {
                 throw new UnsupportedOperationException("EventCode not supported.");
             }
-
-
-            return OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(am), eventLog.getEventType(), ncpSide);
+            OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(am), eventLog.getEventType(), ncpSide);
         } catch (JAXBException e) {
             LOGGER.error("JAXBException: {}", e.getMessage(), e);
-            return false;
         }
     }
 }

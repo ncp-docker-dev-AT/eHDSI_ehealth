@@ -38,7 +38,7 @@ public class UUIDHelper {
             LOGGER.debug("Valid UUID: '{}'", uuid);
             return true;
         } catch (IllegalArgumentException e) {
-            LOGGER.error("IllegalArgumentException: " + e.getMessage());
+            LOGGER.error("IllegalArgumentException: '{}'", e.getMessage());
             return false;
         }
     }

@@ -64,7 +64,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
                 File extensionFile = new File(patientFile + aux.getRoot() + File.separator + aux.getExtension() + ".properties");
 
                 if (extensionFile.exists()) {
-                    patientFile += aux.getRoot() + File.separator + aux.getExtension() + ".properties";
+                    patientFile += (aux.getRoot() + File.separator + aux.getExtension() + ".properties");
                     id = aux;
                     break;
                 }
@@ -86,9 +86,9 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
             patient.setAdministrativeGender(Gender.parseGender(properties.getProperty(GENDER)));
 
             Calendar birth;
-            Integer year = Integer.valueOf(properties.getProperty(BIRTH_DATE_YEAR));
-            Integer month = Integer.valueOf(properties.getProperty(BIRTH_DATE_MONTH));
-            Integer day = Integer.valueOf(properties.getProperty(BIRTH_DATE_DAY));
+            int year = Integer.parseInt(properties.getProperty(BIRTH_DATE_YEAR));
+            int month = Integer.parseInt(properties.getProperty(BIRTH_DATE_MONTH));
+            int day = Integer.parseInt(properties.getProperty(BIRTH_DATE_DAY));
             birth = new GregorianCalendar(year, month, day);
             patient.setBirthDate(birth.getTime());
 

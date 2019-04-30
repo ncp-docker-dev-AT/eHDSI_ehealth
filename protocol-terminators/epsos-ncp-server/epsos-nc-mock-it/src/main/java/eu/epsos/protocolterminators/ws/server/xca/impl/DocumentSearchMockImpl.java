@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
@@ -39,9 +40,9 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private static final String PATTERN_EP = "epstore.+\\.xml";
     private static final String PATTERN_PS = "psstore.+\\.xml";
     private static final String PATTERN_MRO = "mrostore.+\\.xml";
-    private static final String CONSTANT_AUTHOR = "author";
     private static final String CONSTANT_EXTENSION = "extension";
-    private static final String HL7_NAMESPACE = "urn:hl7-org:v3";
+    private static final String EHDSI_HL7_NAMESPACE = "urn:hl7-org:v3";
+    private static final String EHDSI_EPSOS_MEDICATION_NAMESPACE = "urn:epsos-org:ep:medication";
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentSearchMockImpl.class);
     private List<DocumentAssociation<EPDocumentMetaData>> epDocumentMetaDatas = new ArrayList<>();
     private List<DocumentAssociation<PSDocumentMetaData>> psDocumentMetaDatas = new ArrayList<>();
@@ -75,13 +76,13 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), CONSTANT_AUTHOR);
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc));
                 LOGGER.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
                 EPDocumentMetaData epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), CONSTANT_AUTHOR);
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc));
                 LOGGER.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
 
@@ -115,10 +116,10 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 PSDocumentMetaData psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), CONSTANT_AUTHOR);
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc));
                 documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
                 PSDocumentMetaData psdXml = DocumentFactory.createPSDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), CONSTANT_AUTHOR);
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc));
                 documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
                 LOGGER.debug("Placed PDF doc id=" + psdPdf.getId() + " into PS repository");
                 LOGGER.debug("Placed XML doc id=" + psdXml.getId() + " into PS repository");
@@ -153,10 +154,10 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 MroDocumentMetaData psdPdf = DocumentFactory.createMroDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), CONSTANT_AUTHOR);
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc));
                 documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
                 MroDocumentMetaData psdXml = DocumentFactory.createMroDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), CONSTANT_AUTHOR);
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc));
                 documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
                 LOGGER.debug("Placed PDF doc id='{}' into MRO repository", psdPdf.getId());
                 LOGGER.debug("Placed XML doc id='{}' into MRO repository", psdXml.getId());
@@ -171,11 +172,51 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private static Document loadCDADocument(String content) throws ParserConfigurationException, SAXException, IOException {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(false);
+        dbf.setNamespaceAware(true);
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
         InputSource is = new InputSource();
         is.setCharacterStream(new StringReader(content));
         return docBuilder.parse(is);
+    }
+
+    private static String getClinicalDocumentAuthor(Document doc) {
+
+        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/author/assignedAuthor/assignedPerson/name");
+        String author = "";
+        for (Node node : nodeList) {
+
+            NodeList nodeList1 = node.getChildNodes();
+            if (nodeList1 != null) {
+                StringBuilder prefix = new StringBuilder();
+                StringBuilder suffix = new StringBuilder();
+                StringBuilder given = new StringBuilder();
+                StringBuilder family = new StringBuilder();
+                for (int i = 0; i < nodeList1.getLength(); i++) {
+                    Node node1 = nodeList1.item(i);
+
+                    if (node1.getNodeType() == Node.ELEMENT_NODE) {
+                        LOGGER.info("Node: '{}'", node1.getLocalName());
+                        switch (node1.getLocalName()) {
+                            case "prefix":
+                                prefix.append(node1.getTextContent()).append(" ");
+                                break;
+                            case "suffix":
+                                suffix.append(node1.getTextContent()).append(" ");
+                                break;
+                            case "given":
+                                given.append(node1.getTextContent()).append(" ");
+                                break;
+                            case "family":
+                                family.append(node1.getTextContent()).append(" ");
+                                break;
+                        }
+                    }
+                }
+                author = String.format("%s %s %s %s", org.apache.commons.lang3.StringUtils.trim(prefix.toString()), org.apache.commons.lang3.StringUtils.trim(given.toString()),
+                        org.apache.commons.lang3.StringUtils.trim(family.toString()), suffix.toString());
+            }
+        }
+        return org.apache.commons.lang3.StringUtils.trim(author);
     }
 
     @Override
@@ -186,8 +227,13 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
         for (DocumentAssociation<PSDocumentMetaData> da : psDocumentMetaDatas) {
 
+            if (da.getXMLDocumentMetaData() != null) {
+                LOGGER.info("Patient ID: '{}'", da.getXMLDocumentMetaData().getPatientId());
+            } else {
+                LOGGER.info("Document Association is null");
+            }
             if (da.getXMLDocumentMetaData() != null
-                    && da.getXMLDocumentMetaData().getPatientId().equals(searchCriteria.getCriteriaValue(Criteria.PatientId))) {
+                    && StringUtils.equals(da.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
                 if (LOGGER.isInfoEnabled()) {
                     LOGGER.info("getPSDocumentList(SearchCriteria searchCriteria): '{}'", da.toString());
                 }
@@ -221,7 +267,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     @Override
     public EPSOSDocument getDocument(SearchCriteria searchCriteria) {
 
-        LOGGER.info("getDocument(SearchCriteria searchCriteria)");
+        LOGGER.info("[NI] Get Document: '{}', '{}', '{}'", searchCriteria.getCriteriaValue(Criteria.DocumentId),
+                searchCriteria.getCriteriaValue(Criteria.PatientId), searchCriteria.getCriteriaValue(Criteria.RepositoryId));
         for (EPSOSDocument doc : documents) {
             if (doc.matchesCriteria(searchCriteria)) {
                 if (LOGGER.isInfoEnabled()) {
@@ -254,10 +301,15 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return null;
     }
 
-    private String getOIDFromDocument(Document doc) {
+    /**
+     * @param document
+     * @return
+     */
+    private String getOIDFromDocument(Document document) {
+
         String oid = "";
-        if (doc.getElementsByTagName("id").getLength() > 0) {
-            Node id = doc.getElementsByTagName("id").item(0);
+        if (document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").getLength() > 0) {
+            Node id = document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").item(0);
             if (id.getAttributes().getNamedItem("root") != null) {
                 oid = oid + id.getAttributes().getNamedItem("root").getTextContent();
             }
@@ -265,13 +317,37 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 oid = oid + "^" + id.getAttributes().getNamedItem(CONSTANT_EXTENSION).getTextContent();
             }
         }
+        LOGGER.info("CDA Document ID: '{}'", oid);
         return oid;
     }
 
+    /**
+     * @param doc
+     * @return
+     */
     private String getTitleFromDocument(Document doc) {
 
-        if (doc.getElementsByTagName("epsos:name").getLength() > 0) {
-            Node titleNode = doc.getElementsByTagName("epsos:name").item(0);
+        NodeList documentNames = doc.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "title");
+
+        if (documentNames != null && documentNames.getLength() > 0) {
+            Node titleNode = documentNames.item(0);
+            return titleNode.getTextContent();
+        }
+        LOGGER.debug("Could not locate the title of the prescription");
+        return "Document Title Not Available";
+    }
+
+    /**
+     * @param doc
+     * @return
+     */
+    private String getDescriptionFromPrescription(Document doc) {
+
+        //xmlns:epsos="urn:epsos-org:ep:medication"
+        NodeList documentNames = doc.getElementsByTagNameNS(EHDSI_EPSOS_MEDICATION_NAMESPACE, "name");
+
+        if (documentNames != null && documentNames.getLength() > 0) {
+            Node titleNode = documentNames.item(0);
             return titleNode.getTextContent();
         }
         LOGGER.debug("Could not locate the title of the prescription");
@@ -282,14 +358,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
         LOGGER.info("NameSpace: '{}', Document URI '{}', XML encoding: '{}', BaseURI: '{}'", doc.getNamespaceURI(),
                 doc.getDocumentURI(), doc.getXmlEncoding(), doc.getBaseURI());
-        // Remove old component element
-        Node oldComponent = doc.getElementsByTagName("component").item(0);
 
-        Element newComponent = doc.createElementNS(HL7_NAMESPACE, "component");
+        // Remove old component element
+        Node oldComponent = doc.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "component").item(0);
+        Element newComponent = doc.createElementNS(EHDSI_HL7_NAMESPACE, "component");
 
         // Add new component element
-        Element nonXMLBody = doc.createElementNS(HL7_NAMESPACE, "nonXMLBody");
-        Element text = doc.createElementNS(HL7_NAMESPACE, "text");
+        Element nonXMLBody = doc.createElementNS(EHDSI_HL7_NAMESPACE, "nonXMLBody");
+        Element text = doc.createElementNS(EHDSI_HL7_NAMESPACE, "text");
 
         text.setAttribute("mediaType", "application/pdf");
         text.setAttribute("representation", "B64");
@@ -299,17 +375,19 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         newComponent.appendChild(nonXMLBody);
 
         Node rootNode = doc.getFirstChild();
-        LOGGER.info("Adding PDF document. Updating NamespaceURI: '{}'-'{}'",
-                oldComponent.getNamespaceURI(), newComponent.getNamespaceURI());
 
         rootNode.replaceChild(newComponent, oldComponent);
         LOGGER.info("PDF document added.");
     }
 
-    private void addFormatToOID(Document doc, int format) {
+    /**
+     * @param document
+     * @param format
+     */
+    private void addFormatToOID(Document document, int format) {
 
-        if (doc.getElementsByTagName("id").getLength() > 0) {
-            Element id = (Element) doc.getElementsByTagName("id").item(0);
+        if (document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").getLength() > 0) {
+            Element id = (Element) document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").item(0);
             if (id.hasAttribute(CONSTANT_EXTENSION)) {
                 id.setAttribute(CONSTANT_EXTENSION, id.getAttribute(CONSTANT_EXTENSION) + "." + format);
             } else {

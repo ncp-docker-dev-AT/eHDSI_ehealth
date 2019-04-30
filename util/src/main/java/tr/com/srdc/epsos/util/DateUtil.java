@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,6 +41,13 @@ public class DateUtil {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         currentTime = dateFormat.format(new Date());
         return currentTime;
+    }
+
+    public static String getCurrentTimeUTC() {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat(TIME_DATE_FORMAT);
+        df.setTimeZone(tz);
+        return df.format(new Date());
     }
 
     // Returns the current time in given format

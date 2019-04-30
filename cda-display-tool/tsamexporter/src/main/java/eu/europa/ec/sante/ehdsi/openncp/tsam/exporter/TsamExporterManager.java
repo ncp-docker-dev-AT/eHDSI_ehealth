@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -22,14 +23,18 @@ public class TsamExporterManager {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final Environment environment;
+
     @Autowired
-    public TsamExporterManager(JdbcTemplate jdbcTemplate) {
+    public TsamExporterManager(Environment environment, JdbcTemplate jdbcTemplate) {
+        this.environment = environment;
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @SuppressWarnings("WeakerAccess")
     public void export() {
-        String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH");
+        String epsosPropsPath = environment.getRequiredProperty("openncp.root.path");
+        //String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH");
         if (StringUtils.isBlank(epsosPropsPath)) {
             throw new TsamExporterException("Environment variable 'EPSOS_PROPS_PATH' is not defined!");
         }

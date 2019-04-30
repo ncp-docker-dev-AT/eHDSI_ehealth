@@ -12,6 +12,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,16 +100,17 @@ public class ClientConnectorConsumer {
         }
     }
 
-    public List<PatientDemographics> queryPatient(Assertion idAssertion, String countryCode, PatientDemographics pd) {
+    public List<PatientDemographics> queryPatient(Assertion idAssertion, String countryCode, PatientDemographics patientDemographics) {
 
         LOGGER.info("[Portal]: queryPatient(countryCode:'{}')", countryCode);
         ClientConnectorServiceServiceStub stub = initializeServiceStub();
 
         try {
+            trimPatientDemographics(patientDemographics);
             addAssertions(stub, idAssertion, null);
             QueryPatientRequest queryPatientRequest = QueryPatientRequest.Factory.newInstance();
 
-            queryPatientRequest.setPatientDemographics(pd);
+            queryPatientRequest.setPatientDemographics(patientDemographics);
             queryPatientRequest.setCountryCode(countryCode);
 
             QueryPatientDocument queryPatientDocument = QueryPatientDocument.Factory.newInstance();
@@ -147,10 +149,11 @@ public class ClientConnectorConsumer {
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode, String targetLanguage) {
 
         LOGGER.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}', targetLanguage:'{}')", countryCode, homeCommunityId, targetLanguage);
-        ClientConnectorServiceServiceStub stub = initializeServiceStub();
+        ClientConnectorServiceServiceStub clientConnectorStub = initializeServiceStub();
 
         try {
-            addAssertions(stub, idAssertion, trcAssertion);
+
+            addAssertions(clientConnectorStub, idAssertion, trcAssertion);
             RetrieveDocumentDocument1 retrieveDocumentDocument = RetrieveDocumentDocument1.Factory.newInstance();
             RetrieveDocument1 retrieveDocument = retrieveDocumentDocument.addNewRetrieveDocument();
 
@@ -161,7 +164,8 @@ public class ClientConnectorConsumer {
             retrieveDocumentRequest.setClassCode(classCode);
             retrieveDocumentRequest.setTargetLanguage(targetLanguage);
 
-            RetrieveDocumentResponseDocument retrieveDocumentResponseDocument = stub.retrieveDocument(retrieveDocumentDocument);
+            RetrieveDocumentResponseDocument retrieveDocumentResponseDocument = clientConnectorStub.retrieveDocument(retrieveDocumentDocument);
+
             return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
         } catch (Exception ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
@@ -181,18 +185,19 @@ public class ClientConnectorConsumer {
     }
 
     public SubmitDocumentResponse submitDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode,
-                                                 EpsosDocument1 document, PatientDemographics pd) {
+                                                 EpsosDocument1 document, PatientDemographics patientDemographics) {
 
         LOGGER.info("[Portal]: submitDocument(countryCode:'{}')", countryCode);
         ClientConnectorServiceServiceStub stub = initializeServiceStub();
 
         try {
+            trimPatientDemographics(patientDemographics);
             addAssertions(stub, idAssertion, trcAssertion);
             SubmitDocumentDocument1 submitDocumentDoc = SubmitDocumentDocument1.Factory.newInstance();
             SubmitDocument1 submitDocument = SubmitDocument1.Factory.newInstance();
             SubmitDocumentRequest submitDocRequest = SubmitDocumentRequest.Factory.newInstance();
 
-            submitDocRequest.setPatientDemographics(pd);
+            submitDocRequest.setPatientDemographics(patientDemographics);
             submitDocRequest.setDocument(document);
             submitDocRequest.setCountryCode(countryCode);
             submitDocument.setArg0(submitDocRequest);
@@ -210,13 +215,55 @@ public class ClientConnectorConsumer {
         LOGGER.debug("Initializing Client Connector Stub Services");
 
         try {
-            ClientConnectorServiceServiceStub stub = new ClientConnectorServiceServiceStub(epr);
-            stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
-            this.registerEvidenceEmitterHandler(stub);
-            return stub;
+            ClientConnectorServiceServiceStub clientConnectorStub = new ClientConnectorServiceServiceStub(epr);
+            clientConnectorStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
+            this.registerEvidenceEmitterHandler(clientConnectorStub);
+            return clientConnectorStub;
         } catch (AxisFault ex) {
             LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Trims the Petient Demographics sent by the client and received by the Client Connector.
+     *
+     * @param patientDemographics Identity Traits to be trimmed and provided by the by the client
+     */
+    private void trimPatientDemographics(PatientDemographics patientDemographics) {
+
+        // Iterate over the Patient Ids
+        for (PatientId patientId : patientDemographics.getPatientIdArray()) {
+
+            patientId.setExtension(StringUtils.trim(patientId.getExtension()));
+            patientId.setRoot(StringUtils.trim(patientId.getRoot()));
+        }
+        if (StringUtils.isNotBlank(patientDemographics.getAdministrativeGender())) {
+            patientDemographics.setAdministrativeGender(StringUtils.trim(patientDemographics.getAdministrativeGender()));
+        }
+        if (StringUtils.isNotBlank(patientDemographics.getFamilyName())) {
+            patientDemographics.setFamilyName(StringUtils.trim(patientDemographics.getFamilyName()));
+        }
+        if (StringUtils.isNotBlank(patientDemographics.getGivenName())) {
+            patientDemographics.setGivenName(StringUtils.trim(patientDemographics.getGivenName()));
+        }
+        if (StringUtils.isNotBlank(patientDemographics.getEmail())) {
+            patientDemographics.setEmail(StringUtils.trim(patientDemographics.getEmail()));
+        }
+        if (StringUtils.isNotBlank(patientDemographics.getTelephone())) {
+            patientDemographics.setTelephone(StringUtils.trim(patientDemographics.getTelephone()));
+        }
+        if (StringUtils.isNotBlank(patientDemographics.getStreetAddress())) {
+            patientDemographics.setStreetAddress(StringUtils.trim(patientDemographics.getStreetAddress()));
+        }
+        if (StringUtils.isNotBlank(patientDemographics.getPostalCode())) {
+            patientDemographics.setPostalCode(StringUtils.trim(patientDemographics.getPostalCode()));
+        }
+        if (StringUtils.isNotBlank(patientDemographics.getCity())) {
+            patientDemographics.setCity(StringUtils.trim(patientDemographics.getCity()));
+        }
+        if (StringUtils.isNotBlank(patientDemographics.getCountry())) {
+            patientDemographics.setCountry(StringUtils.trim(patientDemographics.getCountry()));
         }
     }
 }

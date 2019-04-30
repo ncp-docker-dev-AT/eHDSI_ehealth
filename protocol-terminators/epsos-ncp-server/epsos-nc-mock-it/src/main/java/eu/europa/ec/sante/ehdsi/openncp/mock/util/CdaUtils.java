@@ -49,6 +49,7 @@ public class CdaUtils {
      * Header
      */
     public static PatientDemographics getPatientDemographicsFromXMLDocument(Document doc) {
+
         PatientDemographics pd = new PatientDemographics();
 
         XPathFactory factory = XPathFactory.newInstance();

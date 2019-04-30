@@ -7,6 +7,7 @@ import com.liferay.portal.kernel.util.Validator;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.portal.DispenseException;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -35,6 +36,7 @@ public class CDAUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CDAUtils.class);
 
+    private static final String XML_EMPTY_NAMESPACE = "xmlns=\"\"";
     private static final String XML_LOINC_SYSTEM = "LOINC";
     private static final String XML_LOINC_CODESYSTEM = "2.16.840.1.113883.6.1";
     private static final String XML_PRESCRIPTION_TEMPLATEID = "1.3.6.1.4.1.12559.11.10.1.3.1.1.1";
@@ -70,7 +72,8 @@ public class CDAUtils {
 
     public static String createDispensation(Document epDoc, CDAHeader cda, String eDuuid) {
 
-        return CDAModelToEDXML(epDoc, cda, eDuuid);
+        String dispense = CDAModelToEDXML(epDoc, cda, eDuuid);
+        return StringUtils.removeAll(dispense, XML_EMPTY_NAMESPACE);
     }
 
     private static Document readEpXML(String xml) throws ParserConfigurationException, SAXException, IOException {
@@ -183,8 +186,7 @@ public class CDAUtils {
     }
 
     /**
-     * A method returning the updated context of the substituted product during
-     * the dispensation.
+     * A method returning the updated context of the substituted product during the dispensation.
      *
      * @param doc      the cloned prescription document.
      * @param id       the id of the corresponding product.
@@ -195,8 +197,13 @@ public class CDAUtils {
      */
     private static String getSubstitutedRelativeProductLineFromEP(org.dom4j.Document doc, String id, String product, String unit, String quantity) {
 
-        LOGGER.info("getSubstitutedRelativeProductLineFromEP(Product:'{}')", product);
-        //Context of the substituted product
+
+        //TODO: Check if the ATC code needs to be retrieved from:
+        //String atcCodeExpr = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct
+        // /hl7:manufacturedMaterial/epsos:asSpecializedKind[@classCode='GEN']/epsos:generalizedMedicineClass[@classCode='MMAT']/epsos:code";
+        LOGGER.info("ePrescription Substituted Product dispensed(Product:'{}', ID:'{}', Unit:'{}', Quantity:'{}')",
+                product, id, unit, quantity);
+        //  Context of the substituted product
         String context = "";
 
         try {
@@ -206,18 +213,19 @@ public class CDAUtils {
             namespaces.put("epsos", "urn:epsos-org:ep:medication");
             namespaces.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
-            //Creating an xpath expression for the displayName attribute of the code element
+            //  Creating an xpath expression to retrieve the displayName attribute of the National Code Element
             String expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code/@displayName";
-
             //Setting the xpath processor and the namespaces
             org.dom4j.XPath xpath = org.dom4j.DocumentHelper.createXPath(expression);
             xpath.setNamespaceURIs(namespaces);
 
+            //TODO: check Jerome
             //Getting the displayName node
             org.dom4j.Node displayName = xpath.selectSingleNode(doc);
-
-            //Updating the displayName node context
-            displayName.setText(product);
+            if (displayName != null) {
+                //Updating the displayName node context
+                displayName.setText(product);
+            }
 
             //Creating an xpath expression for the name element
             expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:name";
@@ -228,9 +236,10 @@ public class CDAUtils {
 
             //Getting the name node
             org.dom4j.Node name = xpath.selectSingleNode(doc);
-
-            //Updating the name node context
-            name.setText(product);
+            if (name != null) {
+                //Updating the name node context
+                name.setText(product);
+            }
 
             //Creating an xpath expression for the epsos:name element
             expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:name";
@@ -241,10 +250,10 @@ public class CDAUtils {
 
             //Getting the epsos:name node
             org.dom4j.Node epsosName = xpath.selectSingleNode(doc);
-
-            //Updating the name node context
-            epsosName.setText(product);
-
+            if (epsosName != null) {
+                //Updating the name node context
+                epsosName.setText(product);
+            }
             //TODO epsos:capacityQuantity/@unit
             //Creating an xpath expression for the quantity value attribute of the epsos:capacityQuantity element
             expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@value";
@@ -255,10 +264,10 @@ public class CDAUtils {
 
             //Getting the quantity value node
             org.dom4j.Node value = xpath.selectSingleNode(doc);
-
-            //Updating the quantity value node context
-            value.setText(quantity);
-
+            if (value != null) {
+                //Updating the quantity value node context
+                value.setText(quantity);
+            }
             //Creating an xpath expression for the manufacturedMaterial code element
             expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code";
 
@@ -304,9 +313,10 @@ public class CDAUtils {
 
             //Getting the manufacturedProduct node
             org.dom4j.Node manufacturedProduct = xpath.selectSingleNode(doc);
-
-            //Getting the string representation of the node
-            context = manufacturedProduct.asXML().replaceAll("xmlns=\"\"", "");
+            if (manufacturedProduct != null) {
+                //Getting the string representation of the node
+                context = StringUtils.removeAll(manufacturedProduct.asXML(), XML_EMPTY_NAMESPACE);
+            }
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
@@ -331,7 +341,7 @@ public class CDAUtils {
         String nodeString = "";
         try {
             NodeList nl = epDoc.getElementsByTagName("setId");
-            if (nl.getLength()==0) {
+            if (nl.getLength() == 0) {
                 nodeString = "<setId nullFlavor=\"NI\"/>";
             } else {
                 Node node = nl.item(0);
@@ -426,7 +436,6 @@ public class CDAUtils {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         sb.append("\r\n");
-
         sb.append("<ClinicalDocument xmlns=\"urn:hl7-org:v3\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">");
         sb.append("\r\n");
         sb.append("<typeId root=\"2.16.840.1.113883.1.3\" extension=\"POCD_MT000040\"/>");
@@ -731,7 +740,7 @@ public class CDAUtils {
             org.dom4j.Document clone;
             try {
                 //Cloning the ePrescription document
-                String source = Utils.getDocumentAsXml(epDoc, true).replaceAll("xmlns=\"\"", "");
+                String source = StringUtils.removeAll(Utils.getDocumentAsXml(epDoc, true), XML_EMPTY_NAMESPACE);
                 clone = org.dom4j.DocumentHelper.parseText(source);
 
                 //Getting the substituted fields, if any
@@ -739,7 +748,9 @@ public class CDAUtils {
                 String product = detail.getMedicineCommercialName();
                 String unit = detail.getDispensedQuantityUnit(); //Even in a substitution we getting null
                 String quantity = detail.getDispensedQuantity();
-                LOGGER.info("### EDDetails: {}", detail.toString());
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("### EDDetails: {}", detail.toString());
+                }
                 //Adding the relative product line updated with the substituted data, if any
                 sb.append(getSubstitutedRelativeProductLineFromEP(clone, id, product, unit, quantity));
 

@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.gazelle.validation.reporting;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.GazelleConfiguration;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import net.ihe.gazelle.jaxb.result.sante.DetailedResult;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -27,12 +28,27 @@ public class ReportBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportBuilder.class);
     private static final String REPORT_FILES_FOLDER = "validation";
     private static final boolean GAZELLE_HTML_REPORT;
+    private static final boolean GAZELLE_FORMATTED_REPORT;
 
     static {
         GAZELLE_HTML_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfiguration().getProperty("GAZELLE_HTML_REPORT"));
+        GAZELLE_FORMATTED_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfiguration().getProperty("GAZELLE_FORMATTED_REPORT"));
     }
 
     private ReportBuilder() {
+    }
+
+    /**
+     * @param reportDate
+     * @param model
+     * @param objectType
+     * @param validationObject
+     * @param ncpSide
+     * @return
+     */
+    public static boolean build(final String reportDate, final String model, final String objectType, final String validationObject, final NcpSide ncpSide) {
+
+        return build(reportDate, model, objectType, validationObject, null, null, ncpSide);
     }
 
     /**
@@ -43,8 +59,9 @@ public class ReportBuilder {
      * @param validationObject the validated object.
      * @param validationResult the validation result.
      * @return A boolean flag, indicating if the reporting process succeed or not.
+     * @pa
      */
-    public static boolean build(final String model, final String objectType, final String validationObject,
+    public static boolean build(final String reportDate, final String model, final String objectType, final String validationObject,
                                 final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
 
         String sideFolder;
@@ -88,7 +105,7 @@ public class ReportBuilder {
         }
 
         reportDirName = Constants.EPSOS_PROPS_PATH + REPORT_FILES_FOLDER + File.separator + sideFolder;
-        reportFileName = reportDirName + File.separator + buildReportFileName(model, objectType, validationTestResult);
+        reportFileName = reportDirName + File.separator + buildReportFileName(reportDate, model, objectType, validationTestResult);
 
         if (checkReportDir(reportDirName)) {
 
@@ -120,20 +137,25 @@ public class ReportBuilder {
             }
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(reportFile.getAbsoluteFile()))) {
 
-                bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-                bw.write("\n");
-                bw.write("<validationReport>");
-                bw.write("\n");
-                bw.write("<validatedObject>");
-                bw.write("<![CDATA[\"" + (Base64.isBase64(validationObject) ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) : validationObject) + "\"]]>");
-                bw.write("</validatedObject>");
-                bw.write("\n");
-                bw.write("<validationResult>");
-                bw.write("<![CDATA[\"" + validationBody + "\"]]>");
-                bw.write("</validationResult>");
-                bw.write("\n");
-                bw.write("</validationReport>");
-
+                if (!OpenNCPValidation.isRemoteValidationEnable() && !GAZELLE_FORMATTED_REPORT) {
+                    bw.write((Base64.isBase64(validationObject) ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) : validationObject));
+                } else {
+                    bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+                    bw.write("\n");
+                    bw.write("<validationReport>");
+                    bw.write("\n");
+                    bw.write("<validatedObject>");
+                    bw.write("<![CDATA[\"" + (Base64.isBase64(validationObject) ?
+                            new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) :
+                            validationObject) + "\"]]>");
+                    bw.write("</validatedObject>");
+                    bw.write("\n");
+                    bw.write("<validationResult>");
+                    bw.write("<![CDATA[\"" + validationBody + "\"]]>");
+                    bw.write("</validationResult>");
+                    bw.write("\n");
+                    bw.write("</validationReport>");
+                }
                 return true;
 
             } catch (IOException ex) {
@@ -153,14 +175,14 @@ public class ReportBuilder {
      * @param validationTestResult the validation result object.
      * @return a report file name.
      */
-    private static String buildReportFileName(final String model, final String objectType, final String validationTestResult) {
+    private static String buildReportFileName(final String reportDate, final String model, final String objectType, final String validationTestResult) {
 
         final String SEPARATOR = "_";
         final String FILE_EXTENSION = ".xml";
         final String modelNormalized = model.replace(" ", "-");
 
         StringBuilder fileName = new StringBuilder();
-        fileName.append(formatDate());
+        fileName.append(reportDate);
 
         if (objectType != null && !objectType.isEmpty()) {
             fileName.append(SEPARATOR);
@@ -207,7 +229,12 @@ public class ReportBuilder {
         return true;
     }
 
-    private static String formatDate() {
+    /**
+     * Util method generating a Reporting Date used as a prefix of report filename produced.
+     *
+     * @return ReportingDate in UTC formatted as String.
+     */
+    public static String formatDate() {
 
         TimeZone tz = TimeZone.getTimeZone("UTC");
         //ISO 8601 format: 2017-11-25T10:59:53Z

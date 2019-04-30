@@ -1,6 +1,8 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.cfg.ReadSMPProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smp.BdxSmpValidator;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.*;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.exception.GenericException;
@@ -195,7 +197,8 @@ public class SMPSignFileController {
                 LOGGER.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
             String contentFile = new String(Files.readAllBytes(Paths.get(convFile.getPath())));
-            boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
+            //boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
+            boolean valid = BdxSmpValidator.validateFile(contentFile);
             boolean fileDeleted;
 
             if (valid) {

@@ -1,14 +1,14 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.cfg.ReadSMPProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smp.BdxSmpValidator;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Countries;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPFields;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPFile;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SMPConverter;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.XMLValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,6 @@ import java.util.regex.Pattern;
 /**
  * @author Inês Garganta
  */
-
 @Controller
 @SessionAttributes("smpfile")
 public class SMPGenerateFileController {
@@ -44,11 +43,11 @@ public class SMPGenerateFileController {
 
     private final SMPFields smpfields = new SMPFields();
 
-    private SMPConverter smpconverter = new SMPConverter();
+    private SMPConverter smpconverter;
 
     private Environment env;
 
-    private ReadSMPProperties readProperties = new ReadSMPProperties();
+    private ReadSMPProperties readProperties;
 
     private String type;
 
@@ -299,7 +298,8 @@ public class SMPGenerateFileController {
 
         smpfile.setGeneratedFile(smpconverter.getFile());
         String content = new String(Files.readAllBytes(Paths.get(smpfile.getGeneratedFile().getPath())));
-        boolean valid = XMLValidator.validate(content, "/bdx-smp-201605.xsd");
+        //boolean valid = XMLValidator.validate(content, "/bdx-smp-201605.xsd");
+        boolean valid = BdxSmpValidator.validateFile(content);
         if (valid) {
             LOGGER.debug("\n****VALID XML File");
         } else {
