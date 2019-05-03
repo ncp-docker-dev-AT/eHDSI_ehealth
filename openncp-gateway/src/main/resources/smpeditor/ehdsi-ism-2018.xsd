@@ -57,6 +57,7 @@
         <xs:attribute name="label" type="xs:string" use="required"/>
         <xs:attribute name="min" type="xs:integer"/>
         <xs:attribute name="max" type="xs:integer"/>
+        <xs:attribute name="friendlyName" type="xs:string"/>
     </xs:complexType>
 
     <xs:complexType name="birthDate">
