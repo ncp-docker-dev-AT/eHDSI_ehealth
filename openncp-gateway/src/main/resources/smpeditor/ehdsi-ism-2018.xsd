@@ -2,6 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://ec.europa.eu/sante/ehncp/ism"
            elementFormDefault="qualified" targetNamespace="http://ec.europa.eu/sante/ehncp/ism">
 
+    <!-- Root Element defining the International Search Mask - Patient Identity Traits -->
     <xs:element name="patientSearch">
         <xs:complexType>
             <xs:sequence>
@@ -16,13 +17,17 @@
     <xs:element name="sex" type="sex"/>
     <xs:element name="field" type="field"/>
 
+    <!-- Identification of the eHNCP providing its cross border traits (ISO Country Code of NCP_A) -->
     <xs:complexType name="country">
         <xs:sequence>
             <xs:element name="searchFields" type="searchFields"/>
         </xs:sequence>
         <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="friendlyName" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string"/>
     </xs:complexType>
 
+    <!-- Patient element - LivingSubjectID -->
     <xs:complexType name="searchFields">
         <xs:sequence>
             <xs:element ref="id" maxOccurs="unbounded"/>
@@ -32,37 +37,45 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="field">
-        <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="min" type="xs:integer"/>
-        <xs:attribute name="max" type="xs:integer"/>
-    </xs:complexType>
-
-    <xs:complexType name="sex">
-        <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="min" type="xs:integer"/>
-        <xs:attribute name="max" type="xs:integer"/>
-    </xs:complexType>
-
-    <xs:complexType name="textField">
-        <xs:attribute name="friendlyName" type="xs:string"/>
-        <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="min" type="xs:integer"/>
-        <xs:attribute name="max" type="xs:integer"/>
-    </xs:complexType>
-
+    <!-- Patient element - LivingSubjectID -->
     <xs:complexType name="id">
         <xs:attribute name="domain" type="xs:string" use="required"/>
         <xs:attribute name="format" type="xs:string"/>
-        <xs:attribute name="label" type="xs:string" use="required"/>
         <xs:attribute name="min" type="xs:integer"/>
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string" use="required"/>
     </xs:complexType>
 
+    <!-- Patient element - LivingSubjectBirthTime -->
     <xs:complexType name="birthDate">
-        <xs:attribute name="label" type="xs:string"/>
         <xs:attribute name="min" type="xs:integer"/>
         <xs:attribute name="max" type="xs:integer"/>
+        <xs:attribute name="friendlyName" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string"/>
+    </xs:complexType>
+
+    <!-- Deprecated Element -->
+    <xs:complexType name="field">
+        <xs:attribute name="min" type="xs:integer"/>
+        <xs:attribute name="max" type="xs:integer"/>
+        <xs:attribute name="friendlyName" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string"/>
+    </xs:complexType>
+
+    <!-- Patient element - LivingSubjectGender -->
+    <xs:complexType name="sex">
+        <xs:attribute name="min" type="xs:integer"/>
+        <xs:attribute name="max" type="xs:integer"/>
+        <xs:attribute name="friendlyName" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string"/>
+    </xs:complexType>
+
+    <!-- Patient element  generic Identity Traits- LivingSubjectName, LivingSubjectBirthPlaceAddress, PatientAddress -->
+    <xs:complexType name="textField">
+        <xs:attribute name="min" type="xs:integer"/>
+        <xs:attribute name="max" type="xs:integer"/>
+        <xs:attribute name="friendlyName" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string"/>
     </xs:complexType>
 </xs:schema>
