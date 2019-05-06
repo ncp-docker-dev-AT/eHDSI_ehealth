@@ -16,7 +16,6 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import org.apache.axiom.om.*;
-import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
@@ -480,11 +479,11 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
             try {
 
-                SAXOMBuilder builder = new org.apache.axiom.om.impl.builder.SAXOMBuilder();
+                OMDocument omDocument = OMAbstractFactory.getOMFactory().createOMDocument();
                 Marshaller marshaller = wsContext.createMarshaller();
-                marshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
+                marshaller.marshal(new javax.xml.bind.JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), omDocument.getSAXResult());
 
-                return builder.getRootElement().getXMLStreamReader();
+                return omDocument.getOMDocumentElement().getXMLStreamReader();
 
             } catch (JAXBException e) {
                 throw new XMLStreamException("Error in JAXB marshalling", e);

@@ -41,6 +41,10 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
+    <logger name="org.apache.axis2" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="org.apache.http.client" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>

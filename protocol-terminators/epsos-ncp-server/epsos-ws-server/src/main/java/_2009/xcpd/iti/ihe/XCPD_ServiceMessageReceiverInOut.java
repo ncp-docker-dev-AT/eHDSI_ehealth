@@ -12,7 +12,6 @@ import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.om.*;
-import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
@@ -48,8 +47,6 @@ import java.util.*;
 public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
@@ -69,6 +66,8 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             wsContext = jc;
         }
     }
+
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private String getIPofSender(MessageContext messageContext) {
 
@@ -353,11 +352,11 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
 
             try {
 
-                SAXOMBuilder builder = new SAXOMBuilder();
+                OMDocument omDocument = OMAbstractFactory.getOMFactory().createOMDocument();
                 Marshaller marshaller = wsContext.createMarshaller();
-                marshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
+                marshaller.marshal(new javax.xml.bind.JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), omDocument.getSAXResult());
 
-                return builder.getRootElement().getXMLStreamReader();
+                return omDocument.getOMDocumentElement().getXMLStreamReader();
 
             } catch (JAXBException e) {
                 throw new XMLStreamException("Error in JAXB marshalling", e);

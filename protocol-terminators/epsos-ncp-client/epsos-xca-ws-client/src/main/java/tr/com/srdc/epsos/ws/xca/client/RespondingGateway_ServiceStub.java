@@ -22,11 +22,11 @@ import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.lang.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -36,7 +36,11 @@ import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
@@ -141,7 +145,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             counter = 0;
         }
         counter++;
-        return java.lang.Long.toString(System.currentTimeMillis()) + "_" + counter;
+        return System.currentTimeMillis() + "_" + counter;
     }
 
     public void setAddr(String addr) {
@@ -213,24 +217,25 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
             OMNamespace ns2 = factory.createOMNamespace(XCAConstants.SOAP_HEADERS.QUERY.OM_NAMESPACE, "addressing");
 
-            SOAPHeaderBlock action = new SOAP12HeaderBlockImpl("Action", ns2, soapFactory);
+            SOAPHeaderBlock action = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("Action", ns2);
             OMNode node = factory.createOMText(XCAConstants.SOAP_HEADERS.QUERY.REQUEST_ACTION);
             action.addChild(node);
             OMAttribute att1 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
             action.addAttribute(att1);
 
-            SOAPHeaderBlock id = new SOAP12HeaderBlockImpl("MessageID", ns2, soapFactory);
+            SOAPHeaderBlock id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("MessageID", ns2);
             OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
             id.addChild(node2);
 
-            SOAPHeaderBlock to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+            SOAPHeaderBlock to = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("To", ns2);
             OMNode node3 = factory.createOMText(addr);
             to.addChild(node3);
             OMAttribute att2 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
             to.addAttribute(att2);
 
-            SOAPHeaderBlock replyTo = new SOAP12HeaderBlockImpl("ReplyTo", ns2, soapFactory);
-            OMElement address = new SOAP12HeaderBlockImpl("Address", ns2, soapFactory);
+            SOAPHeaderBlock replyTo = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("ReplyTo", ns2);
+            //OMElement address = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("Address", ns2);
+            OMElement address = OMAbstractFactory.getSOAP12Factory().createOMElement("Address", ns2);
             OMNode node4 = factory.createOMText(XCAConstants.SOAP_HEADERS.ADDRESSING_NAMESPACE);
             address.addChild(node4);
             replyTo.addChild(address);
@@ -246,7 +251,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             _serviceClient.addHeader(replyTo);
 
             OMNamespace ns = factory.createOMNamespace(XCAConstants.SOAP_HEADERS.SECURITY_XSD, "wsse");
-            SOAPHeaderBlock security = new SOAP12HeaderBlockImpl("Security", ns, soapFactory);
+            SOAPHeaderBlock security = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("Security", ns);
             try {
                 security.addChild(XMLUtils.toOM(trcAssertion.getDOM()));
                 security.addChild(XMLUtils.toOM(idAssertion.getDOM()));
@@ -362,7 +367,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                             optimizeContent(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.QUERY.NAMESPACE_REQUEST_LOCAL_PART)));
 
                     /* Creating the new WSA To header with the new endpoint */
-                    to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+                    to = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("To", ns2);
                     node3 = newSoapFactory.createOMText(endpoint);
                     to.addChild(node3);
                     to.addAttribute(att2);
@@ -379,7 +384,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     _serviceClient.addHeadersToEnvelope(newEnv);
 
                     /* we create a new Message Context with the new SOAP envelope */
-                    org.apache.axis2.context.MessageContext newMessageContext = new org.apache.axis2.context.MessageContext();
+                    MessageContext newMessageContext = new MessageContext();
                     newMessageContext.setEnvelope(newEnv);
 
                     /* add the new message contxt to the new operation client */
@@ -514,8 +519,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         java.lang.Class messageClass = java.lang.Class.forName(messageClassName);
                         java.lang.Object messageObject = fromOM(faultElt, messageClass, null);
                         java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage",
-                                new java.lang.Class[]{messageClass});
-                        m.invoke(ex, new java.lang.Object[]{messageObject});
+                                messageClass);
+                        m.invoke(ex, messageObject);
 
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
@@ -577,24 +582,24 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
             OMNamespace ns2 = factory.createOMNamespace(XCAConstants.SOAP_HEADERS.ADDRESSING_NAMESPACE, "addressing");
 
-            OMElement action = new SOAP12HeaderBlockImpl("Action", ns2, soapFactory);
+            OMElement action = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("Action", ns2);
             OMNode node = factory.createOMText(XCAConstants.SOAP_HEADERS.RETRIEVE.REQUEST_ACTION);
             action.addChild(node);
 
             //OMAttribute att1 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
             //action.addAttribute(att1);
-            OMElement id = new SOAP12HeaderBlockImpl("MessageID", ns2, soapFactory);
+            OMElement id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("MessageID", ns2);
             OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
             id.addChild(node2);
 
-            OMElement to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+            OMElement to = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("To", ns2);
             OMNode node3 = factory.createOMText(addr);
             to.addChild(node3);
 
             //OMAttribute att2 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
             //to.addAttribute(att2);
-            OMElement replyTo = new SOAP12HeaderBlockImpl("ReplyTo", ns2, soapFactory);
-            OMElement address = new SOAP12HeaderBlockImpl("Address", ns2, soapFactory);
+            OMElement replyTo = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("ReplyTo", ns2);
+            OMElement address = OMAbstractFactory.getSOAP12Factory().createOMElement("Address", ns2);
             OMNode node4 = factory.createOMText(XCAConstants.SOAP_HEADERS.ADDRESSING_NAMESPACE);
             address.addChild(node4);
             replyTo.addChild(address);
@@ -612,7 +617,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             Element assertion1 = idAssertion.getDOM();
             Element assertion2 = trcAssertion.getDOM();
             OMNamespace ns = factory.createOMNamespace(XCAConstants.SOAP_HEADERS.SECURITY_XSD, "wsse");
-            OMElement security = new SOAP12HeaderBlockImpl("Security", ns, soapFactory);
+            OMElement security = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("Security", ns);
 
             try {
                 security.addChild(XMLUtils.toOM(assertion2));
@@ -716,7 +721,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                             optimizeContent(new javax.xml.namespace.QName(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, XCAConstants.SOAP_HEADERS.RETRIEVE.NAMESPACE_REQUEST_LOCAL_PART)));
 
                     /* Creating the new WSA To header with the new endpoint */
-                    to = new SOAP12HeaderBlockImpl("To", ns2, soapFactory);
+                    to = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("To", ns2);
                     node3 = newSoapFactory.createOMText(endpoint);
                     to.addChild(node3);
 //                    to.addAttribute(att2);
@@ -751,8 +756,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     throw e;
                 }
             }
-            org.apache.axis2.context.MessageContext _returnMessageContext;
-            _returnMessageContext = _operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
 
@@ -849,8 +853,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         java.lang.Class messageClass = java.lang.Class.forName(messageClassName);
                         java.lang.Object messageObject = fromOM(faultElt, messageClass, null);
                         java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage",
-                                new java.lang.Class[]{messageClass});
-                        m.invoke(ex, new java.lang.Object[]{messageObject});
+                                messageClass);
+                        m.invoke(ex, messageObject);
 
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
@@ -901,17 +905,17 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             javax.xml.bind.Marshaller marshaller = wsContext.createMarshaller();
             marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
-            org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
+            OMFactory factory = OMAbstractFactory.getOMFactory();
 
             RespondingGateway_ServiceStub.JaxbRIDataSource source = new RespondingGateway_ServiceStub.JaxbRIDataSource(oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
                     param,
                     marshaller,
                     XCAConstants.REGREP_QUERY,
                     XCAConstants.ADHOC_QUERY_REQUEST);
-            org.apache.axiom.om.OMNamespace namespace = factory.createOMNamespace(XCAConstants.REGREP_QUERY,
+            OMNamespace namespace = factory.createOMNamespace(XCAConstants.REGREP_QUERY,
                     null);
             return factory.createOMElement(source, XCAConstants.ADHOC_QUERY_REQUEST, namespace);
-        } catch (javax.xml.bind.JAXBException bex) {
+        } catch (JAXBException bex) {
             throw org.apache.axis2.AxisFault.makeFault(bex);
         }
     }
@@ -1136,15 +1140,14 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         }
 
         @SuppressWarnings("unchecked")
-        public javax.xml.stream.XMLStreamReader getReader() throws javax.xml.stream.XMLStreamException {
+        public XMLStreamReader getReader() throws XMLStreamException {
 
             try {
-                org.apache.axiom.om.impl.builder.SAXOMBuilder builder = new org.apache.axiom.om.impl.builder.SAXOMBuilder();
-                javax.xml.bind.Marshaller marshaller = wsContext.createMarshaller();
-                marshaller.marshal(new javax.xml.bind.JAXBElement(
-                        new javax.xml.namespace.QName(nsuri, name), outObject.getClass(), outObject), builder);
+                OMDocument omDocument = OMAbstractFactory.getOMFactory().createOMDocument();
+                Marshaller marshaller = wsContext.createMarshaller();
+                marshaller.marshal(new javax.xml.bind.JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), omDocument.getSAXResult());
 
-                return builder.getRootElement().getXMLStreamReader();
+                return omDocument.getOMDocumentElement().getXMLStreamReader();
             } catch (javax.xml.bind.JAXBException e) {
                 throw new javax.xml.stream.XMLStreamException(XCAConstants.EXCEPTIONS.ERROR_JAXB_MARSHALLING, e);
             }
