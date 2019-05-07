@@ -31,7 +31,7 @@
     <xs:complexType name="searchFields">
         <xs:sequence>
             <xs:element ref="id" maxOccurs="unbounded"/>
-            <xs:element ref="textField" minOccurs="0"/>
+            <xs:element ref="textField" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="birthDate" minOccurs="0"/>
             <xs:element ref="sex" minOccurs="0"/>
         </xs:sequence>
