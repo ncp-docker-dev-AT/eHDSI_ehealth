@@ -17,6 +17,8 @@
                             select="epsos:numerator"/>
             <xsl:with-param name="medStrengthDenominator"
                             select="epsos:denominator"/>
+            <xsl:with-param name="medStrengthOriginalText"
+                            select="epsos:translation/epsos:originalText"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -36,12 +38,12 @@
     </xsl:template>
 
     <!--<xsl:template name="intakes">-->
-        <!--<xsl:call-template name="show-numberUnitIntake">-->
-            <!--<xsl:with-param name="medUnitIntakeLow" select="n1:doseQuantity/n1:low/@value"/>-->
-            <!--<xsl:with-param name="medUnitIntakeHigh" select="n1:doseQuantity/n1:high/@value"/>-->
-            <!--<xsl:with-param name="medUnitIntakeUnitLow" select="n1:doseQuantity/n1:low/@unit"/>-->
-            <!--<xsl:with-param name="medUnitIntakeUnitHigh" select="n1:doseQuantity/n1:high/@unit"/>-->
-        <!--</xsl:call-template>-->
+    <!--<xsl:call-template name="show-numberUnitIntake">-->
+    <!--<xsl:with-param name="medUnitIntakeLow" select="n1:doseQuantity/n1:low/@value"/>-->
+    <!--<xsl:with-param name="medUnitIntakeHigh" select="n1:doseQuantity/n1:high/@value"/>-->
+    <!--<xsl:with-param name="medUnitIntakeUnitLow" select="n1:doseQuantity/n1:low/@unit"/>-->
+    <!--<xsl:with-param name="medUnitIntakeUnitHigh" select="n1:doseQuantity/n1:high/@unit"/>-->
+    <!--</xsl:call-template>-->
     <!--</xsl:template>-->
 
     <xsl:template name="add-underscore">
@@ -319,23 +321,42 @@
                             </td>
                         </xsl:if>
                         <td>
-                            <xsl:variable name="hasPackage">
-                                <xsl:call-template name="check-Parameter">
-                                    <xsl:with-param name="parameter"
-                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@nullFlavor"/>
-                                </xsl:call-template>
-                            </xsl:variable>
-                            <xsl:choose>
-                                <xsl:when test="$hasPackage = 'false'">
-                                    <xsl:call-template name="show-nullFlavor">
-                                        <xsl:with-param name="code"
-                                                        select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@nullFlavor"/>
-                                    </xsl:call-template>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:call-template name="package"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                            <xsl:variable name="additionalInfo" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/epsos:translation/epsos:originalText"/>
+                            <table>
+                                <tr>
+                                    <td>
+                                        <xsl:variable name="hasPackage">
+                                            <xsl:call-template name="check-Parameter">
+                                                <xsl:with-param name="parameter"
+                                                                select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@nullFlavor"/>
+                                            </xsl:call-template>
+                                        </xsl:variable>
+                                        <xsl:choose>
+                                            <xsl:when test="$hasPackage = 'false'">
+                                                <xsl:call-template name="show-nullFlavor">
+                                                    <xsl:with-param name="code"
+                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@nullFlavor"/>
+                                                </xsl:call-template>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:call-template name="package"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </td>
+                                </tr>
+                                <xsl:if test="$additionalInfo">
+                                <tr>
+                                    <td>
+                                        <div class="tooltip">
+                                            <div class="additionalInfo">
+                                                <xsl:value-of select="$additionalInfo"/>
+                                            </div>
+                                            <span class="tooltiptext">Additional info</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </xsl:if>
+                            </table>
                         </td>
                         <td>
                             <xsl:call-template name="show-formCode">
@@ -438,21 +459,21 @@
                             </xsl:choose>
                         </td>
                         <!--<td>-->
-                            <!--<xsl:variable name="hasIntakes">-->
-                                <!--<xsl:call-template name="check-Parameter">-->
-                                    <!--<xsl:with-param name="parameter" select="n1:doseQuantity/@nullFlavor"/>-->
-                                <!--</xsl:call-template>-->
-                            <!--</xsl:variable>-->
-                            <!--<xsl:choose>-->
-                                <!--<xsl:when test="$hasIntakes = 'false'">-->
-                                    <!--<xsl:call-template name="show-nullFlavor">-->
-                                        <!--<xsl:with-param name="code" select="n1:doseQuantity/@nullFlavor"/>-->
-                                    <!--</xsl:call-template>-->
-                                <!--</xsl:when>-->
-                                <!--<xsl:otherwise>-->
-                                    <!--<xsl:call-template name="intakes"/>-->
-                                <!--</xsl:otherwise>-->
-                            <!--</xsl:choose>-->
+                        <!--<xsl:variable name="hasIntakes">-->
+                        <!--<xsl:call-template name="check-Parameter">-->
+                        <!--<xsl:with-param name="parameter" select="n1:doseQuantity/@nullFlavor"/>-->
+                        <!--</xsl:call-template>-->
+                        <!--</xsl:variable>-->
+                        <!--<xsl:choose>-->
+                        <!--<xsl:when test="$hasIntakes = 'false'">-->
+                        <!--<xsl:call-template name="show-nullFlavor">-->
+                        <!--<xsl:with-param name="code" select="n1:doseQuantity/@nullFlavor"/>-->
+                        <!--</xsl:call-template>-->
+                        <!--</xsl:when>-->
+                        <!--<xsl:otherwise>-->
+                        <!--<xsl:call-template name="intakes"/>-->
+                        <!--</xsl:otherwise>-->
+                        <!--</xsl:choose>-->
                         <!--</td>-->
                         <td>
                             <xsl:call-template name="show-numberUnitIntakeLow">
