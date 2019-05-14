@@ -154,8 +154,18 @@
                                                                     </th>
                                                                 </tr>
                                                                 <tr>
-                                                                    <th><xsl:value-of select="$min"/></th>
-                                                                    <th><xsl:value-of select="$max"/></th>
+                                                                    <th>
+                                                                        <!-- Min -->
+                                                                        <xsl:call-template name="show-displayLabels">
+                                                                            <xsl:with-param name="code" select="'120'"/>
+                                                                        </xsl:call-template>
+                                                                    </th>
+                                                                    <th>
+                                                                        <!-- Max -->
+                                                                        <xsl:call-template name="show-displayLabels">
+                                                                            <xsl:with-param name="code" select="'121'"/>
+                                                                        </xsl:call-template>
+                                                                    </th>
                                                                 </tr>
                                                                 <xsl:for-each select="n1:entry">
                                                                     <xsl:call-template name="medicationSummarySectionEntry"/>

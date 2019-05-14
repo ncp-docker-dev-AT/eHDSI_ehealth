@@ -380,8 +380,18 @@
                         </th>
                     </tr>
                     <tr>
-                        <th><xsl:value-of select="$min"/></th>
-                        <th><xsl:value-of select="$max"/></th>
+                        <th>
+                            <!-- Min -->
+                            <xsl:call-template name="show-displayLabels">
+                                <xsl:with-param name="code" select="'120'"/>
+                            </xsl:call-template>
+                        </th>
+                        <th>
+                            <!-- Max -->
+                            <xsl:call-template name="show-displayLabels">
+                                <xsl:with-param name="code" select="'121'"/>
+                            </xsl:call-template>
+                        </th>
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -594,9 +604,9 @@
                     <tr>
                         <th>
                             <!-- Dispensed Number of Packages:-->
-                            <span class="td_label">
-                                <xsl:value-of select="$dispensedNumberOfPackages"/>
-                            </span>
+                            <xsl:call-template name="show-displayLabels">
+                                <xsl:with-param name="code" select="'115'"/>
+                            </xsl:call-template>
                         </th>
                         <td colspan="3">
                             <input type="text" size="50">
@@ -618,10 +628,10 @@
                     </tr>
                     <tr>
                         <td style="background-color:#ffffcc" colspan="{6+count($manufacturedMaterialStrength)}">
-                            <!-- HOTFIX - Has to be replaced with a value from the epSOSDisplayLabel value set -->
-                            *  If substitution of brand name is marked as not allowed, pharmacists may still consider dispensing the national equivalent even though the brand name might be slightly different.<br/>
-                            &#160;&#160;This is a known situation: the same pharmaceutical company is marketing the same medicinal product in different countries with slightly different names due to marketing reasons.<br/>
-                            &#160;&#160;If the pharmacist is certain that this is the case, the systems allows the input of the new brand name.<br/>
+                            <!-- If substitution of brand name is ... -->
+                            * <xsl:call-template name="show-displayLabels">
+                                <xsl:with-param name="code" select="'116'"/>
+                            </xsl:call-template>
                         </td>
                         <td style="text-align:center;vertical-align:middle;">
                             <!--  Dispense -->
@@ -841,13 +851,23 @@
 
             <tbody>
                 <tr>
-                    <th><xsl:value-of select="$activeIngredientCodeSystem"/></th>
-                    <th><xsl:value-of select="$activeIngredientCode"/></th>
+                    <th>
+                        <!-- Code System -->
+                        <xsl:call-template name="show-displayLabels">
+                            <xsl:with-param name="code" select="'112'"/>
+                        </xsl:call-template>
+                    </th>
+                    <th>
+                        <!-- Code -->
+                        <xsl:call-template name="show-displayLabels">
+                            <xsl:with-param name="code" select="'113'"/>
+                        </xsl:call-template>
+                    </th>
                     <th><xsl:value-of select="$activeIngredientName"/></th>
                     <th>
-                        <!-- Strength -->
+                        <!-- Name -->
                         <xsl:call-template name="show-displayLabels">
-                            <xsl:with-param name="code" select="'70'"/>
+                            <xsl:with-param name="code" select="'114'"/>
                         </xsl:call-template>
                     </th>
                 </tr>
