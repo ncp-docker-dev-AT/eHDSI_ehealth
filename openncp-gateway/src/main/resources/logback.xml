@@ -35,7 +35,7 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
-    <logger name="eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor" level="INFO" additivity="false">
+    <logger name="eu.europa.ec.sante.ehdsi.openncp.gateway" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

@@ -1,9 +1,11 @@
-package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
+package eu.europa.ec.sante.ehdsi.openncp.gateway.service;
 
 import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.util.DateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,9 +14,6 @@ import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.xml.XMLConstants;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,9 +25,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.time.ZoneOffset;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 /**
  * @author Inês Garganta
@@ -111,23 +107,10 @@ public class AuditManager {
         String localIp = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");
         String participantId = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
 
-        return EventLog.createEventLogPatientPrivacy(transactionName, EventActionCode.EXECUTE, timeUTC(),
+        return EventLog.createEventLogPatientPrivacy(transactionName, EventActionCode.EXECUTE, DateTimeUtil.timeUTC(),
                 EventOutcomeIndicator.FULL_SUCCESS, null, null, null,
                 serviceConsumerUserId, serviceProviderUserId, participantId, null,
                 errorMessagePartObjectId, errorMessagePartObjectDetail, objectID, null,
                 new byte[1], null, new byte[1], localIp, smpServerUri);
-    }
-
-    /**
-     * @return
-     */
-    private static XMLGregorianCalendar timeUTC() {
-        DatatypeFactory factory;
-        try {
-            factory = DatatypeFactory.newInstance();
-        } catch (DatatypeConfigurationException e) {
-            throw new IllegalArgumentException();
-        }
-        return factory.newXMLGregorianCalendar(new GregorianCalendar(TimeZone.getTimeZone(ZoneOffset.UTC)));
     }
 }

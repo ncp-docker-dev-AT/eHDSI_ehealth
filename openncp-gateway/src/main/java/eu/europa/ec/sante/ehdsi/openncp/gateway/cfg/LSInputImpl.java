@@ -1,4 +1,4 @@
-package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
+package eu.europa.ec.sante.ehdsi.openncp.gateway.cfg;
 
 import org.w3c.dom.ls.LSInput;
 

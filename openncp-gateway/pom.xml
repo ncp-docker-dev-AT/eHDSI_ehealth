@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>3.0.0.RC4-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>openncp-gateway</artifactId>
@@ -207,6 +207,9 @@
 
     <build>
         <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
             <resource>
                 <directory>${basedir}/src/main/resources/smpeditor/</directory>
                 <includes>

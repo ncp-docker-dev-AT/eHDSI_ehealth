@@ -39,6 +39,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -482,11 +483,7 @@ public class ePtoeDMapper {
     private Document transformCDADocumenttoDomDocument(ClinicalDocumentDocument1 eD_Document) {
         String xml = eD_Document.xmlText(new XmlOptions().setCharacterEncoding("UTF-8").setSavePrettyPrint());
         byte[] eD_Document_bytes = null;
-        try {
-            eD_Document_bytes = xml.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("UnsupportedEncodingException: ", e);
-        }
+        eD_Document_bytes = xml.getBytes(StandardCharsets.UTF_8);
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document doc = null;
@@ -526,11 +523,7 @@ public class ePtoeDMapper {
         }
 
         byte[] bytes = null;
-        try {
-            bytes = xmlAsWriter.toString().getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("UnsupportedEncodingException: ", e);
-        }
+        bytes = xmlAsWriter.toString().getBytes(StandardCharsets.UTF_8);
         return bytes;
     }
 

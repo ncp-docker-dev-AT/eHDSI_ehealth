@@ -1,12 +1,12 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.web;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.cfg.ReadSMPProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smp.BdxSmpValidator;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.*;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SMPConverter;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.XMLValidator;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.EndpointType;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.RedirectType;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.ServiceMetadata;
@@ -43,7 +43,6 @@ import java.util.regex.Pattern;
 /**
  * @author Inês Garganta
  */
-
 @Controller
 @SessionAttributes("smpfileupdate")
 public class SMPUpdateFileController {
@@ -52,9 +51,9 @@ public class SMPUpdateFileController {
 
     private final SMPFields smpfields = new SMPFields();
 
-    private ReadSMPProperties readProperties = new ReadSMPProperties();
+    private ReadSMPProperties readProperties;
 
-    private SMPConverter smpconverter = new SMPConverter();
+    private SMPConverter smpconverter;
 
     private Environment env;
 
@@ -116,7 +115,7 @@ public class SMPUpdateFileController {
 
         /*Validate xml file*/
         String contentFile = new String(Files.readAllBytes(Paths.get(convFile.getPath())));
-        boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
+        boolean valid = BdxSmpValidator.validateFile(contentFile);
         boolean fileDeleted;
 
         if (valid) {
@@ -204,9 +203,7 @@ public class SMPUpdateFileController {
             String documentIdentifier = smpfileupdate.getDocumentIdentifier();
             LOGGER.debug("\n******** DOC ID 1 - '{}'", documentIdentifier);
 
-      /*
-      Used to check SMP File type in order to render html updatesmpfileform page
-      */
+            //  Used to check SMP File type in order to render html updatesmpfileform page
             String documentID = "";
             Map<String, String> propertiesMap = readProperties.readPropertiesFile();
             Set set2 = propertiesMap.entrySet();
@@ -214,10 +211,12 @@ public class SMPUpdateFileController {
             for (Object aSet2 : set2) {
                 Map.Entry mentry2 = (Map.Entry) aSet2;
                 if (documentIdentifier.equals(mentry2.getKey().toString())) {
+
                     String[] docs = mentry2.getValue().toString().split("\\.");
                     documentID = docs[0];
                     LOGGER.debug("\n ****** documentID - '{}'", documentID);
-                    if (docs.length > 2) { /*Country_B_Identity_Provider case - can have two differents DocIds */
+                    //  Country_B_Identity_Provider case: can have two different DocIds
+                    if (docs.length > 2) {
                         smpfileupdate.setIssuanceType(docs[2]);
                     }
                     break;
@@ -246,7 +245,8 @@ public class SMPUpdateFileController {
                 }
             }
             if (smpfileupdate.getCountry() == null) {
-                String message = env.getProperty("error.serviceinformation.participantID"); //messages.properties
+                //  messages.properties
+                String message = env.getProperty("error.serviceinformation.participantID");
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 return "redirect:/smpeditor/updatesmpfile";
             }
@@ -381,7 +381,7 @@ public class SMPUpdateFileController {
         model.addAttribute("smpfields", smpfields);
         model.addAttribute(type, "Type " + type);
         model.addAttribute(smpfileupdate.getType().name(), "SMPType " + smpfileupdate.getType().name());
-        model.addAttribute("signed" + String.valueOf(isSigned), "Signed -> " + isSigned);
+        model.addAttribute("signed" + isSigned, "Signed -> " + isSigned);
 
         LOGGER.debug("\n********* MODEL - '{}'", model);
         return "smpeditor/updatesmpfileform";
@@ -526,7 +526,8 @@ public class SMPUpdateFileController {
 
         smpfileupdate.setGeneratedFile(smpconverter.getFile());
         String contentFile = new String(Files.readAllBytes(Paths.get(smpfileupdate.getGeneratedFile().getPath())));
-        boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
+        boolean valid = BdxSmpValidator.validateFile(contentFile);
+
         if (valid) {
             LOGGER.debug("\n****VALID XML File");
         } else {

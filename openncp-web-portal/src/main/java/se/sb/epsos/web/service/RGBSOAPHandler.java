@@ -49,7 +49,7 @@ public class RGBSOAPHandler implements SOAPHandler<SOAPMessageContext> {
 
     @Override
     public void close(MessageContext context) {
-        context.clear();
+        context.entrySet().clear();
     }
 
     @Override

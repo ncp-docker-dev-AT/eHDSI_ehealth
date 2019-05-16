@@ -3,6 +3,36 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [3.0.0.RC4] - 30-04-2019
+### Added
+- Full support of CDA with elements and namespace prefixes [EHNCP-1716].
+- SMP-Editor - XSD validation of the International Search Mask [EHNCP-1742].
+- eHDSI Gazelle validation (asynchronous call, threading mechanism) and improvement of the evidences generated (format).
+- SMP audit message adding correct NetworkAccessPointID [EHNCP-1723].
+- Improvement of the data received from the Portal (trim of PAtient Demographics).
+- ATC code added to coded_element_list_epSOS2.xml configuration file.
+- Exception handling enhancement: eD submission (XDR) [EHNCP-1377] and XCA List and Retrieve at NCP-A [EHNCP-1425].
+
+### Changed
+- CDA Document processing are producing xmlns empty attributes [EHNCP-1714].
+- eHDSI Gazelle missing evidences [EHNCP-1718] [EHNCP-1719].
+- XCPD request and response, adding precision for creation date.
+- Adapt Home Community ID for Spain.
+- OpenNCP Commons Components - minor bug fix.
+- SAML Assertions fix (Web Portal) and version alignment among the project [EHNCP-1729].
+- OpenNCP National Connector Mock implementation - minor bug fix.
+- CDA Display Tool enhancement.
+- Audit message content fix after an error has been raised [EHNCP-1166].
+- Logging appender misconfiguration fixed [EHNCP-1676].
+  
+### Deprecated
+- eSense obligation for Consent transactions.
+- Patient Consent handling out of eHDSI scope (creation, revocation).
+- Eclipse Oomph setup removed.
+
+### Removed
+- N/A
+
 ## [3.0.0.RC3] - 10-02-2019
 ### Added
 - N/A

@@ -12,7 +12,6 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerExcept
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.AuditManager;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.DynamicDiscoveryClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;

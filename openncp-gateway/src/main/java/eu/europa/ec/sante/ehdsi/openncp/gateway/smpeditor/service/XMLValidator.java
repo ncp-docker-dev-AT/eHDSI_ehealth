@@ -1,11 +1,11 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
+import eu.europa.ec.sante.ehdsi.openncp.gateway.cfg.ClasspathResourceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Service responsible for validate the generated xml file against the xsd file.
+ * Service responsible for validate the generated XML file against the XSD file.
  *
  * @author Inês Garganta
  */
@@ -34,12 +34,11 @@ public class XMLValidator {
      */
     public static boolean validate(String xmlStream, String xsdResource) {
 
-        LOGGER.debug("XSD Validation of SMP file");
+        LOGGER.info("XSD Validation of SMP file");
 
         boolean valid = true;
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-        Source xmlFile = new StreamSource(new ByteArrayInputStream(xmlStream.getBytes(StandardCharsets.UTF_8)));
+        StreamSource xmlFile = new StreamSource(new ByteArrayInputStream(xmlStream.getBytes(StandardCharsets.UTF_8)));
 
         try {
             schemaFactory.setResourceResolver(new ClasspathResourceResolver());
@@ -47,8 +46,7 @@ public class XMLValidator {
             Schema schema = schemaFactory.newSchema(new StreamSource(inputStream));
             Validator validator = schema.newValidator();
             validator.validate(xmlFile);
-
-            LOGGER.debug("'{}' is valid", ((StreamSource) xmlFile).getPublicId());
+            
         } catch (SAXException ex) {
             valid = false;
             LOGGER.debug("'{}' is NOT valid reason: '{}'", xmlFile.getSystemId(), ex.getMessage(), ex);

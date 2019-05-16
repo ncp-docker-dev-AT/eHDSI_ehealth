@@ -2772,6 +2772,9 @@ public class EpsosHelperService {
                 case "patient.data.sex":
                     pd.setAdministrativeGender(dem.getUserValue());
                     break;
+                default:
+                    LOGGER.warn("Identity Trait '{}' doesn't match to any Key", dem.getKey());
+                    break;
             }
             LOGGER.info("{}: '{}'", dem.getKey(), dem.getUserValue());
         }

@@ -60,13 +60,13 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
             throw new NationalInfrastructureException(XDSErrorCode.INVALID_DISPENSE);
         }
 
-        if (StringUtils.contains(dispensation, "testSubmitNoEP")) {
+        if (StringUtils.contains(dispensation, "NO_MATCHING_EP")) {
 
             logger.error("Tried to submit dispensation with no matching ePrescription.");
-            throw new NationalInfrastructureException(XDSErrorCode.INVALID_DISPENSE);
+            throw new NationalInfrastructureException(XDSErrorCode.NO_MATCHING_PRESCRIPTION);
         }
 
-        if (StringUtils.contains(dispensation, "testSubmitDispEP")) {
+        if (StringUtils.contains(dispensation, "INVALID_DISPENSE")) {
 
             logger.error("Tried to submit already dispensed ePrescription.");
             throw new NationalInfrastructureException(XDSErrorCode.INVALID_DISPENSE);
