@@ -71,7 +71,7 @@ public class HtmlToPdfConverter {
 
             // pdf conversion
             ConverterProperties props = new ConverterProperties();
-            FontProvider dfp = new DefaultFontProvider(true, false, false);
+            FontProvider dfp = new DefaultFontProvider(true, true, false);
 
             /* Temporary fix for display issue with blocks (in current html2pdf version (2.0.1) */
             props.setTagWorkerFactory(new LabelBlockTagWorkerFactory());
