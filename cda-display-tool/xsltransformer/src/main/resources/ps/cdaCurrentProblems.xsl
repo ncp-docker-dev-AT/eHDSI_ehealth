@@ -197,6 +197,7 @@
                         <tr>
                             <td>
                                 <xsl:choose>
+                                    <!-- Display active problem -->
                                     <xsl:when test="not ($activeProblemNode/@nullFlavor)">
                                         <xsl:choose>
                                             <xsl:when test="$activeProblem">
