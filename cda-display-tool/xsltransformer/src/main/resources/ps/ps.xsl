@@ -51,7 +51,6 @@
                                     <div class="content-inner">
                                         <div id="extendedCdaHeader">
                                             <xsl:call-template name="extendedCdaHeader"/>
-                                            <br/>
                                         </div>
                                     </div>
                                 </div>

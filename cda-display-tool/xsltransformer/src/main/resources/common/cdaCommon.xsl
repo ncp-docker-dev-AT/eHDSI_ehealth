@@ -245,7 +245,7 @@
                 <xsl:text>Vacation Home</xsl:text>
             </xsl:when>
             <xsl:when test="$code='HP'">
-                <xsl:text>Pirmary Home</xsl:text>
+                <xsl:text>Primary Home</xsl:text>
             </xsl:when>
             <xsl:when test="$code='WP'">
                 <xsl:text>Work Place</xsl:text>
