@@ -526,7 +526,7 @@
 	</codedElement>
 	<!-- Alerts - Clinical manifestation -->
 	<codedElement>
-		<elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='2.16.840.1.113883.10.20.1.54']/value</elementPath>
+		<elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/value</elementPath>
 		<usage>
 			<patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
 			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -546,7 +546,7 @@
 	</codedElement>
 	<!-- Alerts - Code for problem description -->
 	<codedElement>
-		<elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='2.16.840.1.113883.10.20.1.54']/code</elementPath>
+		<elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/code</elementPath>
 		<usage>
 			<patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
 			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>

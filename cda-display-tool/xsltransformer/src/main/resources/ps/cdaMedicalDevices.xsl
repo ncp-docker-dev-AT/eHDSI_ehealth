@@ -127,17 +127,10 @@
     <!--  FOR EACH ENTRY -->
     <xsl:template name="medicalDevicesSectionEntry">
         <!-- Defining all needed variables -->
-        <xsl:variable name="medDeviceImplantDescriptionNode"
-                      select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code"/>
         <xsl:variable name="medDeviceImplantDescription"
-                      select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code/@displayName"/>
-        <xsl:variable name="medDeviceImplantDescriptionTranslation1"
-                      select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code/n1:translation/n1:translation/@displayName"/>
-        <xsl:variable name="medDeviceImplantDescriptionTranslation2"
-                      select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code/n1:translation/@displayName"/>
+                      select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code"/>
         <xsl:variable name="medDeviceImplantDate"
                       select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:effectiveTime"/>
-        <xsl:variable name="nullEntry" select="."/>
         <xsl:variable name="medDevAct" select="n1:supply"/>
         <!-- End definition of variables-->
 
@@ -146,29 +139,10 @@
             <xsl:when test="not($medDevAct/@nullFlavor)">
                 <tr>
                     <td>
-                        <xsl:choose>
-                            <xsl:when test="not ($medDeviceImplantDescriptionNode/@nullFlavor)">
-                                <xsl:choose>
-                                    <xsl:when test="$medDeviceImplantDescription">
-                                        <xsl:value-of select="$medDeviceImplantDescription"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <!-- uncoded element Problem -->
-                                        <xsl:if test="$medDeviceImplantDescriptionNode/n1:originalText/n1:reference/@value">
-                                            <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="code"
-                                                                select="$medDeviceImplantDescriptionNode/n1:originalText/n1:reference/@value"/>
-                                            </xsl:call-template>
-                                        </xsl:if>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:call-template name="show-nullFlavor">
-                                    <xsl:with-param name="code" select="$medDeviceImplantDescriptionNode/@nullFlavor"/>
-                                </xsl:call-template>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <!-- Medical Device Implant Description -->
+                        <xsl:call-template name="show-element">
+                            <xsl:with-param name="node" select="$medDeviceImplantDescription"/>
+                        </xsl:call-template>
                     </td>
                     <td>
                         <xsl:call-template name="show-time">
