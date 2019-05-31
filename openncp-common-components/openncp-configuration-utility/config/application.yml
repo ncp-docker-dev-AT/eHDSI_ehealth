@@ -1,8 +1,8 @@
 debug: false
 logging:
   level:
-    org.hibernate: ERROR
-    org.springframework.web.client: DEBUG
+     org.hibernate: ERROR
+     org.springframework.web.client: DEBUG
 spring:
   jpa:
     show-sql: false
@@ -11,16 +11,14 @@ spring:
         format_sql: false
     generate-ddl: true
     hibernate:
-      naming:
-        physical_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: none
   datasource:
-    url: jdbc:mysql://127.0.0.1/ehealth_properties?useSSL=false
-    username: eHealthUser
-    password: eHealthPwd
+    url: jdbc:mysql://127.0.0.1/jerome_property?useSSL=false
+    username: root
+    password: MySqlAdminPwd
     driver-class-name: com.mysql.jdbc.Driver
 openncp:
   property-file:
-    path: /opt/openncp-configuration-utility/openncp-configuration.properties
+    path: /opt/ehealth-openncp/ehealth-setup/openncp-configuration-utility/openncp-configuration.properties
 profiles:
-  active: mysql
+   active: mysql
