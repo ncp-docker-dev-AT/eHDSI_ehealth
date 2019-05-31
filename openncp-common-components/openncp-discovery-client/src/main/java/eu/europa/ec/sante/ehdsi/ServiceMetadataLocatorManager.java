@@ -11,6 +11,7 @@ import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
+import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,7 @@ public class ServiceMetadataLocatorManager {
     private static final String PARTICIPANT_IDENTIFIER_SCHEME = "ehealth-participantid-qns";
     private static final String PARTICIPANT_IDENTIFIER_VALUE = "urn:ehealth:%2s:ncp-idp";
     private static final String DOCUMENT_IDENTIFIER_SCHEME = "ehealth-resid-qns";
+    private static final String DOCUMENT_IDENTIFIER_ITI_55 = "urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55";
 
     private final Environment environment;
 
@@ -167,7 +169,7 @@ public class ServiceMetadataLocatorManager {
                 .build();
 
         ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierUrn, PARTICIPANT_IDENTIFIER_SCHEME);
-        DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
+        DocumentIdentifier documentIdentifier = new DocumentIdentifier(DOCUMENT_IDENTIFIER_ITI_55, DOCUMENT_IDENTIFIER_SCHEME);
         List<DocumentIdentifier> documentIdentifiers = smpClient.getServiceGroup(participantIdentifier).getDocumentIdentifiers();
         for (DocumentIdentifier identifier : documentIdentifiers) {
             LOGGER.info("Identifiers: '{}'-'{}'", identifier.getFullIdentifier(), identifier.getIdentifier());
@@ -230,11 +232,13 @@ public class ServiceMetadataLocatorManager {
         String trustStorePath = environment.getRequiredProperty("openncp.truststore.path");
         String trustStorePassword = environment.getRequiredProperty("openncp.truststore.password");
         String serviceMetadataLocatorDomain = environment.getRequiredProperty("openncp.sml.domain");
-        String participantIdentifierUrn = "urn:ehealth:" + environment.getRequiredProperty("openncp.sml.country") + ":ncp-idp";
+        String participantIdentifierUrn = String.format(PARTICIPANT_IDENTIFIER_VALUE, environment.getRequiredProperty("openncp.sml.country"));
 
         try {
 
             LOGGER.info("participantIdentifierValue '{}'.", participantIdentifierUrn);
+            LOGGER.info("NAPTR Hash: '{}'", HashUtil.getSHA256HashBase32(participantIdentifierUrn));
+            LOGGER.info("CNAME Hash: '{}'", StringUtils.lowerCase("b-" + HashUtil.getMD5Hash(participantIdentifierUrn)));
             KeyStore ks = KeyStore.getInstance("JKS");
 
             Resource resource = resourceLoader.getResource("classpath:" + trustStorePath);
@@ -247,7 +251,7 @@ public class ServiceMetadataLocatorManager {
                         .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
                         .build();
 
-                DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
+                DocumentIdentifier documentIdentifier = new DocumentIdentifier(DOCUMENT_IDENTIFIER_ITI_55, DOCUMENT_IDENTIFIER_SCHEME);
                 ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierUrn, PARTICIPANT_IDENTIFIER_SCHEME);
                 URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
                 LOGGER.info("DNS: '{}'", smpURI.toASCIIString());
