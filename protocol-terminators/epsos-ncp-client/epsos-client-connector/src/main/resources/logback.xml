@@ -22,12 +22,6 @@
         </encoder>
     </appender>
 
-<!--    <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">-->
-<!--        <connectionSource class="ch.qos.logback.core.db.JNDIConnectionSource">-->
-<!--            <jndiLocation>java:comp/env/jdbc/LOGS</jndiLocation>-->
-<!--        </connectionSource>-->
-<!--    </appender>-->
-
     <logger name="LOGGER_CLINICAL" level="DEBUG" additivity="false">
         <appender-ref ref="FILE_CLINICAL"/>
     </logger>
@@ -59,17 +53,14 @@
 
     <logger name="tr.com.srdc.epsos.ws.xca.client" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-<!--        <appender-ref ref="DB"/>-->
     </logger>
 
     <logger name="tr.com.srdc.epsos.ws.xcpd.client" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-        <!--<appender-ref ref="DB"/>-->
     </logger>
 
     <logger name="tr.com.srdc.epsos.ws.xdr.client" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-<!--        <appender-ref ref="DB"/>-->
     </logger>
 
     <logger name="ee.affecto.epsos.ws.handler" level="INFO" additivity="false">
@@ -82,17 +73,14 @@
 
     <logger name="eu.epsos.pt.ws.client.xdr" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-<!--        <appender-ref ref="DB"/>-->
     </logger>
 
     <logger name="eu.epsos.pt.cc" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-        <!--<appender-ref ref="DB"/>-->
     </logger>
 
     <logger name="pt.spms.epsos.utils.logging" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-<!--        <appender-ref ref="DB"/>-->
     </logger>
 
     <logger name="epsos.ccd.gnomon.auditmanager" level="INFO" additivity="false">
@@ -105,7 +93,6 @@
 
     <logger name="epsos.ccd.gnomon.configmanager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-        <!--<appender-ref ref="DB"/>-->
     </logger>
 
     <logger name="eu.epsos.util.net" level="INFO" additivity="false">
