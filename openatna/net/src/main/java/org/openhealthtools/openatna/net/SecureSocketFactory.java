@@ -183,7 +183,7 @@ public class SecureSocketFactory {//implements SecureProtocolSocketFactory {
     }
 
     public String[] getAtnaProtocols() {
-        return new String[]{"TLSv1"};
+        return new String[]{"TLSv1.2"};
     }
 
     private void setAtnaProtocols(SSLSocket secureSocket) {

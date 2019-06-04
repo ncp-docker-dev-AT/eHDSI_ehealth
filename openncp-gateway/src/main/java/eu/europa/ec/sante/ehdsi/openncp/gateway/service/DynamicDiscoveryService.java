@@ -68,7 +68,7 @@ public class DynamicDiscoveryService {
 
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
                 sslContext,
-                //  new String[]{"TLSv1"}, // Allow TLSv1 protocol only
+                //  new String[]{"TLSv1.2"}, // Allow TLSv1.2 protocol only
                 //   null,
                 //SSLConnectionSocketFactory.getDefaultHostnameVerifier()
                 new NoopHostnameVerifier());
