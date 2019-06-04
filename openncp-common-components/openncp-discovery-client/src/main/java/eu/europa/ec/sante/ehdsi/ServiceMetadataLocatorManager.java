@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URI;
-import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -240,57 +240,46 @@ public class ServiceMetadataLocatorManager {
             LOGGER.info("NAPTR Hash: '{}'", HashUtil.getSHA256HashBase32(participantIdentifierUrn));
             LOGGER.info("CNAME Hash: '{}'", StringUtils.lowerCase("b-" + HashUtil.getMD5Hash(participantIdentifierUrn)));
             KeyStore ks = KeyStore.getInstance("JKS");
+            InputStream inputStream;
+            LOGGER.info("DynamicDiscovery Client Truststore: '{}'", trustStorePath);
+            FileSystemResource fileSystemResource = new FileSystemResource(new File(trustStorePath));
+            if (fileSystemResource.exists()) {
+                LOGGER.info("Local Truststore Resource Loaded: '{}'", fileSystemResource.getURI().toASCIIString());
+                inputStream = fileSystemResource.getInputStream();
+            } else {
+                LOGGER.info("Loading default Truststore");
+                Resource resource = resourceLoader.getResource("classpath:keystore/openncp-truststore.jks");
+                inputStream = resource.getInputStream();
+            }
 
-            Resource resource = resourceLoader.getResource("classpath:" + trustStorePath);
+            ks.load(inputStream, trustStorePassword.toCharArray());
 
-            try (InputStream inputStream = resource.getInputStream()) {
-                ks.load(inputStream, trustStorePassword.toCharArray());
+            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+                    .locator(new DefaultBDXRLocator(serviceMetadataLocatorDomain, new DefaultDNSLookup()))
+                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
+                    .build();
 
-                DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
-                        .locator(new DefaultBDXRLocator(serviceMetadataLocatorDomain, new DefaultDNSLookup()))
-                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
-                        .build();
+            DocumentIdentifier documentIdentifier = new DocumentIdentifier(DOCUMENT_IDENTIFIER_ITI_55, DOCUMENT_IDENTIFIER_SCHEME);
+            ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierUrn, PARTICIPANT_IDENTIFIER_SCHEME);
+            URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
+            LOGGER.info("DNS: '{}'", smpURI.toASCIIString());
+            ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
+            LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
+            ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation()
+                    .getProcessList();
+            for (ProcessType processType : processListType.getProcess()) {
 
-                DocumentIdentifier documentIdentifier = new DocumentIdentifier(DOCUMENT_IDENTIFIER_ITI_55, DOCUMENT_IDENTIFIER_SCHEME);
-                ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierUrn, PARTICIPANT_IDENTIFIER_SCHEME);
-                URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
-                LOGGER.info("DNS: '{}'", smpURI.toASCIIString());
-                ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
-                LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
-                ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation()
-                        .getProcessList();
-                for (ProcessType processType : processListType.getProcess()) {
-
-                    LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier()
-                            .getScheme());
-                    ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
-                    for (EndpointType endpointType : serviceEndpointList.getEndpoint()) {
-                        LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
-                    }
-                    List<EndpointType> endpoints = serviceEndpointList.getEndpoint();
-
-                    /*
-                     * Constraint: here I think I have just one endpoint
-                     */
-                    int size = endpoints.size();
-                    if (size != 1) {
-                        throw new DynamicDiscoveryClientException(
-                                "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
-                    }
-
-                    EndpointType e = endpoints.get(0);
-                    String address = e.getEndpointURI();
-                    if (address == null) {
-                        throw new DynamicDiscoveryClientException("No address found for");
-                    }
-                    URL urlAddress = new URL(address);
-
-                    InputStream inStream = new ByteArrayInputStream(e.getCertificate());
+                LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier()
+                        .getScheme());
+                ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
+                for (EndpointType endpointType : serviceEndpointList.getEndpoint()) {
+                    LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
+                    InputStream inStream = new ByteArrayInputStream(endpointType.getCertificate());
                     CertificateFactory cf = CertificateFactory.getInstance("X.509");
                     X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
 
                     if (certificate == null) {
-                        throw new DynamicDiscoveryClientException("No certificate found for endpoint: " + e.getEndpointURI());
+                        throw new DynamicDiscoveryClientException("No certificate found for endpoint: " + endpointType.getEndpointURI());
                     }
                     LOGGER.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
                 }
