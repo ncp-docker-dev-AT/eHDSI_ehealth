@@ -236,15 +236,19 @@ public class ServiceMetadataLocatorManager {
 
         try {
 
-            LOGGER.info("participantIdentifierValue '{}'.", participantIdentifierUrn);
-            LOGGER.info("NAPTR Hash: '{}'", HashUtil.getSHA256HashBase32(participantIdentifierUrn));
-            LOGGER.info("CNAME Hash: '{}'", StringUtils.lowerCase("b-" + HashUtil.getMD5Hash(participantIdentifierUrn)));
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("participantIdentifierValue '{}'.", participantIdentifierUrn);
+                LOGGER.info("NAPTR Hash: '{}'", HashUtil.getSHA256HashBase32(participantIdentifierUrn));
+                LOGGER.info("CNAME Hash: '{}'", StringUtils.lowerCase("b-" + HashUtil.getMD5Hash(participantIdentifierUrn)));
+            }
             KeyStore ks = KeyStore.getInstance("JKS");
             InputStream inputStream;
             LOGGER.info("DynamicDiscovery Client Truststore: '{}'", trustStorePath);
             FileSystemResource fileSystemResource = new FileSystemResource(new File(trustStorePath));
             if (fileSystemResource.exists()) {
-                LOGGER.info("Local Truststore Resource Loaded: '{}'", fileSystemResource.getURI().toASCIIString());
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Local Truststore Resource Loaded: '{}'", fileSystemResource.getURI().toASCIIString());
+                }
                 inputStream = fileSystemResource.getInputStream();
             } else {
                 LOGGER.info("Loading default Truststore");
@@ -262,9 +266,13 @@ public class ServiceMetadataLocatorManager {
             DocumentIdentifier documentIdentifier = new DocumentIdentifier(DOCUMENT_IDENTIFIER_ITI_55, DOCUMENT_IDENTIFIER_SCHEME);
             ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierUrn, PARTICIPANT_IDENTIFIER_SCHEME);
             URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
-            LOGGER.info("DNS: '{}'", smpURI.toASCIIString());
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("DNS: '{}'", smpURI.toASCIIString());
+            }
             ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
-            LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
+            }
             ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation()
                     .getProcessList();
             for (ProcessType processType : processListType.getProcess()) {
