@@ -30,6 +30,10 @@ th {
     text-align: left;
     border-bottom: 1px solid #009fd1;
 }
+
+ul {
+    padding-left: 1rem;
+}​
 .h1center {
     font-size: 1.5em;
     font-weight: bold;

@@ -2,9 +2,9 @@
 
 /* Translation table - table containing the coded translations */
 .translation_table{
-    width: 100%;
-    table-layout: fixed;
-}
+            width: 100%;
+            table-layout: fixed;
+        }
 .translation_table th {
     background-color:#E6F2FF;
     color:#4A4A4A;
@@ -17,6 +17,46 @@
 .translation_table td {
     background-color:#E6F2FF;
     font-size:12px;
+    vertical-align: top;
+    text-align: left;
+}
+
+.extended_header_table{
+    border: 1px solid #009fd1;
+    width: 100%;
+    table-layout: fixed;
+    border-radius: 3px;
+}
+.extended_header_table th {
+    background-color:#E6F2FF;
+    color:#4A4A4A;
+    font-size:12px;
+    padding:6px;
+    vertical-align: top;
+    text-align: left;
+    border-bottom: 1px solid #009fd1;
+}
+.extended_header_table td {
+    font-size:12px;
+    vertical-align: top;
+    text-align: left;
+}
+
+.contact_information_table{
+    border-radius: 3px;
+    padding: 0px;
+}
+.contact_information_table th {
+    background-color:#009fd1;
+    color:white;
+    font-size:11px;
+    vertical-align: top;
+    text-align: left;
+}
+.contact_information_table td {
+    background-color:#009fd1;
+    color:white;
+    font-size:11px;
     vertical-align: top;
     text-align: left;
 }
