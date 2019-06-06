@@ -9,7 +9,7 @@ import java.util.List;
 
 public class AuditLogSerializerImpl implements AuditLogSerializer {
 
-    private static final Logger log = LoggerFactory.getLogger(AuditLogSerializer.class);
+    private final Logger logger = LoggerFactory.getLogger(AuditLogSerializerImpl.class);
     private Type type;
 
     public AuditLogSerializerImpl(Type type) {
@@ -36,51 +36,33 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
 
     public Serializable readObjectFromFile(File inFile) throws IOException, ClassNotFoundException {
 
-        InputStream buffer = null;
-        ObjectInput input = null;
         try (InputStream file = new FileInputStream(inFile)) {
 
-            buffer = new BufferedInputStream(file);
-            input = new ObjectInputStream(buffer);
-            return (Serializable) input.readObject();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    log.warn("Unable to close: '{}'", e.getMessage(), e);
-                }
-            }
-            close(buffer);
+            ObjectInput input = new ObjectInputStream(file);
+            Serializable serializable = (Serializable) input.readObject();
+            input.close();
+            return serializable;
         }
     }
 
+    /**
+     * @param message
+     */
     public void writeObjectToFile(Serializable message) {
 
         String path = System.getenv("EPSOS_PROPS_PATH") + type.getNewFileName();
-        OutputStream buffer = null;
-        ObjectOutput output = null;
-
         try (OutputStream file = new FileOutputStream(path)) {
 
             if (message != null) {
 
-                buffer = new BufferedOutputStream(file);
-                output = new ObjectOutputStream(buffer);
-                output.writeObject(message);
-                log.error("Error occurred while writing AuditLog to OpenATNA! AuditLog saved to: '{}'", path);
+                ObjectOutput outputStream = new ObjectOutputStream(file);
+                outputStream.writeObject(message);
+                outputStream.flush();
+                outputStream.close();
+                logger.error("Error occurred while writing AuditLog to OpenATNA! AuditLog saved to: '{}'", path);
             }
         } catch (Exception e) {
-            log.error("Unable to send AuditLog to OpenATNA nor able write auditLog backup! Dumping to log: '{}'", message.toString(), e);
-        } finally {
-            if (output != null) {
-                try {
-                    output.close();
-                } catch (IOException e) {
-                    log.warn("Unable to close: " + e.getMessage(), e);
-                }
-            }
-            close(buffer);
+            logger.error("Unable to send AuditLog to OpenATNA nor able write auditLog backup! Dumping to log: '{}'", message.toString(), e);
         }
     }
 
@@ -98,24 +80,13 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
     private boolean isPathValid(File path) {
 
         if (!path.exists()) {
-            log.error("Source path ('{}') does not exist!", path);
+            logger.error("Source path ('{}') does not exist!", path);
             return false;
         } else if (!path.isDirectory()) {
-            log.error("Source path ('{}') is not a diredtory!", path);
+            logger.error("Source path ('{}') is not a diredtory!", path);
             return false;
         }
 
         return true;
-    }
-
-    private void close(Closeable c) {
-
-        try {
-            if (c != null) {
-                c.close();
-            }
-        } catch (IOException e) {
-            log.warn("Unable to close closeable: '{}'", e.getMessage(), e);
-        }
     }
 }

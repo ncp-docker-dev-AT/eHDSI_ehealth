@@ -21,7 +21,6 @@ import javax.xml.bind.PropertyException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.StringWriter;
 import java.math.BigInteger;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -77,21 +76,18 @@ public enum AuditTrailUtils {
             LOGGER.error(e.getMessage(), e);
         }
         INSTANCE.writeTestAudits(auditmessage, auditMessage);
-        LOGGER.debug("Message constructed: '{}'", eventTypeCode);
+        LOGGER.info("Message constructed: '{}'", eventTypeCode);
 
         boolean validated = false;
-        URL url = null;
+
         try {
-            url = Utils.class.getClassLoader().getResource("RFC3881.xsd");
-        } catch (Exception e) {
-            LOGGER.error(auditmessage.getEventIdentification().getEventID().getCode() + " Error getting xsd url", e);
-        }
-        try {
-            validated = Utils.validateSchema(auditMessage, url);
             LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification().getEventID().getCode());
+            validated = Utils.validateSchema(auditMessage);
+
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
+
         boolean forceWrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "true", true));
         if (!validated) {
             LOGGER.debug("'{}' Message not validated", auditmessage.getEventIdentification().getEventID().getCode());
@@ -100,25 +96,26 @@ public enum AuditTrailUtils {
             }
         }
         if (validated || forceWrite) {
+
             if (validated) {
-                LOGGER.debug("'{}' Message validated", auditmessage.getEventIdentification().getEventID().getCode());
+                LOGGER.debug("'{}' Audit Message validated", auditmessage.getEventIdentification().getEventID().getCode());
             } else {
-                LOGGER.debug("'{}' message not validated", auditmessage.getEventIdentification().getEventID().getCode());
+                LOGGER.debug("'{}' Audit Message not validated", auditmessage.getEventIdentification().getEventID().getCode());
             }
+
             if (forceWrite && !validated) {
                 LOGGER.debug("'{}' AuditManager is force to send the message. So trying ...",
                         auditmessage.getEventIdentification().getEventID().getCode());
             }
 
             try {
-                // validate xml according to xsd
+                // Validating XML according to XSD
                 LOGGER.debug("'{}' XML stuff: Create Dom From String", auditmessage.getEventIdentification().getEventID().getCode());
                 Document doc = Utils.createDomFromString(auditMessage);
                 if (sign) {
 
-                    // Gnomon SecMan
                     auditMessage = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
-                    LOGGER.debug("'{}' message signed", auditmessage.getEventIdentification().getEventID().getCode());
+                    LOGGER.debug("'{}' Audit Message signed", auditmessage.getEventIdentification().getEventID().getCode());
                 }
             } catch (Exception e) {
                 auditMessage = "";
@@ -858,7 +855,7 @@ public enum AuditTrailUtils {
      * @param am
      * @param PC_UserID
      * @param PC_RoleID
-     * @param UserIsRequestor
+     * @param userIsRequester
      * @param codeSystem
      * @return
      */
@@ -881,31 +878,31 @@ public enum AuditTrailUtils {
     }
 
     /**
-     * @param am
+     * @param auditMessage
      * @param HR_UserID
      * @param HR_AlternativeUserID
      * @param HR_RoleID
-     * @param UserIsRequestor
+     * @param userIsRequester
      * @return
      */
-    private AuditMessage addHumanRequestor(AuditMessage am, String HR_UserID, String HR_AlternativeUserID,
+    private AuditMessage addHumanRequestor(AuditMessage auditMessage, String HR_UserID, String HR_AlternativeUserID,
                                            String HR_RoleID, boolean userIsRequester) {
 
-        ActiveParticipant hr = new ActiveParticipant();
-        hr.setUserID(HR_UserID);
-        hr.setAlternativeUserID(HR_AlternativeUserID);
-        hr.setUserIsRequestor(userIsRequester);
-        CodedValueType hrroleId = new CodedValueType();
-        hrroleId.setCode(HR_RoleID);
-        hr.getRoleIDCode().add(hrroleId);
-        am.getActiveParticipant().add(hr);
-        return am;
+        ActiveParticipant humanRequester = new ActiveParticipant();
+        humanRequester.setUserID(HR_UserID);
+        humanRequester.setAlternativeUserID(HR_AlternativeUserID);
+        humanRequester.setUserIsRequestor(userIsRequester);
+        CodedValueType humanRequesterRoleId = new CodedValueType();
+        humanRequesterRoleId.setCode(HR_RoleID);
+        humanRequester.getRoleIDCode().add(humanRequesterRoleId);
+        auditMessage.getActiveParticipant().add(humanRequester);
+        return auditMessage;
     }
 
     /**
-     * @param am
+     * @param auditMessage
      * @param SC_UserID
-     * @param UserIsRequestor
+     * @param userIsRequester
      * @param code
      * @param codeSystem
      * @param displayName
@@ -1387,7 +1384,7 @@ public enum AuditTrailUtils {
                                                    String facility, String severity) {
 
         MessageSender messageSender = new MessageSender(auditLogSerializer, auditMessage, facility, severity);
-        LOGGER.debug("Starting new thread for sending message");
+        LOGGER.info("Starting new thread for sending message");
         messageSender.start();
     }
 

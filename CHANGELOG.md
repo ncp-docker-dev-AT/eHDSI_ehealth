@@ -3,6 +3,31 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [3.0.0] - 04-06-2019
+### Added
+- Wave 2: CDA Implementation Guide & CDA DisplayTool [EHNCP-1724] [EHNCP-1726] [EHNCP-1727].
+- ISM XSD doesn't allow more than 1 textField element [EHNCP-1751].
+- ISM XSD doesn't accept friendlyName attribute on elements other than textField [EHNCP-1750].
+- CDA Display Tool - Clinical Manifestation is not translated [EHNCP-1732].
+- Root CA Certificates from eDelivery SMP have to be imported automatically in OpenNCP truststore [EHNCP-1570].
+
+### Changed
+- Alignment of CDA Extended definition with Art Decor [EHNCP-1633].
+- OpenSAML framework into OpenNCP Portal doesn't start correctly in some situation [EHNCP-1762].
+- Audit Service - FailedLogHandler doesn't work properly [EHNCP-1765].
+- OpenNCP Commons Components - Dynamic Discovery [EHNCP-1764].
+- OpenNCP Web Portal - unexpected exceptions when multiple users are logged in [EHNCP-1244].
+- TSAM Exporter does not recognize correctly Environment variable [EHNCP-1722].
+- CDA Display Tool - Minor improvements [EHNCP-1725] [EHNCP-1743] [EHNCP-1744] [EHNCP-1757].
+- First-Time Configuration Utility doesn't recognize properties table [EHNCP-1696].
+- Minor code refactoring and BugFix on OpenNCP components [EHNCP-1698].
+  
+### Deprecated
+- N/A
+
+### Removed
+- Remove the Database Logging (Logback) [EHNCP-1759].                    
+
 ## [3.0.0.RC4] - 30-04-2019
 ### Added
 - Full support of CDA with elements and namespace prefixes [EHNCP-1716].

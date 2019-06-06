@@ -11,11 +11,13 @@ import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
+import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
@@ -31,7 +33,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URI;
-import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -51,6 +52,7 @@ public class ServiceMetadataLocatorManager {
     private static final String PARTICIPANT_IDENTIFIER_SCHEME = "ehealth-participantid-qns";
     private static final String PARTICIPANT_IDENTIFIER_VALUE = "urn:ehealth:%2s:ncp-idp";
     private static final String DOCUMENT_IDENTIFIER_SCHEME = "ehealth-resid-qns";
+    private static final String DOCUMENT_IDENTIFIER_ITI_55 = "urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55";
 
     private final Environment environment;
 
@@ -167,7 +169,7 @@ public class ServiceMetadataLocatorManager {
                 .build();
 
         ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierUrn, PARTICIPANT_IDENTIFIER_SCHEME);
-        DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
+        DocumentIdentifier documentIdentifier = new DocumentIdentifier(DOCUMENT_IDENTIFIER_ITI_55, DOCUMENT_IDENTIFIER_SCHEME);
         List<DocumentIdentifier> documentIdentifiers = smpClient.getServiceGroup(participantIdentifier).getDocumentIdentifiers();
         for (DocumentIdentifier identifier : documentIdentifiers) {
             LOGGER.info("Identifiers: '{}'-'{}'", identifier.getFullIdentifier(), identifier.getIdentifier());
@@ -230,63 +232,62 @@ public class ServiceMetadataLocatorManager {
         String trustStorePath = environment.getRequiredProperty("openncp.truststore.path");
         String trustStorePassword = environment.getRequiredProperty("openncp.truststore.password");
         String serviceMetadataLocatorDomain = environment.getRequiredProperty("openncp.sml.domain");
-        String participantIdentifierUrn = "urn:ehealth:" + environment.getRequiredProperty("openncp.sml.country") + ":ncp-idp";
+        String participantIdentifierUrn = String.format(PARTICIPANT_IDENTIFIER_VALUE, environment.getRequiredProperty("openncp.sml.country"));
 
         try {
 
-            LOGGER.info("participantIdentifierValue '{}'.", participantIdentifierUrn);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("participantIdentifierValue '{}'.", participantIdentifierUrn);
+                LOGGER.info("NAPTR Hash: '{}'", HashUtil.getSHA256HashBase32(participantIdentifierUrn));
+                LOGGER.info("CNAME Hash: '{}'", StringUtils.lowerCase("b-" + HashUtil.getMD5Hash(participantIdentifierUrn)));
+            }
             KeyStore ks = KeyStore.getInstance("JKS");
+            InputStream inputStream;
+            LOGGER.info("DynamicDiscovery Client Truststore: '{}'", trustStorePath);
+            FileSystemResource fileSystemResource = new FileSystemResource(new File(trustStorePath));
+            if (fileSystemResource.exists()) {
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Local Truststore Resource Loaded: '{}'", fileSystemResource.getURI().toASCIIString());
+                }
+                inputStream = fileSystemResource.getInputStream();
+            } else {
+                LOGGER.info("Loading default Truststore");
+                Resource resource = resourceLoader.getResource("classpath:keystore/openncp-truststore.jks");
+                inputStream = resource.getInputStream();
+            }
 
-            Resource resource = resourceLoader.getResource("classpath:" + trustStorePath);
+            ks.load(inputStream, trustStorePassword.toCharArray());
 
-            try (InputStream inputStream = resource.getInputStream()) {
-                ks.load(inputStream, trustStorePassword.toCharArray());
+            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+                    .locator(new DefaultBDXRLocator(serviceMetadataLocatorDomain, new DefaultDNSLookup()))
+                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
+                    .build();
 
-                DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
-                        .locator(new DefaultBDXRLocator(serviceMetadataLocatorDomain, new DefaultDNSLookup()))
-                        .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
-                        .build();
-
-                DocumentIdentifier documentIdentifier = new DocumentIdentifier("urn:ehealth:patientidentificationandauthentication::xcpd::crossgatewaypatientdiscovery##iti-55", "ehealth-resid-qns");
-                ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierUrn, PARTICIPANT_IDENTIFIER_SCHEME);
-                URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
+            DocumentIdentifier documentIdentifier = new DocumentIdentifier(DOCUMENT_IDENTIFIER_ITI_55, DOCUMENT_IDENTIFIER_SCHEME);
+            ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierUrn, PARTICIPANT_IDENTIFIER_SCHEME);
+            URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
+            if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("DNS: '{}'", smpURI.toASCIIString());
-                ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
+            }
+            ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
+            if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("ServiceMetadata '{}'.", serviceMetadata.toString());
-                ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation()
-                        .getProcessList();
-                for (ProcessType processType : processListType.getProcess()) {
+            }
+            ProcessListType processListType = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation()
+                    .getProcessList();
+            for (ProcessType processType : processListType.getProcess()) {
 
-                    LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier()
-                            .getScheme());
-                    ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
-                    for (EndpointType endpointType : serviceEndpointList.getEndpoint()) {
-                        LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
-                    }
-                    List<EndpointType> endpoints = serviceEndpointList.getEndpoint();
-
-                    /*
-                     * Constraint: here I think I have just one endpoint
-                     */
-                    int size = endpoints.size();
-                    if (size != 1) {
-                        throw new DynamicDiscoveryClientException(
-                                "Invalid number of endpoints found (" + size + "). This implementation works just with 1.");
-                    }
-
-                    EndpointType e = endpoints.get(0);
-                    String address = e.getEndpointURI();
-                    if (address == null) {
-                        throw new DynamicDiscoveryClientException("No address found for");
-                    }
-                    URL urlAddress = new URL(address);
-
-                    InputStream inStream = new ByteArrayInputStream(e.getCertificate());
+                LOGGER.info("ProcessType: '{}' - '{}'", processType.getProcessIdentifier().getValue(), processType.getProcessIdentifier()
+                        .getScheme());
+                ServiceEndpointList serviceEndpointList = processType.getServiceEndpointList();
+                for (EndpointType endpointType : serviceEndpointList.getEndpoint()) {
+                    LOGGER.info("Endpoint: '{}'", endpointType.getEndpointURI());
+                    InputStream inStream = new ByteArrayInputStream(endpointType.getCertificate());
                     CertificateFactory cf = CertificateFactory.getInstance("X.509");
                     X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
 
                     if (certificate == null) {
-                        throw new DynamicDiscoveryClientException("No certificate found for endpoint: " + e.getEndpointURI());
+                        throw new DynamicDiscoveryClientException("No certificate found for endpoint: " + endpointType.getEndpointURI());
                     }
                     LOGGER.info("Certificate: '{}'-'{}", certificate.getIssuerDN().getName(), certificate.getSerialNumber());
                 }

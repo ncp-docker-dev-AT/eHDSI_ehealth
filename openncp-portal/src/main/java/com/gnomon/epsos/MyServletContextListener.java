@@ -6,6 +6,8 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -25,6 +27,13 @@ public class MyServletContextListener implements ServletContextListener {
     private static ClientConnectorConsumer clientConnectorConsumer;
     private ServletContext context = null;
 
+    static {
+        try {
+            InitializationService.initialize();
+        } catch (InitializationException e) {
+            LOGGER.error("InitializationException: '{}'", e.getMessage());
+        }
+    }
 
     public MyServletContextListener() {
         // Public constructor is required by servlet spec

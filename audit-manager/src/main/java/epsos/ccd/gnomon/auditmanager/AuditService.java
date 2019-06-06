@@ -23,7 +23,7 @@ public class AuditService implements MessageHandlerListener {
     public static final String KEY_TIME_BETWEEN_FAILED_LOGS_HANDLING = "time.between.failed.logs.handling";
     public static final long DEFAULT_TIME_BETWEEN = 60 * 60 * 1000L; // 1h
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuditService.class);
+    private final Logger logger = LoggerFactory.getLogger(AuditService.class);
     private FailedLogsHandlerService failedLogsHandlerService;
     private AuditLogSerializer auditLogSerializer;
 
@@ -33,7 +33,7 @@ public class AuditService implements MessageHandlerListener {
     @Deprecated
     public AuditService() {
 
-        LOGGER.debug("Creating Audit Service...");
+        logger.debug("Creating Audit Service...");
         initialize();
     }
 
@@ -59,18 +59,18 @@ public class AuditService implements MessageHandlerListener {
             if (el instanceof EventLog) {
                 EventLog eventLog = (EventLog) el;
                 AuditMessage am = AuditTrailUtils.getInstance().createAuditMessage(eventLog);
-                LOGGER.debug("Start of AuditLog transmission");
+                logger.debug("Start of AuditLog transmission");
                 AuditTrailUtils.getInstance().sendATNASyslogMessage(auditLogSerializer, am, facility, severity);
             } else if (el instanceof AuditMessage) {
                 AuditMessage am = (AuditMessage) el;
-                LOGGER.debug("Start of AuditLog transmission of backuped audit log");
-                AuditTrailUtils.getInstance().sendATNASyslogMessage(null, am, facility, severity);
+                logger.debug("Start of AuditLog transmission of backuped audit log");
+                AuditTrailUtils.getInstance().sendATNASyslogMessage(auditLogSerializer, am, facility, severity);
             } else {
                 throw new IllegalArgumentException("Unsupported message format: " + el.getClass().getCanonicalName());
             }
             return true;
         } catch (Exception e) {
-            LOGGER.warn("Exception: '{}'", e.getMessage(), e);
+            logger.warn("Exception: '{}'", e.getMessage(), e);
             return false;
         }
     }
@@ -80,11 +80,11 @@ public class AuditService implements MessageHandlerListener {
 
         if (message instanceof SerializableMessage) {
             SerializableMessage sm = (SerializableMessage) message;
-            boolean ok = write(sm.getMessage(), sm.getFacility(), sm.getSeverity());
-            LOGGER.info("Attempt to write message to OpenATNA server. Result '{}'", ok);
-            return ok;
+            boolean sent = write(sm.getMessage(), sm.getFacility(), sm.getSeverity());
+            logger.info("Attempt to write message to OpenATNA server. Result '{}'", sent);
+            return sent;
         } else {
-            LOGGER.warn("Message null or unknown type! Cannot handle message.");
+            logger.warn("Message null or unknown type! Cannot handle message.");
             return false;
         }
     }
