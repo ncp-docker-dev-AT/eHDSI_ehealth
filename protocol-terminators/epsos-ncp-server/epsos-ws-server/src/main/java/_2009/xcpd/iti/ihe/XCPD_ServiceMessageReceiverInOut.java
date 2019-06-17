@@ -48,8 +48,6 @@ import java.util.*;
 public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
@@ -69,6 +67,8 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             wsContext = jc;
         }
     }
+
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private String getIPofSender(MessageContext messageContext) {
 
@@ -168,12 +168,9 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
-                try {
-                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                            endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCPD, EadcUtil.Direction.INBOUND, ServiceType.PATIENT_IDENTIFICATION_RESPONSE);
-                } catch (Exception ex) {
-                    LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
-                }
+                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
+                        endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCPD, EadcUtil.Direction.INBOUND,
+                        ServiceType.PATIENT_IDENTIFICATION_RESPONSE);
             }
         } catch (Exception e) {
 
