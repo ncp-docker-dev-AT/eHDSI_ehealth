@@ -142,7 +142,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             counter = 0;    // reset the counter if it is greater than 99999
         }
         counter++;
-        return Long.toString(System.currentTimeMillis()) + "_" + counter;
+        return System.currentTimeMillis() + "_" + counter;
     }
 
     public void setCountryCode(String countryCode) {
@@ -348,19 +348,15 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             /*
              * Invoque eADC
              */
-            try {
-                EadcUtilWrapper.invokeEadc(_messageContext, // Request message context
-                        _returnMessageContext, // Response message context
-                        this._getServiceClient(), //Service Client
-                        null, // CDA document
-                        transactionStartTime, // Transaction Start Time
-                        transactionEndTime, // Transaction End Time
-                        this.countryCode, // Country A ISO Code
-                        EadcEntry.DsTypes.XDR, // Data source type
-                        EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY); // Transaction direction
-            } catch (Exception ex) {
-                LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
-            }
+            EadcUtilWrapper.invokeEadc(_messageContext, // Request message context
+                    _returnMessageContext, // Response message context
+                    this._getServiceClient(), //Service Client
+                    null, // CDA document
+                    transactionStartTime, // Transaction Start Time
+                    transactionEndTime, // Transaction End Time
+                    this.countryCode, // Country A ISO Code
+                    EadcEntry.DsTypes.XDR, // Data source type
+                    EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY); // Transaction direction
 
             /* Log soap response */
             String responseLogMsg;
@@ -419,8 +415,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                         String messageClassName = (String) faultMessageMap.get(faultElt.getQName());
                         Class messageClass = Class.forName(messageClassName);
                         Object messageObject = fromOM(faultElt, messageClass);
-                        java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage", new Class[]{messageClass});
-                        m.invoke(ex, new Object[]{messageObject});
+                        java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
+                        m.invoke(ex, messageObject);
 
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
 

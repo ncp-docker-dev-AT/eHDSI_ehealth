@@ -226,14 +226,10 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
-                try {
-                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null,
-                            EadcUtilWrapper.getCDA(retrieveDocumentSetResponseType), startTime, endTime, tr.com.srdc.epsos.util.Constants.COUNTRY_CODE,
-                            EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND, serviceType);
+                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null,
+                        EadcUtilWrapper.getCDA(retrieveDocumentSetResponseType), startTime, endTime,
+                        tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND, serviceType);
 
-                } catch (Exception e) {
-                    LOGGER.error("EADC INVOCATION FAILED: '{}'", e.getMessage(), e);
-                }
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

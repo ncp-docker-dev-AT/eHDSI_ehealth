@@ -27,6 +27,7 @@ import eu.epsos.pt.eadc.datamodel.TransactionInfo;
 import eu.epsos.pt.eadc.helper.TransactionHelper;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -65,6 +66,9 @@ public class EadcUtil {
      */
     public static void invokeEadc(MessageContext reqMsgContext, MessageContext rspMsgContext, Document cdaDocument,
                                   TransactionInfo transInfo, EadcEntry.DsTypes datasource) throws Exception {
+
+        StopWatch watch = new StopWatch();
+        watch.start();
         Document reqEnv;
         Document respEnv;
         EadcEntry eadcEntry;
@@ -72,7 +76,7 @@ public class EadcUtil {
         Transaction transaction;
         Document transDoc;
 
-        LOGGER.info("START eADC TRANSACTION PROCESSING...");
+        LOGGER.info("[EADC] Transaction Processing Started...");
         reqEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         respEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
@@ -95,7 +99,9 @@ public class EadcUtil {
         eadcReceiver = new EadcReceiverImpl();
         eadcReceiver.process(eadcEntry);
 
-        LOGGER.info("FINISH eADC TRANSACTION PROCESSING.");
+        LOGGER.info("[EADC] Transaction Processing Finished...");
+        watch.stop();
+        LOGGER.debug("[EADC] method invokeEADC executed in: '{}ms'", watch.getTime());
     }
 
     /**

@@ -49,8 +49,6 @@ import java.util.UUID;
 public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XDR_ServiceMessageReceiverInOut.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     private static final javax.xml.bind.JAXBContext wsContext;
 
     static {
@@ -72,6 +70,8 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             wsContext = jc;
         }
     }
+
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private String getIPofSender(MessageContext messageContext) {
 
@@ -172,12 +172,9 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
-                try {
-                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                            endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND, ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
-                } catch (Exception e) {
-                    LOGGER.error("EADC INVOCATION FAILED: '{}'", e.getMessage(), e);
-                }
+                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
+                        endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND,
+                        ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
             }
         } catch (java.lang.Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);

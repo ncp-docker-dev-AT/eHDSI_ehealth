@@ -146,7 +146,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             counter = 0;
         }
         counter++;
-        return Long.toString(System.currentTimeMillis()) + "_" + counter;
+        return System.currentTimeMillis() + "_" + counter;
     }
 
     public void setCountryCode(String countryCode) {
@@ -412,19 +412,15 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             /*
              * Invoque eADC
              */
-            try {
-                EadcUtilWrapper.invokeEadc(messageContext, // Request message context
-                        _returnMessageContext, // Response message context
-                        this._getServiceClient(), //Service Client
-                        null, // CDA document
-                        transactionStartTime, // Transaction Start Time
-                        transactionEndTime, // Transaction End Time
-                        this.countryCode, // Country A ISO Code
-                        EadcEntry.DsTypes.XCPD, // Data source type
-                        EadcUtil.Direction.OUTBOUND, ServiceType.PATIENT_IDENTIFICATION_QUERY); // Transaction direction
-            } catch (Exception ex) {
-                LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
-            }
+            EadcUtilWrapper.invokeEadc(messageContext, // Request message context
+                    _returnMessageContext, // Response message context
+                    this._getServiceClient(), //Service Client
+                    null, // CDA document
+                    transactionStartTime, // Transaction Start Time
+                    transactionEndTime, // Transaction End Time
+                    this.countryCode, // Country A ISO Code
+                    EadcEntry.DsTypes.XCPD, // Data source type
+                    EadcUtil.Direction.OUTBOUND, ServiceType.PATIENT_IDENTIFICATION_QUERY); // Transaction direction
 
             // TMP
             // eADC end time
@@ -471,8 +467,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                         String messageClassName = (String) faultMessageMap.get(faultElt.getQName());
                         Class messageClass = Class.forName(messageClassName);
                         Object messageObject = fromOM(faultElt, messageClass, null);
-                        Method m = exceptionClass.getMethod("setFaultMessage", new Class[]{messageClass});
-                        m.invoke(ex, new Object[]{messageObject});
+                        Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
+                        m.invoke(ex, messageObject);
 
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
