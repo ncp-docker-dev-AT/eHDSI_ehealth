@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * the EadcReceiverImpl is instantiated from the EADCFactory as a singleton instance
+ * EadcReceiverImpl is instantiated from the EADCFactory as a singleton instance.
  */
 public class EadcReceiverImpl implements EadcReceiver {
 
@@ -16,12 +16,12 @@ public class EadcReceiverImpl implements EadcReceiver {
     private AutomaticDataCollector automaticDataCollectorInstance = EadcFactory.INSTANCE.createAutomaticDataCollector();
 
     /**
-     * This method is called from the NCP - called from multiple threads in parallel
+     * This method is called from the NCP - called from multiple threads in parallel.
      */
     @Override
     public void process(EadcEntry entry) throws Exception {
 
-        logger.debug("process entry start");
+        logger.debug("[EADC] Process entry start");
         if (entry == null) {
             throw new EADCException("EADCEntry == null");
         }
@@ -33,6 +33,6 @@ public class EadcReceiverImpl implements EadcReceiver {
         }
         automaticDataCollectorInstance.processTransaction(entry.getDsName(), entry.getData());
 
-        logger.debug("process entry end");
+        logger.debug("[EADC] Process entry stop");
     }
 }
