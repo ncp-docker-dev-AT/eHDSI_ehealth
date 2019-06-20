@@ -14,6 +14,109 @@
 .ingredients_table td {
 }
 
+/***************/
+/* eP table    */
+/***************/
+.ep_table {
+}
+
+.ep_table tr:nth-child(odd) {
+    background: #e3eff7
+}
+.ep_table tr:nth-child(even)  {
+    background: #FFF;
+}
+
+html, body {
+    background: #fff;
+    min-width: 700px;
+}
+
+/* ---- Timeline ---- */
+ol {
+    position: relative;
+    display: block;
+    margin: 10px;
+    margin-top: 50px;
+    height: 1px;
+    background: #085a9f;
+}
+ol::before,
+ol::after {
+    content: "";
+    position: absolute;
+    top: -4px;
+    display: block;
+    width: 0;
+    height: 0;
+    border-radius: 3px;
+    border: 3px solid #085a9f;
+}
+ol::before {
+    top: -2px;
+    left:-3px;
+}
+ol::after {
+    right: -10px;
+    border: 5px solid transparent;
+    border-right: 0;
+    border-left: 10px solid #085a9f;
+}
+
+/* ---- Timeline elements ---- */
+li {
+    position: relative;
+    display: inline-block;
+    float: left;
+    width: 150px;
+    font: 12px arial;
+    height: 50px;
+}
+li .date {
+    position: absolute;
+    top: -35px;
+    left: 30%;
+    color: #000000;
+}
+li .point {
+    top: -2px;
+    left: 43%;
+    display: block;
+    width: 4px;
+    height: 4px;
+    border: 2px solid #085a9f;
+    border-radius: 10px;
+    background: #fff;
+    position: absolute;
+}
+li .description {
+    position: absolute;
+    top: 0px;
+    left: 30%;
+    color: #000000;
+    font: bold 12px arial;
+}
+
+/***********************/
+/* Fieldset            */
+/***********************/
+
+fieldset {
+    font-family: Arial;
+    border: 2px solid #085a9f;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+fieldset legend {
+    background: #085a9f;
+    color: #fff;
+    padding: 5px 10px ;
+    font-size: 14px;
+    border-radius: 5px;
+    margin-left: 20px;
+}
+
 /******************************/
 /* Code System and ATC blocks */
 /******************************/

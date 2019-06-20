@@ -7,7 +7,7 @@ body {
     font-family: Arial;
     font-size: 12px;
     margin: 0;
-    padding: 1rem 5rem;
+    padding: 1rem;
     /*text-rendering: optimizeLegibility;*/
 }
 
@@ -111,12 +111,15 @@ input[type='checkbox'] {
     display: block;
 
     font-weight: bold;
+    color: #009fd1;
     font-size: 13px;
     text-align: left;
 
     padding: 0.5rem;
 
-    background: #009fd1;
+    border: 2px solid #009fd1;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
 
     cursor: pointer;
 
@@ -124,9 +127,6 @@ input[type='checkbox'] {
     transition: all 0.25s ease-out;
 }
 
-.lbl-toggle:hover {
-    color: #085a9f;
-}
 
 .lbl-toggle::before {
     content: ' ';
@@ -247,22 +247,20 @@ input[type='checkbox'] {
     display: block;
 
     font-weight: bold;
-    color: #009fd1;
+    color: #085a9f;
     font-size: 15px;
     text-align: left;
 
     padding: 0.5rem;
 
-    background: #085a9f;
+    border: 2px solid #085a9f;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
 
     cursor: pointer;
 
     border-radius: 3px;
     transition: all 0.25s ease-out;
-}
-
-.lbl-toggle-main:hover {
-    color: white;
 }
 
 .lbl-toggle-main::before {
