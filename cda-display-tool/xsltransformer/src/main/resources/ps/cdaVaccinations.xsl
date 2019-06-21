@@ -98,7 +98,7 @@
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <!-- Received -->
+                                                                <!-- Administered -->
                                                                 <!-- TODO Make this header part of the epsosDisplayLabel value set -->
                                                                 Administered
                                                             </th>
@@ -163,14 +163,16 @@
                         &#160;
                     </td>
                     <td>
-                        <xsl:choose>
-                            <xsl:when test="(not($negationInd) or $negationInd='false')">
+                        <xsl:if test="not($vaccination/@nullFlavor)">
+                            <xsl:choose>
+                                <xsl:when test="(not($negationInd) or $negationInd='false')">
                                     <i class="fa fa-check" style="color:green" aria-hidden="true"/>
-                            </xsl:when>
-                            <xsl:otherwise>
+                                </xsl:when>
+                                <xsl:otherwise>
                                     <i class="fa fa-ban" style="color:red" aria-hidden="true"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:if>
                     </td>
                 </tr>
             </xsl:when>
