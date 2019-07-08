@@ -1383,9 +1383,9 @@ public enum AuditTrailUtils {
     public synchronized void sendATNASyslogMessage(AuditLogSerializer auditLogSerializer, AuditMessage auditMessage,
                                                    String facility, String severity) {
 
-        MessageSender messageSender = new MessageSender(auditLogSerializer, auditMessage, facility, severity);
-        LOGGER.info("Starting new thread for sending message");
-        messageSender.start();
+        LOGGER.info("[Audit Util] Starting new thread for sending message");
+        MessageSender messageSender = new MessageSender();
+        new Thread(() -> messageSender.send(auditLogSerializer, auditMessage, facility, severity)).start();
     }
 
     /**
