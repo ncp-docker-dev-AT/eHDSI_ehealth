@@ -35,6 +35,6 @@ public class PersistenceErrorLogger {
         Logger logger = LoggerFactory.getLogger(PersistenceErrorLogger.class);
         invokeHandlers(e);
 
-        logger.error("===> OpenNCP ATNA persistence exception thrown!!!\nException: {}", e.getError(), e);
+        logger.error("[ATNA Error] OpenNCP ATNA persistence exception thrown!!!\nException: {}", e.getError(), e);
     }
 }
