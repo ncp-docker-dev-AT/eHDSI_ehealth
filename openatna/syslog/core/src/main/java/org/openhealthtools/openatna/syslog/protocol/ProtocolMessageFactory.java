@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -181,8 +182,7 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
 
     /**
      * This reads up to 256 characters to read headers (excluding SDs). This limit is arbitrary.
-     * It is imposed to reduce the risk
-     * of badly formed or malicious messages from using too many resources.
+     * It is imposed to reduce the risk of badly formed or malicious messages from using too many resources.
      *
      * @param in
      * @return
@@ -212,7 +212,7 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
                 curr++;
                 if (c == ' ') {
                     count++;
-                    String currHeader = new String(buff.array(), 0, buff.position(), Constants.ENC_UTF8);
+                    String currHeader = new String(buff.array(), 0, buff.position(), StandardCharsets.UTF_8);
                     LOGGER.debug("CurrHeader: '{}'", currHeader);
                     buff.clear();
                     switch (count) {
