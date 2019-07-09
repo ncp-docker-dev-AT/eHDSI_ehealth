@@ -1,5 +1,7 @@
-package epsos.ccd.gnomon.auditmanager;
+package eu.europa.ec.sante.ehdsi.openncp.audit;
 
+import epsos.ccd.gnomon.auditmanager.AuditTrailUtils;
+import epsos.ccd.gnomon.auditmanager.EventLog;
 import epsos.ccd.gnomon.utils.SerializableMessage;
 import eu.epsos.util.audit.*;
 import eu.epsos.util.audit.AuditLogSerializer.Type;
@@ -15,33 +17,19 @@ import java.io.Serializable;
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
  * @author mail:k.karkaletsis@gnomon.com.gr
- * @version 1.0, 2010, 30 Jun
  * @see net.RFC3881 http://www.rfc3881.net/ generated classes using JAXB Library for populating audit trail entries
  */
 public class AuditService implements MessageHandlerListener {
-
-    public static final String KEY_TIME_BETWEEN_FAILED_LOGS_HANDLING = "time.between.failed.logs.handling";
-    public static final long DEFAULT_TIME_BETWEEN = 60 * 60 * 1000L; // 1h
 
     private final Logger logger = LoggerFactory.getLogger(AuditService.class);
     private FailedLogsHandlerService failedLogsHandlerService;
     private AuditLogSerializer auditLogSerializer;
 
-    /**
-     * @deprecated use {@link #eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory.getInstance()} instead.
-     */
-    @Deprecated
-    public AuditService() {
+    protected AuditService() {
 
         logger.debug("Creating Audit Service...");
-        initialize();
-    }
-
-    private void initialize() {
-
-        Type type = Type.AUDIT_MANAGER;
-        auditLogSerializer = new AuditLogSerializerImpl(type);
-        failedLogsHandlerService = new FailedLogsHandlerServiceImpl(this, type);
+        auditLogSerializer = new AuditLogSerializerImpl(Type.AUDIT_MANAGER);
+        failedLogsHandlerService = new FailedLogsHandlerServiceImpl(this, Type.AUDIT_MANAGER);
         failedLogsHandlerService.start();
     }
 
@@ -87,5 +75,9 @@ public class AuditService implements MessageHandlerListener {
             logger.warn("Message null or unknown type! Cannot handle message.");
             return false;
         }
+    }
+
+    protected void stopFailedHandler() {
+        this.failedLogsHandlerService.stop();
     }
 }

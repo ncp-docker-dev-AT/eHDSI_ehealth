@@ -11,6 +11,7 @@ import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidato
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.*;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.util.Assert;

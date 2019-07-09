@@ -29,7 +29,7 @@ import java.util.TimeZone;
  * @author mail:k.karkaletsis@gnomon.com.gr
  * @version 1.0, 2010, 30 Jun
  */
-public class MessageSender extends Thread {
+public class MessageSender {
 
     private static final String AUDIT_REPOSITORY_URL = "audit.repository.url";
     private static final String AUDIT_REPOSITORY_PORT = "audit.repository.port";
@@ -43,20 +43,18 @@ public class MessageSender extends Thread {
     private String facility;
     private String severity;
 
-    public MessageSender(AuditLogSerializer auditLogSerializer, AuditMessage auditmessage, String facility, String severity) {
+    /**
+     * @param auditLogSerializer
+     * @param auditmessage
+     * @param facility
+     * @param severity
+     */
+    public void send(AuditLogSerializer auditLogSerializer, AuditMessage auditmessage, String facility, String severity) {
 
-        super();
         this.auditLogSerializer = auditLogSerializer;
         this.auditmessage = auditmessage;
         this.facility = facility;
         this.severity = severity;
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void run() {
 
         logger.info("[Audit Service] Message Sender Start...");
         boolean sent = false;
@@ -90,6 +88,7 @@ public class MessageSender extends Thread {
             Thread.currentThread().interrupt();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
         } finally {
             if (!sent) {
                 if (auditLogSerializer != null) {
@@ -110,7 +109,7 @@ public class MessageSender extends Thread {
      * @param severity
      * @return true/false depending of the success of sending the message
      */
-    protected boolean sendMessage(String auditMessage, String facility, String severity) {
+    private boolean sendMessage(String auditMessage, String facility, String severity) {
 
         logger.info("[Audit Service] Sending Message");
         SSLSocket sslsocket;

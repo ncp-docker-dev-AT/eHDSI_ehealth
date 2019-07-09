@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -42,10 +43,12 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage>, Message
 
     public void messageArrived(SyslogMessage<AtnaMessage> message) {
 
+        logger.info("[ATNA Listener] Message '{}' arrived", message.getClass());
         boolean persisted = false;
         try {
             persisted = processMessage(message);
         } finally {
+
             if (!persisted) {
                 auditLogSerializer.writeObjectToFile(message);
             }
@@ -54,6 +57,7 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage>, Message
 
     public boolean handleMessage(Serializable message) {
 
+        logger.info("[ATNA Listener] Handling Message: '{}'", message.getClass());
         if (message instanceof SyslogMessage<?>) {
             return processMessage((SyslogMessage<AtnaMessage>) message);
         } else {
@@ -67,12 +71,12 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage>, Message
         synchronized (this) {
             LogMessage<AtnaMessage> msg = message.getMessage();
             AtnaMessage atnaMessage = msg.getMessageObject();
-            logger.debug("Processing message " + atnaMessage.getEventOutcome());
+            logger.info("[ATNA Listener] Processing Syslog Message: '{}'", atnaMessage.getEventOutcome());
             atnaMessage.setSourceAddress(message.getSourceIp());
-            byte[] bytes = "no message available".getBytes();
-            logger.info("[ATNA Secured Node] Message Received: [{}] '{}'-'{}' '{}' '{}' '{}'",
-                    message.getMessage().getMessageObject().getEventCode().getCode(), message.getFacility(), message.getSeverity(),
-                    message.getHostName(), message.getSourceIp(), message.getTimestamp());
+            byte[] bytes = "No message available".getBytes(StandardCharsets.UTF_8);
+            logger.info("[ATNA Listener] Message Processed: [{}] '{}'-'{}' '{}' '{}' '{}'",
+                    message.getMessage().getMessageObject().getEventCode().getCode(), message.getFacility(),
+                    message.getSeverity(), message.getHostName(), message.getSourceIp(), message.getTimestamp());
             try {
                 bytes = message.toByteArray();
             } catch (SyslogException e1) {
@@ -82,7 +86,11 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage>, Message
             boolean persisted = false;
             try {
                 persisted = service.process(atnaMessage);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("[ATNA Listener] Syslog message '{}' persisted: '{}'", atnaMessage.getMessageId(), persisted);
+                }
             } catch (Exception e) {
+                logger.error("Exception: '{}'", e.getMessage(), e);
                 SyslogException ex = new SyslogException(e.getMessage(), e, bytes);
                 if (message.getSourceIp() != null) {
                     ex.setSourceIp(message.getSourceIp());
@@ -95,7 +103,7 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage>, Message
 
     public void exceptionThrown(SyslogException exception) {
 
-        logger.info("Entered in 'exceptionThrown'");
+        logger.debug("[ATNA Listener] Processing Exception");
         SyslogErrorLogger.log(exception);
         ServiceConfiguration config = service.getServiceConfig();
         if (config != null) {
@@ -107,6 +115,7 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage>, Message
                 synchronized (this) {
                     try {
                         dao.save(ent);
+                        logger.debug("[ATNA Listener] Error persisted into database");
                     } catch (AtnaPersistenceException e) {
                         PersistenceErrorLogger.log(e);
                     }
