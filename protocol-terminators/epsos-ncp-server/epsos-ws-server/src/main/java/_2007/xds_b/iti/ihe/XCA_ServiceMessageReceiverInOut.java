@@ -1,14 +1,14 @@
 package _2007.xds_b.iti.ihe;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
-import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
