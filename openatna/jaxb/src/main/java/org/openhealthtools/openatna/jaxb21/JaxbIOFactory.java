@@ -18,10 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -29,9 +26,10 @@ import java.util.List;
 /**
  * @author Andrew Harrison
  */
-public class JaxbIOFactory implements AtnaIOFactory {
+public class JaxbIOFactory implements AtnaIOFactory, Serializable {
 
     private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
+    private static final long serialVersionUID = 6923830059780468692L;
     private static JAXBContext jaxbContext;
 
     static {
