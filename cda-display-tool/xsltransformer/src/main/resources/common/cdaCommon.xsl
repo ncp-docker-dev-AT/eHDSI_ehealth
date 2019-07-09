@@ -1173,6 +1173,12 @@
         </xsl:for-each>
     </xsl:template>
 
+    <!-- show narrative -->
+    <xsl:template name="show-narrative">
+        <xsl:param name="node"/>
+        <xsl:apply-templates select="$node/self::*"/>
+    </xsl:template>
+
     <!-- paragraph -->
     <xsl:template match="n1:paragraph">
         <p>
