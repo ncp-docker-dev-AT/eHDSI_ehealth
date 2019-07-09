@@ -10,8 +10,7 @@
  **/
 package se.sb.epsos.web.service.mock;
 
-import epsos.ccd.gnomon.auditmanager.AuditService;
-import epsos.ccd.gnomon.auditmanager.EventLog;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
 import org.mockito.MockSettings;
 import org.mockito.Mockito;
