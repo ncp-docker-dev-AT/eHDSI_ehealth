@@ -18,15 +18,23 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
 
     public List<File> listFiles() {
 
+        logger.debug("Processing Audit backup folder");
         List<File> files = new ArrayList<>();
         File path = getPath();
+
         if (isPathValid(path)) {
+
             File[] srcFiles = path.listFiles();
             if (srcFiles == null) {
+
                 return new ArrayList<>();
             }
             for (File file : srcFiles) {
+
                 if (isAuditLogBackupWriterFile(file)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Backup file added: '{}'", file.getName());
+                    }
                     files.add(file);
                 }
             }
@@ -59,10 +67,11 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
                 outputStream.writeObject(message);
                 outputStream.flush();
                 outputStream.close();
-                logger.error("Error occurred while writing AuditLog to OpenATNA! AuditLog saved to: '{}'", path);
+                logger.warn("[Audit Service] Error occurred while sending message to ATNA servr!\nAuditLog saved to: '{}'", path);
             }
         } catch (Exception e) {
-            logger.error("Unable to send AuditLog to OpenATNA nor able write auditLog backup! Dumping to log: '{}'", message.toString(), e);
+            logger.error("[Audit Service] AuditLog not sent to OpenATNA nor saved on filesystem! Dumping to log file:\n'{}'",
+                    message != null ? message.toString() : "Audit message not serialized", e);
         }
     }
 
@@ -83,7 +92,7 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
             logger.error("Source path ('{}') does not exist!", path);
             return false;
         } else if (!path.isDirectory()) {
-            logger.error("Source path ('{}') is not a diredtory!", path);
+            logger.error("Source path ('{}') is not a directory!", path);
             return false;
         }
 
