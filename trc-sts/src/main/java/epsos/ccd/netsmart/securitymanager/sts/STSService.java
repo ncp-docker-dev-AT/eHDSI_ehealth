@@ -9,7 +9,6 @@ import epsos.ccd.netsmart.securitymanager.sts.util.STSUtils;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import sun.security.x509.X500Name;
+import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
 import javax.annotation.Resource;
@@ -355,7 +355,7 @@ public class STSService implements Provider<SOAPMessage> {
      */
     private void sendTRCAuditMessage(String pointOfCareID, String humanRequestorNameID, String humanRequestorSubjectID,
                                      String humanRequestorRole, String patientID, String facilityType, String assertionId,
-                                     String tls_cn, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
+                                     String certificateCommonName, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
 
         AuditService auditService = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
@@ -367,26 +367,27 @@ public class STSService implements Provider<SOAPMessage> {
             logger.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
         String trcCommonName = HTTPUtil.getTlsCertificateCommonName(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
-        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
         //TODO: Review Audit Trail specification - Identifying SC and SP as value of CN from TLS certificate.
         EventLog evLogTRC = EventLog.createEventLogTRCA(TransactionName.epsosTRCAssertion, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID, humanRequestorRole,
-                humanRequestorSubjectID, tls_cn, trcCommonName, cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"), patientID,
-                "urn:uuid:" + assertionId, reqMid, reqSecHeader, resMid, resSecHeader, STSUtils.getServerIP(),
-                getClientIP(), NcpSide.NCP_B);
+                humanRequestorSubjectID, certificateCommonName, trcCommonName, ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
+                patientID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
+                STSUtils.getSTSServerIp(), getClientIP(), NcpSide.NCP_B);
 
         evLogTRC.setEventType(EventType.epsosTRCAssertion);
         auditService.write(evLogTRC, "13", "2");
     }
 
     /**
-     * @return
+     * Returns IP address from the Web Service MessageContext.
+     *
+     * @return String IP address of the client requesting the TRC-STS token.
      */
     private String getClientIP() {
 
-        MessageContext mc = context.getMessageContext();
-        HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
-        return req.getRemoteAddr();
+        MessageContext messageContext = context.getMessageContext();
+        HttpServletRequest servletRequest = (HttpServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST);
+        return servletRequest.getRemoteAddr();
     }
 
     /**

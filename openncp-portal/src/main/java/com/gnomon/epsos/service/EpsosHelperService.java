@@ -80,6 +80,7 @@ import org.xml.sax.SAXException;
 import sun.security.x509.X500Name;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -103,7 +104,6 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -1246,15 +1246,7 @@ public class EpsosHelperService {
         String secHead = "[No security header provided]";
         String requestMsgParticipantObjectID = Constants.UUID_PREFIX + message;
         String responseMsgParticipantObjectID = Constants.UUID_PREFIX + message;
-
-        InetAddress sourceIP = null;
-        try {
-            sourceIP = InetAddress.getLocalHost();
-            LOGGER.info("Source IP: '{}'", sourceIP);
-        } catch (UnknownHostException ex) {
-            LOGGER.error(ExceptionUtils.getStackTrace(ex));
-        }
-
+        String sourceIP = IPUtil.getPrivateServerIp();
         String PC_UserID = orgName;
         String PC_RoleID = orgType;
         String spProvidedID = assertion.getSubject().getNameID().getSPProvidedID();
@@ -1290,15 +1282,11 @@ public class EpsosHelperService {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
         EventLog hcpIdentificationEventLog;
-        String hostSource = "UnknownHost";
-        if (sourceIP != null) {
-            hostSource = sourceIP.getHostAddress();
-        }
         hcpIdentificationEventLog = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
                 eventDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 serviceConsumerUserId, serviceProviderUserId, AS_AuditSourceId, ET_ObjectID, requestMsgParticipantObjectID,
                 secHead.getBytes(StandardCharsets.UTF_8), responseMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                hostSource, hostSource, NcpSide.NCP_B);
+                sourceIP, sourceIP, NcpSide.NCP_B);
 
         LOGGER.info("The audit has been prepared");
         hcpIdentificationEventLog.setEventType(EventType.epsosHcpAuthentication);

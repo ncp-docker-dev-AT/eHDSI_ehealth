@@ -24,11 +24,10 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-import java.net.InetAddress;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -98,14 +97,32 @@ public class EventLogClientUtil {
     public static String getLocalIpAddress() {
 
         // TODO A.R. should be changed for multihomed hosts... It's better to get address from AXIS2 actual socket but how?
-        String ipAddress = null;
+//        String ipAddress = null;
+//        try {
+//            ipAddress = InetAddress.getLocalHost().getHostAddress();
+//        } catch (UnknownHostException e) {
+//
+//            LOGGER.error("UnknownHostException: '{}'", e.getMessage(), e);
+//        }
+//        return ipAddress;
         try {
-            ipAddress = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
 
-            LOGGER.error("UnknownHostException: '{}'", e.getMessage(), e);
+                NetworkInterface networkInterface = networkInterfaces.nextElement();
+                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                while (inetAddresses.hasMoreElements()) {
+                    InetAddress inetAddress = inetAddresses.nextElement();
+                    if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
+                            && (inetAddress instanceof Inet4Address || inetAddress instanceof Inet6Address)) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            LOGGER.error("Unable to get current IP: '{}'", e.getMessage(), e);
         }
-        return ipAddress;
+        return "IP Not Found";
     }
 
     /**

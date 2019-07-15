@@ -20,13 +20,18 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import org.apache.axiom.om.*;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.lang.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -36,6 +41,7 @@ import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
@@ -185,6 +191,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                                                                   Assertion trcAssertion,
                                                                   String classCode)
             throws java.rmi.RemoteException {
+
         MessageContext _messageContext = null;
         try {
             // TMP
@@ -399,8 +406,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 }
             }
 
-            org.apache.axis2.context.MessageContext _returnMessageContext = _operationClient.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-            org.apache.axiom.soap.SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
+            MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
 
             // TMP
@@ -434,7 +441,6 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             end = System.currentTimeMillis();
             LOGGER.info("XCA LIST VALIDATION RES TIME: '{}'", (end - start) / 1000);
 
-            // TMP
             // eADC start time
             start = System.currentTimeMillis();
 
@@ -465,12 +471,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     EadcEntry.DsTypes.XCA, // Data source type
                     Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY); // Transaction direction
 
-            // TMP
             // eADC end time
             end = System.currentTimeMillis();
             LOGGER.info("XCA LIST eADC TIME: '{}' ms", (end - start) / 1000.0);
 
-            // TMP
             // Audit start time
             start = System.currentTimeMillis();
 
@@ -534,11 +538,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     /**
      * Auto generated method signature
      *
-     * @param retrieveDocumentSetRequest
-     * @param idAssertion
-     * @param trcAssertion
-     * @param classCode                  Class code of the document to be retrieved, needed for
-     *                                   audit log preparation
+     * @param retrieveDocumentSetRequest XCA request
+     * @param idAssertion                HCP identity Assertion
+     * @param trcAssertion               TRC Assertion
+     * @param classCode                  Class code of the document to be retrieved, needed for audit log preparation
      * @return
      * @throws java.rmi.RemoteException
      * @see tr.com.srdc.epsos.test.xca.RespondingGateway_Service#respondingGateway_CrossGatewayRetrieve
@@ -691,10 +694,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(endpoint));
 
                     /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
-                    org.apache.axis2.client.OperationClient newOperationClient = _serviceClient.createClient(_operations[1].getName());
+                    OperationClient newOperationClient = _serviceClient.createClient(_operations[1].getName());
                     newOperationClient.getOptions().setAction(XCAConstants.SOAP_HEADERS.RETRIEVE.REQUEST_ACTION);
                     newOperationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
-                    addPropertyToOperationClient(newOperationClient, org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+                    addPropertyToOperationClient(newOperationClient, WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
                     addPropertyToOperationClient(newOperationClient, org.apache.axis2.Constants.Configuration.ENABLE_MTOM, org.apache.axis2.Constants.VALUE_TRUE);
 
                     SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());

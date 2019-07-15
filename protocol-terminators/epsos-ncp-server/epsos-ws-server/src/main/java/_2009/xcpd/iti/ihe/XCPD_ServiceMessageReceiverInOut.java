@@ -5,10 +5,10 @@ import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.om.*;
@@ -52,7 +52,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
 
     static {
 
-        LOGGER.debug("Loading the WS-Security init libraries in XCPD_ServiceMessageReceiverInOut xcpd 2009");
+        LOGGER.debug("Loading the WS-Security init libraries in XCPD_ServiceMessageReceiverInOut XCPD 2009");
         org.apache.xml.security.Init.init();
     }
 
@@ -91,21 +91,24 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
 
         try {
             Date startTime = new Date();
+            String ip = getIPofSender(msgContext);
+            HttpServletRequest servletRequest = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+            String clientDN = HTTPUtil.getClientCertificate(servletRequest);
+            String serverName = servletRequest.getServerName();
+            LOGGER.info("HTTP Request: '{}' '{}' '{}'", servletRequest.getRemoteHost(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost());
+
+            LOGGER.info("[ITI-55] Incoming XCPD Request from '{}-{}' - '{}'", clientDN, ip, serverName);
 
             // get the implementation class for the Web Service
-            Object obj = getTheImplementationObject(msgContext);
+            Object serviceObject = getTheImplementationObject(msgContext);
             SOAPHeader sh = msgContext.getEnvelope().getHeader();
 
             EventLog eventLog = new EventLog();
-            String ip = getIPofSender(msgContext);
             eventLog.setSourceip(ip);
             eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
             eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
-
-            HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
-            String clientDN = HTTPUtil.getClientCertificate(req);
             eventLog.setSC_UserID(clientDN);
-            eventLog.setTargetip(HTTPUtil.getHostIpAddress(req.getServerName()));
+            eventLog.setTargetip(HTTPUtil.getHostIpAddress(serverName));
 
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
@@ -117,7 +120,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                 OpenNCPValidation.validatePatientDemographicRequest(message, NcpSide.NCP_A);
             }
 
-            XCPD_ServiceSkeleton skeleton = (XCPD_ServiceSkeleton) obj;
+            XCPD_ServiceSkeleton skeleton = (XCPD_ServiceSkeleton) serviceObject;
             // Out Envelop
             SOAPEnvelope envelope;
             // Find the axisOperation that has been set by the Dispatch phase.
@@ -144,8 +147,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     /* Validate response message */
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validatePatientDemographicResponse(XMLUtil.prettyPrint(XMLUtils.toDOM(
-                                envelope.getBody().getFirstElement())),
-                                NcpSide.NCP_A);
+                                envelope.getBody().getFirstElement())), NcpSide.NCP_A);
                     }
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
