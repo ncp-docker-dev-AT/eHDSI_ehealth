@@ -412,15 +412,9 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             /*
              * Invoque eADC
              */
-            EadcUtilWrapper.invokeEadc(messageContext, // Request message context
-                    _returnMessageContext, // Response message context
-                    this._getServiceClient(), //Service Client
-                    null, // CDA document
-                    transactionStartTime, // Transaction Start Time
-                    transactionEndTime, // Transaction End Time
-                    this.countryCode, // Country A ISO Code
-                    EadcEntry.DsTypes.XCPD, // Data source type
-                    EadcUtil.Direction.OUTBOUND, ServiceType.PATIENT_IDENTIFICATION_QUERY); // Transaction direction
+            EadcUtilWrapper.invokeEadc(messageContext, _returnMessageContext, this._getServiceClient(), null,
+                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.XCPD,
+                    EadcUtil.Direction.OUTBOUND, ServiceType.PATIENT_IDENTIFICATION_QUERY);
 
             // TMP
             // eADC end time

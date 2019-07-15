@@ -6,7 +6,6 @@ import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
-import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
@@ -778,53 +777,25 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     getEnvelopeNamespaces(returnEnv));
             retrieveDocumentSetResponse = (RetrieveDocumentSetResponseType) object;
 
+            // NRR evidences optional.
             LOGGER.info("XCA Retrieve Request received. EVIDENCE NRR");
 
-//            // NRR
-//            try {
-//                EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(env)),
-//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                        EventType.epsosOrderServiceRetrieve.getCode(),
-//                        new DateTime(),
-//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                        "NCPB_XCA_RETRIEVE_RES");
-//            } catch (Exception e) {
-//                LOGGER.error(ExceptionUtils.getStackTrace(e));
-//            }
-
-            /*
-             * Invoque eADC
-             */
-
+            // Invoke eADC
             Document cda = null;
-            try {
-                if (retrieveDocumentSetResponse.getDocumentResponse() != null && !retrieveDocumentSetResponse.getDocumentResponse().isEmpty()) {
-                    byte[] cdaBytes = retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument();
-                    cda = TMServices.byteToDocument(cdaBytes);
-                }
-            } catch (Exception e) {
-                LOGGER.error("[EADC] Cannot process CDA document: '{}'", e.getMessage(), e);
+            if (retrieveDocumentSetResponse.getDocumentResponse() != null && !retrieveDocumentSetResponse.getDocumentResponse().isEmpty()) {
+
+                cda = EadcUtilWrapper.toXmlDocument(retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument());
             }
-            EadcUtilWrapper.invokeEadc(_messageContext, // Request message context
-                    _returnMessageContext, // Response message context
-                    this._getServiceClient(), //Service Client
-                    cda, // CDA document
-                    transactionStartTime, // Transaction Start Time
-                    transactionEndTime, // Transaction End Time
-                    this.countryCode, // Country A ISO Code
-                    EadcEntry.DsTypes.XCA, // Data source type
-                    Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY); // Transaction direction
+            EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), cda,
+                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.XCA,
+                    Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
 
-
-            /*
-             * Create Audit messages
-             */
+            //  Create Audit messages
             EventLog eventLog = createAndSendEventLogRetrieve(retrieveDocumentSetRequest, retrieveDocumentSetResponse,
                     _messageContext, returnEnv, env, idAssertion, trcAssertion,
                     this._getServiceClient().getOptions().getTo().getAddress(),
                     classCode);
+            LOGGER.info("[Audit Service] Event Log '{}' sent to ATNA server", eventLog.getEventType());
 
             return retrieveDocumentSetResponse;
 
