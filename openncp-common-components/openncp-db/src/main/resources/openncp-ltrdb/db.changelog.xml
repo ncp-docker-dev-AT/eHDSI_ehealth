@@ -89,7 +89,7 @@
             <column name="EPSOS_NAME" type="varchar(255)"/>
             <column name="DESCRIPTION" type="varchar(4000)"/>
             <column name="PARENT_CODE_SYSTEM_ID" type="bigint">
-                <constraints nullable="false" references="CODE_SYSTEM(ID)" foreignKeyName="FK_VALUE_SET_PARENT_CODE_SYSTEM"/>
+                <constraints references="CODE_SYSTEM(ID)" foreignKeyName="FK_VALUE_SET_PARENT_CODE_SYSTEM"/>
             </column>
         </createTable>
 

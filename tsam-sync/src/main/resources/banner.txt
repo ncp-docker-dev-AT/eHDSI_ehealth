@@ -4,3 +4,4 @@
    | |  ___) / ___ \| |  | |  ___) | |_| | | | | (__
    |_| |____/_/   \_\_|  |_| |____/ \__, |_| |_|\___|
                                     |___/
+ ${application.title} ${application.formatted-version}
