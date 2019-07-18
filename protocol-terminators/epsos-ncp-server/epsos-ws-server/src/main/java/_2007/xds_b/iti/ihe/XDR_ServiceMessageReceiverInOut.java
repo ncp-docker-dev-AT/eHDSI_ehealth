@@ -5,10 +5,10 @@ import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.om.*;
@@ -26,6 +26,7 @@ import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
@@ -108,7 +109,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
             String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID().toString();
             String methodName;
-
+            Document eDispenseCda = null;
             if ((op.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(op.getName().getLocalPart())) != null)) {
 
                 SOAPHeader sh = msgContext.getEnvelope().getHeader();
@@ -161,6 +162,8 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         loggerClinical.debug("Response Header:\n{}", envelope.getHeader().toString());
                         loggerClinical.debug("Outgoing XDR Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
+                    // eADC: extract of the eDispense CDA required by the KPIs.
+                    eDispenseCda = EadcUtilWrapper.toXmlDocument(wrappedParam.getDocument().get(0).getValue());
 
                 } else {
                     LOGGER.error("Method not found: '{}'", methodName);
@@ -172,7 +175,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
-                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
+                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, eDispenseCda, startTime,
                         endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND,
                         ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
             }
