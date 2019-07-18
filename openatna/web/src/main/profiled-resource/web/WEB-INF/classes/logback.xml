@@ -47,14 +47,6 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="org.openhealthtools.openexchange" level="INFO" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="com.misyshealthcare.connect" level="WARN" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
     <logger name="org.apache" level="WARN" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
@@ -71,11 +63,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="org.jboss.axis" level="INFO" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="org.jboss.management" level="INFO" additivity="false">
+    <logger name="eu.epsos.util" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

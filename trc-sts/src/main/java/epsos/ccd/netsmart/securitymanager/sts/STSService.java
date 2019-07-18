@@ -7,6 +7,7 @@ import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.sts.util.STSUtils;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;

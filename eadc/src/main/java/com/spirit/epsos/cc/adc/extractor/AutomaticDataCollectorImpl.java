@@ -5,6 +5,7 @@ import com.spirit.epsos.cc.adc.db.EadcDbConnect;
 import eu.epsos.pt.eadc.util.EadcFactory;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -18,15 +19,15 @@ import java.util.TreeMap;
 
 /**
  * Utility for extracting data from a transaction-xml-structure and inserting the results into an sql-database.
- * A detailed behavior of the extraction-process can be configured within the config.xml. The supported structure for
- * config.xml as well as the supported structure for the transaction-xml are specified by xml-schemas.
- * All files are located within the EADC_resources directory. This directory must be placed within the
- * current working directory.
- * For a jboss-installation this usually is jboss/bin/
- *
- * @author mk
+ * A detailed behavior of the extraction-process can be configured within the config.xml.
+ * The supported structure for config.xml as well as the supported structure for the transaction-xml are specified by
+ * xml-schemas. All files are located within the EADC_resources directory.
+ * This directory must be placed within the current working directory.
  */
 public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
+
+    // constant for the cda-namespace
+    public static final String CDA_NAMESPACE = "urn:hl7-org:v3";
 
     // Path to the factory.xslt
     private static final String PATH_XSLT_FACTORY = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
@@ -35,9 +36,10 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     private static final String PATH_XML_CONFIG = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
             + "EADC_resources" + File.separator + "config" + File.separator + "config.xml";
     private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
+    private static AutomaticDataCollectorImpl INSTANCE = null;
     private final Logger logger = LoggerFactory.getLogger(AutomaticDataCollector.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-    // map with one intermediateTransformer per CDA-classcode
+    // Map with one intermediateTransformer per CDA-classCode
     private final TreeMap<String, EasyXsltTransformer> intermediateTransformerList;
     // DOM structure for caching the factory.xslt
     private Document factoryXslt;
@@ -45,34 +47,46 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     private Document configXml;
 
     /**
-     * Initialize a new AutomaticDataCollector
+     * Private constructor initializing a new AutomaticDataCollector (Implementation hidden to use Singleton getInstance().
      *
      * @throws IllegalArgumentException Will be thrown, when a required resource can not be initialized
      */
-    public AutomaticDataCollectorImpl() {
+    private AutomaticDataCollectorImpl() {
 
         try {
+
             intermediateTransformerList = new TreeMap<>();
             this.factoryXslt = XmlFileReader.getInstance().readXmlDocumentFromFile(AutomaticDataCollectorImpl.PATH_XSLT_FACTORY);
             this.configXml = XmlFileReader.getInstance().readXmlDocumentFromFile(AutomaticDataCollectorImpl.PATH_XML_CONFIG);
-            logger.debug("Instance of AutomaticDataCollector created");
-        } catch (Exception exception) {
-            logger.error("Error, when creating an Instance of AutomaticDataCollector");
-            throw new IllegalArgumentException(exception);
+
+        } catch (Exception e) {
+            logger.error("Exception while creating an Instance of AutomaticDataCollector: '{}'", e.getMessage(), e);
+            throw new IllegalArgumentException(e);
         }
+    }
+
+    /**
+     * Initializer of class AutomaticDataCollectorImpl.
+     * @return an Instance of AutomaticDataCollectorImpl initialized.
+     */
+    public static AutomaticDataCollectorImpl getInstance() {
+
+        if (INSTANCE == null)
+            INSTANCE = new AutomaticDataCollectorImpl();
+
+        return INSTANCE;
     }
 
     /**
      * Processes a transaction, extracts data according to config.xml and stores it into the database
      *
-     * @param transaction    The transaction-xml-structure as specified by the
-     *                       XML-Schema
+     * @param transaction    The transaction-xml-structure as specified by the XML-Schema
      * @param dataSourceName The dataSourceName of the Database
      * @throws Exception
      */
     public void processTransaction(String dataSourceName, Document transaction) throws Exception {
 
-        logger.info("Processing a transaction object");
+        logger.debug("Processing a Transaction Object as Document");
         String sqlInsertStatementList = this.extractDataAndCreateAccordingSqlInserts(transaction);
         if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
             loggerClinical.info("Insert the following sql-queries:\n'{}'", sqlInsertStatementList);
@@ -96,11 +110,11 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
         String processedDocumentCodeSystem;
         String processedDocumentCodeAndCodeSystemCombination;
 
-        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
-            loggerClinical.debug("XML Document: {}", EadcUtil.convertXMLDocumentToString(transaction));
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && loggerClinical.isDebugEnabled()) {
+            loggerClinical.debug("XML Document:\n'{}'", EadcUtil.convertXMLDocumentToString(transaction));
         }
 
-        NodeList clinicalDocumentNodeList = transaction.getElementsByTagNameNS(cdaNamespace, "ClinicalDocument");
+        NodeList clinicalDocumentNodeList = transaction.getElementsByTagNameNS(CDA_NAMESPACE, "ClinicalDocument");
         int numberOfCdaDocuments = clinicalDocumentNodeList.getLength();
         // Test, if the currently processed comes without a CDA-document
         if (numberOfCdaDocuments < 1) {
@@ -119,7 +133,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
                 throw new Exception("The ClinicalDocument Node being found was not of type org.w3c.dom.Element");
             }
             Element clinicalDocumentElement = (Element) clinicalDocumentNode;
-            NodeList codeNodeList = clinicalDocumentElement.getElementsByTagNameNS(cdaNamespace, "code");
+            NodeList codeNodeList = clinicalDocumentElement.getElementsByTagNameNS(CDA_NAMESPACE, "code");
             Node codeNode = codeNodeList.item(0);
             if (codeNode.getParentNode() != clinicalDocumentElement) {
                 logger.error("The first codeNode found was not a child of ClinicalDocument");
@@ -198,29 +212,35 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     /**
      * Run the provided SQL-script by using the provided dataSourceName
      *
-     * @param sqlScript      The sql-script being executed. Must be a list of
-     *                       sql-statements being terminated with the ";" character.
-     * @param dataSourceName The dataSource Identifier being used to connect to
-     *                       the database. This string usually refers to a database-specification in a
-     *                       datasource xml-file.
+     * @param sqlScript      The sql-script being executed. Must be a list of sql-statements being terminated with ";".
+     * @param dataSourceName The dataSource Identifier being used to connect to the database. This string usually refers
+     *                       to a database-specification in a datasource xml-file.
      * @throws Exception
      */
     private void runSqlScript(String dataSourceName, String sqlScript) throws Exception {
 
+        StopWatch watch = new StopWatch();
+        watch.start();
         EadcDbConnect sqlConnection = null;
+
         try (StringReader stringReader = new StringReader(sqlScript)) {
+
             sqlConnection = EadcFactory.INSTANCE.createEadcDbConnect(dataSourceName);
             ScriptRunner objScriptRunner = new ScriptRunner(sqlConnection.getConnection(), false, true);
             objScriptRunner.setLogWriter(null);
             objScriptRunner.setErrorLogWriter(null);
-
             objScriptRunner.runScript(stringReader);
+
         } catch (Exception exception) {
             logger.error("The following error occurred during an SQL operation:", exception);
             throw new Exception("The following error occurred during an SQL operation:", exception);
         } finally {
             if (sqlConnection != null) {
                 sqlConnection.closeConnection();
+            }
+            watch.stop();
+            if (logger.isDebugEnabled()) {
+                logger.debug("[EADC] SQL script executed in: '{}ms'", watch.getTime());
             }
         }
     }

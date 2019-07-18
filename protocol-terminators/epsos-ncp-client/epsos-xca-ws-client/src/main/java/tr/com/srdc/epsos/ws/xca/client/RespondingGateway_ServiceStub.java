@@ -6,7 +6,6 @@ import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
-import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
@@ -39,11 +38,8 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /*
  *  RespondingGateway_ServiceStub java implementation
@@ -459,19 +455,15 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             /*
              * Invoque eADC
              */
-            try {
-                EadcUtilWrapper.invokeEadc(_messageContext, // Request message context
-                        _returnMessageContext, // Response message context
-                        this._getServiceClient(), //Service Client
-                        null, // CDA document
-                        transactionStartTime, // Transaction Start Time
-                        transactionEndTime, // Transaction End Time
-                        this.countryCode, // Country A ISO Code
-                        EadcEntry.DsTypes.XCA, // Data source type
-                        Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY); // Transaction direction
-            } catch (Exception ex) {
-                LOGGER.error("EADC INVOCATION FAILED!", ex);
-            }
+            EadcUtilWrapper.invokeEadc(_messageContext, // Request message context
+                    _returnMessageContext, // Response message context
+                    this._getServiceClient(), //Service Client
+                    null, // CDA document
+                    transactionStartTime, // Transaction Start Time
+                    transactionEndTime, // Transaction End Time
+                    this.countryCode, // Country A ISO Code
+                    EadcEntry.DsTypes.XCA, // Data source type
+                    Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY); // Transaction direction
 
             // TMP
             // eADC end time
@@ -785,85 +777,53 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                     getEnvelopeNamespaces(returnEnv));
             retrieveDocumentSetResponse = (RetrieveDocumentSetResponseType) object;
 
+            // NRR evidences optional.
             LOGGER.info("XCA Retrieve Request received. EVIDENCE NRR");
 
-//            // NRR
-//            try {
-//                EvidenceUtils.createEvidenceREMNRR(XMLUtil.prettyPrint(XMLUtils.toDOM(env)),
-//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                        tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                        EventType.epsosOrderServiceRetrieve.getCode(),
-//                        new DateTime(),
-//                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                        "NCPB_XCA_RETRIEVE_RES");
-//            } catch (Exception e) {
-//                LOGGER.error(ExceptionUtils.getStackTrace(e));
-//            }
+            // Invoke eADC
+            Document cda = null;
+            if (retrieveDocumentSetResponse.getDocumentResponse() != null && !retrieveDocumentSetResponse.getDocumentResponse().isEmpty()) {
 
-            /*
-             * Invoque eADC
-             */
-            try {
-                Document cda = null;
-                if (retrieveDocumentSetResponse.getDocumentResponse() != null && !retrieveDocumentSetResponse.getDocumentResponse().isEmpty()) {
-                    byte[] cdaBytes = retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument();
-                    cda = TMServices.byteToDocument(cdaBytes);
-                }
-
-                EadcUtilWrapper.invokeEadc(_messageContext, // Request message context
-                        _returnMessageContext, // Response message context
-                        this._getServiceClient(), //Service Client
-                        cda, // CDA document
-                        transactionStartTime, // Transaction Start Time
-                        transactionEndTime, // Transaction End Time
-                        this.countryCode, // Country A ISO Code
-                        EadcEntry.DsTypes.XCA, // Data source type
-                        Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY); // Transaction direction
-            } catch (Exception ex) {
-                LOGGER.error("EADC INVOCATION FAILED!", ex);
+                cda = EadcUtilWrapper.toXmlDocument(retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument());
             }
+            EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), cda,
+                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.XCA,
+                    Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
 
-            /*
-             * Create Audit messages
-             */
+            //  Create Audit messages
             EventLog eventLog = createAndSendEventLogRetrieve(retrieveDocumentSetRequest, retrieveDocumentSetResponse,
                     _messageContext, returnEnv, env, idAssertion, trcAssertion,
                     this._getServiceClient().getOptions().getTo().getAddress(),
                     classCode);
+            LOGGER.info("[Audit Service] Event Log '{}' sent to ATNA server", eventLog.getEventType());
 
             return retrieveDocumentSetResponse;
 
-        } catch (org.apache.axis2.AxisFault f) {
+        } catch (AxisFault axisFault) {
             // TODO A.R. Audit log SOAP Fault is still missing
-            org.apache.axiom.om.OMElement faultElt = f.getDetail();
+            OMElement faultElt = axisFault.getDetail();
 
-            if (faultElt != null) {
+            if (faultElt != null && faultExceptionNameMap.containsKey(faultElt.getQName())) {
 
-                if (faultExceptionNameMap.containsKey(faultElt.getQName())) {
+                //make the fault by reflection
+                try {
+                    String exceptionClassName = (java.lang.String) faultExceptionClassNameMap.get(faultElt.getQName());
+                    Class exceptionClass = java.lang.Class.forName(exceptionClassName);
+                    Exception ex = (Exception) exceptionClass.newInstance();
+                    //message class
+                    String messageClassName = (java.lang.String) faultMessageMap.get(faultElt.getQName());
+                    Class messageClass = java.lang.Class.forName(messageClassName);
+                    Object messageObject = fromOM(faultElt, messageClass, null);
+                    Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
+                    m.invoke(ex, messageObject);
+                    throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
-                    //make the fault by reflection
-                    try {
-                        java.lang.String exceptionClassName = (java.lang.String) faultExceptionClassNameMap.get(faultElt.getQName());
-                        java.lang.Class exceptionClass = java.lang.Class.forName(exceptionClassName);
-                        java.lang.Exception ex
-                                = (java.lang.Exception) exceptionClass.newInstance();
-                        //message class
-                        java.lang.String messageClassName = (java.lang.String) faultMessageMap.get(faultElt.getQName());
-                        java.lang.Class messageClass = java.lang.Class.forName(messageClassName);
-                        java.lang.Object messageObject = fromOM(faultElt, messageClass, null);
-                        java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage",
-                                messageClass);
-                        m.invoke(ex, messageObject);
-
-                        throw new java.rmi.RemoteException(ex.getMessage(), ex);
-
-                    } catch (Exception e) { // we cannot intantiate the class - throw the original Axis fault
-                        throw new RuntimeException(e.getMessage(), e);
-                    }
+                } catch (Exception e) {
+                    // Cannot instantiate the class - throw the original Axis fault
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
-            throw new RuntimeException(f.getMessage(), f);
+            throw new RuntimeException(axisFault.getMessage(), axisFault);
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);
@@ -872,12 +832,12 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     }
 
     /**
-     * A utility method that copies the namepaces from the SOAPEnvelope
+     * An utility method that copies the namespaces from the SOAPEnvelope
      */
-    private java.util.Map getEnvelopeNamespaces(org.apache.axiom.soap.SOAPEnvelope env) {
+    private Map getEnvelopeNamespaces(org.apache.axiom.soap.SOAPEnvelope env) {
 
-        java.util.Map returnMap = new java.util.HashMap();
-        java.util.Iterator namespaceIterator = env.getAllDeclaredNamespaces();
+        Map returnMap = new java.util.HashMap();
+        Iterator namespaceIterator = env.getAllDeclaredNamespaces();
         while (namespaceIterator.hasNext()) {
             org.apache.axiom.om.OMNamespace ns = (org.apache.axiom.om.OMNamespace) namespaceIterator.next();
             returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
@@ -898,25 +858,22 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         return false;
     }
 
-    private org.apache.axiom.om.OMElement toOM(oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest param, boolean optimizeContent)
-            throws org.apache.axis2.AxisFault {
+    private OMElement toOM(oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest param, boolean optimizeContent)
+            throws AxisFault {
         try {
 
-            javax.xml.bind.Marshaller marshaller = wsContext.createMarshaller();
-            marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            Marshaller marshaller = wsContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
             OMFactory factory = OMAbstractFactory.getOMFactory();
 
             RespondingGateway_ServiceStub.JaxbRIDataSource source = new RespondingGateway_ServiceStub.JaxbRIDataSource(oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest.class,
-                    param,
-                    marshaller,
-                    XCAConstants.REGREP_QUERY,
-                    XCAConstants.ADHOC_QUERY_REQUEST);
-            OMNamespace namespace = factory.createOMNamespace(XCAConstants.REGREP_QUERY,
-                    null);
+                    param, marshaller, XCAConstants.REGREP_QUERY, XCAConstants.ADHOC_QUERY_REQUEST);
+            OMNamespace namespace = factory.createOMNamespace(XCAConstants.REGREP_QUERY, null);
+
             return factory.createOMElement(source, XCAConstants.ADHOC_QUERY_REQUEST, namespace);
-        } catch (JAXBException bex) {
-            throw org.apache.axis2.AxisFault.makeFault(bex);
+        } catch (JAXBException e) {
+            throw AxisFault.makeFault(e);
         }
     }
 

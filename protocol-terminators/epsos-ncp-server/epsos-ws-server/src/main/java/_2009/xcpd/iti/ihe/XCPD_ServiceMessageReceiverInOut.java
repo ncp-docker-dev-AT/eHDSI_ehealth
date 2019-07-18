@@ -1,14 +1,14 @@
 package _2009.xcpd.iti.ihe;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
-import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.om.*;
@@ -167,12 +167,9 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
-                try {
-                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                            endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCPD, EadcUtil.Direction.INBOUND, ServiceType.PATIENT_IDENTIFICATION_RESPONSE);
-                } catch (Exception ex) {
-                    LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
-                }
+                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
+                        endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCPD, EadcUtil.Direction.INBOUND,
+                        ServiceType.PATIENT_IDENTIFICATION_RESPONSE);
             }
         } catch (Exception e) {
 

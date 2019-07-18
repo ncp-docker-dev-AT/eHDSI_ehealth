@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -17,6 +18,7 @@ import java.util.Date;
 public class BsdMessage<M> extends SyslogMessage {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BsdMessage.class);
+    private static final long serialVersionUID = -4985687066173047860L;
     private String tag;
 
     public BsdMessage(int facility, int severity, String timestamp, String hostName, LogMessage<M> message, String tag) {
@@ -39,21 +41,20 @@ public class BsdMessage<M> extends SyslogMessage {
     public static void main(String[] args) {
 
         try {
-            
+
             @SuppressWarnings("squid:S1313")
             BsdMessage m = new BsdMessage(10, 5, "Oct  1 22:14:15", "127.0.0.1", new StringLogMessage("Don't panic"), "ATNALOG");
             SyslogMessageFactory.registerLogMessage("ATNALOG", StringLogMessage.class);
             SyslogMessageFactory.setFactory(new BsdMessageFactory());
             String s = m.toString();
             LOGGER.info(s);
-            SyslogMessage s2 = SyslogMessageFactory.getFactory().read(new ByteArrayInputStream(s.getBytes(Constants.ENC_UTF8)));
+            SyslogMessage s2 = SyslogMessageFactory.getFactory().read(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info(s2.toString());
             }
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
-
     }
 
     private String getHeader() {
@@ -71,7 +72,7 @@ public class BsdMessage<M> extends SyslogMessage {
     public void write(OutputStream out) throws SyslogException {
 
         try {
-            OutputStreamWriter writer = new OutputStreamWriter(out, Constants.ENC_UTF8);
+            OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
             writer.write(getHeader());
             writer.flush();
             getMessage().write(out);
@@ -85,7 +86,7 @@ public class BsdMessage<M> extends SyslogMessage {
 
         try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            bout.write(getHeader().getBytes(Constants.ENC_UTF8));
+            bout.write(getHeader().getBytes(StandardCharsets.UTF_8));
             getMessage().write(bout);
             return bout.toByteArray();
         } catch (IOException e) {

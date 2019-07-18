@@ -32,9 +32,9 @@ public class PersistenceErrorLogger {
 
     public static void log(AtnaPersistenceException e) {
 
-        Logger logger = LoggerFactory.getLogger("ATNA.PERSISTENCE_ERROR_LOG");
+        Logger logger = LoggerFactory.getLogger(PersistenceErrorLogger.class);
         invokeHandlers(e);
 
-        logger.error("===> ATNA PERSISTENCE EXCEPTION THROWN\n** PERSISTENCE ERROR: {} **", e.getError(), e);
+        logger.error("[ATNA Error] OpenNCP ATNA persistence exception thrown!!!\nException: {}", e.getError(), e);
     }
 }

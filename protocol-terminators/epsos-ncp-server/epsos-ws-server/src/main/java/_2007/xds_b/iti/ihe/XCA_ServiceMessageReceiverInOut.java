@@ -1,13 +1,13 @@
 package _2007.xds_b.iti.ihe;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
-import epsos.ccd.gnomon.auditmanager.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
@@ -31,6 +31,7 @@ import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
@@ -98,6 +99,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
         ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponseType = null;
         ServiceType serviceType;
+        Document clinicalDocument = null;
         try {
             Date startTime = new Date();
             // get the implementation class for the Web Service
@@ -214,6 +216,10 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
                     }
                     serviceType = ServiceType.DOCUMENT_EXCHANGED_RESPONSE;
+                    RetrieveDocumentSetResponseType responseType = (RetrieveDocumentSetResponseType) fromOM(
+                            omElement, RetrieveDocumentSetResponseType.class, null);
+
+                    clinicalDocument = EadcUtilWrapper.getCDA(responseType);
 
                 } else {
                     LOGGER.error("Method not found: '{}'", methodName);
@@ -225,14 +231,9 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
                 //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
-                try {
-                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null,
-                            EadcUtilWrapper.getCDA(retrieveDocumentSetResponseType), startTime, endTime, tr.com.srdc.epsos.util.Constants.COUNTRY_CODE,
-                            EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND, serviceType);
+                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, clinicalDocument, startTime, endTime,
+                        tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND, serviceType);
 
-                } catch (Exception e) {
-                    LOGGER.error("EADC INVOCATION FAILED: '{}'", e.getMessage(), e);
-                }
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

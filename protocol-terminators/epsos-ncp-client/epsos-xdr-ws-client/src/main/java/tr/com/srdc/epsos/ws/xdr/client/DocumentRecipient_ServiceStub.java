@@ -30,9 +30,11 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.XMLUtil;
 
@@ -343,24 +345,18 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
 
-            /*
-             * Invoque eADC
-             */
-            try {
-                EadcUtilWrapper.invokeEadc(_messageContext, // Request message context
-                        _returnMessageContext, // Response message context
-                        this._getServiceClient(), //Service Client
-                        null, // CDA document
-                        transactionStartTime, // Transaction Start Time
-                        transactionEndTime, // Transaction End Time
-                        this.countryCode, // Country A ISO Code
-                        EadcEntry.DsTypes.XDR, // Data source type
-                        EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY); // Transaction direction
-            } catch (Exception ex) {
-                LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
-            }
+            // Invoke eADC service.
+            Document eDispenseCda = null;
+            if (!provideAndRegisterDocumentSetRequest.getDocument().isEmpty()
+                    && ArrayUtils.isNotEmpty(provideAndRegisterDocumentSetRequest.getDocument().get(0).getValue())) {
 
-            /* Log soap response */
+                eDispenseCda = EadcUtilWrapper.toXmlDocument(provideAndRegisterDocumentSetRequest.getDocument().get(0).getValue());
+            }
+            EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), eDispenseCda,
+                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.XDR,
+                    EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
+
+            //  Log SOAP response message.
             String responseLogMsg;
             try {
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {

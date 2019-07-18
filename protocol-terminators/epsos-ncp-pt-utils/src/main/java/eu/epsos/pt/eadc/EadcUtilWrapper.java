@@ -7,16 +7,21 @@ import eu.epsos.pt.eadc.datamodel.TransactionInfo;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
+import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.opensaml.saml.saml2.core.AuthnStatement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -32,7 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Locale;
+import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -43,27 +48,44 @@ import java.util.UUID;
  */
 public class EadcUtilWrapper {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EadcUtilWrapper.class);
+
     private EadcUtilWrapper() {
     }
 
     /**
      * Main EADC Wrapper operation. It receives as input all the required information to successfully fill a transaction object.
      *
-     * @param reqMsgCtx   the request Servlet Message Context
-     * @param respMsgCtx  the response Servlet Message Context
-     * @param CDA         the (optional) CDA document
-     * @param idAssertion the Identity Assertion
-     * @param startTime   the transaction start time
-     * @param endTime     the transaction end time
-     * @param rcvgIso     the country A ISO Code
-     * @throws Exception
+     * @param requestMsgCtx  the request Servlet Message Context
+     * @param responseMsgCtx the response Servlet Message Context
+     * @param serviceClient  the Axis2 Service Client
+     * @param cda            the (optional) CDA document*
+     * @param startTime      the transaction start time
+     * @param endTime        the transaction end time
+     * @param receivingIso   the country A ISO Code
+     * @param dsType         the JDBC Datasource corresponding to the IHE operation
+     * @param direction      the Operation type: INBOUND or OUTBOUND
+     * @param serviceType    the Service Type representing the action executed to prevent processing of personal data
      */
-    public static void invokeEadc(MessageContext reqMsgCtx, MessageContext respMsgCtx, ServiceClient serviceClient,
-                                  Document cda, Date startTime, Date endTime, String rcvgIso, EadcEntry.DsTypes dsType,
-                                  Direction direction, ServiceType serviceType) throws Exception {
+    public static void invokeEadc(MessageContext requestMsgCtx, MessageContext responseMsgCtx, ServiceClient serviceClient,
+                                  Document cda, Date startTime, Date endTime, String receivingIso, EadcEntry.DsTypes dsType,
+                                  Direction direction, ServiceType serviceType) {
 
-        EadcUtil.invokeEadc(reqMsgCtx, respMsgCtx, cda, buildTransactionInfo(reqMsgCtx, respMsgCtx, serviceClient,
-                direction, startTime, endTime, rcvgIso, serviceType), dsType);
+        new Thread(() -> {
+            StopWatch watch = new StopWatch();
+            watch.start();
+            try {
+                EadcUtil.invokeEadc(requestMsgCtx, responseMsgCtx, cda, buildTransactionInfo(requestMsgCtx, responseMsgCtx,
+                        serviceClient, direction, startTime, endTime, receivingIso, serviceType), dsType);
+            } catch (Exception e) {
+                LOGGER.error("[EADC] Invocation Failed - Exception: '{}'", e.getMessage(), e);
+            } finally {
+                watch.stop();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("EADC invocation executed in: '{}ms'", watch.getTime());
+                }
+            }
+        }).start();
     }
 
     /**
@@ -71,16 +93,17 @@ public class EadcUtilWrapper {
      *
      * @param reqMsgContext the request Servlet Message Context
      * @param rspMsgContext the response Servlet Message Context
+     * @param serviceClient the Axis2 Service Client
      * @param direction     the request direction, INBOUND or OUTBOUND
-     * @param idAssertion   the Identity Assertion
      * @param startTime     the transaction start time
      * @param endTime       the transaction end time
-     * @param countryAcode  the country A ISO Code
+     * @param countryCodeA  the country A ISO Code
+     * @param serviceType   the service type related to the IHE transaction
      * @return the filled Transaction Info object
      */
     private static TransactionInfo buildTransactionInfo(MessageContext reqMsgContext, MessageContext rspMsgContext,
                                                         ServiceClient serviceClient, Direction direction, Date startTime,
-                                                        Date endTime, String countryAcode, ServiceType serviceType) throws Exception {
+                                                        Date endTime, String countryCodeA, ServiceType serviceType) throws Exception {
 
         TransactionInfo result = new ObjectFactory().createComplexTypeTransactionInfo();
         result.setAuthenticationLevel(reqMsgContext != null ? extractAuthenticationMethodFromAssertion(getAssertion(reqMsgContext)) : null);
@@ -94,13 +117,15 @@ public class EadcUtilWrapper {
         result.setSndISO(sndIso);
         result.setSndNCPOID(sndIso != null ? OidUtil.getHomeCommunityId(sndIso.toLowerCase()) : null);
 
-        if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getFrom() != null && reqMsgContext.getOptions().getFrom().getAddress() != null) {
+        if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getFrom() != null
+                && reqMsgContext.getOptions().getFrom().getAddress() != null) {
+
             result.setHomeHost(reqMsgContext.getOptions().getFrom().getAddress());
         }
 
-        /* we cannot get the MessageID from the reqMsgContext, it returns a wrong one. 
-        Probably related to how the Axis2 engine sets the MessageID, similar issues 
-        were faced during the Evidence Emitter refactoring. Plus, for the XCA Retrieve request messages, 
+        /* we cannot get the MessageID from the reqMsgContext, it returns a wrong one.
+        Probably related to how the Axis2 engine sets the MessageID, similar issues
+        were faced during the Evidence Emitter refactoring. Plus, for the XCA Retrieve request messages,
         when comparing this MessageID with the one from the message itself, be sure to compare it with
         the correct WSA headers, there are duplicated ones, although belonging to different
         namespaces (the correct one is xmlns = http://www.w3.org/2005/08/addressing) (EHNCP-1141)*/
@@ -112,16 +137,14 @@ public class EadcUtilWrapper {
         //  TODO: Clarify values for this field according specifications and GDPR, current value set to "N/A GDPR"
         result.setHumanRequestor("N/A GDPR");
         result.setUserId("N/A GDPR");
-        //result.setHumanRequestor(reqMsgContext != null ? extractNameIdFromAssertion(getAssertion(reqMsgContext)) : null);
-        //result.setUserId(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xacml:1.0:subject:subject-id") : null);
 
         result.setPOC(reqMsgContext != null ?
                 extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
                         extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type") + ")" : null);
         result.setPOCID(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:subject:organization-id") : null);
 
-        result.setReceivingISO(countryAcode);
-        result.setReceivingNCPOID(countryAcode != null ? OidUtil.getHomeCommunityId(countryAcode.toLowerCase()) : null);
+        result.setReceivingISO(countryCodeA);
+        result.setReceivingNCPOID(countryCodeA != null ? OidUtil.getHomeCommunityId(countryCodeA.toLowerCase()) : null);
         if (serviceClient != null && serviceClient.getOptions() != null && serviceClient.getOptions().getTo() != null && serviceClient.getOptions().getTo().getAddress() != null) {
             result.setReceivingHost(serviceClient.getOptions().getTo().getAddress());
             result.setReceivingAddr(EventLogClientUtil.getServerIpAddress(serviceClient.getOptions().getTo().getAddress()));
@@ -192,15 +215,17 @@ public class EadcUtilWrapper {
     }
 
     /**
-     * Utility method to convert a specific date to the RFC 2822 format.
+     * Utility method to convert a specific date to the RFC-2822 format.
      *
      * @param date the date object to be converted
      * @return the RFC 2822 string representation of the date
      */
     private static String getDateAsRFC822String(Date date) {
 
-        // Date format according to RFC 2822 specifications.
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.ROOT);
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z");
+        dateFormat.setTimeZone(timeZone);
+
         return dateFormat.format(date);
     }
 
@@ -209,19 +234,17 @@ public class EadcUtilWrapper {
      *
      * @param retrieveDocumentSetResponseType
      * @return
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
      */
-    public static Document getCDA(ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponseType) throws ParserConfigurationException, SAXException, IOException {
+    public static Document getCDA(RetrieveDocumentSetResponseType retrieveDocumentSetResponseType) {
 
-        ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse documentResponse;
+        RetrieveDocumentSetResponseType.DocumentResponse documentResponse;
 
-        if (retrieveDocumentSetResponseType != null && retrieveDocumentSetResponseType.getDocumentResponse() != null && !retrieveDocumentSetResponseType.getDocumentResponse().isEmpty()) {
+        if (retrieveDocumentSetResponseType != null && retrieveDocumentSetResponseType.getDocumentResponse() != null
+                && !retrieveDocumentSetResponseType.getDocumentResponse().isEmpty()) {
+
             documentResponse = retrieveDocumentSetResponseType.getDocumentResponse().get(0);
-
             byte[] documentData = documentResponse.getDocument();
-            return convertToDomDocument(documentData);
+            return toXmlDocument(documentData);
         }
         return null;
     }
@@ -229,11 +252,8 @@ public class EadcUtilWrapper {
     /**
      * Converts a set of bytes into a Document
      *
-     * @param documentData
-     * @return
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
+     * @param documentData XML Document as byte array
+     * @return Document converted from byte array.
      */
     private static Document convertToDomDocument(byte[] documentData) throws ParserConfigurationException, SAXException, IOException {
 
@@ -275,19 +295,17 @@ public class EadcUtilWrapper {
     /**
      * Extracts the sending country ISO code from Issuer of the given Assertion.
      * E.g., for this issuer:
-     * <saml2:Issuer NameQualifier="urn:epsos:wp34:assertions">urn:idp:PT:countryB</saml2:Issuer>
-     * it will extract "PT"
-     * *
+     * <saml2:Issuer NameQualifier="urn:epsos:wp34:assertions">urn:idp:PT:countryB</saml2:Issuer> it will extract "PT"
      *
      * @param idAssertion
-     * @return string containing the assertion issuer's ISO country code
+     * @return String containing the assertion issuer's ISO country code
      */
     private static String extractSendingCountryIsoFromAssertion(Assertion idAssertion) {
         return idAssertion.getIssuer().getValue().split(":")[2];
     }
 
     /**
-     * Copied from *_ServiceMessageReceiverInOut.java
+     * Copied from <code>_ServiceMessageReceiverInOut.java</code>
      * It returns the MessageID directly from the SOAP Envelope.
      *
      * @param envelope The SOAP envelope
@@ -300,8 +318,20 @@ public class EadcUtilWrapper {
         if (it.hasNext()) {
             return it.next().getText();
         } else {
-            // [Mustafa: May 8, 2012]: Should not be empty string, sch. giveserror.
+            // [Mustafa: May 8, 2012]: Should not be empty string, sch. gives error.
             return Constants.UUID_PREFIX;
+        }
+    }
+
+    public static Document toXmlDocument(byte[] content) {
+
+        if (ArrayUtils.isEmpty(content)) {
+            return null;
+        }
+        try {
+            return XMLUtil.parseContent(content);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            return null;
         }
     }
 }

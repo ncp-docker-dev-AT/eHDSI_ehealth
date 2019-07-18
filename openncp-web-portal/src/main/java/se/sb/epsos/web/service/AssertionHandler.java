@@ -2,6 +2,7 @@ package se.sb.epsos.web.service;
 
 import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;

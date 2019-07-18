@@ -25,6 +25,7 @@ import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
