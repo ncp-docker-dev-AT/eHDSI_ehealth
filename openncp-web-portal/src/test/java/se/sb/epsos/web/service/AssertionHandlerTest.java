@@ -1,6 +1,6 @@
 package se.sb.epsos.web.service;
 
-import epsos.ccd.gnomon.auditmanager.AuditService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import junit.framework.TestCase;

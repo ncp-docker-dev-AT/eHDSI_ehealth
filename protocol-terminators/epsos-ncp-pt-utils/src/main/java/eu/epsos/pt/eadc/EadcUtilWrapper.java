@@ -7,12 +7,14 @@ import eu.epsos.pt.eadc.datamodel.TransactionInfo;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
+import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -35,7 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Locale;
+import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -213,15 +215,17 @@ public class EadcUtilWrapper {
     }
 
     /**
-     * Utility method to convert a specific date to the RFC 2822 format.
+     * Utility method to convert a specific date to the RFC-2822 format.
      *
      * @param date the date object to be converted
      * @return the RFC 2822 string representation of the date
      */
     private static String getDateAsRFC822String(Date date) {
 
-        // Date format according to RFC 2822 specifications.
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.ROOT);
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z");
+        dateFormat.setTimeZone(timeZone);
+
         return dateFormat.format(date);
     }
 
@@ -230,21 +234,17 @@ public class EadcUtilWrapper {
      *
      * @param retrieveDocumentSetResponseType
      * @return
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
      */
-    public static Document getCDA(ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponseType)
-            throws ParserConfigurationException, SAXException, IOException {
+    public static Document getCDA(RetrieveDocumentSetResponseType retrieveDocumentSetResponseType) {
 
-        ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse documentResponse;
+        RetrieveDocumentSetResponseType.DocumentResponse documentResponse;
 
         if (retrieveDocumentSetResponseType != null && retrieveDocumentSetResponseType.getDocumentResponse() != null
                 && !retrieveDocumentSetResponseType.getDocumentResponse().isEmpty()) {
 
             documentResponse = retrieveDocumentSetResponseType.getDocumentResponse().get(0);
             byte[] documentData = documentResponse.getDocument();
-            return convertToDomDocument(documentData);
+            return toXmlDocument(documentData);
         }
         return null;
     }
@@ -320,6 +320,18 @@ public class EadcUtilWrapper {
         } else {
             // [Mustafa: May 8, 2012]: Should not be empty string, sch. gives error.
             return Constants.UUID_PREFIX;
+        }
+    }
+
+    public static Document toXmlDocument(byte[] content) {
+
+        if (ArrayUtils.isEmpty(content)) {
+            return null;
+        }
+        try {
+            return XMLUtil.parseContent(content);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            return null;
         }
     }
 }

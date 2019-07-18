@@ -28,8 +28,8 @@ public class ProtocolMessage<M> extends SyslogMessage {
     private String procId = "-";
     private List<StructuredElement> structuredElement = new ArrayList<>();
 
-    public ProtocolMessage(int facility, int severity, String timestamp, String hostName, LogMessage<M> message, String appName, String messageId,
-                           String procId) throws SyslogException {
+    public ProtocolMessage(int facility, int severity, String timestamp, String hostName, LogMessage<M> message,
+                           String appName, String messageId, String procId) throws SyslogException {
         super(facility, severity, timestamp, hostName, message);
         if (timestamp == null) {
             timestamp = "-";

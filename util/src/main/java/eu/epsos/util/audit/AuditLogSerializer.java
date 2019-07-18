@@ -16,6 +16,7 @@ public interface AuditLogSerializer {
     void writeObjectToFile(Serializable message);
 
     enum Type {
+        
         ATNA("ATNA"),
         AUDIT_MANAGER("AM");
 
@@ -32,7 +33,7 @@ public interface AuditLogSerializer {
         }
 
         public String getFilePrefix() {
-            return filePrefix + "AuditLogBackup-";
+            return filePrefix + "-AuditLogBackup-";
         }
 
         public String getFileSuffix() {
@@ -40,8 +41,7 @@ public interface AuditLogSerializer {
         }
 
         public String getNewFileName() {
-            return getDir() + getFilePrefix() +
-                    getTimeStamp() + "-" + getCounterValue() + getFileSuffix();
+            return getDir() + getFilePrefix() + getTimeStamp() + "-" + getCounterValue() + getFileSuffix();
         }
 
         public long getCounterValue() {

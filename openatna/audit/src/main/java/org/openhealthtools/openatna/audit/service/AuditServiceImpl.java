@@ -1,22 +1,3 @@
-/*
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
 package org.openhealthtools.openatna.audit.service;
 
 import eu.epsos.util.audit.AuditLogSerializer.Type;
@@ -43,7 +24,6 @@ import org.openhealthtools.openatna.syslog.SyslogMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -52,16 +32,10 @@ import java.util.Map;
  * This pulls together various configurations to create an ATNA Audit service
  *
  * @author Andrew Harrison
- * @version $Revision:$
- * @created Oct 5, 2009: 9:27:35 PM
- * @date $Date:$ modified by $Author:$
  */
-
 public class AuditServiceImpl implements AuditService {
 
-    public static final String KEY_TIME_BETWEEN_FAILED_LOGS_HANDLING = "time.between.failed.logs.handling";
-    public static final long DEFAULT_TIME_BETWEEN = 60 * 60 * 1000L; // 1h
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuditServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(AuditServiceImpl.class);
     private ServerConfiguration serverConfig;
     private ServiceConfiguration serviceConfig = new ServiceConfiguration();
     private ProcessorChain chain = new ProcessorChain();
@@ -70,12 +44,12 @@ public class AuditServiceImpl implements AuditService {
 
     /**
      * start the service
-     *
-     * @throws IOException
      */
-    public void start() throws IOException {
+    public void start() {
+
+        logger.info("[ATNA Service] Starting OpenATNA service..");
         if (serviceConfig.getLogMessageClass() == null) {
-            throw new RuntimeException("no log message defined!");
+            throw new RuntimeException("No log message defined!");
         }
 
         loadCodes();
@@ -90,7 +64,7 @@ public class AuditServiceImpl implements AuditService {
                             getClass().getClassLoader()).newInstance();
                     chain.addNext(proc, phase);
                 } catch (Exception e) {
-                    LOGGER.warn("Could not load processor: '{}'", atnaProcessor, e);
+                    logger.warn("Could not load processor: '{}'", atnaProcessor, e);
                 }
             }
         }
@@ -98,21 +72,24 @@ public class AuditServiceImpl implements AuditService {
             serverConfig.load();
             List<AtnaServer> servers = serverConfig.getServers();
             if (servers.isEmpty()) {
-                LOGGER.warn("Could not start service. No AtnaServers were loaded!");
-                return;
+                logger.warn("Could not start service. No AtnaServers were loaded!");
             } else {
+
                 this.syslogServer = servers.get(0);
                 if (syslogServer != null) {
+
                     SyslogMessageFactory.setDefaultLogMessage(serviceConfig.getLogMessageClass());
                     AtnaMessageListener atnaMessageListener = new AtnaMessageListener(this);
                     syslogServer.start(atnaMessageListener);
                     failedLogsHandlerService = new FailedLogsHandlerServiceImpl(atnaMessageListener, Type.ATNA);
+                    failedLogsHandlerService.start();
                 }
             }
         }
     }
 
     private void loadCodes() {
+
         URL defCodes = getClass().getResource("/conf/atnacodes.xml");
         if (defCodes != null) {
             serviceConfig.addCodeUrl(defCodes.toString());
@@ -121,27 +98,28 @@ public class AuditServiceImpl implements AuditService {
         List<AtnaCode> l = CodeRegistry.allCodes();
         CodeDao dao = AtnaFactory.codeDao();
         for (AtnaCode atnaCode : l) {
+
             CodeEntity ce = EntityConverter.createCode(atnaCode, EntityConverter.getCodeType(atnaCode));
             PersistencePolicies pp = new PersistencePolicies();
             pp.setErrorOnDuplicateInsert(false);
             pp.setAllowNewCodes(true);
             try {
                 if (dao.save(ce, pp)) {
-                    LOGGER.info("loading code: '{}'", atnaCode);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Saving loaded codes: '{}'", atnaCode);
+                    }
                 }
             } catch (AtnaPersistenceException e) {
-                LOGGER.info("Exception thrown while storing code:", e.getMessage(), e);
+                logger.error("Exception thrown while storing code: '{}'", e.getMessage(), e);
             }
         }
-
     }
 
     /**
      * stop the service
-     *
-     * @throws IOException
      */
-    public void stop() throws IOException {
+    public void stop() {
+
         if (syslogServer != null) {
             syslogServer.stop();
         }
@@ -163,6 +141,10 @@ public class AuditServiceImpl implements AuditService {
      * Return true if persisted
      */
     public boolean process(AtnaMessage message) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Process AtnaMessage: '{}'", message.getMessageId());
+        }
         ProcessContext context = new ProcessContext(message);
         chain.process(context);
         return context.getState() == State.PERSISTED;
