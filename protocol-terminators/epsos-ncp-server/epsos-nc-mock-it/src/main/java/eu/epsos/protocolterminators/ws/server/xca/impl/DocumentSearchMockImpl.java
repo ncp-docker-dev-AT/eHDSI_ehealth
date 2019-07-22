@@ -5,7 +5,14 @@ import eu.epsos.protocolterminators.ws.server.common.ResourceList;
 import eu.epsos.protocolterminators.ws.server.common.ResourceLoader;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
-import fi.kela.se.epsos.data.model.*;
+import fi.kela.se.epsos.data.model.DocumentAssociation;
+import fi.kela.se.epsos.data.model.DocumentFactory;
+import fi.kela.se.epsos.data.model.EPDocumentMetaData;
+import fi.kela.se.epsos.data.model.EPSOSDocument;
+import fi.kela.se.epsos.data.model.EPSOSDocumentMetaData;
+import fi.kela.se.epsos.data.model.MroDocumentMetaData;
+import fi.kela.se.epsos.data.model.PSDocumentMetaData;
+import fi.kela.se.epsos.data.model.SearchCriteria;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -75,14 +82,22 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
+                String productCode = null;
+                String productName = null;
+                Element element = getProductFromPrescription(xmlDoc);
+                if (element != null) {
+                    productCode = element.getAttribute("code");
+                    productName = element.getAttribute("displayName");
+                }
+
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc));
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), productCode, productName, true);
                 LOGGER.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
                 EPDocumentMetaData epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc));
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), productCode, productName, true);
                 LOGGER.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
 
@@ -335,6 +350,16 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
         LOGGER.debug("Could not locate the title of the prescription");
         return "Document Title Not Available";
+    }
+
+
+    private Element getProductFromPrescription(Document document) {
+        NodeList elements = document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "generalizedMedicineClass");
+        if (elements.getLength() == 1) {
+            return null;
+        }
+        return (Element) elements.item(0)
+                .getFirstChild();
     }
 
     /**

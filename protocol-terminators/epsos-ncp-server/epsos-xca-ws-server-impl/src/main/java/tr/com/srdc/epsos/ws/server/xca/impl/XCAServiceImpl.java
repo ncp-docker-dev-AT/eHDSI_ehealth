@@ -1,6 +1,11 @@
 package tr.com.srdc.epsos.ws.server.xca.impl;
 
-import epsos.ccd.gnomon.auditmanager.*;
+import epsos.ccd.gnomon.auditmanager.EventActionCode;
+import epsos.ccd.gnomon.auditmanager.EventLog;
+import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
+import epsos.ccd.gnomon.auditmanager.EventType;
+import epsos.ccd.gnomon.auditmanager.IHEEventType;
+import epsos.ccd.gnomon.auditmanager.TransactionName;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.posam.tm.exception.TMError;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
@@ -20,15 +25,29 @@ import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import eu.europa.ec.sante.ehdsi.openncp.util.UUIDHelper;
-import fi.kela.se.epsos.data.model.*;
+import fi.kela.se.epsos.data.model.DocumentAssociation;
+import fi.kela.se.epsos.data.model.DocumentFactory;
+import fi.kela.se.epsos.data.model.EPDocumentMetaData;
+import fi.kela.se.epsos.data.model.EPSOSDocument;
+import fi.kela.se.epsos.data.model.EPSOSDocumentMetaData;
+import fi.kela.se.epsos.data.model.MroDocumentMetaData;
+import fi.kela.se.epsos.data.model.PSDocumentMetaData;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.AssociationType1;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.ClassificationType;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExtrinsicObjectType;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
-import org.apache.axiom.om.*;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMText;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
@@ -58,7 +77,13 @@ import javax.xml.namespace.QName;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.UUID;
 
 public class XCAServiceImpl implements XCAServiceInterface {
 
@@ -569,7 +594,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
         eot.getName().getLocalizedString().get(0).setValue(name);
 
-        // Description (optional)
+        // Description
         eot.setDescription(ofRim.createInternationalStringType());
         eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
         eot.getDescription().getLocalizedString().get(0).setValue(document.getTitle());
@@ -597,6 +622,26 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Type code (not written in 3.4.2)
         eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
                 uuid, Constants.EP_CLASSCODE, "2.16.840.1.113883.6.1", name));
+
+        // Product
+        if (document.hasProduct()) {
+            EPDocumentMetaData.ProductMetadata product = document.getProduct();
+            eot.getClassification()
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                            uuid, product.getProductCode(), "2.16.840.1.113883.6.73", product.getProductName()));
+        }
+
+        // Dispensable
+        if (document.isDispensable()) {
+            eot.getClassification()
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                            uuid, "urn:ihe:iti:xdw:2011:eventCode:closed", "1.3.6.1.4.1.19376.1.2.3", "Closed"));
+        } else {
+            eot.getClassification()
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                            uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open"));
+        }
+
         // Confidentiality Code
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
                 uuid, "N", "2.16.840.1.113883.5.25", "Normal"));
