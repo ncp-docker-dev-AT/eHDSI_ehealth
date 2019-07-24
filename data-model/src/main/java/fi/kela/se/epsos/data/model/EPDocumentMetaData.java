@@ -10,7 +10,7 @@ public interface EPDocumentMetaData extends EPSOSDocumentMetaData {
     ProductMetadata getProduct();
 
     default boolean hasProduct() {
-        return getProduct() == null;
+        return getProduct() != null;
     }
 
     boolean isDispensable();
