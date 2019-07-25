@@ -147,7 +147,7 @@ public class EadcUtilWrapper {
         result.setReceivingNCPOID(countryCodeA != null ? OidUtil.getHomeCommunityId(countryCodeA.toLowerCase()) : null);
         if (serviceClient != null && serviceClient.getOptions() != null && serviceClient.getOptions().getTo() != null && serviceClient.getOptions().getTo().getAddress() != null) {
             result.setReceivingHost(serviceClient.getOptions().getTo().getAddress());
-            result.setReceivingAddr(EventLogClientUtil.getServerIpAddress(serviceClient.getOptions().getTo().getAddress()));
+            result.setReceivingAddr(EventLogClientUtil.getRemoteIpAddress(serviceClient.getOptions().getTo().getAddress()));
         }
         if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getAction() != null) {
             result.setRequestAction(reqMsgContext.getOptions().getAction());

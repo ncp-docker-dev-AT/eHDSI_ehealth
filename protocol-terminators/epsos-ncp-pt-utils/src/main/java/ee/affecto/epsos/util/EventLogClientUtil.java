@@ -6,6 +6,7 @@ import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.client.Stub;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -19,22 +20,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-import java.net.*;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.Enumeration;
+import java.net.InetAddress;
+import java.net.URL;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-//TODO: Review OpenNCP-2.5.5
 public class EventLogClientUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventLogClientUtil.class);
+    private static final String ERROR_UNKNOWN_HOST = "UNKNOWN_HOST";
 
     private EventLogClientUtil() {
     }
@@ -42,7 +40,7 @@ public class EventLogClientUtil {
     /**
      * @param stub
      */
-    public static void createDummyMustUnderstandHandler(org.apache.axis2.client.Stub stub) {
+    public static void createDummyMustUnderstandHandler(Stub stub) {
 
         HandlerDescription description = new HandlerDescription("DummyMustUnderstandHandler");
         description.setHandler(new DummyMustUnderstandHandler());
@@ -60,86 +58,30 @@ public class EventLogClientUtil {
     }
 
     /**
-     * @param epr
-     * @return
-     */
-    public static String getServerCertificateDN(String epr) {
-
-        String dn = null;
-
-        try {
-            // TODO A.R. Silly, very silly  to open connection again just for getting server certificate.
-            // But can we get it from AXIS2?
-
-            HostnameVerifier allHostsValid = (hostname, session) -> true;
-            // Install the all-trusting host verifier
-            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-
-            URL url = new URL(epr);
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-            con.connect();
-            Certificate[] certs = con.getServerCertificates();
-            // Peers certificate is first
-            if (certs != null && certs.length > 0) {
-                X509Certificate cert = (X509Certificate) certs[0];
-                dn = cert.getSubjectDN().getName();
-            }
-            con.disconnect();
-        } catch (Exception ex) {
-            LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
-        }
-        return dn;
-    }
-
-    /**
-     * @return
+     * Returns the local private IP of the machine executing the method.
+     *
+     * @return First IP v4 or v6 value retrieved which is not a loopback or local IP address.
      */
     public static String getLocalIpAddress() {
 
-        // TODO A.R. should be changed for multihomed hosts... It's better to get address from AXIS2 actual socket but how?
-//        String ipAddress = null;
-//        try {
-//            ipAddress = InetAddress.getLocalHost().getHostAddress();
-//        } catch (UnknownHostException e) {
-//
-//            LOGGER.error("UnknownHostException: '{}'", e.getMessage(), e);
-//        }
-//        return ipAddress;
-        try {
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (networkInterfaces.hasMoreElements()) {
-
-                NetworkInterface networkInterface = networkInterfaces.nextElement();
-                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
-                    if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
-                            && (inetAddress instanceof Inet4Address || inetAddress instanceof Inet6Address)) {
-                        return inetAddress.getHostAddress();
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            LOGGER.error("Unable to get current IP: '{}'", e.getMessage(), e);
-        }
-        return "IP Not Found";
+        return IPUtil.getPrivateServerIp();
     }
 
     /**
-     * @param epr
-     * @return
+     * Returns the IP address or a remote server.
+     *
+     * @param endpointReference - client endpoint reference value extracted from the SOAP ServiceClient
+     * @return IP address of the client retrieved by InetAddress or ERROR_UNKNOWN_HOST.
      */
-    public static String getServerIpAddress(String epr) {
+    public static String getRemoteIpAddress(String endpointReference) {
 
-        URL url;
-        String ipAddress = null;
         try {
-            url = new URL(epr);
-            ipAddress = InetAddress.getByName(url.getHost()).getHostAddress();
+            URL url = new URL(endpointReference);
+            return InetAddress.getByName(url.getHost()).getHostAddress();
         } catch (Exception e) {
-            LOGGER.error(null, e);
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            return ERROR_UNKNOWN_HOST;
         }
-        return ipAddress;
     }
 
     /**
@@ -173,7 +115,7 @@ public class EventLogClientUtil {
         }
 
         // Set Target Ip
-        String serverIp = EventLogClientUtil.getServerIpAddress(address);
+        String serverIp = EventLogClientUtil.getRemoteIpAddress(address);
         if (serverIp != null) {
             eventLog.setTargetip(serverIp);
         }

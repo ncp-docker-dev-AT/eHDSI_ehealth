@@ -13,7 +13,6 @@ import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +24,7 @@ import org.w3c.dom.*;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.xml.XMLConstants;
 import javax.xml.datatype.DatatypeFactory;
@@ -311,24 +311,23 @@ public class TransformationService implements ITransformationService, TMConstant
         logger.debug("[Transformation Service] Audit trail BEGIN");
 
         if (responseStructure != null) {
+            //TODO: Review if this 'if (config.isAuditTrailEnabled())' is authorized according Audit Profile specification
             if (config.isAuditTrailEnabled()) {
 
                 try {
                     GregorianCalendar calendar = new GregorianCalendar();
                     calendar.setTime(new Date());
-                    // TODO this is not final/correct version
                     String securityHeader = "[No security header provided]";
                     EventLog eventLog = EventLog.createEventLogPivotTranslation(
                             TransactionName.epsosPivotTranslation, // Possible values according to D4.5.6 are E,R,U,D
                             EventActionCode.EXECUTE,
                             DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar),
                             responseStructure.getStatus().equals(STATUS_SUCCESS) ? EventOutcomeIndicator.FULL_SUCCESS : EventOutcomeIndicator.PERMANENT_FAILURE,
-                            // The string encoded CN of the TLS certificate of the NCP triggered the epsos operation
+                            // The string encoded CN of the TLS certificate of the NCP triggering the eHDSI operation
                             HTTPUtil.getSubjectDN(false),
                             // Identifier that allows to unequivocally identify the SOURCE document or source data entries. (UUID Format)
                             getOIDFromDocument(responseStructure.getDocument()),
                             getOIDFromDocument(responseStructure.getResponseCDA()), // Identifier that allows to unequivocally identify the TARGET document. (UUID Format)
-                            //Constants.UUID_PREFIX + "",
                             // The value MUST contain the base64 encoded security header
                             Constants.UUID_PREFIX + responseStructure.getRequestId(),
                             securityHeader.getBytes(StandardCharsets.UTF_8), // ReqM_ParticipantObjectDetail - The value MUST contain the base64 encoded security header
@@ -336,7 +335,7 @@ public class TransformationService implements ITransformationService, TMConstant
                             // String-encoded UUID of the response message
                             Constants.UUID_PREFIX + responseStructure.getRequestId(),
                             securityHeader.getBytes(StandardCharsets.UTF_8), // ResM_ParticipantObjectDetail - The value MUST contain the base64 encoded security header
-                            ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP") // The IP Address of the target Gateway
+                            IPUtil.getPrivateServerIp() // The IP Address of the target Gateway
                     );
                     eventLog.setEventType(EventType.epsosPivotTranslation);
                     eventLog.setNcpSide(NcpSide.valueOf(config.getNcpSide()));

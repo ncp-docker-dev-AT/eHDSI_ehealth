@@ -101,7 +101,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
 import java.io.*;
-import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -1246,6 +1245,7 @@ public class EpsosHelperService {
         String secHead = "[No security header provided]";
         String requestMsgParticipantObjectID = Constants.UUID_PREFIX + message;
         String responseMsgParticipantObjectID = Constants.UUID_PREFIX + message;
+        //TODO: Might be necessary to adapt the targetIp to the relevant XUA Provider address.
         String sourceIP = IPUtil.getPrivateServerIp();
         String PC_UserID = orgName;
         String PC_RoleID = orgType;
@@ -1263,9 +1263,7 @@ public class EpsosHelperService {
             if (!attributesSaml.isEmpty()) {
                 HR_AlternativeUserID = ((XSString) attributesSaml.get(0)).getValue();
             }
-
         }
-        // String HR_AlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
         String serviceConsumerUserId = name;
         String serviceProviderUserId = name;
 
