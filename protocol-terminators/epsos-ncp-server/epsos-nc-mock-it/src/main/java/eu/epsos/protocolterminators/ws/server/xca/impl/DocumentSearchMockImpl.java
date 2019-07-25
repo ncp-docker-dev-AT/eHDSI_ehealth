@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -355,11 +356,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
     private Element getProductFromPrescription(Document document) {
         NodeList elements = document.getElementsByTagNameNS(EHDSI_EPSOS_MEDICATION_NAMESPACE, "generalizedMedicineClass");
-        if (elements.getLength() == 0) {
-            return null;
+        for (int i = 0; i < elements.getLength(); i++) {
+            Node node = elements.item(0);
+            if (Objects.equals(Node.ELEMENT_NODE, node.getNodeType()) &&
+                    Objects.equals("code", node.getLocalName())) {
+                return (Element) node;
+            }
         }
-        return (Element) elements.item(0)
-                .getFirstChild();
+        return null;
     }
 
     /**
