@@ -354,7 +354,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
 
     private Element getProductFromPrescription(Document document) {
-        NodeList elements = document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "generalizedMedicineClass");
+        NodeList elements = document.getElementsByTagNameNS(EHDSI_EPSOS_MEDICATION_NAMESPACE, "generalizedMedicineClass");
         if (elements.getLength() == 0) {
             return null;
         }
