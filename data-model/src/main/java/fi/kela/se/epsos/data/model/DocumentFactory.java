@@ -50,7 +50,7 @@ public class DocumentFactory {
     private static EPDocumentMetaData createEPDocument(int documentFormat, String id, String patientId, Date effectiveDate,
                                                        String repositoryId, String title, String author) {
 
-        return createEPDocument(documentFormat, id, patientId, effectiveDate, repositoryId, title, author, null, null, false);
+        return createEPDocument(documentFormat, id, patientId, effectiveDate, repositoryId, title, author, null, null, true);
     }
 
     private static EPDocumentMetaData createEPDocument(int documentFormat, String id, String patientId, Date effectiveDate,
@@ -67,13 +67,13 @@ public class DocumentFactory {
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, false);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, true);
     }
 
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String productCode, String productName) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, productCode, productName, false);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, productCode, productName, true);
     }
 
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
@@ -90,13 +90,13 @@ public class DocumentFactory {
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author) {
-        return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, false);
+        return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, true);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String productCode, String productName) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, productCode, productName, false);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, productCode, productName, true);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
@@ -159,17 +159,20 @@ public class DocumentFactory {
     /**
      * ConsentDocument
      */
+    @Deprecated
     private static ConsentDocumentMetaData createConsentDocument(int documentFormat, String id, String patientId, Date effectiveDate, String repositoryId, String title, String author) {
 
         EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate, Constants.CONSENT_CLASSCODE, repositoryId, title, author);
         return new ConsentDocumentMetaDataImpl(metaData);
     }
 
+    @Deprecated
     public static ConsentDocumentMetaData createConsentDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId, String title, String author) {
 
         return createConsentDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF, id, patientId, effectiveDate, repositoryId, title, author);
     }
 
+    @Deprecated
     public static ConsentDocumentMetaData createConsentDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId, String title, String author) {
 
         return createConsentDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, repositoryId, title, author);
@@ -178,17 +181,20 @@ public class DocumentFactory {
     /**
      * MRODocument
      */
+    @Deprecated
     private static MroDocumentMetaData createMroDocument(int documentFormat, String id, String patientId, Date effectiveDate, String repositoryId, String title, String author) {
 
         EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate, Constants.MRO_CLASSCODE, repositoryId, title, author);
         return new MroDocumentMetaDataImpl(metaData);
     }
 
+    @Deprecated
     public static MroDocumentMetaData createMroDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId, String title, String author) {
 
         return createMroDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF, id, patientId, effectiveDate, repositoryId, title, author);
     }
 
+    @Deprecated
     public static MroDocumentMetaData createMroDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId, String title, String author) {
 
         return createMroDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, repositoryId, title, author);

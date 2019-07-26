@@ -5,14 +5,7 @@ import eu.epsos.protocolterminators.ws.server.common.ResourceList;
 import eu.epsos.protocolterminators.ws.server.common.ResourceLoader;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
-import fi.kela.se.epsos.data.model.DocumentAssociation;
-import fi.kela.se.epsos.data.model.DocumentFactory;
-import fi.kela.se.epsos.data.model.EPDocumentMetaData;
-import fi.kela.se.epsos.data.model.EPSOSDocument;
-import fi.kela.se.epsos.data.model.EPSOSDocumentMetaData;
-import fi.kela.se.epsos.data.model.MroDocumentMetaData;
-import fi.kela.se.epsos.data.model.PSDocumentMetaData;
-import fi.kela.se.epsos.data.model.SearchCriteria;
+import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -33,11 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -355,11 +344,15 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
 
     private Element getProductFromPrescription(Document document) {
+
         NodeList elements = document.getElementsByTagNameNS(EHDSI_EPSOS_MEDICATION_NAMESPACE, "generalizedMedicineClass");
-        for (int i = 0; i < elements.getLength(); i++) {
-            Node node = elements.item(0);
-            if (Objects.equals(Node.ELEMENT_NODE, node.getNodeType()) &&
-                    Objects.equals("code", node.getLocalName())) {
+        if (elements.getLength() == 0) {
+            return null;
+        }
+        NodeList children = elements.item(0).getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node node = children.item(i);
+            if (Objects.equals(Node.ELEMENT_NODE, node.getNodeType()) && Objects.equals("code", node.getLocalName())) {
                 return (Element) node;
             }
         }
