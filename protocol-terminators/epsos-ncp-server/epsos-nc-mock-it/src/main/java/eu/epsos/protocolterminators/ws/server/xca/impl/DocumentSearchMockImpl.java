@@ -31,6 +31,9 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -91,14 +94,16 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                     productName = element.getAttribute("displayName");
                 }
 
+                String description = getDescriptionFromDocument(xmlDoc);
+
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), productCode, productName, true);
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true);
                 LOGGER.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
                 EPDocumentMetaData epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), productCode, productName, true);
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true);
                 LOGGER.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
 
@@ -371,23 +376,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return null;
     }
 
-    /**
-     * @param doc
-     * @return
-     */
-    private String getDescriptionFromPrescription(Document doc) {
-
-        //xmlns:epsos="urn:epsos-org:ep:medication"
-        NodeList documentNames = doc.getElementsByTagNameNS(EHDSI_EPSOS_MEDICATION_NAMESPACE, "name");
-
-        if (documentNames != null && documentNames.getLength() > 0) {
-            Node titleNode = documentNames.item(0);
-            return titleNode.getTextContent();
-        }
-        LOGGER.debug("Could not locate the title of the prescription");
-        return "ePrescription";
-    }
-
     private void wrapPDFinCDA(byte[] pdf, Document doc) {
 
         LOGGER.info("NameSpace: '{}', Document URI '{}', XML encoding: '{}', BaseURI: '{}'", doc.getNamespaceURI(),
@@ -428,5 +416,21 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 id.setAttribute(CONSTANT_EXTENSION, Integer.toString(format));
             }
         }
+    }
+
+    private String getDescriptionFromDocument(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String description = null;
+
+        try {
+            description = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='name']/text()", doc) +
+                    ", " + path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='formCode']/@displayName", doc) +
+                    ", " + path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='desc']/text()", doc);
+        } catch (XPathExpressionException e) {
+            LOGGER.error("XPath expression error", e);
+        }
+
+        return description;
     }
 }

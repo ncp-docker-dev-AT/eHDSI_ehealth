@@ -3,26 +3,33 @@ package fi.kela.se.epsos.data.model;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements EPDocumentMetaData {
 
+    private String description;
+
     private ProductMetadata product;
 
     private boolean dispensable;
 
-    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData) {
-        this(metaData, null);
+    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description) {
+        this(metaData, description, null);
     }
 
-    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, ProductMetadata product) {
-        this(metaData, product, false);
+    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, ProductMetadata product) {
+        this(metaData, description, product, false);
     }
 
-    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, boolean dispensable) {
-        this(metaData, null, dispensable);
+    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, boolean dispensable) {
+        this(metaData, description, null, dispensable);
     }
 
-    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, ProductMetadata product, boolean dispensable) {
+    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, ProductMetadata product, boolean dispensable) {
         super(metaData);
         this.product = product;
         this.dispensable = dispensable;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 
     @Override

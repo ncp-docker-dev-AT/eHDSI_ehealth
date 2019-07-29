@@ -48,67 +48,67 @@ public class DocumentFactory {
      * EPDocument
      */
     private static EPDocumentMetaData createEPDocument(int documentFormat, String id, String patientId, Date effectiveDate,
-                                                       String repositoryId, String title, String author) {
+                                                       String repositoryId, String title, String author, String description) {
 
-        return createEPDocument(documentFormat, id, patientId, effectiveDate, repositoryId, title, author, null, null, true);
+        return createEPDocument(documentFormat, id, patientId, effectiveDate, repositoryId, title, author, description, null, null, true);
     }
 
     private static EPDocumentMetaData createEPDocument(int documentFormat, String id, String patientId, Date effectiveDate,
-                                                       String repositoryId, String title, String author, String productCode, String productName, boolean dispensable) {
+                                                       String repositoryId, String title, String author, String description, String productCode, String productName, boolean dispensable) {
         EPSOSDocumentMetaData metaData =
                 new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate, Constants.EP_CLASSCODE, repositoryId, title, author);
         if (StringUtils.isNoneBlank(productCode, productName)) {
-            return new EPDocumentMetaDataImpl(metaData, new EPDocumentMetaDataImpl.SimpleProductMetadata(productCode, productName), dispensable);
+            return new EPDocumentMetaDataImpl(metaData, description, new EPDocumentMetaDataImpl.SimpleProductMetadata(productCode, productName), dispensable);
         } else {
-            return new EPDocumentMetaDataImpl(metaData, dispensable);
+            return new EPDocumentMetaDataImpl(metaData, description, dispensable);
         }
     }
 
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                         String title, String author) {
+                                                         String title, String author, String description) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, true);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, true);
     }
 
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                         String title, String author, String productCode, String productName) {
+                                                         String title, String author, String description, String productCode, String productName) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, productCode, productName, true);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName, true);
     }
 
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                         String title, String author, boolean dispensable) {
+                                                         String title, String author, String description, boolean dispensable) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, null, null, dispensable);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, null, null, dispensable);
     }
 
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                         String title, String author, String productCode, String productName, boolean dispensable) {
+                                                         String title, String author, String description, String productCode, String productName, boolean dispensable) {
 
-        return createEPDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF, id, patientId, effectiveDate, repositoryId, title, author, productCode, productName, dispensable);
+        return createEPDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF, id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName, dispensable);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                         String title, String author) {
-        return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, true);
+                                                         String title, String author, String description) {
+        return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, true);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                         String title, String author, String productCode, String productName) {
+                                                         String title, String author, String description, String productCode, String productName) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, productCode, productName, true);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName, true);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                         String title, String author, boolean dispensable) {
+                                                         String title, String author, String description, boolean dispensable) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, null, null, dispensable);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, null, null, dispensable);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                         String title, String author, String productCode, String productName, boolean dispensable) {
+                                                         String title, String author, String description, String productCode, String productName, boolean dispensable) {
 
-        return createEPDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, repositoryId, title, author, productCode, productName, dispensable);
+        return createEPDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName, dispensable);
     }
 
     /**

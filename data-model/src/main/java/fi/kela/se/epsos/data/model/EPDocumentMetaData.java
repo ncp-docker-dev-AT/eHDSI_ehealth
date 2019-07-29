@@ -7,6 +7,8 @@ package fi.kela.se.epsos.data.model;
  */
 public interface EPDocumentMetaData extends EPSOSDocumentMetaData {
 
+    String getDescription();
+
     ProductMetadata getProduct();
 
     default boolean hasProduct() {

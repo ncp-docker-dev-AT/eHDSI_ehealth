@@ -569,16 +569,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
         eot.getName().getLocalizedString().get(0).setValue(name);
 
-        //TODO: Implementation of CP-0024 - Review
         // Description
         eot.setDescription(ofRim.createInternationalStringType());
         eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
-        if (document.hasProduct()) {
-
-            eot.getDescription().getLocalizedString().get(0).setValue(String.format("%s: %s (%s)", document.getProduct().getProductName(), "Tablettes", "40mg"));
-        } else {
-            eot.getDescription().getLocalizedString().get(0).setValue(document.getTitle());
-        }
+        eot.getDescription().getLocalizedString().get(0).setValue(document.getDescription());
 
         // Version Info
         eot.setVersionInfo(ofRim.createVersionInfoType());
