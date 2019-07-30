@@ -25,6 +25,7 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
         super(metaData);
         this.product = product;
         this.dispensable = dispensable;
+        this.description = description;
     }
 
     @Override
