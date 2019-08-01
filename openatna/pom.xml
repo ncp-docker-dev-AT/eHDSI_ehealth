@@ -44,8 +44,8 @@
     <modules>
         <module>syslog</module>
         <module>audit</module>
-        <module>anom</module>
         <module>jaxb</module>
+        <module>anom</module>
         <module>net</module>
         <module>report</module>
         <module>archive</module>
