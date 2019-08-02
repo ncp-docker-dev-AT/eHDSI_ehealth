@@ -600,7 +600,7 @@ public class EventLog {
      *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
      *                                     encoded security header.
-     * @param sourceip                     The IP Address of the source Gateway
+     * @param sourceIp                     The IP Address of the source Gateway
      * @param targetip                     The IP Address of the target Gateway
      * @return the EventLog object
      */
@@ -611,7 +611,7 @@ public class EventLog {
                                               String AS_AuditSourceId, String PT_PatricipantObjectID, String eventTargetObjectId,
                                               String ReqM_ParticipantObjectID, byte[] ReqM_PatricipantObjectDetail,
                                               String ResM_ParticipantObjectID, byte[] ResM_PatricipantObjectDetail,
-                                              String sourceip, String targetip, NcpSide ncpSide) {
+                                              String sourceIp, String targetIp, NcpSide ncpSide) {
 
         LOGGER.info("Creating EventLog for TRC Assertions: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
         EventLog eventLog = new EventLog();
@@ -634,8 +634,8 @@ public class EventLog {
         eventLog.setReqM_PatricipantObjectDetail(ReqM_PatricipantObjectDetail);
         eventLog.setResM_ParticipantObjectID(nullToEmptyString(ResM_ParticipantObjectID));
         eventLog.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
-        eventLog.setSourceip(nullToEmptyString(sourceip));
-        eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setSourceip(nullToEmptyString(sourceIp));
+        eventLog.setTargetip(nullToEmptyString(targetIp));
         eventLog.ncpSide = ncpSide;
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
