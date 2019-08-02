@@ -42,7 +42,7 @@ public class IPUtil {
                 while (inetAddresses.hasMoreElements()) {
                     InetAddress inetAddress = inetAddresses.nextElement();
                     if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
-                            && (inetAddress instanceof Inet4Address || inetAddress instanceof Inet6Address)) {
+                            && (inetAddress instanceof Inet4Address)) {
                         return inetAddress.getHostAddress();
                     }
                 }
@@ -51,5 +51,37 @@ public class IPUtil {
             LOGGER.error("Unable to get current IP: '{}'", e.getMessage(), e);
         }
         return ERROR_UNKNOWN_HOST;
+    }
+
+    public static boolean isThisMyIpAddress(InetAddress addr) {
+        // Check if the address is a valid special local or loop back
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress())
+            return true;
+
+        // Check if the address is defined on any interface
+        try {
+            if (NetworkInterface.getByInetAddress(addr) != null) {
+                NetworkInterface networkInterface = NetworkInterface.getByInetAddress(addr);
+                while (networkInterface.getInetAddresses().hasMoreElements()) {
+                    InetAddress inetAddress = networkInterface.getInetAddresses().nextElement();
+                    System.out.println(inetAddress.getHostName());
+                    return true;
+                }
+            }
+            return false;
+        } catch (SocketException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean isLocalIp(String ipAddress) {
+        boolean isMyDesiredIp = false;
+        try {
+            isMyDesiredIp = isThisMyIpAddress(InetAddress.getByName(ipAddress)); //"localhost" for localhost
+        } catch (UnknownHostException unknownHost) {
+            unknownHost.printStackTrace();
+        }
+        return isMyDesiredIp;
     }
 }

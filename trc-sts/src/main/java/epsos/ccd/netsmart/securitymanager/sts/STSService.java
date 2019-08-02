@@ -30,6 +30,7 @@ import org.w3c.dom.Node;
 import sun.security.x509.X500Name;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -367,12 +368,17 @@ public class STSService implements Provider<SOAPMessage> {
             logger.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
         String trcCommonName = HTTPUtil.getTlsCertificateCommonName(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
+        String sourceGateway = getClientIP();
+        MessageContext messageContext = context.getMessageContext();
+        HttpServletRequest servletRequest = (HttpServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST);
+        String serverName = servletRequest.getServerName();
+
         //TODO: Review Audit Trail specification - Identifying SC and SP as value of CN from TLS certificate.
         EventLog evLogTRC = EventLog.createEventLogTRCA(TransactionName.epsosTRCAssertion, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID, humanRequestorRole,
                 humanRequestorSubjectID, certificateCommonName, trcCommonName, ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
                 patientID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
-                STSUtils.getSTSServerIp(), getClientIP(), NcpSide.NCP_B);
+                IPUtil.isLocalIp(sourceGateway) ? serverName : sourceGateway, STSUtils.getSTSServerIp(), NcpSide.NCP_B);
 
         evLogTRC.setEventType(EventType.epsosTRCAssertion);
         auditService.write(evLogTRC, "13", "2");

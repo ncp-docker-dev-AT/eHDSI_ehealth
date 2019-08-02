@@ -23,6 +23,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
 import java.io.StringWriter;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URL;
 import java.security.cert.X509Certificate;
@@ -142,11 +143,11 @@ public class STSUtils {
         try {
             URL url = new URL(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
             InetAddress inetAddress = InetAddress.getByName(url.getHost());
-            if (inetAddress.isLoopbackAddress()) {
-                return IPUtil.getPrivateServerIp();
+            if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
+                    && (inetAddress instanceof Inet4Address)) {
+                return inetAddress.getHostAddress();
             } else {
-                return
-                        inetAddress.getHostAddress();
+                return IPUtil.getPrivateServerIp();
             }
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);

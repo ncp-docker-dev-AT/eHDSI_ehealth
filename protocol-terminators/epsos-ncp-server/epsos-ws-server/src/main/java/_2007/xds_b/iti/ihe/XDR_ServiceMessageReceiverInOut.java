@@ -1,6 +1,7 @@
 package _2007.xds_b.iti.ihe;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
+import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
@@ -21,7 +22,6 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,9 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
-import tr.com.srdc.epsos.util.http.HTTPUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.*;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -75,17 +73,6 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
-    /**
-     * Returns the client IP address extracted from the Axis2 Message Context.
-     *
-     * @param messageContext Axis2 Messages Context.
-     * @return IP address of the remote client.
-     */
-    private String getRemoteIpAddress(MessageContext messageContext) {
-
-        return (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
-    }
-
     private String getMessageID(org.apache.axiom.soap.SOAPEnvelope envelope) {
         Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(new QName(AddressingConstants.Final.WSA_NAMESPACE, AddressingConstants.WSA_MESSAGE_ID));
         if (it.hasNext()) {
@@ -120,17 +107,16 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             if ((axisOperation.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(axisOperation.getName().getLocalPart())) != null)) {
 
                 SOAPHeader soapHeader = msgContext.getEnvelope().getHeader();
+                //  Identification of the TLS Common Name of the client.
+                String clientCommonName = EventLogUtil.getClientCommonName(msgContext);
+                LOGGER.info("[ITI-41] Incoming XDR Request from '{}'", clientCommonName);
 
                 EventLog eventLog = new EventLog();
-                String ip = getRemoteIpAddress(msgContext);
-                eventLog.setSourceip(ip);
                 eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
                 eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
-
-                HttpServletRequest httpServletRequest = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
-                String clientDN = HTTPUtil.getClientCertificate(httpServletRequest);
-                eventLog.setSC_UserID(clientDN);
-                eventLog.setTargetip(HTTPUtil.getHostIpAddress(httpServletRequest.getServerName()));
+                eventLog.setSC_UserID(clientCommonName);
+                eventLog.setSourceip(EventLogUtil.getSourceGatewayIdentifier(msgContext));
+                eventLog.setTargetip(EventLogUtil.getTargetGatewayIdentifier());
 
                 if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                     loggerClinical.debug("Incoming XDR Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
@@ -372,8 +358,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             try {
 
                 SAXOMBuilder builder = new SAXOMBuilder();
-                Marshaller marshaller = wsContext.createMarshaller();
-                marshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
+                wsContext.createMarshaller().marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
 
                 return builder.getRootElement().getXMLStreamReader();
 

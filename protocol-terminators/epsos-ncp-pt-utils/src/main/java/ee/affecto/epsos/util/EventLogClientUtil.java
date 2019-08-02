@@ -3,7 +3,6 @@ package ee.affecto.epsos.util;
 import ee.affecto.epsos.ws.handler.DummyMustUnderstandHandler;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.client.Stub;
@@ -19,14 +18,14 @@ import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 import tr.com.srdc.epsos.util.http.IPUtil;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
+import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.URL;
-import java.util.GregorianCalendar;
+import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 public class EventLogClientUtil {
@@ -62,7 +61,7 @@ public class EventLogClientUtil {
      *
      * @return First IP v4 or v6 value retrieved which is not a loopback or local IP address.
      */
-    public static String getLocalIpAddress() {
+    public static String getSourceGatewayIdentifier() {
 
         return IPUtil.getPrivateServerIp();
     }
@@ -70,14 +69,20 @@ public class EventLogClientUtil {
     /**
      * Returns the IP address or a remote server.
      *
-     * @param endpointReference - client endpoint reference value extracted from the SOAP ServiceClient
+     * @param endpointReference - client endpoint reference value extracted from the SOAP ServiceClient.
      * @return IP address of the client retrieved by InetAddress or ERROR_UNKNOWN_HOST.
      */
-    public static String getRemoteIpAddress(String endpointReference) {
+    public static String getTargetGatewayIdentifier(String endpointReference) {
 
         try {
-            URL url = new URL(endpointReference);
-            return InetAddress.getByName(url.getHost()).getHostAddress();
+            URI url = new URI(endpointReference);
+            InetAddress inetAddress = InetAddress.getByName(url.getHost());
+            if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
+                    && (inetAddress instanceof Inet4Address)) {
+                return inetAddress.getHostAddress();
+            } else {
+                return url.getHost();
+            }
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
             return ERROR_UNKNOWN_HOST;
@@ -87,38 +92,26 @@ public class EventLogClientUtil {
     /**
      * @param msgContext
      * @param soapEnvelope
-     * @param address
+     * @param endpointReference
      * @return
      */
-    public static EventLog prepareEventLog(MessageContext msgContext, SOAPEnvelope soapEnvelope, String address) {
+    public static EventLog prepareEventLog(MessageContext msgContext, SOAPEnvelope soapEnvelope, String endpointReference) {
 
         EventLog eventLog = new EventLog();
-
-        try {
-            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
-        } catch (DatatypeConfigurationException e) {
-            LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
-        }
+        eventLog.setEI_EventDateTime(DateUtil.getDateAsXMLGregorian(new Date()));
 
         // Set Active Participant Identification: Service Consumer NCP
         eventLog.setSC_UserID(HTTPUtil.getSubjectDN(false));
-        eventLog.setSP_UserID(HTTPUtil.getServerCertificate(address));
+        eventLog.setSP_UserID(HTTPUtil.getServerCertificate(endpointReference));
 
         // Set Audit Source
-        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
-        eventLog.setAS_AuditSourceId(cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"));
+        eventLog.setAS_AuditSourceId(ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"));
 
         // Set Source Ip
-        String localIp = EventLogClientUtil.getLocalIpAddress();
-        if (localIp != null) {
-            eventLog.setSourceip(localIp);
-        }
+        eventLog.setSourceip(getSourceGatewayIdentifier());
 
         // Set Target Ip
-        String serverIp = EventLogClientUtil.getRemoteIpAddress(address);
-        if (serverIp != null) {
-            eventLog.setTargetip(serverIp);
-        }
+        eventLog.setTargetip(getTargetGatewayIdentifier(endpointReference));
 
         // Set Participant Object: Request Message
         String reqMessageId = appendUrnUuid(EventLogUtil.getMessageID(msgContext.getEnvelope()));

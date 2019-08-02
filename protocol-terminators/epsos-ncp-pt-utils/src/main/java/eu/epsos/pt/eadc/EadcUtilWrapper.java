@@ -33,7 +33,6 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -111,8 +110,7 @@ public class EadcUtilWrapper {
         result.setStartTime(startTime != null ? getDateAsRFC822String(startTime) : null);
         result.setEndTime(endTime != null ? getDateAsRFC822String(endTime) : null);
         result.setDuration(endTime != null && startTime != null ? String.valueOf(endTime.getTime() - startTime.getTime()) : null);
-
-        result.setHomeAddress(EventLogClientUtil.getLocalIpAddress());
+        result.setHomeAddress(EventLogClientUtil.getSourceGatewayIdentifier());
         String sndIso = reqMsgContext != null ? extractSendingCountryIsoFromAssertion(getAssertion(reqMsgContext)) : null;
         result.setSndISO(sndIso);
         result.setSndNCPOID(sndIso != null ? OidUtil.getHomeCommunityId(sndIso.toLowerCase()) : null);
@@ -123,12 +121,13 @@ public class EadcUtilWrapper {
             result.setHomeHost(reqMsgContext.getOptions().getFrom().getAddress());
         }
 
-        /* we cannot get the MessageID from the reqMsgContext, it returns a wrong one.
-        Probably related to how the Axis2 engine sets the MessageID, similar issues
-        were faced during the Evidence Emitter refactoring. Plus, for the XCA Retrieve request messages,
-        when comparing this MessageID with the one from the message itself, be sure to compare it with
-        the correct WSA headers, there are duplicated ones, although belonging to different
-        namespaces (the correct one is xmlns = http://www.w3.org/2005/08/addressing) (EHNCP-1141)*/
+        /*
+            (EHNCP-1141) We cannot get the MessageID from the reqMsgContext, it returns a wrong one.
+            Probably related to how the Axis2 engine sets the MessageID, similar issues were faced during the Evidence
+            Emitter refactoring. Plus, for the XCA Retrieve request messages, when comparing this MessageID with the one
+            from the message itself, be sure to compare it with the correct WSA headers, there are duplicated ones,
+            although belonging to different namespaces (the correct one is xmlns = http://www.w3.org/2005/08/addressing)
+        */
         result.setSndMsgID(reqMsgContext != null ? getMessageID(reqMsgContext.getEnvelope()) : null);
         result.setHomeHCID("");
         result.setHomeISO(Constants.COUNTRY_CODE);
@@ -137,17 +136,16 @@ public class EadcUtilWrapper {
         //  TODO: Clarify values for this field according specifications and GDPR, current value set to "N/A GDPR"
         result.setHumanRequestor("N/A GDPR");
         result.setUserId("N/A GDPR");
-
         result.setPOC(reqMsgContext != null ?
                 extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
                         extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type") + ")" : null);
         result.setPOCID(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:subject:organization-id") : null);
-
         result.setReceivingISO(countryCodeA);
         result.setReceivingNCPOID(countryCodeA != null ? OidUtil.getHomeCommunityId(countryCodeA.toLowerCase()) : null);
+
         if (serviceClient != null && serviceClient.getOptions() != null && serviceClient.getOptions().getTo() != null && serviceClient.getOptions().getTo().getAddress() != null) {
             result.setReceivingHost(serviceClient.getOptions().getTo().getAddress());
-            result.setReceivingAddr(EventLogClientUtil.getRemoteIpAddress(serviceClient.getOptions().getTo().getAddress()));
+            result.setReceivingAddr(EventLogClientUtil.getTargetGatewayIdentifier(serviceClient.getOptions().getTo().getAddress()));
         }
         if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getAction() != null) {
             result.setRequestAction(reqMsgContext.getOptions().getAction());
@@ -158,10 +156,12 @@ public class EadcUtilWrapper {
         if (reqMsgContext != null && reqMsgContext.getOperationContext() != null && reqMsgContext.getOperationContext().getServiceName() != null) {
             result.setServiceName(reqMsgContext.getOperationContext().getServiceName());
         }
+
         result.setReceivingMsgID(rspMsgContext != null ? rspMsgContext.getOptions().getMessageId() : null);
         result.setServiceType(serviceType.getDescription());
         result.setTransactionCounter("");
         result.setTransactionPK(UUID.randomUUID().toString());
+
         return result;
     }
 
@@ -247,20 +247,6 @@ public class EadcUtilWrapper {
             return toXmlDocument(documentData);
         }
         return null;
-    }
-
-    /**
-     * Converts a set of bytes into a Document
-     *
-     * @param documentData XML Document as byte array
-     * @return Document converted from byte array.
-     */
-    private static Document convertToDomDocument(byte[] documentData) throws ParserConfigurationException, SAXException, IOException {
-
-        Document xmlDocument;
-        String xmlStr = new String(documentData, StandardCharsets.UTF_8);
-        xmlDocument = XMLUtil.parseContent(xmlStr);
-        return xmlDocument;
     }
 
     /**
