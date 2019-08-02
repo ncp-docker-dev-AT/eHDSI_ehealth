@@ -27,6 +27,7 @@ import tr.com.srdc.epsos.util.http.HTTPUtil;
 import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.xml.XMLConstants;
+import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -36,9 +37,18 @@ import java.util.*;
  */
 public class TransformationService implements ITransformationService, TMConstants, InitializingBean {
 
+    private static final DatatypeFactory DATATYPE_FACTORY;
+
+    static {
+        try {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private final Logger logger = LoggerFactory.getLogger(TransformationService.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
     private ITerminologyService tsamApi = null;
     private HashMap<String, String> level1Type;
     private HashMap<String, String> level3Type;
@@ -304,51 +314,45 @@ public class TransformationService implements ITransformationService, TMConstant
     }
 
     /**
-     * @param responseStructure
+     * Writes an audit trail entry for the pivot translation of a medical document.
+     * The audit message MUST be assembled according to the HP Assurance audit schema.
+     *
+     * @param responseStructure CDA transformation result object.
      */
     private void writeAuditTrail(TMResponseStructure responseStructure) {
 
         logger.debug("[Transformation Service] Audit trail BEGIN");
 
         if (responseStructure != null) {
-            //TODO: Review if this 'if (config.isAuditTrailEnabled())' is authorized according Audit Profile specification
-            if (config.isAuditTrailEnabled()) {
 
-                try {
-                    GregorianCalendar calendar = new GregorianCalendar();
-                    calendar.setTime(new Date());
-                    String securityHeader = "[No security header provided]";
-                    EventLog eventLog = EventLog.createEventLogPivotTranslation(
-                            TransactionName.epsosPivotTranslation, // Possible values according to D4.5.6 are E,R,U,D
-                            EventActionCode.EXECUTE,
-                            DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar),
-                            responseStructure.getStatus().equals(STATUS_SUCCESS) ? EventOutcomeIndicator.FULL_SUCCESS : EventOutcomeIndicator.PERMANENT_FAILURE,
-                            // The string encoded CN of the TLS certificate of the NCP triggering the eHDSI operation
-                            HTTPUtil.getSubjectDN(false),
-                            // Identifier that allows to unequivocally identify the SOURCE document or source data entries. (UUID Format)
-                            getOIDFromDocument(responseStructure.getDocument()),
-                            getOIDFromDocument(responseStructure.getResponseCDA()), // Identifier that allows to unequivocally identify the TARGET document. (UUID Format)
-                            // The value MUST contain the base64 encoded security header
-                            Constants.UUID_PREFIX + responseStructure.getRequestId(),
-                            securityHeader.getBytes(StandardCharsets.UTF_8), // ReqM_ParticipantObjectDetail - The value MUST contain the base64 encoded security header
-                            //Constants.UUID_PREFIX + "",
-                            // String-encoded UUID of the response message
-                            Constants.UUID_PREFIX + responseStructure.getRequestId(),
-                            securityHeader.getBytes(StandardCharsets.UTF_8), // ResM_ParticipantObjectDetail - The value MUST contain the base64 encoded security header
-                            IPUtil.getPrivateServerIp() // The IP Address of the target Gateway
-                    );
-                    eventLog.setEventType(EventType.epsosPivotTranslation);
-                    eventLog.setNcpSide(NcpSide.valueOf(config.getNcpSide()));
+            try {
+                GregorianCalendar calendar = new GregorianCalendar();
+                calendar.setTime(new Date());
+                String securityHeader = "[No security header provided]";
+                EventLog eventLog = EventLog.createEventLogPivotTranslation(
+                        TransactionName.epsosPivotTranslation,
+                        EventActionCode.EXECUTE,
+                        DATATYPE_FACTORY.newXMLGregorianCalendar(calendar),
+                        responseStructure.getStatus().equals(STATUS_SUCCESS) ? EventOutcomeIndicator.FULL_SUCCESS : EventOutcomeIndicator.PERMANENT_FAILURE,
+                        HTTPUtil.getSubjectDN(false),
+                        getOIDFromDocument(responseStructure.getDocument()),
+                        getOIDFromDocument(responseStructure.getResponseCDA()),
+                        Constants.UUID_PREFIX + responseStructure.getRequestId(),
+                        securityHeader.getBytes(StandardCharsets.UTF_8),
+                        Constants.UUID_PREFIX + responseStructure.getRequestId(),
+                        securityHeader.getBytes(StandardCharsets.UTF_8),
+                        IPUtil.getPrivateServerIp()
+                );
+                eventLog.setEventType(EventType.epsosPivotTranslation);
+                eventLog.setNcpSide(NcpSide.valueOf(config.getNcpSide()));
 
-                    logger.info("Write AuditTrail: '{}'", eventLog.getEventType());
-                    AuditServiceFactory.getInstance().write(eventLog, config.getAuditTrailFacility(), config.getAuditTrailSeverity());
-                } catch (Exception e) {
-                    logger.error("Audit trail ERROR! ", e);
-                }
-                logger.debug("[Transformation Service] Audit trail END");
-            } else {
-                logger.debug("[Transformation Service] Audit trail DISABLED");
+                AuditServiceFactory.getInstance().write(eventLog, config.getAuditTrailFacility(), config.getAuditTrailSeverity());
+                logger.info("Write AuditTrail: '{}'", eventLog.getEventType());
+
+            } catch (Exception e) {
+                logger.error("Audit trail ERROR! ", e);
             }
+            logger.debug("[Transformation Service] Audit trail END");
         } else {
             logger.error("Write AuditTrail Error: Cannot process Transformation Manager response");
         }
@@ -359,11 +363,11 @@ public class TransformationService implements ITransformationService, TMConstant
      * Input document is enriched with translation elements (transcoded Concept), list of errors & warnings is filled,
      * finally status of operation is returned
      *
-     * @param document        original CDA document
-     * @param errors          empty list for TMErrors
-     * @param warnings        empty list for TMWarnings
-     * @param cdaDocumentType
-     * @return String - final status of transcoding
+     * @param document        Original CDA document
+     * @param errors          Empty list for TMErrors
+     * @param warnings        Empty list for TMWarnings
+     * @param cdaDocumentType Type of CDA document to process
+     * @return String - Final status of transcoding
      */
     private String transcodeDocument(Document document, List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings, String cdaDocumentType) {
 
