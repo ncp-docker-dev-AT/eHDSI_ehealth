@@ -128,7 +128,7 @@ public enum AuditTrailUtils {
 
     /**
      * The method converts the audit message to xml format, having as input the Audit Message.
-     * Uses the JAXB library to marshal the audit message object
+     * Uses the JAXB library to marshal the audit message object.
      *
      * @param am
      * @return

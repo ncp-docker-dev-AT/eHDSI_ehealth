@@ -21,7 +21,8 @@ import java.util.List;
  */
 public class ProtocolMessage<M> extends SyslogMessage {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProtocolMessage.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProtocolMessage.class);
+    private static final long serialVersionUID = 4839446464986500200L;
 
     private String appName = "-";
     private String messageId = "-";
@@ -112,23 +113,23 @@ public class ProtocolMessage<M> extends SyslogMessage {
             String result = XMLUtil.prettyPrint(dom.getDocumentElement());
             return result.getBytes();
         } catch (Exception e) {
-            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
+            logger.error("{}: '{}'", e.getClass(), e.getMessage(), e);
             throw new SyslogException(e);
         }
     }
 
     public String toString() {
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(getHeader());
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(getHeader());
         if (!structuredElement.isEmpty()) {
             for (StructuredElement element : structuredElement) {
-                sb.append(element.toString());
+                stringBuilder.append(element.toString());
             }
         } else {
-            sb.append("-");
+            stringBuilder.append("-");
         }
-        sb.append(" ");
+        stringBuilder.append(" ");
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         try {
             getMessage().write(bout);
@@ -136,10 +137,10 @@ public class ProtocolMessage<M> extends SyslogMessage {
             assert false;
         }
         try {
-            sb.append(new String(bout.toByteArray(), getMessage().getExpectedEncoding()));
+            stringBuilder.append(new String(bout.toByteArray(), getMessage().getExpectedEncoding()));
         } catch (UnsupportedEncodingException e) {
             assert false;
         }
-        return sb.toString();
+        return stringBuilder.toString();
     }
 }
