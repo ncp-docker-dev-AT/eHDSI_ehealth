@@ -92,7 +92,9 @@ public class TerminologyService implements ITerminologyService {
             String csVersion = localConcept.getVersion();
             String vsOid = localConcept.getVsOid();
             String vsVersion = localConcept.getValueSetVersion();
-            logger.info("Searching Concept: '{}'-'{}'-'{}'-'{}'-'{}'-'{}'", code, csName, csOid, csVersion, vsOid, vsVersion);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Searching Concept: '{}'-'{}'-'{}'-'{}'-'{}'-'{}'", code, csName, csOid, csVersion, vsOid, vsVersion);
+            }
             // obtain CodeSystem
             CodeSystem system = dao.getCodeSystem(csOid);
             checkCodeSystemName(system, csName, response);
