@@ -1370,9 +1370,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         while (it.hasNext()) {
 
             element = (OMElement) it.next();
-            logger.info("checkIfOnlyWarnings() - Element: '{}'", element.getText());
-            logger.info("[TEST eHDSI PIVOT] Checking Elements and Attributes\n{}\n{}", element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
-                    "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error");
             if (StringUtils.equals(element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR)) {
                 logger.debug("Error has been detected for Element: '{}'", element.getText());

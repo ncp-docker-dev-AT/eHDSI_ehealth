@@ -29,14 +29,14 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class TerminologyService implements ITerminologyService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TerminologyService.class);
     private static final String CURRENT = "current";
+    private final Logger logger = LoggerFactory.getLogger(TerminologyService.class);
     private ITsamDao dao;
     private TsamConfiguration config;
 
     public TSAMResponseStructure getDesignationByEpSOSConcept(CodedElement epSOSRefConcept, String targetLanguageCode) {
 
-        LOGGER.debug("getDesignationByEpSOSConcept BEGIN ('{}', lang: '{}')", epSOSRefConcept, targetLanguageCode);
+        logger.debug("getDesignationByEpSOSConcept BEGIN ('{}', lang: '{}')", epSOSRefConcept, targetLanguageCode);
         DebugUtils.showTransactionStatus("getDesignationByEpSOSConcept()");
         TSAMResponseStructure response = new TSAMResponseStructure(epSOSRefConcept);
         try {
@@ -70,18 +70,18 @@ public class TerminologyService implements ITerminologyService {
 
         } catch (TSAMException e) {
             response.addError(e.getReason(), epSOSRefConcept.toString());
-            LOGGER.debug("No '{}' Translation available - {}", targetLanguageCode, epSOSRefConcept);
+            logger.debug("No '{}' Translation available - {}", targetLanguageCode, epSOSRefConcept);
         } catch (Exception e) {
             response.addError(TSAMError.ERROR_PROCESSING_ERROR, epSOSRefConcept.toString());
-            LOGGER.error(epSOSRefConcept.toString(), e);
+            logger.error(epSOSRefConcept.toString(), e);
         }
-        LOGGER.debug("getDesignationByEpSOSConcept END");
+        logger.debug("getDesignationByEpSOSConcept END");
         return response;
     }
 
     public TSAMResponseStructure getEpSOSConceptByCode(CodedElement localConcept) {
 
-        LOGGER.debug("getEpSOSConceptByCode BEGIN ('{}')", localConcept);
+        logger.debug("getEpSOSConceptByCode BEGIN ('{}')", localConcept);
         DebugUtils.showTransactionStatus("getEpSOSConceptByCode()");
         TSAMResponseStructure response = new TSAMResponseStructure(localConcept);
 
@@ -92,7 +92,7 @@ public class TerminologyService implements ITerminologyService {
             String csVersion = localConcept.getVersion();
             String vsOid = localConcept.getVsOid();
             String vsVersion = localConcept.getValueSetVersion();
-            LOGGER.info("Searching Concept: '{}'-'{}'-'{}'-'{}'-'{}'-'{}'", code, csName, csOid, csVersion, vsOid, vsVersion);
+            logger.info("Searching Concept: '{}'-'{}'-'{}'-'{}'-'{}'-'{}'", code, csName, csOid, csVersion, vsOid, vsVersion);
             // obtain CodeSystem
             CodeSystem system = dao.getCodeSystem(csOid);
             checkCodeSystemName(system, csName, response);
@@ -140,17 +140,17 @@ public class TerminologyService implements ITerminologyService {
             }
         } catch (TSAMException e) {
             // TSAM Exception considered as Warning
-            LOGGER.error("TSAMException: '{}'", e.getMessage());
+            logger.error("TSAMException: '{}'", e.getMessage());
             response.addError(e.getReason(), localConcept.toString());
-            LOGGER.warn(localConcept + ", " + e.toString(), e);
+            logger.error(localConcept + ", " + e.toString(), e);
         } catch (Exception e) {
             // Other Exception considered as Error
-            LOGGER.error("Exception: '{}'", e.getMessage());
+            logger.error("Exception: '{}'", e.getMessage());
             response.addError(TSAMError.ERROR_PROCESSING_ERROR, localConcept.toString());
-            LOGGER.error(localConcept.toString(), e);
+            logger.error(localConcept.toString(), e);
         }
 
-        LOGGER.debug("getEpSOSConceptByCode END");
+        logger.debug("getEpSOSConceptByCode END");
         return response;
     }
 
@@ -177,7 +177,9 @@ public class TerminologyService implements ITerminologyService {
                 ctx = "Code System is null and  != " + name;
             }
             response.addWarning(TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
-            LOGGER.warn("[{}] '{}': '{}'", response.getInputCodedElement(), TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
+            if (logger.isDebugEnabled()) {
+                logger.debug("[{}] '{}': '{}'", response.getInputCodedElement(), TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
+            }
         }
     }
 
@@ -233,8 +235,8 @@ public class TerminologyService implements ITerminologyService {
             if (preferred == 0) {
                 TSAMError warning = TSAMError.WARNING_MANY_DESIGNATIONS;
                 response.addWarning(warning, response.getCode());
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("'{}': '{}'", response.getInputCodedElement(), warning);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("'{}': '{}'", response.getInputCodedElement(), warning);
                 }
             }
         }
@@ -257,8 +259,8 @@ public class TerminologyService implements ITerminologyService {
                 String warnMsg = "CodeSystemConcept: " + code + ", ValueSetOid: " + vsOid;
                 TSAMError warning = TSAMError.WARNING_VS_DOESNT_MATCH;
                 response.addWarning(warning, warnMsg);
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("[{}]- '{}'", warning, warning);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("[{}]- '{}'", warning, warning);
                 }
             }
         }
@@ -273,7 +275,9 @@ public class TerminologyService implements ITerminologyService {
         if (concept != null && !CURRENT.equalsIgnoreCase(concept.getStatus())) {
             TSAMError warning = TSAMError.WARNING_CONCEPT_STATUS_NOT_CURRENT;
             response.addWarning(warning, concept.getCode());
-            LOGGER.warn("'{}': '{}'", response.getInputCodedElement(), warning);
+            if (logger.isDebugEnabled()) {
+                logger.debug("'{}': '{}'", response.getInputCodedElement(), warning);
+            }
         }
     }
 

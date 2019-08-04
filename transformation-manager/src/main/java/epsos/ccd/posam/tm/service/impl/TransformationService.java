@@ -650,7 +650,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     suffix = attr.getValue().substring(colon + 1);
                 }
                 if (!StringUtils.equals(suffix, CE) && !StringUtils.equals(suffix, CD)) {
-                    logger.warn("TSAM Warning: '{}-'{}''", TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE.getCode(),
+                    logger.debug("TSAM Warning: '{}-'{}''", TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE.getCode(),
                             TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE.getDescription());
                     warnings.add(TMError.WARNING_CODED_ELEMENT_NOT_PROPER_TYPE);
                 }
@@ -872,7 +872,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     logger.debug("Element without required attributes, but has originalText, ignoring: '{}'", elName);
                     return true;
                 } else {
-                    logger.warn("Element has no \"code or \"codeSystem\" attribute: '{}'", elName);
+                    logger.debug("Element has no \"code or \"codeSystem\" attribute: '{}'", elName);
                     warnings.add(new TmErrorCtx(TMError.WARNING_MANDATORY_ATTRIBUTES_MISSING, "Element " + elName));
                     return false;
                 }
@@ -899,7 +899,9 @@ public class TransformationService implements ITransformationService, TMConstant
                 oid = oid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
             }
         }
-        logger.info("Document OID: '{}'", oid);
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isInfoEnabled()) {
+            loggerClinical.info("Document OID: '{}'", oid);
+        }
         return oid;
     }
 
