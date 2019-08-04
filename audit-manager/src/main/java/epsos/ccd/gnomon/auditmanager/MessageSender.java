@@ -126,7 +126,8 @@ public class MessageSender {
         try (BufferedOutputStream outputStream = new BufferedOutputStream(sslsocket.getOutputStream())) {
 
             //  Set header AuditLogSerializer of syslog message.
-            String hostName = sslsocket.getLocalAddress().getHostName();
+            String hostName = sslsocket.getInetAddress().getHostName();
+            //String hostName = sslsocket.getLocalAddress().getHostName();
             logger.info("Syslog Server hostname: '{}'", hostName);
             if (!sslsocket.getLocalAddress().isLinkLocalAddress() && !sslsocket.getLocalAddress().isLoopbackAddress()
                     && (sslsocket.getLocalAddress() instanceof Inet4Address)) {
