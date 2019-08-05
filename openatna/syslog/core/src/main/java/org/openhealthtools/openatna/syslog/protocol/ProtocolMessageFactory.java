@@ -1,6 +1,9 @@
 package org.openhealthtools.openatna.syslog.protocol;
 
-import org.openhealthtools.openatna.syslog.*;
+import org.openhealthtools.openatna.syslog.LogMessage;
+import org.openhealthtools.openatna.syslog.SyslogException;
+import org.openhealthtools.openatna.syslog.SyslogMessage;
+import org.openhealthtools.openatna.syslog.SyslogMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,51 +86,52 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
      * @return The serialized string form of the date
      */
     public static String formatDate(Date date) {
-        StringBuilder sb = new StringBuilder();
+
+        StringBuilder stringBuilder = new StringBuilder();
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         c.setTime(date);
-        sb.append(c.get(Calendar.YEAR));
-        sb.append('-');
+        stringBuilder.append(c.get(Calendar.YEAR));
+        stringBuilder.append('-');
         int f = c.get(Calendar.MONTH);
         if (f < 9) {
-            sb.append('0');
+            stringBuilder.append('0');
         }
-        sb.append(f + 1);
-        sb.append('-');
+        stringBuilder.append(f + 1);
+        stringBuilder.append('-');
         f = c.get(Calendar.DATE);
         if (f < 10) {
-            sb.append('0');
+            stringBuilder.append('0');
         }
-        sb.append(f);
-        sb.append('T');
+        stringBuilder.append(f);
+        stringBuilder.append('T');
         f = c.get(Calendar.HOUR_OF_DAY);
         if (f < 10) {
-            sb.append('0');
+            stringBuilder.append('0');
         }
-        sb.append(f);
-        sb.append(':');
+        stringBuilder.append(f);
+        stringBuilder.append(':');
         f = c.get(Calendar.MINUTE);
         if (f < 10) {
-            sb.append('0');
+            stringBuilder.append('0');
         }
-        sb.append(f);
-        sb.append(':');
+        stringBuilder.append(f);
+        stringBuilder.append(':');
         f = c.get(Calendar.SECOND);
         if (f < 10) {
-            sb.append('0');
+            stringBuilder.append('0');
         }
-        sb.append(f);
-        sb.append('.');
+        stringBuilder.append(f);
+        stringBuilder.append('.');
         f = c.get(Calendar.MILLISECOND);
         if (f < 100) {
-            sb.append('0');
+            stringBuilder.append('0');
         }
         if (f < 10) {
-            sb.append('0');
+            stringBuilder.append('0');
         }
-        sb.append(f);
-        sb.append('Z');
-        return sb.toString();
+        stringBuilder.append(f);
+        stringBuilder.append('Z');
+        return stringBuilder.toString();
     }
 
     /**
@@ -181,8 +186,7 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
 
     /**
      * This reads up to 256 characters to read headers (excluding SDs). This limit is arbitrary.
-     * It is imposed to reduce the risk
-     * of badly formed or malicious messages from using too many resources.
+     * It is imposed to reduce the risk of badly formed or malicious messages from using too many resources.
      *
      * @param in
      * @return
@@ -212,7 +216,7 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
                 curr++;
                 if (c == ' ') {
                     count++;
-                    String currHeader = new String(buff.array(), 0, buff.position(), Constants.ENC_UTF8);
+                    String currHeader = new String(buff.array(), 0, buff.position(), StandardCharsets.UTF_8);
                     LOGGER.debug("CurrHeader: '{}'", currHeader);
                     buff.clear();
                     switch (count) {
@@ -231,6 +235,8 @@ public class ProtocolMessageFactory extends SyslogMessageFactory {
                         case 5:
                             mid = currHeader;
                             break;
+                        default:
+                            throw new IllegalStateException("Unexpected value: " + count);
                     }
                 } else {
                     buff.put(c);

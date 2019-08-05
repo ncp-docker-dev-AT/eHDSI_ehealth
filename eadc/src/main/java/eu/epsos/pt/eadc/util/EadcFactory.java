@@ -29,20 +29,19 @@ public enum EadcFactory {
     }
 
     public AutomaticDataCollector createAutomaticDataCollector() {
-        return new AutomaticDataCollectorImpl();
+        return AutomaticDataCollectorImpl.getInstance();
     }
 
     /**
-     * returns the EadcReceiver used for processing the EadcEntry
+     * Returns the EadcReceiver used for processing the EadcEntry
      */
     public EadcReceiver getReceiver() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         return initReceiver(EadcReceiverImpl.class.getName());
     }
 
     /**
-     * returns the EadcReceiver used for processing the EadcEntry - this method
-     * is called by the NCP implementation - if no receiver impl is configured
-     * at the NCP the default EadcReceiverImpl is used - only one receiver impl
+     * Returns the EadcReceiver used for processing the EadcEntry - this method is called by the NCP implementation -
+     * if no receiver impl is configured at the NCP the default EadcReceiverImpl is used - only one receiver impl
      * can be used in one classPath!
      */
     public EadcReceiver getReceiver(String implClass) throws InstantiationException, IllegalAccessException,
@@ -51,7 +50,7 @@ public enum EadcFactory {
     }
 
     /**
-     * returns the default EadcEntry
+     * Returns the default EadcEntry
      */
     public EadcEntry getEntry(String dsName, Document data, Document soapRqData, Document soapRspData)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException {
@@ -59,9 +58,8 @@ public enum EadcFactory {
     }
 
     /**
-     * returns the EadcEntry used for processing from the NCP - this method is
-     * called by the NCP implementation - if no entry impl is configured at the
-     * NCP the default EadcEntryImpl is used
+     * Returns the EadcEntry used for processing from the NCP - this method is called by the NCP implementation -
+     * if no entry impl is configured at the NCP the default EadcEntryImpl is used.
      */
     public EadcEntry getEntry(String implClass, String dsName, Document data, Document soapRqData, Document soapRspData)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException {
@@ -69,8 +67,8 @@ public enum EadcFactory {
     }
 
     /**
-     * initializes the EadcReceiver - using a different EadcReceiverImpl would enable you to add additional
-     * functionality during the data collection from the EadcEntry to the Database tables
+     * Initializes the EadcReceiver - using a different EadcReceiverImpl would enable you to add additional
+     * functionality during the data collection from the EadcEntry to the Database tables.
      */
     private synchronized EadcReceiver initReceiver(String implClass) throws InstantiationException, IllegalAccessException,
             ClassNotFoundException {
@@ -89,13 +87,13 @@ public enum EadcFactory {
     }
 
     /**
-     * initializes the EadcEntry - using a different EadcEntryImpl would enable you to extract additional data
+     * Initializes the EadcEntry - using a different EadcEntryImpl would enable you to extract additional data
      * from the soap request or response data to the data xml before the entry is processed by the EadcReceiverImpl -
      * the default EadcReceiverImpl is only using the data xml and not the soap request and response data
      */
     private synchronized EadcEntry initEntry(String implClass, String dsName, Document data, Document soapRqData,
-                                             Document soapRspData) throws InstantiationException, IllegalAccessException,
-            ClassNotFoundException {
+                                             Document soapRspData)
+            throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 
         if (entry == null) {
             LOGGER.debug("initEntry - instantiate new: '{}'", implClass);
@@ -112,10 +110,10 @@ public enum EadcFactory {
     }
 
     /**
-     * called if the NCP is reloaded
+     * Called if the NCP is reloaded
      */
     public void clear() {
-        LOGGER.debug("clear");
+
         synchronized (INSTANCE) {
             receiver = null;
             entry = null;

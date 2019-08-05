@@ -5,6 +5,10 @@
 
     <display-name>eHDSI OpenNCP TRC-STS - ${project.version}</display-name>
 
+    <listener>
+        <listener-class>eu.europa.ec.sante.ehdsi.openncp.cc.WebAppContextListener</listener-class>
+    </listener>
+
     <filter>
         <filter-name>ParameterValidationFilter</filter-name>
         <filter-class>com.matthewcasperson.validation.filter.ParameterValidationFilter</filter-class>

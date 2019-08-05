@@ -1,11 +1,13 @@
 package epsos.ccd.netsmart.securitymanager.sts.util;
 
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +23,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
 import java.io.StringWriter;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
@@ -134,14 +138,20 @@ public class STSUtils {
     /**
      * @return
      */
-    public static String getServerIP() {
+    public static String getSTSServerIp() {
 
         try {
-            InetAddress thisIp = InetAddress.getLocalHost();
-            return thisIp.getHostAddress();
+            URL url = new URL(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
+            InetAddress inetAddress = InetAddress.getByName(url.getHost());
+            if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
+                    && (inetAddress instanceof Inet4Address)) {
+                return inetAddress.getHostAddress();
+            } else {
+                return IPUtil.getPrivateServerIp();
+            }
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
-            return "Unknown IP";
+            return "UNKNOW_HOST";
         }
     }
 

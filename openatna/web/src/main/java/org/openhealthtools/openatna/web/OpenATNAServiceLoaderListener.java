@@ -17,8 +17,9 @@ public class OpenATNAServiceLoaderListener implements ApplicationContextAware {
     private ApplicationContext context;
 
     public synchronized void start() {
+
         if (service == null) {
-            logger.info("Starting OpenATNA service..");
+            logger.info("[ATNA Service] Starting OpenATNA service...");
 
             AtnaFactory.initialize(context);
 
@@ -32,6 +33,8 @@ public class OpenATNAServiceLoaderListener implements ApplicationContextAware {
     }
 
     public synchronized void destroy() {
+
+        logger.info("[ATNA Service] OpenATNA service...");
         if (service != null) {
             try {
                 service.stop();

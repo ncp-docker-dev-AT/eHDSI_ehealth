@@ -9,6 +9,7 @@ import net.RFC3881.*;
 import net.RFC3881.AuditMessage.ActiveParticipant;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.validator.routines.InetAddressValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -127,7 +128,7 @@ public enum AuditTrailUtils {
 
     /**
      * The method converts the audit message to xml format, having as input the Audit Message.
-     * Uses the JAXB library to marshal the audit message object
+     * Uses the JAXB library to marshal the audit message object.
      *
      * @param am
      * @return
@@ -901,7 +902,7 @@ public enum AuditTrailUtils {
 
     /**
      * @param auditMessage
-     * @param SC_UserID
+     * @param userId
      * @param userIsRequester
      * @param code
      * @param codeSystem
@@ -909,23 +910,28 @@ public enum AuditTrailUtils {
      * @param ipAddress
      * @return
      */
-    private AuditMessage addService(AuditMessage auditMessage, String SC_UserID, boolean userIsRequester, String code,
+    private AuditMessage addService(AuditMessage auditMessage, String userId, boolean userIsRequester, String code,
                                     String codeSystem, String displayName, String ipAddress) {
 
-        if (StringUtils.isBlank(SC_UserID)) {
+        InetAddressValidator validator = InetAddressValidator.getInstance();
+        if (StringUtils.isBlank(userId)) {
             LOGGER.warn("No Service, as this is Service Consumer");
         } else {
-            ActiveParticipant sc = new ActiveParticipant();
-            sc.setNetworkAccessPointID(ipAddress);
-            sc.setNetworkAccessPointTypeCode(new Short("2"));
-            sc.setUserID(SC_UserID);
-            sc.setUserIsRequestor(userIsRequester);
+            ActiveParticipant activeParticipant = new ActiveParticipant();
+            activeParticipant.setNetworkAccessPointID(ipAddress);
+            if (validator.isValidInet4Address(ipAddress) || validator.isValidInet6Address(ipAddress)) {
+                activeParticipant.setNetworkAccessPointTypeCode(new Short("2"));
+            } else {
+                activeParticipant.setNetworkAccessPointTypeCode(new Short("1"));
+            }
+            activeParticipant.setUserID(userId);
+            activeParticipant.setUserIsRequestor(userIsRequester);
             CodedValueType scroleId = new CodedValueType();
             scroleId.setCode(code);
             scroleId.setCodeSystem(codeSystem);
             scroleId.setDisplayName(displayName);
-            sc.getRoleIDCode().add(scroleId);
-            auditMessage.getActiveParticipant().add(sc);
+            activeParticipant.getRoleIDCode().add(scroleId);
+            auditMessage.getActiveParticipant().add(activeParticipant);
         }
         return auditMessage;
     }
@@ -1383,9 +1389,9 @@ public enum AuditTrailUtils {
     public synchronized void sendATNASyslogMessage(AuditLogSerializer auditLogSerializer, AuditMessage auditMessage,
                                                    String facility, String severity) {
 
-        MessageSender messageSender = new MessageSender(auditLogSerializer, auditMessage, facility, severity);
-        LOGGER.info("Starting new thread for sending message");
-        messageSender.start();
+        LOGGER.info("[Audit Util] Starting new thread for sending message");
+        MessageSender messageSender = new MessageSender();
+        new Thread(() -> messageSender.send(auditLogSerializer, auditMessage, facility, severity)).start();
     }
 
     /**

@@ -1,13 +1,14 @@
 package _2007.xds_b.iti.ihe;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
-import epsos.ccd.gnomon.auditmanager.AuditService;
+import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
@@ -17,20 +18,19 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
-import tr.com.srdc.epsos.util.http.HTTPUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.*;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -49,37 +49,32 @@ import java.util.UUID;
 public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XDR_ServiceMessageReceiverInOut.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
-    private static final javax.xml.bind.JAXBContext wsContext;
+    private static final JAXBContext wsContext;
 
     static {
 
-        LOGGER.debug("Loading the WS-Security init libraries in XDR 2007");
+        LOGGER.debug("[XDR Services] Loading the WS-Security init libraries in XDR 2007");
         org.apache.xml.security.Init.init();
     }
 
     static {
 
-        JAXBContext jc = null;
+        JAXBContext jaxbContext = null;
 
         try {
-            jc = JAXBContext.newInstance(ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class, oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType.class);
+            jaxbContext = JAXBContext.newInstance(ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class, oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType.class);
         } catch (JAXBException ex) {
             LOGGER.error("Unable to create JAXBContext: '{}'", ex.getMessage(), ex);
             Runtime.getRuntime().exit(-1);
         } finally {
-            wsContext = jc;
+            wsContext = jaxbContext;
         }
     }
 
-    private String getIPofSender(MessageContext messageContext) {
-
-        return (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
-    }
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private String getMessageID(org.apache.axiom.soap.SOAPEnvelope envelope) {
-        Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(new QName("http://www.w3.org/2005/08/addressing", "MessageID"));
+        Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(new QName(AddressingConstants.Final.WSA_NAMESPACE, AddressingConstants.WSA_MESSAGE_ID));
         if (it.hasNext()) {
             return it.next().getText();
         } else {
@@ -90,41 +85,40 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
     public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
 
         try {
+
             Date startTime = new Date();
-
             // get the implementation class for the Web Service
-            Object obj = getTheImplementationObject(msgContext);
-
-            XDR_ServiceSkeleton skel = (XDR_ServiceSkeleton) obj;
+            Object serviceObject = getTheImplementationObject(msgContext);
+            XDR_ServiceSkeleton skel = (XDR_ServiceSkeleton) serviceObject;
             // Out Envelop
             SOAPEnvelope envelope;
             // Find the axisOperation that has been set by the Dispatch phase.
-            AxisOperation op = msgContext.getOperationContext().getAxisOperation();
+            AxisOperation axisOperation = msgContext.getOperationContext().getAxisOperation();
 
-            if (op == null) {
+            if (axisOperation == null) {
                 throw new AxisFault(
-                        "Operation is not located, if this is doclit style the SOAP-ACTION should specified via the SOAP Action to use the RawXMLProvider");
+                        "Operation is not located, if this is Doc/lit style the SOAP-ACTION should specified via the " +
+                                "SOAP Action to use the RawXMLProvider");
             }
 
             String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID().toString();
             String methodName;
+            Document eDispenseCda;
+            if ((axisOperation.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(axisOperation.getName().getLocalPart())) != null)) {
 
-            if ((op.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(op.getName().getLocalPart())) != null)) {
-
-                SOAPHeader sh = msgContext.getEnvelope().getHeader();
+                SOAPHeader soapHeader = msgContext.getEnvelope().getHeader();
+                //  Identification of the TLS Common Name of the client.
+                String clientCommonName = EventLogUtil.getClientCommonName(msgContext);
+                LOGGER.info("[ITI-41] Incoming XDR Request from '{}'", clientCommonName);
 
                 EventLog eventLog = new EventLog();
-                String ip = getIPofSender(msgContext);
-                eventLog.setSourceip(ip);
                 eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
                 eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
+                eventLog.setSC_UserID(clientCommonName);
+                eventLog.setSourceip(EventLogUtil.getSourceGatewayIdentifier(msgContext));
+                eventLog.setTargetip(EventLogUtil.getTargetGatewayIdentifier());
 
-                HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
-                String clientDN = HTTPUtil.getClientCertificate(req);
-                eventLog.setSC_UserID(clientDN);
-                eventLog.setTargetip(HTTPUtil.getHostIpAddress(req.getServerName()));
-
-                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                     loggerClinical.debug("Incoming XDR Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
                 }
 
@@ -141,7 +135,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                             ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    registryResponse = skel.documentRecipient_ProvideAndRegisterDocumentSetB(wrappedParam, sh, eventLog);
+                    registryResponse = skel.documentRecipient_ProvideAndRegisterDocumentSetB(wrappedParam, soapHeader, eventLog);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), registryResponse, false);
 
@@ -157,10 +151,12 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateXDRMessage(responseMessage, NcpSide.NCP_A);
                     }
-                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                    if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                         loggerClinical.debug("Response Header:\n{}", envelope.getHeader().toString());
                         loggerClinical.debug("Outgoing XDR Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
+                    // eADC: extract of the eDispense CDA required by the KPIs.
+                    eDispenseCda = EadcUtilWrapper.toXmlDocument(wrappedParam.getDocument().get(0).getValue());
 
                 } else {
                     LOGGER.error("Method not found: '{}'", methodName);
@@ -171,28 +167,25 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
-                //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
-                try {
-                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                            endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND, ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
-                } catch (Exception e) {
-                    LOGGER.error("EADC INVOCATION FAILED: '{}'", e.getMessage(), e);
-                }
+                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, eDispenseCda, startTime,
+                        endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND,
+                        ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
             }
         } catch (java.lang.Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
-            throw org.apache.axis2.AxisFault.makeFault(e);
+            throw AxisFault.makeFault(e);
         }
     }
 
-    private org.apache.axiom.om.OMElement toOM(ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType param,
-                                               boolean optimizeContent) throws AxisFault {
+    private OMElement toOM(ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType param, boolean optimizeContent)
+            throws AxisFault {
+
         try {
 
             Marshaller marshaller = wsContext.createMarshaller();
-            marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
-            OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
+            OMFactory factory = OMAbstractFactory.getOMFactory();
 
             JaxbRIDataSource source = new JaxbRIDataSource(ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class,
                     param, marshaller, "urn:ihe:iti:xds-b:2007", "ProvideAndRegisterDocumentSetRequest");
@@ -223,7 +216,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             Marshaller marshaller = wsContext.createMarshaller();
             marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
-            OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
+            OMFactory factory = OMAbstractFactory.getOMFactory();
 
             JaxbRIDataSource source = new JaxbRIDataSource(oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType.class,
                     param, marshaller, "urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0", "RegistryResponse");
@@ -365,8 +358,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             try {
 
                 SAXOMBuilder builder = new SAXOMBuilder();
-                Marshaller marshaller = wsContext.createMarshaller();
-                marshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
+                wsContext.createMarshaller().marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
 
                 return builder.getRootElement().getXMLStreamReader();
 

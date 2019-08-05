@@ -2,6 +2,7 @@ package com.spirit.epsos.cc.adc.test;
 
 import com.spirit.epsos.cc.adc.db.EadcDbConnect;
 import com.spirit.epsos.cc.adc.extractor.AutomaticDataCollector;
+import com.spirit.epsos.cc.adc.extractor.AutomaticDataCollectorImpl;
 import com.spirit.epsos.cc.adc.extractor.XmlFileReader;
 import eu.epsos.pt.eadc.util.EadcFactory;
 import org.junit.After;
@@ -19,8 +20,6 @@ import java.util.UUID;
 
 /**
  * Test-class for testing the DataExtractionMechanism and storing the results into a database
- *
- * @author mk
  */
 @RunWith(JUnit4.class)
 public class TestAutomaticDataCollector extends BaseEadcTest {
@@ -100,8 +99,8 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     @Test(expected = Exception.class)
     public void testWithNoCodeElementInCdaDocument() throws Exception {
-        transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace, "ClinicalDocument")
-                .item(0).removeChild(transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace,
+        transactionDemo.getElementsByTagNameNS(AutomaticDataCollectorImpl.CDA_NAMESPACE, "ClinicalDocument")
+                .item(0).removeChild(transactionDemo.getElementsByTagNameNS(AutomaticDataCollectorImpl.CDA_NAMESPACE,
                 "code").item(0));
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
@@ -114,7 +113,7 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     @Test(expected = Exception.class)
     public void testWithNoCodeSystemAttributeInCodeElementOfCdaDocument() throws Exception {
-        ((Element) transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace,
+        ((Element) transactionDemo.getElementsByTagNameNS(AutomaticDataCollectorImpl.CDA_NAMESPACE,
                 "code").item(0)).removeAttribute("code");
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
@@ -127,7 +126,7 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
      */
     @Test(expected = Exception.class)
     public void testWithNoCodeSystemAttributeInCodeSystemElementOfCdaDocument() throws Exception {
-        ((Element) transactionDemo.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace,
+        ((Element) transactionDemo.getElementsByTagNameNS(AutomaticDataCollectorImpl.CDA_NAMESPACE,
                 "code").item(0)).removeAttribute("codeSystem");
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
@@ -140,7 +139,7 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
     @Test
     public void testWithNoCdaDocument() throws Exception {
         transactionDemo.getFirstChild().removeChild(transactionDemo.getElementsByTagNameNS(
-                AutomaticDataCollector.cdaNamespace, "ClinicalDocument").item(0));
+                AutomaticDataCollectorImpl.CDA_NAMESPACE, "ClinicalDocument").item(0));
         runAutomaticDataCollector(DS_NAME, transactionDemo);
     }
 
@@ -169,10 +168,10 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
         LOGGER.info("currentProcessedDocumentCode:" + currentProcessedDocumentCode);
 
         // Insert the currently tested code Attribute into the TransactionDemo XML-Structure
-        ((Element) (transactionXmlStructure.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace,
+        ((Element) (transactionXmlStructure.getElementsByTagNameNS(AutomaticDataCollectorImpl.CDA_NAMESPACE,
                 "code").item(0))).setAttribute("codeSystem", currentProcessedDocumentCodeSystem);
         // Insert the currently tested codeSystem Attribute into the TransactionDemo XML-Structure
-        ((Element) (transactionXmlStructure.getElementsByTagNameNS(AutomaticDataCollector.cdaNamespace, "code")
+        ((Element) (transactionXmlStructure.getElementsByTagNameNS(AutomaticDataCollectorImpl.CDA_NAMESPACE, "code")
                 .item(0))).setAttribute("code", currentProcessedDocumentCode);
     }
 

@@ -1,7 +1,7 @@
 package _2007.xds_b.iti.ihe;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
-import epsos.ccd.gnomon.auditmanager.AuditService;
+import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
@@ -26,16 +26,14 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.XMLUtil;
-import tr.com.srdc.epsos.util.http.HTTPUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.*;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -79,11 +77,6 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
-    private String getIPofSender(MessageContext messageContext) {
-
-        return (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
-    }
-
     private String getMessageID(SOAPEnvelope envelope) {
 
         Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(new QName("http://www.w3.org/2005/08/addressing", "MessageID"));
@@ -99,6 +92,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
         ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponseType = null;
         ServiceType serviceType;
+        Document clinicalDocument = null;
         try {
             Date startTime = new Date();
             // get the implementation class for the Web Service
@@ -121,25 +115,24 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             if ((op.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(op.getName().getLocalPart())) != null)) {
 
                 SOAPHeader sh = msgContext.getEnvelope().getHeader();
+                //  Identification of the TLS Common Name of the client.
+                String clientCommonName = EventLogUtil.getClientCommonName(msgContext);
 
                 EventLog eventLog = new EventLog();
-
-                String ip = getIPofSender(msgContext);
-                eventLog.setSourceip(ip);
                 eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
                 eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
-                HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
-                String clientDN = HTTPUtil.getClientCertificate(req);
-                eventLog.setSC_UserID(clientDN);
-                eventLog.setTargetip(HTTPUtil.getHostIpAddress(req.getServerName()));
+                eventLog.setSC_UserID(clientCommonName);
+                eventLog.setSourceip(EventLogUtil.getSourceGatewayIdentifier(msgContext));
+                eventLog.setTargetip(EventLogUtil.getTargetGatewayIdentifier());
 
-                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-                    loggerClinical.info("[Audit Debug] Requester: ParticipantId: '{}'\nObjectDetail: '{}'",
+                if (!StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name()) && loggerClinical.isDebugEnabled()) {
+                    loggerClinical.debug("[Audit Debug] Requester: ParticipantId: '{}'\nObjectDetail: '{}'",
                             getMessageID(msgContext.getEnvelope()), msgContext.getEnvelope().getHeader().toString());
                     loggerClinical.debug("Incoming XCA Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
                 }
                 if (StringUtils.equals(XCAOperation.SERVICE_CROSS_GATEWAY_QUERY, methodName)) {
 
+                    LOGGER.info("[ITI-38] Incoming XCA List from '{}'", clientCommonName);
                     /* Validate incoming query request */
                     String requestMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
                     if (OpenNCPValidation.isValidationEnable()) {
@@ -155,11 +148,12 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     envelope = toEnvelope(getSOAPFactory(msgContext), adhocQueryResponse1, false);
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
-                    LOGGER.info("[Audit Debug] Responder: ParticipantId: '{}'\nObjectDetail: '{}'",
-                            randomUUID, envelope.getHeader().toString());
+                    if (LOGGER.isInfoEnabled()) {
+                        LOGGER.info("[Audit Debug] Responder: ParticipantId: '{}'\nObjectDetail: '{}'",
+                                randomUUID, envelope.getHeader().toString());
+                    }
                     eventLog.setNcpSide(NcpSide.NCP_A);
-                    AuditService auditService = AuditServiceFactory.getInstance();
-                    auditService.write(eventLog, "", "1");
+                    AuditServiceFactory.getInstance().write(eventLog, "", "1");
 
                     /* Validate outgoing query response */
                     String responseMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
@@ -167,7 +161,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
                     }
 
-                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                    if (!StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name()) && loggerClinical.isDebugEnabled()) {
                         loggerClinical.debug("Response Header:\n{}", envelope.getHeader().toString());
                         loggerClinical.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
@@ -175,16 +169,15 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                 } else if (StringUtils.equals(XCAOperation.SERVICE_CROSS_GATEWAY_RETRIEVE, methodName)) {
 
+                    LOGGER.info("[ITI-39] Incoming XCA Retrieve from '{}'", clientCommonName);
                     /* Validate incoming retrieve request */
                     String requestMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A);
                     }
 
-                    ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponse3 = null;
-                    ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType wrappedParam = (ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType) fromOM(
-                            msgContext.getEnvelope().getBody().getFirstElement(),
-                            ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType.class,
+                    RetrieveDocumentSetRequestType wrappedParam = (RetrieveDocumentSetRequestType) fromOM(
+                            msgContext.getEnvelope().getBody().getFirstElement(), RetrieveDocumentSetRequestType.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
                     OMFactory factory = OMAbstractFactory.getOMFactory();
@@ -198,10 +191,9 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
                     eventLog.setNcpSide(NcpSide.NCP_A);
 
-                    AuditService auditService = AuditServiceFactory.getInstance();
-                    auditService.write(eventLog, "", "1");
+                    AuditServiceFactory.getInstance().write(eventLog, "", "1");
 
-                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                    if (!StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name()) && loggerClinical.isDebugEnabled()) {
                         loggerClinical.debug("Outgoing XCA Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
                     }
 
@@ -215,25 +207,22 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
                     }
                     serviceType = ServiceType.DOCUMENT_EXCHANGED_RESPONSE;
+                    RetrieveDocumentSetResponseType responseType = (RetrieveDocumentSetResponseType) fromOM(
+                            omElement, RetrieveDocumentSetResponseType.class, null);
+
+                    clinicalDocument = EadcUtilWrapper.getCDA(responseType);
 
                 } else {
                     LOGGER.error("Method not found: '{}'", methodName);
                     throw new java.lang.RuntimeException("method not found");
                 }
 
-                Date endTime = new Date();
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
+                Date endTime = new Date();
+                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, clinicalDocument, startTime, endTime,
+                        tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND, serviceType);
 
-                //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
-                try {
-                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null,
-                            EadcUtilWrapper.getCDA(retrieveDocumentSetResponseType), startTime, endTime, tr.com.srdc.epsos.util.Constants.COUNTRY_CODE,
-                            EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND, serviceType);
-
-                } catch (Exception e) {
-                    LOGGER.error("EADC INVOCATION FAILED: '{}'", e.getMessage(), e);
-                }
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -481,8 +470,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             try {
 
                 SAXOMBuilder builder = new org.apache.axiom.om.impl.builder.SAXOMBuilder();
-                Marshaller marshaller = wsContext.createMarshaller();
-                marshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
+                wsContext.createMarshaller().marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
 
                 return builder.getRootElement().getXMLStreamReader();
 

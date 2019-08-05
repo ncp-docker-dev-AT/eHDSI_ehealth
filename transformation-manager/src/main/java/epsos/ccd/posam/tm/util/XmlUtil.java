@@ -1,5 +1,6 @@
 package epsos.ccd.posam.tm.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jaxen.JaxenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,16 +23,13 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Helper class for TM specific XML manipulation methods
+ * Helper class for TM specific XML manipulation methods.
  *
  * @author Frantisek Rudik
- * @author Organization: Posam
- * @author mail:frantisek.rudik@posam.sk
- * @version 1.10, 2010, 20 October
  */
 public class XmlUtil implements TMConstants {
 
-    private static final Logger log = LoggerFactory.getLogger(XmlUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlUtil.class);
 
     private XmlUtil() {
     }
@@ -39,8 +37,8 @@ public class XmlUtil implements TMConstants {
     /**
      * Simply prints Node as String (useful for logging/testing purpose)
      *
-     * @param node
-     * @return String
+     * @param node Node element
+     * @return String representation of the Node element
      */
     public static String xmlToString(Node node) {
 
@@ -55,7 +53,7 @@ public class XmlUtil implements TMConstants {
             transformer.transform(source, result);
             return stringWriter.getBuffer().toString();
         } catch (TransformerException e) {
-            log.error("xmlToString error: ", e);
+            LOGGER.error("xmlToString error: ", e);
         }
         return null;
     }
@@ -77,7 +75,7 @@ public class XmlUtil implements TMConstants {
 
             return stringWriter.getBuffer().toString();
         } catch (TransformerException e) {
-            log.error("xmlToString error: ", e);
+            LOGGER.error("xmlToString error: ", e);
         }
         return null;
     }
@@ -86,22 +84,21 @@ public class XmlUtil implements TMConstants {
      * Creates DOM Document from File
      *
      * @param file           XML File
-     * @param namespaceAware boolean parameter, determines if Document is namespaceAware or
-     *                       not
+     * @param namespaceAware boolean parameter, determines if Document is namespaceAware or not
      * @return Document
      */
     public static Document getDocument(File file, boolean namespaceAware) {
 
         Document document = null;
         try {
-            // parse an XML document into a DOM tree
+            // Parse a XML document into a DOM tree
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
             documentFactory.setNamespaceAware(namespaceAware);
             DocumentBuilder parser = documentFactory.newDocumentBuilder();
 
             document = parser.parse(file);
-        } catch (Exception e) {
-            log.error("getDocument error: ", e);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return document;
     }
@@ -110,8 +107,7 @@ public class XmlUtil implements TMConstants {
      * Creates DOM Document from ByteArray
      *
      * @param xml            input ByteArray
-     * @param namespaceAware boolean parameter, determines if Document is namespaceAware or
-     *                       not
+     * @param namespaceAware boolean parameter, determines if Document is namespaceAware or not
      * @return Document
      */
     public static Document bytesToXml(byte[] xml, boolean namespaceAware) {
@@ -124,7 +120,7 @@ public class XmlUtil implements TMConstants {
             return builder.parse(new ByteArrayInputStream(xml));
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            log.error("bytesToXml error: ", e);
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return null;
     }
@@ -147,23 +143,30 @@ public class XmlUtil implements TMConstants {
             transformer.transform(source, result);
             return out.toByteArray();
         } catch (TransformerException e) {
-            log.error("doc2bytes error: ", e);
+            LOGGER.error("TransformerException: '{}'", e.getMessage(), e);
         }
         return new byte[]{};
     }
 
     /**
-     * Returns namespaceAware Document (namespaceAware Document is required bye
-     * validation against schema)
+     * Returns namespaceAware Document (namespaceAware Document is required by validation against schema)
      *
      * @param inputDocument Document
      * @return output NamespaceAware Document
      */
     public static Document getNamespaceAwareDocument(Document inputDocument) {
+
         return bytesToXml(doc2bytes(inputDocument), true);
     }
 
+    /**
+     * Returns namespaceAware Document (namespaceAware Document is required by validation against schema)
+     *
+     * @param inputDocumentBytes Document as byte array
+     * @return output NamespaceAware Document
+     */
     public static Document getNamespaceAwareDocument(byte[] inputDocumentBytes) {
+
         return bytesToXml(inputDocumentBytes, true);
     }
 
@@ -174,6 +177,7 @@ public class XmlUtil implements TMConstants {
      * @return output Namespace NOT aware Document
      */
     public static Document getNamespaceNOTAwareDocument(Document inputDocument) {
+
         return bytesToXml(doc2bytes(inputDocument), false);
     }
 
@@ -181,29 +185,29 @@ public class XmlUtil implements TMConstants {
      * Using XPath expression evaluates input node
      *
      * @param node            input Document
-     * @param xpathexpression XPath expression to be evaluated
+     * @param xPathExpression XPath expression to be evaluated
      * @return NodeList
      */
-    public static List<Node> getNodeList(Node node, String xpathexpression) {
+    public static List<Node> getNodeList(Node node, String xPathExpression) {
 
         List<Node> result;
         try {
-            NoNsXpath xpath = new NoNsXpath(xpathexpression);
+            NoNsXpath xpath = new NoNsXpath(xPathExpression);
             result = xpath.selectNodes(node);
         } catch (JaxenException e) {
-            log.error("xpath: " + xpathexpression + ", node: " + node, e);
+            LOGGER.error("JaxenException: XPath: '{}', Node: '{}'", xPathExpression, node, e);
             return new ArrayList<>();
         }
         return result;
     }
 
-    public static Node getNode(Node node, String xpathexpression) {
+    public static Node getNode(Node node, String xPathExpression) {
 
         try {
-            NoNsXpath xpath = new NoNsXpath(xpathexpression);
+            NoNsXpath xpath = new NoNsXpath(xPathExpression);
             return (Node) xpath.selectSingleNode(node);
         } catch (JaxenException e) {
-            log.error("xpath: " + xpathexpression + ", node: " + node, e);
+            LOGGER.error("JaxenException: XPath: '{}', Node: '{}'", xPathExpression, node, e);
             return null;
         }
     }
@@ -219,11 +223,8 @@ public class XmlUtil implements TMConstants {
     /**
      * Workaround how to avoid empty xmlns="" by processing document
      *
-     * @param input
-     * @return
-     * @throws SAXException
-     * @throws ParserConfigurationException
-     * @throws IOException
+     * @param input Document to process
+     * @return Document with empty namespace removed
      */
     public static Document removeEmptyXmlns(Document input) throws SAXException, ParserConfigurationException, IOException {
 
@@ -235,9 +236,9 @@ public class XmlUtil implements TMConstants {
     /**
      * Returns InputStream from Document
      *
-     * @param node
+     * @param node Document Node to transform as InputStream
      * @return InputStream
-     * @throws TransformerException
+     * @throws TransformerException Java XML Transformation error
      */
     public static InputStream nodeToInputStream(Node node) throws TransformerException {
 
@@ -245,8 +246,8 @@ public class XmlUtil implements TMConstants {
         Result outputTarget = new StreamResult(outputStream);
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        Transformer t = transformerFactory.newTransformer();
-        t.transform(new DOMSource(node), outputTarget);
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.transform(new DOMSource(node), outputTarget);
         return new ByteArrayInputStream(outputStream.toByteArray());
     }
 
@@ -260,31 +261,34 @@ public class XmlUtil implements TMConstants {
             Node next = e;
             int pos = 1;
             Node tmp = e;
+
             while (prev != null) {
+
                 prev = tmp.getPreviousSibling();
                 if (prev != null) {
                     tmp = prev;
                     if (prev.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    if (prev.getLocalName().equals(name)) {
+                    if (StringUtils.equals(prev.getLocalName(), name)) {
                         pos++;
                     }
                 }
             }
-            // ak je pos null, skontrolujem aj nasledujce elemnty
-            // ci je viac takych z rovnakym menom
+            // CZ Translation: If POS is null, Checking the following elements if there is more than one with the same name
             boolean more = false;
             if (pos == 1) {
                 tmp = e;
                 while (next != null) {
                     next = tmp.getNextSibling();
+
                     if (next != null) {
+
                         tmp = next;
                         if (next.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
-                        if (next.getLocalName() != null && next.getLocalName().equals(name)) {
+                        if (next.getLocalName() != null && StringUtils.equals(next.getLocalName(), name)) {
                             more = true;
                             break;
                         }
@@ -315,7 +319,7 @@ class CdaNameSpaceContext implements NamespaceContext {
     private static final String NS_CDA = "urn:hl7-org:v3";
 
     public String getNamespaceURI(String prefix) {
-        if ("nsCda".equals(prefix)) {
+        if (StringUtils.equals("nsCda", prefix)) {
             return NS_CDA;
         }
         return null;

@@ -23,7 +23,7 @@ package org.openhealthtools.openatna.all.test;
 import org.openhealthtools.openatna.anom.AtnaException;
 import org.openhealthtools.openatna.anom.AtnaMessage;
 import org.openhealthtools.openatna.anom.codes.CodeParser;
-import org.openhealthtools.openatna.jaxb21.JaxbIOFactory;
+import org.openhealthtools.openatna.anom.JaxbIOFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -64,15 +64,6 @@
         <property name="schemaValidationEnabled">
             <value>${tm.schema.validation.enabled}</value>
         </property>
-        <property name="auditTrailEnabled">
-            <value>${tm.audittrail.enabled}</value>
-        </property>
-        <property name="auditTrailTransactionNumber">
-            <value>${tm.audittrail.transactionnumber}</value>
-        </property>
-        <property name="auditTrailTargetIP">
-            <value>${tm.audittrail.targetip}</value>
-        </property>
         <property name="auditTrailFacility">
             <value>${tm.audittrail.facility}</value>
         </property>

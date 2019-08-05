@@ -44,7 +44,6 @@ public class TcpNioServer implements Notifier, Server {
     public void start() {
 
         try {
-            String host = tlsConnection.getHostname();
             ByteBuffer.setUseDirectBuffers(false);
             acceptor = new SocketAcceptor(Runtime.getRuntime().availableProcessors() + 1, Executors.newCachedThreadPool());
             acceptor.getDefaultConfig().setThreadModel(ThreadModel.MANUAL);
@@ -62,8 +61,9 @@ public class TcpNioServer implements Notifier, Server {
             }
             chain.addLast("codec", new ProtocolCodecFilter(new SyslogProtocolCodecFactory()));
             acceptor.setFilterChainBuilder(chain);
-            acceptor.bind(new InetSocketAddress(host, tlsConnection.getPort()), new SyslogProtocolHandler(this));
-            LOGGER.info("TLS Server running on port: '{}'", tlsConnection.getPort());
+            acceptor.bind(new InetSocketAddress(tlsConnection.getHostname(), tlsConnection.getPort()), new SyslogProtocolHandler(this));
+            LOGGER.info("TLS Server '{}' running on port: '{}'", tlsConnection.getHostname(), tlsConnection.getPort());
+
         } catch (IOException e) {
             LOGGER.error("IoException: '{}'", e.getMessage(), e);
         }

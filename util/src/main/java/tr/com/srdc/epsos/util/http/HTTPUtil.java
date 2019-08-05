@@ -30,6 +30,7 @@ public class HTTPUtil {
 
     public static String getHostIpAddress(String host) {
         try {
+            //return IPUtil.getPrivateServerIp();
             return InetAddress.getByName(host).getHostAddress();
         } catch (UnknownHostException e) {
             return "Server IP Unknown";

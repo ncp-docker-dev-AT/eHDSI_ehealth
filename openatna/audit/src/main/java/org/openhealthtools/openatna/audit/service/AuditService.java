@@ -7,11 +7,8 @@ import java.io.IOException;
 
 /**
  * @author Andrew Harrison
- * @version $Revision:$
  */
 public interface AuditService {
-
-    String PROPERTY_DAO_FACTORY = AuditService.class.getName() + ".dao.factory";
 
     /**
      * start the service

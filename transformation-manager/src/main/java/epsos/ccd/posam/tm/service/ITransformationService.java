@@ -47,7 +47,6 @@ public interface ITransformationService {
      * <li>5. Schematron based validation of output CDA
      * document. (Can be enabled/disabled through property
      * <i>tm.schematron.validation.enabled)</i></li>
-     * <li>6. Writing Audit trail.(Can be enabled/disabled through property <i>tm.audittrail.enabled</i>)</li>
      *
      * @param epSOSOriginalData Medical document in its original data format as provided from the NationalConnector to
      *                          this component. The provided document is compliant with the epSOS pivot CDA (see D 3.5.2 Appendix C)
@@ -97,7 +96,6 @@ public interface ITransformationService {
      * <li>5. Schematron based validation of output CDA
      * document. (Can be enabled/disabled through property
      * <i>tm.schematron.validation.enabled)</i></li>
-     * <li>6. Writing Audit trail.(Can be enabled/disabled through property <i>tm.audittrail.enabled</i>)</li>
      *
      * @param epSosCDA           Document in epSOS pivot format (with epSOS codes )
      * @param targetLanguageCode Identifier (code) of the target language.
