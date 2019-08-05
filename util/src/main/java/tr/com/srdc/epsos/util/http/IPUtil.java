@@ -4,45 +4,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
+import java.util.Enumeration;
 
 public class IPUtil {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(IPUtil.class);
     @SuppressWarnings("squid:S1313")
     private static final String LOCAL_IP_ADDRESS = "127.0.0.1";
+    private static final String ERROR_UNKNOWN_HOST = "UNKNOWN_HOST";
 
     private IPUtil() {
-    }
-
-    /**
-     * This static method depends on the automation page of WhatIsMyIP.com
-     *
-     * @return IP Address of the server discovered by the remote service.
-     */
-    public static String getMyPublicIP() {
-
-        URL autoIP;
-        try {
-            autoIP = new URL("http://automation.whatismyip.com/n09230945.asp");
-        } catch (MalformedURLException e) {
-            LOGGER.error("whatismyip.com was not accessible for learning our IP: '{}'", e.getMessage(), e);
-            return LOCAL_IP_ADDRESS;
-        }
-
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(autoIP.openStream()))) {
-
-            return (in.readLine()).trim();
-
-        } catch (IOException e) {
-            LOGGER.error("whatismyip.com was not accessible for learning our IP: '{}'", e.getMessage(), e);
-        }
-
-        return LOCAL_IP_ADDRESS;
     }
 
     /**
@@ -50,7 +22,66 @@ public class IPUtil {
      *
      * @return IP Address of the server defined into the OpenNCP Configuration Database.
      */
-    public static String getServerIPStatic() {
+    public static String getStaticServerIP() {
         return Constants.SERVER_IP;
+    }
+
+    /**
+     * Returns Local IP address of the machine executing the method.
+     *
+     * @return IP address of the server or "UNKNOWN_HOST" if an IP cannot be retrieved.
+     */
+    public static String getPrivateServerIp() {
+
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+
+                NetworkInterface networkInterface = networkInterfaces.nextElement();
+                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                while (inetAddresses.hasMoreElements()) {
+                    InetAddress inetAddress = inetAddresses.nextElement();
+                    if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
+                            && (inetAddress instanceof Inet4Address)) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            LOGGER.error("Unable to get current IP: '{}'", e.getMessage(), e);
+        }
+        return ERROR_UNKNOWN_HOST;
+    }
+
+    public static boolean isThisMyIpAddress(InetAddress addr) {
+        // Check if the address is a valid special local or loop back
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress())
+            return true;
+
+        // Check if the address is defined on any interface
+        try {
+            if (NetworkInterface.getByInetAddress(addr) != null) {
+                NetworkInterface networkInterface = NetworkInterface.getByInetAddress(addr);
+                while (networkInterface.getInetAddresses().hasMoreElements()) {
+                    InetAddress inetAddress = networkInterface.getInetAddresses().nextElement();
+                    System.out.println(inetAddress.getHostName());
+                    return true;
+                }
+            }
+            return false;
+        } catch (SocketException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean isLocalIp(String ipAddress) {
+        boolean isMyDesiredIp = false;
+        try {
+            isMyDesiredIp = isThisMyIpAddress(InetAddress.getByName(ipAddress)); //"localhost" for localhost
+        } catch (UnknownHostException unknownHost) {
+            unknownHost.printStackTrace();
+        }
+        return isMyDesiredIp;
     }
 }

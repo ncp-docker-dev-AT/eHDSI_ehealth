@@ -3,9 +3,9 @@ package ee.affecto.epsos.util;
 import ee.affecto.epsos.ws.handler.DummyMustUnderstandHandler;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.client.Stub;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -18,24 +18,20 @@ import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
+import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.GregorianCalendar;
+import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
-//TODO: Review OpenNCP-2.5.5
 public class EventLogClientUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventLogClientUtil.class);
+    private static final String ERROR_UNKNOWN_HOST = "UNKNOWN_HOST";
 
     private EventLogClientUtil() {
     }
@@ -43,7 +39,7 @@ public class EventLogClientUtil {
     /**
      * @param stub
      */
-    public static void createDummyMustUnderstandHandler(org.apache.axis2.client.Stub stub) {
+    public static void createDummyMustUnderstandHandler(Stub stub) {
 
         HandlerDescription description = new HandlerDescription("DummyMustUnderstandHandler");
         description.setHandler(new DummyMustUnderstandHandler());
@@ -61,105 +57,61 @@ public class EventLogClientUtil {
     }
 
     /**
-     * @param epr
-     * @return
+     * Returns the local private IP of the machine executing the method.
+     *
+     * @return First IP v4 or v6 value retrieved which is not a loopback or local IP address.
      */
-    public static String getServerCertificateDN(String epr) {
+    public static String getSourceGatewayIdentifier() {
 
-        String dn = null;
+        return IPUtil.getPrivateServerIp();
+    }
+
+    /**
+     * Returns the IP address or a remote server.
+     *
+     * @param endpointReference - client endpoint reference value extracted from the SOAP ServiceClient.
+     * @return IP address of the client retrieved by InetAddress or ERROR_UNKNOWN_HOST.
+     */
+    public static String getTargetGatewayIdentifier(String endpointReference) {
 
         try {
-            // TODO A.R. Silly, very silly  to open connection again just for getting server certificate.
-            // But can we get it from AXIS2?
-
-            HostnameVerifier allHostsValid = (hostname, session) -> true;
-            // Install the all-trusting host verifier
-            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-
-            URL url = new URL(epr);
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-            con.connect();
-            Certificate[] certs = con.getServerCertificates();
-            // Peers certificate is first
-            if (certs != null && certs.length > 0) {
-                X509Certificate cert = (X509Certificate) certs[0];
-                dn = cert.getSubjectDN().getName();
+            URI url = new URI(endpointReference);
+            InetAddress inetAddress = InetAddress.getByName(url.getHost());
+            if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
+                    && (inetAddress instanceof Inet4Address)) {
+                return inetAddress.getHostAddress();
+            } else {
+                return url.getHost();
             }
-            con.disconnect();
-        } catch (Exception ex) {
-            LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
-        }
-        return dn;
-    }
-
-    /**
-     * @return
-     */
-    public static String getLocalIpAddress() {
-
-        // TODO A.R. should be changed for multihomed hosts... It's better to get address from AXIS2 actual socket but how?
-        String ipAddress = null;
-        try {
-            ipAddress = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-
-            LOGGER.error("UnknownHostException: '{}'", e.getMessage(), e);
-        }
-        return ipAddress;
-    }
-
-    /**
-     * @param epr
-     * @return
-     */
-    public static String getServerIpAddress(String epr) {
-
-        URL url;
-        String ipAddress = null;
-        try {
-            url = new URL(epr);
-            ipAddress = InetAddress.getByName(url.getHost()).getHostAddress();
         } catch (Exception e) {
-            LOGGER.error(null, e);
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            return ERROR_UNKNOWN_HOST;
         }
-        return ipAddress;
     }
 
     /**
      * @param msgContext
      * @param soapEnvelope
-     * @param address
+     * @param endpointReference
      * @return
      */
-    public static EventLog prepareEventLog(MessageContext msgContext, SOAPEnvelope soapEnvelope, String address) {
+    public static EventLog prepareEventLog(MessageContext msgContext, SOAPEnvelope soapEnvelope, String endpointReference) {
 
         EventLog eventLog = new EventLog();
-
-        try {
-            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
-        } catch (DatatypeConfigurationException e) {
-            LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
-        }
+        eventLog.setEI_EventDateTime(DateUtil.getDateAsXMLGregorian(new Date()));
 
         // Set Active Participant Identification: Service Consumer NCP
         eventLog.setSC_UserID(HTTPUtil.getSubjectDN(false));
-        eventLog.setSP_UserID(HTTPUtil.getServerCertificate(address));
+        eventLog.setSP_UserID(HTTPUtil.getServerCertificate(endpointReference));
 
         // Set Audit Source
-        ConfigurationManager cms = ConfigurationManagerFactory.getConfigurationManager();
-        eventLog.setAS_AuditSourceId(cms.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"));
+        eventLog.setAS_AuditSourceId(ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"));
 
         // Set Source Ip
-        String localIp = EventLogClientUtil.getLocalIpAddress();
-        if (localIp != null) {
-            eventLog.setSourceip(localIp);
-        }
+        eventLog.setSourceip(getSourceGatewayIdentifier());
 
         // Set Target Ip
-        String serverIp = EventLogClientUtil.getServerIpAddress(address);
-        if (serverIp != null) {
-            eventLog.setTargetip(serverIp);
-        }
+        eventLog.setTargetip(getTargetGatewayIdentifier(endpointReference));
 
         // Set Participant Object: Request Message
         String reqMessageId = appendUrnUuid(EventLogUtil.getMessageID(msgContext.getEnvelope()));

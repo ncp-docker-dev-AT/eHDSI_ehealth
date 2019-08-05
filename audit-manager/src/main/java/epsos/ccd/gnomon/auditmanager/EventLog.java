@@ -253,8 +253,7 @@ public class EventLog {
                                                           String ResM_ParticipantObjectID, byte[] ResM_PatricipantObjectDetail,
                                                           String targetip) {
 
-        LOGGER.info("Creating EventLog for CDA Pivot Translation: '{}'-'{}'",
-                EI_TransactionName, EI_EventActionCode);
+        LOGGER.info("Creating EventLog for CDA Pivot Translation: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
         EventLog eventLog = new EventLog();
         // Set Audit Source
         ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
@@ -289,8 +288,7 @@ public class EventLog {
                                                         String ResM_ParticipantObjectID, byte[] ResM_PatricipantObjectDetail,
                                                         String sourceip, String targetip) {
 
-        LOGGER.info("Creating EventLog for Patient Privacy: '{}'-'{}'",
-                EI_TransactionName, EI_EventActionCode);
+        LOGGER.info("Creating EventLog for Patient Privacy: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
         return EventLog.createEventLogHCPAssurance(EI_TransactionName, EI_EventActionCode, EI_EventDateTime,
                 EI_EventOutcomeIndicator, null, null, HR_UserID, HR_AlternativeUserID, HR_RoleID,
                 SC_UserID, SP_UserID, AS_AuditSourceId, PT_PatricipantObjectID, EM_PatricipantObjectID,
@@ -395,8 +393,7 @@ public class EventLog {
                                                        byte[] ReqM_PatricipantObjectDetail, String ResM_ParticipantObjectID,
                                                        byte[] ResM_PatricipantObjectDetail, String sourceip, String targetip) {
 
-        LOGGER.info("Creating EventLog for Consent PIN Deny: '{}'-'{}'",
-                EI_TransactionName, EI_EventActionCode);
+        LOGGER.info("Creating EventLog for Consent PIN Deny: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
         return EventLog.createEventLogHCPAssurance(EI_TransactionName, EI_EventActionCode, EI_EventDateTime, EI_EventOutcomeIndicator,
                 PC_UserID, PC_RoleID, HR_UserID, HR_AlternativeUserID, HR_RoleID, SC_UserID, SP_UserID, AS_AuditSourceId,
                 PT_PatricipantObjectID, null, null, "PINdny",
@@ -454,8 +451,7 @@ public class EventLog {
                                                       String ResM_ParticipantObjectID, byte[] ResM_PatricipantObjectDetail,
                                                       String sourceip, String targetip) {
 
-        LOGGER.info("Creating EventLog for Healthcare Provider Assurance: '{}'-'{}'",
-                EI_TransactionName, EI_EventActionCode);
+        LOGGER.info("Creating EventLog for Healthcare Provider Assurance: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
         EventLog eventLog = new EventLog();
         eventLog.setEI_TransactionName(EI_TransactionName);
         eventLog.setEI_EventActionCode(EI_EventActionCode);
@@ -521,8 +517,7 @@ public class EventLog {
                                              byte[] ReqM_PatricipantObjectDetail, String ResM_ParticipantObjectID,
                                              byte[] ResM_PatricipantObjectDetail, String sourceip, String targetip) {
 
-        LOGGER.info("Creating EventLog for Patient Access Control(PAC): '{}'-'{}'",
-                EI_TransactionName, EI_EventActionCode);
+        LOGGER.info("Creating EventLog for Patient Access Control(PAC): '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
         return EventLog.createEventLogHCPAssurance(EI_TransactionName, EI_EventActionCode, EI_EventDateTime, EI_EventOutcomeIndicator,
                 PC_UserID, PC_RoleID, HR_UserID, HR_AlternativeUserID, HR_RoleID, SC_UserID, SP_UserID, AS_AuditSourceId,
                 PT_PatricipantObjectID, EM_PatricipantObjectID, EM_PatricipantObjectDetail, eventTargetObjectId,
@@ -565,8 +560,7 @@ public class EventLog {
                                                         byte[] ReqM_PatricipantObjectDetail, String ResM_ParticipantObjectID,
                                                         byte[] ResM_PatricipantObjectDetail, String sourceip, String targetip) {
 
-        LOGGER.info("Creating EventLog for Patient Service: '{}'-'{}'",
-                EI_TransactionName, EI_EventActionCode);
+        LOGGER.info("Creating EventLog for Patient Service: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
         return EventLog.createEventLogHCPAssurance(EI_TransactionName, EI_EventActionCode, EI_EventDateTime, EI_EventOutcomeIndicator,
                 PC_UserID, PC_RoleID, HR_UserID, HR_AlternativeUserID, HR_RoleID, SC_UserID, SP_UserID, AS_AuditSourceId,
                 PT_PatricipantObjectID, EM_PatricipantObjectID, EM_PatricipantObjectDetail, eventTargetObjectId,
@@ -606,7 +600,7 @@ public class EventLog {
      *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
      *                                     encoded security header.
-     * @param sourceip                     The IP Address of the source Gateway
+     * @param sourceIp                     The IP Address of the source Gateway
      * @param targetip                     The IP Address of the target Gateway
      * @return the EventLog object
      */
@@ -617,10 +611,9 @@ public class EventLog {
                                               String AS_AuditSourceId, String PT_PatricipantObjectID, String eventTargetObjectId,
                                               String ReqM_ParticipantObjectID, byte[] ReqM_PatricipantObjectDetail,
                                               String ResM_ParticipantObjectID, byte[] ResM_PatricipantObjectDetail,
-                                              String sourceip, String targetip, NcpSide ncpSide) {
+                                              String sourceIp, String targetIp, NcpSide ncpSide) {
 
-        LOGGER.info("Creating EventLog for TRC Assertions: '{}'-'{}'",
-                EI_TransactionName, EI_EventActionCode);
+        LOGGER.info("Creating EventLog for TRC Assertions: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
         EventLog eventLog = new EventLog();
         eventLog.setEI_TransactionName(EI_TransactionName);
         eventLog.setEI_EventActionCode(EI_EventActionCode);
@@ -641,8 +634,8 @@ public class EventLog {
         eventLog.setReqM_PatricipantObjectDetail(ReqM_PatricipantObjectDetail);
         eventLog.setResM_ParticipantObjectID(nullToEmptyString(ResM_ParticipantObjectID));
         eventLog.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
-        eventLog.setSourceip(nullToEmptyString(sourceip));
-        eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setSourceip(nullToEmptyString(sourceIp));
+        eventLog.setTargetip(nullToEmptyString(targetIp));
         eventLog.ncpSide = ncpSide;
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
@@ -705,8 +698,7 @@ public class EventLog {
                                                         byte[] ReqM_PatricipantObjectDetail, String ResM_ParticipantObjectID,
                                                         byte[] ResM_PatricipantObjectDetail, String sourceip, String targetip) {
 
-        LOGGER.info("Creating EventLog for Patient ID Mapping: '{}'-'{}'",
-                EI_TransactionName, EI_EventActionCode);
+        LOGGER.info("Creating EventLog for Patient ID Mapping: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
         EventLog eventLog = new EventLog();
         eventLog.setEI_TransactionName(EI_TransactionName);
         eventLog.setEI_EventActionCode(EI_EventActionCode);
@@ -729,6 +721,7 @@ public class EventLog {
         eventLog.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
+
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
         }
@@ -781,8 +774,7 @@ public class EventLog {
                                                               byte[] ReqM_PatricipantObjectDetail, String ResM_ParticipantObjectID,
                                                               byte[] ResM_PatricipantObjectDetail, String sourceip, String targetip) {
 
-        LOGGER.info("Creating EventLog for System Communication Failure: '{}'-'{}'",
-                EI_TransactionName, EI_EventActionCode);
+        LOGGER.info("Creating EventLog for System Communication Failure: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
         EventLog eventLog = new EventLog();
         eventLog.setEI_TransactionName(EI_TransactionName);
         eventLog.setEI_EventActionCode(EI_EventActionCode);

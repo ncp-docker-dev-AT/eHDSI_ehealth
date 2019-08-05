@@ -12,15 +12,18 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.v3.II;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml.saml2.core.Attribute;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.http.HTTPUtil;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -31,8 +34,6 @@ import java.util.UUID;
 // Common part for client and server logging
 // TODO A.R. Should be moved into openncp-util later to avoid duplication
 public class EventLogUtil {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventLogUtil.class);
 
     private EventLogUtil() {
     }
@@ -362,5 +363,26 @@ public class EventLogUtil {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public static String getSourceGatewayIdentifier(MessageContext messageContext) {
+
+        String clientIp = (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
+        if (IPUtil.isLocalIp(clientIp)) {
+            HttpServletRequest servletRequest = (HttpServletRequest) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+            return servletRequest.getServerName();
+        } else {
+            return clientIp;
+        }
+    }
+
+    public static String getTargetGatewayIdentifier() {
+        return IPUtil.getPrivateServerIp();
+    }
+
+    public static String getClientCommonName(MessageContext messageContext) {
+
+        HttpServletRequest servletRequest = (HttpServletRequest) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+        return HTTPUtil.getClientCertificate(servletRequest);
     }
 }
