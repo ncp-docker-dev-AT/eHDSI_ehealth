@@ -1,14 +1,15 @@
 package _2009.xcpd.iti.ihe;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
+import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.om.*;
@@ -47,11 +48,11 @@ import java.util.*;
 public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XCPD_ServiceMessageReceiverInOut.class);
-    private static final javax.xml.bind.JAXBContext wsContext;
+    private static final JAXBContext wsContext;
 
     static {
 
-        LOGGER.debug("Loading the WS-Security init libraries in XCPD_ServiceMessageReceiverInOut xcpd 2009");
+        LOGGER.debug("Loading the WS-Security init libraries in XCPD_ServiceMessageReceiverInOut XCPD 2009");
         org.apache.xml.security.Init.init();
     }
 
@@ -69,11 +70,6 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
 
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
-    private String getIPofSender(MessageContext messageContext) {
-
-        return (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
-    }
-
     private String getMessageID(SOAPEnvelope envelope) {
 
         Iterator<OMElement> it = envelope.getHeader().getChildrenWithName(
@@ -81,7 +77,6 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
         if (it.hasNext()) {
             return it.next().getText();
         } else {
-            // [Mustafa: May 8, 2012]: Should not be empty string, sch. gives error.
             return Constants.UUID_PREFIX;
         }
     }
@@ -89,22 +84,24 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
     public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
 
         try {
+            // Start Date for eADC
             Date startTime = new Date();
 
-            // get the implementation class for the Web Service
-            Object obj = getTheImplementationObject(msgContext);
-            SOAPHeader sh = msgContext.getEnvelope().getHeader();
+            //  Identification of the TLS Common Name of the client.
+            String clientCommonName = EventLogUtil.getClientCommonName(msgContext);
+            LOGGER.info("[ITI-55] Incoming XCPD Request from '{}'", clientCommonName);
 
+            // Get the implementation class for the Web Service
+            Object serviceObject = getTheImplementationObject(msgContext);
+            SOAPHeader soapHeader = msgContext.getEnvelope().getHeader();
+
+            // Prepare EventLog for audit purpose.
             EventLog eventLog = new EventLog();
-            String ip = getIPofSender(msgContext);
-            eventLog.setSourceip(ip);
             eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
             eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
-
-            HttpServletRequest req = (HttpServletRequest) msgContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
-            String clientDN = HTTPUtil.getClientCertificate(req);
-            eventLog.setSC_UserID(clientDN);
-            eventLog.setTargetip(HTTPUtil.getHostIpAddress(req.getServerName()));
+            eventLog.setSC_UserID(clientCommonName);
+            eventLog.setSourceip(EventLogUtil.getSourceGatewayIdentifier(msgContext));
+            eventLog.setTargetip(EventLogUtil.getTargetGatewayIdentifier());
 
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.debug("Incoming XCPD Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
@@ -116,12 +113,12 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                 OpenNCPValidation.validatePatientDemographicRequest(message, NcpSide.NCP_A);
             }
 
-            XCPD_ServiceSkeleton skeleton = (XCPD_ServiceSkeleton) obj;
+            XCPD_ServiceSkeleton skeleton = (XCPD_ServiceSkeleton) serviceObject;
             // Out Envelop
             SOAPEnvelope envelope;
             // Find the axisOperation that has been set by the Dispatch phase.
-            AxisOperation op = msgContext.getOperationContext().getAxisOperation();
-            if (op == null) {
+            AxisOperation axisOperation = msgContext.getOperationContext().getAxisOperation();
+            if (axisOperation == null) {
                 throw new AxisFault("Operation is not located, if this is doclit style the SOAP-ACTION " +
                         "should specified via the SOAP Action to use the RawXMLProvider");
             }
@@ -129,29 +126,28 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID().toString();
             String methodName;
 
-            if ((op.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(op.getName().getLocalPart())) != null)) {
+            if ((axisOperation.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(axisOperation.getName().getLocalPart())) != null)) {
 
                 if (StringUtils.equals("respondingGateway_PRPA_IN201305UV02", methodName)) {
 
                     PRPAIN201305UV02 wrappedParam = (PRPAIN201305UV02) fromOM(msgContext.getEnvelope().getBody().getFirstElement(),
                             PRPAIN201305UV02.class, getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    PRPAIN201306UV02 prpain201306UV02 = skeleton.respondingGateway_PRPA_IN201305UV02(wrappedParam, sh, eventLog);
+                    PRPAIN201306UV02 prpain201306UV02 = skeleton.respondingGateway_PRPA_IN201305UV02(wrappedParam, soapHeader, eventLog);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), prpain201306UV02, false);
 
                     /* Validate response message */
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validatePatientDemographicResponse(XMLUtil.prettyPrint(XMLUtils.toDOM(
-                                envelope.getBody().getFirstElement())),
-                                NcpSide.NCP_A);
+                                envelope.getBody().getFirstElement())), NcpSide.NCP_A);
                     }
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
                     eventLog.setNcpSide(NcpSide.NCP_A);
-                    LOGGER.info("EventLog: '{}'", eventLog.getEventType());
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
+                    LOGGER.info("EventLog: '{}' generated.", eventLog.getEventType());
 
                     if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                         loggerClinical.debug("Outgoing XCPD Response Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(envelope)));
@@ -161,14 +157,11 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     LOGGER.error("Method not Found: '{}'", methodName);
                     throw new RuntimeException("method not found");
                 }
-
-                Date endTime = new Date();
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
-                //TODO: Review EADC specification for INBOUND/OUTBOUND [EHNCP-829]
                 EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                        endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCPD, EadcUtil.Direction.INBOUND,
+                        new Date(), Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCPD, EadcUtil.Direction.INBOUND,
                         ServiceType.PATIENT_IDENTIFICATION_RESPONSE);
             }
         } catch (Exception e) {
@@ -252,7 +245,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
     }
 
     /**
-     * A utility method that copies the namepaces from the SOAPEnvelope
+     * A utility method that copies the namespaces from the SOAPEnvelope
      */
     private Map getEnvelopeNamespaces(SOAPEnvelope env) {
 

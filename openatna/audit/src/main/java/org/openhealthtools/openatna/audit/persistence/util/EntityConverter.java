@@ -1,22 +1,3 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
 package org.openhealthtools.openatna.audit.persistence.util;
 
 import org.openhealthtools.openatna.anom.*;
@@ -30,11 +11,7 @@ import java.util.Set;
  * Converts between ANOM objects and persistable objects.
  *
  * @author Andrew Harrison
- * @version $Revision:$
- * @created Sep 30, 2009: 6:16:59 PM
- * @date $Date:$ modified by $Author:$
  */
-
 public class EntityConverter {
 
     private EntityConverter() {
@@ -43,36 +20,36 @@ public class EntityConverter {
     public static MessageEntity createMessage(AtnaMessage message) {
 
         CodeEntity code = createCode(message.getEventCode(), CodeEntity.CodeType.EVENT_ID);
-        MessageEntity ent = new MessageEntity((EventIdCodeEntity) code, new Integer(message.getEventOutcome().value()));
-        ent.setEventDateTime(message.getEventDateTime());
+        MessageEntity messageEntity = new MessageEntity((EventIdCodeEntity) code, message.getEventOutcome().value());
+        messageEntity.setEventDateTime(message.getEventDateTime());
         if (message.getSourceAddress() != null) {
-            ent.setSourceAddress(message.getSourceAddress());
+            messageEntity.setSourceAddress(message.getSourceAddress());
         }
         if (message.getEventActionCode() != null) {
-            ent.setEventActionCode(message.getEventActionCode().value());
+            messageEntity.setEventActionCode(message.getEventActionCode().value());
         }
-        ent.setEventOutcome(new Integer(message.getEventOutcome().value()));
+        messageEntity.setEventOutcome(message.getEventOutcome().value());
         List<AtnaCode> codes = message.getEventTypeCodes();
         for (AtnaCode atnaCode : codes) {
             EventTypeCodeEntity e = (EventTypeCodeEntity) createCode(atnaCode, CodeEntity.CodeType.EVENT_TYPE);
-            ent.addEventTypeCode(e);
+            messageEntity.addEventTypeCode(e);
         }
         List<AtnaMessageObject> objects = message.getObjects();
         for (AtnaMessageObject object : objects) {
-            ent.addMessageObject(createMessageObject(object));
+            messageEntity.addMessageObject(createMessageObject(object));
         }
         List<AtnaSource> sources = message.getSources();
         for (AtnaSource source : sources) {
-            ent.addMessageSource(createMessageSource(source));
+            messageEntity.addMessageSource(createMessageSource(source));
         }
         List<AtnaMessageParticipant> participants = message.getParticipants();
         for (AtnaMessageParticipant participant : participants) {
-            ent.addMessageParticipant(createMessageParticipant(participant));
+            messageEntity.addMessageParticipant(createMessageParticipant(participant));
         }
         if (message.getMessageContent() != null) {
-            ent.setMessageContent(message.getMessageContent());
+            messageEntity.setMessageContent(message.getMessageContent());
         }
-        return ent;
+        return messageEntity;
     }
 
     public static AtnaMessage createMessage(MessageEntity entity) {
@@ -278,6 +255,7 @@ public class EntityConverter {
     }
 
     public static SourceEntity createSource(AtnaSource source) {
+
         SourceEntity e = new SourceEntity();
         e.setSourceId(source.getSourceId());
         e.setEnterpriseSiteId(source.getEnterpriseSiteId());
@@ -291,6 +269,7 @@ public class EntityConverter {
     }
 
     public static AtnaSource createSource(SourceEntity entity) {
+
         AtnaSource as = new AtnaSource(entity.getSourceId());
         as.setEnterpriseSiteId(entity.getEnterpriseSiteId());
         Set<SourceCodeEntity> codes = entity.getSourceTypeCodes();
@@ -301,6 +280,7 @@ public class EntityConverter {
     }
 
     public static ParticipantEntity createParticipant(AtnaParticipant participant) {
+
         ParticipantEntity e = new ParticipantEntity();
         e.setUserId(participant.getUserId());
         e.setUserName(participant.getUserName());
@@ -315,6 +295,7 @@ public class EntityConverter {
     }
 
     public static AtnaParticipant createParticipant(ParticipantEntity entity) {
+
         AtnaParticipant ap = new AtnaParticipant(entity.getUserId());
         ap.setUserName(entity.getUserName());
         ap.setAlternativeUserId(entity.getAlternativeUserId());
@@ -326,6 +307,7 @@ public class EntityConverter {
     }
 
     public static CodeEntity createCode(AtnaCode code, CodeEntity.CodeType type) {
+
         switch (type) {
             case EVENT_TYPE:
                 return new EventTypeCodeEntity(code.getCode(), code.getCodeSystem(),
@@ -348,6 +330,7 @@ public class EntityConverter {
     }
 
     public static AtnaCode createCode(CodeEntity code) {
+
         String type = AtnaCode.EVENT_ID;
         if (code instanceof EventTypeCodeEntity) {
             type = AtnaCode.EVENT_TYPE;
@@ -358,29 +341,26 @@ public class EntityConverter {
         } else if (code instanceof ObjectIdTypeCodeEntity) {
             type = AtnaCode.OBJECT_ID_TYPE;
         }
-        AtnaCode ac = new AtnaCode(type, code.getCode(),
-                code.getCodeSystem(),
-                code.getCodeSystemName(),
-                code.getDisplayName(),
+        return new AtnaCode(type, code.getCode(), code.getCodeSystem(), code.getCodeSystemName(), code.getDisplayName(),
                 code.getOriginalText());
-        return ac;
     }
 
     public static CodeEntity.CodeType getCodeType(AtnaCode code) {
+
         String type = code.getCodeType();
-        if (type.equals(AtnaCode.EVENT_ID)) {
-            return CodeEntity.CodeType.EVENT_ID;
-        } else if (type.equals(AtnaCode.EVENT_TYPE)) {
-            return CodeEntity.CodeType.EVENT_TYPE;
-        } else if (type.equals(AtnaCode.OBJECT_ID_TYPE)) {
-            return CodeEntity.CodeType.PARTICIPANT_OBJECT_ID_TYPE;
-        } else if (type.equals(AtnaCode.PARTICIPANT_ROLE_TYPE)) {
-            return CodeEntity.CodeType.ACTIVE_PARTICIPANT;
-        } else if (type.equals(AtnaCode.SOURCE_TYPE)) {
-            return CodeEntity.CodeType.AUDIT_SOURCE;
+        switch (type) {
+            case AtnaCode.EVENT_ID:
+                return CodeEntity.CodeType.EVENT_ID;
+            case AtnaCode.EVENT_TYPE:
+                return CodeEntity.CodeType.EVENT_TYPE;
+            case AtnaCode.OBJECT_ID_TYPE:
+                return CodeEntity.CodeType.PARTICIPANT_OBJECT_ID_TYPE;
+            case AtnaCode.PARTICIPANT_ROLE_TYPE:
+                return CodeEntity.CodeType.ACTIVE_PARTICIPANT;
+            case AtnaCode.SOURCE_TYPE:
+                return CodeEntity.CodeType.AUDIT_SOURCE;
+            default:
+                return null;
         }
-        return null;
     }
-
-
 }

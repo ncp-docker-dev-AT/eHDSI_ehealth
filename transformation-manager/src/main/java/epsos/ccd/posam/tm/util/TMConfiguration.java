@@ -7,13 +7,9 @@ import java.util.Collection;
 
 
 /**
- * Class/Singleton stores configurable parameters for TM module
- * Parameters are written in tm.properties file
+ * Class/Singleton stores configurable parameters for TM module Parameters are written in tm.properties file.
  *
- * @author Frantisek Rudik
- * @author Organization: Posam
- * @author mail:frantisek.rudik@posam.sk
- * @version 1.6, 2010, 20 October
+ * @author Frantisek Rudik.
  */
 public class TMConfiguration implements InitializingBean {
 
@@ -24,43 +20,31 @@ public class TMConfiguration implements InitializingBean {
     private String eDispensationCode;
     private String hcerCode;
     private String mroCode;
-
     private String schemaFilePath;
-
     private String patientSummarySchematronFriendlyPath;
     private String ePrescriptionSchematronFriendlyPath;
     private String eDispensationSchematronFriendlyPath;
     private String hcerSchematronFriendlyPath;
     private String mroSchematronFriendlyPath;
     private String scannedDocFriendlyPath;
-
     private String patientSummarySchematronPivotPath;
     private String ePrescriptionSchematronPivotPath;
     private String eDispensationSchematronPivotPath;
     private String hcerSchematronPivotPath;
     private String mroSchematronPivotPath;
     private String scannedDocPivotPath;
-
     private String scannedDocumentFriendlyPath;
     private String scannedDocumentPivotPath;
-
     private String mdaCdaXsdPath;
     private String mdaCdaEpsosXsdPath;
     private String mdaCdaXslTransformerPath;
     private String mdaValuesetRepositoryPath;
-
     private boolean schemaValidationEnabled;
     private boolean schematronValidationEnabled;
     private boolean modelValidationEnabled;
-
-
-    private boolean auditTrailEnabled;
-    private String auditTrailTransactionNumber;
-    private String auditTrailTargetIP;
     private String auditTrailFacility;
     private String auditTrailSeverity;
     private Collection<String> docTypesCollection;
-
     private String ncpSide;
 
     private TMConfiguration() {
@@ -201,33 +185,8 @@ public class TMConfiguration implements InitializingBean {
         this.schematronValidationEnabled = schematronValidationEnabled;
     }
 
-    public boolean isAuditTrailEnabled() {
-        return auditTrailEnabled;
-    }
-
-    public void setAuditTrailEnabled(boolean auditTrailEnabled) {
-        this.auditTrailEnabled = auditTrailEnabled;
-    }
-
     public Collection<String> getDocTypesCollection() {
         return docTypesCollection;
-    }
-
-
-    public String getAuditTrailTransactionNumber() {
-        return auditTrailTransactionNumber;
-    }
-
-    public void setAuditTrailTransactionNumber(String auditTrailTransactionNumber) {
-        this.auditTrailTransactionNumber = auditTrailTransactionNumber;
-    }
-
-    public String getAuditTrailTargetIP() {
-        return auditTrailTargetIP;
-    }
-
-    public void setAuditTrailTargetIP(String auditTrailTargetIP) {
-        this.auditTrailTargetIP = auditTrailTargetIP;
     }
 
     public String getAuditTrailFacility() {
@@ -252,24 +211,6 @@ public class TMConfiguration implements InitializingBean {
 
     public void setNcpSide(String ncpSide) {
         this.ncpSide = ncpSide;
-    }
-
-    /**
-     * initializes docTypesCollection
-     */
-    public void afterPropertiesSet() throws Exception {
-        if (docTypesCollection == null) {
-            docTypesCollection = new ArrayList<>();
-        }
-        if (patientSummaryCode != null && patientSummaryCode.length() > 0 && !docTypesCollection.contains(patientSummaryCode)) {
-            docTypesCollection.add(patientSummaryCode);
-        }
-        if (eDispensationCode != null && eDispensationCode.length() > 0 && !docTypesCollection.contains(eDispensationCode)) {
-            docTypesCollection.add(eDispensationCode);
-        }
-        if (ePrescriptionCode != null && ePrescriptionCode.length() > 0 && !docTypesCollection.contains(ePrescriptionCode)) {
-            docTypesCollection.add(ePrescriptionCode);
-        }
     }
 
     public String getPatientSummarySchematronFriendlyPath() {
@@ -358,5 +299,23 @@ public class TMConfiguration implements InitializingBean {
 
     public void setModelValidationEnabled(boolean modelValidationEnabled) {
         this.modelValidationEnabled = modelValidationEnabled;
+    }
+
+    /**
+     * Initializes docTypesCollection
+     */
+    public void afterPropertiesSet() {
+        if (docTypesCollection == null) {
+            docTypesCollection = new ArrayList<>();
+        }
+        if (patientSummaryCode != null && patientSummaryCode.length() > 0 && !docTypesCollection.contains(patientSummaryCode)) {
+            docTypesCollection.add(patientSummaryCode);
+        }
+        if (eDispensationCode != null && eDispensationCode.length() > 0 && !docTypesCollection.contains(eDispensationCode)) {
+            docTypesCollection.add(eDispensationCode);
+        }
+        if (ePrescriptionCode != null && ePrescriptionCode.length() > 0 && !docTypesCollection.contains(ePrescriptionCode)) {
+            docTypesCollection.add(ePrescriptionCode);
+        }
     }
 }

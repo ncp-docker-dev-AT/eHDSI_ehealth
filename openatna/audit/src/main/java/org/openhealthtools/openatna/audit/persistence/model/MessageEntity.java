@@ -1,6 +1,5 @@
 package org.openhealthtools.openatna.audit.persistence.model;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.openhealthtools.openatna.audit.persistence.model.codes.EventIdCodeEntity;
 import org.openhealthtools.openatna.audit.persistence.model.codes.EventTypeCodeEntity;
 
@@ -9,29 +8,25 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "messages")
 public class MessageEntity extends PersistentEntity {
 
-    private static final long serialVersionUID = -1L;
-
+    private static final long serialVersionUID = -4989747917448824812L;
     private Long id;
-
-    private Set<MessageParticipantEntity> messageParticipants = new HashSet<>();
-
-    private Set<MessageSourceEntity> messageSources = new HashSet<>();
-
-    private Set<MessageObjectEntity> messageObjects = new HashSet<>();
-
     private EventIdCodeEntity eventId;
-    private Set<EventTypeCodeEntity> eventTypeCodes = new HashSet<>();
     private String eventActionCode;
     private Date eventDateTime;
     private Integer eventOutcome;
     private String sourceAddress;
     private byte[] messageContent = new byte[0];
+    private Set<EventTypeCodeEntity> eventTypeCodes = new HashSet<>();
+    private Set<MessageParticipantEntity> messageParticipants = new HashSet<>();
+    private Set<MessageObjectEntity> messageObjects = new HashSet<>();
+    private Set<MessageSourceEntity> messageSources = new HashSet<>();
 
     public MessageEntity() {
     }
@@ -43,8 +38,6 @@ public class MessageEntity extends PersistentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    //@GenericGenerator(name = "native", strategy = "native")
     public Long getId() {
         return id;
     }
@@ -151,6 +144,17 @@ public class MessageEntity extends PersistentEntity {
         getMessageObjects().add(entity);
     }
 
+    //length = 65535)
+    @Lob
+    @Column(columnDefinition = "BLOB")
+    public byte[] getMessageContent() {
+        return messageContent;
+    }
+
+    public void setMessageContent(byte[] messageContent) {
+        this.messageContent = messageContent;
+    }
+
     private String formatDate() {
         DateFormat format = new SimpleDateFormat("yyyy:MM:dd'T'HH:mm:SS");
         return format.format(getEventDateTime());
@@ -166,19 +170,19 @@ public class MessageEntity extends PersistentEntity {
         }
 
         MessageEntity that = (MessageEntity) o;
-        if (id != null ? !id.equals(that.id) : that.id != null) {
+        if (!Objects.equals(id, that.id)) {
             return false;
         }
-        if (eventActionCode != null ? !eventActionCode.equals(that.eventActionCode) : that.eventActionCode != null) {
+        if (!Objects.equals(eventActionCode, that.eventActionCode)) {
             return false;
         }
-        if (eventDateTime != null ? !eventDateTime.equals(that.eventDateTime) : that.eventDateTime != null) {
+        if (!Objects.equals(eventDateTime, that.eventDateTime)) {
             return false;
         }
-        if (eventId != null ? !eventId.equals(that.eventId) : that.eventId != null) {
+        if (!Objects.equals(eventId, that.eventId)) {
             return false;
         }
-        if (eventOutcome != null ? !eventOutcome.equals(that.eventOutcome) : that.eventOutcome != null) {
+        if (!Objects.equals(eventOutcome, that.eventOutcome)) {
             return false;
         }
         if (getEventTypeCodes() != null ? !getEventTypeCodes().equals(that.getEventTypeCodes())
@@ -231,14 +235,5 @@ public class MessageEntity extends PersistentEntity {
                 ", participant objects=" +
                 getMessageObjects() +
                 "]";
-    }
-
-    @Column(length = 65535)
-    public byte[] getMessageContent() {
-        return messageContent;
-    }
-
-    public void setMessageContent(byte[] messageContent) {
-        this.messageContent = messageContent;
     }
 }

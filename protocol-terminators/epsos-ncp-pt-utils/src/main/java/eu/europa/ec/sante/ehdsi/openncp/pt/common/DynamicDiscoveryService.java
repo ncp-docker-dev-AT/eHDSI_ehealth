@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -240,11 +241,8 @@ public class DynamicDiscoveryService {
             String ncp = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
             String ncpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.email");
             String country = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-            //Target Gateway ???
-            //String remoteip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");
 
-            //Source Gateway ???
-            String localip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");
+            String localIp = IPUtil.getPrivateServerIp();
             String smp = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT");
             String smpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT_EMAIL");
             //ET_ObjectID --> Base64 of url
@@ -261,7 +259,7 @@ public class DynamicDiscoveryService {
             //TODO: Request Audit SMP Query
             URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
             LOGGER.info("DNS: '{}'", smpURI);
-            sendAuditQuery(ncp, ncpemail, smp, smpemail, country, localip, smpURI.toASCIIString(), new String(encodedObjectID),
+            sendAuditQuery(ncp, ncpemail, smp, smpemail, country, localIp, smpURI.getHost(), new String(encodedObjectID),
                     null, null, smpURI.toASCIIString());
 
 
