@@ -1,25 +1,23 @@
 package org.openhealthtools.openatna.audit.server;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openhealthtools.openatna.audit.server.nio.TcpNioServer;
 import org.openhealthtools.openatna.audit.server.nio.UdpNioServer;
 import org.openhealthtools.openatna.net.IConnectionDescription;
 import org.openhealthtools.openatna.syslog.SyslogException;
 import org.openhealthtools.openatna.syslog.SyslogMessage;
 import org.openhealthtools.openatna.syslog.transport.SyslogListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * @author Andrew Harrison
- * @date $Date:$ modified by $Author:$
  */
-
 public class AtnaServer {
 
-    private static Log log = LogFactory.getLog("org.openhealthtools.openatna.audit.server.AtnaServer");
+    private final Logger logger = LoggerFactory.getLogger(AtnaServer.class);
 
     private IConnectionDescription tlsConnection;
     private IConnectionDescription udpConnection;
@@ -63,7 +61,7 @@ public class AtnaServer {
     }
 
     public void stop() {
-        log.info("AtnaServer shutting down...");
+        logger.info("AtnaServer shutting down...");
         if (tcpServer != null) {
             tcpServer.stop();
         }

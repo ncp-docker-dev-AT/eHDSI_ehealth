@@ -4,6 +4,7 @@ import eu.epsos.util.audit.AuditLogSerializer;
 import eu.epsos.util.audit.AuditLogSerializer.Type;
 import eu.epsos.util.audit.AuditLogSerializerImpl;
 import eu.epsos.util.audit.MessageHandlerListener;
+import org.apache.commons.lang3.StringUtils;
 import org.openhealthtools.openatna.anom.AtnaMessage;
 import org.openhealthtools.openatna.audit.AtnaFactory;
 import org.openhealthtools.openatna.audit.log.PersistenceErrorLogger;
@@ -14,7 +15,6 @@ import org.openhealthtools.openatna.audit.persistence.dao.ErrorDao;
 import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
 import org.openhealthtools.openatna.audit.service.AuditService;
 import org.openhealthtools.openatna.audit.service.ServiceConfiguration;
-import org.openhealthtools.openatna.syslog.LogMessage;
 import org.openhealthtools.openatna.syslog.SyslogException;
 import org.openhealthtools.openatna.syslog.SyslogMessage;
 import org.openhealthtools.openatna.syslog.transport.SyslogListener;
@@ -27,12 +27,11 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-/**
- * @author Andrew Harrison
- */
 public class AtnaMessageListener implements SyslogListener<AtnaMessage>, MessageHandlerListener {
 
-    private Logger logger = LoggerFactory.getLogger(AtnaMessageListener.class);
+    private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
+    private final Logger logger = LoggerFactory.getLogger(AtnaMessageListener.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private AuditService service;
     private AuditLogSerializer auditLogSerializer;
 
@@ -43,7 +42,6 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage>, Message
 
     public void messageArrived(SyslogMessage<AtnaMessage> message) {
 
-        logger.info("[ATNA Listener] Message '{}' arrived", message.getClass());
         boolean persisted = false;
         try {
             persisted = processMessage(message);
@@ -66,28 +64,29 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage>, Message
         }
     }
 
+    /**
+     * Processes the Syslog ATNA message received by the secured node.
+     *
+     * @param message Audit Message marshalled as SyslogMessage<AtnaMessage>.
+     * @return true or false according the result of the save operation.
+     */
     public boolean processMessage(SyslogMessage<AtnaMessage> message) {
 
         synchronized (this) {
-            LogMessage<AtnaMessage> msg = message.getMessage();
-            AtnaMessage atnaMessage = msg.getMessageObject();
-            logger.info("[ATNA Listener] Processing Syslog Message: '{}'", atnaMessage.getEventOutcome());
-            atnaMessage.setSourceAddress(message.getSourceIp());
+
             byte[] bytes = "No message available".getBytes(StandardCharsets.UTF_8);
-            logger.info("[ATNA Listener] Message Processed: [{}] '{}'-'{}' '{}' '{}' '{}'",
+            AtnaMessage atnaMessage = message.getMessage().getMessageObject();
+            atnaMessage.setSourceAddress(message.getSourceIp());
+            logger.info("[ATNA Listener] Message Processed: [{}] Facility:'{}' Severity:'{}' ('{}'/'{}') at '{}'",
                     message.getMessage().getMessageObject().getEventCode().getCode(), message.getFacility(),
                     message.getSeverity(), message.getHostName(), message.getSourceIp(), message.getTimestamp());
-            try {
-                bytes = message.toByteArray();
-            } catch (SyslogException e1) {
-                logger.error("SyslogException: '{}'", e1.getMessage());
-            }
-            atnaMessage.setMessageContent(bytes);
+
             boolean persisted = false;
             try {
                 persisted = service.process(atnaMessage);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("[ATNA Listener] Syslog message '{}' persisted: '{}'", atnaMessage.getMessageId(), persisted);
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && loggerClinical.isDebugEnabled()) {
+                    logger.debug("[ATNA Listener] Syslog message '{}' persisted: '{}'\n'{}'", atnaMessage.getMessageId(),
+                            persisted, new String(atnaMessage.getMessageContent(), StandardCharsets.UTF_8));
                 }
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
@@ -103,7 +102,6 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage>, Message
 
     public void exceptionThrown(SyslogException exception) {
 
-        logger.debug("[ATNA Listener] Processing Exception");
         SyslogErrorLogger.log(exception);
         ServiceConfiguration config = service.getServiceConfig();
         if (config != null) {
@@ -115,7 +113,6 @@ public class AtnaMessageListener implements SyslogListener<AtnaMessage>, Message
                 synchronized (this) {
                     try {
                         dao.save(ent);
-                        logger.debug("[ATNA Listener] Error persisted into database");
                     } catch (AtnaPersistenceException e) {
                         PersistenceErrorLogger.log(e);
                     }

@@ -18,7 +18,6 @@ import java.net.InetSocketAddress;
 
 /**
  * @author Andrew Harrison
- * @version 1.0.0 Sep 28, 2010
  */
 public class UdpNioServer implements Notifier, Server {
 
@@ -37,17 +36,15 @@ public class UdpNioServer implements Notifier, Server {
     public void start() {
 
         try {
-            String host = udpConnection.getHostname();
-
             ByteBuffer.setUseDirectBuffers(false);
             acceptor = new DatagramAcceptor();
             acceptor.getDefaultConfig().setThreadModel(ThreadModel.MANUAL);
             IoAcceptorConfig config = new DatagramAcceptorConfig();
             DefaultIoFilterChainBuilder chain = config.getFilterChain();
-
             acceptor.setFilterChainBuilder(chain);
-            acceptor.bind(new InetSocketAddress(host, udpConnection.getPort()), new UdpProtocolHandler(this, 32786));
-            LOGGER.info("UDP server started on port '{}'", udpConnection.getPort());
+            acceptor.bind(new InetSocketAddress(udpConnection.getHostname(), udpConnection.getPort()), new UdpProtocolHandler(this, 32786));
+            LOGGER.info("UDP server '{}' running on port '{}'", udpConnection.getHostname(), udpConnection.getPort());
+
         } catch (IOException e) {
             LOGGER.error("IoException: '{}'", e.getMessage(), e);
         }
