@@ -10,11 +10,13 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import net.RFC3881.AuditMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.net.ssl.SSLSocket;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,7 +41,7 @@ public class MessageSender {
     private static String[] enabledProtocols = {"TLSv1.2"};
     private final Logger logger = LoggerFactory.getLogger(MessageSender.class);
     private AuditLogSerializer auditLogSerializer;
-    private AuditMessage auditmessage;
+    //private AuditMessage auditmessage;
     private String facility;
     private String severity;
 
@@ -52,7 +54,7 @@ public class MessageSender {
     public void send(AuditLogSerializer auditLogSerializer, AuditMessage auditmessage, String facility, String severity) {
 
         this.auditLogSerializer = auditLogSerializer;
-        this.auditmessage = auditmessage;
+        //this.auditmessage = auditmessage;
         this.facility = facility;
         this.severity = severity;
 
@@ -111,7 +113,6 @@ public class MessageSender {
      */
     private boolean sendMessage(String auditMessage, String facility, String severity) {
 
-        logger.info("[Audit Service] Sending Message");
         SSLSocket sslsocket;
         boolean sent = false;
         String facsev = facility + severity;
@@ -123,14 +124,18 @@ public class MessageSender {
             return false;
         }
         try (BufferedOutputStream outputStream = new BufferedOutputStream(sslsocket.getOutputStream())) {
-            logger.debug("'{}' - Initialize the SSL socket", auditmessage.getEventIdentification().getEventID().getCode());
 
-            //  Set headAuditLogSerializerer of syslog message.
+            //  Set header AuditLogSerializer of syslog message.
             String hostName = sslsocket.getLocalAddress().getHostName();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+            logger.info("Syslog Server hostname: '{}'", hostName);
+            if (!sslsocket.getLocalAddress().isLinkLocalAddress() && !sslsocket.getLocalAddress().isLoopbackAddress()
+                    && (sslsocket.getLocalAddress() instanceof Inet4Address)) {
+                hostName = IPUtil.getPrivateServerIp();
+            }
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             Date now = new Date();
-            StringBuilder nowStr = new StringBuilder(sdf.format(now));
+            StringBuilder nowStr = new StringBuilder(dateFormat.format(now));
             if (nowStr.charAt(4) == '0') {
                 nowStr.setCharAt(4, ' ');
             }
@@ -141,24 +146,24 @@ public class MessageSender {
             outputStream.write((length + " ").getBytes());
             outputStream.write(header.getBytes());
 
-            //  Sets the bom for utf-8
+            //  Set the bom for UTF-8
             outputStream.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
             outputStream.flush();
-            logger.debug("'{}' - Write the object to bos", auditmessage.getEventIdentification().getEventID().getCode());
 
-            //  Write the syslog message to repository
+            //  Write the Syslog message to repository
             outputStream.write(auditMessage.getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
 
             sent = true;
 
         } catch (Exception e) {
-            logger.error("'{}' - Error sending message: '{}'", auditmessage.getEventIdentification().getEventID().getCode(), e.getMessage(), e);
+            logger.error("Error sending message: '{}'", e.getMessage(), e);
+
         } finally {
 
-            // Closing Secured Socket
             try {
-                logger.info("Sending Message");
+                // Closing Secured Socket
+                logger.info("Closing SSL Socket");
                 sslsocket.close();
             } catch (IOException e) {
                 logger.warn("Unable to close SSLSocket", e);

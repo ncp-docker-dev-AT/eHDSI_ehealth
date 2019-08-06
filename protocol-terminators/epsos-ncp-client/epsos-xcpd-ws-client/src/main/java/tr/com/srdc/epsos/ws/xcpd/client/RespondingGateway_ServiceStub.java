@@ -21,9 +21,11 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
@@ -70,8 +72,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     }
 
     static {
-        javax.xml.bind.JAXBContext jc;
-        jc = null;
+        JAXBContext jc = null;
         try {
             jc = JAXBContext.newInstance(PRPAIN201305UV02.class, PRPAIN201306UV02.class);
         } catch (JAXBException ex) {
@@ -83,7 +84,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
         }
     }
 
-    protected org.apache.axis2.description.AxisOperation[] _operations;
+    protected AxisOperation[] _operations;
     // HashMap to keep the fault mapping
     private HashMap faultExceptionNameMap = new HashMap();
     private HashMap faultExceptionClassNameMap = new HashMap();
@@ -103,7 +104,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
     /**
      * Constructor that takes in a configContext and useseperate listner
      */
-    public RespondingGateway_ServiceStub(org.apache.axis2.context.ConfigurationContext configurationContext, String targetEndpoint, boolean useSeparateListener) {
+    public RespondingGateway_ServiceStub(ConfigurationContext configurationContext, String targetEndpoint, boolean useSeparateListener) {
+
         // To populate AxisService
         populateAxisService();
         populateFaults();
@@ -113,10 +115,10 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             throw new RuntimeException(ex);
         }
 
-        _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(targetEndpoint));
+        _serviceClient.getOptions().setTo(new EndpointReference(targetEndpoint));
         _serviceClient.getOptions().setUseSeparateListener(useSeparateListener);
-
-        _serviceClient.getOptions().setTimeOutInMilliSeconds(180000); //Wait time after which a client times out in a blocking scenario: 3 minutes
+        //  Wait time after which a client times out in a blocking scenario: 3 minutes
+        _serviceClient.getOptions().setTimeOutInMilliSeconds(180000);
 
         // Set the soap version
         _serviceClient.getOptions().setSoapVersionURI(org.apache.axiom.soap.SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
@@ -181,7 +183,8 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
      * @return
      */
     public org.hl7.v3.PRPAIN201306UV02 respondingGateway_PRPA_IN201305UV02(PRPAIN201305UV02 pRPA_IN201305UV02, Assertion idAssertion) {
-        org.apache.axis2.context.MessageContext _messageContext = null;
+
+        MessageContext _messageContext = null;
 
         LOGGER.info("respondingGateway_PRPA_IN201305UV02('{}', '{}'", pRPA_IN201305UV02.getId().getRoot(), idAssertion.getID());
 
@@ -198,8 +201,7 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             SOAPFactory soapFactory = getFactory(operationClient.getOptions().getSoapVersionURI());
 
             /* create SOAP envelope with that payload */
-            org.apache.axiom.soap.SOAPEnvelope env;
-            env = toEnvelope(soapFactory, pRPA_IN201305UV02, optimizeContent(
+            SOAPEnvelope env = toEnvelope(soapFactory, pRPA_IN201305UV02, optimizeContent(
                     new QName(XCPDConstants.SOAP_HEADERS.NAMESPACE_URI, XCPDConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART)));
 
             /* adding SOAP soap_headers */
@@ -235,14 +237,13 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
             _serviceClient.addHeadersToEnvelope(env);
 
             /* set the message context with that soap envelope */
-            org.apache.axis2.context.MessageContext messageContext = new org.apache.axis2.context.MessageContext();
+            MessageContext messageContext = new MessageContext();
             messageContext.setEnvelope(env);
 
             /* add the message contxt to the operation client */
             operationClient.addMessageContext(messageContext);
 
             /* Log soap request */
-
             String logRequestBody;
             try {
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
@@ -251,44 +252,27 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
                 }
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
 
-//                LOGGER.info("XCPD Request sent. EVIDENCE NRO");
-//                NRO
-//                try {
-//                    EvidenceUtils.createEvidenceREMNRO(envCanonicalized,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                            EventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
-//                            new DateTime(),
-//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                            "NCPB_XCPD_REQ");
-//                } catch (Exception e) {
-//                    LOGGER.error(ExceptionUtils.getStackTrace(e));
-//                }
+// NRO  NCPB_XCPD_REQ             LOGGER.info("XCPD Request sent. EVIDENCE NRO");
 
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
 
-            // TMP
             // XCPD response end time
             long end = System.currentTimeMillis();
             LOGGER.info("XCPD REQUEST-RESPONSE TIME: '{}'", (end - start) / 1000.0);
 
-            // TMP
             // Validation start time
             start = System.currentTimeMillis();
 
-            /* Validate Request Messages */
+            // Validate Request Messages
             if (OpenNCPValidation.isValidationEnable()) {
                 OpenNCPValidation.validatePatientDemographicRequest(logRequestBody, NcpSide.NCP_B);
             }
-            // TMP
             // Transaction end time
             end = System.currentTimeMillis();
             LOGGER.info("XCPD VALIDATION REQ TIME: '{}'", (end - start) / 1000.0);
 
-            // TMP
             // Transaction start time
             start = System.currentTimeMillis();
 
@@ -307,22 +291,21 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
                     /* if we get something from the Central Services, then we retry the request */
                     /* correctly sets the Transport information with the new endpoint */
-                    LOGGER.debug("Retrying the request with the new configurations: [" + value + "]");
-                    _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(value));
+                    LOGGER.debug("Retrying the request with the new configurations: [{}]", value);
+                    _serviceClient.getOptions().setTo(new EndpointReference(value));
 
                     /* we need a new OperationClient, otherwise we'll face the error "A message was added that is not valid. However, the operation context was complete." */
                     OperationClient newOperationClient = _serviceClient.createClient(_operations[0].getName());
                     newOperationClient.getOptions().setAction(XCPDConstants.SOAP_HEADERS.REQUEST_ACTION);
                     newOperationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
-                    addPropertyToOperationClient(newOperationClient, org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+                    addPropertyToOperationClient(newOperationClient, WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
 
                     SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
 
                     /* we need to create a new SOAP payload so that the wsa:To header is correctly set
                     (i.e., copied from the Transport information to the wsa:To during the running of the Addressing Phase,
                     as defined by the global engagement of the addressing module in axis2.xml). The old payload still contains the old endpoint. */
-                    org.apache.axiom.soap.SOAPEnvelope newEnv;
-                    newEnv = toEnvelope(newSoapFactory, pRPA_IN201305UV02,
+                    SOAPEnvelope newEnv = toEnvelope(newSoapFactory, pRPA_IN201305UV02,
                             optimizeContent(new QName(XCPDConstants.SOAP_HEADERS.NAMESPACE_URI, XCPDConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART)));
 
                     /* we set the previous headers in the new SOAP envelope. Note: the wsa:To header is not manually set (only Action and MessageID are) but instead handled by the
@@ -448,28 +431,25 @@ public class RespondingGateway_ServiceStub extends org.apache.axis2.client.Stub 
 
             OMElement faultElt = f.getDetail();
 
-            if (faultElt != null) {
+            if (faultElt != null && faultExceptionNameMap.containsKey(faultElt.getQName())) {
 
-                if (faultExceptionNameMap.containsKey(faultElt.getQName())) {
+                /* make the fault by reflection */
+                try {
+                    String exceptionClassName = (String) faultExceptionClassNameMap.get(faultElt.getQName());
+                    Class exceptionClass = Class.forName(exceptionClassName);
+                    Exception ex = (Exception) exceptionClass.newInstance();
+                    // message class
+                    String messageClassName = (String) faultMessageMap.get(faultElt.getQName());
+                    Class messageClass = Class.forName(messageClassName);
+                    Object messageObject = fromOM(faultElt, messageClass, null);
+                    Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
+                    m.invoke(ex, messageObject);
 
-                    /* make the fault by reflection */
-                    try {
-                        String exceptionClassName = (String) faultExceptionClassNameMap.get(faultElt.getQName());
-                        Class exceptionClass = Class.forName(exceptionClassName);
-                        Exception ex = (Exception) exceptionClass.newInstance();
-                        // message class
-                        String messageClassName = (String) faultMessageMap.get(faultElt.getQName());
-                        Class messageClass = Class.forName(messageClassName);
-                        Object messageObject = fromOM(faultElt, messageClass, null);
-                        Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
-                        m.invoke(ex, messageObject);
+                    throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
-                        throw new java.rmi.RemoteException(ex.getMessage(), ex);
-
-                    } catch (Exception e) {
-                        // we cannot instantiate the class - throw the original Axis fault
-                        throw new RuntimeException(f.getMessage(), f);
-                    }
+                } catch (Exception e) {
+                    // we cannot instantiate the class - throw the original Axis fault
+                    throw new RuntimeException(f.getMessage(), f);
                 }
             }
             throw new RuntimeException(f.getMessage(), f);

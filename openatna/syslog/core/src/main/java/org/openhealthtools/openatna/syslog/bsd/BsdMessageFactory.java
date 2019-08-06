@@ -1,26 +1,9 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
-
 package org.openhealthtools.openatna.syslog.bsd;
 
-import org.openhealthtools.openatna.syslog.*;
+import org.openhealthtools.openatna.syslog.LogMessage;
+import org.openhealthtools.openatna.syslog.SyslogException;
+import org.openhealthtools.openatna.syslog.SyslogMessage;
+import org.openhealthtools.openatna.syslog.SyslogMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,11 +22,7 @@ import java.util.TimeZone;
  * Reads in data and creates BSD style syslog messages
  *
  * @author Andrew Harrison
- * @version $Revision:$
- * @created Aug 19, 2009: 11:48:37 AM
- * @date $Date:$ modified by $Author:$
  */
-
 public class BsdMessageFactory extends SyslogMessageFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BsdMessageFactory.class);
@@ -69,35 +49,35 @@ public class BsdMessageFactory extends SyslogMessageFactory {
     }
 
     /**
-     * reads the priority value and positions the stream at the space after greater than sign.
+     * Reads the priority value and positions the stream at the space after greater than sign.
      * This reads up to 5 characters to read the priority and the following space.
      *
-     * @param in
+     * @param inputStream
      * @return
      * @throws org.openhealthtools.openatna.syslog.SyslogException
      */
-    private int readPriority(InputStream in) throws SyslogException {
+    private int readPriority(InputStream inputStream) throws SyslogException {
         try {
             int max = 5;
             int count = 0;
-            String pri = "";
+            StringBuilder pri = new StringBuilder();
             boolean afterOpen = false;
             while (count < max) {
-                char c = (char) in.read();
+                char c = (char) inputStream.read();
                 count++;
                 switch (c) {
                     case '<':
                         afterOpen = true;
                         break;
                     case '>':
-                        int priority = Integer.parseInt(pri);
+                        int priority = Integer.parseInt(pri.toString());
                         if (!afterOpen || priority < 0 || priority > 191) {
                             throw new SyslogException("syntax error");
                         }
                         return priority;
                     default:
                         if (afterOpen) {
-                            pri += c;
+                            pri.append(c);
                         }
                         break;
                 }
@@ -136,7 +116,7 @@ public class BsdMessageFactory extends SyslogMessageFactory {
                 if (c == ' ') {
                     if (!spaceBefore) {
                         count++;
-                        String currHeader = new String(buff.array(), 0, buff.position(), Constants.ENC_UTF8);
+                        String currHeader = new String(buff.array(), 0, buff.position(), StandardCharsets.UTF_8);
                         buff.clear();
                         switch (count) {
                             case 1:
@@ -151,6 +131,8 @@ public class BsdMessageFactory extends SyslogMessageFactory {
                             case 4:
                                 host = currHeader;
                                 break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + count);
                         }
                     }
                     spaceBefore = true;
@@ -188,7 +170,7 @@ public class BsdMessageFactory extends SyslogMessageFactory {
                 buff.put(c);
             }
             if (buff.position() > 0) {
-                tag = new String(buff.array(), 0, buff.position(), Constants.ENC_UTF8);
+                tag = new String(buff.array(), 0, buff.position(), StandardCharsets.UTF_8);
             }
 
             LogMessage logMessage = getLogMessage(tag);
@@ -197,9 +179,10 @@ public class BsdMessageFactory extends SyslogMessageFactory {
             facility = priority / 8;
             severity = priority % 8;
             return new BsdMessage(facility, severity, timestamp, host, logMessage, tag);
+
         } catch (IOException e) {
 
-            LOGGER.debug("IOException: '{}'", e.getMessage(), e);
+            LOGGER.error("IOException: '{}'", e.getMessage(), e);
             throw new SyslogException(e);
         }
     }

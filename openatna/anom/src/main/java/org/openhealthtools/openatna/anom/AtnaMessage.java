@@ -1,6 +1,7 @@
 package org.openhealthtools.openatna.anom;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -12,19 +13,16 @@ public class AtnaMessage implements Serializable {
 
     private static final long serialVersionUID = -5502378798460439820L;
 
+    private Long messageId;
     private AtnaCode eventCode;
     private Set<AtnaCode> eventTypeCodes = new HashSet<>();
     private EventAction eventActionCode;
     private EventOutcome eventOutcome;
     private Date eventDateTime;
     private String sourceAddress;
-
-    private Long messageId;
-
     private Set<AtnaMessageParticipant> participants = new HashSet<>();
     private Set<AtnaSource> sources = new HashSet<>();
     private Set<AtnaMessageObject> objects = new HashSet<>();
-
     private byte[] messageContent;
 
     public AtnaMessage(AtnaCode eventCode, EventOutcome eventOutcome) {
@@ -33,9 +31,9 @@ public class AtnaMessage implements Serializable {
     }
 
     /**
-     * a unique id for the message. This is assigned once a message has been successfully persisted.
+     * Returns unique ID for the message. This is assigned once a message has been successfully persisted.
      *
-     * @return
+     * @return Atna message unique ID.
      */
     public Long getMessageId() {
         return messageId;
@@ -172,6 +170,14 @@ public class AtnaMessage implements Serializable {
         return null;
     }
 
+    public byte[] getMessageContent() {
+        return messageContent;
+    }
+
+    public void setMessageContent(byte[] messageContent) {
+        this.messageContent = messageContent;
+    }
+
     @Override
     public boolean equals(Object o) {
 
@@ -241,13 +247,5 @@ public class AtnaMessage implements Serializable {
                 " objects=" +
                 getObjects() +
                 "]";
-    }
-
-    public byte[] getMessageContent() {
-        return messageContent;
-    }
-
-    public void setMessageContent(byte[] messageContent) {
-        this.messageContent = messageContent;
     }
 }

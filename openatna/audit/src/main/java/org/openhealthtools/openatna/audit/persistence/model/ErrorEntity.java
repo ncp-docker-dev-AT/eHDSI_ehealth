@@ -1,19 +1,17 @@
 package org.openhealthtools.openatna.audit.persistence.model;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Date;
 
 /**
  * @author Andrew Harrison
- * @version 1.0.0
  */
 @Entity
 @Table(name = "errors")
 public class ErrorEntity extends PersistentEntity {
 
+    private static final long serialVersionUID = 4878120253966610977L;
     private Long id;
     private Integer version;
     private Date errorTimestamp;
@@ -25,8 +23,6 @@ public class ErrorEntity extends PersistentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    //@GenericGenerator(name = "native", strategy = "native")
     public Long getId() {
         return id;
     }
