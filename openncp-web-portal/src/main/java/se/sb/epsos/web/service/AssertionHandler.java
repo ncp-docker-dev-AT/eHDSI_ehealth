@@ -35,6 +35,7 @@ import se.sb.epsos.web.pages.KeyStoreManager;
 import se.sb.epsos.web.pages.KeyStoreManagerImpl;
 import se.sb.epsos.web.util.CdaHelper.Validator;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -42,8 +43,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import java.io.FileInputStream;
 import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.X509Certificate;
@@ -248,16 +247,7 @@ public class AssertionHandler implements Serializable {
         String reqm_participantObjectID = Constants.UUID_PREFIX + assertion.getID();
         String resm_participantObjectID = Constants.UUID_PREFIX + assertion.getID();
 
-        InetAddress sourceIP;
-        String sourceHost;
-        try {
-            sourceIP = InetAddress.getLocalHost();
-            sourceHost = sourceIP.getHostAddress();
-        } catch (UnknownHostException ex) {
-            LOGGER.error("UnknownHostException: '{}'", ex.getMessage(), ex);
-            sourceHost = "UnknownHost";
-        }
-
+        String sourceIP = IPUtil.getPrivateServerIp();
         String email = userDetails.getUserId() + "@" + configurationManager.getProperty("ncp.country");
 
         String PC_UserID = userDetails.getOrganizationName();
@@ -287,7 +277,7 @@ public class AssertionHandler implements Serializable {
                 eventLogDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID,
                 secHead.getBytes(StandardCharsets.UTF_8), resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                sourceHost, sourceHost, NcpSide.NCP_B);
+                sourceIP, sourceIP, NcpSide.NCP_B);
         eventLog.setEventType(EventType.epsosHcpAuthentication);
         asd.write(eventLog, "13", "2");
         LOGGER.debug("################################################");

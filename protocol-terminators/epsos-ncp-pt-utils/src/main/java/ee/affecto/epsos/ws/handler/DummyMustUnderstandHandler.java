@@ -9,11 +9,11 @@ import java.util.Iterator;
 
 public class DummyMustUnderstandHandler extends AbstractHandler {
 
-    public InvocationResponse invoke(MessageContext ctx) {
+    public InvocationResponse invoke(MessageContext messageContext) {
 
-        SOAPHeader header = ctx.getEnvelope().getHeader();
-        if (header != null) {
-            Iterator<?> blocks = header.examineAllHeaderBlocks();
+        SOAPHeader soapHeader = messageContext.getEnvelope().getHeader();
+        if (soapHeader != null) {
+            Iterator<?> blocks = soapHeader.examineAllHeaderBlocks();
             while (blocks.hasNext()) {
                 SOAPHeaderBlock block = (SOAPHeaderBlock) blocks.next();
                 //  if( ... some check to see if this is one of your headers ... )

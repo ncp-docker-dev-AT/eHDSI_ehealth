@@ -67,7 +67,7 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
                 outputStream.writeObject(message);
                 outputStream.flush();
                 outputStream.close();
-                logger.warn("[Audit Service] Error occurred while sending message to ATNA servr!\nAuditLog saved to: '{}'", path);
+                logger.warn("[Audit Service] Error occurred while sending message to ATNA server!\nAuditLog saved to: '{}'", path);
             }
         } catch (Exception e) {
             logger.error("[Audit Service] AuditLog not sent to OpenATNA nor saved on filesystem! Dumping to log file:\n'{}'",

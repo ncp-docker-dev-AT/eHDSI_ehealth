@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- *
- * This file is part of SRDC epSOS NCP.
- *
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- *
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- */
 package tr.com.srdc.epsos.ws.xcpd.client;
 
 import ee.affecto.epsos.util.EventLogClientUtil;
@@ -66,28 +47,29 @@ public final class RespondingGateway_RequestSender {
                                                                        final String countryCode) {
 
         DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
-        String epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH),
+        String endpointUrl = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH),
                 RegisteredService.PATIENT_IDENTIFICATION_SERVICE);
 
-        PRPAIN201305UV02 hl7Request;
         String dstHomeCommunityId = OidUtil.getHomeCommunityId(countryCode.toLowerCase(Locale.ENGLISH));
-        hl7Request = PRPAIN201305UV022DTS.newInstance(pd, dstHomeCommunityId);
-        LOGGER.debug("ClientConnector is trying to contact remote NCP-A:\nEndpoint: '{}'\nHomeCommunityId: '{}'",
-                epr, dstHomeCommunityId);
-
-        return sendRequest(epr, hl7Request, idAssertion, countryCode);
+        PRPAIN201305UV02 hl7Request = PRPAIN201305UV022DTS.newInstance(pd, dstHomeCommunityId);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("ClientConnector is trying to contact remote NCP-A:\nEndpoint: '{}'\nHomeCommunityId: '{}'",
+                    endpointUrl, dstHomeCommunityId);
+        }
+        return sendRequest(endpointUrl, hl7Request, idAssertion, countryCode);
     }
 
     /**
-     * @param epr
+     * @param endpointUrl
      * @param pRPAIN201305UV022
      * @param idAssertion
      * @param countryCode
      * @return
      */
-    private static PRPAIN201306UV02 sendRequest(String epr, PRPAIN201305UV02 pRPAIN201305UV022, Assertion idAssertion, final String countryCode) {
+    private static PRPAIN201306UV02 sendRequest(String endpointUrl, PRPAIN201305UV02 pRPAIN201305UV022,
+                                                Assertion idAssertion, final String countryCode) {
 
-        RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub(epr);
+        RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub(endpointUrl);
         // Dummy handler for any mustUnderstand
         EventLogClientUtil.createDummyMustUnderstandHandler(stub);
         stub.setCountryCode(countryCode);
