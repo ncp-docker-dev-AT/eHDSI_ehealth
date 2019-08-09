@@ -550,7 +550,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private String prepareExtrinsicObjectEP(AdhocQueryRequest request, ExtrinsicObjectType eot, EPDocumentMetaData document) {
 
-        String name = "ePrescription";
+        String name = "eHDSI - ePrescription";
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
         boolean isPDF = document.getFormat() == EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF;
 
@@ -569,10 +569,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
         eot.getName().getLocalizedString().get(0).setValue(name);
 
-        // Description (optional)
+        // Description
         eot.setDescription(ofRim.createInternationalStringType());
         eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
-        eot.getDescription().getLocalizedString().get(0).setValue(document.getTitle());
+        eot.getDescription().getLocalizedString().get(0).setValue(document.getDescription());
 
         // Version Info
         eot.setVersionInfo(ofRim.createVersionInfoType());
@@ -597,6 +597,26 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Type code (not written in 3.4.2)
         eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
                 uuid, Constants.EP_CLASSCODE, "2.16.840.1.113883.6.1", name));
+
+        // Product
+        if (document.hasProduct()) {
+            EPDocumentMetaData.ProductMetadata product = document.getProduct();
+            eot.getClassification()
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                            product.getProductCode(), "2.16.840.1.113883.6.73", product.getProductName()));
+        }
+
+        // Dispensable
+        if (document.isDispensable()) {
+            eot.getClassification()
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                            uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open"));
+        } else {
+            eot.getClassification()
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                            uuid, "urn:ihe:iti:xdw:2011:eventCode:closed", "1.3.6.1.4.1.19376.1.2.3", "Closed"));
+        }
+
         // Confidentiality Code
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
                 uuid, "N", "2.16.840.1.113883.5.25", "Normal"));
