@@ -407,6 +407,7 @@
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <attachClasses>true</attachClasses>
                     <packagingExcludes>
+                        WEB-INF/lib/axiom-dom-1.2.21.jar,
                         WEB-INF/lib/xercesImpl-2.10.0.jar
                     </packagingExcludes>
                 </configuration>
