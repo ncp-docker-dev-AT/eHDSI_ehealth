@@ -20,13 +20,13 @@ public class DynamicDiscoveryClientApplication {
         LOGGER.info("JRE: {} ({})", System.getProperty("java.version"), System.getProperty("java.vendor"));
         LOGGER.info("JVM: {} ({})", System.getProperty("java.vm.version"), System.getProperty("java.vm.name"));
 
-        ServiceMetadataLocatorManager manager = context.getBean(ServiceMetadataLocatorManager.class);
+        ServiceMetadataLocatorManager serviceMetadataLocatorManager = context.getBean(ServiceMetadataLocatorManager.class);
 
         try {
             LOGGER.info("Start synchronization process");
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            manager.lookupOpenNCP();
+            serviceMetadataLocatorManager.lookup();
             stopWatch.stop();
             LOGGER.info("Synchronization done in {} s", stopWatch.getTotalTimeSeconds());
 
