@@ -112,7 +112,6 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
         // Set the soap version
         _serviceClient.getOptions().setSoapVersionURI(org.apache.axiom.soap.SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-
         _serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_MTOM, Constants.VALUE_TRUE);
     }
 
