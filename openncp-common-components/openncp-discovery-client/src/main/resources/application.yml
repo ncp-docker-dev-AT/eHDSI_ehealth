@@ -9,6 +9,13 @@ openncp:
     path: keystore/openncp-truststore.jks
     #Password of your Truststore
     password: changeit
+  proxy:
+    enabled: false
+    authenticated: false
+    host: 127.0.0.1
+    port: 8080
+    username: userProxy
+    password: passwordProxy
   sml:
     #SML Domain name: Testa-> ehealth.testa.eu OR Internet-> ehealth-trn.acc.edelivery.tech.ec.europa.eu
     domain: ehealth-trn.acc.edelivery.tech.ec.europa.eu

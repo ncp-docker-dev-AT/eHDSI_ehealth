@@ -34,7 +34,7 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2</artifactId>
+                    <artifactId>axis2-kernel</artifactId>
                 </exclusion>
                 <exclusion>
                     <artifactId>saxon</artifactId>
@@ -108,7 +108,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2</artifactId>
+            <artifactId>axis2-kernel</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>

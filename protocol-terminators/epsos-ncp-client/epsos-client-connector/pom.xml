@@ -106,11 +106,15 @@
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2</artifactId>
+            <artifactId>axis2-kernel</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-xmlbeans</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlbeans</groupId>
@@ -136,11 +140,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.4.4</version>
-        </dependency>
-        <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
         </dependency>
@@ -159,7 +158,20 @@
                     <groupId>commons-beanutils</groupId>
                     <artifactId>commons-beanutils-core</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>commons-httpclient</artifactId>
+                    <groupId>commons-httpclient</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.owasp.esapi</groupId>
+                    <artifactId>esapi</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
+            <version>${esapi.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -264,16 +276,20 @@
                         </resource>
                     </webResources>
                     <packagingExcludes>
-                        WEB-INF/lib/axiom-dom-1.2.13.jar,
-                        WEB-INF/lib/commons-codec-1.3.jar,
-                        WEB-INF/lib/commons-io-1.4.jar,
-                        WEB-INF/lib/httpcore-4.0.jar,
-                        WEB-INF/lib/jaxen-1.1.1.jar,
+                        WEB-INF/lib/axiom-dom-1.2.21.jar,
+                        WEB-INF/lib/commons-codec-1.2.jar,
+                        WEB-INF/lib/commons-io-2.1.jar,
+                        WEB-INF/lib/jaxb-api-2.1.jar,
+                        WEB-INF/lib/jaxb-impl-2.2.4-1.jar,
                         WEB-INF/lib/log4j-1.2.15.jar,
+                        WEB-INF/lib/mail-1.4.jar,
+                        WEB-INF/lib/neethi-3.0.2.jar,
+                        WEB-INF/lib/stax2-api-3.0.2.jar,
+                        WEB-INF/lib/stax-api-1.0.1.jar,
+                        WEB-INF/lib/woodstox-core-asl-4.0.8.jar,
                         WEB-INF/lib/xalan-2.7.0.jar,
                         WEB-INF/lib/xalan-2.7.1.jar,
-                        WEB-INF/lib/xercesImpl-2.10.0.jar,
-                        WEB-INF/lib/xmlbeans-2.3.0.jar
+                        WEB-INF/lib/xercesImpl-2.10.0.jar
                     </packagingExcludes>
                 </configuration>
             </plugin>

@@ -43,7 +43,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tools.ant.util.DateUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.PrettyXmlSerializer;
@@ -2204,7 +2204,7 @@ public class EpsosHelperService {
             parameters.put("printedby", fullName);
             parameters.put("lang1", language);
             parameters.put("lang2", language2);
-            parameters.put("date", DateUtils.format(new Date(), "yyyy/MM/dd"));
+            parameters.put("date", DateFormatUtils.format(new Date(), "yyyy/MM/dd"));
 
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             URL url = cl.getResource("epsosConsent.jasper");

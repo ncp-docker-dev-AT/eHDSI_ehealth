@@ -274,7 +274,7 @@
         <dependency>
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
-            <version>1.4.01</version>
+            <version>${xml-apis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -456,6 +456,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <packagingExcludes>
+                        WEB-INF/lib/axiom-dom-1.2.21.jar,
                         WEB-INF/lib/xercesImpl-2.10.0.jar
                     </packagingExcludes>
                 </configuration>

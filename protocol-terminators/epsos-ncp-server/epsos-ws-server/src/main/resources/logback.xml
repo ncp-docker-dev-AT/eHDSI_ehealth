@@ -40,6 +40,10 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
+    <logger name="org.apache.axis2" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="eu.epsos.protocolterminators.ws.server" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
@@ -65,10 +69,6 @@
     </logger>
 
     <logger name="_2009.xcpd.iti.ihe" level="INFO" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="org.apache.axis2" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
