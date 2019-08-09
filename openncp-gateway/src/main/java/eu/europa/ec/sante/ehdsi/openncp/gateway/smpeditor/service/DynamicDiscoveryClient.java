@@ -1,11 +1,8 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
 
-import eu.epsos.util.net.ProxyCredentials;
-import eu.epsos.util.net.ProxyUtil;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
-import eu.europa.ec.dynamicdiscovery.core.fetcher.impl.DefaultURLFetcher;
 import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
 import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
@@ -46,22 +43,22 @@ public class DynamicDiscoveryClient {
                     ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD).toCharArray());
 
             LOGGER.debug("Loading Dynamic Discovery Builder...");
-            DynamicDiscoveryBuilder builder = DynamicDiscoveryBuilder.newInstance()
+            DynamicDiscoveryBuilder dynamicDiscoveryBuilder = ConfigurationManagerFactory.getConfigurationManager().initializeDynamicDiscoveryFetcher()
                     .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
                             .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
                     .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)));
 
-            if (ProxyUtil.isProxyAnthenticationMandatory()) {
-                LOGGER.debug("Loading Proxy Credentials...");
-                ProxyCredentials proxyCredentials = ProxyUtil.getProxyCredentials();
-                if (proxyCredentials != null) {
-                    builder.fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(),
-                            Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(),
-                            proxyCredentials.getProxyPassword())));
-                }
-            }
+//            if (ProxyUtil.isProxyAnthenticationMandatory()) {
+//                LOGGER.debug("Loading Proxy Credentials...");
+//                ProxyCredentials proxyCredentials = ProxyUtil.getProxyCredentials();
+//                if (proxyCredentials != null) {
+//                    builder.fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(),
+//                            Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(),
+//                            proxyCredentials.getProxyPassword())));
+//                }
+//            }
             LOGGER.debug("Building Dynamic Discovery...");
-            INSTANCE = builder.build();
+            INSTANCE = dynamicDiscoveryBuilder.build();
 
         }
         LOGGER.debug("Return Dynamic Discovery...");

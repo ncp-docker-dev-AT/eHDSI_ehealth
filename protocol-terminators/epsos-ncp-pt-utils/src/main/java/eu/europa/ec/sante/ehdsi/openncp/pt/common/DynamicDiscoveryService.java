@@ -3,7 +3,6 @@ package eu.europa.ec.sante.ehdsi.openncp.pt.common;
 import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
-import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
 import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
@@ -174,7 +173,7 @@ public class DynamicDiscoveryService {
             FileInputStream fileInputStream = new FileInputStream(file);
             ks.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
 
-            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+            DynamicDiscovery smpClient = ConfigurationManagerFactory.getConfigurationManager().initializeDynamicDiscoveryFetcher()
                     .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
                     .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
                     .build();

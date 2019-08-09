@@ -3,9 +3,11 @@ package eu.europa.ec.sante.ehdsi;
 import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
+import eu.europa.ec.dynamicdiscovery.core.fetcher.impl.DefaultURLFetcher;
 import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
 import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
+import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultProxy;
 import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidator;
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
@@ -231,6 +233,12 @@ public class ServiceMetadataLocatorManager {
 
         String trustStorePath = environment.getRequiredProperty("openncp.truststore.path");
         String trustStorePassword = environment.getRequiredProperty("openncp.truststore.password");
+        boolean proxyEnabled = Boolean.parseBoolean(environment.getRequiredProperty("openncp.proxy.enabled"));
+        boolean proxyAuthenticated = Boolean.parseBoolean(environment.getRequiredProperty("openncp.proxy.authenticated"));
+        String proxyHost = environment.getRequiredProperty("openncp.proxy.host");
+        int proxyPort = Integer.parseInt(environment.getRequiredProperty("openncp.proxy.port"));
+        String proxyUsername = environment.getRequiredProperty("openncp.proxy.username");
+        String proxyPassword = environment.getRequiredProperty("openncp.proxy.password");
         String serviceMetadataLocatorDomain = environment.getRequiredProperty("openncp.sml.domain");
         String participantIdentifierUrn = String.format(PARTICIPANT_IDENTIFIER_VALUE, environment.getRequiredProperty("openncp.sml.country"));
 
@@ -241,7 +249,7 @@ public class ServiceMetadataLocatorManager {
                 LOGGER.info("NAPTR Hash: '{}'", HashUtil.getSHA256HashBase32(participantIdentifierUrn));
                 LOGGER.info("CNAME Hash: '{}'", StringUtils.lowerCase("b-" + HashUtil.getMD5Hash(participantIdentifierUrn)));
             }
-            KeyStore ks = KeyStore.getInstance("JKS");
+            KeyStore keyStore = KeyStore.getInstance("JKS");
             InputStream inputStream;
             LOGGER.info("DynamicDiscovery Client Truststore: '{}'", trustStorePath);
             FileSystemResource fileSystemResource = new FileSystemResource(new File(trustStorePath));
@@ -255,12 +263,22 @@ public class ServiceMetadataLocatorManager {
                 Resource resource = resourceLoader.getResource("classpath:keystore/openncp-truststore.jks");
                 inputStream = resource.getInputStream();
             }
+            keyStore.load(inputStream, trustStorePassword.toCharArray());
 
-            ks.load(inputStream, trustStorePassword.toCharArray());
-
-            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+            DynamicDiscoveryBuilder discoveryBuilder = DynamicDiscoveryBuilder.newInstance();
+            if (proxyEnabled) {
+                if (proxyAuthenticated) {
+                    LOGGER.info("Configuring access through Authenticated Proxy '{}:{}' with Credentials: '{}/{}'",
+                            proxyHost, proxyPort, proxyUsername, StringUtils.isNoneBlank(proxyPassword) ? "XXXXXX" : "No Password provided");
+                    discoveryBuilder.fetcher(new DefaultURLFetcher(new DefaultProxy(proxyHost, proxyPort, proxyUsername, proxyPassword)));
+                } else {
+                    LOGGER.info("Configuring access through Proxy '{}:{}'", proxyHost, proxyPort);
+                    discoveryBuilder.fetcher(new DefaultURLFetcher(new DefaultProxy(proxyHost, proxyPort)));
+                }
+            }
+            DynamicDiscovery smpClient = discoveryBuilder
                     .locator(new DefaultBDXRLocator(serviceMetadataLocatorDomain, new DefaultDNSLookup()))
-                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
+                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(keyStore)))
                     .build();
 
             DocumentIdentifier documentIdentifier = new DocumentIdentifier(DOCUMENT_IDENTIFIER_ITI_55, DOCUMENT_IDENTIFIER_SCHEME);
