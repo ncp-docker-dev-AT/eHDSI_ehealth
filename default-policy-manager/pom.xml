@@ -30,45 +30,6 @@
             <artifactId>jcl-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-        <!--dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>xmltooling</artifactId>
-            <version>${xmltooling.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.xerces</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.xerces</groupId>
-                    <artifactId>serializer</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.xalan</groupId>
-                    <artifactId>xalan</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-jdk14</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>log4j-over-slf4j</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency-->
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml-core</artifactId>

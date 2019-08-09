@@ -9,19 +9,23 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class PdfHandlerTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PdfHandlerTest.class);
+    private final Logger logger = LoggerFactory.getLogger(PdfHandlerTest.class);
 
     @Test
     public void testConvertStringToPdf() {
+
         byte[] bytes = null;
         try {
-            String testHtml = FileUtils.readFileToString(new File("src/main/java/se/sb/epsos/web/pages/ViewDispensationPage.html"));
+            String testHtml = FileUtils.readFileToString(new File("src/main/java/se/sb/epsos/web/pages/ViewDispensationPage.html"),
+                    StandardCharsets.UTF_8);
             bytes = PdfHandler.convertStringToPdf(testHtml);
             File testResourceFolder = new File("src/test/resources/pdf");
-            testResourceFolder.mkdirs();
+            boolean folderCreated = testResourceFolder.mkdirs();
+            logger.info("Test folder created: '{}'", folderCreated);
             File file = new File(testResourceFolder, "File.pdf");
             FileOutputStream pdfFileOs = new FileOutputStream(file);
             pdfFileOs.write(bytes);
@@ -30,9 +34,8 @@ public class PdfHandlerTest {
 
             assert (file.exists());
         } catch (IOException | DocumentException e) {
-            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
+            logger.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
-
         assert (bytes != null);
     }
 }

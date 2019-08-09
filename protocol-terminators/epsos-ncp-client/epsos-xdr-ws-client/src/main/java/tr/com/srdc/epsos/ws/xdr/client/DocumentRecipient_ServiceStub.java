@@ -20,10 +20,8 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.*;
-import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
@@ -114,7 +112,6 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
         // Set the soap version
         _serviceClient.getOptions().setSoapVersionURI(org.apache.axiom.soap.SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-
         _serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_MTOM, Constants.VALUE_TRUE);
     }
 
@@ -195,21 +192,21 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
             OMNamespace ns2 = factory.createOMNamespace(XDRConstants.SOAP_HEADERS.OM_NAMESPACE, "");
 
-            SOAPHeaderBlock action = new SOAP12HeaderBlockImpl(XDRConstants.SOAP_HEADERS.ACTION_STR, ns2, soapFactory);
+            SOAPHeaderBlock action = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(XDRConstants.SOAP_HEADERS.ACTION_STR, ns2);
             OMNode node = factory.createOMText(XDRConstants.SOAP_HEADERS.REQUEST_ACTION);
             action.addChild(node);
 
             OMAttribute att = factory.createOMAttribute(XDRConstants.SOAP_HEADERS.MUST_UNDERSTAND_STR, env.getNamespace(), "1");
             action.addAttribute(att);
 
-            SOAPHeaderBlock id = new SOAP12HeaderBlockImpl(XDRConstants.SOAP_HEADERS.MESSAGEID_STR, ns2, soapFactory);
+            SOAPHeaderBlock id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(XDRConstants.SOAP_HEADERS.MESSAGEID_STR, ns2);
             OMNode node2 = factory.createOMText(tr.com.srdc.epsos.util.Constants.UUID_PREFIX + UUID.randomUUID().toString());
             id.addChild(node2);
 
             Element idAssertionElement = idAssertion.getDOM();
             Element trcAssertionElement = trcAssertion.getDOM();
             OMNamespace ns = factory.createOMNamespace(XDRConstants.SOAP_HEADERS.SECURITY_XSD, "wsse");
-            SOAPHeaderBlock security = new SOAP12HeaderBlockImpl(XDRConstants.SOAP_HEADERS.SECURITY_STR, ns, soapFactory);
+            SOAPHeaderBlock security = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(XDRConstants.SOAP_HEADERS.SECURITY_STR, ns);
 
             try {
                 security.addChild(XMLUtils.toOM(trcAssertionElement));
@@ -639,11 +636,11 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
             try {
 
-                SAXOMBuilder builder = new SAXOMBuilder();
-                Marshaller contextMarshaller = wsContext.createMarshaller();
-                contextMarshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
+                OMDocument omDocument = OMAbstractFactory.getOMFactory().createOMDocument();
+                Marshaller marshaller = wsContext.createMarshaller();
+                marshaller.marshal(new javax.xml.bind.JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), omDocument.getSAXResult());
 
-                return builder.getRootElement().getXMLStreamReader();
+                return omDocument.getOMDocumentElement().getXMLStreamReader();
 
             } catch (javax.xml.bind.JAXBException e) {
                 throw new javax.xml.stream.XMLStreamException(XDRConstants.EXCEPTIONS.ERROR_JAXB_MARSHALLING, e);
