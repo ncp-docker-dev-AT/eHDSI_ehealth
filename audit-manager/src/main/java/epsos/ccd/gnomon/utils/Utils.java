@@ -13,7 +13,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class Utils {
@@ -84,13 +83,18 @@ public class Utils {
      * Validates an xml file against XMLSchema
      *
      * @param xmlDocumentUrl is the path of the tsl file
-     * @param url            the url of the schema file
      * @return true/false if the source xml is valid against the rfc3881 xsd
      */
-    public static boolean validateSchema(String xmlDocumentUrl, URL url) throws SAXException, IOException {
+    public static boolean validateSchema(String xmlDocumentUrl) throws SAXException, IOException {
 
+        InputStream streamXsd = Utils.class.getClassLoader().getResourceAsStream("RFC3881.xsd");
+        if (streamXsd == null || streamXsd.available() == 0) {
+            LOGGER.error("Cannot load XSD resource: \"RFC3881.xsd\"");
+            return false;
+        }
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = factory.newSchema(url);
+        StreamSource streamSource = new StreamSource(streamXsd);
+        Schema schema = factory.newSchema(streamSource);
         javax.xml.validation.Validator validator = schema.newValidator();
         Source source = new StreamSource(stringToStream(xmlDocumentUrl));
 

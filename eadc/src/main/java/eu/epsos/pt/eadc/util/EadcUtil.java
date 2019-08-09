@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2013  SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.eadc.util;
 
 import com.spirit.epsos.cc.adc.EadcEntry;
@@ -27,6 +8,7 @@ import eu.epsos.pt.eadc.datamodel.TransactionInfo;
 import eu.epsos.pt.eadc.helper.TransactionHelper;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -65,6 +47,9 @@ public class EadcUtil {
      */
     public static void invokeEadc(MessageContext reqMsgContext, MessageContext rspMsgContext, Document cdaDocument,
                                   TransactionInfo transInfo, EadcEntry.DsTypes datasource) throws Exception {
+
+        StopWatch watch = new StopWatch();
+        watch.start();
         Document reqEnv;
         Document respEnv;
         EadcEntry eadcEntry;
@@ -72,7 +57,7 @@ public class EadcUtil {
         Transaction transaction;
         Document transDoc;
 
-        LOGGER.info("START eADC TRANSACTION PROCESSING...");
+        LOGGER.info("[EADC] Transaction Processing Started...");
         reqEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         respEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
@@ -95,7 +80,9 @@ public class EadcUtil {
         eadcReceiver = new EadcReceiverImpl();
         eadcReceiver.process(eadcEntry);
 
-        LOGGER.info("FINISH eADC TRANSACTION PROCESSING.");
+        watch.stop();
+        LOGGER.debug("[EADC] method invokeEADC executed in: '{}ms'", watch.getTime());
+        LOGGER.info("[EADC] Transaction Processing Finished...");
     }
 
     /**

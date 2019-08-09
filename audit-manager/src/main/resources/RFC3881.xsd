@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
            attributeFormDefault="unqualified">
+    <!--xmlns:ds="http://www.w3.org/2000/09/xmldsig#"-->
+<!--    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>-->
     <xs:element name="AuditMessage">
         <xs:complexType>
             <xs:sequence>
@@ -19,6 +21,7 @@
                 <xs:element name="ParticipantObjectIdentification"
                             type="ParticipantObjectIdentificationType" minOccurs="0"
                             maxOccurs="unbounded"/>
+<!--                <xs:element ref="ds:Signature"/>-->
             </xs:sequence>
         </xs:complexType>
     </xs:element>

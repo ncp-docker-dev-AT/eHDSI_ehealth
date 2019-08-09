@@ -4,11 +4,14 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Random;
 import java.util.TimeZone;
 
@@ -16,11 +19,27 @@ public class DateUtil {
 
     public static final String TIME_DATE_FORMAT = "yyyyMMddHHmmss.SSSZZZZ";
     public static final String DATE_FORMAT = "yyyyMMdd";
+    private static final DatatypeFactory DATATYPE_FACTORY;
     private static final int RAND_LIMIT = 10000;
     private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class);
     private static Random rand = new Random();
 
+    static {
+        try {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private DateUtil() {
+    }
+
+    public static XMLGregorianCalendar getDateAsXMLGregorian(Date date) {
+
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        return DATATYPE_FACTORY.newXMLGregorianCalendar(calendar);
     }
 
     // Returns the current time in the local time zone

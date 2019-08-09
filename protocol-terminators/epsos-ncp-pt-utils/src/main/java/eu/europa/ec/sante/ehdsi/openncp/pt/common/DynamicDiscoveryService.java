@@ -3,7 +3,6 @@ package eu.europa.ec.sante.ehdsi.openncp.pt.common;
 import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
-import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
 import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
@@ -11,6 +10,7 @@ import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidato
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.*;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.util.Assert;
@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
+import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -172,7 +173,7 @@ public class DynamicDiscoveryService {
             FileInputStream fileInputStream = new FileInputStream(file);
             ks.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
 
-            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+            DynamicDiscovery smpClient = ConfigurationManagerFactory.getConfigurationManager().initializeDynamicDiscoveryFetcher()
                     .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
                     .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
                     .build();
@@ -239,11 +240,8 @@ public class DynamicDiscoveryService {
             String ncp = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
             String ncpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.email");
             String country = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-            //Target Gateway ???
-            //String remoteip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_ADMIN_URL");
 
-            //Source Gateway ???
-            String localip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");
+            String localIp = IPUtil.getPrivateServerIp();
             String smp = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT");
             String smpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("SMP_SUPPORT_EMAIL");
             //ET_ObjectID --> Base64 of url
@@ -260,7 +258,7 @@ public class DynamicDiscoveryService {
             //TODO: Request Audit SMP Query
             URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
             LOGGER.info("DNS: '{}'", smpURI);
-            sendAuditQuery(ncp, ncpemail, smp, smpemail, country, localip, smpURI.toASCIIString(), new String(encodedObjectID),
+            sendAuditQuery(ncp, ncpemail, smp, smpemail, country, localIp, smpURI.getHost(), new String(encodedObjectID),
                     null, null, smpURI.toASCIIString());
 
 

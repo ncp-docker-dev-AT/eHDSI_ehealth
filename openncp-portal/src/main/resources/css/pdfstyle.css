@@ -2,7 +2,7 @@ body {
     font-family: Arial;
     font-size:.6em;
     margin: 0;
-    padding: 1rem 5rem;
+    padding: 1rem;
     /*text-rendering: optimizeLegibility;*/
 }
 
@@ -192,7 +192,6 @@ input[type='checkbox'] {
     padding: .5rem 1rem;
 }
 
-
 /* Translation table - table containing the coded translations */
 .translation_table{
     width: 100%;
@@ -210,6 +209,47 @@ input[type='checkbox'] {
 .translation_table td {
     background-color:#E6F2FF;
     font-size:.6em;
+    vertical-align: top;
+    text-align: left;
+}
+
+/* Extended header table - table containing the different administrative details from the ps file */
+.extended_header_table{
+    border: 1px solid #009fd1;
+    width: 100%;
+    table-layout: fixed;
+    border-radius: 3px;
+}
+.extended_header_table th {
+    background-color:#E6F2FF;
+    color:#4A4A4A;
+    font-size:.9em;
+    padding:.2em;
+    vertical-align: top;
+    text-align: left;
+    border-bottom: .2em solid #009fd1;
+}
+.extended_header_table td {
+    font-size:.9em;
+    vertical-align: top;
+    text-align: left;
+}
+
+.contact_information_table{
+    border-radius: .2em;
+    padding: .em;
+}
+.contact_information_table th {
+    background-color:#009fd1;
+    color:white;
+    font-size: 1em;
+    vertical-align: top;
+    text-align: left;
+}
+.contact_information_table td {
+    background-color:#009fd1;
+    color:white;
+    font-size:.9em;
     vertical-align: top;
     text-align: left;
 }

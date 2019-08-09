@@ -20,10 +20,8 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axiom.attachments.ByteArrayDataSource;
 import org.apache.axiom.om.*;
-import org.apache.axiom.om.impl.builder.SAXOMBuilder;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.soap.impl.llom.soap12.SOAP12HeaderBlockImpl;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
@@ -32,9 +30,11 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.XMLUtil;
 
@@ -112,7 +112,6 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
         // Set the soap version
         _serviceClient.getOptions().setSoapVersionURI(org.apache.axiom.soap.SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-
         _serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_MTOM, Constants.VALUE_TRUE);
     }
 
@@ -142,7 +141,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             counter = 0;    // reset the counter if it is greater than 99999
         }
         counter++;
-        return Long.toString(System.currentTimeMillis()) + "_" + counter;
+        return System.currentTimeMillis() + "_" + counter;
     }
 
     public void setCountryCode(String countryCode) {
@@ -193,21 +192,21 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
             OMNamespace ns2 = factory.createOMNamespace(XDRConstants.SOAP_HEADERS.OM_NAMESPACE, "");
 
-            SOAPHeaderBlock action = new SOAP12HeaderBlockImpl(XDRConstants.SOAP_HEADERS.ACTION_STR, ns2, soapFactory);
+            SOAPHeaderBlock action = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(XDRConstants.SOAP_HEADERS.ACTION_STR, ns2);
             OMNode node = factory.createOMText(XDRConstants.SOAP_HEADERS.REQUEST_ACTION);
             action.addChild(node);
 
             OMAttribute att = factory.createOMAttribute(XDRConstants.SOAP_HEADERS.MUST_UNDERSTAND_STR, env.getNamespace(), "1");
             action.addAttribute(att);
 
-            SOAPHeaderBlock id = new SOAP12HeaderBlockImpl(XDRConstants.SOAP_HEADERS.MESSAGEID_STR, ns2, soapFactory);
+            SOAPHeaderBlock id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(XDRConstants.SOAP_HEADERS.MESSAGEID_STR, ns2);
             OMNode node2 = factory.createOMText(tr.com.srdc.epsos.util.Constants.UUID_PREFIX + UUID.randomUUID().toString());
             id.addChild(node2);
 
             Element idAssertionElement = idAssertion.getDOM();
             Element trcAssertionElement = trcAssertion.getDOM();
             OMNamespace ns = factory.createOMNamespace(XDRConstants.SOAP_HEADERS.SECURITY_XSD, "wsse");
-            SOAPHeaderBlock security = new SOAP12HeaderBlockImpl(XDRConstants.SOAP_HEADERS.SECURITY_STR, ns, soapFactory);
+            SOAPHeaderBlock security = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(XDRConstants.SOAP_HEADERS.SECURITY_STR, ns);
 
             try {
                 security.addChild(XMLUtils.toOM(trcAssertionElement));
@@ -345,24 +344,18 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
 
-            /*
-             * Invoque eADC
-             */
-            try {
-                EadcUtilWrapper.invokeEadc(_messageContext, // Request message context
-                        _returnMessageContext, // Response message context
-                        this._getServiceClient(), //Service Client
-                        null, // CDA document
-                        transactionStartTime, // Transaction Start Time
-                        transactionEndTime, // Transaction End Time
-                        this.countryCode, // Country A ISO Code
-                        EadcEntry.DsTypes.XDR, // Data source type
-                        EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY); // Transaction direction
-            } catch (Exception ex) {
-                LOGGER.error("EADC INVOCATION FAILED: '{}'", ex.getMessage(), ex);
-            }
+            // Invoke eADC service.
+            Document eDispenseCda = null;
+            if (!provideAndRegisterDocumentSetRequest.getDocument().isEmpty()
+                    && ArrayUtils.isNotEmpty(provideAndRegisterDocumentSetRequest.getDocument().get(0).getValue())) {
 
-            /* Log soap response */
+                eDispenseCda = EadcUtilWrapper.toXmlDocument(provideAndRegisterDocumentSetRequest.getDocument().get(0).getValue());
+            }
+            EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), eDispenseCda,
+                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.XDR,
+                    EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
+
+            //  Log SOAP response message.
             String responseLogMsg;
             try {
                 if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
@@ -419,8 +412,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                         String messageClassName = (String) faultMessageMap.get(faultElt.getQName());
                         Class messageClass = Class.forName(messageClassName);
                         Object messageObject = fromOM(faultElt, messageClass);
-                        java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage", new Class[]{messageClass});
-                        m.invoke(ex, new Object[]{messageObject});
+                        java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
+                        m.invoke(ex, messageObject);
 
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
@@ -643,11 +636,11 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
             try {
 
-                SAXOMBuilder builder = new SAXOMBuilder();
-                Marshaller contextMarshaller = wsContext.createMarshaller();
-                contextMarshaller.marshal(new JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), builder);
+                OMDocument omDocument = OMAbstractFactory.getOMFactory().createOMDocument();
+                Marshaller marshaller = wsContext.createMarshaller();
+                marshaller.marshal(new javax.xml.bind.JAXBElement(new QName(nsuri, name), outObject.getClass(), outObject), omDocument.getSAXResult());
 
-                return builder.getRootElement().getXMLStreamReader();
+                return omDocument.getOMDocumentElement().getXMLStreamReader();
 
             } catch (javax.xml.bind.JAXBException e) {
                 throw new javax.xml.stream.XMLStreamException(XDRConstants.EXCEPTIONS.ERROR_JAXB_MARSHALLING, e);

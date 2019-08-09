@@ -36,6 +36,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class XMLUtil {
@@ -84,35 +85,29 @@ public class XMLUtil {
 
     public static Document parseContent(byte[] byteContent) throws ParserConfigurationException, SAXException, IOException {
 
-        Document doc;
-        String content = new String(byteContent);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("XMLUtil: parse byte[] content: \n'{}'", byteContent.length);
+        }
+        String content = new String(byteContent, StandardCharsets.UTF_8);
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         StringReader lReader = new StringReader(content);
         InputSource inputSource = new InputSource(lReader);
-        doc = docBuilder.parse(inputSource);
-        return doc;
+        return documentBuilder.parse(inputSource);
     }
 
-    /**
-     * @param content
-     * @return
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
-     */
     public static Document parseContent(String content) throws ParserConfigurationException, SAXException, IOException {
 
-        LOGGER.debug("parseContent(): \n'{}'", content);
-        Document doc;
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("XMLUtil: parse String content: \n'{}'", content);
+        }
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         StringReader lReader = new StringReader(content);
         InputSource inputSource = new InputSource(lReader);
-        doc = docBuilder.parse(inputSource);
-        return doc;
+        return documentBuilder.parse(inputSource);
     }
 
     public static String documentToString(Document doc) throws TransformerException {
@@ -201,7 +196,7 @@ public class XMLUtil {
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        transformer.transform(new DOMSource(doc), new StreamResult(new OutputStreamWriter(out, "UTF-8")));
+        transformer.transform(new DOMSource(doc), new StreamResult(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
     }
 
     /**

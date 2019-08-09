@@ -159,7 +159,7 @@
                     <xsl:when
                             test="$code/n1:originalText/n1:reference/@value">
                         <xsl:call-template name="show-uncodedElement">
-                            <xsl:with-param name="data" select="$code/n1:originalText/n1:reference/@value"/>
+                            <xsl:with-param name="code" select="$code/n1:originalText/n1:reference/@value"/>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>

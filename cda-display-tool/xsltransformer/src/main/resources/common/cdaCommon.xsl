@@ -24,18 +24,18 @@
     <!-- show-signature -->
     <!-- DEPRECATED - Nowhere used -->
     <!--<xsl:template name="show-sig">-->
-        <!--<xsl:param name="sig"/>-->
-        <!--<xsl:choose>-->
-            <!--<xsl:when test="$sig/@code ='S'">-->
-                <!--<xsl:text>signed</xsl:text>-->
-            <!--</xsl:when>-->
-            <!--<xsl:when test="$sig/@code='I'">-->
-                <!--<xsl:text>intended</xsl:text>-->
-            <!--</xsl:when>-->
-            <!--<xsl:when test="$sig/@code='X'">-->
-                <!--<xsl:text>signature required</xsl:text>-->
-            <!--</xsl:when>-->
-        <!--</xsl:choose>-->
+    <!--<xsl:param name="sig"/>-->
+    <!--<xsl:choose>-->
+    <!--<xsl:when test="$sig/@code ='S'">-->
+    <!--<xsl:text>signed</xsl:text>-->
+    <!--</xsl:when>-->
+    <!--<xsl:when test="$sig/@code='I'">-->
+    <!--<xsl:text>intended</xsl:text>-->
+    <!--</xsl:when>-->
+    <!--<xsl:when test="$sig/@code='X'">-->
+    <!--<xsl:text>signature required</xsl:text>-->
+    <!--</xsl:when>-->
+    <!--</xsl:choose>-->
     <!--</xsl:template>-->
 
     <!-- show-id -->
@@ -194,6 +194,33 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- show-element -->
+    <xsl:template name="show-element">
+        <xsl:param name="node"/>
+        <xsl:choose>
+            <xsl:when test="not($node/@nullFlavor)">
+                <xsl:choose>
+                    <xsl:when test="$node/@displayName">
+                        <xsl:value-of select="$node/@displayName"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:if test="$node/n1:originalText/n1:reference/@value">
+                            <xsl:call-template name="show-uncodedElement">
+                                <xsl:with-param name="code"
+                                                select="$node/n1:originalText/n1:reference/@value"/>
+                            </xsl:call-template>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="show-nullFlavor">
+                    <xsl:with-param name="code" select="$node/@nullFlavor"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <!-- Convert Telecom URL to display text -->
     <xsl:template name="translateTelecomCode">
         <xsl:param name="code"/>
@@ -218,7 +245,7 @@
                 <xsl:text>Vacation Home</xsl:text>
             </xsl:when>
             <xsl:when test="$code='HP'">
-                <xsl:text>Pirmary Home</xsl:text>
+                <xsl:text>Primary Home</xsl:text>
             </xsl:when>
             <xsl:when test="$code='WP'">
                 <xsl:text>Work Place</xsl:text>
@@ -907,11 +934,11 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
+
     <xsl:variable name="denominatorUnit">
-        
+
     </xsl:variable>
-    
+
     <!-- Number of Unit per Intake -->
     <xsl:template name="show-numberUnitIntake">
         <xsl:param name="medUnitIntake"/>
@@ -1144,6 +1171,12 @@
                 <xsl:with-param name="margin" select="2*$margin"/>
             </xsl:call-template>
         </xsl:for-each>
+    </xsl:template>
+
+    <!-- show narrative -->
+    <xsl:template name="show-narrative">
+        <xsl:param name="node"/>
+        <xsl:apply-templates select="$node/self::*"/>
     </xsl:template>
 
     <!-- paragraph -->

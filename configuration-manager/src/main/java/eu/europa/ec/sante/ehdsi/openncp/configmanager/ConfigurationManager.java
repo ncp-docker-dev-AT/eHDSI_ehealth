@@ -1,8 +1,16 @@
 package eu.europa.ec.sante.ehdsi.openncp.configmanager;
 
+import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
+
 import java.util.Map;
 
 public interface ConfigurationManager {
+
+    /**
+     *
+     * @return
+     */
+    DynamicDiscoveryBuilder initializeDynamicDiscoveryFetcher();
 
     /**
      * @param key

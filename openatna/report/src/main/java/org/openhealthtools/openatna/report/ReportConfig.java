@@ -75,9 +75,9 @@ public class ReportConfig extends HashMap<String, Object> {
     };
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportConfig.class);
+    private static final long serialVersionUID = -1477636651222523878L;
 
-    public ReportConfig() {
-
+    private ReportConfig() {
     }
 
     public static ReportConfig fromXml(InputStream in) throws IOException {
@@ -167,7 +167,7 @@ public class ReportConfig extends HashMap<String, Object> {
         return doc;
     }
 
-    private static Document newDocument() throws IOException {
+    private static Document newDocument() {
 
         Document doc = null;
         try {
@@ -217,7 +217,9 @@ public class ReportConfig extends HashMap<String, Object> {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ReportConfig.toXml(config, outputStream);
-            LOGGER.info("Report:\n{}", outputStream.toString());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Report:\n{}", outputStream.toString());
+            }
         } catch (IOException e) {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
         }

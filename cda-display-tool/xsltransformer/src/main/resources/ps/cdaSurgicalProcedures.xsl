@@ -69,9 +69,9 @@
                                         </label>
                                         <div class="collapsible-content">
                                             <div class="content-inner">
-                                                <xsl:apply-templates
-                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='47519-4']/../n1:text/*"/>
-                                                <br/>
+                                                <xsl:call-template name="show-narrative">
+                                                    <xsl:with-param name="node" select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section/n1:code[@code='47519-4']/../n1:text"/>
+                                                </xsl:call-template>
                                             </div>
                                         </div>
                                     </div>
@@ -132,26 +132,14 @@
     <xsl:template name="surgicalProceduresSectionEntry">
         <!-- Defining all needed variables -->
         <xsl:variable
-                name="surgicalProcedureNode"
-                select="n1:procedure/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.19']/../n1:code"/>
-        <xsl:variable
                 name="surgicalProcedure"
-                select="n1:procedure/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.19']/../n1:code/@displayName"/>
-        <xsl:variable
-                name="surgicalProcedureTranslation1"
-                select="n1:procedure/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.19']/../n1:code/n1:translation/n1:translation/@displayName"/>
-        <xsl:variable
-                name="surgicalProcedureTranslation2"
-                select="n1:procedure/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.19']/../n1:code/n1:translation/@displayName"/>
+                select="n1:procedure/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.19']/../n1:code"/>
         <xsl:variable
                 name="surgicalProcedureLowDate"
                 select="n1:procedure/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.19']/../n1:effectiveTime/n1:low"/>
         <xsl:variable
                 name="surgicalProcedureDate"
                 select="n1:procedure/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.19']/../n1:effectiveTime"/>
-        <xsl:variable
-                name="nullEntry"
-                select="."/>
         <xsl:variable name="surgProcAct"
                       select="n1:procedure"/>
         <!-- End definition of variables-->
@@ -159,29 +147,10 @@
             <xsl:when test="not($surgProcAct/@nullFlavor)">
                 <tr>
                     <td>
-                        <xsl:choose>
-                            <xsl:when test="not ($surgicalProcedureNode/@nullFlavor)">
-                                <xsl:choose>
-                                    <xsl:when test="$surgicalProcedure">
-                                        <xsl:value-of select="$surgicalProcedure"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <!--  uncoded element only if we don;t have displayName -->
-                                        <xsl:if test="$surgicalProcedureNode/n1:originalText/n1:reference/@value">
-                                            <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="code"
-                                                                select="$surgicalProcedureNode/n1:originalText/n1:reference/@value"/>
-                                            </xsl:call-template>
-                                        </xsl:if>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:call-template name="show-nullFlavor">
-                                    <xsl:with-param name="code" select="$surgicalProcedureNode/@nullFlavor"/>
-                                </xsl:call-template>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <!-- Display clinical manifestation -->
+                        <xsl:call-template name="show-element">
+                            <xsl:with-param name="node" select="$surgicalProcedure"/>
+                        </xsl:call-template>
                     </td>
                     <td>
                         <xsl:choose>

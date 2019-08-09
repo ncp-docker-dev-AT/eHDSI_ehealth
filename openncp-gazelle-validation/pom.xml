@@ -5,7 +5,7 @@
     <parent>
         <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,9 +14,9 @@
     <name>OpenNCP Gazelle Validation</name>
 
     <properties>
-        <httpclient.version>4.5.2</httpclient.version>
+        <httpclient.version>4.5.3</httpclient.version>
         <jaxb2-plugin.version>2.3.1</jaxb2-plugin.version>
-        <spring-ws.version>2.4.2.RELEASE</spring-ws.version>
+        <spring-ws.version>2.4.5.RELEASE</spring-ws.version>
     </properties>
 
     <profiles>

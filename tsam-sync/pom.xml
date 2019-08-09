@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>openncp-tsam-sync</artifactId>
@@ -19,7 +19,7 @@
         <java.version>1.8</java.version>
         <commons-lang3.version>3.5</commons-lang3.version>
         <ehealth-termservice-server.version>1.0.0</ehealth-termservice-server.version>
-        <httpclient.version>4.5.2</httpclient.version>
+        <httpclient.version>4.5.3</httpclient.version>
         <jackson.version>2.8.4</jackson.version>
         <javax-el.version>3.0.1-b08</javax-el.version>
         <mysql-connector.version>5.1.43</mysql-connector.version>

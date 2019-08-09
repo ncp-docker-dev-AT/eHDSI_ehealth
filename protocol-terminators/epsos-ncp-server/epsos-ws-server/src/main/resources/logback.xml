@@ -23,12 +23,6 @@
         </encoder>
     </appender>
 
-    <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
-        <connectionSource class="ch.qos.logback.core.db.JNDIConnectionSource">
-            <jndiLocation>java:comp/env/jdbc/LOGS</jndiLocation>
-        </connectionSource>
-    </appender>
-
     <logger name="LOGGER_CLINICAL" level="DEBUG" additivity="false">
         <appender-ref ref="FILE_CLINICAL"/>
     </logger>
@@ -46,14 +40,16 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
+    <logger name="org.apache.axis2" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="eu.epsos.protocolterminators.ws.server" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-        <appender-ref ref="DB"/>
     </logger>
 
     <logger name="eu.epsos.protocolterminators.ws.server.xca.impl" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-        <appender-ref ref="DB"/>
     </logger>
 
     <logger name="eu.europa.ec.sante.ehdsi.gazelle.validation" level="INFO" additivity="false">
@@ -70,15 +66,9 @@
 
     <logger name="_2007.xds_b.iti.ihe" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-        <appender-ref ref="DB"/>
     </logger>
 
     <logger name="_2009.xcpd.iti.ihe" level="INFO" additivity="false">
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="DB"/>
-    </logger>
-
-    <logger name="org.apache.axis2" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -88,7 +78,6 @@
 
     <logger name="epsos.ccd.gnomon.configmanager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
-        <appender-ref ref="DB"/>
     </logger>
 
     <logger name="epsos.ccd.gnomon.auditmanager" level="INFO" additivity="false">

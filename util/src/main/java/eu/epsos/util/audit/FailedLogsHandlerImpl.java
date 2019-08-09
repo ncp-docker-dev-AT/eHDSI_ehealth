@@ -12,41 +12,49 @@ import java.util.List;
 
 public class FailedLogsHandlerImpl implements FailedLogsHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FailedLogsHandlerImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(FailedLogsHandlerImpl.class);
     private MessageHandlerListener listener;
     private AuditLogSerializer serializer;
 
     public FailedLogsHandlerImpl(MessageHandlerListener listener, Type type) {
+
         this.listener = listener;
         serializer = new AuditLogSerializerImpl(type);
     }
 
     public void run() {
 
-        try {
-            List<File> files = serializer.listFiles();
-            for (File file : files) {
-                LOGGER.info("Found file to be re-send to OpenATNAServer: '{}'", file.getAbsolutePath());
+        logger.info("[Audit Util] FailedLogsHandler thread '{}' is running", Thread.currentThread().getId());
+        List<File> files = serializer.listFiles();
+        for (File file : files) {
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found file to be re-send to ATNA Server: '{}'", file.getAbsolutePath());
+            }
+            try {
                 Serializable message = serializer.readObjectFromFile(file);
                 if (listener.handleMessage(message)) {
+
                     handleSentMessage(file);
                 }
-                Thread.sleep(1000);
+            } catch (IOException | ClassNotFoundException e) {
+                logger.error("Exception: '{}'", e.getMessage(), e);
             }
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-            LOGGER.error("InterruptedException: '{}'", ie.getMessage(), ie);
-        } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
     }
 
+    /**
+     * @param file
+     */
     private void handleSentMessage(File file) {
 
         try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Resent Message file has been processed, it should be deleted from filesystem:\n'{}'", file.getAbsolutePath());
+            }
             Files.delete(file.toPath());
         } catch (IOException e) {
-            LOGGER.error("Unable to delete successfully re-sent log backup ('{}')!", file.getAbsolutePath());
+            logger.error("Unable to delete successfully re-sent log backup ('{}')!", file.getAbsolutePath());
         }
     }
 }

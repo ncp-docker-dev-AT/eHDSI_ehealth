@@ -11,7 +11,6 @@ import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerException;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.DynamicDiscoveryClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -68,7 +67,7 @@ public class DynamicDiscoveryService {
 
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
                 sslContext,
-                //  new String[]{"TLSv1"}, // Allow TLSv1 protocol only
+                //  new String[]{"TLSv1.2"}, // Allow TLSv1.2 protocol only
                 //   null,
                 //SSLConnectionSocketFactory.getDefaultHostnameVerifier()
                 new NoopHostnameVerifier());
@@ -164,22 +163,10 @@ public class DynamicDiscoveryService {
                         }
                     }
                     //Audit vars
-                    String ncp = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country");
-                    String ncpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.email");
-                    String country = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-                    //String remoteip = ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_ADMIN_URL);//Source Gateway
-                    String localip = ConfigurationManagerFactory.getConfigurationManager().getProperty("SERVER_IP");//Target Gateway
-                    String smp = ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_SUPPORT);
-                    String smpemail = ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.SMP_SML_SUPPORT_EMAIL);
-                    //ET_ObjectID --> Base64 of url
-                    //String objectID = uri.toString(); //ParticipantObjectID
-
                     URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
                     LOGGER.info("DNS: '{}'", smpURI);
                     byte[] encodedObjectID = Base64.encodeBase64(smpURI.toASCIIString().getBytes());
                     AuditManager.handleDynamicDiscoveryQuery(smpURI.toASCIIString(), new String(encodedObjectID), null, null);
-                    //AuditManager.sendAuditQuery(smp, smpemail, ncp, ncpemail, country, localip, smpURI.toASCIIString(),
-                    //       new String(encodedObjectID), null, null, smpURI.toASCIIString());
                 }
 
             } catch (NoSuchAlgorithmException e) {
