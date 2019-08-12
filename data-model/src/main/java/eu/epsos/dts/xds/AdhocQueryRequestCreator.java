@@ -8,9 +8,6 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ValueListType;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 
-/**
- *
- */
 public class AdhocQueryRequestCreator {
 
     /**
