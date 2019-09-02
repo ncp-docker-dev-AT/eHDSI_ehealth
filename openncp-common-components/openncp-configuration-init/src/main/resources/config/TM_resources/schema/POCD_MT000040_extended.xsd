@@ -753,6 +753,7 @@
 				<xs:element name="manufacturedLabeledDrug" type="POCD_MT000040.LabeledDrug"/>
 				<xs:element name="manufacturedMaterial" type="POCD_MT000040.Material"/>
 			</xs:choice>
+			<xs:element ref="epsos:marketingAuthorizationHolder" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="manufacturerOrganization" type="POCD_MT000040.Organization"
 				minOccurs="0"/>
 			<xs:element ref="epsos:subjectOf1" minOccurs="0" maxOccurs="unbounded"/>
