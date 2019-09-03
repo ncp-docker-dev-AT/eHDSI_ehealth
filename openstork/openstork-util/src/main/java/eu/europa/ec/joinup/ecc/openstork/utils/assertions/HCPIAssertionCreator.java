@@ -1,6 +1,6 @@
 package eu.europa.ec.joinup.ecc.openstork.utils.assertions;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.exceptions.InvalidInput;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.joda.time.DateTime;
@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.util.Constants;
-import tr.com.srdc.epsos.util.saml.SAML;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 
 import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;

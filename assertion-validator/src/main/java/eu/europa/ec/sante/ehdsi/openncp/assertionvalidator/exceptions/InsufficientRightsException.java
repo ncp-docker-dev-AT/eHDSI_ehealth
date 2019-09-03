@@ -1,4 +1,4 @@
-package tr.com.srdc.epsos.securityman.exceptions;
+package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
 import java.util.HashMap;
 import java.util.Map;

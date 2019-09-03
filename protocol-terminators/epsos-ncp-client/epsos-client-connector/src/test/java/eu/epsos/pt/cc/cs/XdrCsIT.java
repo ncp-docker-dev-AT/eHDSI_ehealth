@@ -19,7 +19,7 @@
  */
 package eu.epsos.pt.cc.cs;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
@@ -68,7 +68,7 @@ public class XdrCsIT extends ClientGenericIT {
     public void testSubmitConsent() {
         List<String> permissions = new ArrayList<>(1);
         permissions.add("32");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_CS_#0.xml", XSPARole.PHYSICIAN);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_CS_#0.xml", XSPARole.DEPRECATED_PHYSICIAN);
 
         testGood("PT_CLIENT_XDR_CS_#0", REQ_FOLDER + "PT_CLIENT_XDR_CS_#0.xml");
         validateCDA(REQ_FOLDER + "PT_CLIENT_XDR_CS_#0.xml", CdaExtraction.MessageType.PORTAL, CdaModel.CONSENT);

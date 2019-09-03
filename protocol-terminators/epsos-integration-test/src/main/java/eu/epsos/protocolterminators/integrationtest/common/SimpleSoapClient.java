@@ -1,6 +1,6 @@
 package eu.epsos.protocolterminators.integrationtest.common;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.util.IheConstants;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -61,7 +61,7 @@ public class SimpleSoapClient {
         }
 
         // build list of SAML2 assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.PHYSICIAN);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.DEPRECATED_PHYSICIAN);
         Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion("", "");
         Collection<Assertion> assertions = new ArrayList<>();
         assertions.add(idAssertion);

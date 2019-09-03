@@ -1,6 +1,6 @@
 package eu.epsos.policymanager;
 
-import eu.epsos.assertionvalidator.*;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.*;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang3.StringUtils;
@@ -8,84 +8,134 @@ import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
-import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
-import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import tr.com.srdc.epsos.util.Constants;
 
 import java.util.List;
 
-import static eu.epsos.assertionvalidator.AssertionHelper.getAttributeFromAssertion;
+import static eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper.getAttributeFromAssertion;
 
 /**
- * Default Policy Manager implementation conform with IHE profiles and eHDSI specifications.
+ * Default Policy Manager implementation compliant with IHE profiles and eHDSI specifications.
  */
-public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
+public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
-    private static final String DEPRECATED_EPSOS_DOCTOR_ROLE = "medical doctor";
     private final Logger logger = LoggerFactory.getLogger(DefaultPolicyManagerImpl.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
+    /**
+     * Validates Healthcare Facility Type SAML attribute implemented by default according the eHDSI SAML Profile document.
+     *
+     * @param assertion     - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException - User's assertion attribute is missing.
+     * @throws InvalidFieldException - User's assertion attribute is not correct according the specification.
+     */
     @Override
-    public void HealthcareFacilityValidator(Assertion assertion, String documentClass) throws MissingFieldException,
-            InvalidFieldException {
+    public void HealthcareFacilityValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
 
-        String healthcareFacilityType = getAttributeFromAssertion(assertion, URN_EPSOS_NAMES_WP3_4_SUBJECT_HEALTHCARE_FACILITY_TYPE);
-        if (healthcareFacilityType.equals(HealthcareFacilityType.HOSPITAL.toString())
-                || healthcareFacilityType.equals(HealthcareFacilityType.RESIDENT_PHYSICIAN.toString())
-                || healthcareFacilityType.equals(HealthcareFacilityType.PHARMACY.toString())
-                || healthcareFacilityType.equals(HealthcareFacilityType.OTHER.toString())) {
-            logger.debug("HCP Identity Assertion Healthcare Facility Type: '{}'", healthcareFacilityType);
+        String facilityType = getAttributeFromAssertion(assertion, AssertionConstants.URN_EPSOS_NAMES_WP3_4_SUBJECT_HEALTHCARE_FACILITY_TYPE);
+        if (StringUtils.equalsIgnoreCase(facilityType, HealthcareFacilityType.HOSPITAL.toString())
+                || StringUtils.equalsIgnoreCase(facilityType, HealthcareFacilityType.RESIDENT_PHYSICIAN.toString())
+                || StringUtils.equalsIgnoreCase(facilityType, HealthcareFacilityType.PHARMACY.toString())
+                || StringUtils.equalsIgnoreCase(facilityType, HealthcareFacilityType.OTHER.toString())) {
+
+            logger.debug("HCP Identity Assertion Healthcare Facility Type: '{}'", facilityType);
         } else {
             logger.warn("InvalidFieldException: epSOS Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
             throw new InvalidFieldException("epSOS Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
         }
     }
 
+    /**
+     * Validates the OnBehalf attribute when an user is acting on behalf a clinician and its role is one of the
+     * following list: "Ancillary Services", "Clinical Services".
+     *
+     * @param assertion     - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException - User's assertion attribute is missing.
+     * @throws InvalidFieldException - User's assertion attribute is not correct according the specification.
+     */
     @Override
-    public void OnBehalfOfValidator(Assertion assertion, String documentClass) throws MissingFieldException,
-            InvalidFieldException {
+    public void OnBehalfOfValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
 
-        String onBehalfOfRole = getAttributeFromAssertion(assertion, URN_EPSOS_NAMES_WP3_4_SUBJECT_ON_BEHALF_OF);
-        if (onBehalfOfRole.equals(OnBehalfOf.DENTIST.toString())
-                || onBehalfOfRole.equals(OnBehalfOf.NURSE.toString())
-                || onBehalfOfRole.equals(OnBehalfOf.PHARMACIST.toString())
-                || onBehalfOfRole.equals(OnBehalfOf.PHYSICIAN.toString())
-                || onBehalfOfRole.equals(OnBehalfOf.NURSE_MIDWIFE.toString())
-                || StringUtils.equals(onBehalfOfRole, DEPRECATED_EPSOS_DOCTOR_ROLE)) {
+        String onBehalfOfRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_EPSOS_NAMES_WP3_4_SUBJECT_ON_BEHALF_OF);
+        if (StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.PHYSICIAN.toString())
+                || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.PHARMACIST.toString())
+                || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.NURSE.toString())
+                || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.NURSE_MIDWIFE.toString())) {
+
             logger.debug("HCP Identity Assertion OnBehalfOf: '{}'", onBehalfOfRole);
         } else {
             throw new InvalidFieldException("OnBehalfOf 'urn:epsos:names:wp3.4:subject:on-behalf-of' attribute in assertion should be one of followings " +
-                    "{'dentist', 'nurse', 'pharmacist', 'physician', 'nurse midwife'}.");
+                    "{'nurse', 'pharmacist', 'physician', 'nurse midwife'}.");
         }
     }
 
+    /**
+     * Validates the HCP Assertions provided by the end-user, a pair of structural and functional roles must be provided.
+     * Previous roles used in epSOS and eHDSI Wave 1-2 are now deprecated, they might be considered as an ERROR in a future release
+     * of the DefaultPolicyManager.
+     *
+     * @param assertion     - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException - User's assertion attribute is missing.
+     * @throws InvalidFieldException - User's assertion attribute is not correct according the specification.
+     */
     @Override
     public void XSPARoleValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
 
-        String xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
-        // TODO: XSPARole.EPSOS_DOCTOR this role is not valid and considered as workaround
-        if (xspaRole.equals(XSPARole.NURSE.toString()) || xspaRole.equals(XSPARole.PHARMACIST.toString())
-                || xspaRole.equals(XSPARole.PHYSICIAN.toString()) || xspaRole.equals(XSPARole.NURSE_MIDWIFE.toString())
-                || xspaRole.equals(XSPARole.PATIENT.toString()) || StringUtils.equals(xspaRole, DEPRECATED_EPSOS_DOCTOR_ROLE)) {
+        //TODO: Refactor this method after the approval of CP-0023 implementation.
+        String structuralRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+        logger.debug("HCP Identity Assertion XSPA Structural Role: '{}'", structuralRole);
 
-            logger.debug("HCP Identity Assertion XSPA Role: '{}'", xspaRole);
-        } else if (xspaRole.equals(XSPARole.ANCILLARY_SERVICES.toString()) || xspaRole.equals(XSPARole.CLINICAL_SERVICES.toString())) {
+        if (structuralRole.equals(XSPARole.ANCILLARY_SERVICES.toString())
+                || structuralRole.equals(XSPARole.CLINICAL_SERVICES.toString())) {
 
-            logger.debug("HCP Identity Assertion XSPA Role: '{}'", xspaRole);
             OnBehalfOfValidator(assertion, documentClass);
+            XSPAFunctionalRoleValidator(assertion, documentClass);
+
+        } else if (StringUtils.equalsIgnoreCase(structuralRole, XSPARole.LICENSED_HCP.toString())
+                || isDeprecatedMedicalRole(structuralRole)) {
+
+            XSPAFunctionalRoleValidator(assertion, documentClass);
+
         } else {
 
-            logger.error("Found XSPA Role: '{}'", xspaRole);
-            logger.error("XSPA Role 'urn:oasis:names:tc:xacml:2.0:subject:role' attribute in assertion should be one of followings {'nurse', 'pharmacist', 'physician', 'medical doctor', 'nurse midwife', 'ancillary services' , 'clinical services', 'patient'}.");
-            throw new InvalidFieldException("The user role is invalid. It should be one of followings {'nurse', 'pharmacist', 'physician', 'medical doctor', 'nurse midwife', 'ancillary services' , 'clinical services', 'patient'}");
+            logger.error("XSPA Role 'urn:oasis:names:tc:xacml:2.0:subject:role' attribute in assertion should be one of the authorized value!");
+            throw new InvalidFieldException("The user role is invalid. It shall be one of authorized value!");
         }
     }
 
+    /**
+     * @param assertion     - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException - User's assertion attribute is missing.
+     * @throws InvalidFieldException - User's assertion attribute is not correct according the specification.
+     */
+    @Override
+    public void XSPAFunctionalRoleValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
+
+        String functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
+        logger.debug("XSPA Functional Role: '{}'", functionalRole);
+
+        if (!XSPAFunctionalRole.containsLabel(functionalRole)) {
+            throw new InvalidFieldException("The functional Role " + functionalRole + " of the user is invalid.");
+        }
+    }
+
+    /**
+     * @param assertion     - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException - User's assertion attribute is missing.
+     * @throws InvalidFieldException - User's assertion attribute is not correct according the specification.
+     */
     @Override
     public void XSPASubjectValidatorForHCP(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
 
-        String subjectId = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_1_0_SUBJECT_SUBJECT_ID);
+        String subjectId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_1_0_SUBJECT_SUBJECT_ID);
         if (StringUtils.isEmpty(subjectId)) {
             throw new InvalidFieldException("XSPA Subject 'urn:oasis:names:tc:xacml:1.0:subject:subject-id' attribute in assertion should be filled.");
         } else if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
@@ -93,21 +143,31 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         }
     }
 
+    /**
+     * @param assertion     - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException - User's assertion attribute is missing.
+     * @throws InvalidFieldException - User's assertion attribute is not correct according the specification.
+     */
     @Override
     public void XSPASubjectValidatorForTRC(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
 
-        String resourceId = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_1_0_RESOURCE_RESOURCE_ID);
-        if (resourceId.equals("")) {
+        String resourceId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_1_0_RESOURCE_RESOURCE_ID);
+        if (StringUtils.isBlank(resourceId)) {
             throw new InvalidFieldException("XSPA subject 'uurn:oasis:names:tc:xacml:1.0:resource:resource-id' attribute in assertion should be filled.");
-        } else if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            loggerClinical.info("TRC Assertion XSPA subject: '{}'", resourceId);
         }
     }
 
+    /**
+     * @param assertion     - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException       - User's assertion attribute is missing.
+     * @throws InsufficientRightsException - User's assertion attribute is not correct according the specification.
+     */
     @Override
     public void PurposeOfUseValidator(Assertion assertion, String documentClass) throws MissingFieldException, InsufficientRightsException {
 
-        String resourceId = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_PURPOSEOFUSE);
+        String resourceId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_PURPOSEOFUSE);
         if (resourceId.equals("TREATMENT") || resourceId.equals("EMERGENCY")) {
             logger.debug("HCP Identity Assertion XSPA Purpose of Use: '{}'", resourceId);
         } else {
@@ -116,31 +176,49 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         }
     }
 
+    /**
+     * @param assertion     - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException - User's assertion attribute is missing.
+     * @throws InvalidFieldException - User's assertion attribute is not correct according the specification.
+     */
     @Override
     public void XSPALocalityValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
 
-        String environmentLocality = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XSPA_1_0_ENVIRONMENT_LOCALITY);
-        if (environmentLocality.equals("")) {
+        String environmentLocality = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_ENVIRONMENT_LOCALITY);
+        if (StringUtils.isBlank(environmentLocality)) {
             throw new InvalidFieldException("XSPA Locality 'urn:oasis:names:tc:xspa:1.0:environment:locality' attribute in assertion should be filled.");
         }
         logger.debug("HCP Identity Assertion XSPA Locality: '{}", environmentLocality);
     }
 
+    /**
+     * @param assertion - SAML user assertion.
+     * @throws InsufficientRightsException - User doesn't have enough privileges.
+     */
     @Override
     public void XCPDPermissionValidator(Assertion assertion) throws InsufficientRightsException {
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         for (XMLObject permission : permissions) {
-            logger.debug("HCP Identity Assertion XSPD Permission: '{}'", permission.getDOM().getTextContent());
-            if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_006)) {
-                logger.debug("Found permission for PRD-006 (Patient Identification and Lookup)");
-                return;
+            if (permission.getDOM() != null) {
+                logger.debug("HCP Identity Assertion XCPD Permission: '{}'", permission.getDOM().getTextContent());
+                if (permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_006)) {
+                    logger.debug("Found permission for PRD-006 (Patient Identification and Lookup)");
+                    return;
+                }
             }
         }
-        logger.error("InsufficientRightsException");
+        logger.error("InsufficientRightsException: Permission '{}' not found!", AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_006);
         throw new InsufficientRightsException();
     }
 
+    /**
+     * @param assertion     - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException       - User's assertion attribute is missing.
+     * @throws InsufficientRightsException - User's assertion attribute is not correct according the specification.
+     */
     @Override
     public void XCAPermissionValidator(Assertion assertion, String documentClass) throws InsufficientRightsException, MissingFieldException {
 
@@ -163,8 +241,8 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
     }
 
     /**
-     * @param assertion
-     * @throws InsufficientRightsException
+     * @param assertion - SAML user assertion.
+     * @throws InsufficientRightsException - User doesn't have enough privileges.
      */
     private void XCAPermissionValidatorPS(Assertion assertion) throws InsufficientRightsException {
 
@@ -176,18 +254,23 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String permissionValue;
-        String xspaRole;
+        String role;
+        String functionalRole;
 
         //Check allowed roles
         try {
-            xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+            role = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+            functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
+            logger.error("A MissingFieldException was caught. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!xspaRole.equals(XSPARole.PHYSICIAN.toString()) && !xspaRole.equals(XSPARole.PATIENT.toString())
-                && !StringUtils.equals(xspaRole, DEPRECATED_EPSOS_DOCTOR_ROLE)) {
-            logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to access Patient Summary documents.", xspaRole);
+        if (!role.equals(XSPARole.DEPRECATED_PHYSICIAN.toString())
+                && !role.equals(XSPARole.DEPRECATED_PATIENT.toString())
+                && !StringUtils.equalsIgnoreCase(role, XSPARole.LICENSED_HCP.toString())
+                && !StringUtils.equalsIgnoreCase(functionalRole, XSPAFunctionalRole.MEDICAL_DOCTORS.toString())) {
+
+            logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to access Patient Summary documents.", role);
             throw new InsufficientRightsException();
         }
 
@@ -197,19 +280,19 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
                 permissionValue = permission.getDOM().getTextContent();
                 logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permissionValue);
                 switch (permissionValue) {
-                    case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_003:
+                    case AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_003:
                         medicalHistory = true;
                         logger.debug("Found permission for PRD-003 (Review Medical History)");
                         break;
-                    case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_005:
+                    case AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_005:
                         vitalSign = true;
                         logger.debug("Found permission for PRD-005 (Review Vital Signs/Patient Measurements)");
                         break;
-                    case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_010:
+                    case AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_010:
                         patientMedications = true;
                         logger.debug("Found permission for PRD-010 (Review Patient Medications)");
                         break;
-                    case URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_016:
+                    case AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_016:
                         reviewProblem = true;
                         logger.debug("Found permission for PRD-016 (Review Problems)");
                         break;
@@ -230,8 +313,8 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
     /**
      * XCA for order service (ePrescription)
      *
-     * @param assertion the SAML Assertion
-     * @throws InsufficientRightsException
+     * @param assertion - SAML user assertion.
+     * @throws InsufficientRightsException - User doesn't have enough privileges.
      */
     private void XCAPermissionValidatorEP(Assertion assertion) throws InsufficientRightsException {
 
@@ -239,17 +322,21 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         boolean patientMedications = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
-        String xspaRole;
+        String role;
+        String functionalRole;
 
         //Check allowed roles
         try {
-            xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+            role = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+            functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
+            logger.error("A MissingFieldException was caught. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!xspaRole.equals(XSPARole.PHARMACIST.toString())) {
-            logger.error("InsufficientRightsException - Unsupported (named: '{}) role tried to access ePrescriptions documents.", xspaRole);
+        if (!StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHARMACIST.toString())
+                && !StringUtils.equalsIgnoreCase(functionalRole, XSPAFunctionalRole.PHARMACIST.toString())) {
+
+            logger.error("InsufficientRightsException - Unsupported (named: '{}'/'{}') role tried to access ePrescriptions documents.", role, functionalRole);
             throw new InsufficientRightsException();
         }
 
@@ -257,10 +344,10 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         for (XMLObject permission : permissions) {
             if (permission.getDOM() != null) {
                 logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
-                if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_004)) {
+                if (permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_004)) {
                     reviewExistingOrders = true;
                     logger.debug("Found permission for PRD-004 (Review Existing Orders)");
-                } else if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_010)) {
+                } else if (permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_010)) {
                     patientMedications = true;
                     logger.debug("Found permission for PRD-010 (Review Patient Medications)");
                 }
@@ -277,14 +364,20 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
     /**
      * XCA validator for MRO service, currently using the same validator for eP.
      *
-     * @param assertion
-     * @throws InsufficientRightsException
+     * @param assertion - SAML user assertion.
+     * @throws InsufficientRightsException - User doesn't have enough privileges.
      */
     private void XCAPermissionValidatorMro(Assertion assertion) throws InsufficientRightsException {
 
         XCAPermissionValidatorEP(assertion);
     }
 
+    /**
+     * @param assertion     - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException       - User's assertion attribute is missing.
+     * @throws InsufficientRightsException - User's assertion attribute is not correct according the specification.
+     */
     @Override
     public void XDRPermissionValidator(Assertion assertion, String documentClass) throws InsufficientRightsException, MissingFieldException {
 
@@ -310,8 +403,8 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
     /**
      * XDR for dispensation service (eDispensation) or HCER service
      *
-     * @param assertion the SAML Assertion
-     * @throws InsufficientRightsException
+     * @param assertion - SAML user assertion.
+     * @throws InsufficientRightsException - User doesn't have enough privileges.
      */
     private void XDRPermissionValidatorEDOrHCER(Assertion assertion) throws InsufficientRightsException {
 
@@ -319,26 +412,34 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         boolean recordMedicationAdministrationRecord = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
-        String xspaRole;
+        String role;
+        String functionalRole;
 
         //Check allowed roles
         try {
-            xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+            role = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+            functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
+
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
+            logger.error("A MissingFieldException was caught. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!xspaRole.equals(XSPARole.PHARMACIST.toString()) && !xspaRole.equals(XSPARole.PHYSICIAN.toString())) {
-            logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit eDispensations or HCER documents.", xspaRole);
+        if (!StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHARMACIST.toString())
+                && !StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHYSICIAN.toString())
+                && !StringUtils.equalsIgnoreCase(role, XSPARole.LICENSED_HCP.toString())
+                && !StringUtils.equalsIgnoreCase(functionalRole, XSPAFunctionalRole.MEDICAL_DOCTORS.toString())) {
+            logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit eDispensations or HCER documents.", role);
             throw new InsufficientRightsException();
         }
 
         //Check required permissions
         for (XMLObject permission : permissions) {
-            logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
-            if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_046)) {
-                recordMedicationAdministrationRecord = true;
-                logger.debug("Found permission for PPD-046 (Record Medication Administration Record)");
+            if (permission.getDOM() != null) {
+                logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
+                if (permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_046)) {
+                    recordMedicationAdministrationRecord = true;
+                    logger.debug("Found permission for PPD-046 (Record Medication Administration Record)");
+                }
             }
         }
 
@@ -351,8 +452,8 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
     /**
      * XDR for patient consent
      *
-     * @param assertion the SAML Assertion
-     * @throws InsufficientRightsException
+     * @param assertion - SAML user assertion.
+     * @throws InsufficientRightsException - User doesn't have enough privileges.
      */
     private void XDRPermissionValidatorConsent(Assertion assertion) throws InsufficientRightsException {
 
@@ -360,17 +461,17 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         boolean recordMedicationAdministrationRecord = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
-        String xspaRole;
+        String role;
 
         //Check allowed roles
         try {
-            xspaRole = getAttributeFromAssertion(assertion, URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+            role = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caugth. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
+            logger.error("A MissingFieldException was caught. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!xspaRole.equals(XSPARole.PHARMACIST.toString()) && !xspaRole.equals(XSPARole.PHYSICIAN.toString())) {
-            logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit consent documents.", xspaRole);
+        if (!role.equals(XSPARole.DEPRECATED_PHARMACIST.toString()) && !role.equals(XSPARole.DEPRECATED_PHYSICIAN.toString())) {
+            logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit consent documents.", role);
             throw new InsufficientRightsException();
         }
 
@@ -378,7 +479,7 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         for (XMLObject permission : permissions) {
             if (permission.getDOM() != null) {
                 logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
-                if (permission.getDOM().getTextContent().equals(URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_032)) {
+                if (permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_032)) {
                     recordMedicationAdministrationRecord = true;
                     logger.debug("Found permission for PPD-032 (New Consents and Authorizations)");
                 }
@@ -391,12 +492,32 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
         }
     }
 
+    /**
+     * Validates if a patient has provided his consent. Default implementation always returns TRUE as the system is using
+     * a mocked National Infrastructure.
+     *
+     * @param patientId - Patient Identifier provided during the XCPD request (traits identifier).
+     * @param countryId - ISO code from the patient country of origin.
+     * @return true||false according Patient Consent Management system from the National Infrastructure.
+     */
     @Override
     public boolean isConsentGiven(String patientId, String countryId) {
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            loggerClinical.debug("Checking consent of patient '{}' for country '{}'", patientId, countryId);
-            loggerClinical.debug("Consent is Valid by default of patient '{}' from country '{}'", patientId, countryId);
-        }
+
+        // Default policy always return TRUE.
         return true;
+    }
+
+    private boolean isDeprecatedMedicalRole(String role) {
+
+        if (StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_NURSE.toString())
+                || StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHARMACIST.toString())
+                || StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHYSICIAN.toString())
+                || StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_MIDWIFE.toString())
+                || StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PATIENT.toString())) {
+
+            logger.warn("eHDSI Security Issue: Role of the user is deprecated - Please update your XSPA Policy to the latest version of the specification");
+            return true;
+        }
+        return false;
     }
 }

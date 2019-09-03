@@ -1,6 +1,6 @@
 package eu.europa.ec.joinup.ecc.openstork.utils;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.util.validation.StringPool;
 import eu.europa.ec.joinup.ecc.openstork.utils.assertions.HCPIAssertionCreator;
 import eu.europa.ec.joinup.ecc.openstork.utils.datamodel.HcpRole;
@@ -140,7 +140,7 @@ public class StorkUtils {
         } else {
             onBehalfOfId = getRepresentedEidentifiers(storkResponse, null).get(0).getRoot();
         }
-        assertionBuilder.onBehalfOf(XSPARole.PATIENT.name(), onBehalfOfId);
+        assertionBuilder.onBehalfOf(XSPARole.DEPRECATED_PATIENT.name(), onBehalfOfId);
 
         // OPTIONAL (0..*): Permissions
         permissions = obtainPermissionsForRole(obtainHcpRole(storkResponse));

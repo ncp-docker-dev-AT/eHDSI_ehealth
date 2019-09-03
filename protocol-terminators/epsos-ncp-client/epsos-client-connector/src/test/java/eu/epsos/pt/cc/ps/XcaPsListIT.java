@@ -19,7 +19,7 @@
  */
 package eu.epsos.pt.cc.ps;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.pt.cc.ClientGenericIT;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -69,7 +69,7 @@ public class XcaPsListIT extends ClientGenericIT {
         permissions.add("5");
         permissions.add("10");
         permissions.add("16");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#0.xml", XSPARole.PHYSICIAN);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#0.xml", XSPARole.DEPRECATED_PHYSICIAN);
 
         testGood("PT_CLIENT_XCA_PS_#0", REQ_FOLDER + "PT_CLIENT_XCA_PS_#0.xml");
     }
@@ -120,7 +120,7 @@ public class XcaPsListIT extends ClientGenericIT {
     public void testQueryPSInsRights() {
         List<String> permissions = new ArrayList<>(1);
         permissions.add("4");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#3.xml", XSPARole.PHYSICIAN);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#3.xml", XSPARole.DEPRECATED_PHYSICIAN);
         testFailScenario("PT_CLIENT_XCA_PS_#3", "4703", REQ_FOLDER + "PT_CLIENT_XCA_PS_#3.xml");
     }
 
@@ -138,7 +138,7 @@ public class XcaPsListIT extends ClientGenericIT {
         permissions.add("5");
         permissions.add("10");
         permissions.add("16");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#4.xml", XSPARole.PHYSICIAN);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#4.xml", XSPARole.DEPRECATED_PHYSICIAN);
         testFailScenario("PT_CLIENT_XCA_PS_#4", "1102", REQ_FOLDER + "PT_CLIENT_XCA_PS_#4.xml");
     }
 

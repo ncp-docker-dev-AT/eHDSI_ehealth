@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
  */
-package tr.com.srdc.epsos.securityman.exceptions;
+package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
 public class XSDValidationException extends Exception {
 	/**

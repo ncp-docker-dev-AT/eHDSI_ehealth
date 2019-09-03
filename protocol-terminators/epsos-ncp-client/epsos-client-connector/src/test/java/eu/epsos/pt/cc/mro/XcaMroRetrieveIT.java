@@ -19,7 +19,7 @@
  */
 package eu.epsos.pt.cc.mro;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
@@ -68,7 +68,7 @@ public class XcaMroRetrieveIT extends ClientGenericIT {
         List<String> permissions = new ArrayList<String>(2);
         permissions.add("4");
         permissions.add("10");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#1.xml", XSPARole.PHARMACIST);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#1.xml", XSPARole.DEPRECATED_PHARMACIST);
 
         SOAPElement rspSoapMsg = testGood("PT_CLIENT_XCA_MRO_#1", REQ_FOLDER + "PT_CLIENT_XCA_MRO_#1.xml");
         validateCDA(rspSoapMsg, CdaExtraction.MessageType.PORTAL, CdaModel.MRO);
@@ -87,7 +87,7 @@ public class XcaMroRetrieveIT extends ClientGenericIT {
         List<String> permissions = new ArrayList<String>(2);
         permissions.add("4");
         permissions.add("10");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#2.xml", XSPARole.PHARMACIST);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#2.xml", XSPARole.DEPRECATED_PHARMACIST);
 
         SOAPElement rspSoapMsg = testGood("PT_CLIENT_XCA_MRO_#2", REQ_FOLDER + "PT_CLIENT_XCA_MRO_#2.xml");
         validateCDA(rspSoapMsg, CdaExtraction.MessageType.PORTAL, CdaModel.MRO);
