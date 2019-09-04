@@ -1,5 +1,6 @@
 package epsos.openncp.protocolterminator;
 
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PurposeOfUse;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -230,7 +231,7 @@ public class HCPIAssertionCreator {
             XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
-            attVal.setTextContent("TREATMENT");
+            attVal.setTextContent(PurposeOfUse.TREATMENT.toString());
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);

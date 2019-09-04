@@ -25,6 +25,7 @@ import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PurposeOfUse;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPAFunctionalRole;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
@@ -1049,7 +1050,7 @@ public class EpsosHelperService {
                     orgType = "Hospital";
                 }
             }
-            String purposeOfUse = isEmergency ? "EMERGENCY" : "TREATMENT";
+            String purposeOfUse = isEmergency ? PurposeOfUse.EMERGENCY.toString() : PurposeOfUse.TREATMENT.toString();
 
             assertion = createAssertion(username, structuralRole, functionalRole, orgName, organizationId, orgType, purposeOfUse, poc, permissions);
 
@@ -1176,7 +1177,8 @@ public class EpsosHelperService {
             if (isPhysician) {
                 orgType = "Resident Physician";
             }
-            assertion = EpsosHelperService.createAssertion(username, rolename, "FUNCTIONAL_ROLE", orgName, orgId, orgType, "TREATMENT", poc, permissions);
+            assertion = EpsosHelperService.createAssertion(username, rolename, "FUNCTIONAL_ROLE", orgName,
+                    orgId, orgType, PurposeOfUse.TREATMENT.toString(), poc, permissions);
 
             // send Audit message
             if (assertion != null) {

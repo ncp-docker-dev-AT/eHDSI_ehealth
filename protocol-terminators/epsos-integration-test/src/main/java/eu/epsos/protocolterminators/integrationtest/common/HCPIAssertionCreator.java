@@ -1,5 +1,6 @@
 package eu.epsos.protocolterminators.integrationtest.common;
 
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PurposeOfUse;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.exceptions.InvalidInput;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
@@ -245,7 +246,7 @@ public class HCPIAssertionCreator {
             XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
-            attVal.setTextContent("TREATMENT");
+            attVal.setTextContent(PurposeOfUse.TREATMENT.toString());
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);

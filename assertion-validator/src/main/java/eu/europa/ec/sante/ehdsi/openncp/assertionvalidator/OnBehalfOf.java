@@ -8,10 +8,12 @@ package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator;
  */
 public enum OnBehalfOf {
 
-    NURSE("nurse"),
-    PHARMACIST("pharmacist"),
-    PHYSICIAN("physician"),
-    NURSE_MIDWIFE("nurse midwife");
+    MIDWIVES("Midwives"),
+    PHARMACIST("Pharmacist"),
+    PHYSICIAN("Physician"),
+    REGISTERED_NURSE("Registered Nurse"),
+    DEPRECATED_NURSE("nurse"),
+    DEPRECATED_NURSE_MIDWIFE("nurse midwife");
 
     private final String role;
 

@@ -1,16 +1,14 @@
 package eu.epsos.policymanager;
 
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.*;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
-import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import tr.com.srdc.epsos.util.Constants;
 
 import java.util.List;
@@ -19,14 +17,15 @@ import static eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelpe
 
 /**
  * Default Policy Manager implementation compliant with IHE profiles and eHDSI specifications.
+ * TODO: Refactor this class after the approval of CP-0023 implementation.
  */
 public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
+    private static final String ERROR_ASSERTION_MISSING_FIELD_ROLE = "A MissingFieldException was caught. The assertion role could not be obtained: '{}'";
     private final Logger logger = LoggerFactory.getLogger(DefaultPolicyManagerImpl.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     /**
-     * Validates Healthcare Facility Type SAML attribute implemented by default according the eHDSI SAML Profile document.
+     * Validates Health Care Facility Type SAML attribute implemented by default according the eHDSI SAML Profile document.
      *
      * @param assertion     - SAML user assertion.
      * @param documentClass - Type of clinical document requested by the user (if available).
@@ -44,7 +43,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
             logger.debug("HCP Identity Assertion Healthcare Facility Type: '{}'", facilityType);
         } else {
-            logger.warn("InvalidFieldException: epSOS Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
+            logger.warn("InvalidFieldException: epSOS HealthCare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
             throw new InvalidFieldException("epSOS Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
         }
     }
@@ -64,13 +63,13 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         String onBehalfOfRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_EPSOS_NAMES_WP3_4_SUBJECT_ON_BEHALF_OF);
         if (StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.PHYSICIAN.toString())
                 || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.PHARMACIST.toString())
-                || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.NURSE.toString())
-                || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.NURSE_MIDWIFE.toString())) {
+                || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.REGISTERED_NURSE.toString())
+                || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.MIDWIVES.toString())) {
 
             logger.debug("HCP Identity Assertion OnBehalfOf: '{}'", onBehalfOfRole);
         } else {
             throw new InvalidFieldException("OnBehalfOf 'urn:epsos:names:wp3.4:subject:on-behalf-of' attribute in assertion should be one of followings " +
-                    "{'nurse', 'pharmacist', 'physician', 'nurse midwife'}.");
+                    "{'Midwifes', 'Pharmacist', 'Physician', 'Registered Nurse'}.");
         }
     }
 
@@ -87,7 +86,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     @Override
     public void XSPARoleValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
 
-        //TODO: Refactor this method after the approval of CP-0023 implementation.
         String structuralRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
         logger.debug("HCP Identity Assertion XSPA Structural Role: '{}'", structuralRole);
 
@@ -138,8 +136,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         String subjectId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_1_0_SUBJECT_SUBJECT_ID);
         if (StringUtils.isEmpty(subjectId)) {
             throw new InvalidFieldException("XSPA Subject 'urn:oasis:names:tc:xacml:1.0:subject:subject-id' attribute in assertion should be filled.");
-        } else if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            loggerClinical.info("HCP Identity Assertion XSPA Subject: '{}", subjectId);
         }
     }
 
@@ -168,12 +164,13 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     public void PurposeOfUseValidator(Assertion assertion, String documentClass) throws MissingFieldException, InsufficientRightsException {
 
         String resourceId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_PURPOSEOFUSE);
-        if (resourceId.equals("TREATMENT") || resourceId.equals("EMERGENCY")) {
-            logger.debug("HCP Identity Assertion XSPA Purpose of Use: '{}'", resourceId);
-        } else {
+        if (!StringUtils.equals(resourceId, PurposeOfUse.EMERGENCY.toString())
+                && !StringUtils.equals(resourceId, PurposeOfUse.TREATMENT.toString())) {
             logger.error("InsufficientRightsException: Purpose of Use provided is not supported");
             throw new InsufficientRightsException();
+
         }
+        logger.debug("HCP Identity Assertion XSPA Purpose of Use: '{}'", resourceId);
     }
 
     /**
@@ -235,7 +232,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             default:
                 String errorMsg = "Invalid document class code: " + documentClass;
                 logger.error(errorMsg);
-                // TODO: What to do when wrong class code
                 throw new MissingFieldException(errorMsg);
         }
     }
@@ -262,7 +258,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             role = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
             functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caught. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
+            logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
         if (!role.equals(XSPARole.DEPRECATED_PHYSICIAN.toString())
@@ -278,7 +274,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         for (XMLObject permission : permissions) {
             if (permission.getDOM() != null) {
                 permissionValue = permission.getDOM().getTextContent();
-                logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permissionValue);
+
                 switch (permissionValue) {
                     case AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_003:
                         medicalHistory = true;
@@ -306,7 +302,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         if (medicalHistory && vitalSign && patientMedications && reviewProblem) {
             return;
         }
-        logger.error("InsufficientRightsException");
+        logger.error("InsufficientRightsException for Cross-Community Access to Patient Summary request");
         throw new InsufficientRightsException();
     }
 
@@ -330,7 +326,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             role = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
             functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caught. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
+            logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
         if (!StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHARMACIST.toString())
@@ -343,7 +339,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         //Check required permissions
         for (XMLObject permission : permissions) {
             if (permission.getDOM() != null) {
-                logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
+
                 if (permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PRD_004)) {
                     reviewExistingOrders = true;
                     logger.debug("Found permission for PRD-004 (Review Existing Orders)");
@@ -357,7 +353,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         if (reviewExistingOrders && patientMedications) {
             return;
         }
-        logger.error("InsufficientRightsException");
+        logger.error("InsufficientRightsException for Cross-Community Access to ePrescription request");
         throw new InsufficientRightsException();
     }
 
@@ -393,7 +389,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             case Constants.CONSENT_CLASSCODE:
                 XDRPermissionValidatorConsent(assertion);
                 break;
-            // TODO: What to do when wrong class code?
             default:
                 logger.error("Invalid document class code: '{}'", documentClass);
                 throw new MissingFieldException("Invalid document class code: " + documentClass);
@@ -408,7 +403,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XDRPermissionValidatorEDOrHCER(Assertion assertion) throws InsufficientRightsException {
 
-        //  TODO: add support for discard operation
         boolean recordMedicationAdministrationRecord = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
@@ -421,30 +415,28 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
 
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caught. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
+            logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
         if (!StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHARMACIST.toString())
                 && !StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHYSICIAN.toString())
                 && !StringUtils.equalsIgnoreCase(role, XSPARole.LICENSED_HCP.toString())
                 && !StringUtils.equalsIgnoreCase(functionalRole, XSPAFunctionalRole.MEDICAL_DOCTORS.toString())) {
+
             logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit eDispensations or HCER documents.", role);
             throw new InsufficientRightsException();
         }
 
         //Check required permissions
         for (XMLObject permission : permissions) {
-            if (permission.getDOM() != null) {
-                logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
-                if (permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_046)) {
-                    recordMedicationAdministrationRecord = true;
-                    logger.debug("Found permission for PPD-046 (Record Medication Administration Record)");
-                }
+            if (permission.getDOM() != null && permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_046)) {
+                recordMedicationAdministrationRecord = true;
+                logger.debug("Found permission for PPD-046 (Record Medication Administration Record)");
             }
         }
 
         if (!recordMedicationAdministrationRecord) {
-            logger.error("InsufficientRightsException");
+            logger.error("InsufficientRightsException for Cross-Community Document Reliable to eDispense request");
             throw new InsufficientRightsException();
         }
     }
@@ -457,7 +449,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XDRPermissionValidatorConsent(Assertion assertion) throws InsufficientRightsException {
 
-        //  TODO: add support for consent discard operation
         boolean recordMedicationAdministrationRecord = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
@@ -466,8 +457,9 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         //Check allowed roles
         try {
             role = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+
         } catch (MissingFieldException ex) {
-            logger.error("A MissingFieldException was caught. The assertion role could not be obtained: '{}'", ex.getMessage(), ex);
+            logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
         if (!role.equals(XSPARole.DEPRECATED_PHARMACIST.toString()) && !role.equals(XSPARole.DEPRECATED_PHYSICIAN.toString())) {
@@ -477,17 +469,14 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
         //  Check required permissions
         for (XMLObject permission : permissions) {
-            if (permission.getDOM() != null) {
-                logger.debug("HCP Identity Assertion XSPA Permission: '{}'", permission.getDOM().getTextContent());
-                if (permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_032)) {
-                    recordMedicationAdministrationRecord = true;
-                    logger.debug("Found permission for PPD-032 (New Consents and Authorizations)");
-                }
+            if (permission.getDOM() != null && permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_032)) {
+                recordMedicationAdministrationRecord = true;
+                logger.debug("Found permission for PPD-032 (New Consents and Authorizations)");
             }
         }
 
         if (!recordMedicationAdministrationRecord) {
-            logger.error("InsufficientRightsException");
+            logger.error("InsufficientRightsException for Cross-Community Document Reliable to eConsent request");
             throw new InsufficientRightsException();
         }
     }
