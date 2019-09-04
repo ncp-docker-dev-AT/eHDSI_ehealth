@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>openncp-common-components</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>openncp-db</artifactId>
+    <artifactId>openncp-database-initializer</artifactId>
 
-    <name>OpenNCP Database</name>
+    <name>OpenNCP Database Initializer</name>
 
     <properties>
         <liquibase.version>3.6.3</liquibase.version>
@@ -34,8 +33,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-ltrdb/db.changelog.xml</changeLogFile>
-                            <url>offline:mysql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-ltrdb/schema-mysql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:mysql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-ltrdb/schema-mysql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -46,8 +49,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-ltrdb/db.changelog.xml</changeLogFile>
-                            <url>offline:oracle?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-ltrdb/schema-oracle12c.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:oracle?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-ltrdb/schema-oracle12c.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -58,8 +65,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-ltrdb/db.changelog.xml</changeLogFile>
-                            <url>offline:postgresql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-ltrdb/schema-postgresql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:postgresql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-ltrdb/schema-postgresql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -70,8 +81,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-ltrdb/db.changelog.xml</changeLogFile>
-                            <url>offline:mssql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-ltrdb/schema-mssql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:mssql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-ltrdb/schema-mssql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <!-- OpenNCP Properties Database -->
@@ -83,8 +98,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-properties/db.changelog.xml</changeLogFile>
-                            <url>offline:mysql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-properties/schema-mysql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:mysql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-properties/schema-mysql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -95,8 +114,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-properties/db.changelog.xml</changeLogFile>
-                            <url>offline:oracle?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-properties/schema-oracle12c.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:oracle?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-properties/schema-oracle12c.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -107,8 +130,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-properties/db.changelog.xml</changeLogFile>
-                            <url>offline:postgresql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-properties/schema-postgresql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:postgresql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-properties/schema-postgresql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -119,8 +146,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-properties/db.changelog.xml</changeLogFile>
-                            <url>offline:mssql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-properties/schema-mssql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:mssql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-properties/schema-mssql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <!-- OpenNCP EADC Database -->
@@ -132,8 +163,11 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-eadc/db.changelog.xml</changeLogFile>
-                            <url>offline:mysql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-eadc/schema-mysql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:mysql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-eadc/schema-mysql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -144,8 +178,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-eadc/db.changelog.xml</changeLogFile>
-                            <url>offline:oracle?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-eadc/schema-oracle12c.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:oracle?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-eadc/schema-oracle12c.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -156,8 +194,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-eadc/db.changelog.xml</changeLogFile>
-                            <url>offline:postgresql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-eadc/schema-postgresql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:postgresql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-eadc/schema-postgresql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -168,8 +210,11 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-eadc/db.changelog.xml</changeLogFile>
-                            <url>offline:mssql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-eadc/schema-mssql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:mssql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-eadc/schema-mssql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <!-- OpenNCP ATNA Database -->
@@ -181,8 +226,11 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-atna/db.changelog.xml</changeLogFile>
-                            <url>offline:mysql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-atna/schema-mysql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:mysql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-atna/schema-mysql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -193,8 +241,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-atna/db.changelog.xml</changeLogFile>
-                            <url>offline:oracle?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-atna/schema-oracle12c.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:oracle?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-atna/schema-oracle12c.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -205,8 +257,12 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-atna/db.changelog.xml</changeLogFile>
-                            <url>offline:postgresql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-atna/schema-postgresql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:postgresql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>
+                                ${project.build.directory}/liquibase/openncp-atna/schema-postgresql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -217,8 +273,11 @@
                         </goals>
                         <configuration>
                             <changeLogFile>src/main/resources/openncp-atna/db.changelog.xml</changeLogFile>
-                            <url>offline:mssql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv</url>
-                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-atna/schema-mssql.sql</migrationSqlOutputFile>
+                            <url>
+                                offline:mssql?changeLogFile=${project.build.directory}/liquibase/databasechangelog.csv
+                            </url>
+                            <migrationSqlOutputFile>${project.build.directory}/liquibase/openncp-atna/schema-mssql.sql
+                            </migrationSqlOutputFile>
                         </configuration>
                     </execution>
                 </executions>
