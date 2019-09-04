@@ -14,12 +14,9 @@
     <xsl:param name="shownarrative" select="''"/>
 
     <!-- TODO these values should be added to the epsosDisplayLabel valueSet -->
-    <xsl:variable name="min" select="'Min'"/>
-    <xsl:variable name="max" select="'Max'"/>
     <xsl:variable name="activeIngredientCodeSystem" select="'Code System'"/>
     <xsl:variable name="activeIngredientCode" select="'Code'"/>
     <xsl:variable name="activeIngredientName" select="'Name'"/>
-    <xsl:variable name="dispensedNumberOfPackages" select="'Dispensed Number of packages'"/>
 
     <!-- show-signature -->
     <!-- DEPRECATED - Nowhere used -->
