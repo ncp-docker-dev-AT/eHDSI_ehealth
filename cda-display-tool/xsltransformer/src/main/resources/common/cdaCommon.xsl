@@ -747,6 +747,16 @@
         </xsl:call-template>
     </xsl:template>
 
+    <!-- epSOSTimingEvent -->
+    <xsl:template name="show-timing-event">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.41.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.139'"/>
+        </xsl:call-template>
+    </xsl:template>
+
     <!-- epSOSRouteOfAdministration -->
     <xsl:template name="show-routeOfAdministration">
         <xsl:param name="code"/>
@@ -1020,19 +1030,21 @@
                 </xsl:if>
             </xsl:when>
             <xsl:when test="$medFrequencyIntakeType='EIVL_TS'">
+                <xsl:variable name="medEvent" select="$medFrequencyIntake/n1:event"/>
                 <xsl:variable name="medOffset" select="$medFrequencyIntake/n1:offset"/>
                 <xsl:variable name="medOffsetWidth"
-                              select="$medFrequencyIntake/n1:offset/n1:width"/>
+                              select="$medOffset/n1:width"/>
                 <xsl:variable name="medOffsetLow"
-                              select="$medFrequencyIntake/n1:offset/n1:low"/>
+                              select="$medOffset/n1:low"/>
                 <xsl:if test="$medOffsetLow">
                     <xsl:value-of select="$medOffsetLow/@value"/>
                     &#160;
                     <xsl:value-of select="$medOffsetLow/@unit"/>
                     &#160;
                 </xsl:if>
-                <!--xsl:value-of select="$medFrequencyIntake/n1:event/@code"/ -->
-                <xsl:value-of select="$medFrequencyIntake/n1:event/@displayName"/>
+                <xsl:call-template name="show-timing-event">
+                    <xsl:with-param name="code" select="$medEvent/@code"/>
+                </xsl:call-template>
                 <xsl:if test="$medOffsetWidth">
                     <xsl:text>&#160; </xsl:text>
                     <xsl:call-template name="show-displayLabels">
