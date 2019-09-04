@@ -1,4 +1,4 @@
-package tr.com.srdc.epsos.securityman.helper;
+package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator;
 
 import org.apache.commons.lang.StringUtils;
 import org.opensaml.saml.common.xml.SAMLSchemaBuilder;
@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
-import tr.com.srdc.epsos.util.saml.SAML;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 
 import javax.xml.transform.dom.DOMSource;
 

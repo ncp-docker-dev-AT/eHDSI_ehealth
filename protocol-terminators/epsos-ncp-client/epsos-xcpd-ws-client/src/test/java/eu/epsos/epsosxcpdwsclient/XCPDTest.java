@@ -1,6 +1,6 @@
 package eu.epsos.epsosxcpdwsclient;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.protocolterminators.integrationtest.common.HCPIAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
@@ -58,7 +58,7 @@ public class XCPDTest {
         patientDemographics.setCountry(PATIENT_COUNTRY);
 
         // assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.PHYSICIAN);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.DEPRECATED_PHYSICIAN);
 
         // Call the service
         try {

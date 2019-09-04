@@ -1,17 +1,7 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
- *
- *    This file is part of epSOS-WEB.
- *
- *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
- **/
 package se.sb.epsos.web.service.mock;
 
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import org.mockito.MockSettings;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -47,6 +37,7 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
     private MockSettings settings = withSettings().serializable();
 
     public NcpServiceFacadeMock() {
+
         LOGGER.info("Creating NcpServiceFacadeMock");
         webServiceClient = mock(ClientConnectorService.class, settings);
         service = mock(ClientConnectorServiceService.class, settings);
@@ -95,62 +86,36 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
     }
 
     private void mockSubmitDocumentResponse(ClientConnectorService webServiceClientMock) {
-//		try {
-//			when(webServiceClientMock.submitDocument(any(SourceSubmissionClientDto.class), any(EhrPatientClientDto.class))).thenAnswer(
-//					new Answer<EhrPatientClientDto>() {
-//						@Override
-//						public EhrPatientClientDto answer(InvocationOnMock invocation) throws Throwable {
-//							EhrPatientClientDto dto = (EhrPatientClientDto) invocation.getArguments()[1];
-//							return dto;
-//						}
-//					});
-//		} catch (EhrException_Exception e) {
-//		}
     }
 
     private void mockRetrieveDocumentResponse(ClientConnectorService webServiceClientMock) {
-        when(webServiceClientMock.retrieveDocument(any(RetrieveDocumentRequest.class))).thenAnswer(new Answer<EpsosDocument>() {
 
-            @Override
-            public EpsosDocument answer(InvocationOnMock invocation) throws Throwable {
-                RetrieveDocumentRequest req = (RetrieveDocumentRequest) invocation.getArguments()[0];
-                String documentId = req.getDocumentId().getDocumentUniqueId();
-                byte[] bytes = DocumentCatalog.get(documentId);
-                EpsosDocument mock = new EpsosDocument();
-                mock.setBase64Binary(bytes);
-                return mock;
-            }
+        when(webServiceClientMock.retrieveDocument(any(RetrieveDocumentRequest.class))).thenAnswer((Answer<EpsosDocument>) invocation -> {
+            RetrieveDocumentRequest req = (RetrieveDocumentRequest) invocation.getArguments()[0];
+            String documentId = req.getDocumentId().getDocumentUniqueId();
+            byte[] bytes = DocumentCatalog.get(documentId);
+            EpsosDocument mock = new EpsosDocument();
+            mock.setBase64Binary(bytes);
+            return mock;
         });
     }
 
     private void mockQueryDocumentsResponse(ClientConnectorService webServiceClientMock) {
-        when(webServiceClientMock.queryDocuments(any(QueryDocumentRequest.class))).thenAnswer(new Answer<List<EpsosDocument>>() {
 
-            @Override
-            public List<EpsosDocument> answer(InvocationOnMock invocation) throws Throwable {
-                List<EpsosDocument> result = new ArrayList<EpsosDocument>();
+        when(webServiceClientMock.queryDocuments(any(QueryDocumentRequest.class))).thenAnswer((Answer<List<EpsosDocument>>) invocation -> {
 
-                QueryDocumentRequest request = (QueryDocumentRequest) invocation.getArguments()[0];
-                PatientId patientId = request.getPatientId();
-//						EpsosDocument qargs = (EpsosDocument) invocation.getArguments()[1];
-//							if ("57833-6".equals(qargs.getClassCodes().get(0).getNodeRepresentation())) {
-//								result = DocumentCatalog.queryEP(createLongPatientId(pids.get(0)));
-//							} else if ("60591-5".equals(qargs.getClassCodes().get(0).getNodeRepresentation())) {
-//								result = DocumentCatalog.queryPS(createLongPatientId(pids.get(0)));
-//							}
-                LOGGER.debug("PatientId: " + createLongPatientId(patientId));
-                result = DocumentCatalog.queryEP(createLongPatientId(patientId));
+            QueryDocumentRequest request = (QueryDocumentRequest) invocation.getArguments()[0];
+            PatientId patientId = request.getPatientId();
+            LOGGER.debug("PatientId: " + createLongPatientId(patientId));
+            List<EpsosDocument> result = DocumentCatalog.queryEP(createLongPatientId(patientId));
 
-                if (LOGGER.isDebugEnabled()) {
-                    for (EpsosDocument epsosDocument : result) {
-                        LOGGER.debug("\n" + XmlUtil.marshallJaxbObject(new XmlTypeWrapper<EpsosDocument>(epsosDocument)));
-                        LOGGER.debug("Doc: " + epsosDocument.getTitle());
-                    }
+            if (LOGGER.isDebugEnabled()) {
+                for (EpsosDocument epsosDocument : result) {
+                    LOGGER.debug("\n" + XmlUtil.marshallJaxbObject(new XmlTypeWrapper<>(epsosDocument)));
+                    LOGGER.debug("Doc: " + epsosDocument.getTitle());
                 }
-
-                //result.add(doc);
-                return result;
             }
+            return result;
         });
     }
 
@@ -159,25 +124,24 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
     }
 
     private void mockQueryPatentsResponse(ClientConnectorService webServiceClientMock) {
-        when(webServiceClientMock.queryPatient(any(QueryPatientRequest.class))).thenAnswer(new Answer<List<PatientDemographics>>() {
-            @Override
-            public List<PatientDemographics> answer(InvocationOnMock invocation) throws Throwable {
-                List<PatientDemographics> result = new ArrayList<PatientDemographics>();
-                QueryPatientRequest query = (QueryPatientRequest) invocation.getArguments()[0];
-                String queryId = query.getPatientDemographics().getPatientId().get(0).getExtension() + "^^^&" + query.getPatientDemographics().getPatientId().get(0).getRoot(); // TODO: uses only the first one..
-                PatientDemographics pat = PatientCatalog.query(queryId);
-                if (pat != null) {
-                    result.add(pat);
-                }
-                return result;
+
+        when(webServiceClientMock.queryPatient(any(QueryPatientRequest.class))).thenAnswer((Answer<List<PatientDemographics>>) invocation -> {
+            List<PatientDemographics> result = new ArrayList<>();
+            QueryPatientRequest query = (QueryPatientRequest) invocation.getArguments()[0];
+            // TODO: uses only the first one..
+            String queryId = query.getPatientDemographics().getPatientId().get(0).getExtension() + "^^^&" + query.getPatientDemographics().getPatientId().get(0).getRoot();
+            PatientDemographics pat = PatientCatalog.query(queryId);
+            if (pat != null) {
+                result.add(pat);
             }
+            return result;
         });
     }
 
     private AuthenticatedUser createUserDetailsMock() {
         AuthenticatedUser user = mock(AuthenticatedUser.class, settings);
         when(user.getUsername()).thenReturn("test");
-        when(user.getRoles()).thenReturn(Arrays.asList(new String[]{"ROLE_PHARMACIST"}));
+        when(user.getRoles()).thenReturn(Arrays.asList("ROLE_PHARMACIST"));
         when(user.getCommonName()).thenReturn("Unit Test");
         when(user.getOrganizationName()).thenReturn("TEST");
         when(user.getOrganizationId()).thenReturn("111");
@@ -200,7 +164,7 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
     }
 
     @Override
-    public void setTRCAssertion(TRC trc, AuthenticatedUser user) throws NcpServiceException {
+    public void setTRCAssertion(TRC trc, AuthenticatedUser user) {
 
     }
 

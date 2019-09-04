@@ -53,6 +53,7 @@ public class AssertionHandler implements Serializable {
     private static final long serialVersionUID = 5209063407337843010L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionHandler.class);
+    private static final String URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE = "urn:oasis:names:tc:xspa:1.0:subject:functional-role";
     private AssertionHandlerConfigManager configHandler;
     private Assertion assertion;
 
@@ -128,10 +129,14 @@ public class AssertionHandler implements Serializable {
                 "urn:oasis:names:tc:xacml:1.0:subject:subject-id", userDetails.getCommonName(), "", "");
         attributeStatement.getAttributes().add(attrPID);
 
-        //TODO fix multiple roles??
+        //  TODO fix multiple roles??
         String role = AssertionHandlerConfigManager.getRoleDisplayName(userDetails.getRoles().get(0));
         Attribute attrPID_1 = createAttribute(builderFactory, "XSPA role", "urn:oasis:names:tc:xacml:2.0:subject:role", role, "", "");
         attributeStatement.getAttributes().add(attrPID_1);
+        // TODO: CP-0023 Implementation of Structural and Functional roles is missing.
+        Attribute attributeFunctionalRole = createAttribute(builderFactory, "XSPA Functional Role", URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE,
+                "CP_0023_FUNCTIONAL_ROLE", "", "");
+        attributeStatement.getAttributes().add(attributeFunctionalRole);
 
         Attribute attrPID_3 = createAttribute(builderFactory, "XSPA Organization",
                 "urn:oasis:names:tc:xspa:1.0:subject:organization", userDetails.getOrganizationName(), "", "");
@@ -157,7 +162,7 @@ public class AssertionHandler implements Serializable {
                 "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission");
         Set<String> permissions = new HashSet<>();
         for (String r : userDetails.getRoles()) {
-            permissions.addAll(AssertionHandlerConfigManager.getPersmissions(r));
+            permissions.addAll(AssertionHandlerConfigManager.getPermissions(r));
         }
 
         String permissionPrefix = AssertionHandlerConfigManager.getPersmissionsPrefix();

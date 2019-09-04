@@ -294,11 +294,16 @@
                                 <xsl:with-param name="code" select="'25'"/>
                             </xsl:call-template>
                         </th>
-                        <th colspan="2">
+                        <th>
                             <!-- Brand Name -->
                             <xsl:call-template name="show-displayLabels">
                                 <xsl:with-param name="code" select="'9'"/>
                             </xsl:call-template>
+                        </th>
+                        <th>
+                            <!-- Marketing Authorization Holder -->
+                            <!-- TODO this label has to be included as a concept in the epSOSDisplayLabel value set -->
+                            Marketing Authorization Holder
                         </th>
                     </tr>
                     <tr>
@@ -343,8 +348,11 @@
                                                 select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:formCode"/>
                             </xsl:call-template>
                         </td>
-                        <td colspan="2">
+                        <td>
                             <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:name"/>
+                        </td>
+                        <td>
+                            <xsl:value-of select="n1:consumable/n1:manufacturedProduct/epsos:marketingAuthorizationHolder/n1:name"/>
                         </td>
                     </tr>
                     <tr>

@@ -1,6 +1,6 @@
 package eu.epsos.epsosxdrwsclient;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.exceptions.XdrException;
 import eu.epsos.protocolterminators.integrationtest.common.HCPIAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.ResourceLoader;
@@ -54,7 +54,7 @@ public class XDRSubmitTest {
     public void doSubmit() throws XdrException, ParseException {
 
         // build assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.PHARMACIST);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.DEPRECATED_PHARMACIST);
         Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion("", "");
 
         // build patient id

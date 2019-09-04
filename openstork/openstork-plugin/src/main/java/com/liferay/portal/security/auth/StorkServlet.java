@@ -11,7 +11,7 @@ import eu.stork.peps.auth.commons.PEPSUtil;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
 import eu.stork.peps.exceptions.STORKSAMLEngineException;
-import org.apache.commons.httpclient.NameValuePair;
+import org.apache.http.NameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +30,8 @@ public class StorkServlet extends HttpServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StorkServlet.class);
     private static final String USER_AGENT = "Mozilla/5.0";
+    private static final String STORK_ENABLED = "stork.enabled";
+    private static final long serialVersionUID = 8297192306258345663L;
     private static Properties configs;
     private static String homepage = "/SP/";
 
@@ -91,7 +93,6 @@ public class StorkServlet extends HttpServlet {
         }
 
         LOGGER.info("IP-Addr: '{}'", ipAddress);
-        String STORK_ENABLED = "stork.enabled";
         Company company;
 
         try {
@@ -120,10 +121,9 @@ public class StorkServlet extends HttpServlet {
      *
      * @param request  servlet request
      * @param response servlet response
-     * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 
         LOGGER.info("Stork Servlet Post ...");
         String providerName = PropsUtil.get("provider.name");

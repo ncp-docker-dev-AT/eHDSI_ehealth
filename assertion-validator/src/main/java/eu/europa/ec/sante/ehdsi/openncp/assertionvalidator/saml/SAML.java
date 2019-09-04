@@ -1,4 +1,4 @@
-package tr.com.srdc.epsos.util.saml;
+package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 
 import net.shibboleth.utilities.java.support.security.SecureRandomIdentifierGenerationStrategy;
 import org.apache.commons.lang.StringUtils;

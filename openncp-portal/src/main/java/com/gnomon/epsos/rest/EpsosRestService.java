@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.gnomon.epsos.filter.RestAuthenticationFilter.AUTHENTICATION_HEADER;
@@ -47,6 +48,7 @@ import static com.gnomon.epsos.filter.RestAuthenticationFilter.AUTHENTICATION_HE
 /**
  * @author karkaletsis
  */
+@Deprecated
 @Path("/")
 public class EpsosRestService {
 
@@ -661,13 +663,9 @@ public class EpsosRestService {
         LOGGER.info("try to authencticate with: '{}'", authCredentials);
         final String encodedUserPassword = authCredentials.replaceFirst("Basic" + " ", "");
         String usernameAndPassword = null;
-        try {
-            byte[] decodedBytes = Base64.decodeBase64(encodedUserPassword);
-            usernameAndPassword = new String(decodedBytes, "UTF-8");
-            LOGGER.info("Decoded password: '{}'", usernameAndPassword);
-        } catch (IOException e) {
-            LOGGER.error("IOException: '{}'", e.getMessage(), e);
-        }
+        byte[] decodedBytes = Base64.decodeBase64(encodedUserPassword);
+        usernameAndPassword = new String(decodedBytes, StandardCharsets.UTF_8);
+        LOGGER.info("Decoded password: '{}'", usernameAndPassword);
         final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
         boolean authenticationStatus = false;
         try {

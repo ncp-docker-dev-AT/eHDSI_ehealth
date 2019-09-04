@@ -1,18 +1,3 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
- *
- *    This file is part of epSOS-WEB.
- *
- *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
- **/
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package se.sb.epsos.web;
 
 import org.apache.wicket.Request;
@@ -97,7 +82,7 @@ public class EpsosAuthenticatedWebSession extends AuthenticatedWebSession {
 
     @Override
     public boolean authenticate(String username, String password) {
-        boolean authenticated = false;
+        boolean authenticated;
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -127,7 +112,7 @@ public class EpsosAuthenticatedWebSession extends AuthenticatedWebSession {
         if (FeatureFlagsManager.check(Feature.ENABLE_SWEDISH_JAAS)) {
             if (auth != null) {
                 if (authenticatedUser == null) {
-                    JaasGrantedAuthority jaasGrantedAuthority = null;
+                    JaasGrantedAuthority jaasGrantedAuthority;
                     for (GrantedAuthority grantedAuthority : auth.getAuthorities()) {
                         jaasGrantedAuthority = (JaasGrantedAuthority) grantedAuthority;
                         LOGGER.info("grantedAuthority:{}", jaasGrantedAuthority.getPrincipal().getName());

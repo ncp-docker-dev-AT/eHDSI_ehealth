@@ -1,4 +1,4 @@
-package tr.com.srdc.epsos.securityman.validators;
+package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
@@ -8,7 +8,7 @@ import org.joda.time.DateTimeZone;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
 
 public class FieldValueValidators {
 

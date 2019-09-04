@@ -5,7 +5,7 @@ import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import org.opensaml.core.xml.io.MarshallingException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientId;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
 
 import java.util.List;
 

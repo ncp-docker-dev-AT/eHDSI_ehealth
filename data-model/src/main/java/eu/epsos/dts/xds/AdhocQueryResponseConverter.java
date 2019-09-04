@@ -2,13 +2,14 @@ package eu.epsos.dts.xds;
 
 import eu.epsos.util.xdr.XDRConstants;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.AssociationType1;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExtrinsicObjectType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
+import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ import java.util.TreeMap;
  * This class represents a Data Transfer Service, used by XCA and AdhocQueryResponse messages.
  */
 public final class AdhocQueryResponseConverter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdhocQueryResponseConverter.class);
 
     /**
      * Private constructor to avoid instantiation.
@@ -40,16 +43,14 @@ public final class AdhocQueryResponseConverter {
         if (response.getRegistryObjectList() != null) {
             Map<String, String> documentAssociationsMap = new TreeMap<>();
             List<XDSDocument> documents = new ArrayList<>();
-
             String str;
-            // TODO A.R. Why size()-1???
+
             for (int i = 0; i < response.getRegistryObjectList().getIdentifiable().size(); i++) {
                 JAXBElement<?> o = response.getRegistryObjectList().getIdentifiable().get(i);
                 String declaredTypeName = o.getDeclaredType().getSimpleName();
-                // TODO A.R. What should we do with Assotoation?
+                // TODO A.R. What should we do with Association?
                 if ("ExtrinsicObjectType".equals(declaredTypeName)) {
                     XDSDocument document = new XDSDocument();
-
                     JAXBElement<ExtrinsicObjectType> eo;
                     eo = (JAXBElement<ExtrinsicObjectType>) response.getRegistryObjectList().getIdentifiable().get(i);
 
@@ -69,13 +70,6 @@ public final class AdhocQueryResponseConverter {
                         }
                     }
 
-                    // Set description
-                    if (eo.getValue().getDescription() != null) {
-                        if (!eo.getValue().getDescription().getLocalizedString().isEmpty()) {
-                            document.setDescription(eo.getValue().getDescription().getLocalizedString().get(0).getValue());
-                        }
-                    }
-
                     for (int j = 0; j < eo.getValue().getSlot().size(); j++) {
                         str = eo.getValue().getSlot().get(j).getName();
 
@@ -88,10 +82,8 @@ public final class AdhocQueryResponseConverter {
                         if (str.equals("repositoryUniqueId")) {
                             document.setRepositoryUniqueId(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
                         }
-
                     }
-
-
+                    String documentClassCodeType = "";
                     for (int j = 0; j < eo.getValue().getClassification().size(); j++) {
                         str = eo.getValue().getClassification().get(j).getClassificationScheme();
                         //Set isPDF
@@ -112,7 +104,8 @@ public final class AdhocQueryResponseConverter {
 
                         // Set ClassCode
                         if (str.equals(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME)) {
-                            document.setClassCode(eo.getValue().getClassification().get(j).getSlot().get(0).getValueList().getValue().get(0), eo.getValue().getClassification().get(j).getNodeRepresentation());
+                            documentClassCodeType = eo.getValue().getClassification().get(j).getNodeRepresentation();
+                            document.setClassCode(eo.getValue().getClassification().get(j).getSlot().get(0).getValueList().getValue().get(0), documentClassCodeType);
                         }
 
                         // Set AuthorPerson
@@ -125,7 +118,36 @@ public final class AdhocQueryResponseConverter {
                         }
                     }
 
+                    // Set description
+                    if (eo.getValue().getDescription() != null && !eo.getValue().getDescription().getLocalizedString().isEmpty()) {
+
+                        if (StringUtils.equals(documentClassCodeType, Constants.EP_CLASSCODE)) {
+
+                            String status = "N/A";
+                            String code = "N/A";
+                            List<ClassificationType> classificationTypeList = eo.getValue().getClassification();
+                            for (ClassificationType classificationType : classificationTypeList) {
+
+                                if (StringUtils.equals(classificationType.getClassificationScheme(), "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4")) {
+
+                                    if (StringUtils.equals(classificationType.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:open")
+                                            && StringUtils.equals(classificationType.getSlot().get(0).getValueList().getValue().get(0), "1.3.6.1.4.1.19376.1.2.3")) {
+                                        status = "Dispensable";
+                                    } else if (StringUtils.equals(classificationType.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:closed")
+                                            && StringUtils.equals(classificationType.getSlot().get(0).getValueList().getValue().get(0), "1.3.6.1.4.1.19376.1.2.3")) {
+                                        status = "Not Dispensable";
+                                    } else {
+                                        code = classificationType.getNodeRepresentation();
+                                    }
+                                }
+                            }
+                            document.setDescription("(ATC: " + code + ") - " + eo.getValue().getDescription().getLocalizedString().get(0).getValue() + " / " + status);
+                        } else {
+                            document.setDescription(eo.getValue().getDescription().getLocalizedString().get(0).getValue());
+                        }
+                    }
                     documents.add(document);
+
                 } else if ("AssociationType1".equals(declaredTypeName)) {
                     JAXBElement<AssociationType1> eo;
                     eo = (JAXBElement<AssociationType1>) response.getRegistryObjectList().getIdentifiable().get(i);
@@ -136,9 +158,10 @@ public final class AdhocQueryResponseConverter {
             }
 
             List<XDSDocumentAssociation> documentAssociations = new ArrayList<>();
-            for (String key : documentAssociationsMap.keySet()) {
-                String sourceObjectId = key;
-                String targetObjectId = documentAssociationsMap.get(key);
+            for (Map.Entry<String, String> entry : documentAssociationsMap.entrySet()) {
+
+                String sourceObjectId = entry.getKey();
+                String targetObjectId = entry.getValue();
 
                 XDSDocument sourceObject = null;
                 XDSDocument targetObject = null;

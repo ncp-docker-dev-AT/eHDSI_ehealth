@@ -6,8 +6,8 @@ import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
-import eu.epsos.assertionvalidator.AssertionHelper;
-import eu.epsos.assertionvalidator.PolicyManagerInterface;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionConstants;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -26,8 +26,8 @@ import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientId;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
-import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.namespace.QName;
@@ -453,8 +453,8 @@ public class AssertionsConverter {
 
         // MANDATORY: HCP ID and HCP Role
         try {
-            hcpRole = AssertionHelper.getAttributeFromAssertion(epsosHcpAssertion, PolicyManagerInterface.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
-            hcpId = AssertionHelper.getAttributeFromAssertion(epsosHcpAssertion, PolicyManagerInterface.URN_OASIS_NAMES_TC_XACML_1_0_SUBJECT_SUBJECT_ID);
+            hcpRole = AssertionHelper.getAttributeFromAssertion(epsosHcpAssertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+            hcpId = AssertionHelper.getAttributeFromAssertion(epsosHcpAssertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_1_0_SUBJECT_SUBJECT_ID);
             assertionBuilder.hcpIdentifier(hcpId).hcpRole(hcpRole);
 
         } catch (MissingFieldException ex) {
@@ -493,7 +493,7 @@ public class AssertionsConverter {
 
         // MANDATORY: Purpose of Use
         try {
-            purposeOfUse = AssertionHelper.getAttributeFromAssertion(epsosHcpAssertion, PolicyManagerInterface.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_PURPOSEOFUSE);
+            purposeOfUse = AssertionHelper.getAttributeFromAssertion(epsosHcpAssertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_PURPOSEOFUSE);
             assertionBuilder.purposeOfUse(purposeOfUse);
 
         } catch (MissingFieldException ex) {

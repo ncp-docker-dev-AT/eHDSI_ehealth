@@ -1,46 +1,20 @@
-/*
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. <epsos@srdc.com.tr>
- *
- * This file is part of SRDC epSOS NCP.
- *
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- *
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- */
 package eu.epsos.dts.xcpd;
 
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
+import org.hl7.v3.*;
+import tr.com.srdc.epsos.data.model.PatientDemographics;
+import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;
+
+import javax.xml.bind.JAXBElement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
-import org.hl7.v3.AdxpCity;
-import org.hl7.v3.AdxpCountry;
-import org.hl7.v3.AdxpPostalCode;
-import org.hl7.v3.AdxpStreetAddressLine;
-import org.hl7.v3.AdxpStreetName;
-import org.hl7.v3.EnFamily;
-import org.hl7.v3.EnGiven;
-import org.hl7.v3.MCAIMT900001UV01DetectedIssueEvent;
-import org.hl7.v3.PRPAIN201306UV02;
-import tr.com.srdc.epsos.data.model.PatientDemographics;
-import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;
 
 /**
  * RespondingGateway_RequestReceiver class.
- *
+ * <p>
  * Gathers some mechanisms to extract and transform data.
  *
  * @author SRDC<code> - epsos@srdc.com.tr</code>
@@ -50,15 +24,17 @@ import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;
  */
 public class RespondingGateway_RequestReceiver {
 
+    private RespondingGateway_RequestReceiver() {
+    }
+
     /**
      * Extracts a Patient Demographics List from a PRPA_IN201306UV02 HL7
      * message.
      *
      * @param pRPA_IN201306UV02 the XCPD response message.
      * @return a list containing Patient Demographics objects.
-     *
      * @throws InvalidInput This represents the impossibility to transform the
-     * input data.
+     *                      input data.
      * @see PatientDemographics
      * @see PRPAIN201306UV02
      * @see List
@@ -66,13 +42,12 @@ public class RespondingGateway_RequestReceiver {
     public static List<PatientDemographics> respondingGateway_PRPA_IN201306UV02(final PRPAIN201306UV02 pRPA_IN201306UV02)
             throws NoPatientIdDiscoveredException {
 
-        final List<PatientDemographics> patients = new ArrayList<PatientDemographics>(1);
+        final List<PatientDemographics> patients = new ArrayList<>(1);
 
         // TODO A.R. How can be pRPA_IN201306UV02  be null when no matches?
-        if (pRPA_IN201306UV02 != null
-            && pRPA_IN201306UV02.getControlActProcess() != null
-            && pRPA_IN201306UV02.getControlActProcess().getSubject() != null
-            && !pRPA_IN201306UV02.getControlActProcess().getSubject().isEmpty()) {
+        if (pRPA_IN201306UV02 != null && pRPA_IN201306UV02.getControlActProcess() != null
+                && pRPA_IN201306UV02.getControlActProcess().getSubject() != null
+                && !pRPA_IN201306UV02.getControlActProcess().getSubject().isEmpty()) {
 
             for (int s = 0; s < pRPA_IN201306UV02.getControlActProcess().getSubject().size(); s++) {
                 try {
@@ -170,13 +145,13 @@ public class RespondingGateway_RequestReceiver {
         } else {
 
             String errorMsg = null;
-
             MCAIMT900001UV01DetectedIssueEvent issue;
 
+            // Tries to retrieve DetectedIssueEvent to fill error message
             if (pRPA_IN201306UV02.getControlActProcess() != null
-                && pRPA_IN201306UV02.getControlActProcess().getReasonOf() != null
-                && !pRPA_IN201306UV02.getControlActProcess().getReasonOf().isEmpty()
-                && pRPA_IN201306UV02.getControlActProcess().getReasonOf().get(0).getDetectedIssueEvent() != null) { // Tries to retrieve DetectedIssueEvent to fill error message
+                    && pRPA_IN201306UV02.getControlActProcess().getReasonOf() != null
+                    && !pRPA_IN201306UV02.getControlActProcess().getReasonOf().isEmpty()
+                    && pRPA_IN201306UV02.getControlActProcess().getReasonOf().get(0).getDetectedIssueEvent() != null) {
 
                 issue = pRPA_IN201306UV02.getControlActProcess().getReasonOf().get(0).getDetectedIssueEvent();
 
@@ -192,10 +167,11 @@ public class RespondingGateway_RequestReceiver {
                     errorMsg = "UnexpectedError";
                 }
             } else {
+                // If DetectedIssueEvent is not present, it tries to get Acknowledgement details.
                 if (!pRPA_IN201306UV02.getAcknowledgement().isEmpty()
-                    && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail() != null
-                    && !pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()
-                    && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent() != null) {// If DetectedIssueEvent is not present, it tries to get Acknowledgement details.
+                        && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail() != null
+                        && !pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()
+                        && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent() != null) {
                     errorMsg = pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent();
                 } else {
                     errorMsg = "Error: DetectedIssueEvent element or sub-element not present.";

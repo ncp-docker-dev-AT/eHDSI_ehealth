@@ -15,9 +15,9 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPModelBuilder;
 import org.mockito.ArgumentCaptor;
 import org.w3c.dom.Element;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
-import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
-import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import tr.com.srdc.epsos.util.FileUtil;
 
 import javax.xml.bind.JAXBElement;
