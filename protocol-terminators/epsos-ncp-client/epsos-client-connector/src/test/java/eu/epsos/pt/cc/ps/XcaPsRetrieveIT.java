@@ -19,7 +19,7 @@
  */
 package eu.epsos.pt.cc.ps;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
@@ -72,7 +72,7 @@ public class XcaPsRetrieveIT extends ClientGenericIT {
         permissions.add("5");
         permissions.add("10");
         permissions.add("16");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#9.xml", XSPARole.PHYSICIAN);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#9.xml", XSPARole.DEPRECATED_PHYSICIAN);
 
         SOAPElement rspSoapMsg = testGood("PT_CLIENT_XCA_PS_#9", REQ_FOLDER + "PT_CLIENT_XCA_PS_#9.xml");
         validateCDA(rspSoapMsg, CdaExtraction.MessageType.PORTAL, CdaModel.PS_PIVOT);

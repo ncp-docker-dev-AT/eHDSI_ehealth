@@ -19,7 +19,7 @@
  */
 package _2007.xds_b.iti.ihe.hcer;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.pt.server.it.ServerGenericIT;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.junit.BeforeClass;
@@ -55,7 +55,7 @@ public class XDR_Submit_HcerServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitHcer() {
-        this.assertions = this.getAssertions("xdr/hcer/testSubmitHcer.xml", XSPARole.PHYSICIAN);
+        this.assertions = this.getAssertions("xdr/hcer/testSubmitHcer.xml", XSPARole.DEPRECATED_PHYSICIAN);
         testGood("testSubmitHcer", "xdr/hcer/testSubmitHcer.xml");
     }
 }

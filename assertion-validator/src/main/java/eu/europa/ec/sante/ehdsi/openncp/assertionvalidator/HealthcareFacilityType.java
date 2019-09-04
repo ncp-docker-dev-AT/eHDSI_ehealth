@@ -1,14 +1,7 @@
-package eu.epsos.assertionvalidator;
+package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator;
 
 /**
- * Created:
- * Date: 2012-11-26
- * Time: 11:20
- * By:fredrik.dahlman@cag.se
- */
-
-/**
- * From WP3.4 Deliberable D.3.4.2
+ * From WP3.4 Deliverable D.3.4.2
  * Type of HCPO
  * FriendlyName:  epSOS Healthcare Facility Type
  * Name:  urn:epsos:names:wp3.4:subject:healthcare-facility-type

@@ -1,8 +1,8 @@
-package tr.com.srdc.epsos.securityman;
+package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
-import eu.epsos.assertionvalidator.PolicyManagerInterface;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PolicyAssertionManager;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.common.xml.SAMLSchemaBuilder;
@@ -12,13 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
-import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
-import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
-import tr.com.srdc.epsos.securityman.exceptions.XSDValidationException;
-import tr.com.srdc.epsos.securityman.validators.FieldValueValidators;
-import tr.com.srdc.epsos.securityman.validators.RequiredFieldValidators;
-import tr.com.srdc.epsos.util.saml.SAML;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidationException;
 
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -28,9 +25,9 @@ import java.util.ServiceLoader;
 
 public class SAML2Validator {
 
-    private static final ServiceLoader<PolicyManagerInterface> serviceLoader = ServiceLoader.load(PolicyManagerInterface.class);
+    private static final ServiceLoader<PolicyAssertionManager> serviceLoader = ServiceLoader.load(PolicyAssertionManager.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Validator.class);
-    private static PolicyManagerInterface policyManager;
+    private static PolicyAssertionManager policyManager;
 
     static {
         try {

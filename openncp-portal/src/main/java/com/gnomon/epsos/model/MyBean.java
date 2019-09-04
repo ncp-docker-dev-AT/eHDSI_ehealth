@@ -188,59 +188,46 @@ public class MyBean implements Serializable {
     private void searchPatients(Assertion assertion, List<Identifier> identifiers, List<Demographics> demographics, String country) {
 
         logger.info("Search Patients selected country is: '{}'", country);
-        String runningMode = MyServletContextListener.getRunningMode();
-        Assertion ass;
 
-        if (StringUtils.equals(runningMode, "demo")) {
-            patients = EpsosHelperService.getMockPatients();
+        try {
             trcAssertion = null;
             trcassertionnotexists = true;
             trcassertionexists = false;
+            patients = new ArrayList<>();
+
+            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
+            logger.info("Connector URL: '{}'", serviceUrl);
+
+            PatientDemographics patientDemographics = EpsosHelperService.createPatientDemographicsForQuery(identifiers, demographics);
+            ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
+            logger.info("Test Assertions: '{}'", EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS));
+
+            if (logger.isDebugEnabled()) {
+
+                logger.debug("Searching for patients in '{}'", country);
+                logger.debug("Assertion id: '{}'", assertion.getID());
+            }
+
+            List<PatientDemographics> queryPatient = proxy.queryPatient(assertion, country, patientDemographics);
+
+            for (PatientDemographics aux : queryPatient) {
+
+                Patient patient = EpsosHelperService.populatePatient(aux);
+                patients.add(patient);
+                queryPatientsException = "";
+            }
+            if (queryPatient.isEmpty()) {
+                queryPatientsException = LiferayUtils.getPortalTranslation("patient.list.no.patient");
+            }
+            logger.info("Found '{}' patients", patients.size());
             showPatientList = true;
 
-        } else {
+        } catch (Exception ex) {
 
-            try {
-                trcAssertion = null;
-                trcassertionnotexists = true;
-                trcassertionexists = false;
-                patients = new ArrayList<>();
-
-                String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-                logger.info("Connector URL: '{}'", serviceUrl);
-
-                PatientDemographics pd = EpsosHelperService.createPatientDemographicsForQuery(identifiers, demographics);
-                ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
-                logger.info("Test Assertions: '{}'", EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_TEST_ASSERTIONS));
-                ass = assertion;
-
-                if (logger.isDebugEnabled()) {
-
-                    logger.debug("Searching for patients in '{}'", country);
-                    logger.debug("Assertion id: '{}'", ass.getID());
-                }
-
-                List<PatientDemographics> queryPatient = proxy.queryPatient(ass, country, pd);
-
-                for (PatientDemographics aux : queryPatient) {
-
-                    Patient patient = EpsosHelperService.populatePatient(aux);
-                    patients.add(patient);
-                    queryPatientsException = "";
-                }
-                if (queryPatient.isEmpty()) {
-                    queryPatientsException = LiferayUtils.getPortalTranslation("patient.list.no.patient");
-                }
-                logger.info("Found '{}' patients", patients.size());
-                showPatientList = true;
-
-            } catch (Exception ex) {
-
-                logger.error(ExceptionUtils.getStackTrace(ex));
-                patients = new ArrayList<>();
-                showPatientList = true;
-                queryPatientsException = LiferayUtils.getPortalTranslation(ex.getMessage());
-            }
+            logger.error(ExceptionUtils.getStackTrace(ex));
+            patients = new ArrayList<>();
+            showPatientList = true;
+            queryPatientsException = LiferayUtils.getPortalTranslation(ex.getMessage());
         }
     }
 
@@ -410,9 +397,7 @@ public class MyBean implements Serializable {
             return false;
         }
         if (trcassertionexists) {
-            if (consentExists) {
-                return false;
-            }
+            return !consentExists;
         }
         return true;
     }
@@ -1039,17 +1024,13 @@ public class MyBean implements Serializable {
             String checkPermissions = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CHECK_PERMISSIONS);
             String checkHCER = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_HCER_ENABLED);
             boolean hcer = false;
-            if (Validator.isNotNull(checkHCER)) {
-                if (checkHCER.equalsIgnoreCase("true")) {
-                    hcer = true;
-                }
+            if (Validator.isNotNull(checkHCER) && checkHCER.equalsIgnoreCase("true")) {
+                hcer = true;
             }
             String checkMRO = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_MRO_ENABLED);
             boolean mro = false;
-            if (Validator.isNotNull(checkMRO)) {
-                if (checkMRO.equalsIgnoreCase("true")) {
-                    mro = true;
-                }
+            if (Validator.isNotNull(checkMRO) && checkMRO.equalsIgnoreCase("true")) {
+                mro = true;
             }
 
             String checkCCD = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CCD_ENABLED);
@@ -1104,10 +1085,8 @@ public class MyBean implements Serializable {
             canConvert = false;
             try {
                 String canConvertToCCD = PropsUtil.get("can.convert.to.ccd");
-                if (Validator.isNotNull(canConvertToCCD)) {
-                    if (canConvertToCCD.equalsIgnoreCase("true")) {
-                        canConvert = true;
-                    }
+                if (Validator.isNotNull(canConvertToCCD) && canConvertToCCD.equalsIgnoreCase("true")) {
+                    canConvert = true;
                 }
             } catch (Exception e) {
                 logger.error("Error getting property for can convert to ccd");
@@ -1159,7 +1138,6 @@ public class MyBean implements Serializable {
         }
         if (signedTRC != null && !signedTRC.isEmpty()) {
             // Initialize the library
-            //DefaultBootstrap.bootstrap();
             InitializationService.initialize();
 
             // Get parser pool manager

@@ -6,7 +6,7 @@ import fi.kela.se.epsos.data.model.ConsentDocumentMetaData;
 import fi.kela.se.epsos.data.model.DocumentAssociation;
 import fi.kela.se.epsos.data.model.EDDocumentMetaData;
 import fi.kela.se.epsos.data.model.EPSOSDocument;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
 
 /**
  * Interface for XDR document submit service implementation

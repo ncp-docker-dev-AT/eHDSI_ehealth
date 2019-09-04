@@ -1,7 +1,7 @@
-package tr.com.srdc.epsos.securityman.validators;
+package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 
 import org.opensaml.saml.saml2.core.Assertion;
-import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 
 public class RequiredFieldValidators {
 
