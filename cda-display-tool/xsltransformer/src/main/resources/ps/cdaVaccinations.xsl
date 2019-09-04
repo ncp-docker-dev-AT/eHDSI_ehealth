@@ -166,10 +166,10 @@
                         <xsl:if test="not($vaccination/@nullFlavor)">
                             <xsl:choose>
                                 <xsl:when test="(not($negationInd) or $negationInd='false')">
-                                    <i class="fa fa-check" style="color:green" aria-hidden="true"/>
+                                    <font color="green">&#10004;</font>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <i class="fa fa-ban" style="color:red" aria-hidden="true"/>
+                                    <font color="red">&#10006;</font>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:if>
