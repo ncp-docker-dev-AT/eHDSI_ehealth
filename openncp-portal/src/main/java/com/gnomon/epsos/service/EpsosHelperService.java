@@ -23,12 +23,13 @@ import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.util.IheConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPAFunctionalRole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
+import eu.europa.ec.sante.ehdsi.openncp.audit.Configuration;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
@@ -1053,11 +1054,11 @@ public class EpsosHelperService {
             assertion = createAssertion(username, structuralRole, functionalRole, orgName, organizationId, orgType, purposeOfUse, poc, permissions);
 
             // send Audit message
-            // GUI-27
             if (assertion != null) {
-                LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
+
+                LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.AUDIT_REPOSITORY_URL.getValue()));
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    LOGGER_CLINICAL.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
+                    LOGGER_CLINICAL.debug("[Audit Portal] Sending Audit Message 'epsos-91' for User: '{}'", user.getFullName());
                 }
                 String auditPointOfCare;
                 if (StringUtils.isNotBlank(orgName)) {
@@ -1067,22 +1068,20 @@ public class EpsosHelperService {
                 }
                 EpsosHelperService.handleHCPIdentificationAudit(assertion, user.getFullName(), user.getEmailAddress(), auditPointOfCare, orgType,
                         structuralRole, assertion.getID());
-            }
-            // GUI-25
-            if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
-                signSAMLAssertion(assertion, Constants.NCP_SIG_PRIVATEKEY_ALIAS);
-                AssertionMarshaller marshaller = new AssertionMarshaller();
-                Element element = marshaller.marshall(assertion);
+                if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
-                Document document = element.getOwnerDocument();
+                    signSAMLAssertion(assertion, Constants.NCP_SIG_PRIVATEKEY_ALIAS);
 
-                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    String hcpa = Utils.getDocumentAsXml(document, false);
-                    LOGGER_CLINICAL.info("#### HCPA Start\n '{}' \n#### HCPA End", hcpa);
+                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+
+                        AssertionMarshaller marshaller = new AssertionMarshaller();
+                        Element element = marshaller.marshall(assertion);
+                        Document document = element.getOwnerDocument();
+                        String hcpa = Utils.getDocumentAsXml(document, false);
+                        LOGGER_CLINICAL.info("#### HCPA Start\n '{}' \n#### HCPA End", hcpa);
+                    }
                 }
-            }
-            if (assertion != null) {
                 LOGGER.info("Assertion: '{}'", assertion.getID());
             }
         } catch (Exception e) {
@@ -1180,28 +1179,26 @@ public class EpsosHelperService {
             assertion = EpsosHelperService.createAssertion(username, rolename, "FUNCTIONAL_ROLE", orgName, orgId, orgType, "TREATMENT", poc, permissions);
 
             // send Audit message
-            // GUI-27
             if (assertion != null) {
+
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
                 LOGGER.debug("Sending epsos-91 audit message for '{}'", fullname);
                 EpsosHelperService.handleHCPIdentificationAudit(assertion, fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
-            }
-            // GUI-25
-            if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
-                String signatureKeyAlias = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-                LOGGER.info("Signature KEY alias: '{}'", signatureKeyAlias);
+                if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
-                signSAMLAssertion(assertion, signatureKeyAlias);
-                AssertionMarshaller marshaller = new AssertionMarshaller();
-                Element element = marshaller.marshall(assertion);
-                Document document = element.getOwnerDocument();
-                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    String hcpa = Utils.getDocumentAsXml(document, false);
-                    LOGGER_CLINICAL.debug("#### HCPA Start\n{}\n#### HCPA End", hcpa);
+                    String signatureKeyAlias = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
+                    signSAMLAssertion(assertion, signatureKeyAlias);
+
+                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+
+                        AssertionMarshaller marshaller = new AssertionMarshaller();
+                        Element element = marshaller.marshall(assertion);
+                        Document document = element.getOwnerDocument();
+                        String hcpa = Utils.getDocumentAsXml(document, false);
+                        LOGGER_CLINICAL.debug("#### HCPA Start\n{}\n#### HCPA End", hcpa);
+                    }
                 }
-            }
-            if (assertion != null) {
                 LOGGER.info("Assertion: '{}'", assertion.getID());
             }
         } catch (Exception e) {
