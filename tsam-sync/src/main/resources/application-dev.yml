@@ -1,0 +1,10 @@
+logging:
+  level:
+    com.zaxxer.hikari: info
+    org.apache.http: debug
+    org.hibernate: info
+spring:
+  jpa:
+    properties:
+      hibernate.show_sql: true
+      hibernate.format_sql: false
