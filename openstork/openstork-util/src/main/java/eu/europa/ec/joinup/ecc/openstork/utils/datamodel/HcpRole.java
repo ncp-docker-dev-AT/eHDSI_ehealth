@@ -13,7 +13,7 @@ public enum HcpRole {
     PHARMACIST("pharmacist", XSPARole.DEPRECATED_PHARMACIST),
     NURSE("nurse", XSPARole.DEPRECATED_NURSE),
     PATIENT("patient", XSPARole.DEPRECATED_PATIENT),
-    ADMINISTRATOR("administrator", XSPARole.ADMISSION_CLERK);
+    ADMINISTRATOR("administrator", XSPARole.DEPRECATED_ADMISSION_CLERK);
 
     private final String designation;
     private final XSPARole xspaRole;

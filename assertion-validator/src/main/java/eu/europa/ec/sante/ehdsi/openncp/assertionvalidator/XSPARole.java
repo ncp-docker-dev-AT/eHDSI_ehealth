@@ -11,10 +11,10 @@ public enum XSPARole {
 
     LICENSED_HCP("Licensed Health Care Providers"),
     NOT_LICENSED_HCP("Non-Licensed Health Care Providers"),
-    ADMISSION_CLERK("Admission Clerk"),
     ANCILLARY_SERVICES("Ancillary Services"),
     CLINICAL_SERVICES("Clinical Services"),
     // Deprecated roles
+    DEPRECATED_ADMISSION_CLERK("Admission Clerk"),
     DEPRECATED_NURSE("nurse"),
     DEPRECATED_PHARMACIST("pharmacist"),
     DEPRECATED_PHYSICIAN("physician"),
