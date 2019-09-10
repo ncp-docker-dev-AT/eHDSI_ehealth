@@ -12,6 +12,7 @@ import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.repository.ValueSetRepository;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.repository.ValueSetVersionRepository;
 import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.ValueSetCatalogModel;
 import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.ValueSetVersionModel;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -29,23 +30,15 @@ import java.util.stream.Collectors;
 public class TsamSyncManager {
 
     private final Logger logger = LoggerFactory.getLogger(TsamSyncManager.class);
-
+    private final DatabaseTool databaseTool;
+    private final CtsProperties ctsProperties;
+    private final CtsClient ctsClient;
+    private final CodeSystemRepository codeSystemRepository;
+    private final ConceptRepository conceptRepository;
+    private final ValueSetRepository valueSetRepository;
+    private final ValueSetVersionRepository valueSetVersionRepository;
     @Value("${pageable.page-size:250}")
     private Integer pageSize;
-
-    private final DatabaseTool databaseTool;
-
-    private final CtsProperties ctsProperties;
-
-    private final CtsClient ctsClient;
-
-    private final CodeSystemRepository codeSystemRepository;
-
-    private final ConceptRepository conceptRepository;
-
-    private final ValueSetRepository valueSetRepository;
-
-    private final ValueSetVersionRepository valueSetVersionRepository;
 
     public TsamSyncManager(DatabaseTool databaseTool, CtsProperties ctsProperties, CtsClient ctsClient, CodeSystemRepository codeSystemRepository,
                            ConceptRepository conceptRepository, ValueSetRepository valueSetRepository, ValueSetVersionRepository valueSetVersionRepository) {
@@ -77,7 +70,9 @@ public class TsamSyncManager {
             logger.info("Catalogue '{}' retrieved from the server", catalogue.getName());
 
             logger.info("Starting database backup process");
-            databaseTool.backup("backup_" + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE) + ".sql");
+            String date = ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT);
+            date = StringUtils.replace(date, ":", "-");
+            databaseTool.backup("backup_" + date + ".sql");
             valueSetRepository.deleteAll();
             codeSystemRepository.deleteAll();
             logger.info("Database backup operation completed");

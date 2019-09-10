@@ -15,10 +15,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
@@ -236,10 +234,8 @@ public class ReportBuilder {
      */
     public static String formatDate() {
 
-        TimeZone tz = TimeZone.getTimeZone("UTC");
         //ISO 8601 format: 2017-11-25T10:59:53Z
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        df.setTimeZone(tz);
-        return df.format(new Date());
+        String date = ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT);
+        return StringUtils.replace(date, ":", "-");
     }
 }
