@@ -1,0 +1,3 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://${tsam-sync.datasource.host}:${tsam-sync.datasource.port}/${tsam-sync.datasource.database}
