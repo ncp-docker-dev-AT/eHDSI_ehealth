@@ -147,7 +147,9 @@
                     <xsl:when test="($surgicalProcedureCode/@code='no-known-procedure' or $surgicalProcedureCode/@code='no-procedure-info')">
                         <tr>
                             <td colspan="2">
-                                <xsl:value-of select="$surgicalProcedureCode/@displayName"/>
+                                <xsl:call-template name="show-absentOrUnknownProcedures">
+                                    <xsl:with-param name="code" select="$surgicalProcedureCode/@code"/>
+                                </xsl:call-template>
                             </td>
                         </tr>
                     </xsl:when>

@@ -143,7 +143,9 @@
                     <xsl:when test="($medDeviceImplantDescription/@code='no-known-devices' or $medDeviceImplantDescription/@code='no-device-info')">
                         <tr>
                             <td colspan="2">
-                                <xsl:value-of select="$medDeviceImplantDescription/@displayName"/>
+                                <xsl:call-template name="show-absentOrUnknownDevices">
+                                    <xsl:with-param name="code" select="$medDeviceImplantDescription/@code"/>
+                                </xsl:call-template>
                             </td>
                         </tr>
                     </xsl:when>

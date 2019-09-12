@@ -95,7 +95,9 @@
                                                                 <tr>
                                                                     <td colspan="6">
                                                                         <span class="tdtext">
-                                                                            <xsl:value-of select="$medDisplayName"/>
+                                                                            <xsl:call-template name="show-absentOrUnknownMedication">
+                                                                                <xsl:with-param name="code" select="$medCode"/>
+                                                                            </xsl:call-template>
                                                                         </span>
                                                                         <br/>
                                                                     </td>

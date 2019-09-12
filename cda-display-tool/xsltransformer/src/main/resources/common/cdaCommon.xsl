@@ -693,23 +693,53 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSCodeNoMedication -->
-    <xsl:template name="show-codeNoMedication">
+    <!-- eHDSI-AbsentOrUnknownAllergies -->
+    <xsl:template name="show-absentOrUnknownAllergies">
         <xsl:param name="code"/>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
-            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.22.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.47.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSUnknownInformation -->
-    <xsl:template name="show-unknownInformation">
+    <!-- eHDSI-AbsentOrUnknownDevices -->
+    <xsl:template name="show-absentOrUnknownDevices">
         <xsl:param name="code"/>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
-            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.17.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.48.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSI-AbsentOrUnknownMedication -->
+    <xsl:template name="show-absentOrUnknownMedication">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.49.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSI-AbsentOrUnknownProblems -->
+    <xsl:template name="show-absentOrUnknownProblems">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.50.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSI-AbsentOrUnknownProcedures -->
+    <xsl:template name="show-absentOrUnknownProcedures">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.51.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -740,7 +770,7 @@
         <xsl:param name="codeSystem"/>
         <xsl:variable name="dirFile" select="concat($epsosLangDir,'/',$xmlFile)"/>
         <xsl:variable name="foundKey"
-                      select="document(concat('file:///', translate($dirFile,'\','/')))/ValueSet/concept[@code=$code and @codeSystem=$codeSystem]"/>
+                      select="document(concat('file://', $dirFile))/ValueSet/concept[@code=$code and @codeSystem=$codeSystem]"/>
         <xsl:variable name="foundKeyLang" select="$foundKey/designation[@lang=$userLang]"/>
         <xsl:variable name="defFoundKeyLang" select="$foundKey/designation[@lang=$defaultUserLang]"/>
         <xsl:choose>
@@ -759,7 +789,7 @@
         <xsl:variable name="dirFile"
                       select="concat($epsosLangDir,'/1.3.6.1.4.1.12559.11.10.1.3.1.42.46.xml')"/>
         <xsl:variable name="foundKey"
-                      select="document(concat('file:///', translate($dirFile,'\','/')))/ValueSet/concept[@code=$code]"/>
+                      select="document(concat('file://', $dirFile))/ValueSet/concept[@code=$code]"/>
         <xsl:variable name="foundKeyLang"
                       select="$foundKey/designation[@lang=$userLang]"/>
         <xsl:variable name="defFoundKeyLang"

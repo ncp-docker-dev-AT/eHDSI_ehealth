@@ -105,7 +105,6 @@
                                                                         <xsl:with-param name="code" select="'2'"/>
                                                                     </xsl:call-template>
                                                                 </th>
-
                                                                 <th>
                                                                     <!-- OnSet Date -->
                                                                     <xsl:call-template name="show-displayLabels">
@@ -175,13 +174,13 @@
 
                 <xsl:choose>
                     <xsl:when test="($obsValueCode='no-known-problems' or $obsValueCode='no-problem-info')">
-                        <!-- display the relevant code from the v40_unknowInformarion -->
                         <tr>
                             <td colspan="3">
-                                <xsl:value-of select="$obsValueDisplayName"/>
+                                <xsl:call-template name="show-absentOrUnknownProblems">
+                                    <xsl:with-param name="code" select="$obsValueCode"/>
+                                </xsl:call-template>
                             </td>
                         </tr>
-                        <!--xsl:value-of select="document('v40_unknownInfo.xml')/UnknownInformation/UnknownEntry[@code=$probObsCode]/displayName"/-->
                     </xsl:when>
                     <xsl:otherwise>
                         <tr>

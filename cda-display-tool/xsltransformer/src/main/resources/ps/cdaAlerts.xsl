@@ -175,13 +175,9 @@
                     <xsl:when test="($obsValue/@code='no-known-allergies' or $obsValue/@code='no-allergy-info')">
                         <tr>
                             <td colspan="4">
-                                <span class="tdtext">
-                                    <div class="tooltip-right">
-                                        <xsl:value-of select="$obsValue/@displayName"/>
-                                        <span class="tooltiptext">The subject has no known allergy conditions</span>
-                                    </div>
-                                </span>
-                                <br/>
+                                <xsl:call-template name="show-absentOrUnknownAllergies">
+                                    <xsl:with-param name="code" select="$obsValue/@code"/>
+                                </xsl:call-template>
                             </td>
                         </tr>
                     </xsl:when>
