@@ -89,7 +89,7 @@
                                             <xsl:when test="not($surgicalProcedure/@nullFlavor)">
                                                 <table class="translation_table">
                                                     <tbody>
-                                                        <xsl:if test="not ($surgicalProcedureCode/@code='no-known-procedure' or $surgicalProcedureCode/@code='no-procedure-info')">
+                                                        <xsl:if test="not ($surgicalProcedureCode/@code='no-known-procedures' or $surgicalProcedureCode/@code='no-procedure-info')">
                                                             <tr>
                                                                 <th>
                                                                     <!--  Procedure -->
@@ -144,7 +144,7 @@
         <xsl:choose>
             <xsl:when test="not($surgicalProcedureAct/@nullFlavor)">
                 <xsl:choose>
-                    <xsl:when test="($surgicalProcedureCode/@code='no-known-procedure' or $surgicalProcedureCode/@code='no-procedure-info')">
+                    <xsl:when test="($surgicalProcedureCode/@code='no-known-procedures' or $surgicalProcedureCode/@code='no-procedure-info')">
                         <tr>
                             <td colspan="2">
                                 <xsl:call-template name="show-absentOrUnknownProcedures">
