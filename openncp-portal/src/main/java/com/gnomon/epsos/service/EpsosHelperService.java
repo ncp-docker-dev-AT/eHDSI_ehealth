@@ -1014,8 +1014,9 @@ public class EpsosHelperService {
             }
 
             if (isPatient) {
+                // Patient Role is not supported in the eHDSI context. Only clinician can access medical data.
                 structuralRole = "patient";
-                functionalRole = XSPAFunctionalRole.OTHER.toString();
+                functionalRole = XSPAFunctionalRole.OTHER_CLERICAL.toString();
                 String patient_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
                 String[] p1 = patient_perms.split(",");
                 for (String aP1 : p1) {
@@ -1025,7 +1026,7 @@ public class EpsosHelperService {
 
             if (isAdministrator) {
                 structuralRole = "administrator";
-                functionalRole = XSPAFunctionalRole.OTHER.toString();
+                functionalRole = XSPAFunctionalRole.OTHER_CLERICAL.toString();
                 String admin_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
                 String[] p1 = admin_perms.split(",");
                 for (String aP1 : p1) {

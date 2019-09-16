@@ -49,8 +49,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     }
 
     /**
-     * Validates the OnBehalf attribute when an user is acting on behalf a clinician and its role is one of the
-     * following list: "Ancillary Services", "Clinical Services".
+     * Validates the OnBehalf attribute when an user is acting on behalf a clinician and its role is "Clerical and Administrative Personnel".
      *
      * @param assertion     - SAML user assertion.
      * @param documentClass - Type of clinical document requested by the user (if available).
@@ -61,15 +60,11 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     public void OnBehalfOfValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
 
         String onBehalfOfRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_EPSOS_NAMES_WP3_4_SUBJECT_ON_BEHALF_OF);
-        if (StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.PHYSICIAN.toString())
-                || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.PHARMACIST.toString())
-                || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.REGISTERED_NURSE.toString())
-                || StringUtils.equalsIgnoreCase(onBehalfOfRole, OnBehalfOf.MIDWIVES.toString())) {
+        if (XSPAFunctionalRole.containsLabel(onBehalfOfRole)) {
 
             logger.debug("HCP Identity Assertion OnBehalfOf: '{}'", onBehalfOfRole);
         } else {
-            throw new InvalidFieldException("OnBehalfOf 'urn:epsos:names:wp3.4:subject:on-behalf-of' attribute in assertion should be one of followings " +
-                    "{'Midwifes', 'Pharmacist', 'Physician', 'Registered Nurse'}.");
+            throw new InvalidFieldException("OnBehalfOf 'urn:epsos:names:wp3.4:subject:on-behalf-of' attribute in assertion should be one of the element from XSPA Functional Role");
         }
     }
 
@@ -89,8 +84,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         String structuralRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
         logger.debug("HCP Identity Assertion XSPA Structural Role: '{}'", structuralRole);
 
-        if (structuralRole.equals(XSPARole.ANCILLARY_SERVICES.toString())
-                || structuralRole.equals(XSPARole.CLINICAL_SERVICES.toString())) {
+        if (structuralRole.equals(XSPARole.CLERICAL_ADMINISTRATIVE.toString())) {
 
             OnBehalfOfValidator(assertion, documentClass);
             XSPAFunctionalRoleValidator(assertion, documentClass);
@@ -330,6 +324,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             throw new InsufficientRightsException();
         }
         if (!StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHARMACIST.toString())
+                && !StringUtils.equalsIgnoreCase(role, XSPARole.LICENSED_HCP.toString())
                 && !StringUtils.equalsIgnoreCase(functionalRole, XSPAFunctionalRole.PHARMACIST.toString())) {
 
             logger.error("InsufficientRightsException - Unsupported (named: '{}'/'{}') role tried to access ePrescriptions documents.", role, functionalRole);
@@ -421,7 +416,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         if (!StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHARMACIST.toString())
                 && !StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHYSICIAN.toString())
                 && !StringUtils.equalsIgnoreCase(role, XSPARole.LICENSED_HCP.toString())
-                && !StringUtils.equalsIgnoreCase(functionalRole, XSPAFunctionalRole.MEDICAL_DOCTORS.toString())) {
+                && !StringUtils.equalsIgnoreCase(functionalRole, XSPAFunctionalRole.PHARMACIST.toString())) {
 
             logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit eDispensations or HCER documents.", role);
             throw new InsufficientRightsException();
@@ -469,7 +464,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
         //  Check required permissions
         for (XMLObject permission : permissions) {
-            if (permission.getDOM() != null && permission.getDOM().getTextContent().equals(AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_032)) {
+            if (permission.getDOM() != null && StringUtils.equals(permission.getDOM().getTextContent(), AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_HL7_PERMISSION_PPD_032)) {
                 recordMedicationAdministrationRecord = true;
                 logger.debug("Found permission for PPD-032 (New Consents and Authorizations)");
             }
