@@ -80,27 +80,28 @@
                                                     <tbody>
                                                         <tr>
                                                             <th>
-                                                                <!-- Vaccination -->
+                                                                <!-- Vaccination header -->
                                                                 <xsl:call-template name="show-displayLabels">
                                                                     <xsl:with-param name="code" select="'79'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <!-- Brand name -->
+                                                                <!-- Brand name header -->
                                                                 <xsl:call-template name="show-displayLabels">
                                                                     <xsl:with-param name="code" select="'9'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <!-- Vaccination Date -->
+                                                                <!-- Vaccination Date header -->
                                                                 <xsl:call-template name="show-displayLabels">
                                                                     <xsl:with-param name="code" select="'80'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <!-- Administered -->
-                                                                <!-- TODO Make this header part of the epsosDisplayLabel value set -->
-                                                                Administered
+                                                                <!-- Administered header -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'80'"/>
+                                                                </xsl:call-template>
                                                             </th>
                                                         </tr>
                                                         <xsl:for-each select="n1:entry">

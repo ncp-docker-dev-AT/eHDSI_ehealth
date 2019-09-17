@@ -114,15 +114,16 @@
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
-                                                                    <!-- OnSet Date header-->
+                                                                    <!-- OnSet Date header -->
                                                                     <xsl:call-template name="show-displayLabels">
                                                                         <xsl:with-param name="code" select="'45'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
-                                                                    <!-- Severity -->
-                                                                    <!-- TODO Add Severity to the epSOSDisplayLabel value set -->
-                                                                    Severity
+                                                                    <!-- Severity header -->
+                                                                    <xsl:call-template name="show-displayLabels">
+                                                                        <xsl:with-param name="code" select="'123'"/>
+                                                                    </xsl:call-template>
                                                                 </th>
                                                             </tr>
                                                         </xsl:if>
@@ -181,8 +182,6 @@
         <!-- in case of no info scenario the following displayName will be displayed -->
         <xsl:variable name="obsDisplay"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:value/@displayName"/>
-
-        <xsl:variable name="act" select="n1:act"/>
         <!-- End definition of variables-->
 
         <xsl:choose>
