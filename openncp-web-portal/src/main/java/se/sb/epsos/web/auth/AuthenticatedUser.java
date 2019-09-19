@@ -234,7 +234,7 @@ public class AuthenticatedUser implements Serializable, UserDetails {
         this.locales = locales;
     }
 
-    public void setPrmiaryRole(String newRole) {
+    public void setPrimaryRole(String newRole) {
         if (newRole != null && newRole.length() > 0 && this.roles.indexOf(newRole) != -1) {
             int currentIndex = this.roles.indexOf(newRole);
             String currentPrimaryRole = this.roles.get(0);
