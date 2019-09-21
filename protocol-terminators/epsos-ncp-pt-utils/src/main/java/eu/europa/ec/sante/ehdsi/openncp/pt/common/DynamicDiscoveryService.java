@@ -88,13 +88,13 @@ public class DynamicDiscoveryService {
             String serviceConsumerUserId = HTTPUtil.getSubjectDN(false);
             String serviceProviderUserId = HTTPUtil.getTlsCertificateCommonName(smpServer);
 
-            EventLog eventLog1 = EventLog.createEventLogPatientPrivacy(TransactionName.ehealthSMPQuery, EventActionCode.EXECUTE,
+            EventLog eventLog1 = EventLog.createEventLogPatientPrivacy(TransactionName.SMP_QUERY, EventActionCode.EXECUTE,
                     date2, EventOutcomeIndicator.FULL_SUCCESS, null, null, null,
                     serviceConsumerUserId, serviceProviderUserId, partid, null, EM_PatricipantObjectID,
                     EM_PatricipantObjectDetail, objectID, null, new byte[1], null,
                     new byte[1], sourceip, targetip);
             eventLog1.setNcpSide(NcpSide.NCP_B);
-            eventLog1.setEventType(EventType.ehealthSMPQuery);
+            eventLog1.setEventType(EventType.SMP_QUERY);
 
             // According to https://tools.ietf.org/html/rfc5424 (Syslog Protocol)
             // facility = 13 --> log audit | severity = 2 --> Critical: critical conditions

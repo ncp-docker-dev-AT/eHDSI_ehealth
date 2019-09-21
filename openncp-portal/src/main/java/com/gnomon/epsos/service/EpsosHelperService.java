@@ -1185,7 +1185,7 @@ public class EpsosHelperService {
             if (assertion != null) {
 
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
-                LOGGER.debug("Sending epsos-91 audit message for '{}'", fullname);
+                LOGGER.debug("Sending EHDSI-91 audit message for '{}'", fullname);
                 EpsosHelperService.handleHCPIdentificationAudit(assertion, fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
 
                 if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
@@ -1294,14 +1294,14 @@ public class EpsosHelperService {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
         EventLog hcpIdentificationEventLog;
-        hcpIdentificationEventLog = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
+        hcpIdentificationEventLog = EventLog.createEventLogHCPIdentity(TransactionName.HCP_AUTHENTICATION, EventActionCode.EXECUTE,
                 eventDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 serviceConsumerUserId, serviceProviderUserId, AS_AuditSourceId, ET_ObjectID, requestMsgParticipantObjectID,
                 secHead.getBytes(StandardCharsets.UTF_8), responseMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
                 sourceIP, sourceIP, NcpSide.NCP_B);
 
         LOGGER.info("The audit has been prepared");
-        hcpIdentificationEventLog.setEventType(EventType.epsosHcpAuthentication);
+        hcpIdentificationEventLog.setEventType(EventType.HCP_AUTHENTICATION);
         asd.write(hcpIdentificationEventLog, "13", "2");
     }
 

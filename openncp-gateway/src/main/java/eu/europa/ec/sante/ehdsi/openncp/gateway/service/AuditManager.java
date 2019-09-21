@@ -51,9 +51,9 @@ public class AuditManager {
                                                    byte[] errorMessagePartObjectDetail) {
 
         AuditService auditService = AuditServiceFactory.getInstance();
-        EventLog eventLog = createDynamicDiscoveryEventLog(TransactionName.ehealthSMPQuery, objectID, errorMessagePartObjectId,
+        EventLog eventLog = createDynamicDiscoveryEventLog(TransactionName.SMP_QUERY, objectID, errorMessagePartObjectId,
                 errorMessagePartObjectDetail, smpServerUri);
-        eventLog.setEventType(EventType.ehealthSMPQuery);
+        eventLog.setEventType(EventType.SMP_QUERY);
         eventLog.setNcpSide(NcpSide.NCP_A);
         auditService.write(eventLog, "13", "2");
     }
@@ -68,9 +68,9 @@ public class AuditManager {
                                                   byte[] errorMessagePartObjectDetail) {
 
         AuditService auditService = AuditServiceFactory.getInstance();
-        EventLog eventLog = createDynamicDiscoveryEventLog(TransactionName.ehealthSMPPush, objectID, errorMessagePartObjectId,
+        EventLog eventLog = createDynamicDiscoveryEventLog(TransactionName.SMP_PUSH, objectID, errorMessagePartObjectId,
                 errorMessagePartObjectDetail, smpServerUri);
-        eventLog.setEventType(EventType.ehealthSMPPush);
+        eventLog.setEventType(EventType.SMP_PUSH);
         eventLog.setNcpSide(NcpSide.NCP_A);
         auditService.write(eventLog, "13", "2");
     }

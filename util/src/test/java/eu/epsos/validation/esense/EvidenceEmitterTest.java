@@ -99,7 +99,7 @@ public class EvidenceEmitterTest {
                 keyStoreFile.getAbsolutePath(),
                 "spirit",
                 "server1",
-                "epsos-11",
+                "EHDSI-11",
                 new DateTime(),
                 "1",
                 "testNRR");
@@ -129,7 +129,7 @@ public class EvidenceEmitterTest {
                 keyStoreFile.getAbsolutePath(),
                 "spirit",
                 "server1",
-                "epsos-11",
+                "EHDSI-11",
                 new DateTime(),
                 "1", "testNRO", "111111222222");
         keyStoreFile.delete();
