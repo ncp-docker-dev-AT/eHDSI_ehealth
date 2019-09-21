@@ -278,12 +278,12 @@ public class AssertionHandler implements Serializable {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
+        EventLog eventLog = EventLog.createEventLogHCPIdentity(TransactionName.HCP_AUTHENTICATION, EventActionCode.EXECUTE,
                 eventLogDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID,
                 secHead.getBytes(StandardCharsets.UTF_8), resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
                 sourceIP, sourceIP, NcpSide.NCP_B);
-        eventLog.setEventType(EventType.epsosHcpAuthentication);
+        eventLog.setEventType(EventType.HCP_AUTHENTICATION);
         asd.write(eventLog, "13", "2");
         LOGGER.debug("################################################");
         LOGGER.debug("# sendAuditEpsos91 - stop                      #");
