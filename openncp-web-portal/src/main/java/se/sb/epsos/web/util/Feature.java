@@ -7,7 +7,8 @@ public enum Feature {
     SEND_METRICS_TO_GRAPHITE(false),
     SHOW_PARTIALERRORMESSAGES(false),
     ENABLE_STATUS_PAGE(false),
-    ENABLE_SSL(false), ENABLE_SWEDISH_JAAS(false);
+    ENABLE_SSL(false),
+    ENABLE_SWEDISH_JAAS(false);
 
     protected boolean defaultOn;
 
