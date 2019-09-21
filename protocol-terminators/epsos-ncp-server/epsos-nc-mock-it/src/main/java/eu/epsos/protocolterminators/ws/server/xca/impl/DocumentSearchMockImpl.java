@@ -396,7 +396,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         nonXMLBody.appendChild(text);
         newComponent.appendChild(nonXMLBody);
 
-        Node rootNode = doc.getFirstChild();
+        Node rootNode = doc.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "ClinicalDocument").item(0);
 
         rootNode.replaceChild(newComponent, oldComponent);
         LOGGER.info("PDF document added.");
