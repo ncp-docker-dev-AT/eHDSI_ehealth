@@ -1,24 +1,8 @@
 package epsos.ccd.gnomon.auditmanager;
 
 /**
- * Enumeration for populating the EventType of the AuditMessage
+ * Enumeration for populating the EventType of the AuditMessage.
  * One of the available eHDSI event ids:
- * <p>
- * epsos-11:    epsosIdentificationService
- * epsos-21:    epsosPatientService
- * epsos-31:    epsosOrderService
- * epsos-41:    epsosDispensationServuceInitialize
- * epsos-42:    epsosDispensationServuceDiscard
- * epsos-51:    epsosConsentServicePut
- * epsos-52:    epsosConsentServiceDiscard
- * epsos-53:    epsosConsentServicePin
- * epsos-91:    epsosHcpAuthentication
- * epsos-92:    epsosTRCAssertion
- * epsos-93:    epsosNCPTrustedServiceList
- * epsos-94:    epsosPivotTranslation
- * epsos-cf:    epsosCommunicationFailure
- * ehealth-193: SMP::Query
- * ehealth-194: SMP::Push
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -27,27 +11,27 @@ package epsos.ccd.gnomon.auditmanager;
  */
 public enum TransactionName {
 
-    epsosIdentificationServiceFindIdentityByTraits("epsosIdentityService::FindIdentityByTraits"),
-    epsosPatientServiceList("epsosPatientService::List"),
-    epsosPatientServiceRetrieve("epsosPatientService::Retrieve"),
-    epsosOrderServiceList("epsosOrderService::List"),
-    epsosOrderServiceRetrieve("epsosOrderService::Retrieve"),
-    epsosDispensationServiceInitialize("epsosDispensationService::Initialize"),
-    epsosDispensationServiceDiscard("epsosDispensationService::Discard"),
-    epsosConsentServicePut("epsosConsentService::Put"),
-    epsosConsentServiceDiscard("epsosConsentService::Discard"),
-    epsosConsentServicePin("epsosConsentService::PIN"),
-    epsosHcpAuthentication("identityProvider::HPAuthentication"),
-    epsosTRCAssertion("ncp::TrcAssertion"),
-    epsosNCPTrustedServiceList("ncpConfigurationManager::ImportNSL"),
-    epsosPivotTranslation("ncpTransformationMgr::Translate"),
-    epsosCommunicationFailure("epsosCommunicationFailure"),
-    epsosPACRetrieve("epsosPACRetrieve"),
-    epsosHCERPut("epsosHCERService:Put"),
-    epsosMroServiceList("epsosMroService::List"),
-    epsosMroServiceRetrieve("epsosMroService::Retrieve"),
-    ehealthSMPQuery("SMP::Query"),
-    ehealthSMPPush("SMP::Push");
+    IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS("IdentityService::FindIdentityByTraits"),
+    PATIENT_SERVICE_LIST("PatientService::List"),
+    PATIENT_SERVICE_RETRIEVE("PatientService::Retrieve"),
+    ORDER_SERVICE_LIST("OrderService::List"),
+    ORDER_SERVICE_RETRIEVE("OrderService::Retrieve"),
+    DISPENSATION_SERVICE_INITIALIZE("DispensationService::Initialize"),
+    DISPENSATION_SERVICE_DISCARD("DispensationService::Discard"),
+    CONSENT_SERVICE_PUT("ConsentService::Put"),
+    CONSENT_SERVICE_DISCARD("ConsentService::Discard"),
+    CONSENT_SERVICE_PIN("ConsentService::PIN"),
+    HCP_AUTHENTICATION("identityProvider::HPAuthentication"),
+    TRC_ASSERTION("ncp::TrcAssertion"),
+    NCP_TRUSTED_SERVICE_LIST("ncpConfigurationManager::ImportNSL"),
+    PIVOT_TRANSLATION("ncpTransformationMgr::Translate"),
+    COMMUNICATION_FAILURE("CommunicationFailure"),
+    PAC_RETRIEVE("PACRetrieve"),
+    HCER_PUT("HCERService:Put"),
+    MRO_SERVICE_LIST("MroService::List"),
+    MRO_SERVICE_RETRIEVE("MroService::Retrieve"),
+    SMP_QUERY("SMP::Query"),
+    SMP_PUSH("SMP::Push");
 
     private String code;
 

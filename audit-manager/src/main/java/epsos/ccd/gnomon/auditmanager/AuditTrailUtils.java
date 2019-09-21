@@ -162,72 +162,72 @@ public enum AuditTrailUtils {
         //TODO: Check if the Audit Message return with a null value shall be considered as fatal?
         AuditMessage am = new AuditMessage();
         AuditTrailUtils au = AuditTrailUtils.getInstance();
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosIdentificationServiceFindIdentityByTraits.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getCode())) {
             am = au._CreateAuditTrailForIdentificationService(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosPatientServiceList.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.PATIENT_SERVICE_LIST.getCode())) {
             am = au._CreateAuditTrailForPatientService(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosPatientServiceRetrieve.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.PATIENT_SERVICE_RETRIEVE.getCode())) {
             am = au._CreateAuditTrailForPatientService(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosOrderServiceList.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.ORDER_SERVICE_LIST.getCode())) {
             am = au._CreateAuditTrailForOrderService(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosOrderServiceRetrieve.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.ORDER_SERVICE_RETRIEVE.getCode())) {
             am = au._CreateAuditTrailForOrderService(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosDispensationServiceInitialize.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.DISPENSATION_SERVICE_INITIALIZE.getCode())) {
             am = au._CreateAuditTrailForDispensationService(eventLog, "Initialize");
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosDispensationServiceDiscard.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
             am = au._CreateAuditTrailForDispensationService(eventLog, "Discard");
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosConsentServicePut.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.CONSENT_SERVICE_PUT.getCode())) {
             am = au._CreateAuditTrailForConsentService(eventLog, "Put");
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosConsentServiceDiscard.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.CONSENT_SERVICE_DISCARD.getCode())) {
             am = au._CreateAuditTrailForConsentService(eventLog, "Discard");
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosConsentServicePin.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.CONSENT_SERVICE_PIN.getCode())) {
             am = au._CreateAuditTrailForConsentService(eventLog, "Pin");
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosHcpAuthentication.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.HCP_AUTHENTICATION.getCode())) {
             am = au._CreateAuditTrailHCPIdentity(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosTRCAssertion.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.TRC_ASSERTION.getCode())) {
             am = au._CreateAuditTrailTRCA(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosNCPTrustedServiceList.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.NCP_TRUSTED_SERVICE_LIST.getCode())) {
             am = au._CreateAuditTrailNCPTrustedServiceList(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosPivotTranslation.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.PIVOT_TRANSLATION.getCode())) {
             am = au._CreateAuditTrailPivotTranslation(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosCommunicationFailure.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.COMMUNICATION_FAILURE.getCode())) {
             am = au.createAuditTrailForCommunicationFailure(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosPACRetrieve.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.PAC_RETRIEVE.getCode())) {
             am = au._CreateAuditTrailForPACService(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosHCERPut.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.HCER_PUT.getCode())) {
             am = au._CreateAuditTrailForHCERService(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosMroList.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.MRO_LIST.getCode())) {
             am = au._CreateAuditTrailForRequestOfData(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.epsosMroRetrieve.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.MRO_RETRIEVE.getCode())) {
             am = au._CreateAuditTrailForRequestOfData(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.ehealthSMPQuery.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.SMP_QUERY.getCode())) {
             am = au._CreateAuditTrailForEhealthSMPQuery(eventLog);
         }
-        if (StringUtils.equals(eventLog.getEventType(), EventType.ehealthSMPPush.getCode())) {
+        if (StringUtils.equals(eventLog.getEventType(), EventType.SMP_PUSH.getCode())) {
             am = au._CreateAuditTrailForEhealthSMPPush(eventLog);
         }
         //  Non Repudiation information are not relevant for SML/SMP process
-        if (!StringUtils.equals(eventLog.getEventType(), EventType.ehealthSMPQuery.getCode())
-                && !StringUtils.equals(eventLog.getEventType(), EventType.ehealthSMPPush.getCode())) {
+        if (!StringUtils.equals(eventLog.getEventType(), EventType.SMP_QUERY.getCode())
+                && !StringUtils.equals(eventLog.getEventType(), EventType.SMP_PUSH.getCode())) {
 
             am = AuditTrailUtils.getInstance().addNonRepudiationSection(am, eventLog.getReqM_ParticipantObjectID(),
                     eventLog.getReqM_PatricipantObjectDetail(), eventLog.getResM_ParticipantObjectID(),
@@ -286,11 +286,11 @@ public enum AuditTrailUtils {
 
         ParticipantObjectIdentificationType participantObjectIdentification = new ParticipantObjectIdentificationType();
         participantObjectIdentification.setParticipantObjectID(participantObjectId);
-        participantObjectIdentification.setParticipantObjectTypeCode(new Short("4"));
+        participantObjectIdentification.setParticipantObjectTypeCode(Short.valueOf("4"));
 
         CodedValueType codedValue = new CodedValueType();
         codedValue.setCode(action);
-        codedValue.setCodeSystemName("epSOS Msg");
+        codedValue.setCodeSystemName("eHealth DSI Msg");
         if (StringUtils.equals("rsp", action)) {
             codedValue.setDisplayName("Response Message");
         } else {
@@ -318,7 +318,7 @@ public enum AuditTrailUtils {
         AuditMessage am = createAuditTrailForEhealthSMPQuery(eventLog);
         if (am != null) {
             //  TODO: Audit - Event Target
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), null,
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), null,
                     "SMP", "eHealth DSI Security", "SignedServiceMetadata");
         }
         return am;
@@ -334,7 +334,7 @@ public enum AuditTrailUtils {
 
         AuditMessage am = createAuditTrailForEhealthSMPPush(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), null,
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), null,
                     "SMP", "eHealth DSI Security", "SignedServiceMetadata");
         }
         return am;
@@ -351,8 +351,8 @@ public enum AuditTrailUtils {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
 
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), new Short("4"),
-                    "12", "", new Short("0"));
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
+                    "12", "", Short.valueOf("0"));
         }
         return am;
     }
@@ -368,8 +368,8 @@ public enum AuditTrailUtils {
         AuditMessage am = createAuditTrailForHCPIdentity(eventLog);
         if (am != null) {
             // Event Target
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), null,
-                    "IdA", "epSOS Security", "HCP Identity Assertion");
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), null,
+                    "IdA", "eHealth DSI Security", "HCP Identity Assertion");
         }
         return am;
     }
@@ -384,8 +384,8 @@ public enum AuditTrailUtils {
 
         AuditMessage am = createAuditTrailForNCPTrustedServiceList(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), null,
-                    "NSL", "epSOS Security", "Trusted Service List");
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), null,
+                    "NSL", "eHealth DSI Security", "Trusted Service List");
         }
         return am;
     }
@@ -401,10 +401,10 @@ public enum AuditTrailUtils {
         AuditMessage am = createAuditTrailForPivotTranslation(eventLog);
         if (am != null) {
             // Event Target
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("4"), new Short("5"),
-                    "in", "epSOS Translation", "Input Data");
-            addEventTarget(am, Arrays.asList(eventLog.getEventTargetAdditionalObjectId()), new Short("4"), new Short("5"),
-                    "out", "epSOS Translation", "Output Data");
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("4"), Short.valueOf("5"),
+                    "in", "eHealth DSI Translation", "Input Data");
+            addEventTarget(am, Arrays.asList(eventLog.getEventTargetAdditionalObjectId()), Short.valueOf("4"), Short.valueOf("5"),
+                    "out", "eHealth DSI Translation", "Output Data");
         }
         return am;
     }
@@ -419,8 +419,8 @@ public enum AuditTrailUtils {
 
         AuditMessage am = createAuditTrailForTRCA(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), null,
-                    "TrcA", "epSOS Security", "TRC Assertion");
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), null,
+                    "TrcA", "eHealth DSI Security", "TRC Assertion");
         }
         return am;
     }
@@ -438,12 +438,12 @@ public enum AuditTrailUtils {
         // Event Target
         if (am != null) {
             if (action.equals("Discard")) {
-                addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), new Short("4"),
-                        "12", "Discard", new Short("14"));
+                addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
+                        "12", "Discard", Short.valueOf("14"));
 
             } else {
-                addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), new Short("4"),
-                        "12", "", new Short("0"));
+                addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
+                        "12", "", Short.valueOf("0"));
             }
         }
         return am;
@@ -459,8 +459,8 @@ public enum AuditTrailUtils {
 
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), new Short("4"),
-                    "12", "", new Short("0"));
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
+                    "12", "", Short.valueOf("0"));
         }
         return am;
     }
@@ -477,17 +477,17 @@ public enum AuditTrailUtils {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
             if (StringUtils.equalsIgnoreCase(action, "Discard")) {
-                addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), new Short("4"),
-                        "12", action, new Short("14"));
+                addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
+                        "12", action, Short.valueOf("14"));
             }
 
             if (StringUtils.equalsIgnoreCase(action, "Put")) {
-                addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), new Short("4"),
-                        "12", "Put", new Short("0"));
+                addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
+                        "12", "Put", Short.valueOf("0"));
             }
             if (StringUtils.equalsIgnoreCase(action, "Pin")) {
-                addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("4"), new Short("12"),
-                        "PIN", "esSOS Security",
+                addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("4"), Short.valueOf("12"),
+                        "PIN", "eHealth DSI Security",
                         "Privacy Information Notice");
             }
         }
@@ -505,8 +505,8 @@ public enum AuditTrailUtils {
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
 
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), new Short("4"),
-                    "12", "", new Short("0"));
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
+                    "12", "", Short.valueOf("0"));
         }
         return am;
     }
@@ -538,8 +538,8 @@ public enum AuditTrailUtils {
 
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), new Short("24"),
-                    "10", "", new Short("0"));
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("24"),
+                    "10", "", Short.valueOf("0"));
         }
         return am;
     }
@@ -554,9 +554,8 @@ public enum AuditTrailUtils {
 
         AuditMessage am = createAuditTrailForHCPAssurance(eventLog);
         if (am != null) {
-            //addEventTarget(am, eventLog.getET_ObjectID(), new Short("2"), new Short("24"), "10", "", new Short("0"));
-            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), new Short("2"), new Short("24"),
-                    "10", "", new Short("0"));
+            addEventTarget(am, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("24"),
+                    "10", "", Short.valueOf("0"));
         }
         return am;
     }
@@ -581,68 +580,68 @@ public enum AuditTrailUtils {
     private String getMappedEventType(String eventType) {
 
         if (eventType.equals(
-                epsos.ccd.gnomon.auditmanager.EventType.epsosIdentificationServiceFindIdentityByTraits.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode();
+                epsos.ccd.gnomon.auditmanager.EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosCommunicationFailure.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosCommunicationFailure.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.COMMUNICATION_FAILURE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.COMMUNICATION_FAILURE.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosConsentServiceDiscard.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosConsentServiceDiscard.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.CONSENT_SERVICE_DISCARD.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.CONSENT_SERVICE_DISCARD.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosConsentServicePin.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosConsentServicePin.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.CONSENT_SERVICE_PIN.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.CONSENT_SERVICE_PIN.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosConsentServicePut.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosConsentServicePut.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.CONSENT_SERVICE_PUT.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.CONSENT_SERVICE_PUT.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosDispensationServiceDiscard.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosDispensationServiceDiscard.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.DISPENSATION_SERVICE_DISCARD.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosDispensationServiceInitialize.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosDispensationServiceInitialize.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.DISPENSATION_SERVICE_INITIALIZE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosHCERPut.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosHCERPut.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.HCER_PUT.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.HCER_PUT.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosHcpAuthentication.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosHcpAuthentication.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.HCP_AUTHENTICATION.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.HCP_AUTHENTICATION.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosNCPTrustedServiceList.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosNCPTrustedServiceList.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.NCP_TRUSTED_SERVICE_LIST.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.NCP_TRUSTED_SERVICE_LIST.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosOrderServiceList.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosOrderServiceList.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ORDER_SERVICE_LIST.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.ORDER_SERVICE_LIST.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosOrderServiceRetrieve.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosOrderServiceRetrieve.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ORDER_SERVICE_RETRIEVE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.ORDER_SERVICE_RETRIEVE.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosPACRetrieve.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosPACRetrieve.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.PAC_RETRIEVE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.PAC_RETRIEVE.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosPatientServiceList.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosPatientServiceList.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.PATIENT_SERVICE_LIST.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.PATIENT_SERVICE_LIST.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosPatientServiceRetrieve.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosPatientServiceRetrieve.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.PATIENT_SERVICE_RETRIEVE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosPivotTranslation.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosPivotTranslation.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.PIVOT_TRANSLATION.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.PIVOT_TRANSLATION.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosTRCAssertion.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosTRCAssertion.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.TRC_ASSERTION.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.TRC_ASSERTION.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosMroList.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosMroList.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.MRO_LIST.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.MRO_LIST.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosMroRetrieve.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.epsosMroRetrieve.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.MRO_RETRIEVE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.MRO_RETRIEVE.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ehealthSMPQuery.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.ehealthSMPQuery.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.SMP_QUERY.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.SMP_QUERY.getCode();
         }
-        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ehealthSMPPush.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHEEventType.ehealthSMPPush.getCode();
+        if (eventType.equals(epsos.ccd.gnomon.auditmanager.EventType.SMP_PUSH.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHEEventType.SMP_PUSH.getCode();
         }
         // TODO: Fix this issue, does the mappedEventType should be initialized?
         return "Event Type Not Mapped";
@@ -654,202 +653,179 @@ public enum AuditTrailUtils {
      */
     private String getMappedTransactionName(String name) {
 
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosIdentificationServiceFindIdentityByTraits
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS
                 .getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosIdentificationServiceFindIdentityByTraits
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS
                     .getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosCommunicationFailure.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosCommunicationFailure.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.COMMUNICATION_FAILURE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.COMMUNICATION_FAILURE.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosConsentServiceDiscard.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosConsentServiceDiscard.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.CONSENT_SERVICE_DISCARD.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.CONSENT_SERVICE_DISCARD.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosConsentServicePin.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosConsentServicePin.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.CONSENT_SERVICE_PIN.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.CONSENT_SERVICE_PIN.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosConsentServicePut.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosConsentServicePut.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.CONSENT_SERVICE_PUT.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.CONSENT_SERVICE_PUT.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosDispensationServiceDiscard.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosDispensationServiceDiscard.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.DISPENSATION_SERVICE_DISCARD.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.DISPENSATION_SERVICE_DISCARD.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosDispensationServiceInitialize.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosDispensationServiceInitialize.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.DISPENSATION_SERVICE_INITIALIZE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.DISPENSATION_SERVICE_INITIALIZE.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosHCERPut.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosHCERPut.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.HCER_PUT.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.HCER_PUT.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosHcpAuthentication.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosHcpAuthentication.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.HCP_AUTHENTICATION.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.HCP_AUTHENTICATION.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosNCPTrustedServiceList.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosNCPTrustedServiceList.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.NCP_TRUSTED_SERVICE_LIST.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.NCP_TRUSTED_SERVICE_LIST.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosOrderServiceList.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosOrderServiceList.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.ORDER_SERVICE_LIST.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.ORDER_SERVICE_LIST.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosOrderServiceRetrieve.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosOrderServiceRetrieve.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.ORDER_SERVICE_RETRIEVE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.ORDER_SERVICE_RETRIEVE.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosPatientServiceList.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosPatientServiceList.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.PATIENT_SERVICE_LIST.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.PATIENT_SERVICE_LIST.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosPatientServiceRetrieve.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosPatientServiceRetrieve.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.PATIENT_SERVICE_RETRIEVE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.PATIENT_SERVICE_RETRIEVE.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosPivotTranslation.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosPivotTranslation.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.PIVOT_TRANSLATION.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.PIVOT_TRANSLATION.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosTRCAssertion.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosTRCAssertion.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.TRC_ASSERTION.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.TRC_ASSERTION.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosMroServiceList.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosMroServiceList.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.MRO_SERVICE_LIST.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.MRO_SERVICE_LIST.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.epsosMroServiceRetrieve.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.epsosMroServiceRetrieve.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.MRO_SERVICE_RETRIEVE.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.MRO_SERVICE_RETRIEVE.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.ehealthSMPQuery.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.ehealthSMPQuery.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.SMP_QUERY.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.SMP_QUERY.getCode();
         }
-        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.ehealthSMPPush.getCode())) {
-            return epsos.ccd.gnomon.auditmanager.IHETransactionName.ehealthSMPPush.getCode();
+        if (name.equals(epsos.ccd.gnomon.auditmanager.TransactionName.SMP_PUSH.getCode())) {
+            return epsos.ccd.gnomon.auditmanager.IHETransactionName.SMP_PUSH.getCode();
         }
         // TODO: Fix this issue, does the mappedEventType should be initialized?
         return "Transaction not Mapped";
     }
 
     /**
-     * @param am
-     * @param EventType
+     * @param auditMessage
+     * @param eventType
      * @param transactionName
-     * @param EventActionCode
-     * @param EventDateTime
-     * @param EventOutcomeIndicator
+     * @param eventActionCode
+     * @param eventDateTime
+     * @param eventOutcomeIndicator
      * @return
      */
-    private AuditMessage addEventIdentification(AuditMessage am, String EventType, String transactionName,
-                                                String EventActionCode, XMLGregorianCalendar EventDateTime,
-                                                BigInteger EventOutcomeIndicator) {
+    private AuditMessage addEventIdentification(AuditMessage auditMessage, String eventType, String transactionName,
+                                                String eventActionCode, XMLGregorianCalendar eventDateTime,
+                                                BigInteger eventOutcomeIndicator) {
 
         // Change EventType to new ones
         EventIdentificationType eit = new EventIdentificationType();
 
         CodedValueType iheEventID = new CodedValueType();
-        iheEventID.setCode(getMappedEventType(EventType));
+        iheEventID.setCode(getMappedEventType(eventType));
         iheEventID.setCodeSystemName("IHE Transactions");
         iheEventID.setDisplayName(getMappedTransactionName(transactionName));
         eit.setEventID(iheEventID);
 
         CodedValueType eventID = new CodedValueType();
-        eventID.setCode(EventType);
-        eventID.setCodeSystemName("epSOS Transaction");
+        eventID.setCode(eventType);
+        eventID.setCodeSystemName("eHDSI Transactions");
         eventID.setDisplayName(transactionName);
         eit.getEventTypeCode().add(eventID);
 
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosPatientServiceList.getCode())) {
-            CodedValueType eventID_epsos = new CodedValueType();
-            eventID_epsos.setCode("60591-5");
-            eventID_epsos.setCodeSystemName("epSOS LOINC");
-            eventID_epsos.setDisplayName("epSOS Patient Summary");
-            eit.getEventTypeCode().add(eventID_epsos);
-        }
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosPatientServiceRetrieve.getCode())) {
-            CodedValueType eventID_epsos = new CodedValueType();
-            eventID_epsos.setCode("60591-5");
-            eventID_epsos.setCodeSystemName("epSOS LOINC");
-            eventID_epsos.setDisplayName("epSOS Patient Summary");
-            eit.getEventTypeCode().add(eventID_epsos);
-        }
+        if (eventType.equals(EventType.PATIENT_SERVICE_LIST.getCode())
+                || eventType.equals(EventType.PATIENT_SERVICE_RETRIEVE.getCode())) {
 
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosOrderServiceList.getCode())) {
             CodedValueType eventID_epsos = new CodedValueType();
-            eventID_epsos.setCode("57833-6");
-            eventID_epsos.setCodeSystemName("epSOS LOINC");
-            eventID_epsos.setDisplayName("epSOS ePrescription");
+            eventID_epsos.setCode("60591-5");
+            eventID_epsos.setCodeSystemName("LOINC");
+            eventID_epsos.setDisplayName("Patient Summary Document");
             eit.getEventTypeCode().add(eventID_epsos);
         }
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosOrderServiceRetrieve.getCode())) {
+        if (eventType.equals(EventType.ORDER_SERVICE_LIST.getCode())
+                || eventType.equals(EventType.ORDER_SERVICE_RETRIEVE.getCode())) {
+
             CodedValueType eventID_epsos = new CodedValueType();
             eventID_epsos.setCode("57833-6");
-            eventID_epsos.setCodeSystemName("epSOS LOINC");
-            eventID_epsos.setDisplayName("epSOS ePrescription");
+            eventID_epsos.setCodeSystemName("LOINC");
+            eventID_epsos.setDisplayName("Prescription for Medication");
             eit.getEventTypeCode().add(eventID_epsos);
         }
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosConsentServicePut.getCode())) {
+        if (eventType.equals(EventType.CONSENT_SERVICE_PUT.getCode())
+                || eventType.equals(EventType.CONSENT_SERVICE_DISCARD.getCode())) {
+
             CodedValueType eventID_epsos = new CodedValueType();
             eventID_epsos.setCode("57016-8");
-            eventID_epsos.setCodeSystemName("epSOS LOINC");
+            eventID_epsos.setCodeSystemName("LOINC");
             eventID_epsos.setDisplayName("Privacy Policy Acknowledgement Document");
             eit.getEventTypeCode().add(eventID_epsos);
         }
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosConsentServiceDiscard.getCode())) {
-            CodedValueType eventID_epsos = new CodedValueType();
-            eventID_epsos.setCode("57016-8");
-            eventID_epsos.setCodeSystemName("epSOS LOINC");
-            eventID_epsos.setDisplayName("Privacy Policy Acknowledgement Document");
-            eit.getEventTypeCode().add(eventID_epsos);
-        }
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosDispensationServiceInitialize.getCode())) {
+        if (eventType.equals(EventType.DISPENSATION_SERVICE_INITIALIZE.getCode())
+                || eventType.equals(EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
+
             CodedValueType eventID_epsos = new CodedValueType();
             eventID_epsos.setCode("60593-1");
-            eventID_epsos.setCodeSystemName("epSOS LOINC");
-            eventID_epsos.setDisplayName("eDispensation");
+            eventID_epsos.setCodeSystemName("LOINC");
+            eventID_epsos.setDisplayName("Medication Dispensed Document");
             eit.getEventTypeCode().add(eventID_epsos);
         }
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosDispensationServiceDiscard.getCode())) {
-            CodedValueType eventID_epsos = new CodedValueType();
-            eventID_epsos.setCode("60593-1");
-            eventID_epsos.setCodeSystemName("epSOS LOINC");
-            eventID_epsos.setDisplayName("eDispensation");
-            eit.getEventTypeCode().add(eventID_epsos);
-        }
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosHCERPut.getCode())) {
+        if (eventType.equals(EventType.HCER_PUT.getCode())) {
             CodedValueType eventID_epsos = new CodedValueType();
             eventID_epsos.setCode("34133-9");
-            eventID_epsos.setCodeSystemName("epSOS LOINC");
-            eventID_epsos.setDisplayName("Summarization of Episode Note");
+            eventID_epsos.setCodeSystemName("LOINC");
+            eventID_epsos.setDisplayName("Summary of Episode Note");
             eit.getEventTypeCode().add(eventID_epsos);
         }
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.epsosPACRetrieve.getCode())) {
+        if (eventType.equals(EventType.PAC_RETRIEVE.getCode())) {
             CodedValueType eventID_epsos = new CodedValueType();
             eventID_epsos.setCode("N/A");
-            eventID_epsos.setCodeSystemName("epSOS LOINC");
+            eventID_epsos.setCodeSystemName("LOINC");
             eventID_epsos.setDisplayName("PAC");
             eit.getEventTypeCode().add(eventID_epsos);
         }
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ehealthSMPQuery.getCode())) {
+        if (eventType.equals(EventType.SMP_QUERY.getCode())) {
             CodedValueType eventID_epsos = new CodedValueType();
             eventID_epsos.setCode("SMP");
-            eventID_epsos.setCodeSystemName("ehealth-193");
+            eventID_epsos.setCodeSystemName("EHDSI-193");
             eventID_epsos.setDisplayName("SMP::Query");
             eit.getEventTypeCode().add(eventID_epsos);
 
             eit.getEventID().setCode("SMP");
-            eit.getEventID().setCodeSystemName("ehealth-193");
+            eit.getEventID().setCodeSystemName("EHDSI-193");
             eit.getEventID().setDisplayName("SMP::Query");
         }
-        if (EventType.equals(epsos.ccd.gnomon.auditmanager.EventType.ehealthSMPPush.getCode())) {
+        if (eventType.equals(EventType.SMP_PUSH.getCode())) {
             CodedValueType eventID_epsos = new CodedValueType();
             eventID_epsos.setCode("SMP");
-            eventID_epsos.setCodeSystemName("ehealth-194");
+            eventID_epsos.setCodeSystemName("EHDSI-194");
             eventID_epsos.setDisplayName("SMP::Push");
             eit.getEventTypeCode().add(eventID_epsos);
 
             eit.getEventID().setCode("SMP");
-            eit.getEventID().setCodeSystemName("ehealth-194");
+            eit.getEventID().setCodeSystemName("EHDSI-194");
             eit.getEventID().setDisplayName("SMP::Push");
         }
 
-        eit.setEventActionCode(EventActionCode);
-        eit.setEventDateTime(EventDateTime);
-        eit.setEventOutcomeIndicator(EventOutcomeIndicator); // (0,1,4,8)
-        am.setEventIdentification(eit);
+        eit.setEventActionCode(eventActionCode);
+        eit.setEventDateTime(eventDateTime);
+        eit.setEventOutcomeIndicator(eventOutcomeIndicator);
+        auditMessage.setEventIdentification(eit);
 
-        // <EventTypeCode code="60591-5" codeSystemName="epSOS LOINC" displayName="epSOS Patient Summary"
-        // originalText="urn:uuid:1.2.3.4.5.6.7.8.9.10"/>
-        return am;
+        return auditMessage;
     }
 
     /**
@@ -920,9 +896,9 @@ public enum AuditTrailUtils {
             ActiveParticipant activeParticipant = new ActiveParticipant();
             activeParticipant.setNetworkAccessPointID(ipAddress);
             if (validator.isValidInet4Address(ipAddress) || validator.isValidInet6Address(ipAddress)) {
-                activeParticipant.setNetworkAccessPointTypeCode(new Short("2"));
+                activeParticipant.setNetworkAccessPointTypeCode(Short.valueOf("2"));
             } else {
-                activeParticipant.setNetworkAccessPointTypeCode(new Short("1"));
+                activeParticipant.setNetworkAccessPointTypeCode(Short.valueOf("1"));
             }
             activeParticipant.setUserID(userId);
             activeParticipant.setUserIsRequestor(userIsRequester);
@@ -1087,13 +1063,13 @@ public enum AuditTrailUtils {
             addEventIdentification(am, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
                     eventLog.getEI_EventOutcomeIndicator());
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS",
-                    "epSOS Service Consumer", eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS",
-                    "epSOS Service Provider", eventLog.getTargetip());
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI",
+                    "eHealth DSI Service Consumer", eventLog.getSourceip());
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI",
+                    "eHealth DSI Service Provider", eventLog.getTargetip());
             addAuditSource(am, eventLog.getAS_AuditSourceId());
-            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
-                    new Short("3"), "9", "errormsg");
+            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
+                    Short.valueOf("3"), "9", "errormsg");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
@@ -1115,13 +1091,13 @@ public enum AuditTrailUtils {
             addEventIdentification(am, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
                     eventLog.getEI_EventOutcomeIndicator());
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS", "epSOS Service Consumer",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "eHealth DSI Service Consumer",
                     eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "eHealth DSI Service Provider",
                     eventLog.getTargetip());
             addAuditSource(am, eventLog.getAS_AuditSourceId());
-            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
-                    new Short("3"), "9", "errormsg");
+            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
+                    Short.valueOf("3"), "9", "errormsg");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
@@ -1147,15 +1123,15 @@ public enum AuditTrailUtils {
                     "1.3.6.1.4.1.12559.11.10.1.3.2.2.2");
             addHumanRequestor(am, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS", "epSOS Service Consumer",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "eHealth DSI Service Consumer",
                     eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "eHealth DSI Service Provider",
                     eventLog.getTargetip());
             addAuditSource(am, eventLog.getAS_AuditSourceId());
-            addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), new Short("1"), new Short("1"), "Patient",
+            addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"), "Patient",
                     "2", "RFC-3881", "Patient Number");
-            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
-                    new Short("3"), "9", "errormsg");
+            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
+                    Short.valueOf("3"), "9", "errormsg");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
@@ -1180,14 +1156,14 @@ public enum AuditTrailUtils {
                     eventLog.getEI_EventOutcomeIndicator());
             addHumanRequestor(am, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS", "epSOS Service Consumer",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "eHealth DSI Service Consumer",
                     eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "eHealth DSI Service Provider",
                     eventLog.getTargetip());
-            addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), new Short("1"), new Short("1"), "Patient",
+            addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"), "Patient",
                     "2", "RFC-3881", "Patient Number");
-            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
-                    new Short("3"), "9", "errormsg");
+            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
+                    Short.valueOf("3"), "9", "errormsg");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
@@ -1217,11 +1193,11 @@ public enum AuditTrailUtils {
             // Human Requestor
             addHumanRequestor(am, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS", "epSOS Service Consumer",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "eHealth DSI Service Consumer",
                     eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "eHealth DSI Service Provider",
                     eventLog.getTargetip());
-            addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), new Short("1"), new Short("1"), "Patient",
+            addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"), "Patient",
                     "2", "RFC-3881", "Patient Number");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
@@ -1247,9 +1223,9 @@ public enum AuditTrailUtils {
             addEventIdentification(am, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
                     eventLog.getEI_EventOutcomeIndicator());
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS", "epSOS Service Consumer",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "eHealth DSI Service Consumer",
                     eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS", "epSOS Service Provider",
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "eHealth DSI Service Provider",
                     eventLog.getTargetip());
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
@@ -1273,8 +1249,8 @@ public enum AuditTrailUtils {
             addEventIdentification(am, eventLog.getEventType(), eventLog.getEI_TransactionName(), "E",
                     eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator());
 
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS",
-                    "epSOS Service Provider", eventLog.getTargetip());
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI",
+                    "eHealth DSI Service Provider", eventLog.getTargetip());
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
@@ -1304,10 +1280,10 @@ public enum AuditTrailUtils {
             // Human Requester
             addHumanRequestor(am, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS",
-                    "epSOS Service Consumer", eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS",
-                    "epSOS Service Provider", eventLog.getTargetip());
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI",
+                    "eHealth DSI Service Consumer", eventLog.getSourceip());
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI",
+                    "eHealth DSI Service Provider", eventLog.getTargetip());
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
@@ -1331,19 +1307,19 @@ public enum AuditTrailUtils {
                     eventLog.getEI_EventOutcomeIndicator());
             addHumanRequestor(am, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "epSOS",
-                    "epSOS Service Consumer", eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "epSOS",
-                    "epSOS Service Provider", eventLog.getTargetip());
-            addService(am, eventLog.getSP_UserID(), false, "MasterPatientIndex", "epSOS",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI",
+                    "eHealth DSI Service Consumer", eventLog.getSourceip());
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI",
+                    "eHealth DSI Service Provider", eventLog.getTargetip());
+            addService(am, eventLog.getSP_UserID(), false, "MasterPatientIndex", "eHealth DSI",
                     "Master Patient Index", eventLog.getTargetip());
             addAuditSource(am, eventLog.getAS_AuditSourceId());
-            addParticipantObject(am, eventLog.getPS_PatricipantObjectID(), new Short("1"), new Short("1"),
+            addParticipantObject(am, eventLog.getPS_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
                     "PatientSource", "2", "RFC-3881", "Patient Number");
-            addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), new Short("1"), new Short("1"),
+            addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
                     "PatientTarget", "2", "RFC-3881", "Patient Number");
-            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), new Short("2"),
-                    new Short("3"), "9", "errormsg");
+            addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
+                    Short.valueOf("3"), "9", "errormsg");
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(am.toString());
             }
@@ -1408,7 +1384,7 @@ public enum AuditTrailUtils {
             // Infer model according to NCP Side and EventCode
             NcpSide ncpSide = eventLog.getNcpSide();
 
-            if (StringUtils.equals(eventLog.getEventType(), "epsos-cf")) {
+            if (StringUtils.equals(eventLog.getEventType(), "EHDSI-CF")) {
                 throw new UnsupportedOperationException("EventCode not supported.");
             }
             OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(am), eventLog.getEventType(), ncpSide);

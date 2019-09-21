@@ -4,19 +4,19 @@ package epsos.ccd.gnomon.auditmanager;
  * Enumeration for populating the EventType of the AuditMessage.
  * One of the available EPSOS event ids.
  * <p>
- * epsos-11: epsosIdentificationService
- * epsos-21: epsosPatientService
- * epsos-31: epsosOrderService
- * epsos-41: epsodDispensationServuceInitialize
- * epsos-42: epsodDispensationServuceDiscard
- * epsos-51: epsodConsentServicePut
- * epsos-52: epsodConsentServiceDiscard
- * epsos-53: epsodConsentServicePin
- * epsos-91: epsosHcpAuthentication
- * epsos-92: epsosTRCAssertion
- * epsos-93: epsosNCPTrustedServiceList
- * epsos-94: epsosPivotTranslation
- * epsos-cf: epsosCommunicationFailure
+ * EHDSI-11: IdentificationService
+ * EHDSI-21: PatientService
+ * EHDSI-31: OrderService
+ * EHDSI-41: DispensationServiceInitialize
+ * EHDSI-42: DispensationServiceDiscard
+ * EHDSI-51: ConsentServicePut
+ * EHDSI-52: ConsentServiceDiscard
+ * EHDSI-53: ConsentServicePin
+ * EHDSI-91: HcpAuthentication
+ * EHDSI-92: TRCAssertion
+ * EHDSI-93: NCPTrustedServiceList
+ * EHDSI-94: PivotTranslation
+ * EHDSI-CF: CommunicationFailure
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -25,27 +25,27 @@ package epsos.ccd.gnomon.auditmanager;
  */
 public enum IHEEventType {
 
-    epsosIdentificationServiceFindIdentityByTraits("ITI-55"),
-    epsosPatientServiceList("ITI-38"),
-    epsosPatientServiceRetrieve("ITI-39"),
-    epsosOrderServiceList("ITI-38"),
-    epsosOrderServiceRetrieve("ITI-39"),
-    epsosDispensationServiceInitialize("ITI-41"),
-    epsosDispensationServiceDiscard("ITI-41"),
-    epsosConsentServicePut("ITI-41"),
-    epsosConsentServiceDiscard("ITI-41"),
-    epsosConsentServicePin("epsos-53"),
-    epsosHcpAuthentication("ITI-40"),
-    epsosTRCAssertion("epsos-92"),
-    epsosNCPTrustedServiceList("epsos-93"),
-    epsosPivotTranslation("epsos-94"),
-    epsosCommunicationFailure("epsos-cf"),
-    epsosPACRetrieve("epsos-95"),
-    epsosHCERPut("epsos-96"),
-    epsosMroList("ITI-38"),
-    epsosMroRetrieve("ITI-39"),
-    ehealthSMPQuery("ehealth-193"),
-    ehealthSMPPush("ehealth-194");
+    IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS("ITI-55"),
+    PATIENT_SERVICE_LIST("ITI-38"),
+    PATIENT_SERVICE_RETRIEVE("ITI-39"),
+    ORDER_SERVICE_LIST("ITI-38"),
+    ORDER_SERVICE_RETRIEVE("ITI-39"),
+    DISPENSATION_SERVICE_INITIALIZE("ITI-41"),
+    DISPENSATION_SERVICE_DISCARD("ITI-41"),
+    CONSENT_SERVICE_PUT("ITI-41"),
+    CONSENT_SERVICE_DISCARD("ITI-41"),
+    CONSENT_SERVICE_PIN("EHDSI-53"),
+    HCP_AUTHENTICATION("ITI-40"),
+    TRC_ASSERTION("EHDSI-92"),
+    NCP_TRUSTED_SERVICE_LIST("EHDSI-93"),
+    PIVOT_TRANSLATION("EHDSI-94"),
+    COMMUNICATION_FAILURE("EHDSI-CF"),
+    PAC_RETRIEVE("EHDSI-95"),
+    HCER_PUT("EHDSI-96"),
+    MRO_LIST("ITI-38"),
+    MRO_RETRIEVE("ITI-39"),
+    SMP_QUERY("EHDSI-193"),
+    SMP_PUSH("EHDSI-194");
 
     private String code;
 

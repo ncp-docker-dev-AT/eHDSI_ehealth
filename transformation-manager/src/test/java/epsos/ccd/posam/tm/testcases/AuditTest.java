@@ -29,13 +29,13 @@ public class AuditTest extends TestCase {
             calendar.setTime(new Date());
 
             EventLog logg = EventLog.createEventLogPivotTranslation(
-                    TransactionName.epsosPivotTranslation, EventActionCode.EXECUTE,
+                    TransactionName.PIVOT_TRANSLATION, EventActionCode.EXECUTE,
                     DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar),
                     EventOutcomeIndicator.FULL_SUCCESS,
                     "", "", "", "",
                     new byte[0], "",
                     new byte[0], "");
-            logg.setEventType(EventType.epsosPivotTranslation);
+            logg.setEventType(EventType.PIVOT_TRANSLATION);
             //AuditMessage am = AuditTrailUtils.getInstance().createAuditMessage(logg);
             boolean result = AuditServiceFactory.getInstance().write(logg, "testfacility", "testseverity");
             assertTrue(result);

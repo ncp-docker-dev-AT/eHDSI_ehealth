@@ -46,8 +46,8 @@ public class EventLogUtil {
     public static void prepareXCPDCommonLog(EventLog eventLog, PRPAIN201305UV02 request, PRPAIN201306UV02 response) {
 
         // Set Event Identification
-        eventLog.setEventType(EventType.epsosIdentificationServiceFindIdentityByTraits);
-        eventLog.setEI_TransactionName(TransactionName.epsosIdentificationServiceFindIdentityByTraits);
+        eventLog.setEventType(EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS);
+        eventLog.setEI_TransactionName(TransactionName.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS);
         eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
 
         if (!response.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()) {
@@ -99,16 +99,16 @@ public class EventLogUtil {
 
         switch (classCode) {
             case Constants.PS_CLASSCODE:
-                eventLog.setEventType(EventType.epsosPatientServiceList);
-                eventLog.setEI_TransactionName(TransactionName.epsosPatientServiceList);
+                eventLog.setEventType(EventType.PATIENT_SERVICE_LIST);
+                eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_LIST);
                 break;
             case Constants.EP_CLASSCODE:
-                eventLog.setEventType(EventType.epsosOrderServiceList);
-                eventLog.setEI_TransactionName(TransactionName.epsosOrderServiceList);
+                eventLog.setEventType(EventType.ORDER_SERVICE_LIST);
+                eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_LIST);
                 break;
             case Constants.MRO_CLASSCODE:
-                eventLog.setEventType(EventType.epsosMroList);
-                eventLog.setEI_TransactionName(TransactionName.epsosMroServiceList);
+                eventLog.setEventType(EventType.MRO_LIST);
+                eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
                 break;
         }
 
@@ -182,16 +182,16 @@ public class EventLogUtil {
 
         switch (classCode) {
             case Constants.PS_CLASSCODE:
-                eventLog.setEventType(EventType.epsosPatientServiceRetrieve);
-                eventLog.setEI_TransactionName(TransactionName.epsosPatientServiceRetrieve);
+                eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
+                eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
                 break;
             case Constants.EP_CLASSCODE:
-                eventLog.setEventType(EventType.epsosOrderServiceRetrieve);
-                eventLog.setEI_TransactionName(TransactionName.epsosOrderServiceRetrieve);
+                eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
+                eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
                 break;
             case Constants.MRO_CLASSCODE:
-                eventLog.setEventType(EventType.epsosMroRetrieve);
-                eventLog.setEI_TransactionName(TransactionName.epsosMroServiceRetrieve);
+                eventLog.setEventType(EventType.MRO_RETRIEVE);
+                eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
                 break;
         }
 
@@ -280,19 +280,19 @@ public class EventLogUtil {
 
             if (eventCode.endsWith(Constants.CONSENT_PUT_SUFFIX)) {
 
-                eventLog.setEventType(EventType.epsosConsentServicePut);
-                eventLog.setEI_TransactionName(TransactionName.epsosConsentServicePut);
+                eventLog.setEventType(EventType.CONSENT_SERVICE_PUT);
+                eventLog.setEI_TransactionName(TransactionName.CONSENT_SERVICE_PUT);
                 eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
             } else if (eventCode.endsWith(Constants.CONSENT_DISCARD_SUFFIX)) {
 
-                eventLog.setEventType(EventType.epsosConsentServiceDiscard);
-                eventLog.setEI_TransactionName(TransactionName.epsosConsentServiceDiscard);
+                eventLog.setEventType(EventType.CONSENT_SERVICE_DISCARD);
+                eventLog.setEI_TransactionName(TransactionName.CONSENT_SERVICE_DISCARD);
                 eventLog.setEI_EventActionCode(EventActionCode.DELETE);
             }
         } else if (StringUtils.equals(classCode, Constants.ED_CLASSCODE)) {
 
-            eventLog.setEventType(EventType.epsosDispensationServiceInitialize);
-            eventLog.setEI_TransactionName(TransactionName.epsosDispensationServiceInitialize);
+            eventLog.setEventType(EventType.DISPENSATION_SERVICE_INITIALIZE);
+            eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_INITIALIZE);
             eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
         }
 

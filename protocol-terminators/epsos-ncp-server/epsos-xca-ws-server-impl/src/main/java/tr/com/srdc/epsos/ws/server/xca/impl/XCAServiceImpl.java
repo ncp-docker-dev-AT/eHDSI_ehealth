@@ -128,16 +128,16 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         switch (classCode) {
             case Constants.EP_CLASSCODE:
-                eventLog.setEventType(EventType.epsosOrderServiceList);
-                eventLog.setEI_TransactionName(TransactionName.epsosOrderServiceList);
+                eventLog.setEventType(EventType.ORDER_SERVICE_LIST);
+                eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_LIST);
                 break;
             case Constants.PS_CLASSCODE:
-                eventLog.setEventType(EventType.epsosPatientServiceList);
-                eventLog.setEI_TransactionName(TransactionName.epsosPatientServiceList);
+                eventLog.setEventType(EventType.PATIENT_SERVICE_LIST);
+                eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_LIST);
                 break;
             case Constants.MRO_CLASSCODE:
-                eventLog.setEventType(EventType.epsosMroList);
-                eventLog.setEI_TransactionName(TransactionName.epsosMroServiceList);
+                eventLog.setEventType(EventType.MRO_LIST);
+                eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
                 break;
         }
         eventLog.setEI_EventActionCode(EventActionCode.READ);
@@ -228,14 +228,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
         if (classCode == null || classCode.equals(Constants.EP_CLASSCODE)) {
             // In case the document is not found, audit log cannot be properly filled, as we don't know the event type
             // Log this under Order Service
-            eventLog.setEventType(EventType.epsosOrderServiceRetrieve);
-            eventLog.setEI_TransactionName(TransactionName.epsosOrderServiceRetrieve);
+            eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
+            eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
         } else if (classCode.equals(Constants.PS_CLASSCODE)) {
-            eventLog.setEventType(EventType.epsosPatientServiceRetrieve);
-            eventLog.setEI_TransactionName(TransactionName.epsosPatientServiceRetrieve);
+            eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
+            eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
         } else if (classCode.equals(Constants.MRO_CLASSCODE)) {
-            eventLog.setEventType(EventType.epsosMroRetrieve);
-            eventLog.setEI_TransactionName(TransactionName.epsosMroServiceRetrieve);
+            eventLog.setEventType(EventType.MRO_RETRIEVE);
+            eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
         }
         eventLog.setEI_EventActionCode(EventActionCode.READ);
         try {
@@ -815,7 +815,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
                     Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS,
                     Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                    IHEEventType.epsosPatientServiceList.getCode(), new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+                    IHEEventType.PATIENT_SERVICE_LIST.getCode(), new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                     "NI_XCA_LIST_REQ", messageUUID);
         } catch (Exception e) {
             logger.error(ExceptionUtils.getStackTrace(e));
@@ -1153,7 +1153,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
                         Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS,
                         Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        IHEEventType.epsosPatientServiceRetrieve.getCode(), new DateTime(),
+                        IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode(), new DateTime(),
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XCA_RETRIEVE_REQ",
                         Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {

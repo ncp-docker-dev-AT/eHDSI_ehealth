@@ -1,24 +1,24 @@
 package epsos.ccd.gnomon.auditmanager;
 
 /**
- * Enumeration for populating the EventType of the AuditMessage
+ * Enumeration for populating the EventType of the AuditMessage.
  * One of the available eHDSI event ids:
  * <p>
- * epsos-11:    epsosIdentificationService
- * epsos-21:    epsosPatientService
- * epsos-31:    epsosOrderService
- * epsos-41:    epsosDispensationServuceInitialize
- * epsos-42:    epsosDispensationServuceDiscard
- * epsos-51:    epsosConsentServicePut
- * epsos-52:    epsosConsentServiceDiscard
- * epsos-53:    epsosConsentServicePin
- * epsos-91:    epsosHcpAuthentication
- * epsos-92:    epsosTRCAssertion
- * epsos-93:    epsosNCPTrustedServiceList
- * epsos-94:    epsosPivotTranslation
- * epsos-cf:    epsosCommunicationFailure
- * ehealth-193: SMP::Query
- * ehealth-194: SMP::Push
+ * EHDSI-11:    epsosIdentificationService
+ * EHDSI-21:    epsosPatientService
+ * EHDSI-31:    epsosOrderService
+ * EHDSI-41:    epsosDispensationServuceInitialize
+ * EHDSI-42:    epsosDispensationServuceDiscard
+ * EHDSI-51:    epsosConsentServicePut
+ * EHDSI-52:    epsosConsentServiceDiscard
+ * EHDSI-53:    epsosConsentServicePin
+ * EHDSI-91:    epsosHcpAuthentication
+ * EHDSI-92:    epsosTRCAssertion
+ * EHDSI-93:    epsosNCPTrustedServiceList
+ * EHDSI-94:    epsosPivotTranslation
+ * EHDSI-CF:    epsosCommunicationFailure
+ * EHDSI-193:   SMP::Query
+ * EHDSI-194:   SMP::Push
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -27,27 +27,27 @@ package epsos.ccd.gnomon.auditmanager;
  */
 public enum IHETransactionName {
 
-    epsosIdentificationServiceFindIdentityByTraits("XCPD::CrossGatewayPatientDiscovery"),
-    epsosPatientServiceList("XCA::CrossGatewayQuery"),
-    epsosPatientServiceRetrieve("XCA::CrossGatewayRetrieve"),
-    epsosOrderServiceList("XCA::CrossGatewayQuery"),
-    epsosOrderServiceRetrieve("XCA::CrossGatewayRetrieve"),
-    epsosDispensationServiceInitialize("XDR::ProvideandRegisterDocumentSet-b"),
-    epsosDispensationServiceDiscard("XDR::ProvideandRegisterDocumentSet-b"),
-    epsosConsentServicePut("XDR::ProvideandRegisterDocumentSet-b"),
-    epsosConsentServiceDiscard("XDR::ProvideandRegisterDocumentSet-b"),
-    epsosConsentServicePin("epsosConsentService::PIN"),
-    epsosHcpAuthentication("XUA::ProvideX-UserAssertion"),
-    epsosTRCAssertion("ncp::TrcAssertion"),
-    epsosNCPTrustedServiceList("ncpConfigurationManager::ImportNSL"),
-    epsosPivotTranslation("ncpTransformationMgr::Translate"),
-    epsosCommunicationFailure("epsosCommunicationFailure"),
-    epsosPACRetrieve("XCA::CrossGatewayRetrieve"),
-    epsosHCERPut("XDR::ProvideandRegisterDocumentSet-b"),
-    epsosMroServiceList("XCA::CrossGatewayQuery"),
-    epsosMroServiceRetrieve("XCA::CrossGatewayRetrieve"),
-    ehealthSMPQuery("SMP::Query"),
-    ehealthSMPPush("SMP::Push");
+    IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS("XCPD::CrossGatewayPatientDiscovery"),
+    PATIENT_SERVICE_LIST("XCA::CrossGatewayQuery"),
+    PATIENT_SERVICE_RETRIEVE("XCA::CrossGatewayRetrieve"),
+    ORDER_SERVICE_LIST("XCA::CrossGatewayQuery"),
+    ORDER_SERVICE_RETRIEVE("XCA::CrossGatewayRetrieve"),
+    DISPENSATION_SERVICE_INITIALIZE("XDR::ProvideandRegisterDocumentSet-b"),
+    DISPENSATION_SERVICE_DISCARD("XDR::ProvideandRegisterDocumentSet-b"),
+    CONSENT_SERVICE_PUT("XDR::ProvideandRegisterDocumentSet-b"),
+    CONSENT_SERVICE_DISCARD("XDR::ProvideandRegisterDocumentSet-b"),
+    CONSENT_SERVICE_PIN("epsosConsentService::PIN"),
+    HCP_AUTHENTICATION("XUA::ProvideX-UserAssertion"),
+    TRC_ASSERTION("ncp::TrcAssertion"),
+    NCP_TRUSTED_SERVICE_LIST("ncpConfigurationManager::ImportNSL"),
+    PIVOT_TRANSLATION("ncpTransformationMgr::Translate"),
+    COMMUNICATION_FAILURE("epsosCommunicationFailure"),
+    PAC_RETRIEVE("XCA::CrossGatewayRetrieve"),
+    HCER_PUT("XDR::ProvideandRegisterDocumentSet-b"),
+    MRO_SERVICE_LIST("XCA::CrossGatewayQuery"),
+    MRO_SERVICE_RETRIEVE("XCA::CrossGatewayRetrieve"),
+    SMP_QUERY("SMP::Query"),
+    SMP_PUSH("SMP::Push");
 
     private String code;
 

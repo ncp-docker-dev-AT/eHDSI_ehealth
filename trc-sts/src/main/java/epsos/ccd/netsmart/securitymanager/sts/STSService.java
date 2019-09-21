@@ -374,13 +374,13 @@ public class STSService implements Provider<SOAPMessage> {
         String serverName = servletRequest.getServerName();
 
         //TODO: Review Audit Trail specification - Identifying SC and SP as value of CN from TLS certificate.
-        EventLog evLogTRC = EventLog.createEventLogTRCA(TransactionName.epsosTRCAssertion, EventActionCode.EXECUTE,
+        EventLog evLogTRC = EventLog.createEventLogTRCA(TransactionName.TRC_ASSERTION, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID, humanRequestorRole,
                 humanRequestorSubjectID, certificateCommonName, trcCommonName, ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
                 patientID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
                 IPUtil.isLocalIp(sourceGateway) ? serverName : sourceGateway, STSUtils.getSTSServerIp(), NcpSide.NCP_B);
 
-        evLogTRC.setEventType(EventType.epsosTRCAssertion);
+        evLogTRC.setEventType(EventType.TRC_ASSERTION);
         auditService.write(evLogTRC, "13", "2");
     }
 
