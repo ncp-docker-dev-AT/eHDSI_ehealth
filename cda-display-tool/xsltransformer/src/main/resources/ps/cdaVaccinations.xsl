@@ -80,27 +80,28 @@
                                                     <tbody>
                                                         <tr>
                                                             <th>
-                                                                <!-- Vaccination -->
+                                                                <!-- Vaccination header -->
                                                                 <xsl:call-template name="show-displayLabels">
                                                                     <xsl:with-param name="code" select="'79'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <!-- Brand name -->
+                                                                <!-- Brand name header -->
                                                                 <xsl:call-template name="show-displayLabels">
                                                                     <xsl:with-param name="code" select="'9'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <!-- Vaccination Date -->
+                                                                <!-- Vaccination Date header -->
                                                                 <xsl:call-template name="show-displayLabels">
                                                                     <xsl:with-param name="code" select="'80'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <!-- Administered -->
-                                                                <!-- TODO Make this header part of the epsosDisplayLabel value set -->
-                                                                Administered
+                                                                <!-- Administered header -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'80'"/>
+                                                                </xsl:call-template>
                                                             </th>
                                                         </tr>
                                                         <xsl:for-each select="n1:entry">
@@ -184,14 +185,14 @@
                         &#160;
                     </td>
                     <td>
-                        <xsl:choose>
-                            <xsl:when test="(not($negationInd) or $negationInd='false')">
-                                <i class="fa fa-check" style="color:green" aria-hidden="true"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <i class="fa fa-ban" style="color:red" aria-hidden="true"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                            <xsl:choose>
+                                <xsl:when test="(not($negationInd) or $negationInd='false')">
+                                    <font color="green">&#10004;</font>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <font color="red">&#10006;</font>
+                                </xsl:otherwise>
+                            </xsl:choose>
                     </td>
                 </tr>
             </xsl:when>

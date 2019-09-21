@@ -14,12 +14,9 @@
     <xsl:param name="shownarrative" select="''"/>
 
     <!-- TODO these values should be added to the epsosDisplayLabel valueSet -->
-    <xsl:variable name="min" select="'Min'"/>
-    <xsl:variable name="max" select="'Max'"/>
     <xsl:variable name="activeIngredientCodeSystem" select="'Code System'"/>
     <xsl:variable name="activeIngredientCode" select="'Code'"/>
     <xsl:variable name="activeIngredientName" select="'Name'"/>
-    <xsl:variable name="dispensedNumberOfPackages" select="'Dispensed Number of packages'"/>
 
     <!-- show-signature -->
     <!-- DEPRECATED - Nowhere used -->
@@ -720,23 +717,53 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSCodeNoMedication -->
-    <xsl:template name="show-codeNoMedication">
+    <!-- eHDSI-AbsentOrUnknownAllergies -->
+    <xsl:template name="show-absentOrUnknownAllergies">
         <xsl:param name="code"/>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
-            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.22.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.47.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSUnknownInformation -->
-    <xsl:template name="show-unknownInformation">
+    <!-- eHDSI-AbsentOrUnknownDevices -->
+    <xsl:template name="show-absentOrUnknownDevices">
         <xsl:param name="code"/>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
-            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.17.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.48.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSI-AbsentOrUnknownMedication -->
+    <xsl:template name="show-absentOrUnknownMedication">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.49.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSI-AbsentOrUnknownProblems -->
+    <xsl:template name="show-absentOrUnknownProblems">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.50.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSI-AbsentOrUnknownProcedures -->
+    <xsl:template name="show-absentOrUnknownProcedures">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.51.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -747,6 +774,16 @@
             <xsl:with-param name="code" select="$code"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.34.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- epSOSTimingEvent -->
+    <xsl:template name="show-timing-event">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.41.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.139'"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -1023,19 +1060,21 @@
                 </xsl:if>
             </xsl:when>
             <xsl:when test="$medFrequencyIntakeType='EIVL_TS'">
+                <xsl:variable name="medEvent" select="$medFrequencyIntake/n1:event"/>
                 <xsl:variable name="medOffset" select="$medFrequencyIntake/n1:offset"/>
                 <xsl:variable name="medOffsetWidth"
-                              select="$medFrequencyIntake/n1:offset/n1:width"/>
+                              select="$medOffset/n1:width"/>
                 <xsl:variable name="medOffsetLow"
-                              select="$medFrequencyIntake/n1:offset/n1:low"/>
+                              select="$medOffset/n1:low"/>
                 <xsl:if test="$medOffsetLow">
                     <xsl:value-of select="$medOffsetLow/@value"/>
                     &#160;
                     <xsl:value-of select="$medOffsetLow/@unit"/>
                     &#160;
                 </xsl:if>
-                <!--xsl:value-of select="$medFrequencyIntake/n1:event/@code"/ -->
-                <xsl:value-of select="$medFrequencyIntake/n1:event/@displayName"/>
+                <xsl:call-template name="show-timing-event">
+                    <xsl:with-param name="code" select="$medEvent/@code"/>
+                </xsl:call-template>
                 <xsl:if test="$medOffsetWidth">
                     <xsl:text>&#160; </xsl:text>
                     <xsl:call-template name="show-displayLabels">
