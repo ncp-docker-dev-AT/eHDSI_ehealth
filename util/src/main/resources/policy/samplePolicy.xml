@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <PolicySet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            PolicyCombiningAlgId="urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:permit-overrides"
            PolicySetId="optin-xcpd"
@@ -9,7 +9,6 @@
     <Policy PolicyId="policyId2"
             RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides">
         <Target/>
-
         <Rule Effect="Permit" RuleId="permitId">
             <Target>
                 <Actions>
@@ -53,7 +52,6 @@
                                      DataType="http://www.w3.org/2001/XMLSchema#string">
                     urn:oid:1.2.3.4
                 </AttributeAssignment>
-
             </Obligation>
             <Obligation ObligationId="urn:eSENS:obligations:nro:ETSIREM" FulfillOn="Deny">
                 <AttributeAssignment AttributeId="urn:eSENS:obligations:nro:ETSIREM:version"
@@ -68,4 +66,3 @@
         </Obligations>
     </Policy>
 </PolicySet>
-

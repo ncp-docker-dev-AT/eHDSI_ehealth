@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <PolicySet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            PolicyCombiningAlgId="urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:permit-overrides"
            PolicySetId="optin-xcpd"
@@ -23,7 +23,6 @@
             </Target>
         </Rule>
         <Rule Effect="Deny" RuleId="denyID"/>
-
         <Obligations>
             <!-- When the corner 3 receives the message, in case of success, it returns a RelayAcceptanceRejection, which is not considered
             to be a non repudiation token, although it can be seen as an NRS -->
@@ -36,7 +35,6 @@
                                      DataType="http://www.w3.org/2001/XMLSchema#string">
                     urn:oid:1.2.3.5
                 </AttributeAssignment>
-
             </Obligation>
             <Obligation ObligationId="urn:eSENS:obligations:nrr:ETSIREM" FulfillOn="Deny">
                 <AttributeAssignment AttributeId="urn:eSENS:obligations:nrr:ETSIREM:version"
