@@ -6,6 +6,7 @@ import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter.ValueSetVersionConve
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.cts.CtsClient;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.db.DatabaseTool;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.domain.Concept;
+import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.domain.ValueSetVersion;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.repository.CodeSystemRepository;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.repository.ConceptRepository;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.repository.ValueSetRepository;
@@ -82,22 +83,25 @@ public class TsamSyncManager {
 
             logger.info("Starting value sets synchronization");
             int index = 1;
-            for (ValueSetVersionModel valueSetVersion : catalogue.getValueSetVersions()) {
-                valueSetVersionRepository.save(valueSetVersionConverter.convert(valueSetVersion));
 
+            for (ValueSetVersionModel valueSetVersionModel : catalogue.getValueSetVersions()) {
+
+                ValueSetVersion valueSetVersion = valueSetVersionRepository.save(valueSetVersionConverter.convert(valueSetVersionModel));
                 boolean hasNext = false;
-                int page = 0, total = 0;
+                int page = 0;
+                int total = 0;
                 while (hasNext || page == 0) {
-                    List<Concept> concepts = ctsClient.fetchConcepts(valueSetVersion.getValueSet().getId(), valueSetVersion.getVersionId(), page++, pageSize)
+                    List<Concept> concepts = ctsClient.fetchConcepts(valueSetVersionModel.getValueSet().getId(), valueSetVersionModel.getVersionId(), page++, pageSize)
                             .stream()
                             .map(conceptConverter::convert)
                             .collect(Collectors.toList());
+                    concepts.forEach(concept -> concept.addValueSetVersion(valueSetVersion));
                     conceptRepository.saveAll(concepts);
                     total += concepts.size();
                     hasNext = concepts.size() == pageSize;
                 }
 
-                logger.info("{}/{}: '{}' completed ({} concepts)", index++, catalogue.getValueSetVersions().size(), valueSetVersion.getValueSet().getName(), total);
+                logger.info("{}/{}: '{}' completed ({} concepts)", index++, catalogue.getValueSetVersions().size(), valueSetVersionModel.getValueSet().getName(), total);
             }
 
             stopWatch.stop();
