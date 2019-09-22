@@ -18,7 +18,7 @@
         <module>openncp-configuration-init</module>
         <module>openncp-configuration-utility</module>
         <module>openncp-discovery-client</module>
-        <module>openncp-db</module>
+        <module>openncp-database-initializer</module>
     </modules>
 
     <build>
