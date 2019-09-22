@@ -53,6 +53,7 @@ public class AssertionHandler implements Serializable {
     private static final long serialVersionUID = 5209063407337843010L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionHandler.class);
+    private static final String URN_OASIS_NAMES_TC_XSPA_2_0_ROLE = "urn:oasis:names:tc:xacml:2.0:subject:role";
     private static final String URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE = "urn:oasis:names:tc:xspa:1.0:subject:functional-role";
     private AssertionHandlerConfigManager configHandler;
     private Assertion assertion;
@@ -130,12 +131,12 @@ public class AssertionHandler implements Serializable {
         attributeStatement.getAttributes().add(attrPID);
 
         //  TODO fix multiple roles??
-        String role = AssertionHandlerConfigManager.getRoleDisplayName(userDetails.getRoles().get(0));
-        Attribute attrPID_1 = createAttribute(builderFactory, "XSPA role", "urn:oasis:names:tc:xacml:2.0:subject:role", role, "", "");
+        String role = AssertionHandlerConfigManager.getRole(userDetails.getRoles().get(0));
+        Attribute attrPID_1 = createAttribute(builderFactory, "XSPA role", URN_OASIS_NAMES_TC_XSPA_2_0_ROLE, role, "", "");
         attributeStatement.getAttributes().add(attrPID_1);
-        // TODO: CP-0023 Implementation of Structural and Functional roles is missing.
-        Attribute attributeFunctionalRole = createAttribute(builderFactory, "XSPA Functional Role", URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE,
-                "CP_0023_FUNCTIONAL_ROLE", "", "");
+
+        String functionalRole = AssertionHandlerConfigManager.getFunctionalRole(userDetails.getRoles().get(0));
+        Attribute attributeFunctionalRole = createAttribute(builderFactory, "XSPA Functional Role", URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE, functionalRole, "", "");
         attributeStatement.getAttributes().add(attributeFunctionalRole);
 
         Attribute attrPID_3 = createAttribute(builderFactory, "XSPA Organization",
@@ -165,7 +166,7 @@ public class AssertionHandler implements Serializable {
             permissions.addAll(AssertionHandlerConfigManager.getPermissions(r));
         }
 
-        String permissionPrefix = AssertionHandlerConfigManager.getPersmissionsPrefix();
+        String permissionPrefix = AssertionHandlerConfigManager.getPermissionsPrefix();
         for (String permission : permissions) {
             AddAttributeValue(builderFactory, attrPID_8, permissionPrefix + permission, "", "");
         }
@@ -260,7 +261,7 @@ public class AssertionHandler implements Serializable {
         String userIdAlias = assertion.getSubject().getNameID().getSPProvidedID();
         String HR_UserID = StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + assertion.getSubject().getNameID().getValue()
                 + "@" + assertion.getIssuer().getValue() + ">";
-        String HR_RoleID = AssertionHandlerConfigManager.getRoleDisplayName(userDetails.getRoles().get(0));
+        String HR_RoleID = AssertionHandlerConfigManager.getRole(userDetails.getRoles().get(0));
         String HR_AlternativeUserID = userDetails.getCommonName();
         String SC_UserID = name;
         String SP_UserID = name;

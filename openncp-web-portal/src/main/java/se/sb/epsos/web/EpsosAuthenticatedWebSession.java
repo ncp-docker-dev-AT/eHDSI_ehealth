@@ -107,7 +107,6 @@ public class EpsosAuthenticatedWebSession extends AuthenticatedWebSession {
     }
 
     public AuthenticatedUser getUserDetails() {
-
         Authentication auth = getAuthentication();
         if (FeatureFlagsManager.check(Feature.ENABLE_SWEDISH_JAAS)) {
             if (auth != null) {
@@ -129,7 +128,7 @@ public class EpsosAuthenticatedWebSession extends AuthenticatedWebSession {
                         authenticatedUser.setOrganizationName(authorityPrincipal.getOrganizationName());
                         authenticatedUser.setOrganizationId(authorityPrincipal.getOrganizationId());
                         authenticatedUser.setCommonName(authorityPrincipal.getCommonName());
-                        authenticatedUser.setPrmiaryRole(jaasGrantedAuthority.getAuthority());
+                        authenticatedUser.setPrimaryRole(jaasGrantedAuthority.getAuthority());
                     }
                     getServiceFacade().bindToSession(this.getId());
                     try {
