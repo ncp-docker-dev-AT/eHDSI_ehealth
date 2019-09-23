@@ -3,6 +3,42 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [4.0.0] - 23-09-2019
+The OpenNCP 4.0.0 release is the CEF eHDSI Wave 3 Release Candidate available for the eHDSI Preparatory Test Event.
+<br/>Most of the changed are related to the implementation of eHDSI Wave 3 Change Proposals.
+<br/>Major technical update is related to the Apache Axis2 framework upgrade (1.6.2 to 1.7.9). 
+<br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/rgC6Bg
+### Added
+- [EHNCP-1808] OpenNCP Web Portal is not handling ISM containing XML Namespaces.
+- [EHNCP-1794] Dynamic Discovery Client doesn't work properly with Proxy and TLS. 
+- [EHNCP-1788] CP-eHealthDSI-023: SAML - Update Structural Role values of the HP.
+- [EHNCP-1787] CP-eHealthDSI-024: Formalize the 'Description' element in the eP list. 
+- [EHNCP-1754] Use the labels from the MVC 3.0.0 RC1 instead of the hardcoded labels in the CDA Display Tool. 	
+- [EHNCP-1753] Implement CP25 in the CDA Display Tool.
+- [EHNCP-1752] Display Marketing Authorization Holder (MAH) in CDA Display Tool.
+- [EHNCP-1737] Align value sets in MVC 3.0.0 for the representation of "no information"/"known absence" scenarios.  
+
+### Changed
+- [EHNCP-1810] Add date information into the log files - Logback configuration.
+- [EHNCP-1809] Update Gazelle configuration in order to call formal Wave 3 validators. 
+- [EHNCP-1807] Update national connector mock with Wave 3 examples.
+- [EHNCP-1806] Alignment of audit messages and the Wave 3 specifications - Code System Name. 
+- [EHNCP-1804] NullFlavored brand names of immunizations are not displayed.
+- [EHNCP-1801] TSAM-Sync backup filename only contains the date.
+- [EHNCP-1798] Incorrect separator in openncp-web-portal.
+- [EHNCP-1797] NullFlavor tooltip is cut by table margin. 
+- [EHNCP-1795] Harmonize OpenNCP Java dependencies.
+- [EHNCP-1785] Frequency of intakes not well displayed in CDA Display Tool in the case of the EIVL_TS datatype.
+- [EHNCP-1784] Administered icons are not displayed in PDF version of the Patient Summary.
+- [EHNCP-1713] Some labels used into OpenNCP DisplayTool are not part of the VS epSOSDisplayLabel. 
+- [EHNCP-1571] Axis2 Framework version upgrade (1.7.9).
+
+### Deprecated
+- [N/A].
+
+### Removed
+- [N/A].
+
 ## [3.1.0] - 05-08-2019
 The OpenNCP 3.1.0 release is the CEF eHDSI Wave 2 Operation Ready version which is fixing the different findings discovered during the latest Formal Test Event.
 <br/>Most of the changed are related to the Audit and ATNA messages and the identification of the different network components used.
