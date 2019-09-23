@@ -65,4 +65,10 @@
     top:1px;
 }
 
+.additionalInfo {
+    float: left;
+    font-style: italic;
+    color: #009fd1;
+}
+
 ]]></root>

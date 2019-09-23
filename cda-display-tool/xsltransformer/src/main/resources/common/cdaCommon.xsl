@@ -851,6 +851,7 @@
     <xsl:template name="show-strength">
         <xsl:param name="medStrengthNumerator"/>
         <xsl:param name="medStrengthDenominator"/>
+        <xsl:param name="medStrengthOriginalText"/>
 
         <xsl:variable name="numeratorValue" select="$medStrengthNumerator/@value"/>
         <xsl:variable name="numeratorUnit" select="$medStrengthNumerator/@unit"/>
@@ -861,54 +862,72 @@
             </xsl:call-template>
         </xsl:variable>
 
-        <xsl:choose>
-            <xsl:when test="($medStrengthNumerator/@nullFlavor)">
-                <xsl:call-template name="show-nullFlavor">
-                    <xsl:with-param name="code" select="$medStrengthNumerator/@nullFlavor"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="($medStrengthDenominator/@nullFlavor)">
-                <xsl:value-of select="$numeratorValue"/>
-                <xsl:text> </xsl:text>
-                [<xsl:value-of select="$numeratorUnit"/>]
-                <xsl:text> </xsl:text>
-                /
-                <xsl:text> </xsl:text>
-                <xsl:call-template name="show-nullFlavor">
-                    <xsl:with-param name="code" select="$medStrengthDenominator/@nullFlavor"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="$denominatorUnit='1'">
-                <xsl:value-of select="$numeratorValue"/>
-                <xsl:text> </xsl:text>
-                [<xsl:value-of select="$numeratorUnit"/>]
-                <xsl:text> </xsl:text>
-                <xsl:call-template name="show-displayLabels">
-                    <xsl:with-param name="code" select="'53'"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="not($denominatorValue)">
-                <xsl:value-of select="$numeratorValue"/>
-                <xsl:text> </xsl:text>
-                [<xsl:value-of select="$numeratorUnit"/>]
-                <xsl:text> </xsl:text>
-                /
-            </xsl:when>
-            <xsl:when test="not($numeratorValue) and not($denominatorValue)">
-                /
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$numeratorValue"/>
-                <xsl:text> </xsl:text>
-                [<xsl:value-of select="$numeratorUnit"/>]
-                <xsl:text> </xsl:text>
-                /
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="$denominatorValue"/>
-                <xsl:text> </xsl:text>
-                [<xsl:value-of select="$denominatorUnit"/>]
-            </xsl:otherwise>
-        </xsl:choose>
+        <table>
+            <tr>
+                <td>
+                    <xsl:choose>
+                        <xsl:when test="($medStrengthNumerator/@nullFlavor)">
+                            <xsl:call-template name="show-nullFlavor">
+                                <xsl:with-param name="code" select="$medStrengthNumerator/@nullFlavor"/>
+                            </xsl:call-template>
+                        </xsl:when>
+                        <xsl:when test="($medStrengthDenominator/@nullFlavor)">
+                            <xsl:value-of select="$numeratorValue"/>
+                            <xsl:text> </xsl:text>
+                            [<xsl:value-of select="$numeratorUnit"/>]
+                            <xsl:text> </xsl:text>
+                            /
+                            <xsl:text> </xsl:text>
+                            <xsl:call-template name="show-nullFlavor">
+                                <xsl:with-param name="code" select="$medStrengthDenominator/@nullFlavor"/>
+                            </xsl:call-template>
+                        </xsl:when>
+                        <xsl:when test="$denominatorUnit='1'">
+                            <xsl:value-of select="$numeratorValue"/>
+                            <xsl:text> </xsl:text>
+                            [<xsl:value-of select="$numeratorUnit"/>]
+                            <xsl:text> </xsl:text>
+                            <xsl:call-template name="show-displayLabels">
+                                <xsl:with-param name="code" select="'53'"/>
+                            </xsl:call-template>
+                        </xsl:when>
+                        <xsl:when test="not($denominatorValue)">
+                            <xsl:value-of select="$numeratorValue"/>
+                            <xsl:text> </xsl:text>
+                            [<xsl:value-of select="$numeratorUnit"/>]
+                            <xsl:text> </xsl:text>
+                            /
+                        </xsl:when>
+                        <xsl:when test="not($numeratorValue) and not($denominatorValue)">
+                            /
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="$numeratorValue"/>
+                            <xsl:text> </xsl:text>
+                            [<xsl:value-of select="$numeratorUnit"/>]
+                            <xsl:text> </xsl:text>
+                            /
+                            <xsl:text> </xsl:text>
+                            <xsl:value-of select="$denominatorValue"/>
+                            <xsl:text> </xsl:text>
+                            [<xsl:value-of select="$denominatorUnit"/>]
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </td>
+            </tr>
+            <xsl:if test="$medStrengthOriginalText">
+                <tr>
+                    <td>
+                        <div class="tooltip">
+                            <div class="additionalInfo">
+                                <xsl:value-of select="$medStrengthOriginalText"/>
+                            </div>
+                            <span class="tooltiptext">Additional info</span>
+                        </div>
+                    </td>
+                </tr>
+            </xsl:if>
+        </table>
     </xsl:template>
 
     <!-- Number of Unit per Intake Low value -->
