@@ -61,7 +61,7 @@ public class UserinfoPanel extends Panel {
 
                     @Override
                     public void onClick() {
-                        userDetails.setPrmiaryRole(item.getModelObject());
+                        userDetails.setPrimaryRole(item.getModelObject());
                         try {
                             ((EpsosAuthenticatedWebSession) getSession()).getServiceFacade().initUser(userDetails);
                         } catch (NcpServiceException ex) {

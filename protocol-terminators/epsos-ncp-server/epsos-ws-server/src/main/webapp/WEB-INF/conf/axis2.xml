@@ -18,18 +18,6 @@
   -->
 
 <axisconfig name="AxisJava2.0">
-    <!--
-    <module ref="rampart" />
-    
-    <parameter name="OutflowSecurity">
-        <action>
-            <items>UsernameToken</items>
-            <user>bob</user>
-            <passwordCallbackClass>org.apache.rampart.samples.sample09.PWCBHandler</passwordCallbackClass>
-        </action>
-    </parameter>
-    -->
-
     <!-- ================================================= -->
     <!-- Parameters -->
     <!-- ================================================= -->
@@ -38,12 +26,23 @@
     <parameter name="enableMTOM">false</parameter>
     <parameter name="enableSwA">false</parameter>
 
-    <parameter name="EnableChildFirstClassLoading">false</parameter>
-
     <!--Uncomment if you want to enable file caching for attachments -->
     <!--parameter name="cacheAttachments">true</parameter>
     <parameter name="attachmentDIR"></parameter>
     <parameter name="sizeThreshold">4000</parameter-->
+
+    <parameter name="EnableChildFirstClassLoading">false</parameter>
+
+    <!--
+      The exposeServiceMetadata parameter decides whether the metadata (WSDL, schema, policy) of
+      the services deployed on Axis2 should be visible when ?wsdl, ?wsdl2, ?xsd, ?policy requests
+      are received.
+      This parameter can be defined in the axi2.xml file, in which case this will be applicable
+      globally, or in the services.xml files, in which case, it will be applicable to the
+      Service groups and/or services, depending on the level at which the parameter is declared.
+      This value of this parameter defaults to true.
+   -->
+    <parameter name="exposeServiceMetadata">true</parameter>
 
     <!--Uncomment if you want to plugin your own attachments lifecycle implementation -->
     <!--<attachmentsLifecycleManager class="org.apache.axiom.attachments.lifecycle.impl.LifecycleManagerImpl"/>-->
@@ -99,10 +98,22 @@
     <!-- Following parameter will suppress generation of SOAP 1.2 bindings in auto-generated WSDL files -->
     <parameter name="disableSOAP12" locked="true">false</parameter>
 
+    <!-- ================================================= -->
+    <!-- Deployers -->
+    <!-- ================================================= -->
+
+    <!--Service deployer , this will alow users to deploy AAR or exploded AAR as axis2 services-->
+    <deployer extension=".aar" directory="services" class="org.apache.axis2.deployment.ServiceDeployer">
+        <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension"/>
+        <serviceBuilderExtension name ="wsdlbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
+    </deployer>
+
     <!--POJO deployer , this will alow users to drop .class file and make that into a service-->
     <deployer extension=".class" directory="pojo" class="org.apache.axis2.deployment.POJODeployer"/>
+
     <deployer extension=".jar" directory="servicejars"
               class="org.apache.axis2.jaxws.framework.JAXWSDeployer"/>
+
     <deployer extension=".jar" directory="transports"
               class="org.apache.axis2.deployment.TransportDeployer"/>
 
@@ -144,14 +155,6 @@
     <!--any operation -->
     <!--Note : You can override this for a particular service by adding the same element with your requirement-->
     <messageReceivers>
-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
         <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
         <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
@@ -530,4 +533,3 @@
         <phase name="Security"/>
     </phaseOrder>
 </axisconfig>
-

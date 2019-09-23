@@ -11,7 +11,6 @@ public class AssertionHandlerConfigManagerTest {
 
     @Test
     public void testGetPermissionsPrefix() {
-
     }
 
     @Test
@@ -47,29 +46,50 @@ public class AssertionHandlerConfigManagerTest {
     }
 
     @Test
-    public void testGetRoleDisplayName_ROLE_PHARMACIST() {
-        String role = AssertionHandlerConfigManager.getRoleDisplayName("ROLE_PHARMACIST");
+    public void testGetRole_ROLE_PHARMACIST() {
+        String role = AssertionHandlerConfigManager.getRole("ROLE_PHARMACIST");
         assertNotNull(role);
-        assertEquals("pharmacist", role);
+        assertEquals("Licensed Health Care Providers", role);
     }
 
     @Test
-    public void testGetRoleDisplayName_ROLE_DOCTOR() {
-        String role = AssertionHandlerConfigManager.getRoleDisplayName("ROLE_DOCTOR");
+    public void testGetRole_ROLE_DOCTOR() {
+        String role = AssertionHandlerConfigManager.getRole("ROLE_DOCTOR");
         assertNotNull(role);
-        assertEquals("physician", role);
+        assertEquals("Licensed Health Care Providers", role);
     }
 
     @Test
-    public void testGetRoleDisplayName_ROLE_NURSE() {
-        String role = AssertionHandlerConfigManager.getRoleDisplayName("ROLE_NURSE");
+    public void testGetRole_ROLE_NURSE() {
+        String role = AssertionHandlerConfigManager.getRole("ROLE_NURSE");
         assertNotNull(role);
-        assertEquals("nurse", role);
+        assertEquals("Licensed Health Care Providers", role);
     }
 
     @Test
-    public void testGetPersmissions() {
-        Set<String> roles = AssertionHandlerConfigManager.getPersmissions("ROLE_PHARMACIST");
+    public void testGetFunctionalRole_ROLE_PHARMACIST() {
+        String functionalRole = AssertionHandlerConfigManager.getFunctionalRole("ROLE_PHARMACIST");
+        assertNotNull(functionalRole);
+        assertEquals("Pharmacists", functionalRole);
+    }
+
+    @Test
+    public void testGetFunctionalRole_ROLE_DOCTOR() {
+        String functionalRole = AssertionHandlerConfigManager.getFunctionalRole("ROLE_DOCTOR");
+        assertNotNull(functionalRole);
+        assertEquals("Medical Doctors", functionalRole);
+    }
+
+    @Test
+    public void testGetFunctionalRole_ROLE_NURSE() {
+        String functionalRole = AssertionHandlerConfigManager.getFunctionalRole("ROLE_NURSE");
+        assertNotNull(functionalRole);
+        assertEquals("Nursing professionals", functionalRole);
+    }
+
+    @Test
+    public void testGetPermissions() {
+        Set<String> roles = AssertionHandlerConfigManager.getPermissions("ROLE_PHARMACIST");
         assertNotNull(roles);
         assertEquals(4, roles.size());
     }

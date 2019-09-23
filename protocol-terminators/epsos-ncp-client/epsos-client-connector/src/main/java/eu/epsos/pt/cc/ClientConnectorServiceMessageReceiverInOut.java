@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
-import tr.com.srdc.epsos.securityman.SAML2Validator;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.stream.XMLStreamReader;

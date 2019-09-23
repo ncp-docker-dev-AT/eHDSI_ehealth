@@ -17,8 +17,18 @@
     <xsl:import href="cdaPhysicalFindings.xsl"/>
     <xsl:import href="cdaOtherSection.xsl"/>
 
-    <xsl:variable name="originalNarrativeTableTitle" select="'Original narrative'"/>
-    <xsl:variable name="translatedCodedTableTitle" select="'Translated coded'"/>
+    <xsl:variable name="originalNarrativeTableTitle">
+        <!-- Original narrative -->
+        <xsl:call-template name="show-displayLabels">
+            <xsl:with-param name="code" select="'108'"/>
+        </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="translatedCodedTableTitle">
+        <!-- Translated coded -->
+        <xsl:call-template name="show-displayLabels">
+            <xsl:with-param name="code" select="'109'"/>
+        </xsl:call-template>
+    </xsl:variable>
 
     <!-- xsl:output method="html" indent="yes" version="4.01"   doctype-system="http://www.w3.org/TR/html4/strict.dtd" doctype-public="-//W3C//DTD HTML 4.01//EN"/ -->
     <xsl:template name="psCda">
@@ -68,7 +78,10 @@
             <div class="wrap-collabsible">
                 <input id="collapsible-clinical-sections" class="toggle" type="checkbox" checked="true"/>
                 <label for="collapsible-clinical-sections" class="lbl-toggle-main">
-                    Clinical sections
+                    <!-- Clinical sections -->
+                    <xsl:call-template name="show-displayLabels">
+                        <xsl:with-param name="code" select="'110'"/>
+                    </xsl:call-template>
                 </label>
                 <div class="collapsible-content-main">
                     <div class="content-inner-main">

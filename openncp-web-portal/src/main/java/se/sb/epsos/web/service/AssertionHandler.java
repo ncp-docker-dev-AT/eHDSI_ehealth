@@ -53,6 +53,8 @@ public class AssertionHandler implements Serializable {
     private static final long serialVersionUID = 5209063407337843010L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionHandler.class);
+    private static final String URN_OASIS_NAMES_TC_XSPA_2_0_ROLE = "urn:oasis:names:tc:xacml:2.0:subject:role";
+    private static final String URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE = "urn:oasis:names:tc:xspa:1.0:subject:functional-role";
     private AssertionHandlerConfigManager configHandler;
     private Assertion assertion;
 
@@ -128,10 +130,14 @@ public class AssertionHandler implements Serializable {
                 "urn:oasis:names:tc:xacml:1.0:subject:subject-id", userDetails.getCommonName(), "", "");
         attributeStatement.getAttributes().add(attrPID);
 
-        //TODO fix multiple roles??
-        String role = AssertionHandlerConfigManager.getRoleDisplayName(userDetails.getRoles().get(0));
-        Attribute attrPID_1 = createAttribute(builderFactory, "XSPA role", "urn:oasis:names:tc:xacml:2.0:subject:role", role, "", "");
+        //  TODO fix multiple roles??
+        String role = AssertionHandlerConfigManager.getRole(userDetails.getRoles().get(0));
+        Attribute attrPID_1 = createAttribute(builderFactory, "XSPA role", URN_OASIS_NAMES_TC_XSPA_2_0_ROLE, role, "", "");
         attributeStatement.getAttributes().add(attrPID_1);
+
+        String functionalRole = AssertionHandlerConfigManager.getFunctionalRole(userDetails.getRoles().get(0));
+        Attribute attributeFunctionalRole = createAttribute(builderFactory, "XSPA Functional Role", URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE, functionalRole, "", "");
+        attributeStatement.getAttributes().add(attributeFunctionalRole);
 
         Attribute attrPID_3 = createAttribute(builderFactory, "XSPA Organization",
                 "urn:oasis:names:tc:xspa:1.0:subject:organization", userDetails.getOrganizationName(), "", "");
@@ -157,10 +163,10 @@ public class AssertionHandler implements Serializable {
                 "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission");
         Set<String> permissions = new HashSet<>();
         for (String r : userDetails.getRoles()) {
-            permissions.addAll(AssertionHandlerConfigManager.getPersmissions(r));
+            permissions.addAll(AssertionHandlerConfigManager.getPermissions(r));
         }
 
-        String permissionPrefix = AssertionHandlerConfigManager.getPersmissionsPrefix();
+        String permissionPrefix = AssertionHandlerConfigManager.getPermissionsPrefix();
         for (String permission : permissions) {
             AddAttributeValue(builderFactory, attrPID_8, permissionPrefix + permission, "", "");
         }
@@ -255,7 +261,7 @@ public class AssertionHandler implements Serializable {
         String userIdAlias = assertion.getSubject().getNameID().getSPProvidedID();
         String HR_UserID = StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + assertion.getSubject().getNameID().getValue()
                 + "@" + assertion.getIssuer().getValue() + ">";
-        String HR_RoleID = AssertionHandlerConfigManager.getRoleDisplayName(userDetails.getRoles().get(0));
+        String HR_RoleID = AssertionHandlerConfigManager.getRole(userDetails.getRoles().get(0));
         String HR_AlternativeUserID = userDetails.getCommonName();
         String SC_UserID = name;
         String SP_UserID = name;
@@ -273,12 +279,12 @@ public class AssertionHandler implements Serializable {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
+        EventLog eventLog = EventLog.createEventLogHCPIdentity(TransactionName.HCP_AUTHENTICATION, EventActionCode.EXECUTE,
                 eventLogDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 SC_UserID, SP_UserID, AS_AuditSourceId, ET_ObjectID, reqm_participantObjectID,
                 secHead.getBytes(StandardCharsets.UTF_8), resm_participantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
                 sourceIP, sourceIP, NcpSide.NCP_B);
-        eventLog.setEventType(EventType.epsosHcpAuthentication);
+        eventLog.setEventType(EventType.HCP_AUTHENTICATION);
         asd.write(eventLog, "13", "2");
         LOGGER.debug("################################################");
         LOGGER.debug("# sendAuditEpsos91 - stop                      #");

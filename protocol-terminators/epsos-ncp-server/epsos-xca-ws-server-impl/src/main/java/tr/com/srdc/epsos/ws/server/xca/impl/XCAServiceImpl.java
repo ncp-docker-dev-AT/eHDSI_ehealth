@@ -41,10 +41,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.xds.DocumentType;
-import tr.com.srdc.epsos.securityman.SAML2Validator;
-import tr.com.srdc.epsos.securityman.exceptions.AssertionValidationException;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
-import tr.com.srdc.epsos.securityman.helper.Helper;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.AssertionValidationException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
@@ -128,16 +128,16 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         switch (classCode) {
             case Constants.EP_CLASSCODE:
-                eventLog.setEventType(EventType.epsosOrderServiceList);
-                eventLog.setEI_TransactionName(TransactionName.epsosOrderServiceList);
+                eventLog.setEventType(EventType.ORDER_SERVICE_LIST);
+                eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_LIST);
                 break;
             case Constants.PS_CLASSCODE:
-                eventLog.setEventType(EventType.epsosPatientServiceList);
-                eventLog.setEI_TransactionName(TransactionName.epsosPatientServiceList);
+                eventLog.setEventType(EventType.PATIENT_SERVICE_LIST);
+                eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_LIST);
                 break;
             case Constants.MRO_CLASSCODE:
-                eventLog.setEventType(EventType.epsosMroList);
-                eventLog.setEI_TransactionName(TransactionName.epsosMroServiceList);
+                eventLog.setEventType(EventType.MRO_LIST);
+                eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
                 break;
         }
         eventLog.setEI_EventActionCode(EventActionCode.READ);
@@ -228,14 +228,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
         if (classCode == null || classCode.equals(Constants.EP_CLASSCODE)) {
             // In case the document is not found, audit log cannot be properly filled, as we don't know the event type
             // Log this under Order Service
-            eventLog.setEventType(EventType.epsosOrderServiceRetrieve);
-            eventLog.setEI_TransactionName(TransactionName.epsosOrderServiceRetrieve);
+            eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
+            eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
         } else if (classCode.equals(Constants.PS_CLASSCODE)) {
-            eventLog.setEventType(EventType.epsosPatientServiceRetrieve);
-            eventLog.setEI_TransactionName(TransactionName.epsosPatientServiceRetrieve);
+            eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
+            eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
         } else if (classCode.equals(Constants.MRO_CLASSCODE)) {
-            eventLog.setEventType(EventType.epsosMroRetrieve);
-            eventLog.setEI_TransactionName(TransactionName.epsosMroServiceRetrieve);
+            eventLog.setEventType(EventType.MRO_RETRIEVE);
+            eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
         }
         eventLog.setEI_EventActionCode(EventActionCode.READ);
         try {
@@ -550,7 +550,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private String prepareExtrinsicObjectEP(AdhocQueryRequest request, ExtrinsicObjectType eot, EPDocumentMetaData document) {
 
-        String name = "ePrescription";
+        String name = "eHDSI - ePrescription";
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
         boolean isPDF = document.getFormat() == EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF;
 
@@ -569,10 +569,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
         eot.getName().getLocalizedString().get(0).setValue(name);
 
-        // Description (optional)
+        // Description
         eot.setDescription(ofRim.createInternationalStringType());
         eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
-        eot.getDescription().getLocalizedString().get(0).setValue(document.getTitle());
+        eot.getDescription().getLocalizedString().get(0).setValue(document.getDescription());
 
         // Version Info
         eot.setVersionInfo(ofRim.createVersionInfoType());
@@ -597,6 +597,26 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Type code (not written in 3.4.2)
         eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
                 uuid, Constants.EP_CLASSCODE, "2.16.840.1.113883.6.1", name));
+
+        // Product
+        if (document.hasProduct()) {
+            EPDocumentMetaData.ProductMetadata product = document.getProduct();
+            eot.getClassification()
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                            product.getProductCode(), "2.16.840.1.113883.6.73", product.getProductName()));
+        }
+
+        // Dispensable
+        if (document.isDispensable()) {
+            eot.getClassification()
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                            uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open"));
+        } else {
+            eot.getClassification()
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                            uuid, "urn:ihe:iti:xdw:2011:eventCode:closed", "1.3.6.1.4.1.19376.1.2.3", "Closed"));
+        }
+
         // Confidentiality Code
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
                 uuid, "N", "2.16.840.1.113883.5.25", "Normal"));
@@ -795,7 +815,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
                     Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS,
                     Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                    IHEEventType.epsosPatientServiceList.getCode(), new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
+                    IHEEventType.PATIENT_SERVICE_LIST.getCode(), new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
                     "NI_XCA_LIST_REQ", messageUUID);
         } catch (Exception e) {
             logger.error(ExceptionUtils.getStackTrace(e));
@@ -1133,7 +1153,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
                         Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS,
                         Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        IHEEventType.epsosPatientServiceRetrieve.getCode(), new DateTime(),
+                        IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode(), new DateTime(),
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XCA_RETRIEVE_REQ",
                         Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {

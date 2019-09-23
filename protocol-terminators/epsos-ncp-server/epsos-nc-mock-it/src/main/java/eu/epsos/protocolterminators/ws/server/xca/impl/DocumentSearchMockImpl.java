@@ -5,7 +5,14 @@ import eu.epsos.protocolterminators.ws.server.common.ResourceList;
 import eu.epsos.protocolterminators.ws.server.common.ResourceLoader;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
-import fi.kela.se.epsos.data.model.*;
+import fi.kela.se.epsos.data.model.DocumentAssociation;
+import fi.kela.se.epsos.data.model.DocumentFactory;
+import fi.kela.se.epsos.data.model.EPDocumentMetaData;
+import fi.kela.se.epsos.data.model.EPSOSDocument;
+import fi.kela.se.epsos.data.model.EPSOSDocumentMetaData;
+import fi.kela.se.epsos.data.model.MroDocumentMetaData;
+import fi.kela.se.epsos.data.model.PSDocumentMetaData;
+import fi.kela.se.epsos.data.model.SearchCriteria;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -24,12 +31,16 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -75,14 +86,24 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
+                String productCode = null;
+                String productName = null;
+                Element element = getProductFromPrescription(xmlDoc);
+                if (element != null) {
+                    productCode = element.getAttribute("code");
+                    productName = element.getAttribute("displayName");
+                }
+
+                String description = getDescriptionFromDocument(xmlDoc);
+
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc));
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true);
                 LOGGER.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
                 EPDocumentMetaData epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc));
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true);
                 LOGGER.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
 
@@ -337,21 +358,22 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return "Document Title Not Available";
     }
 
-    /**
-     * @param doc
-     * @return
-     */
-    private String getDescriptionFromPrescription(Document doc) {
 
-        //xmlns:epsos="urn:epsos-org:ep:medication"
-        NodeList documentNames = doc.getElementsByTagNameNS(EHDSI_EPSOS_MEDICATION_NAMESPACE, "name");
-
-        if (documentNames != null && documentNames.getLength() > 0) {
-            Node titleNode = documentNames.item(0);
-            return titleNode.getTextContent();
+    private Element getProductFromPrescription(Document document) {
+        NodeList elements = document.getElementsByTagNameNS(EHDSI_EPSOS_MEDICATION_NAMESPACE, "generalizedMedicineClass");
+        if (elements.getLength() == 0) {
+            return null;
         }
-        LOGGER.debug("Could not locate the title of the prescription");
-        return "ePrescription";
+        NodeList children = elements.item(0)
+                .getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node node = children.item(i);
+            if (Objects.equals(Node.ELEMENT_NODE, node.getNodeType()) &&
+                    Objects.equals("code", node.getLocalName())) {
+                return (Element) node;
+            }
+        }
+        return null;
     }
 
     private void wrapPDFinCDA(byte[] pdf, Document doc) {
@@ -374,7 +396,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         nonXMLBody.appendChild(text);
         newComponent.appendChild(nonXMLBody);
 
-        Node rootNode = doc.getFirstChild();
+        Node rootNode = doc.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "ClinicalDocument").item(0);
 
         rootNode.replaceChild(newComponent, oldComponent);
         LOGGER.info("PDF document added.");
@@ -394,5 +416,21 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 id.setAttribute(CONSTANT_EXTENSION, Integer.toString(format));
             }
         }
+    }
+
+    private String getDescriptionFromDocument(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String description = null;
+
+        try {
+            description = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='name']/text()", doc) +
+                    ", " + path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='formCode']/@displayName", doc) +
+                    ", " + path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='desc']/text()", doc);
+        } catch (XPathExpressionException e) {
+            LOGGER.error("XPath expression error", e);
+        }
+
+        return description;
     }
 }

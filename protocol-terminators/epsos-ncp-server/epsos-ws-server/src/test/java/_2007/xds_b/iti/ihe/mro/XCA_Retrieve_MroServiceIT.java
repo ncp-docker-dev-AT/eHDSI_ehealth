@@ -19,7 +19,7 @@
  */
 package _2007.xds_b.iti.ihe.mro;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.pt.server.it.ServerGenericIT;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.junit.BeforeClass;
@@ -55,7 +55,7 @@ public class XCA_Retrieve_MroServiceIT extends ServerGenericIT {
 
     @Override
     protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
-        return hcpAndTrcAssertionCreate(PATIENT_ISO, XSPARole.PHARMACIST);
+        return hcpAndTrcAssertionCreate(PATIENT_ISO, XSPARole.DEPRECATED_PHARMACIST);
     }
 
     /**
@@ -64,7 +64,7 @@ public class XCA_Retrieve_MroServiceIT extends ServerGenericIT {
      */
     @Test
     public void testRetrieveDocument() {
-        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_L3, XSPARole.PHARMACIST);
+        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_L3, XSPARole.DEPRECATED_PHARMACIST);
         testGood("testRetrieveDocument", QUERY_FILE_L3);
     }
 
@@ -74,21 +74,21 @@ public class XCA_Retrieve_MroServiceIT extends ServerGenericIT {
      */
     @Test
     public void testRetrieveDocumentPdf() {
-        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_L1, XSPARole.PHARMACIST);
+        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_L1, XSPARole.DEPRECATED_PHARMACIST);
         testGood("testRetrieveDocument", QUERY_FILE_L1);
     }
 
     @Ignore
     @Test
     public void testRetrieveInvalidDocument() {
-        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_INVALD_ID, XSPARole.PHARMACIST);
+        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_INVALD_ID, XSPARole.DEPRECATED_PHARMACIST);
         testFail("testRetrieveInvalidDocument", "Failure", QUERY_FILE_INVALD_ID);
     }
 
     @Ignore
     @Test
     public void testRetrieveEmptyDocument() {
-        this.assertions = this.getAssertions(QUERY_FILE_EMPTY_ID, XSPARole.PHARMACIST);
+        this.assertions = this.getAssertions(QUERY_FILE_EMPTY_ID, XSPARole.DEPRECATED_PHARMACIST);
         testFail("testRetrieveEmptyDocument", "Failure", QUERY_FILE_EMPTY_ID);
     }
 }

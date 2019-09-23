@@ -1,6 +1,6 @@
 package eu.europa.ec.joinup.ecc.openstork.utils.datamodel;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 
 /**
  * This ENUM represents all the possible HCP roles in the concerned scope.
@@ -9,11 +9,11 @@ import eu.epsos.assertionvalidator.XSPARole;
  */
 public enum HcpRole {
 
-    PHYSICIAN("physician", XSPARole.PHYSICIAN),
-    PHARMACIST("pharmacist", XSPARole.PHARMACIST),
-    NURSE("nurse", XSPARole.NURSE),
-    PATIENT("patient", XSPARole.PATIENT),
-    ADMINISTRATOR("administrator", XSPARole.ADMISSION_CLERK);
+    PHYSICIAN("physician", XSPARole.DEPRECATED_PHYSICIAN),
+    PHARMACIST("pharmacist", XSPARole.DEPRECATED_PHARMACIST),
+    NURSE("nurse", XSPARole.DEPRECATED_NURSE),
+    PATIENT("patient", XSPARole.DEPRECATED_PATIENT),
+    ADMINISTRATOR("administrator", XSPARole.DEPRECATED_ADMISSION_CLERK);
 
     private final String designation;
     private final XSPARole xspaRole;

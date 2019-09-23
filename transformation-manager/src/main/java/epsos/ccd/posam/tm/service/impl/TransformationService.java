@@ -330,7 +330,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 calendar.setTime(new Date());
                 String securityHeader = "[No security header provided]";
                 EventLog eventLog = EventLog.createEventLogPivotTranslation(
-                        TransactionName.epsosPivotTranslation,
+                        TransactionName.PIVOT_TRANSLATION,
                         EventActionCode.EXECUTE,
                         DATATYPE_FACTORY.newXMLGregorianCalendar(calendar),
                         responseStructure.getStatus().equals(STATUS_SUCCESS) ? EventOutcomeIndicator.FULL_SUCCESS : EventOutcomeIndicator.PERMANENT_FAILURE,
@@ -343,7 +343,7 @@ public class TransformationService implements ITransformationService, TMConstant
                         securityHeader.getBytes(StandardCharsets.UTF_8),
                         IPUtil.getPrivateServerIp()
                 );
-                eventLog.setEventType(EventType.epsosPivotTranslation);
+                eventLog.setEventType(EventType.PIVOT_TRANSLATION);
                 eventLog.setNcpSide(NcpSide.valueOf(config.getNcpSide()));
 
                 AuditServiceFactory.getInstance().write(eventLog, config.getAuditTrailFacility(), config.getAuditTrailSeverity());

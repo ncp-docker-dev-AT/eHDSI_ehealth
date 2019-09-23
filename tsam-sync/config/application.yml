@@ -1,33 +1,16 @@
-debug: false
-ehealth:
-  termserver:
-    base-url: http://127.0.0.1/ehealth-term-server
-    username: openncp_sync_user
-    password: password
-logging:
-  level:
-     org.hibernate: ERROR
-     org.springframework.web.client: DEBUG
-openncp:
-  ltrdb:
-    host: 127.0.0.1
-    port: 3306
-    username: openncp
-    password: password
-    database-name: ehealth_ltrdb_dev
-  tsam-sync:
-    proxy:
-      use: false
-      host:
-      port:
-      use-authentication:
-      username:
-      password:
-spring:
+tsam-sync:
   datasource:
-    url: jdbc:mysql://127.0.0.1/ehealth_ltrdb
-    username: openncp
-    password: password
-    driver-class-name: com.mysql.jdbc.Driver
-  profiles:
-    active: mysql
+    host:
+    port:
+    username:
+    password:
+    database:
+  proxy:
+    host:
+    port:
+    username:
+    password:
+  cts:
+    url:
+    username:
+    password:

@@ -19,7 +19,7 @@
  */
 package _2007.xds_b.iti.ihe.consent;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.pt.server.it.ServerGenericIT;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.junit.BeforeClass;
@@ -50,7 +50,7 @@ public class XDR_Submit_ConsentServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitConsent() {
-        this.assertions = this.getAssertions("xdr/consent/testSubmitConsent.xml", XSPARole.PHYSICIAN);
+        this.assertions = this.getAssertions("xdr/consent/testSubmitConsent.xml", XSPARole.DEPRECATED_PHYSICIAN);
         testGood("testSubmitConsent", "xdr/consent/testSubmitConsent.xml");
     }
 

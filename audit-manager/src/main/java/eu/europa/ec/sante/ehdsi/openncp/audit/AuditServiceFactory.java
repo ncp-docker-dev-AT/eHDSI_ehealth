@@ -1,8 +1,9 @@
 package eu.europa.ec.sante.ehdsi.openncp.audit;
 
-import org.apache.http.annotation.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.concurrent.ThreadSafe;
 
 @ThreadSafe
 public class AuditServiceFactory {

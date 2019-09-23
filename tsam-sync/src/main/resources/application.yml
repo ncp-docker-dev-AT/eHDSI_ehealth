@@ -1,0 +1,16 @@
+logging:
+  level:
+    com.zaxxer.hikari: error
+    org.apache.http: error
+    org.hibernate: error
+    org.springframework: error
+spring:
+  datasource:
+    username: ${tsam-sync.datasource.username}
+    password: ${tsam-sync.datasource.password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+tsam-sync:
+  pageable:
+    default-page-size: 250

@@ -3,7 +3,6 @@ package eu.europa.ec.sante.ehdsi.openncp.pt.common;
 import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
-import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
 import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
@@ -89,13 +88,13 @@ public class DynamicDiscoveryService {
             String serviceConsumerUserId = HTTPUtil.getSubjectDN(false);
             String serviceProviderUserId = HTTPUtil.getTlsCertificateCommonName(smpServer);
 
-            EventLog eventLog1 = EventLog.createEventLogPatientPrivacy(TransactionName.ehealthSMPQuery, EventActionCode.EXECUTE,
+            EventLog eventLog1 = EventLog.createEventLogPatientPrivacy(TransactionName.SMP_QUERY, EventActionCode.EXECUTE,
                     date2, EventOutcomeIndicator.FULL_SUCCESS, null, null, null,
                     serviceConsumerUserId, serviceProviderUserId, partid, null, EM_PatricipantObjectID,
                     EM_PatricipantObjectDetail, objectID, null, new byte[1], null,
                     new byte[1], sourceip, targetip);
             eventLog1.setNcpSide(NcpSide.NCP_B);
-            eventLog1.setEventType(EventType.ehealthSMPQuery);
+            eventLog1.setEventType(EventType.SMP_QUERY);
 
             // According to https://tools.ietf.org/html/rfc5424 (Syslog Protocol)
             // facility = 13 --> log audit | severity = 2 --> Critical: critical conditions
@@ -174,7 +173,7 @@ public class DynamicDiscoveryService {
             FileInputStream fileInputStream = new FileInputStream(file);
             ks.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
 
-            DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+            DynamicDiscovery smpClient = ConfigurationManagerFactory.getConfigurationManager().initializeDynamicDiscoveryFetcher()
                     .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
                     .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)))
                     .build();

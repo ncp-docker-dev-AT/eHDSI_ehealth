@@ -75,9 +75,18 @@
                                                 <table class="translation_table">
                                                     <tbody>
                                                         <tr>
-                                                            <!-- TODO These values have to be added to the epsosDisplayLabel value set -->
-                                                            <th>Diagnostic Date</th>
-                                                            <th>Blood Group</th>
+                                                            <th>
+                                                                <!-- Diagnostic Date -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'118'"/>
+                                                                </xsl:call-template>
+                                                            </th>
+                                                            <th>
+                                                                <!-- Blood Group -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'119'"/>
+                                                                </xsl:call-template>
+                                                            </th>
                                                         </tr>
                                                         <xsl:for-each select="n1:entry">
                                                             <xsl:call-template name="diagnosticSectionEntry"/>

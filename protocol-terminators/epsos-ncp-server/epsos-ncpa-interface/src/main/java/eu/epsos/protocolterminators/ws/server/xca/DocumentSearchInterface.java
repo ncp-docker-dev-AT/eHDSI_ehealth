@@ -11,7 +11,7 @@ import fi.kela.se.epsos.data.model.SearchCriteria;
 
 import java.util.List;
 
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
 
 /**
  * Combined interface for Patient Summary and ePrescription XCA Service implementation.

@@ -25,8 +25,12 @@ import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.util.IheConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PurposeOfUse;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPAFunctionalRole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
+import eu.europa.ec.sante.ehdsi.openncp.audit.Configuration;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
@@ -43,7 +47,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tools.ant.util.DateUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.PrettyXmlSerializer;
@@ -945,6 +949,13 @@ public class EpsosHelperService {
         return getUserAssertion(user, false);
     }
 
+    /**
+     * TODO: Jerome
+     *
+     * @param user
+     * @param isEmergency
+     * @return
+     */
     public static Object getUserAssertion(User user, boolean isEmergency) {
 
         LOGGER.info("User is: '{}'", user.getScreenName());
@@ -968,12 +979,14 @@ public class EpsosHelperService {
             List<String> permissions = new ArrayList<>();
 
             String username = user.getScreenName();
-            String rolename = "";
+            String structuralRole = "";
+            String functionalRole = "";
             String prefix = "urn:oasis:names:tc:xspa:1.0:subject:hl7:permission:";
 
             if (isPhysician) {
 
-                rolename = "physician";
+                structuralRole = XSPARole.LICENSED_HCP.toString();
+                functionalRole = XSPAFunctionalRole.MEDICAL_DOCTORS.toString();
                 String doctor_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DOCTOR_PERMISSIONS);
                 String[] p = doctor_perms.split(",");
                 for (String aP : p) {
@@ -981,7 +994,8 @@ public class EpsosHelperService {
                 }
             }
             if (isPharmacist) {
-                rolename = "pharmacist";
+                structuralRole = XSPARole.LICENSED_HCP.toString();
+                functionalRole = XSPAFunctionalRole.PHARMACIST.toString();
                 String pharm_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_PERMISSIONS);
                 String[] p1 = pharm_perms.split(",");
                 for (String aP1 : p1) {
@@ -990,7 +1004,8 @@ public class EpsosHelperService {
             }
 
             if (isNurse) {
-                rolename = "nurse";
+                structuralRole = XSPARole.LICENSED_HCP.toString();
+                functionalRole = XSPAFunctionalRole.NURSE.toString();
                 String nurse_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_NURSE_PERMISSIONS);
                 String[] p1 = nurse_perms.split(",");
                 for (String aP1 : p1) {
@@ -999,7 +1014,9 @@ public class EpsosHelperService {
             }
 
             if (isPatient) {
-                rolename = "patient";
+                // Patient Role is not supported in the eHDSI context. Only clinician can access medical data.
+                structuralRole = "patient";
+                functionalRole = XSPAFunctionalRole.OTHER_CLERICAL.toString();
                 String patient_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PATIENT_PERMISSIONS);
                 String[] p1 = patient_perms.split(",");
                 for (String aP1 : p1) {
@@ -1008,7 +1025,8 @@ public class EpsosHelperService {
             }
 
             if (isAdministrator) {
-                rolename = "administrator";
+                structuralRole = "administrator";
+                functionalRole = XSPAFunctionalRole.OTHER_CLERICAL.toString();
                 String admin_perms = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_ADMIN_PERMISSIONS);
                 String[] p1 = admin_perms.split(",");
                 for (String aP1 : p1) {
@@ -1033,16 +1051,16 @@ public class EpsosHelperService {
                     orgType = "Hospital";
                 }
             }
-            String purposeOfUse = isEmergency ? "EMERGENCY" : "TREATMENT";
+            String purposeOfUse = isEmergency ? PurposeOfUse.EMERGENCY.toString() : PurposeOfUse.TREATMENT.toString();
 
-            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, organizationId, orgType, purposeOfUse, poc, permissions);
+            assertion = createAssertion(username, structuralRole, functionalRole, orgName, organizationId, orgType, purposeOfUse, poc, permissions);
 
             // send Audit message
-            // GUI-27
             if (assertion != null) {
-                LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
+
+                LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.AUDIT_REPOSITORY_URL.getValue()));
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    LOGGER_CLINICAL.debug("Sending epsos-91 audit message for '{}'", user.getFullName());
+                    LOGGER_CLINICAL.debug("[Audit Portal] Sending Audit Message 'epsos-91' for User: '{}'", user.getFullName());
                 }
                 String auditPointOfCare;
                 if (StringUtils.isNotBlank(orgName)) {
@@ -1051,23 +1069,21 @@ public class EpsosHelperService {
                     auditPointOfCare = poc;
                 }
                 EpsosHelperService.handleHCPIdentificationAudit(assertion, user.getFullName(), user.getEmailAddress(), auditPointOfCare, orgType,
-                        rolename, assertion.getID());
-            }
-            // GUI-25
-            if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
+                        structuralRole, assertion.getID());
 
-                signSAMLAssertion(assertion, Constants.NCP_SIG_PRIVATEKEY_ALIAS);
-                AssertionMarshaller marshaller = new AssertionMarshaller();
-                Element element = marshaller.marshall(assertion);
+                if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
-                Document document = element.getOwnerDocument();
+                    signSAMLAssertion(assertion, Constants.NCP_SIG_PRIVATEKEY_ALIAS);
 
-                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    String hcpa = Utils.getDocumentAsXml(document, false);
-                    LOGGER_CLINICAL.info("#### HCPA Start\n '{}' \n#### HCPA End", hcpa);
+                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+
+                        AssertionMarshaller marshaller = new AssertionMarshaller();
+                        Element element = marshaller.marshall(assertion);
+                        Document document = element.getOwnerDocument();
+                        String hcpa = Utils.getDocumentAsXml(document, false);
+                        LOGGER_CLINICAL.info("#### HCPA Start\n '{}' \n#### HCPA End", hcpa);
+                    }
                 }
-            }
-            if (assertion != null) {
                 LOGGER.info("Assertion: '{}'", assertion.getID());
             }
         } catch (Exception e) {
@@ -1162,32 +1178,30 @@ public class EpsosHelperService {
             if (isPhysician) {
                 orgType = "Resident Physician";
             }
-            assertion = EpsosHelperService.createAssertion(username, rolename, orgName, orgId, orgType,
-                    "TREATMENT", poc, permissions);
+            assertion = EpsosHelperService.createAssertion(username, rolename, "FUNCTIONAL_ROLE", orgName,
+                    orgId, orgType, PurposeOfUse.TREATMENT.toString(), poc, permissions);
 
             // send Audit message
-            // GUI-27
             if (assertion != null) {
+
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
-                LOGGER.debug("Sending epsos-91 audit message for '{}'", fullname);
+                LOGGER.debug("Sending EHDSI-91 audit message for '{}'", fullname);
                 EpsosHelperService.handleHCPIdentificationAudit(assertion, fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
-            }
-            // GUI-25
-            if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
-                String signatureKeyAlias = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-                LOGGER.info("Signature KEY alias: '{}'", signatureKeyAlias);
+                if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
-                signSAMLAssertion(assertion, signatureKeyAlias);
-                AssertionMarshaller marshaller = new AssertionMarshaller();
-                Element element = marshaller.marshall(assertion);
-                Document document = element.getOwnerDocument();
-                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    String hcpa = Utils.getDocumentAsXml(document, false);
-                    LOGGER_CLINICAL.debug("#### HCPA Start\n{}\n#### HCPA End", hcpa);
+                    String signatureKeyAlias = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
+                    signSAMLAssertion(assertion, signatureKeyAlias);
+
+                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+
+                        AssertionMarshaller marshaller = new AssertionMarshaller();
+                        Element element = marshaller.marshall(assertion);
+                        Document document = element.getOwnerDocument();
+                        String hcpa = Utils.getDocumentAsXml(document, false);
+                        LOGGER_CLINICAL.debug("#### HCPA Start\n{}\n#### HCPA End", hcpa);
+                    }
                 }
-            }
-            if (assertion != null) {
                 LOGGER.info("Assertion: '{}'", assertion.getID());
             }
         } catch (Exception e) {
@@ -1280,14 +1294,14 @@ public class EpsosHelperService {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
         EventLog hcpIdentificationEventLog;
-        hcpIdentificationEventLog = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication, EventActionCode.EXECUTE,
+        hcpIdentificationEventLog = EventLog.createEventLogHCPIdentity(TransactionName.HCP_AUTHENTICATION, EventActionCode.EXECUTE,
                 eventDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
                 serviceConsumerUserId, serviceProviderUserId, AS_AuditSourceId, ET_ObjectID, requestMsgParticipantObjectID,
                 secHead.getBytes(StandardCharsets.UTF_8), responseMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
                 sourceIP, sourceIP, NcpSide.NCP_B);
 
         LOGGER.info("The audit has been prepared");
-        hcpIdentificationEventLog.setEventType(EventType.epsosHcpAuthentication);
+        hcpIdentificationEventLog.setEventType(EventType.HCP_AUTHENTICATION);
         asd.write(hcpIdentificationEventLog, "13", "2");
     }
 
@@ -1366,12 +1380,12 @@ public class EpsosHelperService {
         return (T) (XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(qname)).buildObject(qname);
     }
 
-    private static Assertion createAssertion(String username, String role, String organization, String organizationId,
+    private static Assertion createAssertion(String username, String role, String functionalRole, String organization, String organizationId,
                                              String facilityType, String purposeOfUse, String xspaLocality, List<String> permissions) {
 
         String fullName = LiferayUtils.getPortalUser().getFullName();
         String email = LiferayUtils.getPortalUser().getEmailAddress();
-        return createStorkAssertion(username, fullName, email, role, organization, organizationId, facilityType, purposeOfUse,
+        return createStorkAssertion(username, fullName, email, role, functionalRole, organization, organizationId, facilityType, purposeOfUse,
                 xspaLocality, permissions, null);
     }
 
@@ -1389,8 +1403,8 @@ public class EpsosHelperService {
      * @param onBehalfId
      * @return
      */
-    private static Assertion createStorkAssertion(String username, String fullName, String email, String role, String organization,
-                                                  String organizationId, String facilityType, String purposeOfUse,
+    private static Assertion createStorkAssertion(String username, String fullName, String email, String role, String functionalRole,
+                                                  String organization, String organizationId, String facilityType, String purposeOfUse,
                                                   String xspaLocality, List<String> permissions, String onBehalfId) {
         // assertion
         LOGGER.info("Username: '{}'", username);
@@ -1471,9 +1485,13 @@ public class EpsosHelperService {
             attrStmt.getAttributes().add(attrPID);
 
             // XSPA Role
-            Attribute attrPID_1 = createAttribute(builderFactory, "XSPA role",
+            Attribute structuralRole = createAttribute(builderFactory, "XSPA role",
                     "urn:oasis:names:tc:xacml:2.0:subject:role", role, "", "");
-            attrStmt.getAttributes().add(attrPID_1);
+            attrStmt.getAttributes().add(structuralRole);
+
+            Attribute attrFunctionalRole = createAttribute(builderFactory, "XSPA Functional Role",
+                    "urn:oasis:names:tc:xspa:1.0:subject:functional-role", functionalRole, "", "");
+            attrStmt.getAttributes().add(attrFunctionalRole);
 
             // XSPA Organization - Optional Field (eHDSI SAML Profile 2.2.0)
             if (StringUtils.isNotBlank(organization)) {
@@ -2204,7 +2222,7 @@ public class EpsosHelperService {
             parameters.put("printedby", fullName);
             parameters.put("lang1", language);
             parameters.put("lang2", language2);
-            parameters.put("date", DateUtils.format(new Date(), "yyyy/MM/dd"));
+            parameters.put("date", DateFormatUtils.format(new Date(), "yyyy/MM/dd"));
 
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             URL url = cl.getResource("epsosConsent.jasper");
@@ -2263,29 +2281,6 @@ public class EpsosHelperService {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
             return new byte[0];
         }
-    }
-
-    public static List<Patient> getMockPatients() {
-
-        List<Patient> mockedPatients = new ArrayList<>();
-        Patient patient = new Patient();
-        patient.setName("Patient name");
-        patient.setFamilyName("Patient family name");
-        Calendar cal = Calendar.getInstance();
-        DateFormat sdf = LiferayUtils.getPortalUserDateFormat();
-        patient.setBirthDate(sdf.format(cal.getTime()));
-        patient.setCity("Thessaloniki");
-        patient.setAddress("somewhrere");
-        patient.setAdministrativeGender("F");
-        patient.setCountry("Greece");
-        patient.setEmail("test@email.com");
-        patient.setPostalCode("56001");
-        patient.setTelephone("21212121");
-        patient.setRoot("root");
-        patient.setExtension("extension");
-        mockedPatients.add(patient);
-
-        return mockedPatients;
     }
 
     public static List<PatientDocument> getMockPSDocuments() {
@@ -2451,48 +2446,43 @@ public class EpsosHelperService {
     public static List<Patient> searchPatients(Assertion assertion, PatientDemographics pd, String country) {
 
         LOGGER.info("Selected country is: '{}'", country);
-        List<Patient> patients;
-        String runningMode = MyServletContextListener.getRunningMode();
-        if (StringUtils.equals(runningMode, "demo")) {
-            patients = EpsosHelperService.getMockPatients();
-        } else {
-            try {
-                patients = new ArrayList<>();
-                String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
-                LOGGER.info("CONNECTOR URL IS: '{}'", serviceUrl);
-                ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
-                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    LOGGER_CLINICAL.info("Searching for patients in '{}'", country);
-                    LOGGER_CLINICAL.info("Assertion id: '{}'", assertion.getID());
-                    LOGGER_CLINICAL.info("PD:\n'{}'", pd.toString());
-                }
-                List<PatientDemographics> queryPatient = proxy.queryPatient(assertion, country, pd);
 
-                for (PatientDemographics aux : queryPatient) {
-
-                    Patient patient = new Patient();
-                    patient.setName(aux.getGivenName());
-                    patient.setFamilyName(aux.getFamilyName());
-                    patient.setCity(aux.getCity());
-                    patient.setAddress(aux.getStreetAddress());
-                    patient.setAdministrativeGender(aux.getAdministrativeGender());
-                    patient.setCountry(aux.getCountry());
-                    patient.setEmail(aux.getEmail());
-                    patient.setPostalCode(aux.getPostalCode());
-                    patient.setTelephone(aux.getTelephone());
-                    patient.setRoot(aux.getPatientIdArray()[0].getRoot());
-                    patient.setExtension(aux.getPatientIdArray()[0].getExtension());
-                    patient.setPatientDemographics(aux);
-                    patients.add(patient);
-                }
-                LOGGER.info("Found '{}' patients", patients.size());
-            } catch (Exception ex) {
-                LOGGER.error(ExceptionUtils.getStackTrace(ex));
-                LOGGER.error(ex.getMessage());
-                patients = new ArrayList<>();
+        try {
+            List<Patient> patients = new ArrayList<>();
+            String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
+            LOGGER.info("Client Connector URL is: '{}'", serviceUrl);
+            ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+                LOGGER_CLINICAL.info("Searching for patients in '{}'", country);
+                LOGGER_CLINICAL.info("Assertion id: '{}'", assertion.getID());
+                LOGGER_CLINICAL.info("Patient Demographics:\n'{}'", pd.toString());
             }
+            List<PatientDemographics> queryPatient = proxy.queryPatient(assertion, country, pd);
+
+            for (PatientDemographics aux : queryPatient) {
+
+                Patient patient = new Patient();
+                patient.setName(aux.getGivenName());
+                patient.setFamilyName(aux.getFamilyName());
+                patient.setCity(aux.getCity());
+                patient.setAddress(aux.getStreetAddress());
+                patient.setAdministrativeGender(aux.getAdministrativeGender());
+                patient.setCountry(aux.getCountry());
+                patient.setEmail(aux.getEmail());
+                patient.setPostalCode(aux.getPostalCode());
+                patient.setTelephone(aux.getTelephone());
+                patient.setRoot(aux.getPatientIdArray()[0].getRoot());
+                patient.setExtension(aux.getPatientIdArray()[0].getExtension());
+                patient.setPatientDemographics(aux);
+                patients.add(patient);
+            }
+            LOGGER.info("Found '{}' patients", patients.size());
+            return patients;
+        } catch (Exception ex) {
+            LOGGER.error(ExceptionUtils.getStackTrace(ex));
+            LOGGER.error(ex.getMessage());
+            return new ArrayList<>();
         }
-        return patients;
     }
 
     public static List<PatientDocument> getPSDocs(Assertion assertion, Assertion trca, String root, String extension,

@@ -1,12 +1,12 @@
 package eu.europa.ec.sante.ehdsi.openncp.policymanager;
 
-import eu.epsos.assertionvalidator.PolicyManagerInterface;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PolicyAssertionManager;
 import org.opensaml.saml.saml2.core.Assertion;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
-import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
-import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 
-public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
+public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
     @Override
     public void XSPASubjectValidatorForHCP(final Assertion assertion, String documentClass)
@@ -26,6 +26,11 @@ public class DefaultPolicyManagerImpl implements PolicyManagerInterface {
     public void XSPARoleValidator(final Assertion assertion, String documentClass)
             throws MissingFieldException, InvalidFieldException {
         // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void XSPAFunctionalRoleValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
 
     }
 

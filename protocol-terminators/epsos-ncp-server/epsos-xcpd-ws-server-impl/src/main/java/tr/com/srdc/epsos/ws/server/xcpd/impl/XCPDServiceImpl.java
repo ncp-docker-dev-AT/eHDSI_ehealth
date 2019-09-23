@@ -20,12 +20,12 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientId;
-import tr.com.srdc.epsos.securityman.SAML2Validator;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
-import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
-import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
-import tr.com.srdc.epsos.securityman.exceptions.XSDValidationException;
-import tr.com.srdc.epsos.securityman.helper.Helper;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidationException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
@@ -72,8 +72,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     public void prepareEventLog(EventLog eventLog, PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, Element sh) {
 
         logger.info("prepareEventLog('{}')", eventLog.getEventType());
-        eventLog.setEventType(EventType.epsosIdentificationServiceFindIdentityByTraits);
-        eventLog.setEI_TransactionName(TransactionName.epsosIdentificationServiceFindIdentityByTraits);
+        eventLog.setEventType(EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS);
+        eventLog.setEI_TransactionName(TransactionName.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS);
         eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
@@ -616,7 +616,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     EvidenceUtils.createEvidenceREMNRO(doc, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
                             Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
                             Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                            Constants.NCP_SIG_PRIVATEKEY_ALIAS, IHEEventType.epsosIdentificationServiceFindIdentityByTraits.getCode(),
+                            Constants.NCP_SIG_PRIVATEKEY_ALIAS, IHEEventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getCode(),
                             new DateTime(), EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XCPD_REQ",
                             Helper.getHCPAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
                 } catch (Exception e) {

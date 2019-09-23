@@ -721,10 +721,6 @@
 				<xsl:value-of select="$foundKeyLang"/>
 			</xsl:otherwise>
 		</xsl:choose>
-
-
-
-
 	</xsl:template>
 
 	<!--- display v40_unknownInfo -->
@@ -743,10 +739,6 @@
 				<xsl:value-of select="$foundKeyLang"/>
 			</xsl:otherwise>
 		</xsl:choose>
-
-
-
-
 	</xsl:template>
 
 	<!--  display Labels -->

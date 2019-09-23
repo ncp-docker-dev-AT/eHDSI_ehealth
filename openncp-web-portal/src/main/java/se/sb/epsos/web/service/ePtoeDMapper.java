@@ -188,7 +188,7 @@ public class ePtoeDMapper {
         eD_Document.getClinicalDocument().getRecordTargetArray(0)
                 .setPatientRole(eP_Document.getClinicalDocument().getRecordTargetArray(0).getPatientRole());
 
-        // eD_Document.getClinicalDocument().getAuthorArray(0).getFunctionCode().setDisplayName(AssertionHandlerConfigManager.getRoleDisplayName(user.getRoles().get(0)));
+        // eD_Document.getClinicalDocument().getAuthorArray(0).getFunctionCode().setDisplayName(AssertionHandlerConfigManager.getRole(user.getRoles().get(0)));
         // Author time
         eD_Document.getClinicalDocument().getAuthorArray(0).getTime()
                 .setValue(DateUtil.formatDate(date, EpsosWebConstants.DATEFORMATSEC));

@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.util.Constants;
-import tr.com.srdc.epsos.util.saml.SAML;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;

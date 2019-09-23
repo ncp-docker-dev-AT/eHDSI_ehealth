@@ -32,12 +32,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import tr.com.srdc.epsos.securityman.SAML2Validator;
-import tr.com.srdc.epsos.securityman.exceptions.AssertionValidationException;
-import tr.com.srdc.epsos.securityman.exceptions.InsufficientRightsException;
-import tr.com.srdc.epsos.securityman.exceptions.InvalidFieldException;
-import tr.com.srdc.epsos.securityman.exceptions.MissingFieldException;
-import tr.com.srdc.epsos.securityman.helper.Helper;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.AssertionValidationException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
@@ -109,8 +109,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
     public void prepareEventLogForDispensationInitialize(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request,
                                                          RegistryResponseType response, Element sh) {
 
-        eventLog.setEventType(EventType.epsosDispensationServiceInitialize);
-        eventLog.setEI_TransactionName(TransactionName.epsosDispensationServiceInitialize);
+        eventLog.setEventType(EventType.DISPENSATION_SERVICE_INITIALIZE);
+        eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_INITIALIZE);
         eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
@@ -168,8 +168,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
      */
     public void prepareEventLogForConsentPut(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request, RegistryResponseType response, Element sh) {
 
-        eventLog.setEventType(EventType.epsosConsentServicePut);
-        eventLog.setEI_TransactionName(TransactionName.epsosConsentServicePut);
+        eventLog.setEventType(EventType.CONSENT_SERVICE_PUT);
+        eventLog.setEI_TransactionName(TransactionName.CONSENT_SERVICE_PUT);
         eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
@@ -367,7 +367,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                                 Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
                                 Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH,
                                 Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                IHEEventType.epsosDispensationServiceInitialize.getCode(), new DateTime(),
+                                IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode(), new DateTime(),
                                 EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XDR_DISP_REQ",
                                 Objects.requireNonNull(Helper.getTRCAssertion(shElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
                     } catch (Exception e) {
@@ -545,7 +545,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                             Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SP_KEYSTORE_PATH,
                             Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH,
                             Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            IHEEventType.epsosConsentServicePut.getCode(), new DateTime(),
+                            IHEEventType.CONSENT_SERVICE_PUT.getCode(), new DateTime(),
                             EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XDR_CONSENT_REQ",
                             Objects.requireNonNull(Helper.getTRCAssertion(shElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
                 } catch (Exception e) {

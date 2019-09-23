@@ -3,102 +3,46 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <artifactId>openncp</artifactId>
-        <version>3.1.0</version>
-    </parent>
-
+    <groupId>eu.europa.ec.sante.ehdsi</groupId>
     <artifactId>openncp-tsam-sync</artifactId>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
 
     <name>OpenNCP TSAM Synchronizer</name>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-        <commons-lang3.version>3.5</commons-lang3.version>
-        <ehealth-termservice-server.version>1.0.0</ehealth-termservice-server.version>
-        <httpclient.version>4.5.2</httpclient.version>
-        <jackson.version>2.8.4</jackson.version>
-        <javax-el.version>3.0.1-b08</javax-el.version>
-        <mysql-connector.version>5.1.43</mysql-connector.version>
-        <ojdbc.version>11.2.0.4</ojdbc.version>
-        <spring.version>4.3.10.RELEASE</spring.version>
-        <spring-boot.version>1.5.6.RELEASE</spring-boot.version>
-        <hibernate.version>5.2.10.Final</hibernate.version>
-    </properties>
+    <distributionManagement>
+        <repository>
+            <id>cef-digital-releases</id>
+            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth/</url>
+        </repository>
+        <snapshotRepository>
+            <id>cef-digital-snapshots</id>
+            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>eu.europa.ec.sante.ehdsi.termservice</groupId>
-            <artifactId>ehealth-termservice-rest-model</artifactId>
-            <version>${ehealth-termservice-server.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <version>${spring-boot.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>${spring-boot.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${hibernate.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
-            <version>${javax-el.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>${ojdbc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql-connector.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commons-io.version}</version>
-        </dependency>
-    </dependencies>
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-boot.version>2.1.6.RELEASE</spring-boot.version>
+    </properties>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -113,4 +57,90 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi.termservice</groupId>
+            <artifactId>ehealth-termservice-rest-model</artifactId>
+            <version>1.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.9</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.48</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>12.2.0.1</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>cef-digital-releases</id>
+            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth/</url>
+        </repository>
+        <repository>
+            <id>cef-digital-snapshots</id>
+            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>cef-digital-digit-releases</id>
+            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eDelivery/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>cef-digital-digit-snapshots</id>
+            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eDelivery-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>cef-digital-third-party</id>
+            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/ehealth-third-party/</url>
+        </repository>
+    </repositories>
 </project>

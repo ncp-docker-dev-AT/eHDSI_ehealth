@@ -80,27 +80,28 @@
                                                     <tbody>
                                                         <tr>
                                                             <th>
-                                                                <!-- Vaccination -->
+                                                                <!-- Vaccination header -->
                                                                 <xsl:call-template name="show-displayLabels">
                                                                     <xsl:with-param name="code" select="'79'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <!-- BrandName -->
+                                                                <!-- Brand name header -->
                                                                 <xsl:call-template name="show-displayLabels">
                                                                     <xsl:with-param name="code" select="'9'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <!-- Vaccination Date -->
+                                                                <!-- Vaccination Date header -->
                                                                 <xsl:call-template name="show-displayLabels">
                                                                     <xsl:with-param name="code" select="'80'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <!-- Administered -->
-                                                                <!-- TODO Make this header part of the epsosDisplayLabel value set -->
-                                                                Administered
+                                                                <!-- Administered header -->
+                                                                <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:with-param name="code" select="'80'"/>
+                                                                </xsl:call-template>
                                                             </th>
                                                         </tr>
                                                         <xsl:for-each select="n1:entry">
@@ -149,12 +150,33 @@
                 <tr>
                     <td>
                         <!-- Display vaccination -->
-                        <xsl:call-template name="show-element">
-                            <xsl:with-param name="node" select="$vaccination"/>
-                        </xsl:call-template>
+                        <xsl:choose>
+                            <xsl:when test="$vaccination/@nullFlavor">
+                                <xsl:call-template name="show-nullFlavor">
+                                    <xsl:with-param name="code"
+                                                    select="$vaccination/@nullFlavor"/>
+                                </xsl:call-template>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:call-template name="show-element">
+                                    <xsl:with-param name="node" select="$vaccination"/>
+                                </xsl:call-template>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </td>
                     <td>
-                        <xsl:value-of select="$vaccinationsBrandName"/>
+                        <!-- Display brand name -->
+                        <xsl:choose>
+                            <xsl:when test="$vaccinationsBrandName/@nullFlavor">
+                                <xsl:call-template name="show-nullFlavor">
+                                    <xsl:with-param name="code"
+                                                    select="$vaccinationsBrandName/@nullFlavor"/>
+                                </xsl:call-template>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$vaccinationsBrandName"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </td>
                     <td>
                         <xsl:call-template name="show-time">
@@ -163,16 +185,14 @@
                         &#160;
                     </td>
                     <td>
-                        <xsl:if test="not($vaccination/@nullFlavor)">
                             <xsl:choose>
                                 <xsl:when test="(not($negationInd) or $negationInd='false')">
-                                    <i class="fa fa-check" style="color:green" aria-hidden="true"/>
+                                    <font color="green">&#10004;</font>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <i class="fa fa-ban" style="color:red" aria-hidden="true"/>
+                                    <font color="red">&#10006;</font>
                                 </xsl:otherwise>
                             </xsl:choose>
-                        </xsl:if>
                     </td>
                 </tr>
             </xsl:when>

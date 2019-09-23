@@ -17,6 +17,7 @@ import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
 import epsos.openncp.protocolterminator.clientconnector.PatientId;
 import eu.epsos.util.IheConstants;
 import eu.europa.ec.joinup.ecc.openstork.utils.StorkUtils;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PurposeOfUse;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.stork.peps.auth.commons.STORKAuthnResponse;
 import eu.stork.peps.auth.engine.STORKSAMLEngine;
@@ -160,7 +161,7 @@ public class PacBean implements Serializable {
 
         if (Validator.isNotNull(selectedPatient)) {
             LOGGER.info("Create TRCA (Start)");
-            createTRCA("ps", "TREATMENT");
+            createTRCA("ps", PurposeOfUse.TREATMENT.toString());
             LOGGER.info("Create TRCA (End)");
             try {
                 LOGGER.info("Get PS Docs (Start)");

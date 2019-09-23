@@ -48,8 +48,8 @@
         <xsl:variable
                 name="nullEntry"
                 select="n1:entry"/>
-        <xsl:variable name="probObsCode"
-                      select="n1:entry/n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value/@code"/>
+        <xsl:variable name="obsValueCode"
+                      select="n1:entry/n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value/@code"/>
         <!-- null flavor entry act -->
         <xsl:variable name="probAct"
                       select="n1:entry/n1:act"/>
@@ -97,7 +97,7 @@
                                             <xsl:when test="not($probAct/@nullFlavor)">
                                                 <table class="translation_table">
                                                     <tbody>
-                                                        <xsl:if test="not ($probObsCode='396782006' or $probObsCode='407559004' or $probObsCode='160243008' or $probObsCode='160245001')">
+                                                        <xsl:if test="not ($obsValueCode='no-known-problems' or $obsValueCode='no-problem-info')">
                                                             <tr>
                                                                 <th>
                                                                     <!-- Active Problem -->
@@ -105,7 +105,6 @@
                                                                         <xsl:with-param name="code" select="'2'"/>
                                                                     </xsl:call-template>
                                                                 </th>
-
                                                                 <th>
                                                                     <!-- OnSet Date -->
                                                                     <xsl:call-template name="show-displayLabels">
@@ -144,26 +143,19 @@
 
         <!-- Defining all needed variables -->
         <xsl:variable name="activeProblemNode"
-                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value"/>
+                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value"/>
         <xsl:variable name="activeProblem"
-                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value/@displayName"/>
-        <xsl:variable name="activeProblemTranslation1"
-                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value/n1:translation/n1:translation/@displayName"/>
-        <xsl:variable name="activeProblemTranslation2"
-                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value/n1:translation/@displayName"/>
+                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value/@displayName"/>
         <xsl:variable name="activeProblemID"
-                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value/@code"/>
+                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value/@code"/>
         <xsl:variable
                 name="probOnSetDate"
                 select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:effectiveTime/n1:low"/>
-        <xsl:variable name="probObsCode"
-                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value/@code"/>
+        <xsl:variable name="obsValueCode"
+                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value/@code"/>
         <!-- in case of no info scenario the following displayName will be displayed -->
-        <xsl:variable name="probObsDisplay"
-                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value/@displayName"/>
-        <xsl:variable
-                name="nullEntry"
-                select="."/>
+        <xsl:variable name="obsValueDisplayName"
+                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value/@displayName"/>
 
         <!-- null flavor entry act -->
 
@@ -181,21 +173,19 @@
                 <!-- No info Scenario... observation.value@code is one of the two values -->
 
                 <xsl:choose>
-                    <xsl:when
-                            test="($probObsCode='396782006' or $probObsCode='407559004' or $probObsCode='160243008' or $probObsCode='160245001' )">
-                        <!-- display the relevant code from the v40_unknowInformarion -->
+                    <xsl:when test="($obsValueCode='no-known-problems' or $obsValueCode='no-problem-info')">
                         <tr>
                             <td colspan="3">
-                                <xsl:call-template name="show-unknownInformation">
-                                    <xsl:with-param name="code" select="$probObsCode"/>
+                                <xsl:call-template name="show-absentOrUnknownProblems">
+                                    <xsl:with-param name="code" select="$obsValueCode"/>
                                 </xsl:call-template>
                             </td>
                         </tr>
-                        <!--xsl:value-of select="document('v40_unknownInfo.xml')/UnknownInformation/UnknownEntry[@code=$probObsCode]/displayName"/-->
                     </xsl:when>
                     <xsl:otherwise>
                         <tr>
                             <td>
+                                <!-- Active Problem -->
                                 <xsl:choose>
                                     <!-- Display active problem -->
                                     <xsl:when test="not ($activeProblemNode/@nullFlavor)">
@@ -222,9 +212,8 @@
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </td>
-
                             <td>
-
+                                <!-- OnSet Date -->
                                 <xsl:call-template name="show-time">
                                     <xsl:with-param name="datetime" select="$probOnSetDate"/>
                                 </xsl:call-template>&#160;

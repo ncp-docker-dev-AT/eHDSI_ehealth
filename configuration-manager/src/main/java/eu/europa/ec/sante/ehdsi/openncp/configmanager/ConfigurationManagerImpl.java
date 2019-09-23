@@ -3,10 +3,13 @@ package eu.europa.ec.sante.ehdsi.openncp.configmanager;
 import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
+import eu.europa.ec.dynamicdiscovery.core.fetcher.impl.DefaultURLFetcher;
 import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
 import eu.europa.ec.dynamicdiscovery.core.locator.impl.DefaultBDXRLocator;
 import eu.europa.ec.dynamicdiscovery.core.reader.impl.DefaultBDXRReader;
+import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultProxy;
 import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidator;
+import eu.europa.ec.dynamicdiscovery.exception.ConnectionException;
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
@@ -58,8 +61,6 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
     private Map<String, String> properties = new HashMap<>();
 
     public ConfigurationManagerImpl(SessionFactory sessionFactory) {
-//        Cleanup cleanup = new Cleanup();
-//        cleanup.clean();
         Assert.notNull(sessionFactory, "sessionFactory must not be null!");
         this.sessionFactory = sessionFactory;
     }
@@ -68,8 +69,6 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
     public String getProperty(String key) {
         Assert.notNull(key, "key must not be null!");
         return getProperty(key, true);
-//        return findProperty(key)
-//                .orElseThrow(() -> new PropertyNotFoundException("Property '" + key + "' not found!"));
     }
 
     public String getProperty(String key, boolean checkMap) {
@@ -106,20 +105,19 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
     public void fetchInternationalSearchMask(String countryCode) {
 
         try {
+
             LOGGER.info("fetchInternationalSearchMask({}) - '{}'", countryCode, RegisteredService.EHEALTH_107.getUrn());
             String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH") + "forms" + System.getProperty("file.separator");
+
             try {
 
                 KeyStore trustStore = KeyStore.getInstance("JKS");
                 File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH"));
+
                 try (FileInputStream fileInputStream = new FileInputStream(file)) {
                     trustStore.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
 
-                    //TODO: Missing Proxy configuration:
-                    //DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance().fetcher(
-                    // new DefaultURLFetcher(new DefaultProxy("127.0.0.1", 8000, "user", "password"))).build();
-
-                    DynamicDiscovery smpClient = DynamicDiscoveryBuilder.newInstance()
+                    DynamicDiscovery smpClient = initializeDynamicDiscoveryFetcher()
                             .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager().getProperty("SML_DOMAIN"), new DefaultDNSLookup()))
                             .reader(new DefaultBDXRReader(new DefaultSignatureValidator(trustStore)))
                             .build();
@@ -176,6 +174,39 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
             }
         } catch (Exception e) {
             throw new ConfigurationManagerException("An internal error occurred while retrieving the International Search Mask", e);
+        }
+    }
+
+    public DynamicDiscoveryBuilder initializeDynamicDiscoveryFetcher() {
+
+        try {
+            boolean proxyEnabled = getBooleanProperty("APP_BEHIND_PROXY");
+            boolean proxyAuthenticated = getBooleanProperty("APP_PROXY_AUTHENTICATED");
+            String proxyHost = getProperty("APP_PROXY_HOST");
+            int proxyPort = getIntegerProperty("APP_PROXY_PORT");
+            String proxyUsername = getProperty("APP_PROXY_USERNAME");
+            String proxyPassword = getProperty("APP_PROXY_PASSWORD");
+
+            DynamicDiscoveryBuilder discoveryBuilder = DynamicDiscoveryBuilder.newInstance();
+            if (proxyEnabled) {
+                if (proxyAuthenticated) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Configuring access through Authenticated Proxy '{}:{}' with Credentials: '{}/{}'",
+                                proxyHost, proxyPort, proxyUsername, StringUtils.isNoneBlank(proxyPassword) ? "XXXXXX" : "No Password provided");
+                    }
+
+                    discoveryBuilder.fetcher(new DefaultURLFetcher(new DefaultProxy(proxyHost, proxyPort, proxyUsername, proxyPassword)));
+
+                } else {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Configuring access through Proxy '{}:{}'", proxyHost, proxyPort);
+                    }
+                    discoveryBuilder.fetcher(new DefaultURLFetcher(new DefaultProxy(proxyHost, proxyPort)));
+                }
+            }
+            return discoveryBuilder;
+        } catch (ConnectionException e) {
+            throw new ConfigurationManagerException("An internal error occurred while trying to connect the Proxy", e);
         }
     }
 

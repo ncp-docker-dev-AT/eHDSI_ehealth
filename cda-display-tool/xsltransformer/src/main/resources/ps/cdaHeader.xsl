@@ -50,8 +50,12 @@
                             <xsl:with-param name="datetime" select="$lastUpdate"/>
                         </xsl:call-template>
                     </td>
-                    <!-- CDA Language of origin:-->
-                    <th>Original Document Language</th>
+                    <th>
+                        <!-- Original Document Language -->
+                        <xsl:call-template name="show-displayLabels">
+                            <xsl:with-param name="code" select="'117'"/>
+                        </xsl:call-template>
+                    </th>
                     <td><xsl:value-of select="$documentLanguageCode"/></td>
                 </tr>
             </tbody>

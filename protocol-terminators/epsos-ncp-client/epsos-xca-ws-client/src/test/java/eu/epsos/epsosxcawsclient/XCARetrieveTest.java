@@ -1,6 +1,6 @@
 package eu.epsos.epsosxcawsclient;
 
-import eu.epsos.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.protocolterminators.integrationtest.common.HCPIAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TRCAssertionCreator;
@@ -46,7 +46,7 @@ public class XCARetrieveTest {
     public void doRetrieve() throws XCAException {
 
         // build assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.PHARMACIST);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.DEPRECATED_PHARMACIST);
         Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion(HOME_COMMUNITY_ID, PATIENT_COUNTRY);
 
         // build XDS document

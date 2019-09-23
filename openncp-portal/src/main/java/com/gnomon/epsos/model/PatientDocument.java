@@ -9,7 +9,6 @@ import java.io.Serializable;
 
 public class PatientDocument implements Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger("PatientDocument");
     private static final long serialVersionUID = 2812911062938264973L;
     private String title;
     private String description;

@@ -72,14 +72,14 @@ public class AuditTrailUtilsTest {
         } catch (DatatypeConfigurationException ex) {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
-        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosPACRetrieve, EventActionCode.QUERY,
+        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.PAC_RETRIEVE, EventActionCode.QUERY,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "Hospital", "MassimilianoMasi<saml:massi@saml:test.fr>", "AT",
                 "dentist", "Vienna", "USER", "AS-12", "aaa",
                 "aaa", new byte[1], "aaa", "aaa", new byte[1],
                 "aaa", new byte[1], "1.2.3.4", "1.2.3.4");
 
-        eventLog1.setEventType(EventType.epsosPACRetrieve);
+        eventLog1.setEventType(EventType.PAC_RETRIEVE);
         asd.write(eventLog1, "13", "2");
         try {
             Thread.sleep(10000);
@@ -102,14 +102,14 @@ public class AuditTrailUtilsTest {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog1 = EventLog.createEventLogConsentPINdny(TransactionName.epsosConsentServicePin,
+        EventLog eventLog1 = EventLog.createEventLogConsentPINdny(TransactionName.CONSENT_SERVICE_PIN,
                 EventActionCode.READ, date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "Hospital", "MassimilianoMasi<saml:massi@saml:test.fr>", "Massi",
                 "doctor", "MassimilianoMasi<saml:massi@saml:test.fr>", "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "AS-12", "22", "11", new byte[1], "22",
                 new byte[1], "194.219.31.2", "222.33.33.3");
 
-        eventLog1.setEventType(EventType.epsosConsentServicePin);
+        eventLog1.setEventType(EventType.CONSENT_SERVICE_PIN);
         asd.write(eventLog1, "13", "2");
         try {
             Thread.sleep(1000);
@@ -132,14 +132,14 @@ public class AuditTrailUtilsTest {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog1 = EventLog.createEventLogPatientMapping(TransactionName.epsosIdentificationServiceFindIdentityByTraits,
+        EventLog eventLog1 = EventLog.createEventLogPatientMapping(TransactionName.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS,
                 EventActionCode.EXECUTE, date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "dentist", "Massimiliano Masi", "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "MassimilianoMasi<saml:massi@saml:test.fr>", "AS-12", "AbCD^^122333443",
                 "0", null, new byte[0], "aa", "aa",
                 new byte[1], "aa", new byte[1], "194.219.31.2", "222.33.33.3");
 
-        eventLog1.setEventType(EventType.epsosIdentificationServiceFindIdentityByTraits);
+        eventLog1.setEventType(EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS);
         asd.write(eventLog1, "13", "2");
 
         try {
@@ -162,14 +162,14 @@ public class AuditTrailUtilsTest {
         } catch (DatatypeConfigurationException ex) {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
-        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosPatientServiceList, EventActionCode.QUERY,
+        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.PATIENT_SERVICE_LIST, EventActionCode.QUERY,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "Hospital", "MassimilianoMasi<saml:massi@saml:test.fr>", "AT",
                 "dentist", "Vienna", "USER", "AS-12", "aaa",
                 "aaa", new byte[1], "aaa", "aaa", new byte[1],
                 "aaa", new byte[1], "1.2.3.4", "1.2.3.4");
 
-        eventLog1.setEventType(EventType.epsosPatientServiceList);
+        eventLog1.setEventType(EventType.PATIENT_SERVICE_LIST);
         asd.write(eventLog1, "13", "1");
 
         try {
@@ -193,14 +193,14 @@ public class AuditTrailUtilsTest {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosOrderServiceList, EventActionCode.READ,
+        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.ORDER_SERVICE_LIST, EventActionCode.READ,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "Hospital", "MassimilianoMasi<saml:massi@saml:test.fr>", "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "dentist", "MassimilianoMasi<saml:massi@saml:test.fr>", "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "AS-12", "22", "333", new byte[1], "patienttarget^^^",
                 "11", new byte[1], "22", new byte[1], "194.219.31.2", "222.33.33.3");
 
-        eventLog1.setEventType(EventType.epsosOrderServiceList);
+        eventLog1.setEventType(EventType.ORDER_SERVICE_LIST);
         asd.write(eventLog1, "13", "2");
 
         try {
@@ -224,14 +224,14 @@ public class AuditTrailUtilsTest {
             LOGGER.error("DatatypeConfigurationException: ", ex);
         }
 
-        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosDispensationServiceInitialize,
+        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.DISPENSATION_SERVICE_INITIALIZE,
                 EventActionCode.UPDATE, date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "Hospital", "MassimilianoMasi<saml:massi@saml:test.fr>", "Massimiliano",
                 "dentist", "MassimilianoMasi<saml:massi@saml:test.fr>", "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "AS-13", "22", "333", new byte[1], "patienttarget^^^",
                 "11", new byte[1], "22", new byte[1], "194.219.31.2", "222.33.33.3");
 
-        eventLog1.setEventType(EventType.epsosDispensationServiceInitialize);
+        eventLog1.setEventType(EventType.DISPENSATION_SERVICE_INITIALIZE);
         asd.write(eventLog1, "13", "2");
         try {
             Thread.sleep(1000);
@@ -254,7 +254,7 @@ public class AuditTrailUtilsTest {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosDispensationServiceDiscard,
+        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.DISPENSATION_SERVICE_DISCARD,
                 EventActionCode.DELETE, date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "Hospital", "MassimilianoMasi<saml:massi@saml:test.fr>", "Massi",
                 "dentist", "MassimilianoMasi<saml:massi@saml:test.fr>", "SMassimilianoMasi<saml:massi@saml:test.fr>",
@@ -262,7 +262,7 @@ public class AuditTrailUtilsTest {
                 "patienttarget^^^", "11", new byte[1], "22",
                 new byte[1], "194.219.31.2", "222.33.33.3");
 
-        eventLog1.setEventType(EventType.epsosDispensationServiceDiscard);
+        eventLog1.setEventType(EventType.DISPENSATION_SERVICE_DISCARD);
         asd.write(eventLog1, "13", "2");
         try {
             Thread.sleep(1000);
@@ -285,14 +285,14 @@ public class AuditTrailUtilsTest {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.epsosConsentServicePut,
+        EventLog eventLog1 = EventLog.createEventLogHCPAssurance(TransactionName.CONSENT_SERVICE_PUT,
                 EventActionCode.UPDATE, date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "Hospital", "MassimilianoMasi<saml:massi@saml:test.fr>", "Massi",
                 "dentist", "MassimilianoMasi<saml:massi@saml:test.fr>", "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "AS-12", "22", "333", new byte[1], "patienttarget^^^",
                 "11", new byte[1], "22", new byte[1], "194.219.31.2", "222.33.33.3");
 
-        eventLog1.setEventType(EventType.epsosConsentServicePut);
+        eventLog1.setEventType(EventType.CONSENT_SERVICE_PUT);
         asd.write(eventLog1, "13", "2");
         try {
             Thread.sleep(1000);
@@ -317,14 +317,14 @@ public class AuditTrailUtilsTest {
 
         EventLog eventLog1 = EventLog.createEventLogHCPAssurance(
 
-                TransactionName.epsosConsentServiceDiscard, EventActionCode.DELETE, date2, EventOutcomeIndicator.FULL_SUCCESS,
+                TransactionName.CONSENT_SERVICE_DISCARD, EventActionCode.DELETE, date2, EventOutcomeIndicator.FULL_SUCCESS,
                 "MassimilianoMasi<saml:massi@saml:test.fr>", "Hospital", "Massimiliano Masi",
                 "MassimilianoMasi<saml:massi@saml:test.fr>", "dentist", "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "MassimilianoMasi<saml:massi@saml:test.fr>", "AS-12", "22", "333",
                 new byte[1], "patienttarget^^^", "11", new byte[1], "22",
                 new byte[1], "194.219.31.2", "222.33.33.3");
 
-        eventLog1.setEventType(EventType.epsosConsentServiceDiscard);
+        eventLog1.setEventType(EventType.CONSENT_SERVICE_DISCARD);
         asd.write(eventLog1, "13", "2");
         try {
             Thread.sleep(1000);
@@ -347,13 +347,13 @@ public class AuditTrailUtilsTest {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.epsosHcpAuthentication,
+        EventLog eventLog1 = EventLog.createEventLogHCPIdentity(TransactionName.HCP_AUTHENTICATION,
                 EventActionCode.EXECUTE, date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "Hospital", "MassimilianoMasi<saml:massi@saml:test.fr>", "dentist",
                 "dentdsdsdsist", "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "MassimilianoMasi<saml:massi@saml:test.fr>", "AS-12", "ssasa",
                 "aa", new byte[1], "aaa", new byte[1], "AA", "AA", NcpSide.NCP_B);
-        eventLog1.setEventType(EventType.epsosHcpAuthentication);
+        eventLog1.setEventType(EventType.HCP_AUTHENTICATION);
 
         asd.write(eventLog1, "13", "2");
         try {
@@ -377,7 +377,7 @@ public class AuditTrailUtilsTest {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog1 = EventLog.createEventLogTRCA(TransactionName.epsosTRCAssertion, EventActionCode.EXECUTE, date2,
+        EventLog eventLog1 = EventLog.createEventLogTRCA(TransactionName.TRC_ASSERTION, EventActionCode.EXECUTE, date2,
                 EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>", "Hospital",
                 "MassimilianoMasi<saml:massi@saml:test.fr>", "dentist", "massi",
                 "MassimilianoMasi<saml:massi@saml:test.fr>", "MassimilianoMasi<saml:massi@saml:test.fr>",
@@ -385,7 +385,7 @@ public class AuditTrailUtilsTest {
                 "11", new byte[1], "22", new byte[1], "194.219.31.2",
                 "222.33.33.3", NcpSide.NCP_B);
 
-        eventLog1.setEventType(EventType.epsosTRCAssertion);
+        eventLog1.setEventType(EventType.TRC_ASSERTION);
         asd.write(eventLog1, "13", "2");
         try {
             Thread.sleep(1000);
@@ -408,12 +408,12 @@ public class AuditTrailUtilsTest {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog1 = EventLog.createEventLogNCPTrustedServiceList(TransactionName.epsosNCPTrustedServiceList,
+        EventLog eventLog1 = EventLog.createEventLogNCPTrustedServiceList(TransactionName.NCP_TRUSTED_SERVICE_LIST,
                 EventActionCode.EXECUTE, date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "MassimilianoMasi<saml:massi@saml:test.fr>", "ET_ObjectID^^^", "11",
                 new byte[1], "22", new byte[1], "194.219.31.2", "222.33.33.3");
 
-        eventLog1.setEventType(EventType.epsosNCPTrustedServiceList);
+        eventLog1.setEventType(EventType.NCP_TRUSTED_SERVICE_LIST);
         asd.write(eventLog1, "13", "2");
         try {
             Thread.sleep(1000);
@@ -436,11 +436,11 @@ public class AuditTrailUtilsTest {
             LOGGER.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
 
-        EventLog eventLog1 = EventLog.createEventLogPivotTranslation(TransactionName.epsosPivotTranslation, EventActionCode.EXECUTE,
+        EventLog eventLog1 = EventLog.createEventLogPivotTranslation(TransactionName.PIVOT_TRANSLATION, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, "MassimilianoMasi<saml:massi@saml:test.fr>",
                 "ET_ObjectID^^^", "22", "11", new byte[1], "22",
                 new byte[1], "194.219.31.2");
-        eventLog1.setEventType(EventType.epsosPivotTranslation);
+        eventLog1.setEventType(EventType.PIVOT_TRANSLATION);
         asd.write(eventLog1, "13", "2");
         try {
             Thread.sleep(1000);

@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,11 +19,13 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
 import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfiguration.class, loader = AnnotationConfigContextLoader.class)
 public class AssertionValidatorTest {
+
+    private final Logger logger = LoggerFactory.getLogger(AssertionValidatorTest.class);
 
     @Autowired
     private HttpClient httpClient;
@@ -42,7 +46,7 @@ public class AssertionValidatorTest {
     }
 
     @Test
-    public void testValidateDocument() throws GazelleValidationException {
+    public void testValidateDocument() {
 
         String XML_ASSERTION = "\n" +
                 "\n" +
@@ -117,9 +121,9 @@ public class AssertionValidatorTest {
                 "</saml2:Assertion>\n" +
                 "\n";
 
-        String assertionsSTR = DatatypeConverter.printBase64Binary(XML_ASSERTION.getBytes(Charset.forName("UTF-8")));
+        String assertionsSTR = DatatypeConverter.printBase64Binary(XML_ASSERTION.getBytes(StandardCharsets.UTF_8));
         String result = assertionValidator.validateObject(assertionsSTR, "epSOS - HCP Identity Assertion", "epSOS - HCP Identity Assertion");
-        System.out.println(result);
+        logger.info("Result:\n'{}'", result);
         Assert.assertNotNull(result);
     }
 }
