@@ -25,7 +25,7 @@
                 </HelpTextForTest>
 			</DK>
 			<ES homeCommunity="2.16.17.710.801.1000.990.1">
-				<text></text>
+                <text/>
                 <HelpTextForTest>Tillgängliga test patienter: 
                     1199925/803409 
                     2146789/803409 
@@ -35,12 +35,15 @@
                 </HelpTextForTest>
 			</ES>
             <EU homeCommunity="2.16.17.710.850.1000.990.1">
-                <text>ID Card number</text>
-                <HelpTextForTest>Mock dataset:
-                    1
-                    2
+                <text>European Identifier</text>
+                <HelpTextForTest>Mock Dataset: ePrescription(1-1234-W1, 1-1234-W2, 1-1234-W3, 1-5678-W1, 1-5678-W2) -
+                    Patient Summary(2-1234-W1, 2-1234-W2, 2-1234-W3, 2-5678-W1, 2-5678-W2).
                 </HelpTextForTest>
             </EU>
+            <HU homeCommunity="2.16.17.710.818.1000.990.1">
+                <text>National Identifier</text>
+                <HelpTextForTest/>
+            </HU>
 			<FR homeCommunity="2.16.17.710.790.1000.990.1">
 				<text>Ange personens INSEE code</text>
                 <HelpTextForTest>Tillgänlgia testpatienter: 
@@ -131,9 +134,7 @@
             </HR>
             <IH homeCommunity="2.16.17.710.812.1000.990.1">
                 <text>IHE Simulator</text>
-                <HelpTextForTest>Test patients:
-					2469772
-                </HelpTextForTest>
+                <HelpTextForTest>Test patients: 2469772</HelpTextForTest>
             </IH>
         </country>
 	</CountryConfigManager>
