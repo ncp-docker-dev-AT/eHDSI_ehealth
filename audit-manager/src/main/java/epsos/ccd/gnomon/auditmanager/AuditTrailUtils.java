@@ -1064,9 +1064,9 @@ public enum AuditTrailUtils {
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
                     eventLog.getEI_EventOutcomeIndicator());
             addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI",
-                    "eHealth DSI Service Consumer", eventLog.getSourceip());
+                    "Service Consumer", eventLog.getSourceip());
             addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI",
-                    "eHealth DSI Service Provider", eventLog.getTargetip());
+                    "Service Provider", eventLog.getTargetip());
             addAuditSource(am, eventLog.getAS_AuditSourceId());
             addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
                     Short.valueOf("3"), "9", "errormsg");
@@ -1091,9 +1091,9 @@ public enum AuditTrailUtils {
             addEventIdentification(am, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
                     eventLog.getEI_EventOutcomeIndicator());
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "eHealth DSI Service Consumer",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "Service Consumer",
                     eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "eHealth DSI Service Provider",
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "Service Provider",
                     eventLog.getTargetip());
             addAuditSource(am, eventLog.getAS_AuditSourceId());
             addError(am, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
@@ -1123,9 +1123,9 @@ public enum AuditTrailUtils {
                     "1.3.6.1.4.1.12559.11.10.1.3.2.2.2");
             addHumanRequestor(am, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "eHealth DSI Service Consumer",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "Service Consumer",
                     eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "eHealth DSI Service Provider",
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "Service Provider",
                     eventLog.getTargetip());
             addAuditSource(am, eventLog.getAS_AuditSourceId());
             addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"), "Patient",
@@ -1156,9 +1156,9 @@ public enum AuditTrailUtils {
                     eventLog.getEI_EventOutcomeIndicator());
             addHumanRequestor(am, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "eHealth DSI Service Consumer",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "Service Consumer",
                     eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "eHealth DSI Service Provider",
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "Service Provider",
                     eventLog.getTargetip());
             addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"), "Patient",
                     "2", "RFC-3881", "Patient Number");
@@ -1193,9 +1193,9 @@ public enum AuditTrailUtils {
             // Human Requestor
             addHumanRequestor(am, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "eHealth DSI Service Consumer",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "Service Consumer",
                     eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "eHealth DSI Service Provider",
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "Service Provider",
                     eventLog.getTargetip());
             addParticipantObject(am, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"), "Patient",
                     "2", "RFC-3881", "Patient Number");
@@ -1223,9 +1223,9 @@ public enum AuditTrailUtils {
             addEventIdentification(am, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
                     eventLog.getEI_EventOutcomeIndicator());
-            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "eHealth DSI Service Consumer",
+            addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI", "Service Consumer",
                     eventLog.getSourceip());
-            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "eHealth DSI Service Provider",
+            addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI", "Service Provider",
                     eventLog.getTargetip());
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
@@ -1250,7 +1250,7 @@ public enum AuditTrailUtils {
                     eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator());
 
             addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI",
-                    "eHealth DSI Service Provider", eventLog.getTargetip());
+                    "Service Provider", eventLog.getTargetip());
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
@@ -1281,9 +1281,9 @@ public enum AuditTrailUtils {
             addHumanRequestor(am, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
             addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI",
-                    "eHealth DSI Service Consumer", eventLog.getSourceip());
+                    "Service Consumer", eventLog.getSourceip());
             addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI",
-                    "eHealth DSI Service Provider", eventLog.getTargetip());
+                    "Service Provider", eventLog.getTargetip());
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
@@ -1308,9 +1308,9 @@ public enum AuditTrailUtils {
             addHumanRequestor(am, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
             addService(am, eventLog.getSC_UserID(), true, "ServiceConsumer", "eHealth DSI",
-                    "eHealth DSI Service Consumer", eventLog.getSourceip());
+                    "Service Consumer", eventLog.getSourceip());
             addService(am, eventLog.getSP_UserID(), false, "ServiceProvider", "eHealth DSI",
-                    "eHealth DSI Service Provider", eventLog.getTargetip());
+                    "Service Provider", eventLog.getTargetip());
             addService(am, eventLog.getSP_UserID(), false, "MasterPatientIndex", "eHealth DSI",
                     "Master Patient Index", eventLog.getTargetip());
             addAuditSource(am, eventLog.getAS_AuditSourceId());
