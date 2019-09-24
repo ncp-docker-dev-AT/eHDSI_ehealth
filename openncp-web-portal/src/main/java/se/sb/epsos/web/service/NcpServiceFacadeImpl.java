@@ -4,6 +4,7 @@ import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import hl7OrgV3.ClinicalDocumentDocument1;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.joda.time.DateTime;
@@ -250,7 +251,6 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
                 throw new NcpServiceException("Failed to build TRC Request, TRCAssertionRequest was null", new Exception());
             }
         } catch (Exception e) {
-            LOGGER.error("TRC webservice call failed", e);
             throw new NcpServiceException("TRC Webservice call failed", e);
         }
         LOGGER.info("stop::setTRCAssertion()");
@@ -303,13 +303,18 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
     @Override
     public CdaDocument retrieveDocument(MetaDocument doc) throws NcpServiceException {
-        String hcid = doc.getDoc().getHcid();
-        if (hcid != null && hcid.startsWith(Constants.OID_PREFIX)) {
-            hcid = hcid.substring(8);
-        }
-        CountryVO country = CountryConfigManager.getCountry(hcid);
-        String countryCode = country != null ? country.getId() : "UNKNOWN";
+
         CdaDocument document = null;
+        String homeCommunityId = doc.getDoc().getHcid();
+        if (StringUtils.startsWith(homeCommunityId, Constants.OID_PREFIX)) {
+            homeCommunityId = homeCommunityId.substring(8);
+        }
+        // Fetch country from Portal configuration based on homeCommunityId
+        CountryVO country = CountryConfigManager.getCountry(homeCommunityId);
+        String countryCode = country != null ? country.getId() : "UNKNOWN";
+        if (StringUtils.equals(countryCode, "UNKNOWN")) {
+            LOGGER.warn("Cannot retrieve Country Code from configuration with the following HomeCommunityId: '{}'", homeCommunityId);
+        }
 
         RetrieveDocumentRequest retrieveDocumentRequest = new RetrieveDocumentRequest();
         retrieveDocumentRequest.setCountryCode(countryCode);
@@ -322,7 +327,6 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
         try {
             EpsosDocument epsosDocument = shelobConnector.retrieveDocument(retrieveDocumentRequest);
-            LOGGER.debug("Doc: '{}'", epsosDocument);
             byte[] bytes = epsosDocument.getBase64Binary();
             if (doc.getType().equals(DocType.EP)) {
                 document = new Prescription(doc, bytes, epsosDocument);
@@ -347,7 +351,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
     }
 
     @Override
-    public byte[] submitDocument(Dispensation dispensation, AuthenticatedUser user, Person person, String eD_PageAsString) throws NcpServiceException {
+    public byte[] submitDocument(Dispensation dispensation, AuthenticatedUser user, Person person, String eDispensePageAsString) throws NcpServiceException {
 
         byte[] bytes;
         String oidRoot = MasterConfigManager.get("ApplicationConfigManager.xmlDispensationRoot");
@@ -358,17 +362,15 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         try {
             bytes = getDispensationDocument(dispensation, user, cdaIdExtension, pdfIdExtension);
         } catch (Exception e) {
-            LOGGER.error("Exception", e);
             throw new NcpServiceException("Failed to create CDA", e);
         }
 
         byte[] pdfInBytes;
         byte[] pdfCdaInBytes;
         try {
-            pdfInBytes = PdfHandler.convertStringToPdf(eD_PageAsString);
+            pdfInBytes = PdfHandler.convertStringToPdf(eDispensePageAsString);
             pdfCdaInBytes = getDispensationAsByteArray(getDispensationDocumentPDF(pdfInBytes, dispensation, user, cdaIdExtension, pdfIdExtension));
         } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             throw new NcpServiceException("Failed to create PDF", e);
         }
         EpsosDocument doc = dispensation.getDoc();
@@ -405,7 +407,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
             LOGGER.info("Submitdocument is done.");
             GRAPHITELOGGER.logMetric("epsos-web.service.submitDocument.success." + person.getCountryCode(), 1L);
         } catch (SOAPFaultException sfe) {
-            // Revert dispensation uuid, because retry is not possible if the dispensation uuid does not match the uuid in DocumentCache
+            // Revert dispensation uuid, because retry is not possible if the dispensation uuid does not match the UUID in DocumentCache
             dispensation.getDoc().setUuid(dispensationDocumentCacheKey);
             throw new NcpServiceException("Failed to submit document.", sfe);
         } finally {
@@ -422,9 +424,8 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         return pdfInBytes;
     }
 
-    private ClinicalDocumentDocument1 getDispensationDocumentPDF(byte[] bytes, Dispensation dispensation,
-                                                                 AuthenticatedUser user, String cdaIdExtension,
-                                                                 String pdfIdExtension) throws Exception {
+    private ClinicalDocumentDocument1 getDispensationDocumentPDF(byte[] bytes, Dispensation dispensation, AuthenticatedUser user,
+                                                                 String cdaIdExtension, String pdfIdExtension) throws Exception {
 
         ePtoeDMapper mapper = new ePtoeDMapper();
         return mapper.createDispensation_PDF(bytes, dispensation, user, cdaIdExtension, pdfIdExtension);
@@ -437,9 +438,9 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         return mapper.createDispensationFromPrescription(dispensation, user, cdaIdExtension, pdfIdExtension);
     }
 
-    private byte[] getDispensationAsByteArray(ClinicalDocumentDocument1 eD_Document) {
+    private byte[] getDispensationAsByteArray(ClinicalDocumentDocument1 eDispense) {
 
-        String xml = eD_Document.xmlText(new XmlOptions().setCharacterEncoding(StandardCharsets.UTF_8.name()).setSavePrettyPrint());
+        String xml = eDispense.xmlText(new XmlOptions().setCharacterEncoding(StandardCharsets.UTF_8.name()).setSavePrettyPrint());
         return xml.getBytes(StandardCharsets.UTF_8);
     }
 
