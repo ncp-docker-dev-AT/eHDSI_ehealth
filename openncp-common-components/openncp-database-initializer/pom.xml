@@ -6,7 +6,7 @@
     <parent>
         <artifactId>openncp-common-components</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>4.0.0</version>
+        <version>4.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>openncp-database-initializer</artifactId>
