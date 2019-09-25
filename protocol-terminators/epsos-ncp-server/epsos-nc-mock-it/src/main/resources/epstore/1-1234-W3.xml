@@ -198,8 +198,8 @@
                                         </epsos:ingredient>
                                     </manufacturedMaterial>
                                     <epsos:marketingAuthorizationHolder classCode="ORG" determinerCode="INSTANCE">
-                                        <id root="2.99" extension="XYZ"/>
-                                        <name>Merck AB</name>
+                                        <epsos:id root="2.99" extension="XYZ"/>
+                                        <epsos:name>Merck AB</epsos:name>
                                     </epsos:marketingAuthorizationHolder>
                                 </manufacturedProduct>
                             </consumable>
