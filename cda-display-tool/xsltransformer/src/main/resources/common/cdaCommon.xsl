@@ -797,6 +797,26 @@
         </xsl:call-template>
     </xsl:template>
 
+    <!-- epSOSPersonalRelationship -->
+    <xsl:template name="show-personalRelationship">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.38.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.111'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- epSOSRoleClass -->
+    <xsl:template name="show-roleClass">
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.39.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.110'"/>
+        </xsl:call-template>
+    </xsl:template>
+
     <!-- display translated code value -->
     <xsl:template name="show-code-value" match="/n1:ValueSet/n1:concept">
         <xsl:param name="code"/>

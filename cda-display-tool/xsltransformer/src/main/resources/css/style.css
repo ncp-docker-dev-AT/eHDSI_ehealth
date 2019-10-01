@@ -391,4 +391,17 @@ input[type='checkbox'] {
     color: #085a9f;
 }
 
+.label {
+    color: white;
+    padding: 4px;
+}
+
+.otherContacts-personalRelationship {
+    background-color: #009fd1;
+}
+
+.otherContacts-roleClass {
+    background-color: #085a9f;
+}
+
 ]]></root>
