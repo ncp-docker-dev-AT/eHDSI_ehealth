@@ -44,7 +44,6 @@ public class Validator implements TMConstants {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
             factory.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
             LOGGER.info("XSD Path File: '{}'", TMConfiguration.getInstance().getSchemaFilePath());
             Source schemaFile = new StreamSource(new File(TMConfiguration.getInstance().getSchemaFilePath()));
