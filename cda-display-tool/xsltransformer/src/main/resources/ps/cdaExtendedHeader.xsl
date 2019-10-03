@@ -24,17 +24,17 @@
 
     <!--Prefered HCP/ Legal Organization -->
     <xsl:variable
-            name="preferredHCPLegalOrgan"
+            name="preferredHCPScopingOrganization"
             select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity[@classCode='PRS']/n1:scopingOrganization"/>
     <xsl:variable
-            name="preferredHCPLegalOrgan2"
+            name="preferredHCPAssociatedPerson"
             select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity[@classCode='PRS']/n1:associatedPerson"/>
     <xsl:variable
-            name="preferredHCPLegalOrgName"
-            select="$preferredHCPLegalOrgan/n1:name"/>
+            name="preferredHCPScopingOrganizationName"
+            select="$preferredHCPScopingOrganization/n1:name"/>
     <xsl:variable
-            name="preferredHCPLegalOrg2Name"
-            select="$preferredHCPLegalOrgan2/n1:name"/>
+            name="preferredHCPAssociatedPersonName"
+            select="$preferredHCPAssociatedPerson/n1:name"/>
     <xsl:variable
             name="preferredHCPLegalOrg"
             select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity"/>
@@ -157,11 +157,11 @@
                 <tr>
                     <td>
                         <!-- show person's name and if exists organization name -->
-                        <xsl:value-of select="$preferredHCPLegalOrg2Name/n1:given"/>&#160;
-                        <xsl:value-of select="$preferredHCPLegalOrg2Name/n1:family"/>&#160;
-                        <xsl:if test="$preferredHCPLegalOrgName">
-                            ,<xsl:value-of select="$preferredHCPLegalOrgName/n1:given"/>&#160;
-                            <xsl:value-of select="$preferredHCPLegalOrgName/n1:family"/>
+                        <xsl:value-of select="$preferredHCPAssociatedPersonName/n1:given"/>&#160;
+                        <xsl:value-of select="$preferredHCPAssociatedPersonName/n1:family"/>&#160;
+                        <xsl:if test="$preferredHCPScopingOrganizationName">
+                            ,<xsl:value-of select="$preferredHCPScopingOrganizationName/n1:given"/>&#160;
+                            <xsl:value-of select="$preferredHCPScopingOrganizationName/n1:family"/>
                         </xsl:if>
                     </td>
                     <td>
