@@ -29,16 +29,16 @@ public class AssertionHandlerConfigManager implements Serializable {
         return MasterConfigManager.get(CONFIG_PREFIX + PURPOSE_OF_USE);
     }
 
-    public static String getXspaLocality() {
+    public static String getXSPALocality() {
         return MasterConfigManager.get(CONFIG_PREFIX + XSPA_LOCALITY);
     }
 
-    public static String getRole(String role) {
-        return MasterConfigManager.get(CONFIG_PREFIX + ROLE_PERMISSIONS_PREFIX + role + "[@role]");
+    public static String getRole(String portalRole) {
+        return MasterConfigManager.get(CONFIG_PREFIX + ROLE_PERMISSIONS_PREFIX + portalRole + "[@role]");
     }
 
-    public static String getFunctionalRole(String functionalRole) {
-        return MasterConfigManager.get(CONFIG_PREFIX + ROLE_PERMISSIONS_PREFIX + functionalRole + "[@functionalRole]");
+    public static String getFunctionalRole(String portalRole) {
+        return MasterConfigManager.get(CONFIG_PREFIX + ROLE_PERMISSIONS_PREFIX + portalRole + "[@functionalRole]");
     }
 
     public static Set<String> getPermissions(String role) {

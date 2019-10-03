@@ -1,13 +1,13 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator;
 
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 public class AssertionHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionHelper.class);
-    private static final String ERROR_MESSAGE = "'%s' - attribute should contain AttributeValue element.";
+    private static final String ERROR_MESSAGE = "'{0}' - attribute shall contain AttributeValue element.";
 
     private AssertionHelper() {
     }
@@ -64,6 +64,13 @@ public class AssertionHelper {
         throw new MissingFieldException(MessageFormat.format(ERROR_MESSAGE, attribute));
     }
 
+    /**
+     * Returns the HL7 permissions list associated to the SAML assertion in parameter.
+     *
+     * @param assertion - HCP assertions
+     * @return List of HL7 permissions.
+     * @throws InsufficientRightsException - When no permissions are provided, HCP is not authorized as consequence.
+     */
     public static List<XMLObject> getPermissionValuesFromAssertion(Assertion assertion) throws InsufficientRightsException {
 
         try {

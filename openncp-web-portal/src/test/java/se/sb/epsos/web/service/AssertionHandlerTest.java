@@ -1,7 +1,7 @@
 package se.sb.epsos.web.service;
 
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import epsos.ccd.gnomon.auditmanager.EventLog;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import junit.framework.TestCase;
 import org.mockito.MockSettings;
@@ -20,14 +20,13 @@ public class AssertionHandlerTest extends TestCase {
     private AuthenticatedUser userDetailsMock;
     private Assertion assertionMock;
     private ConfigurationManager configurationManager;
-    private AuditService as;
     private MockSettings settings = withSettings().serializable();
 
     @Override
     protected void setUp() throws Exception {
 
         super.setUp();
-        as = mock(AuditService.class, settings);
+        AuditService as = mock(AuditService.class, settings);
         configurationManager = mock(ConfigurationManager.class);
 
         assertionHandler = new AssertionHandler() {
@@ -35,10 +34,6 @@ public class AssertionHandlerTest extends TestCase {
 
             protected ConfigurationManager getConfigurationManager() {
                 return configurationManager;
-            }
-
-            protected AuditService getAuditService() {
-                return as;
             }
 
             protected String getPrivateKeyAlias() {
@@ -91,6 +86,6 @@ public class AssertionHandlerTest extends TestCase {
 
     public void testSendAuditEpsos91() {
 
-        assertionHandler.sendAuditEpsos91(userDetailsMock, assertionMock);
+        assertionHandler.sendHPAuthenticationAudit(userDetailsMock, assertionMock);
     }
 }

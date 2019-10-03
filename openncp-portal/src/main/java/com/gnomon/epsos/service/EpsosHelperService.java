@@ -28,7 +28,6 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PurposeOfUse;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPAFunctionalRole;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
-import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.audit.Configuration;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
@@ -156,13 +155,15 @@ public class EpsosHelperService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EpsosHelperService.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final Base64 decode = new Base64();
+    private static final DatatypeFactory DATATYPE_FACTORY;
 
     static {
         try {
             InitializationService.initialize();
-        } catch (InitializationException e) {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (InitializationException | DatatypeConfigurationException e) {
             LOGGER.error("InitializationException: '{}'", e.getMessage(), e);
-
+            throw new IllegalArgumentException();
         }
     }
 
@@ -1069,7 +1070,7 @@ public class EpsosHelperService {
                     auditPointOfCare = poc;
                 }
                 EpsosHelperService.handleHCPIdentificationAudit(assertion, user.getFullName(), user.getEmailAddress(), auditPointOfCare, orgType,
-                        structuralRole, assertion.getID());
+                        functionalRole, assertion.getID());
 
                 if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
@@ -1186,7 +1187,7 @@ public class EpsosHelperService {
 
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("audit.repository.url"));
                 LOGGER.debug("Sending EHDSI-91 audit message for '{}'", fullname);
-                EpsosHelperService.handleHCPIdentificationAudit(assertion, fullname, emailaddress, orgName, orgType, rolename, assertion.getID());
+                EpsosHelperService.handleHCPIdentificationAudit(assertion, fullname, emailaddress, orgName, orgType, "FUNCTIONAL_ROLE", assertion.getID());
 
                 if (isPhysician || isPharmacist || isNurse || isAdministrator || isPatient) {
 
@@ -1256,53 +1257,41 @@ public class EpsosHelperService {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
-        String secHead = "[No security header provided]";
+        String securityHeader = "[No security header provided]";
         String requestMsgParticipantObjectID = Constants.UUID_PREFIX + message;
         String responseMsgParticipantObjectID = Constants.UUID_PREFIX + message;
         //TODO: Might be necessary to adapt the targetIp to the relevant XUA Provider address.
         String sourceIP = IPUtil.getPrivateServerIp();
-        String PC_UserID = orgName;
-        String PC_RoleID = orgType;
         String spProvidedID = assertion.getSubject().getNameID().getSPProvidedID();
-        String HR_UserID = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + assertion.getSubject().getNameID().getValue()
+        String humanRequesterUserID = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + assertion.getSubject().getNameID().getValue()
                 + "@" + assertion.getIssuer().getValue() + ">";
-        String HR_RoleID = roleName;
 
         //Human readable name of the HP as given in the Subject-ID attribute of the HP identity assertion
-        String HR_AlternativeUserID = "Not Provided";
+        String humanRequesterAlternativeUserID = "Not Provided";
         Attribute subjectIdAttr = findStringInAttributeStatement(assertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
         if (subjectIdAttr != null) {
             List<XMLObject> attributesSaml = subjectIdAttr.getAttributeValues();
             if (!attributesSaml.isEmpty()) {
-                HR_AlternativeUserID = ((XSString) attributesSaml.get(0)).getValue();
+                humanRequesterAlternativeUserID = ((XSString) attributesSaml.get(0)).getValue();
             }
         }
         String serviceConsumerUserId = name;
         String serviceProviderUserId = name;
 
-        String AS_AuditSourceId = Constants.COUNTRY_PRINCIPAL_SUBDIVISION;
-        String ET_ObjectID = Constants.UUID_PREFIX + message;
+        String auditSourceId = Constants.COUNTRY_PRINCIPAL_SUBDIVISION;
+        String eventTargetObjectId = Constants.UUID_PREFIX + message;
 
-        AuditService asd = AuditServiceFactory.getInstance();
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(new Date());
-        XMLGregorianCalendar eventDateTime = null;
-        try {
-            eventDateTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-        } catch (DatatypeConfigurationException ex) {
-            LOGGER.error(ExceptionUtils.getStackTrace(ex));
-        }
-        EventLog hcpIdentificationEventLog;
-        hcpIdentificationEventLog = EventLog.createEventLogHCPIdentity(TransactionName.HCP_AUTHENTICATION, EventActionCode.EXECUTE,
-                eventDateTime, EventOutcomeIndicator.FULL_SUCCESS, PC_UserID, PC_RoleID, HR_UserID, HR_RoleID, HR_AlternativeUserID,
-                serviceConsumerUserId, serviceProviderUserId, AS_AuditSourceId, ET_ObjectID, requestMsgParticipantObjectID,
-                secHead.getBytes(StandardCharsets.UTF_8), responseMsgParticipantObjectID, secHead.getBytes(StandardCharsets.UTF_8),
-                sourceIP, sourceIP, NcpSide.NCP_B);
-
-        LOGGER.info("The audit has been prepared");
+        XMLGregorianCalendar eventDateTime = DATATYPE_FACTORY.newXMLGregorianCalendar(c);
+        EventLog hcpIdentificationEventLog = EventLog.createEventLogHCPIdentity(TransactionName.HCP_AUTHENTICATION, EventActionCode.EXECUTE,
+                eventDateTime, EventOutcomeIndicator.FULL_SUCCESS, orgName, orgType, humanRequesterUserID, roleName,
+                humanRequesterAlternativeUserID, serviceConsumerUserId, serviceProviderUserId, auditSourceId, eventTargetObjectId,
+                requestMsgParticipantObjectID, securityHeader.getBytes(StandardCharsets.UTF_8), responseMsgParticipantObjectID,
+                securityHeader.getBytes(StandardCharsets.UTF_8), sourceIP, sourceIP, NcpSide.NCP_B);
         hcpIdentificationEventLog.setEventType(EventType.HCP_AUTHENTICATION);
-        asd.write(hcpIdentificationEventLog, "13", "2");
+        AuditServiceFactory.getInstance().write(hcpIdentificationEventLog, "13", "2");
     }
 
     private static Attribute findStringInAttributeStatement(List<AttributeStatement> statements, String attrName) {
