@@ -4,7 +4,6 @@ import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import org.mockito.MockSettings;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -31,16 +30,14 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
 
     private NcpServiceFacade serviceFacade;
     private ClientConnectorService webServiceClient;
-    private ClientConnectorServiceService service;
     private TrcServiceHandler trcServiceHandler;
-    private AuditService auditService;
     private MockSettings settings = withSettings().serializable();
 
     public NcpServiceFacadeMock() {
 
         LOGGER.info("Creating NcpServiceFacadeMock");
         webServiceClient = mock(ClientConnectorService.class, settings);
-        service = mock(ClientConnectorServiceService.class, settings);
+        ClientConnectorServiceService service = mock(ClientConnectorServiceService.class, settings);
         mockInitUserResponse(service);
         mockQueryPatentsResponse(webServiceClient);
         mockSetTRCAssertionResponse(webServiceClient);
@@ -48,7 +45,7 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
         mockRetrieveDocumentResponse(webServiceClient);
         mockSubmitDocumentResponse(webServiceClient);
 
-        auditService = mock(AuditService.class, settings);
+        AuditService auditService = mock(AuditService.class, settings);
         when(auditService.write(Mockito.notNull(), (String) Mockito.notNull(), (String) Mockito.notNull())).thenReturn(true);
 
         trcServiceHandler = mock(TrcServiceHandler.class, settings);
@@ -69,16 +66,13 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
 
     private void mockBuildTrcRequestResponse(TrcServiceHandler trcServiceHandlerMock) {
         try {
-            when(trcServiceHandler.buildTrcRequest(any(Assertion.class), anyString(), anyString())).thenAnswer(new Answer<TRCAssertionRequest>() {
-                @Override
-                public TRCAssertionRequest answer(InvocationOnMock invocation) throws Throwable {
-                    final Assertion assertion = (Assertion) invocation.getArguments()[0];
-                    String patientId = (String) invocation.getArguments()[1];
-                    String purposeOfUse = (String) invocation.getArguments()[2];
-                    TRCAssertionRequest request = mock(TRCAssertionRequest.class, settings);
-                    when(request.request()).thenReturn(assertion);
-                    return request;
-                }
+            when(trcServiceHandler.buildTrcRequest(any(Assertion.class), anyString(), anyString())).thenAnswer((Answer<TRCAssertionRequest>) invocation -> {
+                final Assertion assertion = (Assertion) invocation.getArguments()[0];
+                String patientId = (String) invocation.getArguments()[1];
+                String purposeOfUse = (String) invocation.getArguments()[2];
+                TRCAssertionRequest request = mock(TRCAssertionRequest.class, settings);
+                when(request.request()).thenReturn(assertion);
+                return request;
             });
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
@@ -158,9 +152,9 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
     }
 
     @Override
-    public void initUser(AuthenticatedUser user) throws NcpServiceException {
+    public void initServices(AuthenticatedUser user) throws NcpServiceException {
         LOGGER.info("Method call: " + this.getClass().getSimpleName() + ".initUser()");
-        serviceFacade.initUser(user);
+        serviceFacade.initServices(user);
     }
 
     @Override

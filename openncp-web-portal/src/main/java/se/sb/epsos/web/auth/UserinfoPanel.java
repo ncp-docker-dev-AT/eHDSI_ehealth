@@ -63,7 +63,7 @@ public class UserinfoPanel extends Panel {
                     public void onClick() {
                         userDetails.setPrimaryRole(item.getModelObject());
                         try {
-                            ((EpsosAuthenticatedWebSession) getSession()).getServiceFacade().initUser(userDetails);
+                            ((EpsosAuthenticatedWebSession) getSession()).getServiceFacade().initServices(userDetails);
                         } catch (NcpServiceException ex) {
                             LOGGER.error("NcpServiceException: '{}'", ex.getMessage(), ex);
                             error(getString("error.login.init"));

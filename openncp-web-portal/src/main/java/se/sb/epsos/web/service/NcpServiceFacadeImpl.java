@@ -29,6 +29,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.IOException;
@@ -46,36 +47,44 @@ import java.util.List;
 public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NcpServiceFacadeImpl.class);
+    private static final String CLIENT_CONNECTOR_NS_URL = "http://clientconnector.protocolterminator.openncp.epsos/";
+    private static final String CLIENT_CONNECTOR_LOCAL_PART = "ClientConnectorServiceService";
+    private static final DatatypeFactory DATATYPE_FACTORY;
     private static final GraphiteLogger GRAPHITELOGGER = GraphiteLogger.getDefaultLogger();
+
+    static {
+        try {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private ClientConnectorServiceService service;
-    private ClientConnectorService shelobConnector;
+    private ClientConnectorService clientConnectorService;
     private TrcServiceHandler trcServiceHandler;
     private String sessionId;
     private AssertionHandler assertionHandler = new AssertionHandler();
 
-    public NcpServiceFacadeImpl(ClientConnectorServiceService service, ClientConnectorService shelobConnector,
-                                TrcServiceHandler trcServiceHandler) {
+    @Deprecated
+    public NcpServiceFacadeImpl(ClientConnectorServiceService service, ClientConnectorService clientConnectorService, TrcServiceHandler trcServiceHandler) {
         this.service = service;
         this.trcServiceHandler = trcServiceHandler;
-        this.shelobConnector = shelobConnector;
+        this.clientConnectorService = clientConnectorService;
     }
 
     public NcpServiceFacadeImpl() {
-        this.service = NcpClientConnector.createClientConnector();
+        this.service = new ClientConnectorServiceService(null, new QName(CLIENT_CONNECTOR_NS_URL, CLIENT_CONNECTOR_LOCAL_PART));
         this.trcServiceHandler = new TrcServiceHandler();
     }
 
     private static XMLGregorianCalendar getXMLGregorian(GregorianCalendar calendar) {
-        XMLGregorianCalendar date2 = null;
-        try {
-            date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
-        } catch (DatatypeConfigurationException e) {
-            LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
-        }
-        return date2;
+
+        return DATATYPE_FACTORY.newXMLGregorianCalendar(calendar);
     }
 
     private static XMLGregorianCalendar getDate(String indate, DateTimeFormatter df) {
+
         DateTime dateTime = df.parseDateTime(indate);
         return getXMLGregorian(dateTime.toGregorianCalendar());
     }
@@ -103,7 +112,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
     @Override
     public String about() {
-        return getClass().getSimpleName() + " (online: epSOS-Web)";
+        return getClass().getSimpleName() + " (online: OpenNCP-Web)";
     }
 
     @Override
@@ -113,24 +122,20 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
     }
 
     @Override
-    public void initUser(final AuthenticatedUser userDetails) {
-        /*
-         * Creating web service call header with assertion.
-         */
+    public void initServices(final AuthenticatedUser userDetails) {
+
+        //  Creating web service call header with assertion.
         service.setHandlerResolver(portInfo -> {
             List<Handler> handlerList = new ArrayList<>();
             handlerList.add(new RGBSOAPHandler(userDetails));
             return handlerList;
         });
 
-        /*
-         * If you want to change this port you have to change it on server side in the axis2.xml
-         */
-        if (FeatureFlagsManager.check(Feature.ENABLE_SSL)) {
-            shelobConnector = service.getPort(new QName("http://cc.pt.epsos.eu", "ClientConnectorServiceHttpsSoap11Endpoint"), ClientConnectorService.class);
-        } else {
-            shelobConnector = service.getPort(new QName("http://cc.pt.epsos.eu", "ClientConnectorServiceHttpSoap11Endpoint"), ClientConnectorService.class);
-        }
+        String clientConnectorWsdlUrl = System.getProperty("client-connector-wsdl-url");
+        LOGGER.info("[Portal] Initializing client-connector-wsdl-url: '{}'", clientConnectorWsdlUrl);
+        clientConnectorService = service.getClientConnectorServicePort();
+        BindingProvider bindingProvider = (BindingProvider) clientConnectorService;
+        bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, clientConnectorWsdlUrl);
     }
 
     @Override
@@ -143,9 +148,9 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
         QueryPatientRequest queryPatientRequest = createQueryPatientRequest(patientList, country);
         List<Person> personList = new ArrayList<>();
-        if (shelobConnector != null) {
+        if (clientConnectorService != null) {
             try {
-                List<PatientDemographics> queryPatient = shelobConnector.queryPatient(queryPatientRequest);
+                List<PatientDemographics> queryPatient = clientConnectorService.queryPatient(queryPatientRequest);
                 for (PatientDemographics dem : queryPatient) {
                     Person person = new Person(this.sessionId, dem, country.getId());
                     personList.add(person);
@@ -286,7 +291,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
         List<MetaDocument> docList = new ArrayList<>();
         try {
-            List<EpsosDocument> list = shelobConnector.queryDocuments(request);
+            List<EpsosDocument> list = clientConnectorService.queryDocuments(request);
             for (EpsosDocument doc : list) {
                 MetaDocument metaDocument = new MetaDocument(this.sessionId, person.getEpsosId(), doc);
                 if (LOGGER.isDebugEnabled()) {
@@ -326,7 +331,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         retrieveDocumentRequest.setHomeCommunityId(addOIDPrefix(doc.getDoc().getHcid()));
 
         try {
-            EpsosDocument epsosDocument = shelobConnector.retrieveDocument(retrieveDocumentRequest);
+            EpsosDocument epsosDocument = clientConnectorService.retrieveDocument(retrieveDocumentRequest);
             byte[] bytes = epsosDocument.getBase64Binary();
             if (doc.getType().equals(DocType.EP)) {
                 document = new Prescription(doc, bytes, epsosDocument);
@@ -403,7 +408,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         request.setPatientDemographics(person.getPatientDemographics());
 
         try {
-            shelobConnector.submitDocument(request);
+            clientConnectorService.submitDocument(request);
             LOGGER.info("Submitdocument is done.");
             GRAPHITELOGGER.logMetric("epsos-web.service.submitDocument.success." + person.getCountryCode(), 1L);
         } catch (SOAPFaultException sfe) {
