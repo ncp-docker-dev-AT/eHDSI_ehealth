@@ -158,23 +158,18 @@
 
     <!--Prefered HCP/ Legal Organization -->
     <xsl:variable
-            name="preferedHCPLegalOrgan"
+            name="preferredHCPScopingOrganisation"
             select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity[@classCode='PRS']/n1:scopingOrganization"/>
     <xsl:variable
-            name="preferedHCPLegalOrgan2"
+            name="preferredHCPScopingOrganisationName"
+            select="$preferredHCPScopingOrganisation/n1:name"/>
+
+    <xsl:variable
+            name="preferredHCPAssociatedPerson"
             select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity[@classCode='PRS']/n1:associatedPerson"/>
     <xsl:variable
-            name="preferedHCPLegalOrgName"
-            select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity[@classCode='PRS']/n1:scopingOrganization/n1:name"/>
-    <xsl:variable
-            name="preferedHCPLegalOrg2Name"
-            select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity[@classCode='PRS']/n1:associatedPerson/n1:name"/>
-    <xsl:variable
-            name="preferedHCPLegalOrg2FamilyName"
-            select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity[@classCode='PRS']/n1:associatedPerson/n1:name/n1:family"/>
-    <xsl:variable
-            name="preferedHCPLegalOrg2GivenName"
-            select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity[@classCode='PRS']/n1:associatedPerson/n1:name/n1:given"/>
+            name="preferredHCPAssociatedPersonName"
+            select="$preferredHCPAssociatedPerson/n1:name"/>
 
 
     <!--Prefered HCP/ Legal Organization Address-->
@@ -687,11 +682,15 @@
                 <tr>
                     <td>
                         <!-- show person's name and if exists organization name -->
-                        <xsl:value-of select="$preferedHCPLegalOrg2Name/n1:given"/>&#160;
-                        <xsl:value-of select="$preferedHCPLegalOrg2Name/n1:family"/>&#160;
-                        <xsl:if test="$preferedHCPLegalOrgName">
-                            ,<xsl:value-of select="$preferedHCPLegalOrgName/n1:given"/>&#160;
-                            <xsl:value-of select="$preferedHCPLegalOrgName/n1:family"/>
+                        <xsl:if test="not($preferredHCPAssociatedPersonName/@nullFlavor)">
+                            <xsl:value-of select="$preferredHCPAssociatedPersonName/n1:given"/>&#160;
+                            <xsl:value-of select="$preferredHCPAssociatedPersonName/n1:family"/>
+                        </xsl:if>
+                        <xsl:if test="$preferredHCPScopingOrganisation">
+                            <xsl:if test="($preferredHCPAssociatedPersonName/n1:given or $preferredHCPAssociatedPersonName/n1:family) and $preferredHCPScopingOrganisation/n1:name">
+                            ,&#160;
+                            </xsl:if>
+                            <xsl:value-of select="$preferredHCPScopingOrganisation/n1:name"/>
                         </xsl:if>
                     </td>
                     <td>
