@@ -19,7 +19,7 @@
         <serviceFacadeClass/>
         <!-- in order to run selenium integrationtests use mvn -DserviceFacadeClass=se.sb.epsos.web.service.mock.NcpServiceFacadeMock -Plocal,integration clean install -->
         <wicket.version>1.4.17</wicket.version>
-        <spring-security.version>3.1.4.RELEASE</spring-security.version>
+        <spring-security.version>3.1.7.RELEASE</spring-security.version>
         <jetty.version>7.3.0.v20110203</jetty.version>
         <!-- Global properties & plugin config -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -346,7 +346,7 @@
     </dependencies>
 
     <build>
-        <finalName>epsos-web</finalName>
+        <finalName>openncp-web</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

@@ -3,18 +3,16 @@ package se.sb.epsos.web.util;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.DefaultConfigurationBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class MasterConfigManager {
 
-    public static final String CONFIG_PROPERTY = "epsos-web.master.cfg";
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterConfigManager.class);
+    private static final String CONFIG_PROPERTY = "epsos-web.master.cfg";
     private static final String DEFAULT_CONFIG_FILE = "config/master-config.xml";
     private static MasterConfigManager instance;
 
@@ -24,17 +22,18 @@ public class MasterConfigManager {
 
         super();
         String cfgFilePath = System.getProperty(CONFIG_PROPERTY);
-        if (cfgFilePath == null || "".equals(cfgFilePath)) {
+        if (StringUtils.isBlank(cfgFilePath)) {
             LOGGER.warn("No explicit master config file found in system property ''{}', using default bundled config", CONFIG_PROPERTY);
-            cfgFilePath = getClass().getClassLoader().getResource(DEFAULT_CONFIG_FILE).getPath();
+            cfgFilePath = Objects.requireNonNull(getClass().getClassLoader().getResource(DEFAULT_CONFIG_FILE)).getPath();
         }
         if (!System.getProperties().containsKey("override-config.xml")) {
             System.setProperty("override-config.xml", "override-config.xml");
         }
         try {
+            LOGGER.info("Loading Web Portal configuration file: '{}'", cfgFilePath);
             this.config = new DefaultConfigurationBuilder(cfgFilePath).getConfiguration();
         } catch (ConfigurationException e) {
-            LOGGER.error("Failed to initialize master config", e);
+            LOGGER.error("Failed to initialize master config: '{}'", e.getMessage());
         }
         if (config != null) {
             LOGGER.debug("Master configuration read successfully!");
