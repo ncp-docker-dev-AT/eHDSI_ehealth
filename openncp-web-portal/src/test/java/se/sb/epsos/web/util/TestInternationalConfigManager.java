@@ -18,9 +18,9 @@ public class TestInternationalConfigManager {
 
     @Before
     public void setUp() {
-        System.setProperty("epsos-internationalsearch-config-path", "src/test/resources/");
+        System.setProperty("epsos-internationalsearch-config-path", "C:/LocalData/Development/openncp/openncp-web-portal/src/test/resources/");
         List<CountryVO> list = new ArrayList<>();
-        vo = new CountryVO("SE", "Sverige");
+        vo = new CountryVO("HR", "Croatia");
         list.add(vo);
         config = new InternationalConfigManager(list);
     }

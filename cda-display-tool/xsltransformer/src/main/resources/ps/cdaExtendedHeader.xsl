@@ -10,25 +10,25 @@
 
     <!-- patient address -->
     <xsl:variable
-            name="patientWholeAddress"
+            name="patientRole"
             select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole"/>
 
     <xsl:variable
             name="patientPreferLang"
-            select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:languageCommunication/n1:languageCode"/>
+            select="$patientRole/n1:patient/n1:languageCommunication/n1:languageCode"/>
 
     <!-- guardian -->
     <xsl:variable
             name="patientGuardian"
-            select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:guardian"/>
+            select="$patientRole/n1:patient/n1:guardian"/>
 
     <!--Prefered HCP/ Legal Organization -->
     <xsl:variable
-            name="preferredHCPScopingOrganisation"
+            name="preferredHCPPRSScopingOrganisation"
             select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity[@classCode='PRS']/n1:scopingOrganization"/>
     <xsl:variable
-            name="preferredHCPScopingOrganisationName"
-            select="$preferredHCPScopingOrganisation/n1:name"/>
+            name="preferredHCPPRSScopingOrganisationName"
+            select="$preferredHCPPRSScopingOrganisation/n1:name"/>
 
     <xsl:variable
             name="preferredHCPAssociatedPerson"
@@ -40,16 +40,12 @@
 
     <!--Prefered HCP/ Legal Organization Address-->
     <xsl:variable
-            name="preferedHCPLegalOrg"
+            name="preferredHCPAssociatedEntity"
             select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity"/>
 
     <xsl:variable
-            name="preferredHCPLegalOrg2"
-            select="/n1:ClinicalDocument/n1:participant/n1:functionCode[@code='PCP'][@codeSystem='2.16.840.1.113883.5.88']/../n1:associatedEntity/n1:scopingOrganization"/>
-
-    <xsl:variable
-            name="preferredHCPLegalOrgAddress"
-            select="/n1:ClinicalDocument/n1:participant/n1:associatedEntity/n1:addr"/>
+            name="preferredHCPScopingOrganisation"
+            select="$preferredHCPAssociatedEntity/n1:scopingOrganization"/>
 
     <!-- Authoring device -->
     <xsl:variable
@@ -135,7 +131,7 @@
                             <tr>
                                 <td>
                                     <xsl:call-template name="show-contactInfo">
-                                        <xsl:with-param name="contact" select="$patientWholeAddress"/>
+                                        <xsl:with-param name="contact" select="$patientRole"/>
                                     </xsl:call-template>
                                 </td>
                             </tr>
@@ -165,11 +161,11 @@
                             <xsl:value-of select="$preferredHCPAssociatedPersonName/n1:given"/>&#160;
                             <xsl:value-of select="$preferredHCPAssociatedPersonName/n1:family"/>
                         </xsl:if>
-                        <xsl:if test="$preferredHCPScopingOrganisation">
-                            <xsl:if test="($preferredHCPAssociatedPersonName/n1:given or $preferredHCPAssociatedPersonName/n1:family) and $preferredHCPScopingOrganisation/n1:name">
+                        <xsl:if test="$preferredHCPPRSScopingOrganisation">
+                            <xsl:if test="($preferredHCPAssociatedPersonName/n1:given or $preferredHCPAssociatedPersonName/n1:family) and $preferredHCPPRSScopingOrganisation/n1:name">
                             ,&#160;
                             </xsl:if>
-                            <xsl:value-of select="$preferredHCPScopingOrganisation/n1:name"/>
+                            <xsl:value-of select="$preferredHCPPRSScopingOrganisation/n1:name"/>
                         </xsl:if>
                     </td>
                     <td>
@@ -185,14 +181,14 @@
                                 <td>
                                     <xsl:choose>
                                         <!-- first person's address.. then if not exist show org address -->
-                                        <xsl:when test="$preferredHCPLegalOrg">
+                                        <xsl:when test="$preferredHCPAssociatedEntity">
                                             <xsl:call-template name="show-contactInfo">
-                                                <xsl:with-param name="contact" select="$preferredHCPLegalOrg"/>
+                                                <xsl:with-param name="contact" select="$preferredHCPAssociatedEntity"/>
                                             </xsl:call-template>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:call-template name="show-contactInfo">
-                                                <xsl:with-param name="contact" select="$preferredHCPLegalOrg2"/>
+                                                <xsl:with-param name="contact" select="$preferredHCPScopingOrganisation"/>
                                             </xsl:call-template>
                                         </xsl:otherwise>
                                     </xsl:choose>
