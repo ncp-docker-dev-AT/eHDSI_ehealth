@@ -65,15 +65,9 @@ public class AssertionHandler implements Serializable {
         }
     }
 
-    private AssertionHandlerConfigManager configHandler;
     private Assertion assertion;
 
-    public AssertionHandler(AssertionHandlerConfigManager config) {
-        this.configHandler = config;
-    }
-
     public AssertionHandler() {
-        this(new AssertionHandlerConfigManager());
     }
 
     public boolean isExpired(Assertion assertion) {
@@ -86,7 +80,7 @@ public class AssertionHandler implements Serializable {
                 && (assertion.getConditions().getNotOnOrAfter().isBeforeNow() || assertion.getConditions().getNotOnOrAfter().isEqualNow());
     }
 
-    Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws InitializationException {
+    public Assertion createSAMLAssertion(AuthenticatedUser userDetails) throws InitializationException {
 
         LOGGER.info("[OpenNCP Web Portal] HCP Assertion Creation");
         InitializationService.initialize();
