@@ -3,6 +3,33 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [4.0.1] - 11-10-2019
+The OpenNCP 4.0.1 release is the CEF eHDSI Wave 3 RC HotFix version available for the eHDSI Preparatory Test Event.
+<br/>Update of the validation performed by the default-policy-manager.
+<br/>BugFix on XDS Metadata associated to the XCA List response message (incorrect type of documents). 
+<br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/iwbKC
+### Added
+- [EHNCP-1829] Alignment of default-policy-manager to Change Proposal 23.
+- [EHNCP-1824] OpenNCP ATNA webapp doesn't start properly.
+- [EHNCP-1814] Audit message EHDSI-91 are not conformant with specification on portals.
+- [EHNCP-1813] Alignment of Spring Boot and Spring Framework version among the project
+- [EHNCP-1808] OpenNCP Web Portal is not handling ISM containing XML Namespaces.
+- [EHNCP-1578] Add database schema management tool 
+
+### Changed
+- [EHNCP-1830] Problem running OpenNCP TSAM-Sync.
+- [EHNCP-1820] Minor source code re-factoring of OpenNCP Web Portal.
+- [EHNCP-1819] Single comma displayed in Preferred HCP/Legal organization to contact.
+- [EHNCP-1812] ePrescription list returned by OrderService contains incorrect type of document.
+- [EHNCP-1811] National Connector Mock - Wave 3 CDA are not correct.
+- [EHNCP-1743] Improve CDA Display tool in the case no primary care unit is provided.
+
+### Deprecated
+- [N/A].
+
+### Removed
+- [N/A].
+
 ## [4.0.0] - 23-09-2019
 The OpenNCP 4.0.0 release is the CEF eHDSI Wave 3 Release Candidate available for the eHDSI Preparatory Test Event.
 <br/>Most of the changed are related to the implementation of eHDSI Wave 3 Change Proposals.
