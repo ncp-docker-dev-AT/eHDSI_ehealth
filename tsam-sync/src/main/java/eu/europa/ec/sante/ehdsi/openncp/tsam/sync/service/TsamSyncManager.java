@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.tsam.sync.service;
 
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.config.CtsProperties;
+import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.config.DatabaseProperties;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter.ConceptConverter;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter.ValueSetVersionConverter;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.cts.CtsClient;
@@ -34,6 +35,7 @@ public class TsamSyncManager {
     private final DatabaseTool databaseTool;
     private final CtsProperties ctsProperties;
     private final CtsClient ctsClient;
+    private final DatabaseProperties databaseProperties;
     private final CodeSystemRepository codeSystemRepository;
     private final ConceptRepository conceptRepository;
     private final ValueSetRepository valueSetRepository;
@@ -41,12 +43,14 @@ public class TsamSyncManager {
     @Value("${pageable.page-size:250}")
     private Integer pageSize;
 
-    public TsamSyncManager(DatabaseTool databaseTool, CtsProperties ctsProperties, CtsClient ctsClient, CodeSystemRepository codeSystemRepository,
-                           ConceptRepository conceptRepository, ValueSetRepository valueSetRepository, ValueSetVersionRepository valueSetVersionRepository) {
-
+    @SuppressWarnings("squid:S00107")
+    public TsamSyncManager(DatabaseTool databaseTool, CtsProperties ctsProperties, CtsClient ctsClient,
+                           DatabaseProperties databaseProperties, CodeSystemRepository codeSystemRepository, ConceptRepository conceptRepository,
+                           ValueSetRepository valueSetRepository, ValueSetVersionRepository valueSetVersionRepository) {
         this.databaseTool = databaseTool;
         this.ctsProperties = ctsProperties;
         this.ctsClient = ctsClient;
+        this.databaseProperties = databaseProperties;
         this.codeSystemRepository = codeSystemRepository;
         this.conceptRepository = conceptRepository;
         this.valueSetRepository = valueSetRepository;
@@ -70,13 +74,18 @@ public class TsamSyncManager {
             ValueSetCatalogModel catalogue = opt.get();
             logger.info("Catalogue '{}' retrieved from the server", catalogue.getName());
 
-            logger.info("Starting database backup process");
-            String date = ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT);
-            date = StringUtils.replace(date, ":", "-");
-            databaseTool.backup("backup_" + date + ".sql");
+            if (databaseProperties.isBackup()) {
+                logger.info("Starting database backup process");
+                String date = ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT);
+                date = StringUtils.replace(date, ":", "-");
+                databaseTool.backup("backup_" + date + ".sql");
+                logger.info("Database backup operation completed");
+            } else {
+                logger.warn("Database backup is disabled (Property 'tsam-sync.database.backup' is set to 'false')");
+            }
+
             valueSetRepository.deleteAll();
             codeSystemRepository.deleteAll();
-            logger.info("Database backup operation completed");
 
             ValueSetVersionConverter valueSetVersionConverter = new ValueSetVersionConverter();
             ConceptConverter conceptConverter = new ConceptConverter();

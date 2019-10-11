@@ -72,7 +72,7 @@ public class XcaPsRetrieveIT extends ClientGenericIT {
         permissions.add("5");
         permissions.add("10");
         permissions.add("16");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#9.xml", XSPARole.DEPRECATED_PHYSICIAN);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_PS_#9.xml", XSPARole.LICENSED_HCP);
 
         SOAPElement rspSoapMsg = testGood("PT_CLIENT_XCA_PS_#9", REQ_FOLDER + "PT_CLIENT_XCA_PS_#9.xml");
         validateCDA(rspSoapMsg, CdaExtraction.MessageType.PORTAL, CdaModel.PS_PIVOT);

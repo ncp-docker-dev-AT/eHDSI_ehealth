@@ -17,7 +17,6 @@ import static eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelpe
 
 /**
  * Default Policy Manager implementation compliant with IHE profiles and eHDSI specifications.
- * TODO: Refactor this class after the approval of CP-0023 implementation.
  */
 public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
@@ -84,16 +83,13 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         String structuralRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
         logger.debug("HCP Identity Assertion XSPA Structural Role: '{}'", structuralRole);
 
-        if (structuralRole.equals(XSPARole.CLERICAL_ADMINISTRATIVE.toString())) {
+        if (XSPARole.containsLabel(structuralRole)) {
 
-            OnBehalfOfValidator(assertion, documentClass);
+            if (structuralRole.equals(XSPARole.CLERICAL_ADMINISTRATIVE.toString())) {
+
+                OnBehalfOfValidator(assertion, documentClass);
+            }
             XSPAFunctionalRoleValidator(assertion, documentClass);
-
-        } else if (StringUtils.equalsIgnoreCase(structuralRole, XSPARole.LICENSED_HCP.toString())
-                || isDeprecatedMedicalRole(structuralRole)) {
-
-            XSPAFunctionalRoleValidator(assertion, documentClass);
-
         } else {
 
             logger.error("XSPA Role 'urn:oasis:names:tc:xacml:2.0:subject:role' attribute in assertion should be one of the authorized value!");
@@ -144,7 +140,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
         String resourceId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_1_0_RESOURCE_RESOURCE_ID);
         if (StringUtils.isBlank(resourceId)) {
-            throw new InvalidFieldException("XSPA subject 'uurn:oasis:names:tc:xacml:1.0:resource:resource-id' attribute in assertion should be filled.");
+            throw new InvalidFieldException("XSPA subject 'urn:oasis:names:tc:xacml:1.0:resource:resource-id' attribute in assertion should be filled.");
         }
     }
 
@@ -255,10 +251,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!role.equals(XSPARole.DEPRECATED_PHYSICIAN.toString())
-                && !role.equals(XSPARole.DEPRECATED_PATIENT.toString())
-                && !StringUtils.equalsIgnoreCase(role, XSPARole.LICENSED_HCP.toString())
-                && !StringUtils.equalsIgnoreCase(functionalRole, XSPAFunctionalRole.MEDICAL_DOCTORS.toString())) {
+        if (!XSPARole.containsLabel(role) && !XSPAFunctionalRole.containsLabel(functionalRole)) {
 
             logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to access Patient Summary documents.", role);
             throw new InsufficientRightsException();
@@ -323,9 +316,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHARMACIST.toString())
-                && !StringUtils.equalsIgnoreCase(role, XSPARole.LICENSED_HCP.toString())
-                && !StringUtils.equalsIgnoreCase(functionalRole, XSPAFunctionalRole.PHARMACIST.toString())) {
+        if (!XSPARole.containsLabel(role) && !XSPAFunctionalRole.containsLabel(functionalRole)) {
 
             logger.error("InsufficientRightsException - Unsupported (named: '{}'/'{}') role tried to access ePrescriptions documents.", role, functionalRole);
             throw new InsufficientRightsException();
@@ -413,10 +404,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHARMACIST.toString())
-                && !StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHYSICIAN.toString())
-                && !StringUtils.equalsIgnoreCase(role, XSPARole.LICENSED_HCP.toString())
-                && !StringUtils.equalsIgnoreCase(functionalRole, XSPAFunctionalRole.PHARMACIST.toString())) {
+        if (!XSPARole.containsLabel(role) && !XSPAFunctionalRole.containsLabel(functionalRole)) {
 
             logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit eDispensations or HCER documents.", role);
             throw new InsufficientRightsException();
@@ -448,16 +436,18 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String role;
+        String functionalRole;
 
         //Check allowed roles
         try {
             role = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
+            functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
 
         } catch (MissingFieldException ex) {
             logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
         }
-        if (!role.equals(XSPARole.DEPRECATED_PHARMACIST.toString()) && !role.equals(XSPARole.DEPRECATED_PHYSICIAN.toString())) {
+        if (!XSPARole.containsLabel(role) && !XSPAFunctionalRole.containsLabel(functionalRole)) {
             logger.error("InsufficientRightsException - Unsupported role (named: '{}') tried to submit consent documents.", role);
             throw new InsufficientRightsException();
         }
@@ -489,19 +479,5 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
         // Default policy always return TRUE.
         return true;
-    }
-
-    private boolean isDeprecatedMedicalRole(String role) {
-
-        if (StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_NURSE.toString())
-                || StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHARMACIST.toString())
-                || StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PHYSICIAN.toString())
-                || StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_MIDWIFE.toString())
-                || StringUtils.equalsIgnoreCase(role, XSPARole.DEPRECATED_PATIENT.toString())) {
-
-            logger.warn("eHDSI Security Issue: Role of the user is deprecated - Please update your XSPA Policy to the latest version of the specification");
-            return true;
-        }
-        return false;
     }
 }

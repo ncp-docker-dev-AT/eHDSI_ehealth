@@ -36,7 +36,7 @@ Although being real choices for the different diseases and conditions, the selec
                 <city>Lisbon</city>
                 <country>PT</country>
             </addr>
-            <telecom value="tel:351211234567" use="H"/>05
+            <telecom value="tel:351211234567" use="H"/>
             <telecom value="mailto:paciente@gmail.com"/>
             <patient>
                 <name>

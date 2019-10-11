@@ -96,13 +96,13 @@ public class DocumentFactory {
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, String productCode, String productName) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName, true);
+        return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName, true);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, boolean dispensable) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, null, null, dispensable);
+        return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, null, null, dispensable);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,

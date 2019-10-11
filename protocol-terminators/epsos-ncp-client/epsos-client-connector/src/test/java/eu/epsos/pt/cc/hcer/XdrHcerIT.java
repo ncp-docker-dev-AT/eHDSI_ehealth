@@ -68,7 +68,7 @@ public class XdrHcerIT extends ClientGenericIT {
     public void testSubmitHcer() {
         List<String> permissions = new ArrayList<>(1);
         permissions.add("46");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_HCER_#0.xml", XSPARole.DEPRECATED_PHYSICIAN);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_HCER_#0.xml", XSPARole.LICENSED_HCP);
 
         testGood("PT_CLIENT_XDR_HCER_#0", REQ_FOLDER + "PT_CLIENT_XDR_HCER_#0.xml");
         validateCDA(REQ_FOLDER + "PT_CLIENT_XDR_HCER_#0.xml", CdaExtraction.MessageType.PORTAL, CdaModel.HCER);

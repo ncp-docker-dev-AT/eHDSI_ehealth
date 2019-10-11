@@ -67,7 +67,7 @@ public class XcaEpListIT extends ClientGenericIT {
         List<String> permissions = new ArrayList<>(2);
         permissions.add("4");
         permissions.add("10");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#0.xml", XSPARole.DEPRECATED_PHARMACIST);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#0.xml", XSPARole.LICENSED_HCP);
 
         testGood("PT_CLIENT_XCA_EP_#0", REQ_FOLDER + "PT_CLIENT_XCA_EP_#0.xml");
     }
@@ -118,7 +118,7 @@ public class XcaEpListIT extends ClientGenericIT {
     public void testQueryEPInsRights() {
         List<String> permissions = new ArrayList<>(1);
         permissions.add("4");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#3.xml", XSPARole.DEPRECATED_PHARMACIST);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#3.xml", XSPARole.LICENSED_HCP);
         testFailScenario("PT_CLIENT_XCA_EP_#3", "4703", REQ_FOLDER + "PT_CLIENT_XCA_EP_#3.xml");
     }
 
@@ -134,7 +134,7 @@ public class XcaEpListIT extends ClientGenericIT {
         List<String> permissions = new ArrayList<>(2);
         permissions.add("4");
         permissions.add("10");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#4.xml", XSPARole.DEPRECATED_PHARMACIST);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#4.xml", XSPARole.LICENSED_HCP);
         testFailScenario("PT_CLIENT_XCA_EP_#4", "1101", REQ_FOLDER + "PT_CLIENT_XCA_EP_#4.xml");
     }
 

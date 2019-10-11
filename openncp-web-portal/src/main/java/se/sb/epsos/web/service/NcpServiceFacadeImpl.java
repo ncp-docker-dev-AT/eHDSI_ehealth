@@ -4,6 +4,7 @@ import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import hl7OrgV3.ClinicalDocumentDocument1;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.joda.time.DateTime;
@@ -28,6 +29,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.IOException;
@@ -45,36 +47,44 @@ import java.util.List;
 public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NcpServiceFacadeImpl.class);
+    private static final String CLIENT_CONNECTOR_NS_URL = "http://clientconnector.protocolterminator.openncp.epsos/";
+    private static final String CLIENT_CONNECTOR_LOCAL_PART = "ClientConnectorServiceService";
+    private static final DatatypeFactory DATATYPE_FACTORY;
     private static final GraphiteLogger GRAPHITELOGGER = GraphiteLogger.getDefaultLogger();
+
+    static {
+        try {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private ClientConnectorServiceService service;
-    private ClientConnectorService shelobConnector;
+    private ClientConnectorService clientConnectorService;
     private TrcServiceHandler trcServiceHandler;
     private String sessionId;
     private AssertionHandler assertionHandler = new AssertionHandler();
 
-    public NcpServiceFacadeImpl(ClientConnectorServiceService service, ClientConnectorService shelobConnector,
-                                TrcServiceHandler trcServiceHandler) {
+    @Deprecated
+    public NcpServiceFacadeImpl(ClientConnectorServiceService service, ClientConnectorService clientConnectorService, TrcServiceHandler trcServiceHandler) {
         this.service = service;
         this.trcServiceHandler = trcServiceHandler;
-        this.shelobConnector = shelobConnector;
+        this.clientConnectorService = clientConnectorService;
     }
 
     public NcpServiceFacadeImpl() {
-        this.service = NcpClientConnector.createClientConnector();
+        this.service = new ClientConnectorServiceService(null, new QName(CLIENT_CONNECTOR_NS_URL, CLIENT_CONNECTOR_LOCAL_PART));
         this.trcServiceHandler = new TrcServiceHandler();
     }
 
     private static XMLGregorianCalendar getXMLGregorian(GregorianCalendar calendar) {
-        XMLGregorianCalendar date2 = null;
-        try {
-            date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
-        } catch (DatatypeConfigurationException e) {
-            LOGGER.error("DatatypeConfigurationException: '{}'", e.getMessage(), e);
-        }
-        return date2;
+
+        return DATATYPE_FACTORY.newXMLGregorianCalendar(calendar);
     }
 
     private static XMLGregorianCalendar getDate(String indate, DateTimeFormatter df) {
+
         DateTime dateTime = df.parseDateTime(indate);
         return getXMLGregorian(dateTime.toGregorianCalendar());
     }
@@ -102,7 +112,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
     @Override
     public String about() {
-        return getClass().getSimpleName() + " (online: epSOS-Web)";
+        return getClass().getSimpleName() + " (online: OpenNCP-Web)";
     }
 
     @Override
@@ -112,24 +122,20 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
     }
 
     @Override
-    public void initUser(final AuthenticatedUser userDetails) {
-        /*
-         * Creating web service call header with assertion.
-         */
+    public void initServices(final AuthenticatedUser userDetails) {
+
+        //  Creating web service call header with assertion.
         service.setHandlerResolver(portInfo -> {
             List<Handler> handlerList = new ArrayList<>();
             handlerList.add(new RGBSOAPHandler(userDetails));
             return handlerList;
         });
 
-        /*
-         * If you want to change this port you have to change it on server side in the axis2.xml
-         */
-        if (FeatureFlagsManager.check(Feature.ENABLE_SSL)) {
-            shelobConnector = service.getPort(new QName("http://cc.pt.epsos.eu", "ClientConnectorServiceHttpsSoap11Endpoint"), ClientConnectorService.class);
-        } else {
-            shelobConnector = service.getPort(new QName("http://cc.pt.epsos.eu", "ClientConnectorServiceHttpSoap11Endpoint"), ClientConnectorService.class);
-        }
+        String clientConnectorWsdlUrl = System.getProperty("client-connector-wsdl-url");
+        LOGGER.info("[Portal] Initializing client-connector-wsdl-url: '{}'", clientConnectorWsdlUrl);
+        clientConnectorService = service.getClientConnectorServicePort();
+        BindingProvider bindingProvider = (BindingProvider) clientConnectorService;
+        bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, clientConnectorWsdlUrl);
     }
 
     @Override
@@ -142,9 +148,9 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
         QueryPatientRequest queryPatientRequest = createQueryPatientRequest(patientList, country);
         List<Person> personList = new ArrayList<>();
-        if (shelobConnector != null) {
+        if (clientConnectorService != null) {
             try {
-                List<PatientDemographics> queryPatient = shelobConnector.queryPatient(queryPatientRequest);
+                List<PatientDemographics> queryPatient = clientConnectorService.queryPatient(queryPatientRequest);
                 for (PatientDemographics dem : queryPatient) {
                     Person person = new Person(this.sessionId, dem, country.getId());
                     personList.add(person);
@@ -250,7 +256,6 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
                 throw new NcpServiceException("Failed to build TRC Request, TRCAssertionRequest was null", new Exception());
             }
         } catch (Exception e) {
-            LOGGER.error("TRC webservice call failed", e);
             throw new NcpServiceException("TRC Webservice call failed", e);
         }
         LOGGER.info("stop::setTRCAssertion()");
@@ -286,7 +291,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
         List<MetaDocument> docList = new ArrayList<>();
         try {
-            List<EpsosDocument> list = shelobConnector.queryDocuments(request);
+            List<EpsosDocument> list = clientConnectorService.queryDocuments(request);
             for (EpsosDocument doc : list) {
                 MetaDocument metaDocument = new MetaDocument(this.sessionId, person.getEpsosId(), doc);
                 if (LOGGER.isDebugEnabled()) {
@@ -303,13 +308,18 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
     @Override
     public CdaDocument retrieveDocument(MetaDocument doc) throws NcpServiceException {
-        String hcid = doc.getDoc().getHcid();
-        if (hcid != null && hcid.startsWith(Constants.OID_PREFIX)) {
-            hcid = hcid.substring(8);
-        }
-        CountryVO country = CountryConfigManager.getCountry(hcid);
-        String countryCode = country != null ? country.getId() : "UNKNOWN";
+
         CdaDocument document = null;
+        String homeCommunityId = doc.getDoc().getHcid();
+        if (StringUtils.startsWith(homeCommunityId, Constants.OID_PREFIX)) {
+            homeCommunityId = homeCommunityId.substring(8);
+        }
+        // Fetch country from Portal configuration based on homeCommunityId
+        CountryVO country = CountryConfigManager.getCountry(homeCommunityId);
+        String countryCode = country != null ? country.getId() : "UNKNOWN";
+        if (StringUtils.equals(countryCode, "UNKNOWN")) {
+            LOGGER.warn("Cannot retrieve Country Code from configuration with the following HomeCommunityId: '{}'", homeCommunityId);
+        }
 
         RetrieveDocumentRequest retrieveDocumentRequest = new RetrieveDocumentRequest();
         retrieveDocumentRequest.setCountryCode(countryCode);
@@ -321,8 +331,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         retrieveDocumentRequest.setHomeCommunityId(addOIDPrefix(doc.getDoc().getHcid()));
 
         try {
-            EpsosDocument epsosDocument = shelobConnector.retrieveDocument(retrieveDocumentRequest);
-            LOGGER.debug("Doc: '{}'", epsosDocument);
+            EpsosDocument epsosDocument = clientConnectorService.retrieveDocument(retrieveDocumentRequest);
             byte[] bytes = epsosDocument.getBase64Binary();
             if (doc.getType().equals(DocType.EP)) {
                 document = new Prescription(doc, bytes, epsosDocument);
@@ -347,7 +356,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
     }
 
     @Override
-    public byte[] submitDocument(Dispensation dispensation, AuthenticatedUser user, Person person, String eD_PageAsString) throws NcpServiceException {
+    public byte[] submitDocument(Dispensation dispensation, AuthenticatedUser user, Person person, String eDispensePageAsString) throws NcpServiceException {
 
         byte[] bytes;
         String oidRoot = MasterConfigManager.get("ApplicationConfigManager.xmlDispensationRoot");
@@ -358,17 +367,15 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         try {
             bytes = getDispensationDocument(dispensation, user, cdaIdExtension, pdfIdExtension);
         } catch (Exception e) {
-            LOGGER.error("Exception", e);
             throw new NcpServiceException("Failed to create CDA", e);
         }
 
         byte[] pdfInBytes;
         byte[] pdfCdaInBytes;
         try {
-            pdfInBytes = PdfHandler.convertStringToPdf(eD_PageAsString);
+            pdfInBytes = PdfHandler.convertStringToPdf(eDispensePageAsString);
             pdfCdaInBytes = getDispensationAsByteArray(getDispensationDocumentPDF(pdfInBytes, dispensation, user, cdaIdExtension, pdfIdExtension));
         } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
             throw new NcpServiceException("Failed to create PDF", e);
         }
         EpsosDocument doc = dispensation.getDoc();
@@ -401,11 +408,11 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         request.setPatientDemographics(person.getPatientDemographics());
 
         try {
-            shelobConnector.submitDocument(request);
+            clientConnectorService.submitDocument(request);
             LOGGER.info("Submitdocument is done.");
             GRAPHITELOGGER.logMetric("epsos-web.service.submitDocument.success." + person.getCountryCode(), 1L);
         } catch (SOAPFaultException sfe) {
-            // Revert dispensation uuid, because retry is not possible if the dispensation uuid does not match the uuid in DocumentCache
+            // Revert dispensation uuid, because retry is not possible if the dispensation uuid does not match the UUID in DocumentCache
             dispensation.getDoc().setUuid(dispensationDocumentCacheKey);
             throw new NcpServiceException("Failed to submit document.", sfe);
         } finally {
@@ -422,9 +429,8 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         return pdfInBytes;
     }
 
-    private ClinicalDocumentDocument1 getDispensationDocumentPDF(byte[] bytes, Dispensation dispensation,
-                                                                 AuthenticatedUser user, String cdaIdExtension,
-                                                                 String pdfIdExtension) throws Exception {
+    private ClinicalDocumentDocument1 getDispensationDocumentPDF(byte[] bytes, Dispensation dispensation, AuthenticatedUser user,
+                                                                 String cdaIdExtension, String pdfIdExtension) throws Exception {
 
         ePtoeDMapper mapper = new ePtoeDMapper();
         return mapper.createDispensation_PDF(bytes, dispensation, user, cdaIdExtension, pdfIdExtension);
@@ -437,9 +443,9 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         return mapper.createDispensationFromPrescription(dispensation, user, cdaIdExtension, pdfIdExtension);
     }
 
-    private byte[] getDispensationAsByteArray(ClinicalDocumentDocument1 eD_Document) {
+    private byte[] getDispensationAsByteArray(ClinicalDocumentDocument1 eDispense) {
 
-        String xml = eD_Document.xmlText(new XmlOptions().setCharacterEncoding(StandardCharsets.UTF_8.name()).setSavePrettyPrint());
+        String xml = eDispense.xmlText(new XmlOptions().setCharacterEncoding(StandardCharsets.UTF_8.name()).setSavePrettyPrint());
         return xml.getBytes(StandardCharsets.UTF_8);
     }
 

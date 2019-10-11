@@ -34,7 +34,7 @@ public class MySqlDatabaseTool implements DatabaseTool {
                 throw new DatabaseToolException("Database backup operation failed");
             }
         } catch (IOException e) {
-            throw new DatabaseToolException("An I/O exception occurred while starting database backup process", e);
+            throw new DatabaseToolException("An error occurred while backuping database using 'mysqldump'", e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new DatabaseToolException("An error occurred while running database backup process", e);

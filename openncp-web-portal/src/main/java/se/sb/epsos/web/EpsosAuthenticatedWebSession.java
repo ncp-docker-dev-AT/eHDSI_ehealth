@@ -67,7 +67,9 @@ public class EpsosAuthenticatedWebSession extends AuthenticatedWebSession {
         } else {
             setLocale(Locale.ENGLISH);
         }
-        LOGGER.info("ServiceFacade initialized with: '{}'", serviceFacade.about());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("ServiceFacade initialized with: '{}'", serviceFacade.about());
+        }
     }
 
     private void ensureDependenciesNotNull() {
@@ -132,7 +134,7 @@ public class EpsosAuthenticatedWebSession extends AuthenticatedWebSession {
                     }
                     getServiceFacade().bindToSession(this.getId());
                     try {
-                        getServiceFacade().initUser(authenticatedUser);
+                        getServiceFacade().initServices(authenticatedUser);
                     } catch (NcpServiceException e) {
                         LOGGER.error("NcpServiceException: '{}'", e.getMessage(), e);
                     }
@@ -174,8 +176,8 @@ public class EpsosAuthenticatedWebSession extends AuthenticatedWebSession {
     public void removeAllAfterBc(BreadCrumbVO<?> bcVo) {
         for (int i = 0; i < breadcrumbList.size(); i++) {
             if (breadcrumbList.get(i).getTitle().equals(bcVo.getTitle())) {
-                for (int j = breadcrumbList.size() - 1; j > i; j--) {
-                    breadcrumbList.remove(j);
+                if (breadcrumbList.size() > i + 1) {
+                    breadcrumbList.subList(i + 1, breadcrumbList.size()).clear();
                 }
                 break;
             }
@@ -229,8 +231,8 @@ public class EpsosAuthenticatedWebSession extends AuthenticatedWebSession {
     public void removeAllAfterTitle(String title) {
         for (int i = 0; i < breadcrumbList.size(); i++) {
             if (breadcrumbList.get(i).getTitle().equals(title)) {
-                for (int j = breadcrumbList.size() - 1; j > i; j--) {
-                    breadcrumbList.remove(j);
+                if (breadcrumbList.size() > i + 1) {
+                    breadcrumbList.subList(i + 1, breadcrumbList.size()).clear();
                 }
                 break;
             }

@@ -3,29 +3,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>eu.europa.ec.sante.ehdsi</groupId>
+    <parent>
+        <groupId>eu.europa.ec.sante.ehdsi</groupId>
+        <artifactId>openncp</artifactId>
+        <version>4.0.1</version>
+    </parent>
+
     <artifactId>openncp-tsam-sync</artifactId>
-    <version>4.0.0</version>
     <packaging>jar</packaging>
 
     <name>OpenNCP TSAM Synchronizer</name>
-
-    <distributionManagement>
-        <repository>
-            <id>cef-digital-releases</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth/</url>
-        </repository>
-        <snapshotRepository>
-            <id>cef-digital-snapshots</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-boot.version>2.1.6.RELEASE</spring-boot.version>
+        <hibernate.version>5.3.11.Final</hibernate.version>
+        <spring.version>5.1.9.RELEASE</spring.version>
     </properties>
 
     <build>
@@ -68,12 +62,22 @@
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-annotations</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>hibernate-validator</artifactId>
+                    <groupId>org.hibernate</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -101,46 +105,4 @@
             <version>12.2.0.1</version>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>cef-digital-releases</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth/</url>
-        </repository>
-        <repository>
-            <id>cef-digital-snapshots</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>cef-digital-digit-releases</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eDelivery/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>cef-digital-digit-snapshots</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eDelivery-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>cef-digital-third-party</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/ehealth-third-party/</url>
-        </repository>
-    </repositories>
 </project>

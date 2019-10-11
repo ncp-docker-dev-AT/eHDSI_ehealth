@@ -55,7 +55,7 @@ public class XCA_Retrieve_MroServiceIT extends ServerGenericIT {
 
     @Override
     protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
-        return hcpAndTrcAssertionCreate(PATIENT_ISO, XSPARole.DEPRECATED_PHARMACIST);
+        return hcpAndTrcAssertionCreate(PATIENT_ISO, XSPARole.LICENSED_HCP);
     }
 
     /**
@@ -64,7 +64,7 @@ public class XCA_Retrieve_MroServiceIT extends ServerGenericIT {
      */
     @Test
     public void testRetrieveDocument() {
-        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_L3, XSPARole.DEPRECATED_PHARMACIST);
+        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_L3, XSPARole.LICENSED_HCP);
         testGood("testRetrieveDocument", QUERY_FILE_L3);
     }
 
@@ -74,21 +74,21 @@ public class XCA_Retrieve_MroServiceIT extends ServerGenericIT {
      */
     @Test
     public void testRetrieveDocumentPdf() {
-        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_L1, XSPARole.DEPRECATED_PHARMACIST);
+        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_L1, XSPARole.LICENSED_HCP);
         testGood("testRetrieveDocument", QUERY_FILE_L1);
     }
 
     @Ignore
     @Test
     public void testRetrieveInvalidDocument() {
-        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_INVALD_ID, XSPARole.DEPRECATED_PHARMACIST);
+        this.assertions = this.assertions = this.getAssertions(QUERY_FILE_INVALD_ID, XSPARole.LICENSED_HCP);
         testFail("testRetrieveInvalidDocument", "Failure", QUERY_FILE_INVALD_ID);
     }
 
     @Ignore
     @Test
     public void testRetrieveEmptyDocument() {
-        this.assertions = this.getAssertions(QUERY_FILE_EMPTY_ID, XSPARole.DEPRECATED_PHARMACIST);
+        this.assertions = this.getAssertions(QUERY_FILE_EMPTY_ID, XSPARole.LICENSED_HCP);
         testFail("testRetrieveEmptyDocument", "Failure", QUERY_FILE_EMPTY_ID);
     }
 }

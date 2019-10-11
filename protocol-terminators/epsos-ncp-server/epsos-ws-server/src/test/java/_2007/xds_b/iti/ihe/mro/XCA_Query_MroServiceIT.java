@@ -53,21 +53,21 @@ public class XCA_Query_MroServiceIT extends ServerGenericIT {
      */
     @Test
     public void testQueryDocuments() {
-        this.assertions = this.getAssertions(QUERY_FILE, XSPARole.DEPRECATED_PHARMACIST);
+        this.assertions = this.getAssertions(QUERY_FILE, XSPARole.LICENSED_HCP);
         testGood("testQueryDocuments", QUERY_FILE);
     }
 
     @Test
     @Ignore
     public void testQueryDocumentInvalidId() {
-        this.assertions = this.getAssertions(QUERY_FILE_INVALID_ID, XSPARole.DEPRECATED_PHARMACIST);
+        this.assertions = this.getAssertions(QUERY_FILE_INVALID_ID, XSPARole.LICENSED_HCP);
         testFail("testQueryInvalidDocument", "errorCode=\"1101\"", QUERY_FILE_INVALID_ID);
     }
 
     @Test
     @Ignore
     public void testQueryDocumentEmptyId() {
-        this.assertions = this.getAssertions(QUERY_FILE_EMPTY_ID, XSPARole.DEPRECATED_PHARMACIST);
+        this.assertions = this.getAssertions(QUERY_FILE_EMPTY_ID, XSPARole.LICENSED_HCP);
         testFail("testQueryDocumentEmptyId", "errorCode=\"1101\"", QUERY_FILE_EMPTY_ID);
     }
 

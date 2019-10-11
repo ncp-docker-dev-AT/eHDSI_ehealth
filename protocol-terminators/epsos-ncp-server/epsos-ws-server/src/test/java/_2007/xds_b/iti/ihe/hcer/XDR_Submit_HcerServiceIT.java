@@ -55,7 +55,7 @@ public class XDR_Submit_HcerServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitHcer() {
-        this.assertions = this.getAssertions("xdr/hcer/testSubmitHcer.xml", XSPARole.DEPRECATED_PHYSICIAN);
+        this.assertions = this.getAssertions("xdr/hcer/testSubmitHcer.xml", XSPARole.LICENSED_HCP);
         testGood("testSubmitHcer", "xdr/hcer/testSubmitHcer.xml");
     }
 }

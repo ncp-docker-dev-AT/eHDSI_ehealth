@@ -1,11 +1,11 @@
 package eu.europa.ec.joinup.ecc.openstork.utils;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.util.validation.StringPool;
 import eu.europa.ec.joinup.ecc.openstork.utils.assertions.HCPIAssertionCreator;
 import eu.europa.ec.joinup.ecc.openstork.utils.datamodel.HcpRole;
 import eu.europa.ec.joinup.ecc.openstork.utils.datamodel.StorkAttributes;
 import eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml.HCPIAssertionBuilder;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import eu.stork.peps.auth.commons.IPersonalAttributeList;
@@ -140,7 +140,7 @@ public class StorkUtils {
         } else {
             onBehalfOfId = getRepresentedEidentifiers(storkResponse, null).get(0).getRoot();
         }
-        assertionBuilder.onBehalfOf(XSPARole.DEPRECATED_PATIENT.name(), onBehalfOfId);
+        //assertionBuilder.onBehalfOf(XSPARole.DEPRECATED_PATIENT.name(), onBehalfOfId);
 
         // OPTIONAL (0..*): Permissions
         permissions = obtainPermissionsForRole(obtainHcpRole(storkResponse));
@@ -390,17 +390,13 @@ public class StorkUtils {
 
         HcpRole result = null;
         if (isHcpProfessional) {
-            if (title.equals(HcpRole.ADMINISTRATOR.toString())) {
-                result = HcpRole.ADMINISTRATOR;
-            } else if (title.equals(HcpRole.PHYSICIAN.toString())) {
+            if (title.equals(HcpRole.PHYSICIAN.toString())) {
                 result = HcpRole.PHYSICIAN;
             } else if (title.equals(HcpRole.PHARMACIST.toString())) {
                 result = HcpRole.PHARMACIST;
             } else if (title.equals(HcpRole.NURSE.toString())) {
                 result = HcpRole.NURSE;
             }
-        } else {
-            result = HcpRole.PATIENT;
         }
         return result;
     }
@@ -425,17 +421,11 @@ public class StorkUtils {
         List<String> result = new ArrayList<>();
         try {
             switch (role) {
-                case ADMINISTRATOR:
-                    result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_ADMIN_PERMISSIONS));
-                    break;
                 case PHYSICIAN:
                     result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_DOCTOR_PERMISSIONS));
                     break;
                 case NURSE:
                     result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_NURSE_PERMISSIONS));
-                    break;
-                case PATIENT:
-                    result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PATIENT_PERMISSIONS));
                     break;
                 case PHARMACIST:
                     result = fillRolePermissions(ConfigurationManagerFactory.getConfigurationManager().getProperty(PORTAL_PHARMACIST_PERMISSIONS));
