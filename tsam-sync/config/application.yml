@@ -1,4 +1,6 @@
 tsam-sync:
+  database:
+    backup:
   datasource:
     host:
     port:
