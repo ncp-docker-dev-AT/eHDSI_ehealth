@@ -50,7 +50,7 @@ public class XDR_Submit_ConsentServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitConsent() {
-        this.assertions = this.getAssertions("xdr/consent/testSubmitConsent.xml", XSPARole.DEPRECATED_PHYSICIAN);
+        this.assertions = this.getAssertions("xdr/consent/testSubmitConsent.xml", XSPARole.LICENSED_HCP);
         testGood("testSubmitConsent", "xdr/consent/testSubmitConsent.xml");
     }
 

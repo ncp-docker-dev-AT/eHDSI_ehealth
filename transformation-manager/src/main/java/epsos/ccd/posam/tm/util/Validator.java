@@ -9,7 +9,6 @@ import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
@@ -44,7 +43,6 @@ public class Validator implements TMConstants {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            factory.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
             LOGGER.info("XSD Path File: '{}'", TMConfiguration.getInstance().getSchemaFilePath());
             Source schemaFile = new StreamSource(new File(TMConfiguration.getInstance().getSchemaFilePath()));
             Schema schema = factory.newSchema(schemaFile);
@@ -124,8 +122,9 @@ public class Validator implements TMConstants {
 
     /**
      * Validates according Model Based.
+     *
      * @param document - CDA document as String.
-     * @param docType - CDA document type.
+     * @param docType  - CDA document type.
      * @param friendly - true|false if the document is a friendly one.
      * @return ModelValidatorResult as a report of the validation executed by the system.
      */

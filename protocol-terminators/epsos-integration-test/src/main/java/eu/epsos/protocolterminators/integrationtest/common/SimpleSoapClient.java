@@ -61,7 +61,7 @@ public class SimpleSoapClient {
         }
 
         // build list of SAML2 assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.DEPRECATED_PHYSICIAN);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.LICENSED_HCP);
         Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion("", "");
         Collection<Assertion> assertions = new ArrayList<>();
         assertions.add(idAssertion);

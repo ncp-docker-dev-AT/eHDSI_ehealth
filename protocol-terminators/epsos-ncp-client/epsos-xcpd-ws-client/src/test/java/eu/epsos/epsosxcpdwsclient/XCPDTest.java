@@ -58,7 +58,7 @@ public class XCPDTest {
         patientDemographics.setCountry(PATIENT_COUNTRY);
 
         // assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.DEPRECATED_PHYSICIAN);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.LICENSED_HCP);
 
         // Call the service
         try {

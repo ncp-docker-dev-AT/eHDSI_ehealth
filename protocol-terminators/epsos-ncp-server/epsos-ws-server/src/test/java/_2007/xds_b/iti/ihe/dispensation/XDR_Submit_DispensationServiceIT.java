@@ -50,7 +50,7 @@ public class XDR_Submit_DispensationServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitED() {
-        this.assertions = this.getAssertions("xdr/edispensation/testSubmitED.xml", XSPARole.DEPRECATED_PHARMACIST);
+        this.assertions = this.getAssertions("xdr/edispensation/testSubmitED.xml", XSPARole.LICENSED_HCP);
         testGood("testSubmitED", "xdr/edispensation/testSubmitED.xml");
     }
 
@@ -60,7 +60,7 @@ public class XDR_Submit_DispensationServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitNoEP() {
-        this.assertions = this.getAssertions("xdr/edispensation/testSubmitNoEP.xml", XSPARole.DEPRECATED_PHARMACIST);
+        this.assertions = this.getAssertions("xdr/edispensation/testSubmitNoEP.xml", XSPARole.LICENSED_HCP);
         testFail("testSubmitNoEP", "4105", "xdr/edispensation/testSubmitNoEP.xml");
     }
 
@@ -70,7 +70,7 @@ public class XDR_Submit_DispensationServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitDispEP() {
-        this.assertions = this.getAssertions("xdr/edispensation/testSubmitDispEP.xml", XSPARole.DEPRECATED_PHARMACIST);
+        this.assertions = this.getAssertions("xdr/edispensation/testSubmitDispEP.xml", XSPARole.LICENSED_HCP);
         testFail("testSubmitDispEP", "4106", "xdr/edispensation/testSubmitDispEP.xml");
     }
 

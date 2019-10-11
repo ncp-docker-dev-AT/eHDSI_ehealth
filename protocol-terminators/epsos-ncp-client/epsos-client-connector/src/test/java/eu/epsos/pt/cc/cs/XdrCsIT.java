@@ -68,7 +68,7 @@ public class XdrCsIT extends ClientGenericIT {
     public void testSubmitConsent() {
         List<String> permissions = new ArrayList<>(1);
         permissions.add("32");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_CS_#0.xml", XSPARole.DEPRECATED_PHYSICIAN);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_CS_#0.xml", XSPARole.LICENSED_HCP);
 
         testGood("PT_CLIENT_XDR_CS_#0", REQ_FOLDER + "PT_CLIENT_XDR_CS_#0.xml");
         validateCDA(REQ_FOLDER + "PT_CLIENT_XDR_CS_#0.xml", CdaExtraction.MessageType.PORTAL, CdaModel.CONSENT);
