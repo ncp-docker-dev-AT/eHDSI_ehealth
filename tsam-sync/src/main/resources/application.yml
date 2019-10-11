@@ -12,5 +12,7 @@ spring:
     hibernate:
       ddl-auto: validate
 tsam-sync:
+  database:
+    backup: true
   pageable:
     default-page-size: 250
