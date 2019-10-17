@@ -3,6 +3,7 @@ package eu.europa.ec.sante.ehdsi.openncp.tsam.sync.service;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.config.CtsProperties;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.config.DatabaseProperties;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter.ConceptConverter;
+import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter.MappingConverter;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter.ValueSetVersionConverter;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.cts.CtsClient;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.db.DatabaseTool;
@@ -88,7 +89,7 @@ public class TsamSyncManager {
             codeSystemRepository.deleteAll();
 
             ValueSetVersionConverter valueSetVersionConverter = new ValueSetVersionConverter();
-            ConceptConverter conceptConverter = new ConceptConverter();
+            ConceptConverter conceptConverter = new ConceptConverter(new MappingConverter());
 
             logger.info("Starting value sets synchronization");
             int index = 1;
