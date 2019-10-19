@@ -147,7 +147,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : ""
                 + "<" + Helper.getUserID(sh) + "@" + Helper.getAssertionsIssuer(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
-        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
+        eventLog.setHR_RoleID(Helper.getRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
         eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
@@ -207,7 +207,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : ""
                 + "<" + Helper.getUserID(sh) + "@" + Helper.getAssertionsIssuer(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
-        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
+        eventLog.setHR_RoleID(Helper.getRoleID(sh));
 
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
 

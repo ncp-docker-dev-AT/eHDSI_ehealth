@@ -175,7 +175,7 @@ public class STSService implements Provider<SOAPMessage> {
 
             sslCommonName = HTTPUtil.getSubjectDN(false);
             sendTRCAuditMessage(samlTRCIssuer.getPointofCare(), samlTRCIssuer.getHumanRequestorNameId(),
-                    samlTRCIssuer.getHumanRequestorSubjectId(), samlTRCIssuer.getFunctionalRole(), patientID,
+                    samlTRCIssuer.getHumanRequestorSubjectId(), samlTRCIssuer.getHRRole(), patientID,
                     samlTRCIssuer.getFacilityType(), trc.getID(), sslCommonName, mid,
                     strReqHeader.getBytes(StandardCharsets.UTF_8), getMessageIdFromHeader(response.getSOAPHeader()),
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
