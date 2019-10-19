@@ -1,5 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator;
 
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 import org.apache.commons.lang.StringUtils;
 import org.opensaml.saml.common.xml.SAMLSchemaBuilder;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -8,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 
 import javax.xml.transform.dom.DOMSource;
 
@@ -108,6 +108,14 @@ public class Helper {
 
     public static String getAlternateUserID(Element sh) {
         String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xacml:1.0:subject:subject-id", false);
+        if (result == null) {
+            return "N/A";
+        }
+        return result;
+    }
+
+    public static String getFunctionalRoleID(Element sh) {
+        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:functional-role", false);
         if (result == null) {
             return "N/A";
         }

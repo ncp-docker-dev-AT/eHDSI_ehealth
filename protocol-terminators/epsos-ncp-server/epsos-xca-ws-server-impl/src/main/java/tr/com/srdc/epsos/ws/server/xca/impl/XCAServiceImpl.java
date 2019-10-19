@@ -171,7 +171,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + Helper.getUserID(sh)
                 + "@" + Helper.getAssertionsIssuer(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
-        eventLog.setHR_RoleID(Helper.getRoleID(sh));
+        eventLog.setHR_RoleID(Helper.getFuntionalRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
         eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
@@ -258,7 +258,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + Helper.getUserID(sh)
                 + "@" + Helper.getAssertionsIssuer(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
-        eventLog.setHR_RoleID(Helper.getRoleID(sh));
+        eventLog.setHR_RoleID(Helper.getFuntionalRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
         eventLog.setPT_PatricipantObjectID(Helper.getDocumentEntryPatientIdFromTRCAssertion(sh));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
