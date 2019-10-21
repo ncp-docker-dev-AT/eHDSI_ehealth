@@ -3,7 +3,6 @@ package eu.europa.ec.sante.ehdsi.openncp.tsam.sync.service;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.config.CtsProperties;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.config.DatabaseProperties;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter.ConceptConverter;
-import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter.MappingConverter;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter.ValueSetVersionConverter;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.cts.CtsClient;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.db.DatabaseTool;
@@ -41,13 +40,16 @@ public class TsamSyncManager {
     private final ConceptRepository conceptRepository;
     private final ValueSetRepository valueSetRepository;
     private final ValueSetVersionRepository valueSetVersionRepository;
+    private final ConceptConverter conceptConverter;
+    private final ValueSetVersionConverter valueSetVersionConverter;
     @Value("${pageable.page-size:250}")
     private Integer pageSize;
 
     @SuppressWarnings("squid:S00107")
-    public TsamSyncManager(DatabaseTool databaseTool, CtsProperties ctsProperties, CtsClient ctsClient,
-                           DatabaseProperties databaseProperties, CodeSystemRepository codeSystemRepository, ConceptRepository conceptRepository,
-                           ValueSetRepository valueSetRepository, ValueSetVersionRepository valueSetVersionRepository) {
+    public TsamSyncManager(DatabaseTool databaseTool, CtsProperties ctsProperties, CtsClient ctsClient, DatabaseProperties databaseProperties,
+                           CodeSystemRepository codeSystemRepository, ConceptRepository conceptRepository, ValueSetRepository valueSetRepository,
+                           ValueSetVersionRepository valueSetVersionRepository, ConceptConverter conceptConverter,
+                           ValueSetVersionConverter valueSetVersionConverter) {
         this.databaseTool = databaseTool;
         this.ctsProperties = ctsProperties;
         this.ctsClient = ctsClient;
@@ -56,6 +58,8 @@ public class TsamSyncManager {
         this.conceptRepository = conceptRepository;
         this.valueSetRepository = valueSetRepository;
         this.valueSetVersionRepository = valueSetVersionRepository;
+        this.conceptConverter = conceptConverter;
+        this.valueSetVersionConverter = valueSetVersionConverter;
     }
 
     @Transactional
@@ -84,12 +88,8 @@ public class TsamSyncManager {
             } else {
                 logger.warn("Database backup is disabled (Property 'tsam-sync.database.backup' is set to 'false')");
             }
-
             valueSetRepository.deleteAll();
             codeSystemRepository.deleteAll();
-
-            ValueSetVersionConverter valueSetVersionConverter = new ValueSetVersionConverter();
-            ConceptConverter conceptConverter = new ConceptConverter(new MappingConverter());
 
             logger.info("Starting value sets synchronization");
             int index = 1;
@@ -110,7 +110,6 @@ public class TsamSyncManager {
                     total += concepts.size();
                     hasNext = concepts.size() == pageSize;
                 }
-
                 logger.info("{}/{}: '{}' completed ({} concepts)", index++, catalogue.getValueSetVersions().size(), valueSetVersionModel.getValueSet().getName(), total);
             }
 

@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @Component
 public class MappingConverter implements Converter<MappingModel, Mapping> {
 
-    private ConceptConverter conceptConverter = new ConceptConverter();
+    @Autowired
+    private ConceptConverter conceptConverter;
 
     @Override
     public Mapping convert(MappingModel source) {
