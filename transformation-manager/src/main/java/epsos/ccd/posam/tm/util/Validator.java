@@ -18,8 +18,6 @@ import java.io.File;
 
 /**
  * Provides access to validation methods for CDA Document.
- *
- * @author Frantisek Rudik
  */
 public class Validator implements TMConstants {
 
@@ -35,30 +33,21 @@ public class Validator implements TMConstants {
      */
     public static boolean validateToSchema(Document document) {
 
-        LOGGER.debug("method validateToSchema('{}')", document);
-
-        // load a WXS schema, represented by a Schema instance
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("XSD Validation of CDA based on: '{}'", TMConfiguration.getInstance().getSchemaFilePath());
+        }
         try {
-            // create a SchemaFactory capable of understanding WXS schemas
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            LOGGER.info("XSD Path File: '{}'", TMConfiguration.getInstance().getSchemaFilePath());
             Source schemaFile = new StreamSource(new File(TMConfiguration.getInstance().getSchemaFilePath()));
             Schema schema = factory.newSchema(schemaFile);
-            // create a Validator instance, which can be used to validate an instance document
             javax.xml.validation.Validator validator = schema.newValidator();
-            validator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            validator.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-
-
-            // validate the DOM tree
-            LOGGER.info("... Schema Validation ");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("DOCUMENT: '{}", XMLUtil.prettyPrint(document));
+                LOGGER.debug("CDA document to be validated:\n'{}", XMLUtil.prettyPrint(document));
             }
             validator.validate(new DOMSource(document));
-            LOGGER.info("OK , instance document is valid ");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("CDA document is valid according XSD definition");
+            }
             return true;
         } catch (SAXException e) {
             LOGGER.error("Schema validation error, input document is invalid!", e);
@@ -70,7 +59,7 @@ public class Validator implements TMConstants {
         }
     }
 
-    private static boolean isScanneddoc(String docType) {
+    private static boolean isScannedDocument(String docType) {
 
         return docType.equals(PATIENT_SUMMARY1) || docType.equals(EDISPENSATION1) || docType.equals(EPRESCRIPTION1)
                 || docType.equals(HCER1) || docType.equals(MRO1);
@@ -85,14 +74,16 @@ public class Validator implements TMConstants {
      */
     public static SchematronResult validateSchematron(Document document, String cdaDocumentType, boolean friendly) {
 
-        LOGGER.info("--> method SchematronResult validateSchematron('{}', '{}', '{})", document, cdaDocumentType, friendly);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("--> method SchematronResult validateSchematron('{}', '{})", cdaDocumentType, friendly);
+        }
         SchematronResult result;
         String schemaPath;
         SchematronValidator schValidator = SchematronValidator.getInstance();
 
         // Fix docType for schematron validation.
         // Schematron has special validators for L1 documents, ignoring actual doc type.
-        if (isScanneddoc(cdaDocumentType)) {
+        if (isScannedDocument(cdaDocumentType)) {
             if (friendly) {
                 cdaDocumentType = SCANNED1;
             } else {
@@ -127,7 +118,9 @@ public class Validator implements TMConstants {
      * @param docType  - CDA document type.
      * @param friendly - true|false if the document is a friendly one.
      * @return ModelValidatorResult as a report of the validation executed by the system.
+     * @deprecated - Should not be used anymore as the rules embedded are not aligned with eHDSI CDA IG.
      */
+    @Deprecated
     public static ModelValidatorResult validateMDA(String document, String docType, boolean friendly) {
         return ModelBasedValidator.getInstance().validate(document, docType, friendly);
     }
