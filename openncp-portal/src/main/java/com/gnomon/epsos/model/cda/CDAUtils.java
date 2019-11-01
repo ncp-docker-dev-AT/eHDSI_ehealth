@@ -70,9 +70,9 @@ public class CDAUtils {
     private CDAUtils() {
     }
 
-    public static String createDispensation(Document epDoc, CDAHeader cda, String eDuuid) {
+    public static String createDispensation(Document ePrescriptionDocument, CDAHeader eDispenseHeader, String eDispenseId) {
 
-        String dispense = CDAModelToEDXML(epDoc, cda, eDuuid);
+        String dispense = transformCDAModelToEDXML(ePrescriptionDocument, eDispenseHeader, eDispenseId);
         return StringUtils.removeAll(dispense, XML_EMPTY_NAMESPACE);
     }
 
@@ -580,7 +580,7 @@ public class CDAUtils {
                 + "</legalAuthenticator>" + "\r\n";
     }
 
-    private static String CDAModelToEDXML(Document epDoc, CDAHeader cda, String eDuuid) {
+    private static String transformCDAModelToEDXML(Document ePrescriptionDocument, CDAHeader eDispenseHeader, String eDispenseId) {
 
         String edCountry = GetterUtil.getString(ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country"), "");
         String pharmacistsOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_PHARMACIST_OID);
@@ -606,50 +606,49 @@ public class CDAUtils {
         sb.append("\r\n");
         sb.append("<templateId root=\"1.3.6.1.4.1.19376.1.5.3.1.1.1\"/>");
         sb.append("\r\n");
-        //String uuid = java.util.UUID.randomUUID().toString().replaceAll("-", "");
-        sb.append("<id extension=\"").append(eDuuid).append("\" root=\"").append(edOid).append("\"/>");
+        sb.append("<id extension=\"").append(eDispenseId).append("\" root=\"").append(edOid).append("\"/>");
         sb.append("\r\n");
         sb.append("<code codeSystemName=\"LOINC\" codeSystem=\"2.16.840.1.113883.6.1\" code=\"60593-1\" displayName=\"eDispensation\"/>");
         sb.append("\r\n");
         sb.append("<title>" + XML_DISPENSATION_TITLE + "</title>");
         sb.append("\r\n");
-        sb.append("<effectiveTime value=\"").append(cda.getEffectiveTime()).append("\" />");
+        sb.append("<effectiveTime value=\"").append(eDispenseHeader.getEffectiveTime()).append("\" />");
         sb.append("\r\n");
         sb.append("<confidentialityCode code=\"N\" codeSystem=\"2.16.840.1.113883.5.25\" codeSystemName=\"Confidentiality\" codeSystemVersion=\"913-20091020\" displayName=\"normal\"/>");
         sb.append("\r\n");
-        sb.append("<languageCode code=\"").append(cda.getLanguageCode()).append("\"/>");
+        sb.append("<languageCode code=\"").append(eDispenseHeader.getLanguageCode()).append("\"/>");
         sb.append("\r\n");
-        sb.append(getSetIdFromEP(epDoc));
+        sb.append(getSetIdFromEP(ePrescriptionDocument));
         sb.append("\r\n");
-        sb.append(getRecordTargetFromEP(epDoc));
+        sb.append(getRecordTargetFromEP(ePrescriptionDocument));
         sb.append("\r\n");
         // dispenser information
         sb.append("<author typeCode=\"AUT\">");
         sb.append("\r\n");
         sb.append("<functionCode code=\"" + "2262" + "\" displayName=\"Pharmacists\" codeSystem=\"2.16.840.1.113883.2.9.6.2.7\" codeSystemName=\"ISCO\"/>");
         sb.append("\r\n");
-        sb.append("<time value=\"").append(cda.getEffectiveTime()).append("\"/>");
+        sb.append("<time value=\"").append(eDispenseHeader.getEffectiveTime()).append("\"/>");
         sb.append("\r\n");
         sb.append("<assignedAuthor classCode=\"ASSIGNED\">");
         sb.append("\r\n");
-        sb.append("<id extension=\"").append(cda.getPharmacistOrgId()).append("\" root=\"").append(pharmacistsOid).append("\"/>");
+        sb.append("<id extension=\"").append(eDispenseHeader.getPharmacistOrgId()).append("\" root=\"").append(pharmacistsOid).append("\"/>");
         sb.append("\r\n");
-        sb.append(addAddress(cda.getPharmacistAddress(), cda.getPharmacistCity(), cda.getPharmacistPostalCode(),
-                cda.getPharmacistCountry(), cda.getPharmacistTelephone(), cda.getPharmacistEmail(), false));
+        sb.append(addAddress(eDispenseHeader.getPharmacistAddress(), eDispenseHeader.getPharmacistCity(), eDispenseHeader.getPharmacistPostalCode(),
+                eDispenseHeader.getPharmacistCountry(), eDispenseHeader.getPharmacistTelephone(), eDispenseHeader.getPharmacistEmail(), false));
         sb.append("<assignedPerson classCode=\"PSN\" determinerCode=\"INSTANCE\">");
         sb.append("\r\n");
-        sb.append(addName(cda.getPharmacistFamilyName(), cda.getPharmacistPrefix(), cda.getPharmacistGivenName()));
+        sb.append(addName(eDispenseHeader.getPharmacistFamilyName(), eDispenseHeader.getPharmacistPrefix(), eDispenseHeader.getPharmacistGivenName()));
         sb.append("\r\n");
         sb.append("</assignedPerson>");
         sb.append("\r\n");
         sb.append("<representedOrganization>");
         sb.append("\r\n");
-        sb.append("<id root=\"").append(pharmaciesOid).append("\" extension=\"").append(cda.getPharmacistOrgId()).append("\"/>");
+        sb.append("<id root=\"").append(pharmaciesOid).append("\" extension=\"").append(eDispenseHeader.getPharmacistOrgId()).append("\"/>");
         sb.append("\r\n");
-        sb.append("<name>").append(cda.getPharmacistOrgName()).append("</name>");
+        sb.append("<name>").append(eDispenseHeader.getPharmacistOrgName()).append("</name>");
         sb.append("\r\n");
-        sb.append(addAddress(cda.getPharmacistOrgAddress(), cda.getPharmacistOrgCity(), cda.getPharmacistOrgPostalCode(),
-                cda.getPharmacistOrgCountry(), cda.getPharmacistOrgTelephone(), cda.getPharmacistOrgEmail(), true));
+        sb.append(addAddress(eDispenseHeader.getPharmacistOrgAddress(), eDispenseHeader.getPharmacistOrgCity(), eDispenseHeader.getPharmacistOrgPostalCode(),
+                eDispenseHeader.getPharmacistOrgCountry(), eDispenseHeader.getPharmacistOrgTelephone(), eDispenseHeader.getPharmacistOrgEmail(), true));
         sb.append("\r\n");
         sb.append("</representedOrganization>");
         sb.append("\r\n");
@@ -657,20 +656,18 @@ public class CDAUtils {
         sb.append("\r\n");
         sb.append("</author>");
         sb.append("\r\n");
-        //sb.append(getCustodianFromEP(epDoc));sb.append("\r\n");
 
         sb.append(addCustodian(custodianOid, custodianName, edCountry));
         sb.append(addLegalAuthenticator(legalOrgOid, legalauthenticatorfirstname, legalauthenticatorlastname,
                 legalauthenticatorcity, legalauthenticatorpostalcode, edCountry));
 
-        //sb.append(getLegalAuthFromEP(epDoc));sb.append("\r\n");
-        String relRoot = getRelativePrescriptionRoot(epDoc);
+        String relRoot = getRelativePrescriptionRoot(ePrescriptionDocument);
         // Add relative prescription
         sb.append("<inFulfillmentOf>");
         sb.append("\r\n");
         sb.append("<order moodCode=\"RQO\">");
         sb.append("\r\n");
-        sb.append(" <id extension=\"").append(cda.getPrescriptionBarcode()).append("\" root=\"").append(relRoot).append("\" />");
+        sb.append(" <id extension=\"").append(eDispenseHeader.getPrescriptionBarcode()).append("\" root=\"").append(relRoot).append("\" />");
         sb.append("\r\n");
         sb.append("</order>");
         sb.append("\r\n");
@@ -682,7 +679,7 @@ public class CDAUtils {
         sb.append("\r\n");
         sb.append("<parentDocument classCode=\"DOCCLIN\" >");
         sb.append("\r\n");
-        sb.append(" <id extension=\"").append(cda.getPrescriptionBarcode()).append("\" root=\"").append(relRoot).append("\" />");
+        sb.append(" <id extension=\"").append(eDispenseHeader.getPrescriptionBarcode()).append("\" root=\"").append(relRoot).append("\" />");
         sb.append("\r\n");
         sb.append("</parentDocument>");
         sb.append("\r\n");
@@ -704,17 +701,18 @@ public class CDAUtils {
         sb.append("<templateId root=\"1.3.6.1.4.1.12559.11.10.1.3.1.2.2\"/>");
         sb.append("\r\n");
         // Κωδικός εκτελεσμένης συνταγής
-        sb.append(addIDRoot(edOid, cda.getDispensationId()));
+        sb.append(addIDRoot(edOid, eDispenseHeader.getDispensationId()));
         sb.append("\r\n");
         sb.append("<code code=\"60590-7\" codeSystem=\"2.16.840.1.113883.6.1\" codeSystemName=\"LOINC\" displayName=\"Medication dispensed\"/>");
         sb.append("\r\n");
 
-        sb.append("<title>" + "Dispensation: ").append(cda.getDispensationId()).append("</title>");
+        sb.append("<title>" + "Dispensation: ").append(eDispenseHeader.getDispensationId()).append("</title>");
         sb.append("\r\n");
-        sb.append(getRelativePrescriptionText(epDoc));
+        sb.append(getRelativePrescriptionText(ePrescriptionDocument));
 
-        for (int i = 0; i < cda.getEDDetail().size(); i++) {
-            EDDetail detail = (EDDetail) cda.getEDDetail().get(i);
+        for (int i = 0; i < eDispenseHeader.getEDDetail().size(); i++) {
+
+            EDDetail detail = (EDDetail) eDispenseHeader.getEDDetail().get(i);
             // prescription details
             sb.append("<entry typeCode=\"COMP\">");
             sb.append("\r\n");
@@ -740,7 +738,7 @@ public class CDAUtils {
             org.dom4j.Document clone;
             try {
                 //Cloning the ePrescription document
-                String source = StringUtils.removeAll(Utils.getDocumentAsXml(epDoc, true), XML_EMPTY_NAMESPACE);
+                String source = StringUtils.removeAll(Utils.getDocumentAsXml(ePrescriptionDocument, true), XML_EMPTY_NAMESPACE);
                 clone = org.dom4j.DocumentHelper.parseText(source);
 
                 //Getting the substituted fields, if any
@@ -753,8 +751,8 @@ public class CDAUtils {
                 }
                 //Adding the relative product line updated with the substituted data, if any
                 sb.append(getSubstitutedRelativeProductLineFromEP(clone, id, product, unit, quantity));
-
                 sb.append("\r\n");
+
             } catch (Exception exc) {
                 LOGGER.error("Error cloning ePrescription document " + exc.getMessage());
                 LOGGER.error(ExceptionUtils.getStackTrace(exc));
@@ -765,29 +763,29 @@ public class CDAUtils {
             // Pharmacist info
             sb.append("<performer typeCode=\"PRF\">");
             sb.append("\r\n");
-            sb.append("<time value=\"").append(cda.getEffectiveTime()).append("\" />");
+            sb.append("<time value=\"").append(eDispenseHeader.getEffectiveTime()).append("\" />");
             sb.append("\r\n");
             sb.append("<assignedEntity>");
             sb.append("\r\n");
-            sb.append("<id root=\"").append(pharmacistsOid).append("\" extension=\"").append(cda.getPharmacistOrgId()).append("\"/>");
+            sb.append("<id root=\"").append(pharmacistsOid).append("\" extension=\"").append(eDispenseHeader.getPharmacistOrgId()).append("\"/>");
             sb.append("\r\n");
-            sb.append(addAddress(cda.getPharmacistAddress(), cda.getPharmacistCity(), cda.getPharmacistPostalCode(),
-                    cda.getPharmacistCountry(), cda.getPharmacistTelephone(), cda.getPharmacistEmail(), false));
+            sb.append(addAddress(eDispenseHeader.getPharmacistAddress(), eDispenseHeader.getPharmacistCity(), eDispenseHeader.getPharmacistPostalCode(),
+                    eDispenseHeader.getPharmacistCountry(), eDispenseHeader.getPharmacistTelephone(), eDispenseHeader.getPharmacistEmail(), false));
             sb.append("\r\n");
             sb.append("<assignedPerson>");
             sb.append("\r\n");
-            sb.append(addName(cda.getPharmacistFamilyName(), cda.getPharmacistPrefix(), cda.getPharmacistGivenName()));
+            sb.append(addName(eDispenseHeader.getPharmacistFamilyName(), eDispenseHeader.getPharmacistPrefix(), eDispenseHeader.getPharmacistGivenName()));
             sb.append("\r\n");
             sb.append("</assignedPerson>");
             sb.append("\r\n");
             sb.append("<representedOrganization>");
             sb.append("\r\n");
-            sb.append("<id root=\"").append(pharmaciesOid).append("\" extension=\"").append(cda.getPharmacistOrgId()).append("\"/>");
+            sb.append("<id root=\"").append(pharmaciesOid).append("\" extension=\"").append(eDispenseHeader.getPharmacistOrgId()).append("\"/>");
             sb.append("\r\n");
-            sb.append("<name>").append(cda.getPharmacistOrgName()).append("</name>");
+            sb.append("<name>").append(eDispenseHeader.getPharmacistOrgName()).append("</name>");
             sb.append("\r\n");
-            sb.append(addAddress(cda.getPharmacistOrgAddress(), cda.getPharmacistOrgCity(), cda.getPharmacistOrgPostalCode(),
-                    cda.getPharmacistOrgCountry(), cda.getPharmacistOrgTelephone(), cda.getPharmacistOrgEmail(), true));
+            sb.append(addAddress(eDispenseHeader.getPharmacistOrgAddress(), eDispenseHeader.getPharmacistOrgCity(), eDispenseHeader.getPharmacistOrgPostalCode(),
+                    eDispenseHeader.getPharmacistOrgCountry(), eDispenseHeader.getPharmacistOrgTelephone(), eDispenseHeader.getPharmacistOrgEmail(), true));
             sb.append("</representedOrganization>");
             sb.append("\r\n");
             sb.append("</assignedEntity>");
@@ -796,7 +794,7 @@ public class CDAUtils {
             sb.append("\r\n");
 
             // Add participant
-            sb.append("<participant typeCode=\"PRF\">");
+            sb.append("<participant typeCode=\"PRF\" contextControlCode=\"OP\">");
             sb.append("\r\n");
             sb.append("<participantRole classCode=\"LIC\" >");
             sb.append("\r\n");
@@ -815,7 +813,7 @@ public class CDAUtils {
 
             // get relative prescription line
             sb.append("<entryRelationship typeCode=\"REFR\">");
-            sb.append(getRelativePrescriptionLineFromEP(epDoc, detail.getRelativePrescriptionLineId()));
+            sb.append(getRelativePrescriptionLineFromEP(ePrescriptionDocument, detail.getRelativePrescriptionLineId()));
             sb.append("\r\n");
             sb.append("</entryRelationship>");
 
