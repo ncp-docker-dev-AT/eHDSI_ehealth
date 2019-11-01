@@ -284,7 +284,7 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                                 <epsos:denominator xsi:type="epsos:PQ" value="1" unit="1"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="H03AA01" displayName="levothyroxine sodium" codeSystem="2.16.840.1.113883.6.73" codeSystemName="ATC">
+                                                <epsos:code code="H03AA01" displayName="levothyroxine sodium" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical">
                                                 <epsos:originalText>
                                                 <epsos:reference value="#ecode-1"/>
                                                 </epsos:originalText>
@@ -325,7 +325,7 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                         </epsos:formCode>
                                         <epsos:asSpecializedKind classCode="GEN">
                                             <epsos:generalizedMedicineClass classCode="MMAT">
-                                                <epsos:code code="C09BB05" codeSystem="2.16.840.1.113883.6.73" displayName="ramipril and felodipine" codeSystemName="ATC">
+                                                <epsos:code code="C09BB05" codeSystem="2.16.840.1.113883.6.73" displayName="ramipril and felodipine" codeSystemName="Anatomical Therapeutic Chemical">
                                                 <epsos:originalText>
                                                 <epsos:reference value="#ecode-2"/>
                                                 </epsos:originalText>
@@ -338,7 +338,7 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                                 <epsos:denominator xsi:type="epsos:PQ" value="1" unit="1"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="C09AA05" displayName="ramipril" codeSystem="2.16.840.1.113883.6.73" codeSystemName="ATC">
+                                                <epsos:code code="C09AA05" displayName="ramipril" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical">
                                                 <epsos:originalText>
                                                 <epsos:reference value="#ecode-3"/>
                                                 </epsos:originalText>
@@ -351,7 +351,7 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                                 <epsos:denominator xsi:type="epsos:PQ" value="1" unit="1"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="C08CA02" displayName="felodipine" codeSystem="2.16.840.1.113883.6.73" codeSystemName="ATC">
+                                                <epsos:code code="C08CA02" displayName="felodipine" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical">
                                                 <epsos:originalText>
                                                 <epsos:reference value="#ecode-4"/>
                                                 </epsos:originalText>
@@ -397,7 +397,7 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                                 <epsos:denominator xsi:type="epsos:PQ" value="1" unit="mL"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="A10AE06" displayName="insulin degludec" codeSystem="2.16.840.1.113883.6.73" codeSystemName="ATC">
+                                                <epsos:code code="A10AE06" displayName="insulin degludec" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical">
                                                 <epsos:originalText>
                                                 <epsos:reference value="#ecode-5"/>
                                                 </epsos:originalText>
@@ -437,7 +437,7 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                         </epsos:formCode>
                                         <epsos:asSpecializedKind classCode="GEN">
                                             <epsos:generalizedMedicineClass classCode="MMAT">
-                                                <epsos:code code="J01CR02" codeSystem="2.16.840.1.113883.6.73" displayName="amoxicillin and enzyme inhibitor" codeSystemName="ATC">
+                                                <epsos:code code="J01CR02" codeSystem="2.16.840.1.113883.6.73" displayName="amoxicillin and enzyme inhibitor" codeSystemName="Anatomical Therapeutic Chemical">
                                                 <epsos:originalText>
                                                 <epsos:reference value="#ecode-6"/>
                                                 </epsos:originalText>
@@ -450,7 +450,7 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                                 <epsos:denominator xsi:type="epsos:PQ" value="1" unit="1"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="J01CA04" displayName="amoxicillin" codeSystem="2.16.840.1.113883.6.73" codeSystemName="ATC">
+                                                <epsos:code code="J01CA04" displayName="amoxicillin" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical">
                                                 <epsos:originalText>
                                                 <epsos:reference value="#ecode-7"/>
                                                 </epsos:originalText>
@@ -513,7 +513,7 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                         </epsos:asContent>
                                         <epsos:asSpecializedKind classCode="GEN">
                                             <epsos:generalizedMedicineClass classCode="MMAT">
-                                                <epsos:code code="R03AL02" codeSystem="2.16.840.1.113883.6.73" displayName="salbutamol and ipratropium bromide" codeSystemName="ATC">
+                                                <epsos:code code="R03AL02" codeSystem="2.16.840.1.113883.6.73" displayName="salbutamol and ipratropium bromide" codeSystemName="Anatomical Therapeutic Chemical">
                                                 <epsos:originalText>
                                                 <epsos:reference value="#ecode-9"/>
                                                 </epsos:originalText>
@@ -526,7 +526,7 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                                 <epsos:denominator xsi:type="epsos:PQ" value="2.5" unit="mL"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="R03AC02" displayName="salbutamol" codeSystem="2.16.840.1.113883.6.73" codeSystemName="ATC">
+                                                <epsos:code code="R03AC02" displayName="salbutamol" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical">
                                                 <epsos:originalText>
                                                 <epsos:reference value="#ecode-10"/>
                                                 </epsos:originalText>
@@ -539,7 +539,7 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                                 <epsos:denominator xsi:type="epsos:PQ" value="2.5" unit="mL"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="R03BB01" displayName="ipratropium bromide" codeSystem="2.16.840.1.113883.6.73" codeSystemName="ATC">
+                                                <epsos:code code="R03BB01" displayName="ipratropium bromide" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical">
                                                 <epsos:originalText>
                                                 <epsos:reference value="#ecode-11"/>
                                                 </epsos:originalText>
@@ -732,8 +732,8 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                         <participantRole classCode="MANU">
                                             <playingEntity classCode="MMAT">
                                                 <!-- Allergy Agent -->
-                                                <code code="N02BA01" codeSystem="2.16.840.1.113883.6.73" displayName="acetylsalicylic acid" codeSystemName="ATC">
-                                                <originalText><reference value="#code-15"/></originalText>
+                                                <code code="N02BA01" codeSystem="2.16.840.1.113883.6.73" displayName="acetylsalicylic acid" codeSystemName="Anatomical Therapeutic Chemical">
+                                                    <originalText><reference value="#code-15"/></originalText>
                                                 </code>
                                             </playingEntity>
                                         </participantRole>
@@ -750,18 +750,14 @@ Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
                                             <text><reference value="#obs-6"/></text>
                                             <!-- epSOSReactionAllergy -->
                                             <value xsi:type="CD" code="195967001" codeSystem="2.16.840.1.113883.6.96" displayName="Asthma" codeSystemName="SNOMED CT">
-                                                <originalText>
-                                                <reference value="#val-6"/>
-                                                </originalText>
+                                                <originalText><reference value="#val-6"/></originalText>
                                             </value>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
                             </entryRelationship>
-
                         </act>
                     </entry>
-
                     <entry>
                         <!-- Allergy and Intolerance Concern -->
                         <act classCode="ACT" moodCode="EVN">
