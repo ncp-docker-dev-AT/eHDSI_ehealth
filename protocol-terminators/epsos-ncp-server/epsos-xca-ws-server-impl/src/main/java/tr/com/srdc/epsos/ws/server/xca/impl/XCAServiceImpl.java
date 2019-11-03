@@ -15,6 +15,10 @@ import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.AssertionValidationException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
@@ -41,10 +45,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.xds.DocumentType;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.AssertionValidationException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
@@ -1107,18 +1107,19 @@ public class XCAServiceImpl implements XCAServiceInterface {
             String documentId = request.getDocumentRequest().get(0).getDocumentUniqueId();
             String patientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(soapHeaderElement));
             String repositoryId = getRepositoryUniqueId(request);
-            logger.info("Retrieving Document with criteria: '{}' '{}' '{}'", patientId, documentId, repositoryId);
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION) {
+                loggerClinical.info("Retrieving Document with criteria: '{}' '{}' '{}'", patientId, documentId, repositoryId);
+            }
             //try getting country code from the certificate
             String countryCode = null;
-            String DN = eventLog.getSC_UserID();
-            int cIndex = DN.indexOf("C=");
-
+            String distinguishedNames = eventLog.getSC_UserID();
+            logger.info("[Certificate] Distinguished Names: '{}'", distinguishedNames);
+            int cIndex = distinguishedNames.indexOf("C=");
             if (cIndex > 0) {
-                countryCode = DN.substring(cIndex + 2, cIndex + 4);
+                countryCode = distinguishedNames.substring(cIndex + 2, cIndex + 4);
             }
-            // Mustafa: This part is added for handling consents when the call is not https
-            // In this case, we check the country code of the signature certificate that
-            // ships within the HCP assertion
+            // Mustafa: This part is added for handling consents when the call is not https. In this case, we check
+            // the country code of the signature certificate that ships within the HCP assertion
             // TODO: Might be necessary to remove later, although it does no harm in reality!
             if (countryCode == null) {
                 logger.info("Could not get client country code from the service consumer certificate. " +
