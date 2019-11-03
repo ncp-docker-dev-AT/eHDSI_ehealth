@@ -164,7 +164,6 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <configuration>
                             <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-                            <warName>openncp-openatna-all</warName>
                             <webXml>${basedir}/src/main/profiled-resource/all/WEB-INF/web.xml</webXml>
                             <webResources>
                                 <resource>
