@@ -81,9 +81,9 @@ public class DispensePrescriptionPage extends BasePage {
         if (!prescription.getObject().getError().isEmpty() && FeatureFlagsManager.check(Feature.SHOW_PARTIAL_ERROR_MESSAGES)) {
             displayListOfWarnings(prescription.getObject().getError());
         }
-        Dispensation disp = new Dispensation(getSession().getId(), personId, prescription.getObject());
+        Dispensation dispensation = new Dispensation(getSession().getId(), personId, prescription.getObject());
         DispensationForm form = new DispensationForm("dispensationForm", new CompoundPropertyModel<Dispensation>(
-                new LoadableDocumentModel<Dispensation>(disp)), new LoadablePersonModel(person), parameters);
+                new LoadableDocumentModel<>(dispensation)), new LoadablePersonModel(person), parameters);
         form.setOutputMarkupId(true);
         add(form);
 
@@ -195,7 +195,7 @@ public class DispensePrescriptionPage extends BasePage {
                         public Iterator<Ingredient> iterator(int start, int count) {
                             if (item.getModelObject().getPrescriptionRow().getIngredient() == null
                                     || item.getModelObject().getPrescriptionRow().getIngredient().isEmpty()) {
-                                return Collections.<Ingredient>emptyList().iterator();
+                                return Collections.emptyIterator();
                             } else {
                                 return item.getModelObject().getPrescriptionRow().getIngredient().subList(start, start + count).iterator();
                             }

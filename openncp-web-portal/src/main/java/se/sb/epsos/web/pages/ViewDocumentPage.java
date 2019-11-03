@@ -1,13 +1,3 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
- *
- *    This file is part of epSOS-WEB.
- *
- *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
- **/
 package se.sb.epsos.web.pages;
 
 import com.gnomon.xslt.EpsosXSLTransformer;
@@ -27,8 +17,8 @@ import se.sb.epsos.web.service.DocumentClientDtoCacheKey;
 import se.sb.epsos.web.service.MetaDocument;
 import se.sb.epsos.web.service.NcpServiceException;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 @AuthorizeInstantiation({"ROLE_PHARMACIST", "ROLE_DOCTOR", "ROLE_NURSE"})
 public class ViewDocumentPage extends WebPage {
@@ -40,13 +30,14 @@ public class ViewDocumentPage extends WebPage {
     }
 
     public ViewDocumentPage(PageParameters parameters) {
+
         DocumentClientDtoCacheKey docKey = new DocumentClientDtoCacheKey(getSession().getId(), parameters.getString("personId"), parameters.getString("id"));
         MetaDocument metaDoc = DocumentCache.getInstance().get(docKey);
 
         ((EpsosAuthenticatedWebSession) getSession()).addToBreadCrumbList(new BreadCrumbVO<ViewDocumentPage>(getString("viewDocumentPage.title." + parameters.getString("docType"))));
-        LoadableDocumentModel<MetaDocument> doc = new LoadableDocumentModel<MetaDocument>(metaDoc);
+        LoadableDocumentModel<MetaDocument> doc = new LoadableDocumentModel<>(metaDoc);
         LOGGER.debug("New page instance: '{}'", this.getClass().getSimpleName());
-        LOGGER.debug("Metadoc: '{}'", doc.getObject());
+        LOGGER.debug("Metadata Document: '{}'", doc.getObject());
         CdaDocument document = null;
 
         if (doc.getObject() instanceof CdaDocument) {
@@ -67,18 +58,16 @@ public class ViewDocumentPage extends WebPage {
         // Starting CDADisplayTool treatment: XSLTransformer
         String xmlfile = null;
         if (document != null) {
-            try {
-                xmlfile = new String(document.getBytes(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.error("Failed to convert CDA bytes to string", e);
-                error(doc.getObject().getType().name() + ".error.service");
-            }
+            xmlfile = new String(document.getBytes(), StandardCharsets.UTF_8);
 
             String transformedResult = null;
             try {
                 URL xmlResourceUrl = getClass().getClassLoader().getResource("displaytool/EpsosRepository");
-                EpsosXSLTransformer xslTransformer = new EpsosXSLTransformer(xmlResourceUrl.getPath());
-                transformedResult = xslTransformer.transform(xmlfile, "sv-SE", null, "css/style.css");
+                EpsosXSLTransformer xslTransformer;
+                if (xmlResourceUrl != null) {
+                    xslTransformer = new EpsosXSLTransformer(xmlResourceUrl.getPath());
+                    transformedResult = xslTransformer.transform(xmlfile, "sv-SE", null, "css/style.css");
+                }
             } catch (Exception e) {
                 LOGGER.error("Failed to transform CDA document to HTML", e);
                 error("Xslt transformation failed: " + e.getMessage());
@@ -88,6 +77,5 @@ public class ViewDocumentPage extends WebPage {
             LOGGER.error("Failed to transform CDA document to HTML because source document is null");
             error("Xslt transformation failed because source document is null");
         }
-        // Ending CDADisplayTool Treatment
     }
 }

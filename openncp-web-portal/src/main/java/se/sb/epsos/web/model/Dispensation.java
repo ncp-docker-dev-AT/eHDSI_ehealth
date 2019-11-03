@@ -1,5 +1,6 @@
 package se.sb.epsos.web.model;
 
+import org.apache.commons.collections4.CollectionUtils;
 import se.sb.epsos.web.service.DocumentClientDtoCacheKey;
 import tr.com.srdc.epsos.util.Constants;
 
@@ -20,7 +21,7 @@ public class Dispensation extends CdaDocument {
         super(new DocumentClientDtoCacheKey(sessionId, patientId, Constants.UUID_PREFIX + UUID.randomUUID().toString()));
         this.prescription = prescription;
         rows = new ArrayList<>();
-        if (prescription != null) {
+        if (prescription != null && !CollectionUtils.isEmpty(prescription.getRows())) {
             for (PrescriptionRow prescriptionRow : prescription.getRows()) {
                 rows.add(new DispensationRow(prescriptionRow));
             }
