@@ -19,65 +19,44 @@ import java.util.HashMap;
  * Reads list from xml structure. (Path to Input xml file is configured through property <i>tm.codedelementlist.path</i>)<br>
  * <br>
  * <p>
- * To follow relation between coded element and valueset, configuration file called CodedElementList will be used. It will contain list of all coded elements, and for each of them:
+ * To follow relation between coded element and value set, configuration file called CodedElementList will be used.
+ * It will contain list of all coded elements, and for each of them:
  * <br>
  * <li> name of coded element (xpath),</li> <li> indication, in which pivot document types coded element
  * is used (Patient Summary, ePrescription, eDispensation, and for each of them if it is in CDA level 3
  * or CDA level 1 embedding pdf and whether element is required or optional),
  * </li>
- * <li> related value set (and value set version) [optional],</li> <li> language to which element should be translated [optional].</li>
+ * <li> related value set (and value set version) [optional],</li>
+ * <li> language to which element should be translated [optional].</li>
  *
  * @author Frantisek Rudik
- * @author Organization: Posam
- * @author mail:frantisek.rudik@posam.sk
- * @version 1.6, 2010, 20 October
  */
 public class CodedElementList implements InitializingBean, TMConstants {
 
-    private static final Logger log = LoggerFactory.getLogger(CodedElementList.class);
-    /**
-     * Collection of Elements contained in Patient Summary CDA document (level
-     * 3)
-     */
+    // Collection of Elements contained in Patient Summary CDA document (level 3)
     private static Collection<CodedElementListItem> patientSummaryl3;
-    /**
-     * Collection of Elements contained in header of Patient Summary CDA
-     * document (level 1 with pdf)
-     */
+    // Collection of Elements contained in header of Patient Summary CDA document (level 1 with pdf)
     private static Collection<CodedElementListItem> patientSummaryl1;
-    /**
-     * Collection of Elements contained in header of ePrescription CDA document
-     * (level 1 with pdf)
-     */
+    // Collection of Elements contained in header of ePrescription CDA document (level 1 with pdf)
     private static Collection<CodedElementListItem> ePrescriptionl1;
-
-    // collections of CodedElementListItem for CDA document types
-    /**
-     * Collection of Elements contained in ePrescription CDA document (level 3)
-     */
+    // Collection of Elements contained in ePrescription CDA document (level 3)
     private static Collection<CodedElementListItem> ePrescriptionl3;
-    /**
-     * Collection of Elements contained in eDispensation CDA document (level 3)
-     */
+    // Collection of Elements contained in header of eDispensation CDA document (level 1 with pdf)
     private static Collection<CodedElementListItem> eDispensationl1;
-    /**
-     * Collection of Elements contained in header of eDispensation CDA document (level 1 with pdf)
-     */
+    // Collection of Elements contained in eDispensation CDA document (level 3)
     private static Collection<CodedElementListItem> eDispensationl3;
+    // Collections of CodedElementListItem for CDA document types
     private static Collection<CodedElementListItem> hcerl3;
     private static Collection<CodedElementListItem> hcerl1;
     private static Collection<CodedElementListItem> mrol3;
     private static Collection<CodedElementListItem> mrol1;
     private static CodedElementList instance = null;
     private static HashMap<String, Collection<CodedElementListItem>> hmDocAndLists = new HashMap<>();
+    private final Logger logger = LoggerFactory.getLogger(CodedElementList.class);
     private boolean isInitialized = false;
-    /**
-     * path to xml file with Coded Element List
-     */
+    // Path to xml file with Coded Element List
     private String codedElementListPath;
-    /**
-     * true means configurable Element identification is used; false means no
-     */
+    // True means configurable Element identification is used; false means no
     private boolean configurableElementIdentification;
 
     private CodedElementList() {
@@ -135,13 +114,13 @@ public class CodedElementList implements InitializingBean, TMConstants {
 
         // read xml file (coded_element_list.xml)
         if (configurableElementIdentification && !isInitialized) {
-            log.info("Coded Element List - configurableElementIdentification USED");
+            logger.info("Coded Element List - configurableElementIdentification USED");
             Document doc = XmlUtil.getDocument(new File(codedElementListPath), true);
-            log.info("Coded Element List - read from xml BEGIN ");
+            logger.info("Coded Element List - read from xml BEGIN ");
 
             Element root = doc.getDocumentElement();
             NodeList codedElements = root.getElementsByTagName(CODED_ELEMENT);
-            log.info("Coded Element count: '{}'", codedElements.getLength());
+            logger.info("Coded Element count: '{}'", codedElements.getLength());
             // fill collections
 
             Element codedElement;
@@ -210,9 +189,9 @@ public class CodedElementList implements InitializingBean, TMConstants {
 
             isInitialized = true;
 
-            log.info("Coded Element List - read from xml END ");
+            logger.info("Coded Element List - read from xml END ");
         } else {
-            log.info("Coded Element List - configurableElementIdentification NOT used");
+            logger.info("Coded Element List - configurableElementIdentification NOT used");
         }
     }
 
@@ -241,7 +220,7 @@ public class CodedElementList implements InitializingBean, TMConstants {
                 }
             }
         } catch (Exception e) {
-            log.error("Exception: '{}'", e.getMessage(), e);
+            logger.error("Exception: '{}'", e.getMessage(), e);
         }
         return collection;
     }

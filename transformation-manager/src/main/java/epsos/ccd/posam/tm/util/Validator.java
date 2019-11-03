@@ -1,11 +1,12 @@
 package epsos.ccd.posam.tm.util;
 
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.XMLConstants;
@@ -22,6 +23,7 @@ import java.io.File;
 public class Validator implements TMConstants {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class);
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private Validator() {
     }
@@ -41,20 +43,16 @@ public class Validator implements TMConstants {
             Source schemaFile = new StreamSource(new File(TMConfiguration.getInstance().getSchemaFilePath()));
             Schema schema = factory.newSchema(schemaFile);
             javax.xml.validation.Validator validator = schema.newValidator();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("CDA document to be validated:\n'{}", XMLUtil.prettyPrint(document));
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+                LOGGER_CLINICAL.debug("[Transformation Manager] Validation of CDA document:\n'{}", XMLUtil.prettyPrint(document));
             }
             validator.validate(new DOMSource(document));
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("CDA document is valid according XSD definition");
+                LOGGER.debug("[Transformation Manager] CDA document is valid according XSD definition");
             }
             return true;
-        } catch (SAXException e) {
-            LOGGER.error("Schema validation error, input document is invalid!", e);
-            return false;
-
         } catch (Exception e) {
-            LOGGER.error("Schema validation error!", e);
+            LOGGER.error("[Transformation Manager] Schema validation error, Invalid Document!", e);
             return false;
         }
     }

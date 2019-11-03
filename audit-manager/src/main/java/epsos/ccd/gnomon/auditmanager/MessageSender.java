@@ -127,11 +127,11 @@ public class MessageSender {
 
             //  Set header AuditLogSerializer of syslog message.
             String hostName = sslsocket.getLocalAddress().getHostName();
-            logger.info("Syslog Server hostname: '{}'", hostName);
             if (!sslsocket.getLocalAddress().isLinkLocalAddress() && !sslsocket.getLocalAddress().isLoopbackAddress()
                     && (sslsocket.getLocalAddress() instanceof Inet4Address)) {
                 hostName = IPUtil.getPrivateServerIp();
             }
+            logger.info("Syslog Server hostname: '{}'", hostName);
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             Date now = new Date();
