@@ -184,9 +184,9 @@
                             <td>
                                 <!--  Procedure Date -->
                                 <xsl:choose>
-                                    <xsl:when test="$surgicalProcedureDate/@low">
+                                    <xsl:when test="$surgicalProcedureDate/n1:low">
                                         <xsl:call-template name="show-time">
-                                            <xsl:with-param name="datetime" select="$surgicalProcedureDate/@low"/>
+                                            <xsl:with-param name="datetime" select="$surgicalProcedureDate/n1:low"/>
                                         </xsl:call-template>&#160;
                                     </xsl:when>
                                     <xsl:otherwise>
