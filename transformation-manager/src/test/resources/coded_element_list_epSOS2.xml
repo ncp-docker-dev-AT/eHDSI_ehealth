@@ -223,7 +223,7 @@
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
-	<!-- Medication Summary - No medication -->
+	<!-- Medication Summary - Absent or unknown information -->
 	<codedElement>
 		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/code</elementPath>
 		<usage>
@@ -238,8 +238,8 @@
 			<MRODocCDAl3>O</MRODocCDAl3>
 			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
 		</usage>
-		<!-- epSOSCodeNoMedication -->
-		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.22</valueSet>
+		<!-- eHDSI-AbsentOrUnknownMedication -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.49</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
@@ -586,7 +586,7 @@
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
-	<!-- Alerts - Unknown allergy -->
+	<!-- Alerts - Absent Or Unknown Allergies -->
 	<codedElement>
 		<elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/value</elementPath>
 		<usage>
@@ -601,8 +601,8 @@
 			<MRODocCDAl3>O</MRODocCDAl3>
 			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
 		</usage>
-		<!-- epSOSUnknownInformation -->
-		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.17</valueSet>
+		<!-- eHDSI-AbsentOrUnknownAllergies -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.47</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
@@ -623,8 +623,8 @@
 		</usage>
 		<!-- epSOSIllnessesandDisorders -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.5</valueSet>
-		<!-- epSOSUnknownInformation -->
-		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.17</valueSet>
+		<!-- eHDSI-AbsentOrUnknownProblems -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.50</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
@@ -665,8 +665,8 @@
 		</usage>
 		<!-- epSOSIllnessesandDisorders -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.5</valueSet>
-		<!-- epSOSUnknownInformation -->
-		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.17</valueSet>
+		<!-- eHDSI-AbsentOrUnknownProblems -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.50</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
