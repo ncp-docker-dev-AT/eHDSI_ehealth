@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <codedElementList>
     <!-- Created based on eHDSI Semantic Implementation Guidelines and eHDSI PS and eP display documents -->
+
     <!-- Document Header -->
+
     <!-- Gender -->
     <codedElement>
         <elementPath>/ClinicalDocument/recordTarget/patientRole/patient/administrativeGenderCode</elementPath>
@@ -22,7 +24,7 @@
         <valueSetVersion />
         <targetLanguageCode />
     </codedElement>
-    <!-- Contact Relationship Type -->
+    <!-- Personal Relationship Type -->
     <codedElement>
         <elementPath>/ClinicalDocument/participant/associatedEntity/code</elementPath>
         <usage>
@@ -37,11 +39,35 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>O</MRODocCDAl1pdf>
         </usage>
-        <!-- HL7:PersonalRelationshipRoleType -->
+        <!-- epSOSPersonalRelationship -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.38</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
     </codedElement>
+
+
+    <!-- Role class -->
+    <codedElement>
+        <elementPath>/ClinicalDocument/participant/associatedEntity/@classCode</elementPath>
+        <usage>
+            <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
+            <patientSummaryCDAl1pdf>RNFA</patientSummaryCDAl1pdf>
+            <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+            <eDispensationCDAl3>NA</eDispensationCDAl3>
+            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+            <HCERDocCDAl3>RNFA</HCERDocCDAl3>
+            <HCERDocCDAl1pdf>RNFA</HCERDocCDAl1pdf>
+            <MRODocCDAl3>RNFA</MRODocCDAl3>
+            <MRODocCDAl1pdf>RNFA</MRODocCDAl1pdf>
+        </usage>
+        <!-- epSOSRoleClass -->
+        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.39</valueSet>
+        <valueSetVersion />
+        <targetLanguageCode />
+    </codedElement>
+
+
     <!-- Profession -->
     <codedElement>
         <elementPath>//documentationOf/serviceEvent/performer/functionCode</elementPath>
@@ -122,7 +148,9 @@
         <valueSetVersion />
         <targetLanguageCode />
     </codedElement>
+
     <!-- Document Body -->
+
     <!-- Prescription - Classification of the substance -->
     <codedElement>
         <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/asSpecializedKind/generalizedMedicineClass/code</elementPath>
@@ -243,66 +271,6 @@
         <valueSetVersion />
         <targetLanguageCode />
     </codedElement>
-    <!-- Prescription - Sub ingredient description -->
-    <codedElement>
-        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/subIngredient/ingredient/code</elementPath>
-        <usage>
-            <patientSummaryCDAl3>NA</patientSummaryCDAl3>
-            <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
-            <ePrescriptionCDAl3>O</ePrescriptionCDAl3>
-            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
-            <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
-            <HCERDocCDAl3>NA</HCERDocCDAl3>
-            <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
-            <MRODocCDAl3>NA</MRODocCDAl3>
-            <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
-        </usage>
-        <!-- epSOSActiveIngredient -->
-        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
-        <valueSetVersion />
-        <targetLanguageCode />
-    </codedElement>
-    <!-- Dispensation - Sub ingredient description -->
-    <codedElement>
-        <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/subIngredient/ingredient/code</elementPath>
-        <usage>
-            <patientSummaryCDAl3>NA</patientSummaryCDAl3>
-            <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
-            <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
-            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
-            <eDispensationCDAl3>O</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
-            <HCERDocCDAl3>NA</HCERDocCDAl3>
-            <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
-            <MRODocCDAl3>NA</MRODocCDAl3>
-            <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
-        </usage>
-        <!-- epSOSActiveIngredient -->
-        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
-        <valueSetVersion />
-        <targetLanguageCode />
-    </codedElement>
-    <!-- Medication Summary - Sub ingredient description -->
-    <codedElement>
-        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/subIngredient/ingredient/code</elementPath>
-        <usage>
-            <patientSummaryCDAl3>O</patientSummaryCDAl3>
-            <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
-            <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
-            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
-            <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
-            <HCERDocCDAl3>O</HCERDocCDAl3>
-            <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
-            <MRODocCDAl3>O</MRODocCDAl3>
-            <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
-        </usage>
-        <!-- epSOSActiveIngredient -->
-        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
-        <valueSetVersion />
-        <targetLanguageCode />
-    </codedElement>
     <!-- Prescription - Dose form description -->
     <codedElement>
         <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/formCode</elementPath>
@@ -378,8 +346,28 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSRoutesofAdministration -->
+        <!-- epSOSRouteofAdministration -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.12</valueSet>
+        <valueSetVersion />
+        <targetLanguageCode />
+    </codedElement>
+    <!-- Prescription - Dose Quantity Unit -->
+    <codedElement>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/doseQuantity/@unit</elementPath>
+        <usage>
+            <patientSummaryCDAl3>NA</patientSummaryCDAl3>
+            <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+            <ePrescriptionCDAl3>O</ePrescriptionCDAl3>
+            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+            <eDispensationCDAl3>NA</eDispensationCDAl3>
+            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+            <HCERDocCDAl3>NA</HCERDocCDAl3>
+            <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+            <MRODocCDAl3>NA</MRODocCDAl3>
+            <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+        </usage>
+        <!-- epSOSUnits -->
+        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.16</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
     </codedElement>
@@ -398,7 +386,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSRoutesofAdministration -->
+        <!-- epSOSRouteofAdministration -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.12</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -418,7 +406,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSRoutesofAdministration -->
+        <!-- epSOSRouteofAdministration -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.12</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -787,6 +775,8 @@
         </usage>
         <!-- epSOSProcedures -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.10</valueSet>
+        <!-- eHDSI-AbsentOrUnknownProcedures -->
+        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.51</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
     </codedElement>
@@ -807,6 +797,8 @@
         </usage>
         <!-- epSOSMedicalDevices -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.8</valueSet>
+        <!-- eHDSI-AbsentOrUnknownDevices -->
+        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.48</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
     </codedElement>
