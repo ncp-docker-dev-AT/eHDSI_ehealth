@@ -26,15 +26,15 @@ public class DynamicDiscovery {
         String[] countries = StringUtils.split(countryList, ",");
         List<String> synchronizedCountry = new ArrayList<>();
 
-        for (String s : countries) {
-            logger.info("Fetching ISM for MS: '{}'", s);
+        for (String countryCode : countries) {
+            logger.info("Fetching ISM for MS: '{}'", countryCode);
             try {
-                DynamicDiscoveryService.fetchInternationalSearchMask(s);
-                synchronizedCountry.add(s);
+                DynamicDiscoveryService.fetchInternationalSearchMask(countryCode);
+                synchronizedCountry.add(countryCode);
 
             } catch (ConfigurationManagerException e) {
-                logger.error("ConfigurationManagerException: '{}'", e.getMessage(), e);
-                synchronizedCountry.add(e.getLocalizedMessage());
+                logger.error("ConfigurationManagerException: '{}'", e.getMessage());
+                synchronizedCountry.add(e.getLocalizedMessage() + " " + e.getMessage());
             }
         }
         model.addAttribute("synchronizedCountry", synchronizedCountry);

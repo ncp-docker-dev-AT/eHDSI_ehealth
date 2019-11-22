@@ -22,10 +22,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
@@ -35,7 +32,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -43,9 +39,6 @@ public class XMLUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtil.class);
 
-    /**
-     * Creates a new instance of XMLUtil
-     */
     private XMLUtil() {
     }
 
@@ -57,11 +50,12 @@ public class XMLUtil {
         if (node == null) {
             return null;
         }
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        org.w3c.dom.Document theDocument = db.newDocument();
-        theDocument.appendChild(theDocument.importNode(node, true));
-        return theDocument.getDocumentElement();
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        Document document = documentBuilder.newDocument();
+        document.appendChild(document.importNode(node, true));
+        return document.getDocumentElement();
     }
 
     /**
@@ -77,10 +71,10 @@ public class XMLUtil {
 
         Canonicalizer canon = Canonicalizer.getInstance(CryptographicConstant.ALGO_ID_C14N_INCL_OMIT_COMMENTS);
         byte[] back = canon.canonicalizeSubtree(doc);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
 
-        return dbf.newDocumentBuilder().parse(new ByteArrayInputStream(back));
+        return documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(back));
     }
 
     public static Document parseContent(byte[] byteContent) throws ParserConfigurationException, SAXException, IOException {
@@ -184,10 +178,10 @@ public class XMLUtil {
     }
 
     /**
-     * @param doc
-     * @param out
+     * @param source
+     * @param result
      */
-    public static void prettyPrint(Document doc, OutputStream out) throws TransformerException, UnsupportedEncodingException {
+    public static void transformDocument(DOMSource source, Result result) throws TransformerException {
 
         TransformerFactory factory = TransformerFactory.newInstance();
         factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
@@ -196,7 +190,7 @@ public class XMLUtil {
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        transformer.transform(new DOMSource(doc), new StreamResult(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
+        transformer.transform(source, result);
     }
 
     /**
@@ -329,7 +323,7 @@ public class XMLUtil {
 
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-                    new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8")))).getDocumentElement();
+                    new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))).getDocumentElement();
         } catch (SAXException | ParserConfigurationException e) {
             return null;
         }
