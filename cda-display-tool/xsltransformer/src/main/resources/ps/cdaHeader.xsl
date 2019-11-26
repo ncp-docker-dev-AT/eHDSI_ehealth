@@ -30,7 +30,7 @@
                 <tr class="td_creation_date">
                     <th>
                         <!-- Creation Date: -->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'15'"/>
                         </xsl:call-template>
                     </th>
@@ -41,7 +41,7 @@
                     </td>
                     <th>
                         <!-- Last Update:-->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'39'"/>
                         </xsl:call-template>
                     </th>
@@ -52,7 +52,7 @@
                     </td>
                     <th>
                         <!-- Original Document Language -->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'117'"/>
                         </xsl:call-template>
                     </th>
@@ -70,19 +70,19 @@
                             <tr>
                                 <th>
                                     <!-- Prefix-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'55'"/>
                                     </xsl:call-template>
                                 </th>
                                 <th>
                                     <!-- Family Name-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'30'"/>
                                     </xsl:call-template>
                                 </th>
                                 <th>
                                     <!-- Given Name-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'34'"/>
                                     </xsl:call-template>
                                 </th>
@@ -101,7 +101,7 @@
                             <tr>
                                 <th style="width:100px;">
                                     <!-- Patient Ids-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'52'"/>
                                     </xsl:call-template>
                                 </th>
@@ -125,7 +125,7 @@
                             <tr>
                                 <th style="width:100px;">
                                     <!-- Gender-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'33'"/>
                                     </xsl:call-template>
                                 </th>
@@ -134,7 +134,7 @@
                                 </td>
                                 <th style="width:100px;">
                                     <!-- Date Of Birth-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'19'"/>
                                     </xsl:call-template>
                                 </th>

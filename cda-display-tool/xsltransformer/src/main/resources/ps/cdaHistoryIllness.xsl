@@ -29,9 +29,6 @@
         <xsl:variable
                 name="historyIllnessSectionTitleCode"
                 select="n1:code/@code"/>
-        <xsl:variable
-                name="historyIllnessSectionTitle"
-                select="n1:code[@code='11348-0']/@displayName"/>
         <xsl:variable name="nullEntry" select="n1:entry"/>
         <xsl:variable name="historyAct" select="n1:entry/n1:entry"/>
         <xsl:variable name="obsValueCode"
@@ -43,7 +40,10 @@
                 <div class="wrap-collabsible">
                     <input id="collapsible-history-illness-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-history-illness-section-original" class="lbl-toggle-title">
-                        <xsl:value-of select="$historyIllnessSectionTitle"/>
+                        <!-- Section title -->
+                        <xsl:call-template name="show-epSOSSections">
+                            <xsl:with-param name="code" select="'11348-0'"/>
+                        </xsl:call-template>
                     </label>
                     <div class="collapsible-content-title">
                         <div class="content-inner-title">
@@ -81,19 +81,19 @@
                                                             <tr>
                                                                 <th>
                                                                     <!-- xsl:text>Closed Inactive Problem</xsl:text-->
-                                                                    <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                                         <xsl:with-param name="code" select="'11'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- xsl:text>Onset Date</xsl:text-->
-                                                                    <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                                         <xsl:with-param name="code" select="'45'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- xsl:text>End Date</xsl:text-->
-                                                                    <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                                         <xsl:with-param name="code" select="'26'"/>
                                                                     </xsl:call-template>
                                                                 </th>
@@ -107,7 +107,7 @@
                                                 </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-nullFlavor">
+                                                <xsl:call-template name="show-epSOSNullFlavor">
                                                     <xsl:with-param name="code" select="$historyAct/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -152,7 +152,7 @@
             <xsl:when test="not($historyAct/@nullFlavor)">
                 <xsl:choose>
                     <xsl:when test="($historyIllnessClosedProblemID='no-known-problems' or $historyIllnessClosedProblemID='no-problem-info')">
-                        <xsl:call-template name="show-absentOrUnknownProblems">
+                        <xsl:call-template name="show-eHDSI-AbsentOrUnknownProblems">
                             <xsl:with-param name="code" select="$historyIllnessClosedProblemID"/>
                         </xsl:call-template>
                     </xsl:when>
@@ -177,7 +177,7 @@
                                         </xsl:choose>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:call-template name="show-nullFlavor">
+                                        <xsl:call-template name="show-epSOSNullFlavor">
                                             <xsl:with-param name="code"
                                                             select="$historyIllnessClosedProblemNode/@nullFlavor"/>
                                         </xsl:call-template>
@@ -201,7 +201,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-nullFlavor">
+                        <xsl:call-template name="show-epSOSNullFlavor">
                             <xsl:with-param name="code" select="$historyAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

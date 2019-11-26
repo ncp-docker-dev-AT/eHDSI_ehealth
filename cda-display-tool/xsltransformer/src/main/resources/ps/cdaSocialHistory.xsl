@@ -34,9 +34,6 @@
                 name="socialHistorySectionTitleCode"
                 select="n1:code/@code"/>
         <xsl:variable
-                name="socialHistorySectionTitle"
-                select="n1:code[@code='29762-2']/@displayName"/>
-        <xsl:variable
                 name="nullEntry"
                 select="n1:entry"/>
         <xsl:variable name="socHistAct"
@@ -49,7 +46,10 @@
                 <div class="wrap-collabsible">
                     <input id="collapsible-social-history-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-social-history-section-original" class="lbl-toggle-title">
-                        <xsl:value-of select="$socialHistorySectionTitle"/>
+                        <!-- Section title -->
+                        <xsl:call-template name="show-epSOSSections">
+                            <xsl:with-param name="code" select="'29762-2'"/>
+                        </xsl:call-template>
                     </label>
                     <div class="collapsible-content-title">
                         <div class="content-inner-title">
@@ -85,26 +85,26 @@
                                                         <tr>
                                                             <th>
                                                                 <!-- Observation Type -->
-                                                                <xsl:call-template name="show-displayLabels">
+                                                                <xsl:call-template name="show-epSOSDisplayLabels">
                                                                     <xsl:with-param name="code" select="'44'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
                                                                 <!-- Date From  -->
-                                                                <xsl:call-template name="show-displayLabels">
+                                                                <xsl:call-template name="show-epSOSDisplayLabels">
                                                                     <xsl:with-param name="code" select="'85'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
                                                                 <!-- Date To -->
-                                                                <xsl:call-template name="show-displayLabels">
+                                                                <xsl:call-template name="show-epSOSDisplayLabels">
                                                                     <xsl:with-param name="code" select="'18'"/>
                                                                 </xsl:call-template>
 
                                                             </th>
                                                             <th>
                                                                 <!--  Observation Value -->
-                                                                <xsl:call-template name="show-displayLabels">
+                                                                <xsl:call-template name="show-epSOSDisplayLabels">
                                                                     <xsl:with-param name="code" select="'84'"/>
                                                                 </xsl:call-template>
                                                             </th>
@@ -119,7 +119,7 @@
                                             <xsl:otherwise>
                                                 <tr>
                                                     <td colspan="3">
-                                                        <xsl:call-template name="show-nullFlavor">
+                                                        <xsl:call-template name="show-epSOSNullFlavor">
                                                             <xsl:with-param name="code" select="$socHistAct/@nullFlavor"/>
                                                         </xsl:call-template>
                                                     </td>
@@ -208,7 +208,7 @@
                                 </xsl:choose>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:call-template name="show-nullFlavor">
+                                <xsl:call-template name="show-epSOSNullFlavor">
                                     <xsl:with-param name="code" select="$socialHistoryObservationValueXsi/@nullFlavor"/>
                                 </xsl:call-template>
                             </xsl:otherwise>
@@ -219,7 +219,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-nullFlavor">
+                        <xsl:call-template name="show-epSOSNullFlavor">
                             <xsl:with-param name="code" select="$socHistAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

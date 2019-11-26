@@ -32,9 +32,6 @@
         <xsl:variable
                 name="pregnancyHistorySectionTitleCode"
                 select="n1:code/@code"/>
-        <xsl:variable
-                name="pregnancyHistorySectionTitle"
-                select="n1:code[@code='10162-6']/@displayName"/>
         <xsl:variable name="pregnancyHistoryObservation"
                       select="n1:entry/n1:observation"/>
         <!-- End definition of variables-->
@@ -45,7 +42,10 @@
                 <div class="wrap-collabsible">
                     <input id="collapsible-pregnancy-history-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-pregnancy-history-section-original" class="lbl-toggle-title">
-                        <xsl:value-of select="$pregnancyHistorySectionTitle"/>
+                        <!-- Section title -->
+                        <xsl:call-template name="show-epSOSSections">
+                            <xsl:with-param name="code" select="'10162-6'"/>
+                        </xsl:call-template>
                     </label>
                     <div class="collapsible-content-title">
                         <div class="content-inner-title">
@@ -82,9 +82,10 @@
                                                         <tr>
                                                             <th>
                                                                 <xsl:choose>
-                                                                    <xsl:when test="$pregnancyHistoryObservation/n1:code/@displayName">
-                                                                        <!-- TODO this has to become a value in the epsosDisplayLabel value set -->
-                                                                        <xsl:value-of select="$pregnancyHistoryObservation/n1:code/@displayName"/>
+                                                                    <xsl:when test="$pregnancyHistoryObservation/n1:code/@code">
+                                                                        <xsl:call-template name="show-epSOSPregnancyInformation">
+                                                                            <xsl:with-param name="code" select="$pregnancyHistoryObservation/n1:code/@code"/>
+                                                                        </xsl:call-template>
                                                                     </xsl:when>
                                                                     <xsl:otherwise>
                                                                         <!-- uncoded element Problem -->
@@ -107,7 +108,7 @@
                                             <xsl:otherwise>
                                                 <tr>
                                                     <td>
-                                                        <xsl:call-template name="show-nullFlavor">
+                                                        <xsl:call-template name="show-epSOSNullFlavor">
                                                             <xsl:with-param name="code" select="$pregnancyHistoryObservation/@nullFlavor"/>
                                                         </xsl:call-template>
                                                     </td>
@@ -150,7 +151,7 @@
                             </xsl:call-template>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:call-template name="show-nullFlavor">
+                            <xsl:call-template name="show-epSOSNullFlavor">
                                 <xsl:with-param name="code" select="$pregnancyExpectedDateNode/@nullFlavor"/>
                             </xsl:call-template>
                         </xsl:otherwise>
@@ -160,7 +161,7 @@
             <xsl:otherwise>
                 <tr>
                     <td>
-                        <xsl:call-template name="show-nullFlavor">
+                        <xsl:call-template name="show-epSOSNullFlavor">
                             <xsl:with-param name="code" select="$pregHistAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

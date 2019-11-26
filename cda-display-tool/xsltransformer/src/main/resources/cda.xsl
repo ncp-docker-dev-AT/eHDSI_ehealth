@@ -3,6 +3,7 @@
 
     <!-- global variable title -->
     <xsl:import href="common/cdaCommon.xsl"/>
+    <xsl:import href="common/mvc.xsl"/>
     <xsl:import href="ps/ps.xsl"/>
     <xsl:import href="ep/ep.xsl"/>
     <!--<xsl:import href="mro/mro.xsl"/>-->

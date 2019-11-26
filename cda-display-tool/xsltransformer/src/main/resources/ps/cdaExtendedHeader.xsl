@@ -111,7 +111,7 @@
                 <!-- Patient Contact Info-->
                 <tr>
                     <th colspan="2">
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'51'"/>
                         </xsl:call-template>
                     </th>
@@ -123,7 +123,7 @@
                         <table class="contact_information_table">
                             <tr>
                                 <th>
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'12'"/>
                                     </xsl:call-template>
                                 </th>
@@ -149,7 +149,7 @@
                 <tr>
                     <th colspan="2">
                         <!-- Preferred HCP/Legal organization to contact-->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'54'"/>
                         </xsl:call-template>
                     </th>
@@ -172,7 +172,7 @@
                         <table class="contact_information_table">
                             <tr>
                                 <th>
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'12'"/>
                                     </xsl:call-template>
                                 </th>
@@ -230,7 +230,7 @@
                     <tr>
                         <th colspan="2">
                             <!-- Author (HCP) -->
-                            <xsl:call-template name="show-displayLabels">
+                            <xsl:call-template name="show-epSOSDisplayLabels">
                                 <xsl:with-param name="code" select="'7'"/>
                             </xsl:call-template>
                         </th>
@@ -260,7 +260,7 @@
                             <table class="contact_information_table">
                                 <tr>
                                     <th>
-                                        <xsl:call-template name="show-displayLabels">
+                                        <xsl:call-template name="show-epSOSDisplayLabels">
                                             <xsl:with-param name="code" select="'12'"/>
                                         </xsl:call-template>
                                     </th>
@@ -296,7 +296,7 @@
                 <tr>
                     <th colspan="2">
                         <!-- Authoring Device -->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'8'"/>
                         </xsl:call-template>
                     </th>
@@ -311,7 +311,7 @@
                         <table class="contact_information_table">
                             <tr>
                                 <th>
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'12'"/>
                                     </xsl:call-template>
                                 </th>
@@ -341,7 +341,7 @@
                 <tr>
                     <th colspan="2">
                         <!-- Legal Authenticator-->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'40'"/>
                         </xsl:call-template>
                     </th>
@@ -358,7 +358,7 @@
                         <table class="contact_information_table">
                             <tr>
                                 <th>
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'12'"/>
                                     </xsl:call-template>
                                 </th>
@@ -394,7 +394,7 @@
                 <tr>
                     <th colspan="2">
                         <!-- Other Contacts-->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'49'"/>
                         </xsl:call-template>
                     </th>
@@ -418,7 +418,7 @@
                         <table class="contact_information_table">
                             <tr>
                                 <th>
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'12'"/>
                                     </xsl:call-template>
                                 </th>
@@ -458,7 +458,7 @@
                 <tr>
                     <th colspan="2">
                         <!-- Guardian-->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'35'"/>
                         </xsl:call-template>
                     </th>
@@ -472,7 +472,7 @@
                         <table class="contact_information_table">
                             <tr>
                                 <th>
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'12'"/>
                                     </xsl:call-template>
                                 </th>
@@ -498,7 +498,7 @@
                 <tr>
                     <th colspan="2">
                         <!-- Custodian-->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'16'"/>
                         </xsl:call-template>
                     </th>
@@ -512,7 +512,7 @@
                             <tr>
                                 <th>
                                     <!-- Contact Information -->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'12'"/>
                                     </xsl:call-template>
                                 </th>

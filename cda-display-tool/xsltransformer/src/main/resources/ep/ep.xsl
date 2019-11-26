@@ -67,7 +67,7 @@
         <xsl:param name="showValue"/>
         <xsl:choose>
             <xsl:when test="($medPackage/@nullFlavor)">
-                <xsl:call-template name="show-nullFlavor">
+                <xsl:call-template name="show-epSOSNullFlavor">
                     <xsl:with-param name="code" select="($medPackage)/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -80,7 +80,7 @@
                 <xsl:text> </xsl:text>
                 <xsl:choose>
                     <xsl:when test="($medPackage/@unit)='1'">
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'77'"/>
                         </xsl:call-template>
                     </xsl:when>
@@ -139,7 +139,7 @@
                 <xsl:value-of select="$parameter"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="show-nullFlavor">
+                <xsl:call-template name="show-epSOSNullFlavor">
                     <xsl:with-param name="code" select="$parameter/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:otherwise>
@@ -161,7 +161,7 @@
                         <xsl:value-of select="$parameter/@displayName"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-nullFlavor">
+                        <xsl:call-template name="show-epSOSNullFlavor">
                             <xsl:with-param name="code" select="$parameter/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -185,7 +185,7 @@
             <input id="collapsible-patient-header" class="toggle" type="checkbox" checked="true"/>
             <label for="collapsible-patient-header" class="lbl-toggle-main">
                 <!-- Patient-->
-                <xsl:call-template name="show-displayLabels">
+                <xsl:call-template name="show-epSOSDisplayLabels">
                     <xsl:with-param name="code" select="'51'"/>
                 </xsl:call-template>
             </label>
@@ -203,7 +203,7 @@
             <tbody>
                 <tr class="td_creation_date">
                     <th>
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'58'"/>
                         </xsl:call-template>
                     </th>
@@ -211,7 +211,7 @@
                         <xsl:value-of select="$prescriptionID"/>
                     </td>
                     <th>
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'20'"/>
                         </xsl:call-template>
                     </th>
