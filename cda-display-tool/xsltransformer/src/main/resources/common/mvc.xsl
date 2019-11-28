@@ -13,9 +13,9 @@
 
     <!-- eHDSI-AbsentOrUnknownAllergies -->
     <xsl:template name="show-eHDSI-AbsentOrUnknownAllergies">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.47.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
         </xsl:call-template>
@@ -23,9 +23,9 @@
 
     <!-- eHDSI-AbsentOrUnknownDevices -->
     <xsl:template name="show-eHDSI-AbsentOrUnknownDevices">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.48.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
         </xsl:call-template>
@@ -33,9 +33,9 @@
 
     <!-- eHDSI-AbsentOrUnknownMedication -->
     <xsl:template name="show-eHDSI-AbsentOrUnknownMedication">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.49.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
         </xsl:call-template>
@@ -43,9 +43,9 @@
 
     <!-- eHDSI-AbsentOrUnknownProblems -->
     <xsl:template name="show-eHDSI-AbsentOrUnknownProblems">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.50.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
         </xsl:call-template>
@@ -53,9 +53,9 @@
 
     <!-- eHDSI-AbsentOrUnknownProcedures -->
     <xsl:template name="show-eHDSI-AbsentOrUnknownProcedures">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.51.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
         </xsl:call-template>
@@ -63,9 +63,9 @@
 
     <!-- epSOSActiveIngredient -->
     <xsl:template name="show-epSOSActiveIngredient">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.24.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.73'"/>
         </xsl:call-template>
@@ -73,9 +73,9 @@
 
     <!-- epSOSAdministrativeGender -->
     <xsl:template name="show-epSOSAdministrativeGender">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.34.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1'"/>
         </xsl:call-template>
@@ -83,9 +83,9 @@
 
     <!-- epSOSAdverseEventType -->
     <xsl:template name="show-epSOSAdverseEventType">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.18.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
@@ -93,9 +93,9 @@
 
     <!-- epSOSAllergenNoDrugs -->
     <xsl:template name="show-epSOSAllergenNoDrugs">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.19.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
@@ -103,9 +103,9 @@
 
     <!-- epSOSBloodGroup -->
     <xsl:template name="show-epSOSBloodGroup">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.20.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
@@ -123,9 +123,9 @@
 
     <!-- epSOSCodeProb -->
     <xsl:template name="show-epSOSCodeProb">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.23.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
@@ -133,9 +133,9 @@
 
     <!-- epSOSConfidentiality -->
     <xsl:template name="show-epSOSConfidentiality">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.31.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.25'"/>
         </xsl:call-template>
@@ -143,9 +143,9 @@
 
     <!-- epSOSCountry -->
     <xsl:template name="show-epSOSCountry">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.4.xml'"/>
             <xsl:with-param name="codeSystem" select="'1.0.3166.1'"/>
         </xsl:call-template>
@@ -164,7 +164,6 @@
                       select="$foundKey/designation[@lang=$defaultUserLang]"/>
         <xsl:choose>
             <xsl:when test="not ($foundKey)">
-                <!-- if the key is not found then display the key itself -->
                 <xsl:value-of select="$code"/>
             </xsl:when>
             <xsl:otherwise>
@@ -182,9 +181,9 @@
 
     <!-- epSOSDocumentCode -->
     <xsl:template name="show-epSOSDocumentCode">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.32.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.1'"/>
         </xsl:call-template>
@@ -192,19 +191,19 @@
 
     <!-- epSOSDoseForm -->
     <xsl:template name="show-epSOSDoseForm">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.2.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.2.9.6.2.7'"/>
+            <xsl:with-param name="codeSystem" select="'0.4.0.127.0.16.1.1.2.1'"/>
         </xsl:call-template>
     </xsl:template>
 
     <!-- epSOSHealthcareProfessionalRoles -->
     <xsl:template name="show-epSOSHealthcareProfessionalRoles">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.1.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.2.9.6.2.7'"/>
         </xsl:call-template>
@@ -212,9 +211,9 @@
 
     <!-- epSOSIllnessesandDisorders -->
     <xsl:template name="show-epSOSIllnessesandDisorders">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.5.xml'"/>
             <xsl:with-param name="codeSystem" select="'1.3.6.1.4.1.12559.11.10.1.3.1.44.2'"/>
         </xsl:call-template>
@@ -222,9 +221,9 @@
 
     <!-- epSOSLanguage -->
     <xsl:template name="show-epSOSLanguage">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.6.xml'"/>
             <xsl:with-param name="codeSystem" select="'1dd183a6-6d2b-4a9d-8f5d-be09d6bb5a6e'"/>
         </xsl:call-template>
@@ -232,9 +231,9 @@
 
     <!-- epSOSMedicalDevices -->
     <xsl:template name="show-epSOSMedicalDevices">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.8.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
@@ -257,9 +256,9 @@
 
     <!-- epSOSPackage -->
     <xsl:template name="show-epSOSPackage">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.3.xml'"/>
             <xsl:with-param name="codeSystem" select="'0.4.0.127.0.16.1.1.2.1'"/>
         </xsl:call-template>
@@ -267,9 +266,9 @@
 
     <!-- epSOSPersonalRelationship -->
     <xsl:template name="show-epSOSPersonalRelationship">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.38.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.111'"/>
         </xsl:call-template>
@@ -277,9 +276,9 @@
 
     <!-- epSOSPregnancyInformation -->
     <xsl:template name="show-epSOSPregnancyInformation">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.9.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.1'"/>
         </xsl:call-template>
@@ -287,9 +286,9 @@
 
     <!-- epSOSProcedures -->
     <xsl:template name="show-epSOSProcedures">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.10.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
@@ -297,9 +296,9 @@
 
     <!-- epSOSReactionAllergy -->
     <xsl:template name="show-epSOSReactionAllergy">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.11.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
@@ -307,9 +306,9 @@
 
     <!-- epSOSResolutionOutcome -->
     <xsl:template name="show-epSOSResolutionOutcome">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.30.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
@@ -317,9 +316,9 @@
 
     <!-- epSOSRoleClass -->
     <xsl:template name="show-epSOSRoleClass">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.39.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.110'"/>
         </xsl:call-template>
@@ -327,9 +326,9 @@
 
     <!-- epSOSRouteOfAdministration -->
     <xsl:template name="show-epSOSRouteOfAdministration">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.12.xml'"/>
             <xsl:with-param name="codeSystem" select="'0.4.0.127.0.16.1.1.2.1'"/>
         </xsl:call-template>
@@ -347,9 +346,9 @@
 
     <!-- epSOSSeverity -->
     <xsl:template name="show-epSOSSeverity">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.13.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
@@ -357,19 +356,19 @@
 
     <!-- epSOSSocialHistory -->
     <xsl:template name="show-epSOSSocialHistory">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.14.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSStatusCode -->
+    <!-- epSOSStatusnode -->
     <xsl:template name="show-epSOSStatusCode">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.15.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
@@ -377,9 +376,9 @@
 
     <!-- epSOSSubstitutionCode -->
     <xsl:template name="show-epSOSSubstitutionCode">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.7.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1070'"/>
         </xsl:call-template>
@@ -387,9 +386,9 @@
 
     <!-- epSOSTelecomAddress -->
     <xsl:template name="show-epSOSTelecomAddress">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.40.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1119'"/>
         </xsl:call-template>
@@ -397,9 +396,9 @@
 
     <!-- epSOSTimingEvent -->
     <xsl:template name="show-epSOSTimingEvent">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.41.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.139'"/>
         </xsl:call-template>
@@ -417,12 +416,46 @@
 
     <!-- epSOSVaccine -->
     <xsl:template name="show-epSOSVaccine">
-        <xsl:param name="code"/>
-        <xsl:call-template name="show-code-value">
-            <xsl:with-param name="code" select="$code"/>
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.28.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template name="show-codedElement">
+        <xsl:param name="node"/>
+        <xsl:param name="xmlFile"/>
+        <xsl:param name="codeSystem"/>
+
+        <xsl:choose>
+        <xsl:when test="not($node/@nullFlavor)">
+            <xsl:choose>
+                <xsl:when test="$node/@code">
+                    <xsl:call-template name="show-code-value">
+                        <xsl:with-param name="code" select="$node/@code"/>
+                        <xsl:with-param name="xmlFile" select="$xmlFile"/>
+                        <xsl:with-param name="codeSystem" select="$codeSystem"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- narrative -->
+                    <xsl:if test="$node/n1:originalText/n1:reference/@value">
+                        <xsl:call-template name="show-uncodedElement">
+                            <xsl:with-param name="code"
+                                            select="$node/n1:originalText/n1:reference/@value"/>
+                        </xsl:call-template>
+                    </xsl:if>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:with-param name="code" select="$node/@nullFlavor"/>
+            </xsl:call-template>
+        </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <!-- display translated code value -->

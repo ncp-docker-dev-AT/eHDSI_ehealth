@@ -216,8 +216,8 @@
                         </xsl:call-template>
                     </th>
                     <td>
-                        <xsl:call-template name="show-time">
-                            <xsl:with-param name="datetime" select="/n1:ClinicalDocument/n1:author/n1:time"/>
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="/n1:ClinicalDocument/n1:author/n1:time"/>
                         </xsl:call-template>
                     </td>
                 </tr>

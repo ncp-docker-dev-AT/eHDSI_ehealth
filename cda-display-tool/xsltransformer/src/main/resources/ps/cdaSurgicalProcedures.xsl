@@ -157,44 +157,15 @@
                         <tr>
                             <td>
                                 <!--  Procedure -->
-                                <xsl:choose>
-                                    <xsl:when test="not ($surgicalProcedureCode/@nullFlavor)">
-                                        <xsl:choose>
-                                            <xsl:when test="$surgicalProcedureCode/@displayName">
-                                                <xsl:value-of select="$surgicalProcedureCode/@displayName"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <!--  uncoded element only if we don;t have displayName -->
-                                                <xsl:if test="$surgicalProcedureCode/n1:originalText/n1:reference/@value">
-                                                    <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="code"
-                                                                        select="$surgicalProcedureCode/n1:originalText/n1:reference/@value"/>
-                                                    </xsl:call-template>
-                                                </xsl:if>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:call-template name="show-epSOSNullFlavor">
-                                            <xsl:with-param name="code" select="$surgicalProcedureCode/@nullFlavor"/>
-                                        </xsl:call-template>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <xsl:call-template name="show-epSOSProcedures">
+                                    <xsl:with-param name="node" select="$surgicalProcedureCode"/>
+                                </xsl:call-template>
                             </td>
                             <td>
                                 <!--  Procedure Date -->
-                                <xsl:choose>
-                                    <xsl:when test="$surgicalProcedureDate/@low">
-                                        <xsl:call-template name="show-time">
-                                            <xsl:with-param name="datetime" select="$surgicalProcedureDate/@low"/>
-                                        </xsl:call-template>&#160;
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:call-template name="show-time">
-                                            <xsl:with-param name="datetime" select="$surgicalProcedureDate"/>
-                                        </xsl:call-template>&#160;
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <xsl:call-template name="show-IVL_TS">
+                                    <xsl:with-param name="node" select="$surgicalProcedureDate"/>
+                                </xsl:call-template>
                             </td>
                         </tr>
                     </xsl:otherwise>

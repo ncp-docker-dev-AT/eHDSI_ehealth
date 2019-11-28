@@ -35,8 +35,8 @@
                         </xsl:call-template>
                     </th>
                     <td>
-                        <xsl:call-template name="show-time">
-                            <xsl:with-param name="datetime" select="$creationDate"/>
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$creationDate"/>
                         </xsl:call-template>
                     </td>
                     <th>
@@ -46,8 +46,8 @@
                         </xsl:call-template>
                     </th>
                     <td>
-                        <xsl:call-template name="show-time">
-                            <xsl:with-param name="datetime" select="$lastUpdate"/>
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$lastUpdate"/>
                         </xsl:call-template>
                     </td>
                     <th>
@@ -139,8 +139,8 @@
                                     </xsl:call-template>
                                 </th>
                                 <td>
-                                    <xsl:call-template name="show-time">
-                                        <xsl:with-param name="datetime" select="$birthdate"/>
+                                    <xsl:call-template name="show-TS">
+                                        <xsl:with-param name="node" select="$birthdate"/>
                                     </xsl:call-template>&#160;
                                 </td>
                             </tr>

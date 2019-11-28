@@ -153,37 +153,17 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <tr>
-                            <!-- Device Implant -->
                             <td>
-                                <xsl:choose>
-                                    <xsl:when test="not ($medDeviceImplantDescription/@nullFlavor)">
-                                        <xsl:choose>
-                                            <xsl:when test="$medDeviceImplantDescription/@displayLabel">
-                                                <xsl:value-of select="$medDeviceImplantDescription/@displayLabel"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <!-- uncoded element Problem -->
-                                                <xsl:if test="$medDeviceImplantDescription/n1:originalText/n1:reference/@value">
-                                                    <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="code"
-                                                                        select="$medDeviceImplantDescription/n1:originalText/n1:reference/@value"/>
-                                                    </xsl:call-template>
-                                                </xsl:if>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:call-template name="show-epSOSNullFlavor">
-                                            <xsl:with-param name="code" select="$medDeviceImplantDescription/@nullFlavor"/>
-                                        </xsl:call-template>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <!-- Device Implant -->
+                                <xsl:call-template name="show-epSOSMedicalDevices">
+                                    <xsl:with-param name="node" select="$medDeviceImplantDescription"/>
+                                </xsl:call-template>
                             </td>
-                            <!-- Implant Date -->
                             <td>
-                                <xsl:call-template name="show-time">
-                                    <xsl:with-param name="datetime" select="$medDeviceImplantDate"/>
-                                </xsl:call-template>&#160;
+                                <!-- Implant Date -->
+                                <xsl:call-template name="show-TS">
+                                    <xsl:with-param name="node" select="$medDeviceImplantDate"/>
+                                </xsl:call-template>
                             </td>
                         </tr>
                     </xsl:otherwise>

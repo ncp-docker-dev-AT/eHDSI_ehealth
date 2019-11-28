@@ -125,73 +125,41 @@
     <!-- FOR EACH ENTRY -->
     <xsl:template name="historyIllnessSectionEntry">
         <!-- Defing all needed variables -->
-        <xsl:variable
-                name="historyIllnessClosedProblemNode"
-                select="n1:act/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value"/>
-        <xsl:variable
-                name="historyIllnessClosedProblem"
-                select="n1:act/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value/@displayName"/>
-        <xsl:variable
-                name="historyIllnessClosedProblemID"
-                select="n1:act/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value/@code"/>
-        <xsl:variable
-                name="historyIllnessOnSetDate"
-                select="n1:act/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:effectiveTime/n1:low"/>
-        <xsl:variable
-                name="historyIllnessEndDate"
-                select="n1:act/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:effectiveTime/n1:high"/>
-        <xsl:variable
-                name="nullEntry"
-                select="."/>
-        <xsl:variable name="historyAct"
-                      select="n1:act"/>
+        <xsl:variable name="problemCondition"
+                      select="n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value"/>
+        <xsl:variable name="historyIllnessOnSetDate"
+                      select="n1:act/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:effectiveTime/n1:low"/>
+        <xsl:variable name="historyIllnessEndDate"
+                      select="n1:act/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:effectiveTime/n1:high"/>
         <!-- End definition of variables-->
 
         <!-- nullflavored act -->
         <xsl:choose>
-            <xsl:when test="not($historyAct/@nullFlavor)">
+            <xsl:when test="not(n1:act/@nullFlavor)">
                 <xsl:choose>
-                    <xsl:when test="($historyIllnessClosedProblemID='no-known-problems' or $historyIllnessClosedProblemID='no-problem-info')">
+                    <xsl:when test="($problemCondition='no-known-problems' or $problemCondition='no-problem-info')">
                         <xsl:call-template name="show-eHDSI-AbsentOrUnknownProblems">
-                            <xsl:with-param name="code" select="$historyIllnessClosedProblemID"/>
+                            <xsl:with-param name="code" select="$problemCondition/@code"/>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
                         <tr>
                             <td>
-                                <xsl:choose>
-                                    <xsl:when test="not ($historyIllnessClosedProblemNode/@nullFlavor)">
-                                        <xsl:choose>
-                                            <xsl:when test="$historyIllnessClosedProblem">
-                                                <xsl:value-of select="$historyIllnessClosedProblem"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <!-- uncoded element Problem -->
-                                                <xsl:if test="$historyIllnessClosedProblemNode/n1:originalText/n1:reference/@value">
-                                                    <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="code"
-                                                                        select="$historyIllnessClosedProblemNode/n1:originalText/n1:reference/@value"/>
-                                                    </xsl:call-template>
-                                                </xsl:if>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:call-template name="show-epSOSNullFlavor">
-                                            <xsl:with-param name="code"
-                                                            select="$historyIllnessClosedProblemNode/@nullFlavor"/>
-                                        </xsl:call-template>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <!-- Closed/Inactive problem -->
+                                <xsl:call-template name="show-epSOSIllnessesandDisorders">
+                                    <xsl:with-param name="node" select="$problemCondition"/>
+                                </xsl:call-template>
                             </td>
                             <td>
-                                <xsl:call-template name="show-time">
-                                    <xsl:with-param name="datetime" select="$historyIllnessOnSetDate"/>
+                                <!-- Onset Date -->
+                                <xsl:call-template name="show-TS">
+                                    <xsl:with-param name="node" select="$historyIllnessOnSetDate"/>
                                 </xsl:call-template>&#160;
                             </td>
                             <td>
-                                <xsl:call-template name="show-time">
-                                    <xsl:with-param name="datetime" select="$historyIllnessEndDate"/>
+                                <!-- End Date -->
+                                <xsl:call-template name="show-TS">
+                                    <xsl:with-param name="node" select="$historyIllnessEndDate"/>
                                 </xsl:call-template>&#160;
                             </td>
                         </tr>
@@ -202,7 +170,7 @@
                 <tr>
                     <td colspan="3">
                         <xsl:call-template name="show-epSOSNullFlavor">
-                            <xsl:with-param name="code" select="$historyAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="n1:act/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

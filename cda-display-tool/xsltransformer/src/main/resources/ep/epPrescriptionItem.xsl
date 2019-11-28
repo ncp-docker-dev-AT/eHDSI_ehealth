@@ -430,14 +430,14 @@
                             </xsl:call-template>
                         </td>
                         <td colspan="2">
-                            <xsl:call-template name="show-time">
-                                <xsl:with-param name="datetime"
+                            <xsl:call-template name="show-TS">
+                                <xsl:with-param name="node"
                                                 select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:low"/>
                             </xsl:call-template>
                         </td>
                         <td>
-                            <xsl:call-template name="show-time">
-                                <xsl:with-param name="datetime"
+                            <xsl:call-template name="show-TS">
+                                <xsl:with-param name="node"
                                                 select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:high"/>
                             </xsl:call-template>
                         </td>

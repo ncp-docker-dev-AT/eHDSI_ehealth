@@ -65,8 +65,8 @@
                             <xsl:value-of select="n1:patient/n1:name/n1:given"/>
                         </td>
                         <td>
-                            <xsl:call-template name="show-time">
-                                <xsl:with-param name="datetime" select="n1:patient/n1:birthTime"/>
+                            <xsl:call-template name="show-TS">
+                                <xsl:with-param name="node" select="n1:patient/n1:birthTime"/>
                             </xsl:call-template>
                         </td>
                         <td>

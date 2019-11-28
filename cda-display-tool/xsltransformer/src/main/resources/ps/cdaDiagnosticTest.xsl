@@ -118,7 +118,7 @@
                 select="n1:observation/n1:code[@code='34530-6']/../n1:effectiveTime"/>
         <xsl:variable
                 name="bloodGroup"
-                select="n1:observation/n1:code[@code='34530-6']/../n1:value/@code"/>
+                select="n1:observation/n1:code[@code='34530-6']/../n1:value"/>
         <xsl:variable
                 name="nullEntry"
                 select="."/>
@@ -129,13 +129,13 @@
             <xsl:when test="not($nullEntry/@nullFlavor)">
                 <tr>
                     <td>
-                        <xsl:call-template name="show-time">
-                            <xsl:with-param name="datetime" select="$diagnosticDate"/>
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$diagnosticDate"/>
                         </xsl:call-template>
                     </td>
                     <td>
                         <xsl:call-template name="show-epSOSBloodGroup">
-                            <xsl:with-param name="code" select="$bloodGroup"/>
+                            <xsl:with-param name="node" select="$bloodGroup"/>
                         </xsl:call-template>
                     </td>
                 </tr>

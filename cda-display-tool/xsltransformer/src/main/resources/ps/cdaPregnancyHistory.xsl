@@ -13,7 +13,7 @@
     <xsl:template name="pregnancyHistory" match="/n1:ClinicalDocument/n1:component/n1:structuredBody">
 
         <xsl:choose>
-            <!-- if we have at least one pregnancy history section -->
+            <!-- if there is at least one pregnancy history section -->
             <xsl:when test="($pregnancyHistoryExist)">
                 <xsl:for-each select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section">
                     <xsl:call-template name="pregnancyHistorySection"/>
@@ -81,22 +81,9 @@
                                                     <tbody>
                                                         <tr>
                                                             <th>
-                                                                <xsl:choose>
-                                                                    <xsl:when test="$pregnancyHistoryObservation/n1:code/@code">
-                                                                        <xsl:call-template name="show-epSOSPregnancyInformation">
-                                                                            <xsl:with-param name="code" select="$pregnancyHistoryObservation/n1:code/@code"/>
-                                                                        </xsl:call-template>
-                                                                    </xsl:when>
-                                                                    <xsl:otherwise>
-                                                                        <!-- uncoded element Problem -->
-                                                                        <xsl:if test="$pregnancyHistoryObservation/n1:value/n1:originalText/n1:reference/@value">
-                                                                            <xsl:call-template name="show-uncodedElement">
-                                                                                <xsl:with-param name="code"
-                                                                                                select="$pregnancyHistoryObservation/n1:value/n1:originalText/n1:reference/@value"/>
-                                                                            </xsl:call-template>
-                                                                        </xsl:if>
-                                                                    </xsl:otherwise>
-                                                                </xsl:choose>
+                                                                <xsl:call-template name="show-epSOSPregnancyInformation">
+                                                                    <xsl:with-param name="node" select="$pregnancyHistoryObservation/n1:code"/>
+                                                                </xsl:call-template>
                                                             </th>
                                                             <xsl:for-each select="$pregnancyHistoryObservation">
                                                                 <xsl:call-template name="pregnancyHistorySectionEntry"/>
@@ -129,44 +116,16 @@
     <xsl:template name="pregnancyHistorySectionEntry">
 
         <!-- Defining all needed variables -->
-        <xsl:variable
-                name="pregnancyExpectedDate"
-                select="n1:value[@xsi:type='TS' or substring-after(@xsi:type, ':')='TS']"/>
+        <xsl:variable name="pregHistAct"
+                      select="n1:observation"/>
         <xsl:variable
                 name="pregnancyExpectedDateNode"
                 select="n1:value"/>
-        <xsl:variable name="pregHistAct"
-                      select="n1:observation"/>
         <!-- End definition of variables-->
-
-
-        <!-- nullflavored act -->
-        <xsl:choose>
-            <xsl:when test="not($pregHistAct/@nullFlavor)">
-                <td>
-                    <xsl:choose>
-                        <xsl:when test="not ($pregnancyExpectedDateNode/@nullFlavor)">
-                            <xsl:call-template name="show-time">
-                                <xsl:with-param name="datetime" select="$pregnancyExpectedDate"/>
-                            </xsl:call-template>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:call-template name="show-epSOSNullFlavor">
-                                <xsl:with-param name="code" select="$pregnancyExpectedDateNode/@nullFlavor"/>
-                            </xsl:call-template>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </td>
-            </xsl:when>
-            <xsl:otherwise>
-                <tr>
-                    <td>
-                        <xsl:call-template name="show-epSOSNullFlavor">
-                            <xsl:with-param name="code" select="$pregHistAct/@nullFlavor"/>
-                        </xsl:call-template>
-                    </td>
-                </tr>
-            </xsl:otherwise>
-        </xsl:choose>
+        <td>
+            <xsl:call-template name="show-TS">
+                <xsl:with-param name="node" select="$pregnancyExpectedDateNode"/>
+            </xsl:call-template>
+        </td>
     </xsl:template>
 </xsl:stylesheet>

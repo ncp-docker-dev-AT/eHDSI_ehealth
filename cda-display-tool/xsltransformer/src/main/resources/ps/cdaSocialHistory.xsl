@@ -139,15 +139,11 @@
     <!--Social  History  Section Entry-->
     <xsl:template name="socialHistorySectionEntry">
         <!-- Defining all needed variables -->
+        <xsl:variable name="socHistAct"
+                      select="n1:observation"/>
         <xsl:variable
                 name="socialHistoryObservationType"
-                select="n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:code/@displayName"/>
-        <xsl:variable
-                name="socialHistoryObservationTypeTranslation1"
-                select="n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:code/n1:translation/n1:translation/@displayName"/>
-        <xsl:variable
-                name="socialHistoryObservationTypeTranslation2"
-                select="n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:code/n1:translation/@displayName"/>
+                select="n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:code"/>
         <xsl:variable
                 name="socialHistoryDateFrom"
                 select="n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:effectiveTime/n1:low"/>
@@ -155,19 +151,8 @@
                 name="socialHistoryDateTo"
                 select="n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:effectiveTime/n1:high"/>
         <xsl:variable
-                name="socialHistoryObservationValueXsi"
-                select="n1:observation/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:value"/>
-        <xsl:variable
                 name="socialHistoryObservationValue"
-                select="n1:observation/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:value[@xsi:type='PQ' or substring-after(@xsi:type, ':')='PQ']/@value"/>
-        <xsl:variable
-                name="socialHistoryObservationValueUnit"
-                select="n1:observation/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:value[@xsi:type='PQ' or substring-after(@xsi:type, ':')='PQ']/@unit"/>
-        <xsl:variable
-                name="nullEntry"
-                select="."/>
-        <xsl:variable name="socHistAct"
-                      select="n1:observation"/>
+                select="n1:observation/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.13.4']/../n1:value"/>
         <!-- End definition of variables-->
 
         <!-- nullflavored act -->
@@ -175,44 +160,28 @@
             <xsl:when test="not($socHistAct/@nullFlavor)">
                 <tr>
                     <td>
-                        <xsl:value-of select="$socialHistoryObservationType"/>
+                        <!-- Observation Type -->
+                        <xsl:call-template name="show-epSOSSocialHistory">
+                            <xsl:with-param name="node" select="$socialHistoryObservationType"/>
+                        </xsl:call-template>
                     </td>
                     <td>
-                        <xsl:call-template name="show-time">
-                            <xsl:with-param name="datetime" select="$socialHistoryDateFrom"/>
-                        </xsl:call-template>&#160;
+                        <!-- Date From -->
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$socialHistoryDateFrom"/>
+                        </xsl:call-template>
                     </td>
                     <td>
-                        <xsl:call-template name="show-time">
-                            <xsl:with-param name="datetime" select="$socialHistoryDateTo"/>
-                        </xsl:call-template>&#160;
+                        <!-- Date To -->
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$socialHistoryDateTo"/>
+                        </xsl:call-template>
                     </td>
                     <td>
-
-                        <xsl:choose>
-                            <xsl:when test="not ($socialHistoryObservationValueXsi/@nullFlavor)">
-                                <xsl:choose>
-                                    <xsl:when test="$socialHistoryObservationValue and $socialHistoryObservationValueUnit">
-                                        <xsl:value-of select="$socialHistoryObservationValue"/>&#160;
-                                        <xsl:value-of select="$socialHistoryObservationValueUnit"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <!-- uncoded element Problem -->
-                                        <xsl:if test="$socialHistoryObservationValueXsi/n1:originalText/n1:reference/@value">
-                                            <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="code"
-                                                                select="$socialHistoryObservationValueXsi/n1:originalText/n1:reference/@value"/>
-                                            </xsl:call-template>
-                                        </xsl:if>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:call-template name="show-epSOSNullFlavor">
-                                    <xsl:with-param name="code" select="$socialHistoryObservationValueXsi/@nullFlavor"/>
-                                </xsl:call-template>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <!-- Observation Value -->
+                        <xsl:call-template name="show-PQ">
+                            <xsl:with-param name="node" select="$socialHistoryObservationValue"/>
+                        </xsl:call-template>
                     </td>
                 </tr>
             </xsl:when>
