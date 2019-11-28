@@ -892,11 +892,14 @@
                             <xsl:with-param name="code" select="'113'"/>
                         </xsl:call-template>
                     </th>
-                    <th><xsl:value-of select="$activeIngredientName"/></th>
-                    <th>
-                        <!-- Name -->
+                    <th><!-- Name -->
                         <xsl:call-template name="show-displayLabels">
                             <xsl:with-param name="code" select="'114'"/>
+                        </xsl:call-template></th>
+                    <th>
+                        <!-- Strength -->
+                        <xsl:call-template name="show-displayLabels">
+                            <xsl:with-param name="code" select="'70'"/>
                         </xsl:call-template>
                     </th>
                 </tr>

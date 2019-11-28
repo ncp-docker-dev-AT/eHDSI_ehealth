@@ -67,12 +67,11 @@ public class DisplayTest {
         } catch (IOException e) {
             LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
-
     }
 
     @Test
     public void runFile() throws Exception {
-        fileTest("cda-display-tool/xsltransformer/samples/pt_ps_friendly.xml", TRANSFORMATION.WithOutputAndDefinedPath);
+        fileTest("cda-display-tool/xsltransformer/samples/IE2FI_539305450001604603_eP_friendly.xml", TRANSFORMATION.WithOutputAndDefinedPath);
     }
 
     @Test

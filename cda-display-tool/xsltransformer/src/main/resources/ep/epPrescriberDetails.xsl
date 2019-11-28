@@ -84,8 +84,9 @@
             <input id="collapsible-prescriber-header" class="toggle" type="checkbox"/>
             <label for="collapsible-prescriber-header" class="lbl-toggle-main">
                 <!-- Prescriber -->
-                <!-- TODO This value should be specified in the epsosDisplayLabel value set -->
-                Prescriber
+                <xsl:call-template name="show-displayLabels">
+                    <xsl:with-param name="code" select="'56'"/>
+                </xsl:call-template>
             </label>
             <div class="collapsible-content-main">
                 <div class="content-inner-main">
