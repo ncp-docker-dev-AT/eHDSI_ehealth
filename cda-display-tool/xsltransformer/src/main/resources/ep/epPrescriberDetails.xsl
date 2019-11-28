@@ -151,7 +151,9 @@
                                                         <xsl:with-param name="code" select="'69'"/>
                                                     </xsl:call-template>
                                                 </th>
-                                                <td></td>
+                                                    <xsl:value-of select="/ClinicalDocument/author/assignedAuthor/code/@displayName"/>
+                                                <td>
+                                                </td>
                                                 <th>
                                                     <!--  Contact Information: -->
                                                     <xsl:call-template name="show-epSOSDisplayLabels">
@@ -175,7 +177,7 @@
                                                 <td>
                                                     <xsl:call-template name="facilityId">
                                                         <xsl:with-param name="id"
-                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:id"/>
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:id"/>
                                                     </xsl:call-template>
                                                 </td>
                                                 <th>
@@ -187,7 +189,7 @@
                                                 <td>
                                                     <xsl:call-template name="facilityName">
                                                         <xsl:with-param name="name"
-                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
                                                     </xsl:call-template>
                                                 </td>
                                             </tr>
@@ -201,7 +203,7 @@
                                                 <td>
                                                     <xsl:call-template name="country">
                                                         <xsl:with-param name="name"
-                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr/n1:country"/>
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr/n1:country"/>
                                                     </xsl:call-template>
                                                 </td>
                                                 <th>
@@ -211,9 +213,8 @@
                                                     </xsl:call-template>
                                                 </th>
                                                 <td>
-                                                    <xsl:call-template name="country">
-                                                        <xsl:with-param name="name"
-                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr"/>
+                                                    <xsl:call-template name="show-address">
+                                                        <xsl:with-param name="address" select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr"/>
                                                     </xsl:call-template>
                                                 </td>
                                             </tr>
