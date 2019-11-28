@@ -84,7 +84,7 @@
             <input id="collapsible-prescriber-header" class="toggle" type="checkbox"/>
             <label for="collapsible-prescriber-header" class="lbl-toggle-main">
                 <!-- Prescriber -->
-                <xsl:call-template name="show-displayLabels">
+                <xsl:call-template name="show-epSOSDisplayLabels">
                     <xsl:with-param name="code" select="'56'"/>
                 </xsl:call-template>
             </label>

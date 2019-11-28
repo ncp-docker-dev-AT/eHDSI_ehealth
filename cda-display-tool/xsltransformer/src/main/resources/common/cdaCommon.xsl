@@ -13,11 +13,6 @@
     <xsl:param name="allowDispense" select="'false'"/>
     <xsl:param name="shownarrative" select="''"/>
 
-    <!-- TODO these values should be added to the epsosDisplayLabel valueSet -->
-    <xsl:variable name="activeIngredientCodeSystem" select="'Code System'"/>
-    <xsl:variable name="activeIngredientCode" select="'Code'"/>
-    <xsl:variable name="activeIngredientName" select="'Name'"/>
-
     <!-- show-id -->
     <xsl:template name="show-id">
         <xsl:param name="id"/>
