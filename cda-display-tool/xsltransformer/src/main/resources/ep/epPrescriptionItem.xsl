@@ -11,17 +11,6 @@
                 doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
 
-    <xsl:template name="strength">
-        <xsl:call-template name="show-strength">
-            <xsl:with-param name="medStrengthNumerator"
-                            select="epsos:numerator"/>
-            <xsl:with-param name="medStrengthDenominator"
-                            select="epsos:denominator"/>
-            <xsl:with-param name="medStrengthOriginalText"
-                            select="epsos:translation/epsos:originalText"/>
-        </xsl:call-template>
-    </xsl:template>
-
     <xsl:template name="package">
         <xsl:call-template name="show-package">
             <xsl:with-param name="medPackage"
@@ -156,12 +145,8 @@
             <td>
                 <xsl:choose>
                     <xsl:when test="not($code/@nullFlavor)">
-                        <xsl:value-of select="$code/@displayName"/>
-                    </xsl:when>
-                    <xsl:when
-                            test="$code/n1:originalText/n1:reference/@value">
-                        <xsl:call-template name="show-uncodedElement">
-                            <xsl:with-param name="code" select="$code/n1:originalText/n1:reference/@value"/>
+                        <xsl:call-template name="show-epSOSActiveIngredient">
+                            <xsl:with-param name="node" select="$code"/>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
@@ -185,9 +170,9 @@
                 </xsl:choose>
             </td>
             <td>
-                <xsl:for-each select="$strength">
-                    <xsl:call-template name="strength"/>
-                </xsl:for-each>
+                <xsl:call-template name="show-strength">
+                    <xsl:with-param name="node" select="$strength"/>
+                </xsl:call-template>
             </td>
         </tr>
     </xsl:template>
@@ -350,16 +335,16 @@
                                     </td>
                                 </tr>
                                 <xsl:if test="$additionalInfo">
-                                <tr>
-                                    <td>
-                                        <div class="tooltip">
-                                            <div class="additionalInfo">
-                                                <xsl:value-of select="$additionalInfo"/>
+                                    <tr>
+                                        <td>
+                                            <div class="tooltip">
+                                                <div class="additionalInfo">
+                                                    <xsl:value-of select="$additionalInfo"/>
+                                                </div>
+                                                <span class="tooltiptext">Additional info</span>
                                             </div>
-                                            <span class="tooltiptext">Additional info</span>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
                                 </xsl:if>
                             </table>
                         </td>
@@ -659,8 +644,8 @@
                         <td style="background-color:#ffffcc" colspan="{6+count($manufacturedMaterialStrength)}">
                             <!-- If substitution of brand name is ... -->
                             * <xsl:call-template name="show-epSOSDisplayLabels">
-                                <xsl:with-param name="code" select="'116'"/>
-                            </xsl:call-template>
+                            <xsl:with-param name="code" select="'116'"/>
+                        </xsl:call-template>
                         </td>
                         <td style="text-align:center;vertical-align:middle;">
                             <!--  Dispense -->
@@ -740,7 +725,9 @@
                                     <xsl:value-of select="position()-1"/>
                                 </xsl:attribute>
                                 <xsl:attribute name="value">
-                                    <xsl:call-template name="strength"/>
+                                    <xsl:call-template name="show-strength">
+                                        <xsl:with-param name="node" select="$strength"/>
+                                    </xsl:call-template>
                                 </xsl:attribute>
                             </input>
                             <input type="hidden">
@@ -861,12 +848,6 @@
                 <xsl:value-of select="'false'"/>
             </xsl:when>
         </xsl:choose>
-    </xsl:template>
-
-    <xsl:template name="show-strengths">
-        <xsl:for-each select="$strength">
-            <xsl:call-template name="strength"/>
-        </xsl:for-each>
     </xsl:template>
 
     <xsl:template name="show-active-ingredients">

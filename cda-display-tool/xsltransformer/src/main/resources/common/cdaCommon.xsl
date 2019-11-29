@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xmlns:epsos="urn:epsos-org:ep:medication"
                 version="1.0">
 
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
@@ -601,85 +602,79 @@
     </xsl:template>
 
     <xsl:template name="show-strength">
-        <xsl:param name="medStrengthNumerator"/>
-        <xsl:param name="medStrengthDenominator"/>
-        <xsl:param name="medStrengthOriginalText"/>
+        <xsl:param name="node"/>
 
-        <xsl:variable name="numeratorValue" select="$medStrengthNumerator/@value"/>
-        <xsl:variable name="numeratorUnit" select="$medStrengthNumerator/@unit"/>
-        <xsl:variable name="denominatorValue" select="$medStrengthDenominator/@value"/>
+        <xsl:variable name="numerator" select="$node/epsos:numerator"/>
+        <xsl:variable name="denominator" select="$node/epsos:denominator"/>
+        <xsl:variable name="numeratorValue" select="$numerator/@value"/>
+        <xsl:variable name="numeratorUnit" select="$numerator/@unit"/>
+        <xsl:variable name="denominatorValue" select="$denominator/@value"/>
+        <xsl:variable name="medStrengthOriginalText" select="$node/epsos:translation/epsos:originalText"/>
         <xsl:variable name="denominatorUnit">
             <xsl:call-template name="supportUCUMAnnotations">
-                <xsl:with-param name="value" select="$medStrengthDenominator/@unit"/>
+                <xsl:with-param name="value" select="$denominator/@unit"/>
             </xsl:call-template>
         </xsl:variable>
-
-        <table>
+        <xsl:choose>
+            <xsl:when test="($numerator/@nullFlavor)">
+                <xsl:call-template name="show-epSOSNullFlavor">
+                    <xsl:with-param name="code" select="$numerator/@nullFlavor"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="($denominator/@nullFlavor)">
+                <xsl:value-of select="$numeratorValue"/>
+                <xsl:text> </xsl:text>
+                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:text> </xsl:text>
+                /
+                <xsl:text> </xsl:text>
+                <xsl:call-template name="show-epSOSNullFlavor">
+                    <xsl:with-param name="code" select="$denominator/@nullFlavor"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="$denominatorUnit='1'">
+                <xsl:value-of select="$numeratorValue"/>
+                <xsl:text> </xsl:text>
+                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:text> </xsl:text>
+                <xsl:call-template name="show-epSOSDisplayLabels">
+                    <xsl:with-param name="code" select="'53'"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="not($denominatorValue)">
+                <xsl:value-of select="$numeratorValue"/>
+                <xsl:text> </xsl:text>
+                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:text> </xsl:text>
+                /
+            </xsl:when>
+            <xsl:when test="not($numeratorValue) and not($denominatorValue)">
+                /
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$numeratorValue"/>
+                <xsl:text> </xsl:text>
+                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:text> </xsl:text>
+                /
+                <xsl:text> </xsl:text>
+                <xsl:value-of select="$denominatorValue"/>
+                <xsl:text> </xsl:text>
+                [<xsl:value-of select="$denominatorUnit"/>]
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:if test="$medStrengthOriginalText">
             <tr>
                 <td>
-                    <xsl:choose>
-                        <xsl:when test="($medStrengthNumerator/@nullFlavor)">
-                            <xsl:call-template name="show-epSOSNullFlavor">
-                                <xsl:with-param name="code" select="$medStrengthNumerator/@nullFlavor"/>
-                            </xsl:call-template>
-                        </xsl:when>
-                        <xsl:when test="($medStrengthDenominator/@nullFlavor)">
-                            <xsl:value-of select="$numeratorValue"/>
-                            <xsl:text> </xsl:text>
-                            [<xsl:value-of select="$numeratorUnit"/>]
-                            <xsl:text> </xsl:text>
-                            /
-                            <xsl:text> </xsl:text>
-                            <xsl:call-template name="show-epSOSNullFlavor">
-                                <xsl:with-param name="code" select="$medStrengthDenominator/@nullFlavor"/>
-                            </xsl:call-template>
-                        </xsl:when>
-                        <xsl:when test="$denominatorUnit='1'">
-                            <xsl:value-of select="$numeratorValue"/>
-                            <xsl:text> </xsl:text>
-                            [<xsl:value-of select="$numeratorUnit"/>]
-                            <xsl:text> </xsl:text>
-                            <xsl:call-template name="show-epSOSDisplayLabels">
-                                <xsl:with-param name="code" select="'53'"/>
-                            </xsl:call-template>
-                        </xsl:when>
-                        <xsl:when test="not($denominatorValue)">
-                            <xsl:value-of select="$numeratorValue"/>
-                            <xsl:text> </xsl:text>
-                            [<xsl:value-of select="$numeratorUnit"/>]
-                            <xsl:text> </xsl:text>
-                            /
-                        </xsl:when>
-                        <xsl:when test="not($numeratorValue) and not($denominatorValue)">
-                            /
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="$numeratorValue"/>
-                            <xsl:text> </xsl:text>
-                            [<xsl:value-of select="$numeratorUnit"/>]
-                            <xsl:text> </xsl:text>
-                            /
-                            <xsl:text> </xsl:text>
-                            <xsl:value-of select="$denominatorValue"/>
-                            <xsl:text> </xsl:text>
-                            [<xsl:value-of select="$denominatorUnit"/>]
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <div class="tooltip">
+                        <div class="additionalInfo">
+                            <xsl:value-of select="$medStrengthOriginalText"/>
+                        </div>
+                        <span class="tooltiptext">Additional info</span>
+                    </div>
                 </td>
             </tr>
-            <xsl:if test="$medStrengthOriginalText">
-                <tr>
-                    <td>
-                        <div class="tooltip">
-                            <div class="additionalInfo">
-                                <xsl:value-of select="$medStrengthOriginalText"/>
-                            </div>
-                            <span class="tooltiptext">Additional info</span>
-                        </div>
-                    </td>
-                </tr>
-            </xsl:if>
-        </table>
+        </xsl:if>
     </xsl:template>
 
     <!-- Number of Unit per Intake Low value -->
