@@ -42,11 +42,10 @@
         <xsl:variable
                 name="probSectionTitleCode"
                 select="n1:code/@code"/>
-        <xsl:variable name="obsValueCode"
-                      select="n1:entry/n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value/@code"/>
-        <!-- null flavor entry act -->
         <xsl:variable name="probAct"
                       select="n1:entry/n1:act"/>
+        <xsl:variable name="obsValueCode"
+                      select="n1:entry/n1:act/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5.2']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value/@code"/>
         <!-- End definition of variables-->
 
 

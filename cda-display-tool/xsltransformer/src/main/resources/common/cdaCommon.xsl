@@ -733,7 +733,9 @@
                 <xsl:value-of select="substring-before(substring-after($value, '{'), '}')"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="$value"/>
+                <xsl:call-template name="show-epSOSUnits">
+                    <xsl:with-param name="code" select="$value"/>
+                </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
