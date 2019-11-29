@@ -624,7 +624,7 @@
             <xsl:when test="($denominator/@nullFlavor)">
                 <xsl:value-of select="$numeratorValue"/>
                 <xsl:text> </xsl:text>
-                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:value-of select="$numeratorUnit"/>
                 <xsl:text> </xsl:text>
                 /
                 <xsl:text> </xsl:text>
@@ -635,7 +635,7 @@
             <xsl:when test="$denominatorUnit='1'">
                 <xsl:value-of select="$numeratorValue"/>
                 <xsl:text> </xsl:text>
-                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:value-of select="$numeratorUnit"/>
                 <xsl:text> </xsl:text>
                 <xsl:call-template name="show-epSOSDisplayLabels">
                     <xsl:with-param name="code" select="'53'"/>
@@ -644,7 +644,7 @@
             <xsl:when test="not($denominatorValue)">
                 <xsl:value-of select="$numeratorValue"/>
                 <xsl:text> </xsl:text>
-                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:value-of select="$numeratorUnit"/>
                 <xsl:text> </xsl:text>
                 /
             </xsl:when>
@@ -654,13 +654,13 @@
             <xsl:otherwise>
                 <xsl:value-of select="$numeratorValue"/>
                 <xsl:text> </xsl:text>
-                [<xsl:value-of select="$numeratorUnit"/>]
+                <xsl:value-of select="$numeratorUnit"/>
                 <xsl:text> </xsl:text>
                 /
                 <xsl:text> </xsl:text>
                 <xsl:value-of select="$denominatorValue"/>
                 <xsl:text> </xsl:text>
-                [<xsl:value-of select="$denominatorUnit"/>]
+                <xsl:value-of select="$denominatorUnit"/>
             </xsl:otherwise>
         </xsl:choose>
         <xsl:if test="$medStrengthOriginalText">
