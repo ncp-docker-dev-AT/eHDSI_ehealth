@@ -22,7 +22,7 @@
                   select="/n1:ClinicalDocument/n1:effectiveTime"/>
     <xsl:variable name="lastUpdate"
                   select="/n1:ClinicalDocument/n1:documentationOf/n1:serviceEvent/n1:effectiveTime/n1:high"/>
-    <xsl:variable name="documentLanguageCode" select="/n1:ClinicalDocument/n1:languageCode/@code"/>
+    <xsl:variable name="documentLanguageCode" select="/n1:ClinicalDocument/n1:languageCode"/>
 
     <xsl:template name="basicCdaHeader">
         <table class="header_table">
@@ -56,7 +56,11 @@
                             <xsl:with-param name="code" select="'117'"/>
                         </xsl:call-template>
                     </th>
-                    <td><xsl:value-of select="$documentLanguageCode"/></td>
+                    <td>
+                        <xsl:call-template name="show-epSOSLanguage">
+                            <xsl:with-param name="node" select="$documentLanguageCode"/>
+                        </xsl:call-template>
+                    </td>
                 </tr>
             </tbody>
         </table>
