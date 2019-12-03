@@ -161,7 +161,7 @@
                                                 <td>
                                                     <xsl:call-template name="telecom">
                                                         <xsl:with-param name="telecomParam"
-                                                                        select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:telecom"/>
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:telecom"/>
                                                     </xsl:call-template>
                                                 </td>
                                             </tr>
