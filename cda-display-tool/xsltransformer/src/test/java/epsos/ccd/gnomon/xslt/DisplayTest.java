@@ -72,7 +72,7 @@ public class DisplayTest {
 
     @Test
     public void runFile() throws Exception {
-        fileTest("cda-display-tool/xsltransformer/samples/pt_ps_friendly.xml", TRANSFORMATION.WithOutputAndDefinedPath);
+        fileTest("cda-display-tool/xsltransformer/samples/SE2FI_199501112388_eP_friendly.xml", TRANSFORMATION.WithOutputAndDefinedPath);
     }
 
     @Test
