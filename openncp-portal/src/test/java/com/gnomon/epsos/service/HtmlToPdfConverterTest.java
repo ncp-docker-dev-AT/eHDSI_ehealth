@@ -13,7 +13,7 @@ public class HtmlToPdfConverterTest {
 
     @Test
     public void testConvertion() throws IOException {
-        String html = readFile(new File("openncp-portal/src/test/resources/ps_friendly.html"));
+        String html = readFile(new File("openncp-portal/src/test/resources/pt.html"));
         ByteArrayOutputStream baos = HtmlToPdfConverter.createPdf(html);
         Assert.assertNotNull(baos);
         Assert.assertTrue(baos.toByteArray().length > 0);

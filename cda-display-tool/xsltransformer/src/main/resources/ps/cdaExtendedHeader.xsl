@@ -402,14 +402,24 @@
                 <tr>
                     <td>
                         <ul>
-                            <xsl:for-each
-                                    select="/n1:ClinicalDocument/n1:participant/n1:associatedEntity">
-                                <xsl:if test="not(../n1:functionCode) or not(../n1:functionCode/@code='PCP')">
-                                    <xsl:if test="n1:associatedPerson/n1:name/* and not(n1:associatedPerson/n1:name/n1:given/@nullFlavor) and not(n1:associatedPerson/n1:name/n1:family/@nullFlavor)">
-                                        <li><xsl:value-of select="n1:associatedPerson/n1:name/n1:given"/>&#160;
-                                            <xsl:value-of select="n1:associatedPerson/n1:name/n1:family"/>&#160;
-                                        </li>
-                                    </xsl:if>
+                            <xsl:for-each select="/n1:ClinicalDocument/n1:participant/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.2.4']/../n1:associatedEntity">
+                                <xsl:if test="n1:associatedPerson/n1:name/* or n1:scopingOrganization">
+                                    <li><xsl:value-of select="n1:associatedPerson/n1:name/n1:given"/>&#160;
+                                        <xsl:value-of select="n1:associatedPerson/n1:name/n1:family"/>&#160;
+                                        <xsl:value-of select="n1:scopingOrganization/n1:name"/>&#160;
+                                        <span class="label otherContacts-roleClass">
+                                            <xsl:call-template name="show-roleClass">
+                                                <xsl:with-param name="code" select="@classCode"/>
+                                            </xsl:call-template>
+                                        </span>&#160;
+                                        <xsl:if test="../n1:functionCode and not(../n1:functionCode/@nullFlavor)">
+                                            <span class="label otherContacts-personalRelationship">
+                                                <xsl:call-template name="show-personalRelationship">
+                                                    <xsl:with-param name="code" select="../n1:functionCode/@code"/>
+                                                </xsl:call-template>
+                                            </span>
+                                        </xsl:if>
+                                    </li>
                                 </xsl:if>
                             </xsl:for-each>
                         </ul>
