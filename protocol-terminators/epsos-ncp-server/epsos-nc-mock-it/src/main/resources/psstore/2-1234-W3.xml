@@ -742,8 +742,8 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <originalText><reference value="#val-4"/></originalText>
                                             </value>
                                         </observation>
-                                        <!-- Severity -->
                                     </entryRelationship>
+                                    <!-- Severity -->
                                     <entryRelationship typeCode="SUBJ" inversionInd="true">
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1"/>
@@ -892,17 +892,17 @@ Although being real choices for the different diseases and conditions, the selec
                                                     <reference value="#val-8"/>
                                                 </originalText>
                                             </value>
-                                            <!-- Severity -->
-                                            <entryRelationship typeCode="SUBJ" inversionInd="true">
-                                                <observation classCode="OBS" moodCode="EVN">
-                                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1"/>
-                                                    <templateId root="2.16.840.1.113883.10.20.1.55"/>
-                                                    <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
-                                                    <text><reference value="#code-21"/></text>
-                                                    <statusCode code="completed"/>
-                                                    <value xsi:type="CD" code="371923003" codeSystem="2.16.840.1.113883.6.96"/>
-                                                </observation>
-                                            </entryRelationship>
+                                        </observation>
+                                    </entryRelationship>
+                                    <!-- Severity -->
+                                    <entryRelationship typeCode="SUBJ" inversionInd="true">
+                                        <observation classCode="OBS" moodCode="EVN">
+                                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1"/>
+                                            <templateId root="2.16.840.1.113883.10.20.1.55"/>
+                                            <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
+                                            <text><reference value="#code-21"/></text>
+                                            <statusCode code="completed"/>
+                                            <value xsi:type="CD" code="371923003" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
