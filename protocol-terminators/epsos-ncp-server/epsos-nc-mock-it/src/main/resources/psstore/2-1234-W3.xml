@@ -9,8 +9,7 @@ At this moment, she presents severe pre-eclampsia (hypertension during pregnancy
 Other sections of her Summary include allergies to latex and kiwi (which are very often associated) and to aspirin, and intolerance to lactose; immunizations administered during childhood and adolescence are also present.
 
 Although being real choices for the different diseases and conditions, the selection of the patient's current medication tries to present some easily described medication as well as not so easily ones: e.g. insulin degludec, amoxicilin+clavulanic acid, and the combination of ipratropium bromide+salbutamol for nebulization. For the oral treatment of the pre-eclampsia the agents selected would not be used in real practice during pregnancy.-->
-<ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:epsos="urn:epsos-org:ep:medication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="urn:hl7-org:v3 infrastructure/cda/CDA_SDTC.xsd">
+<ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:epsos="urn:epsos-org:ep:medication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
     <!-- Template ID for epSOS Patient Summary document -->
     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.3"/>
@@ -604,9 +603,9 @@ Although being real choices for the different diseases and conditions, the selec
                     <title>Allergies and adverse reactions</title>
                     <text>
                         <paragraph ID="obs-1">Food allergy to Kiwi fruit, Reaction: Eczema</paragraph><paragraph ID="obs-3">Food intolerance to Lactose, Reaction: Diarrhea</paragraph><paragraph ID="obs-5">Medication allergy to acetylsalicylic acid, Reaction: Asthma</paragraph><paragraph ID="obs-7">Allergy to Latex, Reaction: Urticaria</paragraph>
-                        <table><colgroup><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/></colgroup>
+                        <table><colgroup><col width="20%"/><col width="15%"/><col width="15%"/><col width="15%"/><col width="10%"/><col width="20%"/><col width="15%"/></colgroup>
                             <thead>
-                                <tr><th>Reaction Type</th><th>Agent</th><th>Clinical Manifestation</th><th>Time</th><th>Status</th><th>Process of establishing a problem</th></tr>
+                                <tr><th>Reaction Type</th><th>Agent</th><th>Clinical Manifestation</th><th>Time</th><th>Status</th><th>Process of establishing a problem</th><th>Severity</th></tr>
                             </thead>
                             <tbody>
                                 <tr><td><content ID="obs-1a"><content ID="code-6" language="xx-XX">Food allergy</content><br/></content></td><td><content ID="code-7" language="xx-XX">Kiwi fruit</content><br/></td><td ID="obs-2"><content ID="val-2" language="xx-XX">Eczema</content><br/></td><td>since 1990-01-10</td><td>active</td><td><content ID="code-8" language="xx-XX">Finding reported by subject or history provider</content></td><td><content ID="code-9" language="xx-XX">Moderate to severe</content><br/></td></tr>
