@@ -408,14 +408,14 @@
                                         <xsl:value-of select="n1:associatedPerson/n1:name/n1:family"/>&#160;
                                         <xsl:value-of select="n1:scopingOrganization/n1:name"/>&#160;
                                         <span class="label otherContacts-roleClass">
-                                            <xsl:call-template name="show-roleClass">
+                                            <xsl:call-template name="show-epSOSRoleClass">
                                                 <xsl:with-param name="code" select="@classCode"/>
                                             </xsl:call-template>
                                         </span>&#160;
                                         <xsl:if test="../n1:functionCode and not(../n1:functionCode/@nullFlavor)">
                                             <span class="label otherContacts-personalRelationship">
-                                                <xsl:call-template name="show-personalRelationship">
-                                                    <xsl:with-param name="code" select="../n1:functionCode/@code"/>
+                                                <xsl:call-template name="show-epSOSPersonalRelationship">
+                                                    <xsl:with-param name="node" select="../n1:functionCode"/>
                                                 </xsl:call-template>
                                             </span>
                                         </xsl:if>
