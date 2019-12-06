@@ -104,66 +104,52 @@
                                                             </xsl:when>
                                                             <xsl:otherwise>
                                                                 <tr>
-                                                                    <th rowspan="2">
+                                                                    <th>
                                                                         <!-- Active ingredient -->
                                                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                                                             <xsl:with-param name="code" select="'1'"/>
                                                                         </xsl:call-template>
                                                                     </th>
-                                                                    <th rowspan="2">
+                                                                    <th>
                                                                         <!-- Strength -->
                                                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                                                             <xsl:with-param name="code" select="'70'"/>
                                                                         </xsl:call-template>
                                                                     </th>
-                                                                    <th rowspan="2">
+                                                                    <th>
                                                                         <!-- Dose form -->
                                                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                                                             <xsl:with-param name="code" select="'25'"/>
                                                                         </xsl:call-template>
                                                                     </th>
-                                                                    <th colspan="2">
+                                                                    <th>
                                                                         <!-- Units per intake -->
                                                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                                                             <xsl:with-param name="code" select="'78'"/>
                                                                         </xsl:call-template>
                                                                     </th>
-                                                                    <th rowspan="2">
+                                                                    <th>
                                                                         <!-- Frequency of intakes -->
                                                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                                                             <xsl:with-param name="code" select="'32'"/>
                                                                         </xsl:call-template>
                                                                     </th>
-                                                                    <th rowspan="2">
+                                                                    <th>
                                                                         <!-- Route of Administration -->
                                                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                                                             <xsl:with-param name="code" select="'67'"/>
                                                                         </xsl:call-template>
                                                                     </th>
-                                                                    <th rowspan="2">
+                                                                    <th>
                                                                         <!-- Onset Date -->
                                                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                                                             <xsl:with-param name="code" select="'45'"/>
                                                                         </xsl:call-template>
                                                                     </th>
-                                                                    <th rowspan="2">
+                                                                    <th>
                                                                         <!-- End Date -->
                                                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                                                             <xsl:with-param name="code" select="'26'"/>
-                                                                        </xsl:call-template>
-                                                                    </th>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th>
-                                                                        <!-- Min -->
-                                                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                                                            <xsl:with-param name="code" select="'120'"/>
-                                                                        </xsl:call-template>
-                                                                    </th>
-                                                                    <th>
-                                                                        <!-- Max -->
-                                                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                                                            <xsl:with-param name="code" select="'121'"/>
                                                                         </xsl:call-template>
                                                                     </th>
                                                                 </tr>
@@ -278,15 +264,9 @@
                                 </xsl:call-template>
                             </td>
                             <td>
-                                <!-- Units per intake - Min -->
-                                <xsl:call-template name="show-numberUnitIntakeLow">
-                                    <xsl:with-param name="medUnitIntake" select="$medUnitIntake"/>
-                                </xsl:call-template>
-                            </td>
-                            <td>
-                                <!-- Units per intake - Max -->
-                                <xsl:call-template name="show-numberUnitIntakeHigh">
-                                    <xsl:with-param name="medUnitIntake" select="$medUnitIntake"/>
+                                <!-- Units per intake -->
+                                <xsl:call-template name="show-IVL_PQ">
+                                    <xsl:with-param name="node" select="$medUnitIntake"/>
                                 </xsl:call-template>
                             </td>
                             <td>

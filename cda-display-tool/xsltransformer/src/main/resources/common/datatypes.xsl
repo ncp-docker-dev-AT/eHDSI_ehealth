@@ -6,6 +6,52 @@
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
 
+    <!-- IVL_PQ datatype -->
+    <xsl:template name="show-IVL_PQ">
+        <xsl:param name="node"/>
+        <xsl:variable name="low" select="$node/n1:low"/>
+        <xsl:variable name="high" select="$node/n1:high"/>
+        <xsl:variable name="width" select="$node/n1:width"/>
+        <xsl:variable name="center" select="$node/n1:center"/>
+        <xsl:variable name="nullFlavor" select="$node/@nullFlavor"/>
+        <xsl:choose>
+            <xsl:when test="$width">
+                <xsl:call-template name="show-PQ">
+                    <xsl:with-param name="node" select="$width"/>
+                </xsl:call-template>&#160;
+            </xsl:when>
+            <xsl:when test="$low and $high">
+                <xsl:call-template name="show-PQ">
+                    <xsl:with-param name="node" select="$low"/>
+                </xsl:call-template> -
+                <xsl:call-template name="show-PQ">
+                    <xsl:with-param name="node" select="$high"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="$low">
+                <xsl:call-template name="show-PQ">
+                    <xsl:with-param name="node" select="$low"/>
+                </xsl:call-template>&#160;
+            </xsl:when>
+            <xsl:when test="$high">
+                <xsl:call-template name="show-PQ">
+                    <xsl:with-param name="node" select="$high"/>
+                </xsl:call-template>&#160;
+            </xsl:when>
+            <xsl:when test="$nullFlavor">
+                <xsl:call-template name="show-epSOSNullFlavor">
+                    <xsl:with-param name="code" select="$nullFlavor"/>
+                </xsl:call-template>&#160;
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="show-PQ">
+                    <xsl:with-param name="node" select="$node"/>
+                </xsl:call-template>&#160;
+            </xsl:otherwise>
+        </xsl:choose>
+
+    </xsl:template>
+
     <!-- PQ datatype -->
     <xsl:template name="show-PQ">
         <xsl:param name="node"/>
@@ -15,9 +61,18 @@
                     <xsl:when test="$node/@value">
                         <xsl:value-of select="$node/@value"/>
                         <xsl:text> </xsl:text>
-                        <xsl:call-template name="show-epSOSUnits">
-                            <xsl:with-param name="code" select="$node/@unit"/>
-                        </xsl:call-template>
+                        <xsl:choose>
+                            <xsl:when test="$node/@unit='1'">
+                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                    <xsl:with-param name="code" select="'77'"/>
+                                </xsl:call-template>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:call-template name="show-epSOSUnits">
+                                    <xsl:with-param name="code" select="$node/@unit"/>
+                                </xsl:call-template>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:when>
                     <xsl:otherwise>
                         <!-- uncoded element -->
@@ -55,7 +110,7 @@
             <xsl:when test="$low and $high">
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$low"/>
-                </xsl:call-template>-
+                </xsl:call-template> -
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$high"/>
                 </xsl:call-template>

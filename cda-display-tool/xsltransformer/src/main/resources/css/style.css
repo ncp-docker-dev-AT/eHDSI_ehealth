@@ -8,6 +8,7 @@ body {
     font-size: 12px;
     margin: 0;
     padding: 1rem;
+    height: 100%;
     /*text-rendering: optimizeLegibility;*/
 }
 
@@ -110,13 +111,15 @@ input[type='checkbox'] {
 .lbl-toggle {
     display: block;
 
+    color: #009fd1;
     font-weight: bold;
     font-size: 13px;
     text-align: left;
 
     padding: 0.5rem;
 
-    background: #009fd1;
+    border: 2px solid #009fd1;
+    background: #FFF;
 
     cursor: pointer;
 
@@ -179,12 +182,13 @@ input[type='checkbox'] {
     display: block;
 
     font-weight: bold;
-    color: white;
+    color: #FFF;
     font-size: 15px;
     text-align: left;
 
     padding: 0.5rem;
 
+    border: 2px solid #085a9f;
     background: #085a9f;
 
     cursor: pointer;

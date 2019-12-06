@@ -607,7 +607,11 @@
         <xsl:variable name="numerator" select="$node/epsos:numerator"/>
         <xsl:variable name="denominator" select="$node/epsos:denominator"/>
         <xsl:variable name="numeratorValue" select="$numerator/@value"/>
-        <xsl:variable name="numeratorUnit" select="$numerator/@unit"/>
+        <xsl:variable name="numeratorUnit">
+            <xsl:call-template name="show-epSOSUnits">
+                <xsl:with-param name="code" select="$numerator/@unit"/>
+            </xsl:call-template>
+        </xsl:variable>
         <xsl:variable name="denominatorValue" select="$denominator/@value"/>
         <xsl:variable name="medStrengthOriginalText" select="$node/epsos:translation/epsos:originalText"/>
         <xsl:variable name="denominatorUnit">
