@@ -35,16 +35,16 @@ th {
 ul {
     padding-left: 1rem;
 }​
-.h1center {
-    font-size: 1.5em;
-    font-weight: bold;
-    text-align: center;
-    background-color: #085a9f;
-    color: #FFF;
-    margin-bottom: 1rem;
-    padding: 0.5rem ;
-    border-radius: 4px
-}
+ .h1center {
+     font-size: 1.5em;
+     font-weight: bold;
+     text-align: center;
+     background-color: #085a9f;
+     color: #FFF;
+     margin-bottom: 1rem;
+     padding: 0.5rem ;
+     border-radius: 4px
+ }
 .header_table{
     border-bottom:0 solid #666;
 }
@@ -251,13 +251,15 @@ input[type='checkbox'] {
     display: block;
 
     font-weight: bold;
-    color: #009fd1;
+    color: #085a9f;
     font-size: 15px;
     text-align: left;
 
+    border: 2px solid #085a9f;
+
     padding: 0.5rem;
 
-    background: #085a9f;
+    background: #FFF;
 
     cursor: pointer;
 
@@ -266,7 +268,7 @@ input[type='checkbox'] {
 }
 
 .lbl-toggle-main:hover {
-    color: white;
+    color: #009fd1;
 }
 
 .lbl-toggle-main::before {
