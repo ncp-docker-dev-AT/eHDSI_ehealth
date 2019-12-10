@@ -122,61 +122,61 @@
 
     <xsl:template name="displayPreferredHCPAndLegalOrganization">
         <div class="extended_header_block">
-        <table class="extended_header_table">
-            <tbody>
-                <tr>
-                    <th colspan="2">
-                        <!-- Preferred HCP/Legal organization to contact-->
-                        <xsl:call-template name="show-epSOSDisplayLabels">
-                            <xsl:with-param name="code" select="'54'"/>
-                        </xsl:call-template>
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        <!-- show person's name and if exists organization name -->
-                        <xsl:if test="not($preferredHCPAssociatedPersonName/@nullFlavor)">
-                            <xsl:value-of select="$preferredHCPAssociatedPersonName/n1:given"/>&#160;
-                            <xsl:value-of select="$preferredHCPAssociatedPersonName/n1:family"/>
-                        </xsl:if>
-                        <xsl:if test="$preferredHCPPRSScopingOrganisation">
-                            <xsl:if test="($preferredHCPAssociatedPersonName/n1:given or $preferredHCPAssociatedPersonName/n1:family) and $preferredHCPPRSScopingOrganisation/n1:name">
-                                ,&#160;
+            <table class="extended_header_table">
+                <tbody>
+                    <tr>
+                        <th colspan="2">
+                            <!-- Preferred HCP/Legal organization to contact-->
+                            <xsl:call-template name="show-epSOSDisplayLabels">
+                                <xsl:with-param name="code" select="'54'"/>
+                            </xsl:call-template>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- show person's name and if exists organization name -->
+                            <xsl:if test="not($preferredHCPAssociatedPersonName/@nullFlavor)">
+                                <xsl:value-of select="$preferredHCPAssociatedPersonName/n1:given"/>&#160;
+                                <xsl:value-of select="$preferredHCPAssociatedPersonName/n1:family"/>
                             </xsl:if>
-                            <xsl:value-of select="$preferredHCPPRSScopingOrganisation/n1:name"/>
-                        </xsl:if>
-                    </td>
-                    <td>
-                        <table class="contact_information_table">
-                            <tr>
-                                <th>
-                                    <xsl:call-template name="show-epSOSDisplayLabels">
-                                        <xsl:with-param name="code" select="'12'"/>
-                                    </xsl:call-template>
-                                </th>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <xsl:choose>
-                                        <!-- first person's address.. then if not exist show org address -->
-                                        <xsl:when test="$preferredHCPAssociatedEntity">
-                                            <xsl:call-template name="show-contactInfo">
-                                                <xsl:with-param name="contact" select="$preferredHCPAssociatedEntity"/>
-                                            </xsl:call-template>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:call-template name="show-contactInfo">
-                                                <xsl:with-param name="contact" select="$preferredHCPScopingOrganisation"/>
-                                            </xsl:call-template>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                            <xsl:if test="$preferredHCPPRSScopingOrganisation">
+                                <xsl:if test="($preferredHCPAssociatedPersonName/n1:given or $preferredHCPAssociatedPersonName/n1:family) and $preferredHCPPRSScopingOrganisation/n1:name">
+                                    ,&#160;
+                                </xsl:if>
+                                <xsl:value-of select="$preferredHCPPRSScopingOrganisation/n1:name"/>
+                            </xsl:if>
+                        </td>
+                        <td>
+                            <table class="contact_information_table">
+                                <tr>
+                                    <th>
+                                        <xsl:call-template name="show-epSOSDisplayLabels">
+                                            <xsl:with-param name="code" select="'12'"/>
+                                        </xsl:call-template>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <xsl:choose>
+                                            <!-- first person's address.. then if not exist show org address -->
+                                            <xsl:when test="$preferredHCPAssociatedEntity">
+                                                <xsl:call-template name="show-contactInfo">
+                                                    <xsl:with-param name="contact" select="$preferredHCPAssociatedEntity"/>
+                                                </xsl:call-template>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:call-template name="show-contactInfo">
+                                                    <xsl:with-param name="contact" select="$preferredHCPScopingOrganisation"/>
+                                                </xsl:call-template>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </xsl:template>
 
@@ -385,23 +385,27 @@
                         <td>
                             <ul>
                                 <xsl:for-each select="/n1:ClinicalDocument/n1:participant/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.2.4']/../n1:associatedEntity">
-                                    <xsl:if test="n1:associatedPerson/n1:name/* or n1:scopingOrganization">
-                                        <li><xsl:value-of select="n1:associatedPerson/n1:name/n1:given"/>&#160;
-                                            <xsl:value-of select="n1:associatedPerson/n1:name/n1:family"/>&#160;
-                                            <xsl:value-of select="n1:scopingOrganization/n1:name"/>&#160;
-                                            <span class="label otherContacts-roleClass">
-                                                <xsl:call-template name="show-epSOSRoleClass">
-                                                    <xsl:with-param name="code" select="@classCode"/>
-                                                </xsl:call-template>
-                                            </span>&#160;
-                                            <xsl:if test="../n1:functionCode and not(../n1:functionCode/@nullFlavor)">
-                                                <span class="label otherContacts-personalRelationship">
-                                                    <xsl:call-template name="show-epSOSPersonalRelationship">
-                                                        <xsl:with-param name="node" select="../n1:functionCode"/>
-                                                    </xsl:call-template>
-                                                </span>
-                                            </xsl:if>
-                                        </li>
+                                    <xsl:if test="not(../n1:functionCode) or not(../n1:functionCode/@code='PCP')">
+                                        <xsl:if test="n1:associatedPerson/n1:name/* or n1:scopingOrganization">
+                                            <li><xsl:value-of select="n1:associatedPerson/n1:name/n1:given"/>&#160;
+                                                <xsl:value-of select="n1:associatedPerson/n1:name/n1:family"/>&#160;
+                                                <xsl:value-of select="n1:scopingOrganization/n1:name"/>&#160;
+                                                <xsl:if test="@classCode">
+                                                    <span class="label otherContacts-roleClass">
+                                                        <xsl:call-template name="show-epSOSRoleClass">
+                                                            <xsl:with-param name="code" select="@classCode"/>
+                                                        </xsl:call-template>
+                                                    </span>&#160;
+                                                </xsl:if>
+                                                <xsl:if test="../n1:functionCode and not(../n1:functionCode/@nullFlavor)">
+                                                    <span class="label otherContacts-personalRelationship">
+                                                        <xsl:call-template name="show-epSOSPersonalRelationship">
+                                                            <xsl:with-param name="node" select="../n1:functionCode"/>
+                                                        </xsl:call-template>
+                                                    </span>
+                                                </xsl:if>
+                                            </li>
+                                        </xsl:if>
                                     </xsl:if>
                                 </xsl:for-each>
                             </ul>
