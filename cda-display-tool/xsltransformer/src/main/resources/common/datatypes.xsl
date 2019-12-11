@@ -55,6 +55,11 @@
     <!-- PQ datatype -->
     <xsl:template name="show-PQ">
         <xsl:param name="node"/>
+        <xsl:variable name="unit">
+            <xsl:call-template name="supportUCUMAnnotations">
+                <xsl:with-param name="value" select="$node/@unit"/>
+            </xsl:call-template>
+        </xsl:variable>
         <xsl:choose>
             <xsl:when test="not ($node/@nullFlavor)">
                 <xsl:choose>
@@ -62,15 +67,13 @@
                         <xsl:value-of select="$node/@value"/>
                         <xsl:text> </xsl:text>
                         <xsl:choose>
-                            <xsl:when test="$node/@unit='1'">
+                            <xsl:when test="$unit='1'">
                                 <xsl:call-template name="show-epSOSDisplayLabels">
                                     <xsl:with-param name="code" select="'77'"/>
                                 </xsl:call-template>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:call-template name="show-epSOSUnits">
-                                    <xsl:with-param name="code" select="$node/@unit"/>
-                                </xsl:call-template>
+                                <xsl:value-of select="$unit"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:when>
