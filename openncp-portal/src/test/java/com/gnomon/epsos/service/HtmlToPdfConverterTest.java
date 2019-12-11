@@ -18,10 +18,10 @@ public class HtmlToPdfConverterTest {
         ByteArrayOutputStream baos = HtmlToPdfConverter.createPdf(html);
         Assert.assertNotNull(baos);
         Assert.assertTrue(baos.toByteArray().length > 0);
-        String filename = "C:\\LocalData\\Share\\openncp-configuration\\EpsosRepository\\out\\output.pdf";
-        FileOutputStream output = new FileOutputStream(filename);
-        output.write(baos.toByteArray());
-        output.close();
+//        String filename = "C:\\LocalData\\Share\\openncp-configuration\\EpsosRepository\\out\\output.pdf";
+//        FileOutputStream output = new FileOutputStream(filename);
+//        output.write(baos.toByteArray());
+//        output.close();
     }
 
     private String readFile(File file) throws IOException {
