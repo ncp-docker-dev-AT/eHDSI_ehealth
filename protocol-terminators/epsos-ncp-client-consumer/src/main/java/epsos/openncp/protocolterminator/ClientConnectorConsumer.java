@@ -1,13 +1,17 @@
 package epsos.openncp.protocolterminator;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
-import epsos.openncp.pt.client.ClientConnectorServiceServiceStub;
+import epsos.openncp.pt.client.ClientConnectorServiceStub;
 import eu.europa.ec.sante.ehdsi.openncp.evidence.utils.OutFlowEvidenceEmitterHandler;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.*;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.HandlerDescription;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
@@ -16,10 +20,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.namespace.QName;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /*
  *  ClientConnectorConsumer
@@ -40,7 +46,7 @@ public class ClientConnectorConsumer {
         this.epr = epr;
     }
 
-    private static void addAssertions(ClientConnectorServiceServiceStub stub, Assertion idAssertion, Assertion trcAssertion)
+    private static void addAssertions(ClientConnectorServiceStub stub, Assertion idAssertion, Assertion trcAssertion)
             throws Exception {
 
         OMFactory omFactory = OMAbstractFactory.getOMFactory();
@@ -53,7 +59,7 @@ public class ClientConnectorConsumer {
         stub._getServiceClient().addHeader(omSecurityElement);
     }
 
-    private void registerEvidenceEmitterHandler(ClientConnectorServiceServiceStub stub) {
+    private void registerEvidenceEmitterHandler(ClientConnectorServiceStub stub) {
 
         // Adding custom phase for evidence emitter processing.
         LOGGER.debug("Adding custom phase for outflow evidence emitter processing");
@@ -77,7 +83,7 @@ public class ClientConnectorConsumer {
                                                PatientId patientId, GenericDocumentCode classCode) {
 
         LOGGER.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
-        ClientConnectorServiceServiceStub stub = initializeServiceStub();
+        ClientConnectorServiceStub stub = initializeServiceStub();
 
         try {
             addAssertions(stub, idAssertion, trcAssertion);
@@ -103,7 +109,27 @@ public class ClientConnectorConsumer {
     public List<PatientDemographics> queryPatient(Assertion idAssertion, String countryCode, PatientDemographics patientDemographics) {
 
         LOGGER.info("[Portal]: queryPatient(countryCode:'{}')", countryCode);
-        ClientConnectorServiceServiceStub stub = initializeServiceStub();
+        ClientConnectorServiceStub stub = initializeServiceStub();
+//        OMFactory factory = OMAbstractFactory.getOMFactory();
+//        OMNamespace ns2 = factory.createOMNamespace(AddressingConstants.Final.WSA_NAMESPACE, "");
+//
+//        SOAPHeaderBlock action = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(AddressingConstants.WSA_ACTION, ns2);
+//        OMNode node = factory.createOMText("urn:ehdsi:queryPatient");
+//        action.addChild(node);
+//        // OMAttribute att2 = factory.createOMAttribute("mustUnderstand", ns2, "1");
+//        // action.addAttribute(att2);
+//
+//        SOAPHeaderBlock headerBlock = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(AddressingConstants.WSA_MESSAGE_ID, ns2);
+//        OMNode messageIdNode = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
+//        headerBlock.addChild(messageIdNode);
+//
+//        SOAPHeaderBlock to = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(AddressingConstants.WSA_TO, ns2);
+//        OMNode node3 = factory.createOMText(epr);
+//        to.addChild(node3);
+//
+//        stub._getServiceClient().addHeader(action);
+//        stub._getServiceClient().addHeader(headerBlock);
+//        stub._getServiceClient().addHeader(to);
 
         try {
             trimPatientDemographics(patientDemographics);
@@ -131,7 +157,7 @@ public class ClientConnectorConsumer {
     public String sayHello(Assertion idAssertion, String name) {
 
         LOGGER.info("[Portal]: sayHello(name:'{}')", name);
-        ClientConnectorServiceServiceStub stub = initializeServiceStub();
+        ClientConnectorServiceStub stub = initializeServiceStub();
         try {
             addAssertions(stub, idAssertion, null);
             SayHelloDocument sayHelloDocument = SayHelloDocument.Factory.newInstance();
@@ -149,7 +175,7 @@ public class ClientConnectorConsumer {
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode, String targetLanguage) {
 
         LOGGER.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}', targetLanguage:'{}')", countryCode, homeCommunityId, targetLanguage);
-        ClientConnectorServiceServiceStub clientConnectorStub = initializeServiceStub();
+        ClientConnectorServiceStub clientConnectorStub = initializeServiceStub();
 
         try {
 
@@ -188,7 +214,7 @@ public class ClientConnectorConsumer {
                                                  EpsosDocument1 document, PatientDemographics patientDemographics) {
 
         LOGGER.info("[Portal]: submitDocument(countryCode:'{}')", countryCode);
-        ClientConnectorServiceServiceStub stub = initializeServiceStub();
+        ClientConnectorServiceStub stub = initializeServiceStub();
 
         try {
             trimPatientDemographics(patientDemographics);
@@ -210,23 +236,27 @@ public class ClientConnectorConsumer {
         }
     }
 
-    private ClientConnectorServiceServiceStub initializeServiceStub() {
-
-        LOGGER.debug("Initializing Client Connector Stub Services");
+    /**
+     * Initializing the ClientConnectorService client stubs to contact WSDL.
+     *
+     * @return Initialized ClientConnectorServiceStub set to the configured EPR and the SOAP version.
+     */
+    private ClientConnectorServiceStub initializeServiceStub() {
 
         try {
-            ClientConnectorServiceServiceStub clientConnectorStub = new ClientConnectorServiceServiceStub(epr);
+            LOGGER.debug("Initializing Client Connector Stub Services");
+            ClientConnectorServiceStub clientConnectorStub = new ClientConnectorServiceStub(epr);
+            clientConnectorStub._getServiceClient().getOptions().setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             clientConnectorStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
             this.registerEvidenceEmitterHandler(clientConnectorStub);
             return clientConnectorStub;
         } catch (AxisFault ex) {
-            LOGGER.error(EXCEPTION_FORMATTER, ex.getClass(), ex.getMessage(), ex);
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
     }
 
     /**
-     * Trims the Petient Demographics sent by the client and received by the Client Connector.
+     * Trims the Patient Demographics sent by the client and received by the Client Connector.
      *
      * @param patientDemographics Identity Traits to be trimmed and provided by the by the client
      */

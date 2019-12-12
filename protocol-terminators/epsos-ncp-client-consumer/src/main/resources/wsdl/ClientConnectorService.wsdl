@@ -1,127 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-             xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
-             xmlns:tns="http://clientconnector.protocolterminator.openncp.epsos/"
-             xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-             xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-             targetNamespace="http://clientconnector.protocolterminator.openncp.epsos/"
-             name="ClientConnectorServiceService">
-    <types>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
+                  xmlns:tns="http://clientconnector.protocolterminator.openncp.epsos/"
+                  xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+                  xmlns:wsaw="http://www.w3.org/2007/05/addressing/metadata"
+                  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  targetNamespace="http://clientconnector.protocolterminator.openncp.epsos/"
+                  name="ClientConnectorService">
+    <wsdl:types>
         <xsd:schema>
             <xsd:import namespace="http://clientconnector.protocolterminator.openncp.epsos/" schemaLocation="ClientConnectorService.xsd" />
         </xsd:schema>
-    </types>
-    <message name="sayHello">
-        <part name="parameters" element="tns:sayHello" />
-    </message>
-    <message name="sayHelloResponse">
-        <part name="parameters" element="tns:sayHelloResponse" />
-    </message>
-    <message name="queryPatient">
-        <part name="parameters" element="tns:queryPatient" />
-    </message>
-    <message name="queryPatientResponse">
-        <part name="parameters" element="tns:queryPatientResponse" />
-    </message>
-    <message name="queryDocuments">
-        <part name="parameters" element="tns:queryDocuments" />
-    </message>
-    <message name="queryDocumentsResponse">
-        <part name="parameters" element="tns:queryDocumentsResponse" />
-    </message>
-    <message name="retrieveDocument">
-        <part name="parameters" element="tns:retrieveDocument" />
-    </message>
-    <message name="retrieveDocumentResponse">
-        <part name="parameters" element="tns:retrieveDocumentResponse" />
-    </message>
-    <message name="submitDocument">
-        <part name="parameters" element="tns:submitDocument" />
-    </message>
-    <message name="submitDocumentResponse">
-        <part name="parameters" element="tns:submitDocumentResponse" />
-    </message>
-    <portType name="ClientConnectorService">
-        <operation name="sayHello">
-            <input message="tns:sayHello" />
-            <output message="tns:sayHelloResponse" />
-        </operation>
-        <operation name="queryPatient">
-            <input message="tns:queryPatient" />
-            <output message="tns:queryPatientResponse" />
-        </operation>
-        <operation name="queryDocuments">
-            <input message="tns:queryDocuments" />
-            <output message="tns:queryDocumentsResponse" />
-        </operation>
-        <operation name="retrieveDocument">
-            <input message="tns:retrieveDocument" />
-            <output message="tns:retrieveDocumentResponse" />
-        </operation>
-        <operation name="submitDocument">
-            <input message="tns:submitDocument" />
-            <output message="tns:submitDocumentResponse" />
-        </operation>
-    </portType>
-    <binding name="ClientConnectorServicePortBinding" type="tns:ClientConnectorService">
-        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
-        <operation name="sayHello">
-            <soap:operation soapAction="" />
-            <input>
-                <soap:body use="literal" />
-            </input>
-            <output>
-                <soap:body use="literal" />
-            </output>
-        </operation>
-        <operation name="queryPatient">
+    </wsdl:types>
+    <wsdl:message name="sayHello">
+        <wsdl:part name="parameters" element="tns:sayHello" />
+    </wsdl:message>
+    <wsdl:message name="sayHelloResponse">
+        <wsdl:part name="parameters" element="tns:sayHelloResponse" />
+    </wsdl:message>
+    <wsdl:message name="queryPatient">
+        <wsdl:part name="parameters" element="tns:queryPatient" />
+    </wsdl:message>
+    <wsdl:message name="queryPatientResponse">
+        <wsdl:part name="parameters" element="tns:queryPatientResponse" />
+    </wsdl:message>
+    <wsdl:message name="queryDocuments">
+        <wsdl:part name="parameters" element="tns:queryDocuments" />
+    </wsdl:message>
+    <wsdl:message name="queryDocumentsResponse">
+        <wsdl:part name="parameters" element="tns:queryDocumentsResponse" />
+    </wsdl:message>
+    <wsdl:message name="retrieveDocument">
+        <wsdl:part name="parameters" element="tns:retrieveDocument" />
+    </wsdl:message>
+    <wsdl:message name="retrieveDocumentResponse">
+        <wsdl:part name="parameters" element="tns:retrieveDocumentResponse" />
+    </wsdl:message>
+    <wsdl:message name="submitDocument">
+        <wsdl:part name="parameters" element="tns:submitDocument" />
+    </wsdl:message>
+    <wsdl:message name="submitDocumentResponse">
+        <wsdl:part name="parameters" element="tns:submitDocumentResponse" />
+    </wsdl:message>
+    <wsdl:portType name="ClientConnectorServicePortType">
+        <wsdl:operation name="sayHello">
+            <wsdl:input message="tns:sayHello" />
+            <wsdl:output message="tns:sayHelloResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="queryPatient">
+            <wsdl:input message="tns:queryPatient" wsaw:Action="urn:ehdsi:queryPatient"/>
+            <wsdl:output message="tns:queryPatientResponse" wsaw:Action="urn:ehdsi:queryPatientResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="queryDocuments">
+            <wsdl:input message="tns:queryDocuments" />
+            <wsdl:output message="tns:queryDocumentsResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="retrieveDocument">
+            <wsdl:input message="tns:retrieveDocument" />
+            <wsdl:output message="tns:retrieveDocumentResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="submitDocument">
+            <wsdl:input message="tns:submitDocument" />
+            <wsdl:output message="tns:submitDocumentResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="ClientConnectorServicePortBinding" type="tns:ClientConnectorServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="sayHello">
+            <soap12:operation soapAction="urn:ehdsi:sayHello" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="queryPatient">
             <wsp:PolicyReference URI="#HttpsWithSAML2AssertionPolicy" />
-            <soap:operation soapAction="" />
-            <input>
-                <soap:body use="literal" />
-            </input>
-            <output>
-                <soap:body use="literal" />
-            </output>
-        </operation>
-        <operation name="queryDocuments">
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="queryDocuments">
             <wsp:PolicyReference URI="#HttpsWithSAML2AssertionPolicy" />
-            <soap:operation soapAction="" />
-            <input>
-                <soap:body use="literal" />
-            </input>
-            <output>
-                <soap:body use="literal" />
-            </output>
-        </operation>
-        <operation name="retrieveDocument">
+            <soap12:operation soapAction="urn:ehdsi:queryDocuments" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="retrieveDocument">
             <wsp:PolicyReference URI="#HttpsWithSAML2AssertionPolicy" />
-            <soap:operation soapAction="" />
-            <input>
-                <soap:body use="literal" />
-            </input>
-            <output>
-                <soap:body use="literal" />
-            </output>
-        </operation>
-        <operation name="submitDocument">
+            <soap12:operation soapAction="urn:ehdsi:retrieveDocument" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="submitDocument">
             <wsp:PolicyReference URI="#HttpsWithSAML2AssertionPolicy" />
-            <soap:operation soapAction="" />
-            <input>
-                <soap:body use="literal" />
-            </input>
-            <output>
-                <soap:body use="literal" />
-            </output>
-        </operation>
-    </binding>
-    <service name="ClientConnectorServiceService">
-        <port name="ClientConnectorServicePort" binding="tns:ClientConnectorServicePortBinding">
-            <soap:address location="REPLACE_WITH_ACTUAL_URL" />
-        </port>
-    </service>
+            <soap12:operation soapAction="urn:ehdsi:submitDocument" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="ClientConnectorService">
+        <wsdl:port name="ClientConnectorServicePort" binding="tns:ClientConnectorServicePortBinding">
+            <soap12:address location="https://openncp.ehdsi.eu/services/ClientConnectorService.ClientConnectorServiceHttpsSoap12Endpoint/" />
+        </wsdl:port>
+    </wsdl:service>
     <wsp:Policy wsu:Id="HttpsWithSAML2AssertionPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
@@ -142,4 +142,4 @@
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-</definitions>
+</wsdl:definitions>

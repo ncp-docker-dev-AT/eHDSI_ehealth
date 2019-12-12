@@ -26,7 +26,7 @@ package eu.europa.ec.sante.ehdsi.protocolterminator.clientconsumer.test;
 import epsos.openncp.protocolterminator.HCPIAssertionCreator;
 import epsos.openncp.protocolterminator.TRCAssertionCreator;
 import epsos.openncp.protocolterminator.clientconnector.*;
-import epsos.openncp.pt.client.ClientConnectorServiceServiceStub;
+import epsos.openncp.pt.client.ClientConnectorServiceStub;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -64,7 +64,7 @@ public class TestClientConnectorService {
         TRCAssertionCreator trcAssertionCreator = new TRCAssertionCreator();
         Assertion trcAssertion = trcAssertionCreator.createTRCAssertion();
 
-        ClientConnectorServiceServiceStub stub = new ClientConnectorServiceServiceStub(EPR);
+        ClientConnectorServiceStub stub = new ClientConnectorServiceStub(EPR);
         addAssertions(stub, idAssertion, trcAssertion);
 
         QueryDocumentsDocument queryDocumentsDocument = QueryDocumentsDocument.Factory.newInstance();
@@ -112,7 +112,7 @@ public class TestClientConnectorService {
         /*
          * Stub
          */
-        ClientConnectorServiceServiceStub stub = new ClientConnectorServiceServiceStub(EPR);
+        ClientConnectorServiceStub stub = new ClientConnectorServiceStub(EPR);
         Assertion idAssertion = new HCPIAssertionCreator().createHCPIAssertion();
         addAssertions(stub, idAssertion, null);
 
@@ -164,7 +164,7 @@ public class TestClientConnectorService {
         HCPIAssertionCreator idAssertionCreator = new HCPIAssertionCreator();
         Assertion idAssertion = idAssertionCreator.createHCPIAssertion();
 
-        ClientConnectorServiceServiceStub stub = new ClientConnectorServiceServiceStub(EPR);
+        ClientConnectorServiceStub stub = new ClientConnectorServiceStub(EPR);
         addAssertions(stub, idAssertion, null);
 
         SayHelloDocument sayHelloDocument = SayHelloDocument.Factory.newInstance();
@@ -187,7 +187,7 @@ public class TestClientConnectorService {
         TRCAssertionCreator trcAssertionCreator = new TRCAssertionCreator();
         Assertion trcAssertion = trcAssertionCreator.createTRCAssertion();
 
-        ClientConnectorServiceServiceStub stub = new ClientConnectorServiceServiceStub(EPR);
+        ClientConnectorServiceStub stub = new ClientConnectorServiceStub(EPR);
         addAssertions(stub, idAssertion, trcAssertion);
 
         RetrieveDocumentDocument1 retrieveDocumentDocument = RetrieveDocumentDocument1.Factory.newInstance();
@@ -215,8 +215,8 @@ public class TestClientConnectorService {
      */
     public static void testsubmitDocument() throws java.lang.Exception {
 
-        ClientConnectorServiceServiceStub stub =
-                new ClientConnectorServiceServiceStub();//the default implementation should point to the right endpoint
+        ClientConnectorServiceStub stub =
+                new ClientConnectorServiceStub();//the default implementation should point to the right endpoint
 
 //		epsos.openncp.protocolterminator.clientconnector.SubmitDocumentDocument1 submitDocument18=
 //				(epsos.openncp.protocolterminator.clientconnector.SubmitDocumentDocument1)getTestObject(epsos.openncp.protocolterminator.clientconnector.SubmitDocumentDocument1.class);
@@ -228,7 +228,7 @@ public class TestClientConnectorService {
 
     }
 
-    private static void addAssertions(ClientConnectorServiceServiceStub stub, Assertion idAssertion, Assertion trcAssertion) throws Exception {
+    private static void addAssertions(ClientConnectorServiceStub stub, Assertion idAssertion, Assertion trcAssertion) throws Exception {
         OMFactory omFactory = OMAbstractFactory.getOMFactory();
         OMElement omSecurityElement = omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security", "wsse"), null);
         if (trcAssertion != null) {

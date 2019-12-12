@@ -247,6 +247,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <wsdlFileName>ClientConnectorService.wsdl</wsdlFileName>
                     <fileSets>
                         <fileSet>
                             <directory>${project.basedir}/src/main/resources/wsdl</directory>
@@ -266,6 +267,14 @@
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <webResources>
+<!--                        <resource>-->
+<!--                            <directory>src/main/resources/wsdl</directory>-->
+<!--                            <includes>-->
+<!--                                <include>**.wsdl</include>-->
+<!--                                <include>**.xsd</include>-->
+<!--                            </includes>-->
+<!--                            <targetPath>META-INF</targetPath>-->
+<!--                        </resource>-->
                         <resource>
                             <directory>target</directory>
                             <includes>
@@ -341,7 +350,7 @@
                                     <generateAllClasses>false</generateAllClasses>
                                     <generateServerSide>false</generateServerSide>
                                     <generateServerSideInterface>true</generateServerSideInterface>
-                                    <generateServicesXml>true</generateServicesXml>
+                                    <generateServicesXml>false</generateServicesXml>
                                     <generateTestcase>false</generateTestcase>
                                     <outputDirectory>target/generated-sources/</outputDirectory>
                                 </configuration>

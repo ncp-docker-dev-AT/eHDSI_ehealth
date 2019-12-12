@@ -45,7 +45,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NcpServiceFacadeImpl.class);
     private static final String CLIENT_CONNECTOR_NS_URL = "http://clientconnector.protocolterminator.openncp.epsos/";
-    private static final String CLIENT_CONNECTOR_LOCAL_PART = "ClientConnectorServiceService";
+    private static final String CLIENT_CONNECTOR_LOCAL_PART = "ClientConnectorService";
     private static final DatatypeFactory DATATYPE_FACTORY;
     private static final GraphiteLogger GRAPHITELOGGER = GraphiteLogger.getDefaultLogger();
 
@@ -57,14 +57,17 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         }
     }
 
-    private ClientConnectorServiceService service;
-    private ClientConnectorService clientConnectorService;
+    private ClientConnectorService service;
+    private ClientConnectorServicePortType clientConnectorService;
     private TrcServiceHandler trcServiceHandler;
     private String sessionId;
     private AssertionHandler assertionHandler = new AssertionHandler();
 
     @Deprecated
-    public NcpServiceFacadeImpl(ClientConnectorServiceService service, ClientConnectorService clientConnectorService, TrcServiceHandler trcServiceHandler) {
+    /**
+     * @deprecated
+     */
+    public NcpServiceFacadeImpl(ClientConnectorService service, ClientConnectorServicePortType clientConnectorService, TrcServiceHandler trcServiceHandler) {
         this.service = service;
         this.trcServiceHandler = trcServiceHandler;
         this.clientConnectorService = clientConnectorService;
@@ -73,7 +76,7 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
     public NcpServiceFacadeImpl() {
         String clientConnectorWsdlUrl = System.getProperty("client-connector-wsdl-url");
         LOGGER.info("[Portal] Initializing client-connector-wsdl-url: '{}'", clientConnectorWsdlUrl);
-        this.service = new ClientConnectorServiceService(null, new QName(CLIENT_CONNECTOR_NS_URL,
+        this.service = new ClientConnectorService(null, new QName(CLIENT_CONNECTOR_NS_URL,
                 CLIENT_CONNECTOR_LOCAL_PART));
         this.trcServiceHandler = new TrcServiceHandler();
     }
