@@ -533,7 +533,7 @@
                 <xsl:value-of select="$day"/>
 
                 <xsl:if test="string-length($date) &gt; 8">
-                    <xsl:text>T</xsl:text>
+                    <xsl:text>&#x9;</xsl:text>
                     <!-- time -->
                     <xsl:variable name="time">
                         <xsl:value-of select="substring($date,9,6)"/>
@@ -564,16 +564,20 @@
                     <xsl:variable name="tzon">
                         <xsl:choose>
                             <xsl:when test="contains($date,'+')">
+                                <xsl:text>(</xsl:text>
                                 <xsl:text>+</xsl:text>
                                 <xsl:value-of select="substring(substring-after($date, '+'),1,2)"/>
                                 <xsl:text>:</xsl:text>
                                 <xsl:value-of select="substring(substring-after($date, '+'),3,2)"/>
+                                <xsl:text>)</xsl:text>
                             </xsl:when>
                             <xsl:when test="contains($date,'-')">
+                                <xsl:text>(</xsl:text>
                                 <xsl:text>-</xsl:text>
                                 <xsl:value-of select="substring(substring-after($date, '-'),1,2)"/>
                                 <xsl:text>:</xsl:text>
                                 <xsl:value-of select="substring(substring-after($date, '-'),3,2)"/>
+                                <xsl:text>)</xsl:text>
                             </xsl:when>
                         </xsl:choose>
                     </xsl:variable>
@@ -782,84 +786,22 @@
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$medFrequencyIntake"/>
                 </xsl:call-template>
-                &#160;
             </xsl:when>
             <xsl:when test="$medFrequencyIntakeType='IVL_TS'">
                 <!-- time interval -->
-                <xsl:call-template name="show-TS">
-                    <xsl:with-param name="node" select="$medFrequencyIntake/n1:low"/>
+                <xsl:call-template name="show-IVL_TS">
+                    <xsl:with-param name="node" select="$medFrequencyIntake"/>
                 </xsl:call-template>
-                &#160;-
-                <xsl:call-template name="show-TS">
-                    <xsl:with-param name="node" select="$medFrequencyIntake/n1:high"/>
-                </xsl:call-template>
-                &#160;
             </xsl:when>
             <xsl:when test="$medFrequencyIntakeType='PIVL_TS'">
-                <xsl:variable name="medPhase" select="$medFrequencyIntake/n1:phase"/>
-                <xsl:variable name="medPeriod" select="$medFrequencyIntake/n1:period"/>
-                <xsl:variable name="medPhaseWidth"
-                              select="$medFrequencyIntake/n1:phase/n1:width"/>
-                <xsl:variable name="medPhaseLow"
-                              select="$medFrequencyIntake/n1:phase/n1:low"/>
-                <xsl:call-template name="show-epSOSDisplayLabels">
-                    <xsl:with-param name="code" select="'27'"/>
+                <xsl:call-template name="show-PIVL_TS">
+                    <xsl:with-param name="node" select="$medFrequencyIntake"/>
                 </xsl:call-template>
-                <xsl:value-of select="$medPeriod/@value"/>
-                <xsl:if test="$medPeriod/@unit">
-                    [
-                    <xsl:value-of select="$medPeriod/@unit"/>
-                    ]
-                </xsl:if>
-                <!-- if phase.width exists -->
-                <xsl:if test="$medPhaseWidth">
-                    <xsl:text>&#160;</xsl:text>
-                    <!--for -->
-                    <xsl:call-template name="show-epSOSDisplayLabels">
-                        <xsl:with-param name="code" select="'31'"/>
-                    </xsl:call-template>
-                    <xsl:text>&#160;</xsl:text>
-                    <xsl:value-of select="$medPhaseWidth/@value"/>
-                    &#160;
-                    <xsl:value-of select="$medPhaseWidth/@unit"/>
-                </xsl:if>
-                <xsl:if test="$medPhaseLow">
-                    <!-- xsl:text> at </xsl:text -->
-                    <xsl:call-template name="show-epSOSDisplayLabels">
-                        <xsl:with-param name="code" select="'6'"/>
-                    </xsl:call-template>
-                    <xsl:call-template name="show-TS">
-                        <xsl:with-param name="node" select="$medPhaseLow"/>
-                    </xsl:call-template>
-                    &#160;
-                </xsl:if>
             </xsl:when>
             <xsl:when test="$medFrequencyIntakeType='EIVL_TS'">
-                <xsl:variable name="medEvent" select="$medFrequencyIntake/n1:event"/>
-                <xsl:variable name="medOffset" select="$medFrequencyIntake/n1:offset"/>
-                <xsl:variable name="medOffsetWidth"
-                              select="$medOffset/n1:width"/>
-                <xsl:variable name="medOffsetLow"
-                              select="$medOffset/n1:low"/>
-                <xsl:if test="$medOffsetLow">
-                    <xsl:value-of select="$medOffsetLow/@value"/>
-                    &#160;
-                    <xsl:value-of select="$medOffsetLow/@unit"/>
-                    &#160;
-                </xsl:if>
-                <xsl:call-template name="show-epSOSTimingEvent">
-                    <xsl:with-param name="node" select="$medEvent"/>
+                <xsl:call-template name="show-EIVL_TS">
+                    <xsl:with-param name="node" select="$medFrequencyIntake"/>
                 </xsl:call-template>
-                <xsl:if test="$medOffsetWidth">
-                    <xsl:text>&#160; </xsl:text>
-                    <xsl:call-template name="show-epSOSDisplayLabels">
-                        <xsl:with-param name="code" select="'31'"/>
-                    </xsl:call-template>
-                    <xsl:text> &#160;</xsl:text>
-                    <xsl:value-of select="$medOffsetWidth/@value"/>
-                    &#160;
-                    <xsl:value-of select="$medOffsetWidth/@unit"/>
-                </xsl:if>
             </xsl:when>
             <xsl:when test="$medFrequencyIntakeType='SXPR_TS'">
                 <!-- composite -->
