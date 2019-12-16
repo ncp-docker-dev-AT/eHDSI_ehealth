@@ -738,7 +738,19 @@
         <xsl:param name="value"/>
         <xsl:choose>
             <xsl:when test="contains($value, '{')">
+                <xsl:call-template name="show-epSOSUnits">
+                    <xsl:with-param name="code" select="substring-before($value, '{')"/>
+                </xsl:call-template>
+                <xsl:if test = "substring-before($value, '{')">
+                    <xsl:text>&#160;</xsl:text>
+                </xsl:if>
                 <xsl:value-of select="substring-before(substring-after($value, '{'), '}')"/>
+                <xsl:if test = "substring-after($value, '}')">
+                    <xsl:text>&#160;</xsl:text>
+                </xsl:if>
+                <xsl:call-template name="show-epSOSUnits">
+                    <xsl:with-param name="code" select="substring-after($value, '}')"/>
+                </xsl:call-template>
             </xsl:when>
             <xsl:when test="$value='1'">
                 <xsl:value-of select="$value"/>

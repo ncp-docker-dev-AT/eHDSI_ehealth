@@ -232,6 +232,7 @@
             <table>
                 <tr>
                     <td>
+                        <!-- TODO Add label to epSOSDisplayLabels value set -->
                         <!-- Medicinal Product -->
                         <fieldset style="min-height:100px;">
                             <legend>Medicinal product</legend>
@@ -335,40 +336,37 @@
                     <td>
                         <!-- Prescription details -->
                         <fieldset style="min-height:100px;">
+                            <!-- TODO Add label to epSOSDisplayLabels value set -->
                             <legend>Prescription details</legend>
-                            <ol>
-                                <li>
-                                    <p class="date">
-                                        <xsl:call-template name="show-TS">
-                                            <xsl:with-param name="node"
-                                                            select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:low"/>
-                                        </xsl:call-template>
-                                    </p>
-                                    <span class="point"></span>
-                                    <p class="description">
+                            <table class="ep_table">
+                                <tr>
+                                    <th>
                                         <!-- Onset Date -->
                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                             <xsl:with-param name="code" select="'45'"/>
                                         </xsl:call-template>
-                                    </p>
-                                </li>
-                                <li>
-                                    <p class="date">
+                                    </th>
+                                    <td>
                                         <xsl:call-template name="show-TS">
                                             <xsl:with-param name="node"
-                                                            select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:high"/>
+                                                            select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:low"/>
                                         </xsl:call-template>
-                                    </p>
-                                    <span class="point"></span>
-                                    <p class="description">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
                                         <!-- End Date -->
                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                             <xsl:with-param name="code" select="'26'"/>
                                         </xsl:call-template>
-                                    </p>
-                                </li>
-                            </ol>
-                            <table class="ep_table">
+                                    </th>
+                                    <td>
+                                        <xsl:call-template name="show-TS">
+                                            <xsl:with-param name="node"
+                                                            select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:high"/>
+                                        </xsl:call-template>
+                                    </td>
+                                </tr>
                                 <tr>
                                     <th>
                                         <!-- Frequency of Intakes -->
@@ -376,7 +374,7 @@
                                             <xsl:with-param name="code" select="'32'"/>
                                         </xsl:call-template>
                                     </th>
-                                    <td colspan="2">
+                                    <td>
                                         <xsl:variable name="hasFrequency">
                                             <xsl:call-template name="check-Parameter">
                                                 <xsl:with-param name="parameter" select="n1:effectiveTime[2]/n1:period/@nullFlavor"/>
@@ -419,7 +417,7 @@
                                             <xsl:with-param name="code" select="'43'"/>
                                         </xsl:call-template>
                                     </th>
-                                    <td colspan="2">
+                                    <td>
                                         <xsl:call-template name="number-of-packages">
                                             <xsl:with-param name="supply" select="n1:entryRelationship[@typeCode='COMP']"/>
                                         </xsl:call-template>
@@ -434,7 +432,7 @@
                                             </xsl:call-template>
                                         </span>
                                     </th>
-                                    <td colspan="2">
+                                    <td>
                                         <xsl:call-template name="show-text">
                                             <xsl:with-param name="txt"
                                                             select="n1:entryRelationship[@typeCode='SUBJ']/n1:act[n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.3'] ]/n1:text"/>
@@ -450,7 +448,7 @@
                                             </xsl:call-template>
                                         </span>
                                     </th>
-                                    <td colspan="2">
+                                    <td>
                                         <xsl:call-template name="show-text">
                                             <xsl:with-param name="txt"
                                                             select="n1:entryRelationship[@typeCode='SUBJ']/n1:act[n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.3.1'] ]/n1:text"/>
@@ -463,7 +461,7 @@
                                             <xsl:with-param name="code" select="'38'"/>
                                         </xsl:call-template>
                                     </th>
-                                    <td colspan="2">
+                                    <td>
                                         <xsl:call-template name="substitution-code"/>
                                     </td>
                                 </tr>
@@ -486,6 +484,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">
+                        <!-- TODO Add label to epSOSDisplayLabels value set -->
                         <!-- Dispensation details -->
                         <fieldset style="min-height:100px;">
                             <legend>Dispensation details</legend>
