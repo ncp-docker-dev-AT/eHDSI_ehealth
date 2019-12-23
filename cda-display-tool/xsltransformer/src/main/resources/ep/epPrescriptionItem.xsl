@@ -689,7 +689,7 @@
                                                 </xsl:attribute>
                                                 <xsl:attribute name="value">
                                                     <xsl:call-template name="show-strength">
-                                                        <xsl:with-param name="node" select="$strength"/>
+                                                        <xsl:with-param name="node" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:quantity"/>
                                                     </xsl:call-template>
                                                 </xsl:attribute>
                                             </input>
