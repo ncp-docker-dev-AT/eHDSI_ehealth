@@ -72,13 +72,13 @@
                     <table class="header_table">
                         <tbody>
                             <tr>
-                                <th>
+                                <th colspan="2">
                                     <!-- Prefix-->
                                     <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'55'"/>
                                     </xsl:call-template>
                                 </th>
-                                <th>
+                                <th colspan="2">
                                     <!-- Family Name-->
                                     <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'30'"/>
@@ -92,18 +92,12 @@
                                 </th>
                             </tr>
                             <tr>
-                                <td><xsl:value-of select="$prefix"/>&#160;</td>
-                                <td><xsl:value-of select="$familyName"/></td>
+                                <td colspan="2"><xsl:value-of select="$prefix"/></td>
+                                <td colspan="2"><xsl:value-of select="$familyName"/></td>
                                 <td><xsl:value-of select="$givenName"/>&#160;</td>
                             </tr>
-                        </tbody>
-                    </table>
-                </tr>
-                <tr>
-                    <table class="header_table">
-                        <tbody>
                             <tr>
-                                <th style="width:100px;">
+                                <th style="width:140px;">
                                     <!-- Primary Patient ID -->
                                     <!-- TODO Add concept to epSOSDisplayLabels value set -->
                                     Primary Patient ID
@@ -114,7 +108,7 @@
                                     </xsl:call-template>
                                 </td>
                                 <xsl:if test="$secondaryPatientId">
-                                    <th style="width:100px;">
+                                    <th style="width:140px;">
                                         <!-- Secondary Patient ID -->
                                         <!-- TODO Add concept to epSOSDisplayLabels value set -->
                                         Secondary Patient ID
@@ -126,14 +120,8 @@
                                     </td>
                                 </xsl:if>
                             </tr>
-                        </tbody>
-                    </table>
-                </tr>
-                <tr>
-                    <table class="header_table">
-                        <tbody>
                             <tr>
-                                <th style="width:100px;">
+                                <th style="width:140px;">
                                     <!-- Gender-->
                                     <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'33'"/>
@@ -142,7 +130,7 @@
                                 <td>
                                     <xsl:value-of select="$gender/@displayName"/>
                                 </td>
-                                <th style="width:100px;">
+                                <th style="width:140px;">
                                     <!-- Date Of Birth-->
                                     <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'19'"/>
