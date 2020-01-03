@@ -28,7 +28,7 @@ Although being real choices for the different diseases and conditions, the selec
     <recordTarget>
         <patientRole>
             <!-- Primary Patient Identifier -->
-            <id extension="2-1234-TM-W3" root="2.16.17.710.820.1000.990.1"/>
+            <id extension="2-1234-W3" root="2.16.17.710.820.1000.990.1"/>
             <addr>
                 <streetAddressLine>155, Avenida da Liberdade</streetAddressLine>
                 <postalCode>1250-141</postalCode>
@@ -603,9 +603,9 @@ Although being real choices for the different diseases and conditions, the selec
                     <title>Allergies and adverse reactions</title>
                     <text>
                         <paragraph ID="obs-1">Food allergy to Kiwi fruit, Reaction: Eczema</paragraph><paragraph ID="obs-3">Food intolerance to Lactose, Reaction: Diarrhea</paragraph><paragraph ID="obs-5">Medication allergy to acetylsalicylic acid, Reaction: Asthma</paragraph><paragraph ID="obs-7">Allergy to Latex, Reaction: Urticaria</paragraph>
-                        <table><colgroup><col width="20%"/><col width="15%"/><col width="15%"/><col width="15%"/><col width="10%"/><col width="20%"/><col width="15%"/></colgroup>
+                        <table><colgroup><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/></colgroup>
                             <thead>
-                                <tr><th>Reaction Type</th><th>Agent</th><th>Clinical Manifestation</th><th>Time</th><th>Status</th><th>Process of establishing a problem</th><th>Severity</th></tr>
+                                <tr><th>Reaction Type</th><th>Agent</th><th>Clinical Manifestation</th><th>Time</th><th>Status</th><th>Process of establishing a problem</th></tr>
                             </thead>
                             <tbody>
                                 <tr><td><content ID="obs-1a"><content ID="code-6" language="xx-XX">Food allergy</content><br/></content></td><td><content ID="code-7" language="xx-XX">Kiwi fruit</content><br/></td><td ID="obs-2"><content ID="val-2" language="xx-XX">Eczema</content><br/></td><td>since 1990-01-10</td><td>active</td><td><content ID="code-8" language="xx-XX">Finding reported by subject or history provider</content></td><td><content ID="code-9" language="xx-XX">Moderate to severe</content><br/></td></tr>
@@ -742,8 +742,8 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <originalText><reference value="#val-4"/></originalText>
                                             </value>
                                         </observation>
+                                        <!-- Severity -->
                                     </entryRelationship>
-                                    <!-- Severity -->
                                     <entryRelationship typeCode="SUBJ" inversionInd="true">
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1"/>
@@ -892,17 +892,17 @@ Although being real choices for the different diseases and conditions, the selec
                                                     <reference value="#val-8"/>
                                                 </originalText>
                                             </value>
-                                        </observation>
-                                    </entryRelationship>
-                                    <!-- Severity -->
-                                    <entryRelationship typeCode="SUBJ" inversionInd="true">
-                                        <observation classCode="OBS" moodCode="EVN">
-                                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1"/>
-                                            <templateId root="2.16.840.1.113883.10.20.1.55"/>
-                                            <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
-                                            <text><reference value="#code-21"/></text>
-                                            <statusCode code="completed"/>
-                                            <value xsi:type="CD" code="371923003" codeSystem="2.16.840.1.113883.6.96"/>
+                                            <!-- Severity -->
+                                            <entryRelationship typeCode="SUBJ" inversionInd="true">
+                                                <observation classCode="OBS" moodCode="EVN">
+                                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1"/>
+                                                    <templateId root="2.16.840.1.113883.10.20.1.55"/>
+                                                    <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
+                                                    <text><reference value="#code-21"/></text>
+                                                    <statusCode code="completed"/>
+                                                    <value xsi:type="CD" code="371923003" codeSystem="2.16.840.1.113883.6.96"/>
+                                                </observation>
+                                            </entryRelationship>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -1652,6 +1652,33 @@ Although being real choices for the different diseases and conditions, the selec
                                 </observation>
                             </component>
                         </organizer>
+                    </entry>
+                </section>
+            </component>
+            <component>
+                <!-- Coded Results -->
+                <section>
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.5"/>
+                    <id root="2.999.11"/>
+                    <code code="30954-2" codeSystem="2.16.840.1.113883.6.1"/>
+                    <title>Coded Results</title>
+                    <text>
+                        <paragraph ID="code-69">Coded Results</paragraph>
+                        <paragraph ID="obs-26">Blood Group: O+</paragraph>
+                    </text>
+                    <entry>
+                        <observation classCode="OBS" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13.6"/>
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
+                            <id root="2.999"/>
+                            <code code="34530-6" codeSystem="2.16.840.1.113883.6.1"/>
+                            <text>
+                                <reference value="#obs-26"/>
+                            </text>
+                            <statusCode code="completed"/>
+                            <effectiveTime value="20191122"/>
+                            <value xsi:type="CV" code="278147001" codeSystem="2.16.840.1.113883.6.96" />
+                        </observation>
                     </entry>
                 </section>
             </component>
