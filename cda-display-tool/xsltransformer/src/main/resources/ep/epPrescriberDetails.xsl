@@ -13,7 +13,7 @@
         <xsl:param name="telecomParam"/>
         <xsl:choose>
             <xsl:when test="$telecomParam/@nullFlavor">
-                <xsl:call-template name="show-nullFlavor">
+                <xsl:call-template name="show-epSOSNullFlavor">
                     <xsl:with-param name="code" select="$telecomParam/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -27,7 +27,7 @@
         <xsl:param name="name"/>
         <xsl:choose>
             <xsl:when test="$name/@nullFlavor">
-                <xsl:call-template name="show-nullFlavor">
+                <xsl:call-template name="show-epSOSNullFlavor">
                     <xsl:with-param name="code" select="$name/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -41,7 +41,7 @@
         <xsl:param name="id"/>
         <xsl:choose>
             <xsl:when test="$id/@nullFlavor">
-                <xsl:call-template name="show-nullFlavor">
+                <xsl:call-template name="show-epSOSNullFlavor">
                     <xsl:with-param name="code" select="$id/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -55,7 +55,7 @@
         <xsl:param name="name"/>
         <xsl:choose>
             <xsl:when test="$name/@nullFlavor">
-                <xsl:call-template name="show-nullFlavor">
+                <xsl:call-template name="show-epSOSNullFlavor">
                     <xsl:with-param name="code" select="$name/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -69,7 +69,7 @@
         <xsl:param name="name"/>
         <xsl:choose>
             <xsl:when test="$name/@nullFlavor">
-                <xsl:call-template name="show-nullFlavor">
+                <xsl:call-template name="show-epSOSNullFlavor">
                     <xsl:with-param name="code" select="$name/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -84,8 +84,9 @@
             <input id="collapsible-prescriber-header" class="toggle" type="checkbox"/>
             <label for="collapsible-prescriber-header" class="lbl-toggle-main">
                 <!-- Prescriber -->
-                <!-- TODO This value should be specified in the epsosDisplayLabel value set -->
-                Prescriber
+                <xsl:call-template name="show-epSOSDisplayLabels">
+                    <xsl:with-param name="code" select="'56'"/>
+                </xsl:call-template>
             </label>
             <div class="collapsible-content-main">
                 <div class="content-inner-main">
@@ -96,13 +97,13 @@
                         <tr>
                             <th>
                                 <!--  Prescriber: -->
-                                <xsl:call-template name="show-displayLabels">
+                                <xsl:call-template name="show-epSOSDisplayLabels">
                                     <xsl:with-param name="code" select="'56'"/>
                                 </xsl:call-template>
                             </th>
                             <th>
                                 <!--  Profession: -->
-                                <xsl:call-template name="show-displayLabels">
+                                <xsl:call-template name="show-epSOSDisplayLabels">
                                     <xsl:with-param name="code" select="'64'"/>
                                 </xsl:call-template>
                             </th>
@@ -126,7 +127,7 @@
                     <div class="wrap-collabsible">
                         <input id="collapsible-extended-prescriber" class="toggle" type="checkbox"/>
                         <label for="collapsible-extended-prescriber" class="lbl-toggle">
-                            <xsl:call-template name="show-displayLabels">
+                            <xsl:call-template name="show-epSOSDisplayLabels">
                                 <xsl:with-param name="code" select="'68'"/>
                             </xsl:call-template>
                         </label>
@@ -147,80 +148,81 @@
                                             <tr>
                                                 <th>
                                                     <!--  Specialty: -->
-                                                    <xsl:call-template name="show-displayLabels">
+                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                         <xsl:with-param name="code" select="'69'"/>
                                                     </xsl:call-template>
                                                 </th>
-                                                <td></td>
+                                                    <xsl:value-of select="/ClinicalDocument/author/assignedAuthor/code/@displayName"/>
+                                                <td>
+                                                </td>
                                                 <th>
                                                     <!--  Contact Information: -->
-                                                    <xsl:call-template name="show-displayLabels">
+                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                         <xsl:with-param name="code" select="'12'"/>
                                                     </xsl:call-template>
                                                 </th>
                                                 <td>
                                                     <xsl:call-template name="telecom">
                                                         <xsl:with-param name="telecomParam"
-                                                                        select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:telecom"/>
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:telecom"/>
                                                     </xsl:call-template>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <th>
                                                     <!-- Facility ID -->
-                                                    <xsl:call-template name="show-displayLabels">
+                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                         <xsl:with-param name="code" select="'28'"/>
                                                     </xsl:call-template>
                                                 </th>
                                                 <td>
                                                     <xsl:call-template name="facilityId">
                                                         <xsl:with-param name="id"
-                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:id"/>
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:id"/>
                                                     </xsl:call-template>
                                                 </td>
                                                 <th>
                                                     <!-- Facility Name:-->
-                                                    <xsl:call-template name="show-displayLabels">
+                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                         <xsl:with-param name="code" select="'29'"/>
                                                     </xsl:call-template>
                                                 </th>
                                                 <td>
                                                     <xsl:call-template name="facilityName">
                                                         <xsl:with-param name="name"
-                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
                                                     </xsl:call-template>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <th>
                                                     <!-- Country: -->
-                                                    <xsl:call-template name="show-displayLabels">
+                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                         <xsl:with-param name="code" select="'13'"/>
                                                     </xsl:call-template>
                                                 </th>
                                                 <td>
                                                     <xsl:call-template name="country">
                                                         <xsl:with-param name="name"
-                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr/n1:country"/>
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr/n1:country"/>
                                                     </xsl:call-template>
                                                 </td>
                                                 <th>
                                                     <!--  Address: -->
-                                                    <xsl:call-template name="show-displayLabels">
+                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                         <xsl:with-param name="code" select="'3'"/>
                                                     </xsl:call-template>
                                                 </th>
                                                 <td>
-                                                    <xsl:call-template name="country">
-                                                        <xsl:with-param name="name"
-                                                                        select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr"/>
+                                                    <xsl:call-template name="show-address">
+                                                        <xsl:with-param name="address" select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr"/>
                                                     </xsl:call-template>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <th>
                                                     <!--  Organisation Name: -->
-                                                    <xsl:call-template name="show-displayLabels">
+                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                         <xsl:with-param name="code" select="'47'"/>
                                                     </xsl:call-template>
                                                 </th>
@@ -232,7 +234,7 @@
                                                 </td>
                                                 <th>
                                                     <!--  Organisation Identifier: -->
-                                                    <xsl:call-template name="show-displayLabels">
+                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                         <xsl:with-param name="code" select="'46'"/>
                                                     </xsl:call-template>
                                                 </th>

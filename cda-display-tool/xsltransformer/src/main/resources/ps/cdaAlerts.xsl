@@ -28,7 +28,7 @@
                     <!-- The Allergies, adverse reactions, alerts section is missing ! -->
                     <xsl:choose>
                         <xsl:when test=" ($documentCode='60591-5')">
-                            <xsl:call-template name="show-displayLabels">
+                            <xsl:call-template name="show-epSOSDisplayLabels">
                                 <xsl:with-param name="code" select="'73'"/>
                             </xsl:call-template>
                         </xsl:when>
@@ -59,7 +59,10 @@
                 <div class="wrap-collabsible">
                     <input id="collapsible-alerts-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-alerts-section-original" class="lbl-toggle-title">
-                        <xsl:value-of select="$sectionCode/@displayName"/>
+                        <!-- Section title -->
+                        <xsl:call-template name="show-epSOSSections">
+                            <xsl:with-param name="code" select="'48765-2'"/>
+                        </xsl:call-template>
                     </label>
                     <div class="collapsible-content-title">
                         <div class="content-inner-title">
@@ -97,31 +100,31 @@
                                                             <tr>
                                                                 <th>
                                                                     <!-- Reaction Type header -->
-                                                                    <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                                         <xsl:with-param name="code" select="'65'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Clinical Manifestation header -->
-                                                                    <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                                         <xsl:with-param name="code" select="'10'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Agent header -->
-                                                                    <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                                         <xsl:with-param name="code" select="'5'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- OnSet Date header -->
-                                                                    <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                                         <xsl:with-param name="code" select="'45'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Severity header -->
-                                                                    <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                                         <xsl:with-param name="code" select="'123'"/>
                                                                     </xsl:call-template>
                                                                 </th>
@@ -135,7 +138,7 @@
                                                 </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-nullFlavor">
+                                                <xsl:call-template name="show-epSOSNullFlavor">
                                                     <xsl:with-param name="code" select="$act/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -157,11 +160,10 @@
 
         <xsl:variable name="observation"
                       select="n1:act/n1:templateId[@root= '2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/.."/>
-
         <xsl:variable name="reactionType"
                       select="$observation/n1:code"/>
         <xsl:variable name="clinicalManifestation"
-                      select="$observation/n1:entryRelationship[@typeCode='MFST']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.5']/../n1:value"/>
+                      select="$observation/n1:entryRelationship[@typeCode='MFST']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:value"/>
         <xsl:variable name="agentCode"
                       select="$observation/n1:participant[@typeCode='CSM']/n1:participantRole[@classCode='MANU']/n1:playingEntity[@classCode='MMAT']/n1:code"/>
         <xsl:variable name="onSetDate"
@@ -170,18 +172,6 @@
                       select="$observation/n1:value"/>
         <xsl:variable name="severity"
                       select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:entryRelationship/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.1']/../n1:value"/>
-
-        <!-- observation value code -->
-        <!-- not sure if we have to filter with root and template ids-->
-        <!---
-        answer by Giorgio for checking the no info scenario
-        entry/act[templateId/@root= ‘2.16.840.1.113883.10.20.1.27’]/entryRelationship[@typeCode=’SUBJ’]/observation[templateId/@root=’1.3.6.1.4.1.19376.1.5.3.1.4.6’]/code/@ displayName -->
-
-        <xsl:variable name="obsCode"
-                      select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:value/@code"/>
-        <!-- in case of no info scenario the following displayName will be displayed -->
-        <xsl:variable name="obsDisplay"
-                      select="n1:act/n1:templateId[@root='2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/../n1:value/@displayName"/>
         <!-- End definition of variables-->
 
         <xsl:choose>
@@ -191,80 +181,44 @@
                     <xsl:when test="($obsValue/@code='no-known-allergies' or $obsValue/@code='no-allergy-info')">
                         <tr>
                             <td colspan="4">
-                                <xsl:call-template name="show-absentOrUnknownAllergies">
-                                    <xsl:with-param name="code" select="$obsValue/@code"/>
+                                <xsl:call-template name="show-eHDSI-AbsentOrUnknownAllergies">
+                                    <xsl:with-param name="node" select="$obsValue"/>
                                 </xsl:call-template>
                             </td>
                         </tr>
                     </xsl:when>
                     <xsl:otherwise>
                         <tr>
-                            <!-- Reaction Type -->
                             <td>
-                                <xsl:choose>
-                                    <xsl:when test="$reactionType/@nullFlavor">
-                                        <xsl:call-template name="show-nullFlavor">
-                                            <xsl:with-param name="code" select="$reactionType/@nullFlavor"/>
-                                        </xsl:call-template>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="$reactionType/@displayName"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <!-- Reaction Type -->
+                                <xsl:call-template name="show-epSOSAdverseEventType">
+                                    <xsl:with-param name="node" select="$reactionType"/>
+                                </xsl:call-template>
                             </td>
-                            <!-- Clinical Manifestation -->
                             <td>
-                                <xsl:choose>
-                                    <xsl:when test="$clinicalManifestation/@displayName">
-                                        <xsl:value-of select="$clinicalManifestation/@displayName"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <!-- uncoded element Problem -->
-                                        <xsl:if test="$clinicalManifestation/n1:originalText/n1:reference/@value">
-                                            <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="code"
-                                                                select="$clinicalManifestation/n1:originalText/n1:reference/@value"/>
-                                            </xsl:call-template>
-                                        </xsl:if>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <!-- Clinical Manifestation -->
+                                <xsl:call-template name="show-epSOSReactionAllergy">
+                                    <xsl:with-param name="node" select="$clinicalManifestation"/>
+                                </xsl:call-template>
                             </td>
-                            <!-- Agent -->
                             <td>
-                                <xsl:choose>
-                                    <xsl:when test=" not($agentCode/@nullFlavor)">
-                                        <xsl:choose>
-                                            <xsl:when test="$agentCode/@displayName">
-                                                <xsl:value-of select="$agentCode/@displayName"/>
-                                                <br/>(<xsl:value-of select="$agentCode/@code"/>)
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <!--  uncoded element -->
-                                                <xsl:if test="$agentCode/n1:originalText/n1:reference/@value">
-                                                    <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="code"
-                                                                        select="$agentCode/n1:originalText/n1:reference/@value"/>
-                                                    </xsl:call-template>
-                                                </xsl:if>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:call-template name="show-nullFlavor">
-                                            <xsl:with-param name="code" select="$agentCode/@nullFlavor"/>
-                                        </xsl:call-template>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <!-- Agent -->
+                                <xsl:call-template name="show-epSOSAllergenNoDrugs">
+                                    <xsl:with-param name="node" select="$agentCode"/>
+                                </xsl:call-template>
+                                <xsl:call-template name="show-epSOSActiveIngredient">
+                                    <xsl:with-param name="node" select="$agentCode"/>
+                                </xsl:call-template>
                             </td>
-                            <!-- OnSet Date -->
                             <td>
-                                <xsl:call-template name="show-time">
-                                    <xsl:with-param name="datetime" select="$onSetDate"/>
+                                <!-- OnSet Date -->
+                                <xsl:call-template name="show-TS">
+                                    <xsl:with-param name="node" select="$onSetDate"/>
                                 </xsl:call-template>
                             </td>
                             <td>
                                 <!-- Severity -->
-                                <xsl:call-template name="show-element">
+                                <xsl:call-template name="show-epSOSSeverity">
                                     <xsl:with-param name="node" select="$severity"/>
                                 </xsl:call-template>
                             </td>
@@ -275,7 +229,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-nullFlavor">
+                        <xsl:call-template name="show-epSOSNullFlavor">
                             <xsl:with-param name="code" select="$act/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

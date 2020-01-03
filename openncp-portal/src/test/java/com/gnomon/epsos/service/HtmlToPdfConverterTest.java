@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -13,7 +14,7 @@ public class HtmlToPdfConverterTest {
 
     @Test
     public void testConvertion() throws IOException {
-        String html = readFile(new File("openncp-portal/src/test/resources/ps_friendly.html"));
+        String html = readFile(new File("openncp-portal/src/test/resources/pt.html"));
         ByteArrayOutputStream baos = HtmlToPdfConverter.createPdf(html);
         Assert.assertNotNull(baos);
         Assert.assertTrue(baos.toByteArray().length > 0);
