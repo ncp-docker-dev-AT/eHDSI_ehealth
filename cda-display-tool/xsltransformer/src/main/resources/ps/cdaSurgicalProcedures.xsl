@@ -24,7 +24,7 @@
                     <!-- The Procedures section is missing! -->
                     <xsl:choose>
                         <xsl:when test=" ($documentCode='60591-5')">
-                            <xsl:call-template name="show-displayLabels">
+                            <xsl:call-template name="show-epSOSDisplayLabels">
                                 <xsl:with-param name="code" select="'76'"/>
                             </xsl:call-template>
                         </xsl:when>
@@ -41,9 +41,6 @@
         <xsl:variable
                 name="surgicalProceduresSectionTitleCode"
                 select="n1:code/@code"/>
-        <xsl:variable
-                name="surgicalProceduresSectionTitle"
-                select="n1:code[@code='47519-4']/@displayName"/>
         <xsl:variable name="surgicalProcedure"
                       select="n1:entry/n1:procedure"/>
         <xsl:variable name="surgicalProcedureCode"
@@ -55,7 +52,10 @@
                 <div class="wrap-collabsible">
                     <input id="collapsible-surgical-procedures-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-surgical-procedures-section-original" class="lbl-toggle-title">
-                        <xsl:value-of select="$surgicalProceduresSectionTitle"/>
+                        <!-- Section title -->
+                        <xsl:call-template name="show-epSOSSections">
+                            <xsl:with-param name="code" select="'47519-4'"/>
+                        </xsl:call-template>
                     </label>
                     <div class="collapsible-content-title">
                         <div class="content-inner-title">
@@ -93,13 +93,13 @@
                                                             <tr>
                                                                 <th>
                                                                     <!--  Procedure -->
-                                                                    <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                                         <xsl:with-param name="code" select="'62'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!--  Procedure Date -->
-                                                                    <xsl:call-template name="show-displayLabels">
+                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                                                         <xsl:with-param name="code" select="'63'"/>
                                                                     </xsl:call-template>
                                                                 </th>
@@ -114,7 +114,7 @@
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <br/>
-                                                <xsl:call-template name="show-nullFlavor">
+                                                <xsl:call-template name="show-epSOSNullFlavor">
                                                     <xsl:with-param name="code" select="$surgicalProcedure/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -147,7 +147,7 @@
                     <xsl:when test="($surgicalProcedureCode/@code='no-known-procedures' or $surgicalProcedureCode/@code='no-procedure-info')">
                         <tr>
                             <td colspan="2">
-                                <xsl:call-template name="show-absentOrUnknownProcedures">
+                                <xsl:call-template name="show-eHDSI-AbsentOrUnknownProcedures">
                                     <xsl:with-param name="code" select="$surgicalProcedureCode/@code"/>
                                 </xsl:call-template>
                             </td>
@@ -157,44 +157,15 @@
                         <tr>
                             <td>
                                 <!--  Procedure -->
-                                <xsl:choose>
-                                    <xsl:when test="not ($surgicalProcedureCode/@nullFlavor)">
-                                        <xsl:choose>
-                                            <xsl:when test="$surgicalProcedureCode/@displayName">
-                                                <xsl:value-of select="$surgicalProcedureCode/@displayName"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <!--  uncoded element only if we don;t have displayName -->
-                                                <xsl:if test="$surgicalProcedureCode/n1:originalText/n1:reference/@value">
-                                                    <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="code"
-                                                                        select="$surgicalProcedureCode/n1:originalText/n1:reference/@value"/>
-                                                    </xsl:call-template>
-                                                </xsl:if>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:call-template name="show-nullFlavor">
-                                            <xsl:with-param name="code" select="$surgicalProcedureCode/@nullFlavor"/>
-                                        </xsl:call-template>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <xsl:call-template name="show-epSOSProcedures">
+                                    <xsl:with-param name="node" select="$surgicalProcedureCode"/>
+                                </xsl:call-template>
                             </td>
                             <td>
                                 <!--  Procedure Date -->
-                                <xsl:choose>
-                                    <xsl:when test="$surgicalProcedureDate/@low">
-                                        <xsl:call-template name="show-time">
-                                            <xsl:with-param name="datetime" select="$surgicalProcedureDate/@low"/>
-                                        </xsl:call-template>&#160;
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:call-template name="show-time">
-                                            <xsl:with-param name="datetime" select="$surgicalProcedureDate"/>
-                                        </xsl:call-template>&#160;
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <xsl:call-template name="show-IVL_TS">
+                                    <xsl:with-param name="node" select="$surgicalProcedureDate"/>
+                                </xsl:call-template>
                             </td>
                         </tr>
                     </xsl:otherwise>
@@ -203,7 +174,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-nullFlavor">
+                        <xsl:call-template name="show-epSOSNullFlavor">
                             <xsl:with-param name="code" select="$surgicalProcedureAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

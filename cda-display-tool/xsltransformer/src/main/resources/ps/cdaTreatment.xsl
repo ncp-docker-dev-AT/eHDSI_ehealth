@@ -29,9 +29,6 @@
                 name="treatmentSectionTitleCode"
                 select="n1:code/@code"/>
         <xsl:variable
-                name="treatmentSectionTitle"
-                select="n1:code[@code='18776-5']/@displayName"/>
-        <xsl:variable
                 name="treatmentSectionText"
                 select="n1:code[@code='18776-5']/../n1:text"/>
         <!-- End definition of variables-->
@@ -42,7 +39,10 @@
                 <div class="wrap-collabsible">
                     <input id="collapsible-treatment-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-treatment-section-original" class="lbl-toggle-title">
-                        <xsl:value-of select="$treatmentSectionTitle"/>
+                        <!-- Section title -->
+                        <xsl:call-template name="show-epSOSSections">
+                            <xsl:with-param name="code" select="'18776-5'"/>
+                        </xsl:call-template>
                     </label>
                     <div class="collapsible-content-title">
                         <div class="content-inner-title">
