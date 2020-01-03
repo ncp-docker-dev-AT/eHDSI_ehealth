@@ -13,15 +13,15 @@ import java.nio.file.Paths;
 public class HtmlToPdfConverterTest {
 
     @Test
-    public void testConvertion() throws IOException {
-        String html = readFile(new File("openncp-portal/src/test/resources/pt.html"));
+    public void testConversion() throws IOException {
+        String html = readFile(new File("src/test/resources/GR2FR_01059902062.html"));
         ByteArrayOutputStream baos = HtmlToPdfConverter.createPdf(html);
         Assert.assertNotNull(baos);
         Assert.assertTrue(baos.toByteArray().length > 0);
-//        String filename = "C:\\LocalData\\Share\\openncp-configuration\\EpsosRepository\\out\\output.pdf";
-//        FileOutputStream output = new FileOutputStream(filename);
-//        output.write(baos.toByteArray());
-//        output.close();
+        /*String filename = "C:\\LocalData\\Share\\openncp-configuration\\EpsosRepository\\out\\output.pdf";
+        FileOutputStream output = new FileOutputStream(filename);
+        output.write(baos.toByteArray());
+        output.close();*/
     }
 
     private String readFile(File file) throws IOException {
