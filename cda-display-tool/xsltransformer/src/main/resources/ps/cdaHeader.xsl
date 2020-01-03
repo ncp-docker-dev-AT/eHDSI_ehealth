@@ -104,21 +104,27 @@
                         <tbody>
                             <tr>
                                 <th style="width:100px;">
-                                    <!-- Patient Ids-->
-                                    <xsl:call-template name="show-epSOSDisplayLabels">
-                                        <xsl:with-param name="code" select="'52'"/>
-                                    </xsl:call-template>
+                                    <!-- Primary Patient ID -->
+                                    <!-- TODO Add concept to epSOSDisplayLabels value set -->
+                                    Primary Patient ID
                                 </th>
                                 <td>
                                     <xsl:call-template name="show-id">
                                         <xsl:with-param name="id" select="$primaryPatientId"/>
                                     </xsl:call-template>
                                 </td>
-                                <td>
-                                    <xsl:call-template name="show-id">
-                                        <xsl:with-param name="id" select="$secondaryPatientId"/>
-                                    </xsl:call-template>
-                                </td>
+                                <xsl:if test="$secondaryPatientId">
+                                    <th style="width:100px;">
+                                        <!-- Secondary Patient ID -->
+                                        <!-- TODO Add concept to epSOSDisplayLabels value set -->
+                                        Secondary Patient ID
+                                    </th>
+                                    <td>
+                                        <xsl:call-template name="show-id">
+                                            <xsl:with-param name="id" select="$secondaryPatientId"/>
+                                        </xsl:call-template>
+                                    </td>
+                                </xsl:if>
                             </tr>
                         </tbody>
                     </table>
