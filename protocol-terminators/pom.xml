@@ -33,7 +33,7 @@
         <dependencies>
             <dependency>
                 <groupId>eu.europa.ec.sante.ehdsi</groupId>
-                <artifactId>openncp-adc</artifactId>
+                <artifactId>openncp-eadc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

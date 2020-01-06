@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-adc</artifactId>
+            <artifactId>openncp-eadc</artifactId>
             <exclusions>
                 <exclusion>
                     <artifactId>log4j</artifactId>
