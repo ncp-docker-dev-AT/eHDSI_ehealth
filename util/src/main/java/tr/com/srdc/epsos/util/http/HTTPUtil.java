@@ -4,6 +4,7 @@ import eu.epsos.util.proxy.CustomProxySelector;
 import eu.epsos.util.proxy.ProxyCredentials;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.x509.X500Name;
@@ -246,7 +247,7 @@ public class HTTPUtil {
 
         ConfigurationManager configService = ConfigurationManagerFactory.getConfigurationManager();
 
-        return Boolean.parseBoolean(configService.getProperty("APP_BEHIND_PROXY"));
+        return Boolean.parseBoolean(configService.getProperty(StandardProperties.HTTP_PROXY_USED));
     }
 
     /**
@@ -256,11 +257,11 @@ public class HTTPUtil {
 
         ProxyCredentials credentials = new ProxyCredentials();
         ConfigurationManager configService = ConfigurationManagerFactory.getConfigurationManager();
-        credentials.setProxyAuthenticated(Boolean.parseBoolean(configService.getProperty("APP_BEHIND_PROXY")));
-        credentials.setHostname(configService.getProperty("APP_PROXY_HOST"));
-        credentials.setPassword(configService.getProperty("APP_PROXY_PASSWORD"));
-        credentials.setPort(configService.getProperty("APP_PROXY_PORT"));
-        credentials.setUsername(configService.getProperty("APP_PROXY_USERNAME"));
+        credentials.setProxyAuthenticated(Boolean.parseBoolean(configService.getProperty(StandardProperties.HTTP_PROXY_USED)));
+        credentials.setHostname(configService.getProperty(StandardProperties.HTTP_PROXY_HOST));
+        credentials.setPassword(configService.getProperty(StandardProperties.HTTP_PROXY_PASSWORD));
+        credentials.setPort(configService.getProperty(StandardProperties.HTTP_PROXY_PORT));
+        credentials.setUsername(configService.getProperty(StandardProperties.HTTP_PROXY_USERNAME));
         return credentials;
     }
 

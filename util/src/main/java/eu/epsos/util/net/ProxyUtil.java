@@ -1,17 +1,18 @@
 package eu.epsos.util.net;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.ProxySelector;
 
 /**
- * An utility class that allows the ability to configure proxy host settings and
- * credentials required when a component need to open an Url connection.
+ * An utility class that allows the ability to configure proxy host settings and credentials required when a component
+ * need to open an Url connection.
  * <p>
- * The following parameters must be stored into the OpenNCP database properties
- * and available throughout the service <code>ConfigurationManagerService</code>
+ * The following parameters must be stored into the OpenNCP database properties and available throughout the service
+ * <code>ConfigurationManagerService</code>.
  * <p>
  * <i>APP_BEHIND_PROXY</i> Boolean if application is behind a Proxy or not.<br/>
  * <i>APP_PROXY_HOST</i> Proxy hostname.<br/>
@@ -27,22 +28,20 @@ import java.net.ProxySelector;
 public class ProxyUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyUtil.class);
-    // TODO: Could be good to add/create an Enumeration into the Configuration
-    // Manager project containing the List of Parameters available for the
-    // application configuration.
+
+    private ProxyUtil() {
+    }
 
     /**
-     * Main method responsible of the detection and configuration of the proxy
-     * credentials.
+     * Main method responsible of the detection and configuration of the proxy credentials.
      */
     public static void initProxyConfiguration() {
 
         LOGGER.info("initProxyConfiguration()");
-        if (isProxyAnthenticationMandatory()) {
+        if (isProxyAuthenticationMandatory()) {
 
             ProxyCredentials proxyCredentials = getProxyCredentials();
-            CustomProxySelector ps = new CustomProxySelector(
-                    ProxySelector.getDefault(), proxyCredentials);
+            CustomProxySelector ps = new CustomProxySelector(ProxySelector.getDefault(), proxyCredentials);
             ProxySelector.setDefault(ps);
 
             System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
@@ -52,32 +51,29 @@ public class ProxyUtil {
 
     /**
      * <p>
-     * Checks if a proxy server has been defined into the application system
-     * properties by querying the database.
+     * Checks if a proxy server has been defined into the application system properties by querying the database.
      * </p>
      *
      * @return <code>true</code> if the property defined is true or null
      */
-    public static boolean isProxyAnthenticationMandatory() {
+    public static boolean isProxyAuthenticationMandatory() {
 
-        return Boolean.valueOf(ConfigurationManagerFactory.getConfigurationManager().getProperty("APP_BEHIND_PROXY"));
+        return Boolean.parseBoolean(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_USED));
     }
 
     /**
-     * Method that returns the information required in order to be proxy
-     * authenticated.
+     * Method that returns the information required in order to be proxy authenticated.
      *
-     * @return <code>ProxyCredentials</code> Object that encapsulates the
-     * necessary connection properties.
+     * @return <code>ProxyCredentials</code> Object that encapsulates the necessary connection properties.
      */
     public static ProxyCredentials getProxyCredentials() {
 
         ProxyCredentials credentials = new ProxyCredentials();
-        credentials.setProxyAuthenticated(ConfigurationManagerFactory.getConfigurationManager().getProperty("APP_BEHIND_PROXY"));
-        credentials.setProxyHost(ConfigurationManagerFactory.getConfigurationManager().getProperty("APP_PROXY_HOST"));
-        credentials.setProxyPort(ConfigurationManagerFactory.getConfigurationManager().getProperty("APP_PROXY_PORT"));
-        credentials.setProxyUser(ConfigurationManagerFactory.getConfigurationManager().getProperty("APP_PROXY_USERNAME"));
-        credentials.setProxyPassword(ConfigurationManagerFactory.getConfigurationManager().getProperty("APP_PROXY_PASSWORD"));
+        credentials.setProxyAuthenticated(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_USED));
+        credentials.setProxyHost(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_HOST));
+        credentials.setProxyPort(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_PORT));
+        credentials.setProxyUser(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_USERNAME));
+        credentials.setProxyPassword(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_PASSWORD));
 
         return credentials;
     }
