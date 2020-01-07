@@ -97,10 +97,12 @@
         </property>
     </bean>
 
-    <bean id="codedElementList" class="epsos.ccd.posam.tm.util.CodedElementList"
-          factory-method="getInstance">
+    <bean id="codedElementList" class="epsos.ccd.posam.tm.util.CodedElementList" factory-method="getInstance">
         <property name="configurableElementIdentification">
             <value>${tm.codedelementlist.enabled}</value>
+        </property>
+        <property name="codedElementListOverride">
+            <value>${tm.codedelementlist.overridden}</value>
         </property>
         <property name="codedElementListPath">
             <value>${EPSOS_PROPS_PATH}${tm.codedelementlist.path}</value>
@@ -119,7 +121,6 @@
         <property name="config" ref="tmConfiguration"/>
     </bean>
 
-    <!-- ::: Service ::: -->
     <import resource="ctx_tsam.xml"/>
 
     <bean class="epsos.ccd.posam.tm.service.impl.TransformationService"

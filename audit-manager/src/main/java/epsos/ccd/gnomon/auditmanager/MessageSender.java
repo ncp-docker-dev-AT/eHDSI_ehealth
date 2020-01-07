@@ -41,7 +41,6 @@ public class MessageSender {
     private static String[] enabledProtocols = {"TLSv1.2"};
     private final Logger logger = LoggerFactory.getLogger(MessageSender.class);
     private AuditLogSerializer auditLogSerializer;
-    //private AuditMessage auditmessage;
     private String facility;
     private String severity;
 
@@ -53,13 +52,11 @@ public class MessageSender {
      */
     public void send(AuditLogSerializer auditLogSerializer, AuditMessage auditmessage, String facility, String severity) {
 
-        this.auditLogSerializer = auditLogSerializer;
-        //this.auditmessage = auditmessage;
-        this.facility = facility;
-        this.severity = severity;
-
         logger.info("[Audit Service] Message Sender Start...");
         boolean sent = false;
+        this.auditLogSerializer = auditLogSerializer;
+        this.facility = facility;
+        this.severity = severity;
 
         try {
             logger.info("Try to construct the Audit Message type: '{}'", auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode());
@@ -81,7 +78,7 @@ public class MessageSender {
                 } while (!sent && !timeouted);
 
                 if (timeouted) {
-                    logger.info("The time set to openncp properties in order to retry sending the audit has passed");
+                    logger.info("The time set to OpenNCP properties in order to retry sending the audit has passed");
                 }
             }
             Thread.sleep(1000);

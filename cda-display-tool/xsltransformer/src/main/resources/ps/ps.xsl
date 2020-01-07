@@ -19,13 +19,13 @@
 
     <xsl:variable name="originalNarrativeTableTitle">
         <!-- Original narrative -->
-        <xsl:call-template name="show-displayLabels">
+        <xsl:call-template name="show-epSOSDisplayLabels">
             <xsl:with-param name="code" select="'108'"/>
         </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="translatedCodedTableTitle">
         <!-- Translated coded -->
-        <xsl:call-template name="show-displayLabels">
+        <xsl:call-template name="show-epSOSDisplayLabels">
             <xsl:with-param name="code" select="'109'"/>
         </xsl:call-template>
     </xsl:variable>
@@ -41,7 +41,7 @@
                 <input id="collapsible-patient-header" class="toggle" type="checkbox" checked="true"/>
                 <label for="collapsible-patient-header" class="lbl-toggle-main">
                     <!-- Patient-->
-                    <xsl:call-template name="show-displayLabels">
+                    <xsl:call-template name="show-epSOSDisplayLabels">
                         <xsl:with-param name="code" select="'51'"/>
                     </xsl:call-template>
                 </label>
@@ -53,7 +53,7 @@
                             <div class="wrap-collabsible">
                                 <input id="collapsible-extended-header" class="toggle" type="checkbox"/>
                                 <label for="collapsible-extended-header" class="lbl-toggle">
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'68'"/>
                                     </xsl:call-template>
                                 </label>
@@ -79,7 +79,7 @@
                 <input id="collapsible-clinical-sections" class="toggle" type="checkbox" checked="true"/>
                 <label for="collapsible-clinical-sections" class="lbl-toggle-main">
                     <!-- Clinical sections -->
-                    <xsl:call-template name="show-displayLabels">
+                    <xsl:call-template name="show-epSOSDisplayLabels">
                         <xsl:with-param name="code" select="'110'"/>
                     </xsl:call-template>
                 </label>

@@ -22,7 +22,7 @@
                   select="/n1:ClinicalDocument/n1:effectiveTime"/>
     <xsl:variable name="lastUpdate"
                   select="/n1:ClinicalDocument/n1:documentationOf/n1:serviceEvent/n1:effectiveTime/n1:high"/>
-    <xsl:variable name="documentLanguageCode" select="/n1:ClinicalDocument/n1:languageCode/@code"/>
+    <xsl:variable name="documentLanguageCode" select="/n1:ClinicalDocument/n1:languageCode"/>
 
     <xsl:template name="basicCdaHeader">
         <table class="header_table">
@@ -30,33 +30,37 @@
                 <tr class="td_creation_date">
                     <th>
                         <!-- Creation Date: -->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'15'"/>
                         </xsl:call-template>
                     </th>
                     <td>
-                        <xsl:call-template name="show-time">
-                            <xsl:with-param name="datetime" select="$creationDate"/>
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$creationDate"/>
                         </xsl:call-template>
                     </td>
                     <th>
                         <!-- Last Update:-->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'39'"/>
                         </xsl:call-template>
                     </th>
                     <td>
-                        <xsl:call-template name="show-time">
-                            <xsl:with-param name="datetime" select="$lastUpdate"/>
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$lastUpdate"/>
                         </xsl:call-template>
                     </td>
                     <th>
                         <!-- Original Document Language -->
-                        <xsl:call-template name="show-displayLabels">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
                             <xsl:with-param name="code" select="'117'"/>
                         </xsl:call-template>
                     </th>
-                    <td><xsl:value-of select="$documentLanguageCode"/></td>
+                    <td>
+                        <xsl:call-template name="show-epSOSLanguage">
+                            <xsl:with-param name="node" select="$documentLanguageCode"/>
+                        </xsl:call-template>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -68,79 +72,73 @@
                     <table class="header_table">
                         <tbody>
                             <tr>
-                                <th>
+                                <th colspan="2">
                                     <!-- Prefix-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'55'"/>
                                     </xsl:call-template>
                                 </th>
-                                <th>
+                                <th colspan="2">
                                     <!-- Family Name-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'30'"/>
                                     </xsl:call-template>
                                 </th>
                                 <th>
                                     <!-- Given Name-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'34'"/>
                                     </xsl:call-template>
                                 </th>
                             </tr>
                             <tr>
-                                <td><xsl:value-of select="$prefix"/>&#160;</td>
-                                <td><xsl:value-of select="$familyName"/></td>
+                                <td colspan="2"><xsl:value-of select="$prefix"/></td>
+                                <td colspan="2"><xsl:value-of select="$familyName"/></td>
                                 <td><xsl:value-of select="$givenName"/>&#160;</td>
                             </tr>
-                        </tbody>
-                    </table>
-                </tr>
-                <tr>
-                    <table class="header_table">
-                        <tbody>
                             <tr>
-                                <th style="width:100px;">
-                                    <!-- Patient Ids-->
-                                    <xsl:call-template name="show-displayLabels">
-                                        <xsl:with-param name="code" select="'52'"/>
-                                    </xsl:call-template>
+                                <th style="width:140px;">
+                                    <!-- Primary Patient ID -->
+                                    <!-- TODO Add concept to epSOSDisplayLabels value set -->
+                                    Primary Patient ID
                                 </th>
                                 <td>
                                     <xsl:call-template name="show-id">
                                         <xsl:with-param name="id" select="$primaryPatientId"/>
                                     </xsl:call-template>
                                 </td>
-                                <td>
-                                    <xsl:call-template name="show-id">
-                                        <xsl:with-param name="id" select="$secondaryPatientId"/>
-                                    </xsl:call-template>
-                                </td>
+                                <xsl:if test="$secondaryPatientId">
+                                    <th style="width:140px;">
+                                        <!-- Secondary Patient ID -->
+                                        <!-- TODO Add concept to epSOSDisplayLabels value set -->
+                                        Secondary Patient ID
+                                    </th>
+                                    <td>
+                                        <xsl:call-template name="show-id">
+                                            <xsl:with-param name="id" select="$secondaryPatientId"/>
+                                        </xsl:call-template>
+                                    </td>
+                                </xsl:if>
                             </tr>
-                        </tbody>
-                    </table>
-                </tr>
-                <tr>
-                    <table class="header_table">
-                        <tbody>
                             <tr>
-                                <th style="width:100px;">
+                                <th style="width:140px;">
                                     <!-- Gender-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'33'"/>
                                     </xsl:call-template>
                                 </th>
                                 <td>
                                     <xsl:value-of select="$gender/@displayName"/>
                                 </td>
-                                <th style="width:100px;">
+                                <th style="width:140px;">
                                     <!-- Date Of Birth-->
-                                    <xsl:call-template name="show-displayLabels">
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
                                         <xsl:with-param name="code" select="'19'"/>
                                     </xsl:call-template>
                                 </th>
                                 <td>
-                                    <xsl:call-template name="show-time">
-                                        <xsl:with-param name="datetime" select="$birthdate"/>
+                                    <xsl:call-template name="show-TS">
+                                        <xsl:with-param name="node" select="$birthdate"/>
                                     </xsl:call-template>&#160;
                                 </td>
                             </tr>

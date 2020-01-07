@@ -1077,7 +1077,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      * @param omElement
      * @throws Exception
      */
-    private void RetrieveDocumentSetBuilder(RetrieveDocumentSetRequestType request, SOAPHeader soapHeader,
+    private void retrieveDocumentSetBuilder(RetrieveDocumentSetRequestType request, SOAPHeader soapHeader,
                                             EventLog eventLog, OMElement omElement) throws Exception {
 
         OMNamespace ns = factory.createOMNamespace("urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0", "");
@@ -1107,16 +1107,17 @@ public class XCAServiceImpl implements XCAServiceInterface {
             String documentId = request.getDocumentRequest().get(0).getDocumentUniqueId();
             String patientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(soapHeaderElement));
             String repositoryId = getRepositoryUniqueId(request);
-            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION) {
-                loggerClinical.info("Retrieving Document with criteria: '{}' '{}' '{}'", patientId, documentId, repositoryId);
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+                loggerClinical.debug("Retrieving clinical document by criteria:\nPatient ID: '{}'\nDocument ID: '{}'\nRepository ID: '{}'",
+                        patientId, documentId, repositoryId);
             }
             //try getting country code from the certificate
             String countryCode = null;
-            String distinguishedNames = eventLog.getSC_UserID();
-            logger.info("[Certificate] Distinguished Names: '{}'", distinguishedNames);
-            int cIndex = distinguishedNames.indexOf("C=");
+            String distinguishedName = eventLog.getSC_UserID();
+            logger.info("[Certificate] Distinguished Name: '{}'", distinguishedName);
+            int cIndex = distinguishedName.indexOf("C=");
             if (cIndex > 0) {
-                countryCode = distinguishedNames.substring(cIndex + 2, cIndex + 4);
+                countryCode = distinguishedName.substring(cIndex + 2, cIndex + 4);
             }
             // Mustafa: This part is added for handling consents when the call is not https. In this case, we check
             // the country code of the signature certificate that ships within the HCP assertion
@@ -1480,7 +1481,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     public void retrieveDocument(RetrieveDocumentSetRequestType request, SOAPHeader sh, EventLog eventLog,
                                  OMElement response) throws Exception {
 
-        RetrieveDocumentSetBuilder(request, sh, eventLog, response);
+        retrieveDocumentSetBuilder(request, sh, eventLog, response);
     }
 
     /**
