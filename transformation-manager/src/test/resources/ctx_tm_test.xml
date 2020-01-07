@@ -91,6 +91,9 @@
         <property name="configurableElementIdentification">
             <value>${tm.codedelementlist.enabled}</value>
         </property>
+        <property name="codedElementListOverride">
+            <value>${tm.codedelementlist.overridden}</value>
+        </property>
         <property name="codedElementListPath">
             <value>${tm.codedelementlist.path}</value>
         </property>
