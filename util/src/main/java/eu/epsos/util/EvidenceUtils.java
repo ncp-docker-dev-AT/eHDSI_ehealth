@@ -103,22 +103,22 @@ public class EvidenceUtils {
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title);
         }
-        MessageType messageType = null;
-        String msguuid;
+        MessageType messageType;
+        String messageIdentifier;
         try {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);
             messageType = messageInspector.getMessageType();
-            msguuid = messageInspector.getMessageUUID();
+            messageIdentifier = messageInspector.getMessageUUID();
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
             UnknownMessageType umt = new UnknownMessageType(incomingMsg);
             messageType = umt;
-            msguuid = UUID.randomUUID().toString();
+            messageIdentifier = UUID.randomUUID().toString();
         }
-
+        LOGGER.info("[Evidence Emitter] Creation of REMNRR for message type: '{}' with ID: '{}'", messageType, messageIdentifier);
         createEvidenceREMNRR(incomingMsg, issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
                 senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias,
-                eventType, submissionTime, status, title, msguuid);
+                eventType, submissionTime, status, title, messageIdentifier);
     }
 
     /**
