@@ -52,16 +52,16 @@ public class MessageInspector {
 
     private void checkHeaders(Document incomingMsg) throws MalformedIHESOAPException {
 
-        logger.debug("Checking if it is a SOAP document");
         Element docElement = incomingMsg.getDocumentElement();
 
         logger.info("[Non Repudiation] '{}' - '{}'", docElement.getLocalName(), docElement.getNamespaceURI());
         logMessage(incomingMsg);
         if (StringUtils.equals(docElement.getLocalName(), SOAP_LOCAL_NAME)
-                && (StringUtils.equals(docElement.getNamespaceURI(), SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE)
-                || StringUtils.equals(docElement.getNamespaceURI(), SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE))) {
+                && StringUtils.equals(docElement.getNamespaceURI(), SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE)) {
 
-            logger.debug("Found a SOAP message");
+            // TODO: Incoming Soap message 1.1 are not considered at this  point of time as a known type of message for
+            //  the sake of evidence emitter. As they are no using right now the WS Addressing etc. SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE
+            logger.debug("Found a SOAP 1.2 message");
             // The SOAP Message must be well structured to avoid MITM attacks e.g., it must have one SOAP header
             // and one single addressing. No WSSE4j is used here (which doesn't check for it).
             NodeList nodeList = docElement.getElementsByTagNameNS(docElement.getNamespaceURI(), "Header");
@@ -72,7 +72,7 @@ public class MessageInspector {
             Utilities.checkForNull(nlBody, "Body", logger);
             Element body = (Element) nlBody.item(0);
 
-            // it can only be an element here, no classcasts
+            // it can only be an element here, no classcast
             Element header = (Element) nodeList.item(0);
 
             // header must have one addressing action
