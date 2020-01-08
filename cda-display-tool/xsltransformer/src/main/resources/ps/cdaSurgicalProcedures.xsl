@@ -148,7 +148,7 @@
                         <tr>
                             <td colspan="2">
                                 <xsl:call-template name="show-eHDSI-AbsentOrUnknownProcedures">
-                                    <xsl:with-param name="code" select="$surgicalProcedureCode/@code"/>
+                                    <xsl:with-param name="node" select="$surgicalProcedureCode"/>
                                 </xsl:call-template>
                             </td>
                         </tr>

@@ -146,7 +146,7 @@
                         <tr>
                             <td colspan="2">
                                 <xsl:call-template name="show-eHDSI-AbsentOrUnknownDevices">
-                                    <xsl:with-param name="code" select="$medDeviceImplantDescription/@code"/>
+                                    <xsl:with-param name="node" select="$medDeviceImplantDescription"/>
                                 </xsl:call-template>
                             </td>
                         </tr>

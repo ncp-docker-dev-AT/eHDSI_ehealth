@@ -43,7 +43,7 @@
         <!-- Defining all needed variables -->
         <xsl:variable name="medSectionTitleCode" select="n1:code/@code"/>
         <xsl:variable name="medAct" select="n1:entry/n1:act"/>
-        <xsl:variable name="medCode" select="n1:entry/n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:code/@code"/>
+        <xsl:variable name="medCode" select="n1:entry/n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:code"/>
         <!-- End definition of variables -->
 
         <xsl:choose>
@@ -90,12 +90,12 @@
                                                 <table class="translation_table">
                                                     <tbody>
                                                         <xsl:choose>
-                                                            <xsl:when test="$medCode='no-known-medications' or $medCode='no-medication-info'">
+                                                            <xsl:when test="$medCode/@code='no-known-medications' or $medCode/@code='no-medication-info'">
                                                                 <tr>
                                                                     <td colspan="6">
                                                                         <span class="tdtext">
                                                                             <xsl:call-template name="show-eHDSI-AbsentOrUnknownMedication">
-                                                                                <xsl:with-param name="code" select="$medCode"/>
+                                                                                <xsl:with-param name="node" select="$medCode"/>
                                                                             </xsl:call-template>
                                                                         </span>
                                                                         <br/>
