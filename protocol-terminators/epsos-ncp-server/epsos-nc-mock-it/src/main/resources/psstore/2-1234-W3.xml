@@ -11,10 +11,10 @@ Other sections of her Summary include allergies to latex and kiwi (which are ver
 Although being real choices for the different diseases and conditions, the selection of the patient's current medication tries to present some easily described medication as well as not so easily ones: e.g. insulin degludec, amoxicilin+clavulanic acid, and the combination of ipratropium bromide+salbutamol for nebulization. For the oral treatment of the pre-eclampsia the agents selected would not be used in real practice during pregnancy.-->
 <ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:epsos="urn:epsos-org:ep:medication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
-    <!-- Template ID for epSOS Patient Summary document -->
+    <!-- Template ID for eHDSI Patient Summary document -->
     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.3"/>
-    <id root="1.2.752.129.2.1.2.1" extension="PS_Pivot_01_sv-SE"/>
-    <!-- Determines the document type "epSOS Patient Summary Document" -->
+    <id root="1.2.752.129.2.1.2.1" extension="PS_Pivot_2-1234-W3_EU"/>
+    <!-- Determines the document type "eHDSI Patient Summary Document" -->
     <code code="60591-5" codeSystem="2.16.840.1.113883.6.1" displayName="Patient summary Document"/>
     <!-- title used for display purposes -->
     <title>Patient Summary</title>
@@ -252,30 +252,132 @@ Although being real choices for the different diseases and conditions, the selec
                     <title>History of Medication use</title>
                     <text>
                         <paragraph ID="sub-1">Eutirox : levothyroxine sodium 100 ug Tablet : 1 ACM since 1997-10-06 (Oral use)</paragraph><paragraph ID="sub-2">Triapin : ramipril 5 mg, felodipine 5 mg Prolonged-release tablet : 2 ACM since 2017-05-06</paragraph><paragraph ID="sub-3">Tresiba : insulin degludec [100 [iU] / mL] Solution for injection in pre-filled pen : 10 [iU] per day since 2012-04-30 (Subcutaneous use)</paragraph><paragraph ID="sub-4">Augmentin : amoxicillin 500 mg, clavulanic acid 125 mg Film-coated tablet : 1 every 8 h between 2017-05-07 and 2017-05-21</paragraph><paragraph ID="sub-5">Combivent Unidose : salbutamol [2.5 mg / 2.5 mL] ipratropium bromide [0.5 mg / 2.5 mL] Nebuliser solution [in Single-dose container, 2.5 mL] : 2.5 mL every 8 h since 2015-01-02</paragraph>
-                        <table><colgroup><col width="10%"/><col width="30%"/><col width="20%"/><col width="5%"/><col width="10%"/><col width="10%"/><col width="10%"/></colgroup><thead><tr><th>Name (Class)</th><th>Active ingredients [Strength]</th><th>Dose Form [Package]</th><th>Dose Quantity</th><th>Dosage</th><th>Time</th><th>Route</th></tr></thead><tbody><tr ID="sub-1a"><td>Eutirox</td><td><list><item>100 ug / 1 <list><item><content ID="ecode-1" language="xx-XX">levothyroxine
-                            sodium</content><br/></item></list></item></list></td><td><content ID="form-1" language="xx-XX">Tablet</content><br/></td><td> </td><td><br/>
-                            Event : ACM</td><td>since 1997-10-06</td><td><content ID="route-1" language="xx-XX">Oral
-                            use</content><br/></td></tr><tr ID="sub-2a"><td>Triapin<br/>
-                            (<content ID="ecode-2" language="xx-XX">ramipril and felodipine</content><br/>)</td><td><list><item>5 mg / 1 <list><item><content ID="ecode-3" language="xx-XX">ramipril</content><br/></item></list></item></list><list><item>5 mg / 1 <list><item><content ID="ecode-4" language="xx-XX">felodipine</content><br/></item></list></item></list></td><td><content ID="form-2" language="xx-XX">Prolonged-release tablet</content><br/></td><td>2</td><td><br/>
-                            Event : ACM</td><td>since 2017-05-06</td><td/></tr><tr ID="sub-3a"><td>Tresiba</td><td><list><item>100 [iU] / 1 mL<list><item><content ID="ecode-5" language="xx-XX">insulin degludec</content><br/></item></list></item></list></td><td><content ID="form-3" language="xx-XX">Solution for injection
-                            in pre-filled pen</content><br/></td><td>10 [iU]</td><td><br/>
-                            Period : 1 d</td><td>since 2012-04-30</td><td><content ID="route-2" language="xx-XX">Subcutaneous
-                            use</content><br/></td></tr><tr ID="sub-4a"><td>Augmentin<br/>
-                            (<content ID="ecode-6" language="xx-XX">amoxicillin and enzyme inhibitor</content><br/>)</td><td><list><item>500 mg / 1 <list><item><content ID="ecode-7" language="xx-XX">amoxicillin</content><br/></item></list></item></list><list><item>125 mg / 1 <list><item><br/><br/>
-                            Translation : clavulanic acid {CAS: 58001-44-8}<br/>
-                            (<br/>
-                            Ingredient
-                            name : clavulanic acid)</item></list></item></list></td><td><content ID="form-4" language="xx-XX">Film-coated
-                            tablet</content><br/></td><td>1</td><td><br/>
-                            Period : 8 h</td><td>between 2017-05-07 and 2017-05-21</td><td/></tr><tr ID="sub-5a"><td>Combivent Unidose<br/>
-                            (<content ID="ecode-9" language="xx-XX">salbutamol and ipratropium
-                                bromide</content><br/>)</td><td><list><item>2.5 mg / 2.5 mL<list><item><content ID="ecode-10" language="xx-XX">salbutamol</content><br/></item></list></item></list><list><item>0.5 mg / 2.5 mL<list><item><content ID="ecode-11" language="xx-XX">ipratropium
-                            bromide</content><br/></item></list></item></list></td><td><content ID="form-5" language="xx-XX">Nebuliser
-                            solution</content><br/> [<br/>
-                            Package form : <content ID="form-6" language="xx-XX">Single-dose
-                                container</content><br/><br/>
-                            capacityQuantity : 2.5 mL]</td><td>2.5 mL</td><td><br/>
-                            Period : 8 h</td><td>since 2015-01-02</td><td/></tr></tbody></table></text>
+                        <table>
+                            <colgroup>
+                                <col width="15%" />
+                                <col width="30%" />
+                                <col width="20%" />
+                                <col width="5%" />
+                                <col width="10%" />
+                                <col width="10%" />
+                                <col width="10%" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Name (Class)</th>
+                                    <th>Active ingredients [Strength]</th>
+                                    <th>Dose Form [Package]</th>
+                                    <th>Dose Quantity</th>
+                                    <th>Dosage</th>
+                                    <th>Time</th>
+                                    <th>Route</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ID="sub-1a">
+                                    <td valign="top">Eutirox</td>
+                                    <td valign="top">
+                                        <content ID="ecode-1" language="xx-XX">levothyroxine sodium</content> (100 ug / 1)
+                                        <br/>
+                                    </td>
+                                    <td>
+                                        <content ID="form-1" language="xx-XX">Tablet</content>
+                                        <br/>
+                                    </td>
+                                    <td></td>
+                                    <td valign="top">Event : ACM</td>
+                                    <td>since 1997-10-06</td>
+                                    <td>
+                                        <content ID="route-1" language="xx-XX">Oral use</content>
+                                        <br/>
+                                    </td>
+                                </tr>
+                                <tr ID="sub-2a">
+                                    <td valign="top">Triapin
+                                        <br/> (
+                                        <content ID="ecode-2" language="xx-XX">ramipril and felodipine</content>)
+                                        <br/>
+                                    </td>
+                                    <td>
+                                        <ul>
+                                            <li>
+                                                <content ID="ecode-3" language="xx-XX">ramipril</content> (5 mg/1)</li>
+                                            <li>
+                                                <content ID="ecode-4" language="xx-XX">felodipine</content> (5 mg/1)</li>
+                                        </ul>
+                                    </td>
+                                    <td valign="top">
+                                        <content ID="form-2" language="xx-XX">Prolonged-release tablet</content>
+                                        <br/>
+                                    </td>
+                                    <td valign="top">2</td>
+                                    <td valign="top">Event : ACM</td>
+                                    <td valign="top">since 2017-05-06</td>
+                                    <td/>
+                                </tr>
+                                <tr ID="sub-3a">
+                                    <td valign="top">Tresiba</td>
+                                    <td valign="top">
+                                        <content ID="ecode-5" language="xx-XX">insulin degludec</content> (100 [iU]/1 mL)</td>
+                                    <td valign="top">
+                                        <content ID="form-3" language="xx-XX">Solution for injection in pre-filled pen</content>
+                                    </td>
+                                    <td valign="top">10 [iU]</td>
+                                    <td valign="top">Period : 1 d</td>
+                                    <td>since 2012-04-30</td>
+                                    <td valign="top">
+                                        <content ID="route-2" language="xx-XX">Subcutaneous use</content>
+                                        <br/>
+                                    </td>
+                                </tr>
+                                <tr ID="sub-4a">
+                                    <td valign="top">Augmentin
+                                        <br/>(
+                                        <content ID="ecode-6" language="xx-XX">amoxicillin and enzyme inhibitor</content>)</td>
+                                    <td valign="top">
+                                        <ul>
+                                            <li>
+                                                <content ID="ecode-7" language="xx-XX">amoxicillin</content> (500 mg/1)</li>
+                                            <li>Translation : clavulanic acid {CAS: 58001-44-8} (Ingredient name : clavulanic acid)</li>
+                                        </ul>
+                                    </td>
+                                    <td valign="top">
+                                        <content ID="form-4" language="xx-XX">Film-coated tablet</content>
+                                        <br/>
+                                    </td>
+                                    <td valign="top">1</td>
+                                    <td valign="top">
+                                        Period : 8 h</td>
+                                    <td valign="top">between 2017-05-07 and 2017-05-21</td>
+                                    <td/>
+                                </tr>
+                                <tr ID="sub-5a">
+                                    <td valign="top">Combivent Unidose
+                                        <br/> (
+                                        <content ID="ecode-9" language="xx-XX">salbutamol and ipratropium bromide</content>)</td>
+                                    <td valign="top">
+                                        <ul>
+                                            <li>
+                                                <content ID="ecode-10" language="xx-XX">salbutamol</content>(2.5 mg/2.5 mL)</li>
+                                            <li>
+                                                <content ID="ecode-11" language="xx-XX">ipratropium bromide
+                                                </content>(0.5 mg/2.5 mL)</li>
+                                        </ul>
+                                    </td>
+                                    <td valign="top">
+                                        <content ID="form-5" language="xx-XX">Nebuliser solution</content>
+                                        <br/> [Package form :
+                                        <content ID="form-6" language="xx-XX">Single-dose container</content>
+                                        <br/> capacityQuantity : 2.5 mL]</td>
+                                    <td valign="top">2.5 mL</td>
+                                    <td valign="top">
+                                        Period : 8 h</td>
+                                    <td valign="top">since 2015-01-02</td>
+                                    <td/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </text>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="INT">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
@@ -502,11 +604,7 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <epsos:denominator xsi:type="epsos:PQ" value="1" unit="1"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code nullFlavor="OTH">
-                                                    <epsos:originalText>
-                                                        <epsos:reference value="#code-8"/>
-                                                    </epsos:originalText>
-                                                </epsos:code>
+                                                <epsos:code nullFlavor="OTH"/>
                                                 <epsos:name>clavulanic acid</epsos:name>
                                             </epsos:ingredient>
                                         </epsos:ingredient>
@@ -590,7 +688,6 @@ Although being real choices for the different diseases and conditions, the selec
                             </consumable>
                         </substanceAdministration>
                     </entry>
-
                 </section>
             </component>
             <component>
@@ -603,9 +700,9 @@ Although being real choices for the different diseases and conditions, the selec
                     <title>Allergies and adverse reactions</title>
                     <text>
                         <paragraph ID="obs-1">Food allergy to Kiwi fruit, Reaction: Eczema</paragraph><paragraph ID="obs-3">Food intolerance to Lactose, Reaction: Diarrhea</paragraph><paragraph ID="obs-5">Medication allergy to acetylsalicylic acid, Reaction: Asthma</paragraph><paragraph ID="obs-7">Allergy to Latex, Reaction: Urticaria</paragraph>
-                        <table><colgroup><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/></colgroup>
+                        <table><colgroup><col width="15%"/><col width="15%"/><col width="15%"/><col width="15%"/><col width="10%"/><col width="15%"/><col width="15%"/></colgroup>
                             <thead>
-                                <tr><th>Reaction Type</th><th>Agent</th><th>Clinical Manifestation</th><th>Time</th><th>Status</th><th>Process of establishing a problem</th></tr>
+                                <tr><th>Reaction Type</th><th>Agent</th><th>Clinical Manifestation</th><th>Time</th><th>Status</th><th>Process of establishing a problem</th><th>Severity</th></tr>
                             </thead>
                             <tbody>
                                 <tr><td><content ID="obs-1a"><content ID="code-6" language="xx-XX">Food allergy</content><br/></content></td><td><content ID="code-7" language="xx-XX">Kiwi fruit</content><br/></td><td ID="obs-2"><content ID="val-2" language="xx-XX">Eczema</content><br/></td><td>since 1990-01-10</td><td>active</td><td><content ID="code-8" language="xx-XX">Finding reported by subject or history provider</content></td><td><content ID="code-9" language="xx-XX">Moderate to severe</content><br/></td></tr>
@@ -642,7 +739,6 @@ Although being real choices for the different diseases and conditions, the selec
                                     <effectiveTime>
                                         <low value="19900110"/>
                                     </effectiveTime>
-                                    <value xsi:type="CD" nullFlavor="NA"/>
                                     <!-- This is the allergen - the substance that caused the allergy -->
                                     <participant typeCode="CSM">
                                         <participantRole classCode="MANU">
@@ -680,7 +776,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
                                             <text><reference value="#code-9"/></text>
                                             <statusCode code="completed"/>
-                                            <value xsi:type="CD" code="371923003" codeSystem="2.16.840.1.113883.6.96"/>
+                                            <value xsi:type="CD" code="371924009" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -715,7 +811,6 @@ Although being real choices for the different diseases and conditions, the selec
                                     <effectiveTime>
                                         <low value="19830505"/>
                                     </effectiveTime>
-                                    <value xsi:type="CD" nullFlavor="NA"/>
                                     <!-- This is the allergen - the substance that caused the allergy -->
                                     <participant typeCode="CSM">
                                         <participantRole classCode="MANU">
@@ -742,16 +837,16 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <originalText><reference value="#val-4"/></originalText>
                                             </value>
                                         </observation>
-                                        <!-- Severity -->
                                     </entryRelationship>
+                                    <!-- Severity -->
                                     <entryRelationship typeCode="SUBJ" inversionInd="true">
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1"/>
                                             <templateId root="2.16.840.1.113883.10.20.1.55"/>
                                             <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
-                                            <text><reference value="#code-13"/></text>
+                                            <text><reference value="#code-9"/></text>
                                             <statusCode code="completed"/>
-                                            <value xsi:type="CD" code="371923003" codeSystem="2.16.840.1.113883.6.96"/>
+                                            <value xsi:type="CD" code="371924009" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -787,7 +882,6 @@ Although being real choices for the different diseases and conditions, the selec
                                     <effectiveTime>
                                         <low value="19941003"/>
                                     </effectiveTime>
-                                    <value xsi:type="CD" nullFlavor="NA"/>
                                     <!-- This is the allergen - the substance that caused the allergy -->
                                     <participant typeCode="CSM">
                                         <participantRole classCode="MANU">
@@ -821,9 +915,9 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1"/>
                                             <templateId root="2.16.840.1.113883.10.20.1.55"/>
                                             <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
-                                            <text><reference value="#code-17"/></text>
+                                            <text><reference value="#code-9"/></text>
                                             <statusCode code="completed"/>
-                                            <value xsi:type="CD" code="371923003" codeSystem="2.16.840.1.113883.6.96"/>
+                                            <value xsi:type="CD" code="371924009" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -864,7 +958,6 @@ Although being real choices for the different diseases and conditions, the selec
                                     <effectiveTime>
                                         <low value="19900110"/>
                                     </effectiveTime>
-                                    <value xsi:type="CD" nullFlavor="NA"/>
                                     <!-- This is the allergen - the substance that caused the allergy -->
                                     <participant typeCode="CSM">
                                         <participantRole classCode="MANU">
@@ -892,17 +985,17 @@ Although being real choices for the different diseases and conditions, the selec
                                                     <reference value="#val-8"/>
                                                 </originalText>
                                             </value>
-                                            <!-- Severity -->
-                                            <entryRelationship typeCode="SUBJ" inversionInd="true">
-                                                <observation classCode="OBS" moodCode="EVN">
-                                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1"/>
-                                                    <templateId root="2.16.840.1.113883.10.20.1.55"/>
-                                                    <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
-                                                    <text><reference value="#code-21"/></text>
-                                                    <statusCode code="completed"/>
-                                                    <value xsi:type="CD" code="371923003" codeSystem="2.16.840.1.113883.6.96"/>
-                                                </observation>
-                                            </entryRelationship>
+                                        </observation>
+                                    </entryRelationship>
+                                    <!-- Severity -->
+                                    <entryRelationship typeCode="SUBJ" inversionInd="true">
+                                        <observation classCode="OBS" moodCode="EVN">
+                                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1"/>
+                                            <templateId root="2.16.840.1.113883.10.20.1.55"/>
+                                            <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
+                                            <text><reference value="#code-9"/></text>
+                                            <statusCode code="completed"/>
+                                            <value xsi:type="CD" code="371924009" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -1672,12 +1765,10 @@ Although being real choices for the different diseases and conditions, the selec
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
                             <id root="2.999"/>
                             <code code="34530-6" codeSystem="2.16.840.1.113883.6.1"/>
-                            <text>
-                                <reference value="#obs-26"/>
-                            </text>
+                            <text><reference value="#obs-26"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime value="20191122"/>
-                            <value xsi:type="CV" code="278147001" codeSystem="2.16.840.1.113883.6.96" />
+                            <value xsi:type="CE" code="278147001" codeSystem="2.16.840.1.113883.6.96" />
                         </observation>
                     </entry>
                 </section>
