@@ -64,6 +64,10 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="tr.com.srdc.epsos.util.http" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="tr.com.srdc.epsos.ws.server.xca.impl" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>

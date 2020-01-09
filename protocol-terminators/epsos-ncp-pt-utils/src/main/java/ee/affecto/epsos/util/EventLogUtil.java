@@ -29,7 +29,10 @@ import tr.com.srdc.epsos.util.http.IPUtil;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 // Common part for client and server logging
 // TODO A.R. Should be moved into openncp-util later to avoid duplication
@@ -374,17 +377,19 @@ public class EventLogUtil {
     public static String getSourceGatewayIdentifier(MessageContext messageContext) {
 
         TransportHeaders headers = (TransportHeaders) messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
-        Set<String> stringSet = headers.keySet();
-        for (String s : stringSet) {
-            LOGGER.info("[Soap Header] Key: '{}'", s);
+        String headerClientIp = headers.get("X-Forwarded-For");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("--> X-Forwarded-For Address: '{}'", headerClientIp);
+            LOGGER.debug("--> Remote Address: '{}'", messageContext.getProperty(MessageContext.REMOTE_ADDR));
+            LOGGER.debug("--> Transport Address: '{}'", messageContext.getProperty(MessageContext.TRANSPORT_ADDR));
         }
-        String remoteIP = headers.get("X-Forwarded-For");
-        if (StringUtils.isNotBlank(remoteIP)) {
-            return remoteIP;
+        if (StringUtils.isNotBlank(headerClientIp)) {
+            if (StringUtils.contains(headerClientIp, ",")) {
+                return StringUtils.split(headerClientIp, ",")[0];
+            } else {
+                return headerClientIp;
+            }
         }
-        LOGGER.info("--> X-Forwarded-For: '{}'", remoteIP);
-        LOGGER.info("--> Host: '{}'", headers.get("host"));
-        LOGGER.info("--> Transport Address: '{}'", messageContext.getProperty(MessageContext.TRANSPORT_ADDR));
         String clientIp = (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
         if (IPUtil.isLocalIp(clientIp)) {
             HttpServletRequest servletRequest = (HttpServletRequest) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
