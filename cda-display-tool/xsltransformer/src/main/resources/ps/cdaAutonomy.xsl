@@ -31,12 +31,6 @@
         <xsl:variable
                 name="autonomySectionTitleCode"
                 select="n1:code/@code"/>
-        <xsl:variable
-                name="autonomySectionTitle"
-                select="n1:code[@code='47420-5']/@displayName"/>
-        <xsl:variable
-                name="autonomySectionText"
-                select="n1:code[@code='47420-5']/../n1:text"/>
         <!-- End definition of variables-->
 
         <xsl:choose>
@@ -46,7 +40,10 @@
                 <div class="wrap-collabsible">
                     <input id="collapsible-social-history-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-social-history-section-original" class="lbl-toggle-title">
-                        <xsl:value-of select="$autonomySectionTitle"/>
+                        <!-- Section title -->
+                        <xsl:call-template name="show-epSOSSections">
+                            <xsl:with-param name="code" select="'47420-5'"/>
+                        </xsl:call-template>
                     </label>
                     <div class="collapsible-content-title">
                         <div class="content-inner-title">

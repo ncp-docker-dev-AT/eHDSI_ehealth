@@ -1,8 +1,9 @@
 body {
-    font-family: Arial;
-    font-size:.6em;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
     margin: 0;
     padding: 1rem;
+    height: 100%;
     /*text-rendering: optimizeLegibility;*/
 }
 
@@ -13,17 +14,17 @@ table {
 tr {}
 td {
     font-size:.6em;
-    padding:5px;
+    padding:.5em;
     vertical-align: top;
     text-align: left;
 }
 th {
     color:#4A4A4A;
     font-size:.6em;
-    padding:6px;
+    padding:.6em;
     vertical-align: top;
     text-align: left;
-    border-bottom: 1px solid #009fd1;
+    border-bottom: .1em solid #009fd1;
 }
 .h1center {
     font-size: 1em;
@@ -33,15 +34,15 @@ th {
     color: #FFF;
     margin-bottom: 1rem;
     padding: 0.5rem ;
-    border-radius: 4px
+    border-radius: .5em
 }
 .header_table{
-    border-bottom:0 solid #666;
 }
+
 .header_table th {
     color:#009fd1;
     font-size: .7em;
-    border-bottom: 1px solid #009fd1
+    border-bottom: .1em solid #009fd1
 }
 .header_table td {
     font-size: .7em;
@@ -49,7 +50,7 @@ th {
 .sectionTitle{
     color:#3871A9;
     font-weight: bold;
-    font-size:.7em;
+    font-size:.6em;
 }
 
 .table_caption {
@@ -60,30 +61,21 @@ th {
 .table_caption th {
     background-color:#9FBFDF;
     color:#4A4A4A;
-    font-size:.7em;
-    padding:6px;
-    border-bottom: 2px solid #4A4A4A;
+    font-size:.6em;
+    padding:6em;
+    border-bottom: .1em solid #4A4A4A;
     -moz-border-radius: 0;
-    -webkit-border-top-right-radius: 6px;
-    -webkit-border-top-left-radius: 6px;
+    -webkit-border-top-right-radius: .1em;
+    -webkit-border-top-left-radius: .1em;
     -webkit-border-bottom-right-radius: 0;
     -webkit-border-bottom-left-radius: 0;
-    border-radius: 6px 6px 0px 0px;
+    border-radius: .1em .1em 0 0;
     text-align:left;
     vertical-align:middle;
 }
 
-.nullFlavor {
-    display: inline;
-    text-align: center;
-    vertical-align: middle;
-    border-radius: 50%;
-    background: yellow;
-    font-weight: bold;
-    padding:5px;
-}
 .wrap-collabsible {
-    margin-bottom: 1.2rem 0px;
+    margin-bottom: 1.2rem;
     width: 100%;
 }
 
@@ -97,16 +89,18 @@ input[type='checkbox'] {
 .lbl-toggle {
     display: block;
 
+    color: #009fd1;
+    font-size: 0.8em;
+
     font-weight: bold;
-    font-size: .8em;
     text-align: left;
 
     padding: 0.5rem;
 
-    background: #009fd1;
+    border: .1em solid #009fd1;
+    border-top-left-radius: .5em;
+    border-top-right-radius: .5em;
 
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
 }
 
 .collapsible-content {
@@ -114,14 +108,17 @@ input[type='checkbox'] {
     overflow: hidden;
 }
 
+.tooltip span {
+    display:none;
+}
+
 .collapsible-content .content-inner {
-    background: white;
-    border-bottom: 2px solid #009fd1;
-    border-left: 2px solid #009fd1;
-    border-right: 2px solid #009fd1;
-    border-bottom-left-radius: 7px;
-    border-bottom-right-radius: 7px;
-    padding: .5rem 1rem;
+    border-bottom: .1em solid #009fd1;
+    border-left: .1em solid #009fd1;
+    border-right: .1em solid #009fd1;
+    border-bottom-left-radius: .5em;
+    border-bottom-right-radius: .5em;
+    padding: .3rem 1rem;
 }
 /*******************************************************/
 /* Collapsible panel for:                              */
@@ -133,15 +130,14 @@ input[type='checkbox'] {
 
     font-weight: bold;
     color: white;
-    font-size: .8em;
     text-align: left;
 
     padding: 0.5rem;
 
+    border: .2em solid #085a9f;
     background: #085a9f;
-
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
+    border-top-left-radius: .5em;
+    border-top-right-radius: .5em;
 }
 
 .collapsible-content-title {
@@ -151,12 +147,12 @@ input[type='checkbox'] {
 
 .collapsible-content-title .content-inner-title {
     background: white;
-    border-bottom: 2px solid #085a9f;
-    border-left: 2px solid #085a9f;
-    border-right: 2px solid #085a9f;
-    border-bottom-left-radius: 7px;
-    border-bottom-right-radius: 7px;
-    padding: .5rem 1rem;
+    border-bottom: .2em solid #085a9f;
+    border-left: .2em solid #085a9f;
+    border-right: .2em solid #085a9f;
+    border-bottom-left-radius: .5em;
+    border-bottom-right-radius: .5em;
+    padding: .3rem 1rem;
 }
 
 /***************************************/
@@ -166,16 +162,14 @@ input[type='checkbox'] {
     display: block;
 
     font-weight: bold;
-    color: #009fd1;
-    font-size: .8em;
+    color: #085a9f;
     text-align: left;
 
     padding: 0.5rem;
 
-    background: #085a9f;
-
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
+    border: .2em solid #085a9f;
+    border-top-left-radius: .5em;
+    border-top-right-radius: .5em;
 }
 
 .collapsible-content-main {
@@ -184,12 +178,12 @@ input[type='checkbox'] {
 }
 
 .collapsible-content-main .content-inner-main {
-    border-bottom: 2px solid #085a9f;
-    border-left: 2px solid #085a9f;
-    border-right: 2px solid #085a9f;
-    border-bottom-left-radius: 7px;
-    border-bottom-right-radius: 7px;
-    padding: .5rem 1rem;
+    border-bottom: .2em solid #085a9f;
+    border-left: .2em solid #085a9f;
+    border-right: .2em solid #085a9f;
+    border-bottom-left-radius: .5em;
+    border-bottom-right-radius: .5em;
+    padding: .3rem 1rem;
 }
 
 /* Translation table - table containing the coded translations */
@@ -198,58 +192,61 @@ input[type='checkbox'] {
     table-layout: fixed;
 }
 .translation_table th {
-    background-color:#E6F2FF;
     color:#4A4A4A;
-    font-size:.6em;
-    padding:6px;
+    font-size:.7em;
+    padding:.5em;
     vertical-align: top;
     text-align: left;
-    border-bottom: 1px solid #009fd1;
+    border-bottom: .1em solid #009fd1;
 }
 .translation_table td {
-    background-color:#E6F2FF;
-    font-size:.6em;
+    font-size:.7em;
     vertical-align: top;
     text-align: left;
 }
 
+.translation_table tr:nth-child(even) {
+    background: #FFF;
+}
+
+.translation_table tr:nth-child(odd) {
+    background: #E6F2FF;
+}
+
 /* Extended header table - table containing the different administrative details from the ps file */
 .extended_header_table{
-    border: 1px solid #009fd1;
+    border: .1em solid #009fd1;
     width: 100%;
     table-layout: fixed;
-    border-radius: 3px;
 }
 .extended_header_table th {
     background-color:#E6F2FF;
     color:#4A4A4A;
-    font-size:.9em;
-    padding:.2em;
+    padding: .2em;
     vertical-align: top;
     text-align: left;
-    border-bottom: .2em solid #009fd1;
+    border-bottom: .1em solid #009fd1;
 }
 .extended_header_table td {
-    font-size:.9em;
     vertical-align: top;
     text-align: left;
 }
 
 .contact_information_table{
     border-radius: .2em;
-    padding: .em;
+    padding: .1em;
 }
 .contact_information_table th {
     background-color:#009fd1;
-    color:white;
     font-size: 1em;
+    color:white;
     vertical-align: top;
     text-align: left;
 }
 .contact_information_table td {
     background-color:#009fd1;
+    font-size: 1em;
     color:white;
-    font-size:.9em;
     vertical-align: top;
     text-align: left;
 }
@@ -259,11 +256,11 @@ input[type='checkbox'] {
 /******************************************************************/
 .ingredients_table {
     border-style: solid;
-    border-width: 1px;
+    border-width: .2em;
     border-color: #009fd1;
 }
 .ingredients_table th {
-    border: 1px;
+    border: .2em;
 }
 .ingredients_table td {
 }
@@ -273,8 +270,21 @@ input[type='checkbox'] {
 /******************************/
 .codeSystem {
     background-color:#666;
-    margin-top:20px;
-    padding-left:10px;
-    padding-right:10px;
-    border-radius:10px 10px 10px 10px;
+    margin-top:.2em;
+    padding-left:.1em;
+    padding-right:.1em;
+    border-radius:.2em .2em .2em .2em;
+}
+
+.container {
+    height:100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    column-gap: .2em;
+    row-gap: .2em;
+}
+
+.item {
+    padding: .2em;
 }

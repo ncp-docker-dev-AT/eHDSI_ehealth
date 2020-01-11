@@ -5,6 +5,8 @@ public final class StandardProperties {
 
     public static final String NCP_CERTIFICATES_DIRECTORY = "certificates.storepath";
 
+    public static final String OPENNCP_BASEDIR = "EPSOS_PROPS_PATH";
+
     // NCP Configuration Properties
     public static final String NCP_COUNTRY_PRINCIPAL_SUBDIVISION = "COUNTRY_PRINCIPAL_SUBDIVISION";
     public static final String NCP_COUNTRY = "ncp.country";

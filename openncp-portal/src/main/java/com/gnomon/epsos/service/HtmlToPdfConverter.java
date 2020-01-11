@@ -129,7 +129,7 @@ public class HtmlToPdfConverter {
         float side = 20;
         float x = 300;
         protected float y = 25;
-        protected float space = 4.5f;
+        protected float space = 3f;
         float descent = 2;
         PageXofY(PdfDocument pdf) {
             placeholder =

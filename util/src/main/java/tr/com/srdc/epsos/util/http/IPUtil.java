@@ -65,11 +65,10 @@ public class IPUtil {
                 NetworkInterface networkInterface = NetworkInterface.getByInetAddress(addr);
                 while (networkInterface.getInetAddresses().hasMoreElements()) {
                     InetAddress inetAddress = networkInterface.getInetAddresses().nextElement();
-                    System.out.println(inetAddress.getHostName());
-                    return true;
+                    LOGGER.debug("isThisMyIpAddress: '{}'", inetAddress.getHostName());
                 }
             }
-            return false;
+            return NetworkInterface.getByInetAddress(addr) != null;
         } catch (SocketException e) {
             LOGGER.error(e.getMessage());
             return false;
@@ -80,7 +79,7 @@ public class IPUtil {
 
         boolean isMyDesiredIp = false;
         try {
-            isMyDesiredIp = isThisMyIpAddress(InetAddress.getByName(ipAddress)); //"localhost" for localhost
+            isMyDesiredIp = isThisMyIpAddress(InetAddress.getByName(ipAddress));
         } catch (UnknownHostException unknownHost) {
             LOGGER.error(unknownHost.getMessage());
         }

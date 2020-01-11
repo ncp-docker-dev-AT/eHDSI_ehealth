@@ -12,14 +12,14 @@ import java.nio.file.Paths;
 public class HtmlToPdfConverterTest {
 
     @Test
-    public void testConvertion() throws IOException {
-        String html = readFile(new File("openncp-portal/src/test/resources/ps_friendly.html"));
-        ByteArrayOutputStream baos = HtmlToPdfConverter.createPdf(html);
-        Assert.assertNotNull(baos);
-        Assert.assertTrue(baos.toByteArray().length > 0);
+    public void testConversion() throws IOException {
+        String html = readFile(new File("src/test/resources/ps_friendly.html"));
+        ByteArrayOutputStream outputStream = HtmlToPdfConverter.createPdf(html);
+        Assert.assertNotNull(outputStream);
+        Assert.assertTrue(outputStream.toByteArray().length > 0);
 //        String filename = "C:\\LocalData\\Share\\openncp-configuration\\EpsosRepository\\out\\output.pdf";
 //        FileOutputStream output = new FileOutputStream(filename);
-//        output.write(baos.toByteArray());
+//        output.write(outputStream.toByteArray());
 //        output.close();
     }
 

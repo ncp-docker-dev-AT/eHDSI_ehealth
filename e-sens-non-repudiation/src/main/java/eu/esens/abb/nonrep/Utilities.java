@@ -32,7 +32,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 
@@ -45,23 +44,20 @@ public class Utilities {
     private Utilities() {
     }
 
-    public static void checkForNull(final NodeList nl, final String toCheck, final Logger l) throws MalformedIHESOAPException {
+    public static void checkForNull(final NodeList nodeList, final String toCheck, final Logger logger) throws MalformedIHESOAPException {
 
-        if (nl == null || nl.getLength() != 1) {
-            String err = "No " + toCheck + " found";
-            l.error(err);
-            throw new MalformedIHESOAPException(err);
+        if (nodeList == null || nodeList.getLength() != 1) {
+            String error = "No " + toCheck + " found";
+            logger.error(error);
+            throw new MalformedIHESOAPException(error);
         }
     }
 
     public static Element toElement(XMLObject a) throws TOElementException {
 
-        //MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
         MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
-
         if (marshallerFactory == null) {
-            throw new TOElementException("No MarshallerFactory available. Did you endorse "
-                    + "xml libraries? Did you bootstrap opensaml?");
+            throw new TOElementException("No MarshallerFactory available. OpenSAML not initialized!!!");
         }
 
         // register some marshaller
@@ -95,10 +91,8 @@ public class Utilities {
         try {
             assertionElement = marshaller.marshall(a);
             return assertionElement;
-        } catch (Exception e1) {
-            LOGGER.error("Exception: {}", e1.getMessage(), e1);
-            throw new TOElementException("Unable to marshall the assertion: "
-                    + e1.getMessage(), e1);
+        } catch (Exception e) {
+            throw new TOElementException("Unable to marshall the assertion: " + e.getMessage(), e);
         }
     }
 
@@ -112,11 +106,11 @@ public class Utilities {
     }
 
     /**
-     * Added for handling alternative outputs (instead of only sysout)
+     * Added for handling alternative outputs (instead of only system out)
      *
      * @param request
      * @param out
-     * @throws IOException
+     * @throws TransformerException
      */
     public static void serialize(Element request, OutputStream out) throws TransformerException {
 

@@ -9,8 +9,8 @@ import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerException;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.DynamicDiscoveryClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -30,20 +30,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
+import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.net.ssl.SSLContext;
-import javax.xml.XMLConstants;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -59,10 +53,15 @@ public class DynamicDiscoveryService {
     private static final String PARTICIPANT_IDENTIFIER_SCHEME = "ehealth-participantid-qns";
     private static final String PARTICIPANT_IDENTIFIER_VALUE = "urn:ehealth:%2s:ncp-idp";
     private static final String DOCUMENT_IDENTIFIER_SCHEME = "ehealth-resid-qns";
+    private static final String URN_EHDSI_ISM = "http://ec.europa.eu/sante/ehncp/ism";
 
     private DynamicDiscoveryService() {
     }
 
+    /**
+     * @param sslContext
+     * @return
+     */
     public static CloseableHttpClient buildHttpClient(SSLContext sslContext) {
 
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
@@ -73,7 +72,7 @@ public class DynamicDiscoveryService {
                 new NoopHostnameVerifier());
 
         ProxyCredentials proxyCredentials = null;
-        if (ProxyUtil.isProxyAnthenticationMandatory()) {
+        if (ProxyUtil.isProxyAuthenticationMandatory()) {
             proxyCredentials = ProxyUtil.getProxyCredentials();
         }
         CloseableHttpClient httpclient;
@@ -96,87 +95,58 @@ public class DynamicDiscoveryService {
                         .setProxy(new HttpHost(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort())))
                         .build();
             }
-
         } else {
-            httpclient = HttpClients.custom()
-                    .setSSLSocketFactory(sslsf)
-                    .build();
+            httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
         }
         return httpclient;
     }
 
+    /**
+     * @param countryCode
+     */
     public static void fetchInternationalSearchMask(String countryCode) {
+
+        String applicationBaseDir = System.getenv(StandardProperties.OPENNCP_BASEDIR) + "forms" + System.getProperty("file.separator");
         try {
-            LOGGER.info("fetchInternationalSearchMask({}) - '{}'", countryCode, RegisteredService.EHEALTH_107.getUrn());
-            String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH") + "forms" + System.getProperty("file.separator");
-            try {
+            DynamicDiscovery smpClient = DynamicDiscoveryClient.getInstance();
+            String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
+            LOGGER.info("Querying ISM for participant identifier {}", participantIdentifierValue);
+            ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue,
+                    PARTICIPANT_IDENTIFIER_SCHEME);
 
-                KeyStore trustStore = KeyStore.getInstance("JKS");
-                File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH"));
-                try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                    trustStore.load(fileInputStream, ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PASSWORD").toCharArray());
+            ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier,
+                    new DocumentIdentifier(RegisteredService.EHEALTH_107.getUrn(), DOCUMENT_IDENTIFIER_SCHEME));
 
-                    DynamicDiscovery smpClient = DynamicDiscoveryClient.getInstance();
+            List<ProcessType> processTypes = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata()
+                    .getServiceInformation().getProcessList().getProcess();
 
-                    String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
-                    LOGGER.info("Querying for participant identifier {}", participantIdentifierValue);
-                    ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue,
-                            PARTICIPANT_IDENTIFIER_SCHEME);
+            if (!processTypes.isEmpty()) {
+                List<EndpointType> endpointTypes = processTypes.get(0).getServiceEndpointList().getEndpoint();
+                LOGGER.debug("EndpointType: '{}' - '{}'", endpointTypes, endpointTypes.size());
+                if (!endpointTypes.isEmpty()) {
+                    List<ExtensionType> extensionTypes = endpointTypes.get(0).getExtension();
+                    LOGGER.debug("ExtensionType: '{}' - '{}'", extensionTypes, extensionTypes.size());
+                    if (!extensionTypes.isEmpty()) {
+                        Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
 
-                    LOGGER.info("Querying for service metadata");
-                    ServiceMetadata sm = smpClient.getServiceMetadata(participantIdentifier,
-                            new DocumentIdentifier(RegisteredService.EHEALTH_107.getUrn(), DOCUMENT_IDENTIFIER_SCHEME));
+                        DOMSource source = new DOMSource(document.getElementsByTagNameNS(
+                                URN_EHDSI_ISM, "patientSearch").item(0));
 
-                    LOGGER.info("DocumentIdentifier: '{}' - '{}'",
-                            sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getDocumentIdentifier().getScheme(),
-                            sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getDocumentIdentifier().getValue());
-
-                    LOGGER.info("ParticipantIdentifier: '{}' - '{}'",
-                            sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getParticipantIdentifier().getScheme(),
-                            sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getParticipantIdentifier().getValue());
-
-                    List<ProcessType> processTypes = sm.getOriginalServiceMetadata().getServiceMetadata().getServiceInformation().getProcessList().getProcess();
-                    LOGGER.info("ProcessType: '{}' - '{}'", processTypes, processTypes.size());
-                    if (!processTypes.isEmpty()) {
-                        List<EndpointType> endpointTypes = processTypes.get(0).getServiceEndpointList().getEndpoint();
-                        LOGGER.info("EndpointType: '{}' - '{}'", endpointTypes, endpointTypes.size());
-                        if (!endpointTypes.isEmpty()) {
-                            List<ExtensionType> extensionTypes = endpointTypes.get(0).getExtension();
-                            LOGGER.info("ExtensionType: '{}' - '{}'", extensionTypes, extensionTypes.size());
-                            if (!extensionTypes.isEmpty()) {
-                                Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
-
-                                DOMSource source = new DOMSource(document.getElementsByTagNameNS(
-                                        "http://ec.europa.eu/sante/ehncp/ism", "patientSearch").item(0));
-                                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                                transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-                                Transformer transformer = transformerFactory.newTransformer();
-                                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-                                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-                                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                                transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-                                String outPath = epsosPropsPath + "InternationalSearch_" + StringUtils.upperCase(countryCode) + ".xml";
-                                LOGGER.info("International Search Mask Path: '{}", outPath);
-                                StreamResult result = new StreamResult(outPath);
-                                transformer.transform(source, result);
-                            }
-                        }
+                        String outPath = applicationBaseDir + "InternationalSearch_" + StringUtils.upperCase(countryCode) + ".xml";
+                        LOGGER.info("International Search Mask Path: '{}", outPath);
+                        StreamResult result = new StreamResult(outPath);
+                        XMLUtil.transformDocument(source, result);
                     }
-                    //Audit vars
-                    URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
-                    LOGGER.info("DNS: '{}'", smpURI);
-                    byte[] encodedObjectID = Base64.encodeBase64(smpURI.toASCIIString().getBytes());
-                    AuditManager.handleDynamicDiscoveryQuery(smpURI.toASCIIString(), new String(encodedObjectID), null, null);
                 }
-
-            } catch (NoSuchAlgorithmException e) {
-                throw new ConfigurationManagerException(e);
-            } catch (IOException | CertificateException | KeyStoreException | TechnicalException | TransformerException e) {
-                LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
             }
+            //Audit vars
+            URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
+            byte[] encodedObjectID = Base64.encodeBase64(smpURI.toASCIIString().getBytes());
+            AuditManager.handleDynamicDiscoveryQuery(smpURI.toASCIIString(), new String(encodedObjectID), null, null);
 
-        } catch (Exception e) {
-            throw new ConfigurationManagerException("An internal error occurred while retrieving the International Search Mask", e);
+        } catch (IOException | CertificateException | KeyStoreException | TechnicalException | TransformerException | NoSuchAlgorithmException e) {
+            //TODO: [Specification] Analyze if an audit message is required in case of error.
+            throw new ConfigurationManagerException("An internal error occurred while retrieving the International Search Mask from " + countryCode, e);
         }
     }
 }
