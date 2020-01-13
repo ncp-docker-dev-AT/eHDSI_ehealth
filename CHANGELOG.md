@@ -3,6 +3,66 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [4.0.2] - 13-01-2020
+The OpenNCP 4.0.2 release is the CEF eHDSI Wave 3 Second HotFix version - available for the eHDSI Formal Test Event.
+<br/>This is the first release compliant with the eHDSI MVC 3.1.0; most of the changes are related to the CDA Display Tool and the updated version of eHDSI CDA Implementation Guidelines 3.0.1.
+<br/>Improvements have been implemented into the Audit Manager, Transformation Manager (configuration file embedded into the JAR) and Portals. 
+<br/>Oracle and PostgreSQL databases are now supported.
+<br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/QQEbCw
+### Added
+- [EHNCP-1871] - Adding default coded element list in Transformation Manager.
+- [EHNCP-1869] - HCP and TRC Assertions - ServiceConsumer attribute set to localhost in NAT environment.
+- [EHNCP-1844] - Authentication - role doctor is able to dispense a prescription.
+- [EHNCP-1840] - OpenNCP Web Portal doesn't support all types of Identity Traits.
+- [EHNCP-1839] - Add color layout to Logback configuration for clarity in logs.
+- [EHNCP-1838] - Audit message (TRC, List and Retrieve Documents) providing HCP Role are not conformant with CP-023.
+- [EHNCP-1837] - PostgreSQL database support.
+- [EHNCP-1822] - Create ClientConnectorService client stub dynamic from WSDL definition.
+- [EHNCP-1817] - OpenNCP Portal - Language_cs_CZ.properties - add new CZ translation.
+- [EHNCP-1782] - Oracle Database 12c support.
+- [EHNCP-1728] - Signed Audit messages - Gazelle Validation.
+- [EHNCP-1578] - Add database schema management tool.
+
+### Changed
+- [EHNCP-1874] - Fix generic value set retrieval for known absence/no information scenarios.
+- [EHNCP-1873] - ePrescription XML processing creates NullPointerException.
+- [EHNCP-1870] - Personal data is being logged in PRODUCTION.
+- [EHNCP-1868] - Improve distinction between date and time in the CDA Display Tool.
+- [EHNCP-1867] - Improve PDF generation: align it with HTML view and apply small bug fixes.
+- [EHNCP-1866] - Adapt extended header for Patient summary: distinguish clearly between assignedPerson and authoringDevice.
+- [EHNCP-1865] - Filtering between other contacts and preferred Healthcare Provider is not done correctly.
+- [EHNCP-1864] - CDA Display Tool - Prescriber telecom value not properly displayed.
+- [EHNCP-1862] - CDA Display Tool - Remove brackets from strength.
+- [EHNCP-1861] - Prescriber details are not displayed in CDA Display Tool.
+- [EHNCP-1857] - Fix value set OIDs for no information/known absence cases in coded_element_list_epSOS2.xml.
+- [EHNCP-1856] - Align coded_element_list_epSOS2.xml with correct XPATH.
+- [EHNCP-1854] - Question about CDA Display Tool and procedures section.
+- [EHNCP-1853] - CDA Display Tool - Fix bugs related to use of labels in ePrescription visualization.
+- [EHNCP-1848] - Maven pom configuration build alignment.
+- [EHNCP-1846] - Required attribute contextControlCode with value 'OP' is not added to the eDispensation document by the portal.
+- [EHNCP-1843] - Proxy configuration is mandatory even if proxy is not used.
+- [EHNCP-1841] - Wave 3 CDA L1 Validator has an incorect behaviour - hl7:realmCode.
+- [EHNCP-1836] - TSAM Sync process is not handling concepts mappings.
+- [EHNCP-1833] - Fixing Logback configuration typo in OpenNCP Portal.
+- [EHNCP-1820] - Minor source code re-factoring of OpenNCP Web Portal.
+- [EHNCP-1811] - National Connector Mock - Wave 3 CDA are not correct.
+- [EHNCP-1799] - CDA Display Tool - Distinguish clearly between primary and secondary patientID.
+- [EHNCP-1770] - Refactor CDA Display Tool Visualization for ePrescription.
+- [EHNCP-1761] - LTRDB does not support Oracle Database - Hibernate Identifier strategy.      
+    
+### Deprecated
+- [N/A].
+
+### Removed
+- [N/A].
+
+### Support
+- [EHNCP-1855] - Question about pregnancy section.
+- [EHNCP-1850] - Issue on CDA L1 retrieve PS-B.
+- [EHNCP-1849] - Order Service test (epSOS_WF_ePresc_eDispens) : Friendly Dispensation document on NCP_A side.
+- [EHNCP-1845] - Gazelle Validator eHDSI Audit - Fetch Document Service (Service Consumer) - Wave 3 (V3.1.0) Failure on ActiveParticipant > RoleIDCode.
+- [EHNCP-1666] - Policy manager implementation guide.
+
 ## [4.0.1] - 11-10-2019
 The OpenNCP 4.0.1 release is the CEF eHDSI Wave 3 RC HotFix version available for the eHDSI Preparatory Test Event.
 <br/>Update of the validation performed by the default-policy-manager.
