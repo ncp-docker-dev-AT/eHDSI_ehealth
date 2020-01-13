@@ -30,20 +30,17 @@
                 name="physicalFindingsSectionTitleCode"
                 select="n1:code/@code"/>
         <xsl:variable
-                name="physicalFindingsSectionTitle"
-                select="n1:code[@code='8716-3']/@displayName"/>
+                name="systolicObservation"
+                select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8480-6']/.."/>
         <xsl:variable
-                name="systolicBLabel"
-                select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8480-6']/@displayName"/>
+                name="diastolicObservation"
+                select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8462-4']/.."/>
         <xsl:variable
-                name="diastolicBLabel"
-                select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8462-4']/@displayName"/>
+                name="systolicDate"
+                select="$systolicObservation/n1:effectiveTime/@value"/>
         <xsl:variable
-                name="systolicBDate"
-                select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8480-6']/../n1:effectiveTime/@value"/>
-        <xsl:variable
-                name="diastolicBDate"
-                select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8462-4']/../n1:effectiveTime/@value"/>
+                name="diastolicDate"
+                select="$diastolicObservation/n1:effectiveTime/@value"/>
         <xsl:variable
                 name="physicalFindingsOrganizerDate"
                 select="n1:entry/n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:effectiveTime"/>
@@ -57,12 +54,15 @@
                 <div class="wrap-collabsible">
                     <input id="collapsible-physical-findings-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-physical-findings-section-original" class="lbl-toggle-title">
-                        <xsl:value-of select="$physicalFindingsSectionTitle"/>
+                        <!-- Section title -->
+                        <xsl:call-template name="show-epSOSSections">
+                            <xsl:with-param name="code" select="'8716-3'"/>
+                        </xsl:call-template>
                     </label>
                     <div class="collapsible-content-title">
                         <div class="content-inner-title">
                             <xsl:choose>
-                                <xsl:when test="(not($physicalFindingsOrganizerDate/@value = $systolicBDate) or not($physicalFindingsOrganizerDate/@value = $diastolicBDate))">
+                                <xsl:when test="(not($physicalFindingsOrganizerDate/@value = $systolicDate) or not($physicalFindingsOrganizerDate/@value = $diastolicDate))">
                                     <table>
                                         <tr>
                                             <td style="background-color:#ffffcc">
@@ -107,15 +107,21 @@
                                                         <tr>
                                                             <th>
                                                                 <!--  Date -->
-                                                                <xsl:call-template name="show-displayLabels">
+                                                                <xsl:call-template name="show-epSOSDisplayLabels">
                                                                     <xsl:with-param name="code" select="'17'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <xsl:value-of select="$systolicBLabel"/>
+                                                                <!-- Systolic blood pressure -->
+                                                                <xsl:call-template name="show-epSOSBloodPressure">
+                                                                    <xsl:with-param name="code" select="'8480-6'"/>
+                                                                </xsl:call-template>
                                                             </th>
                                                             <th>
-                                                                <xsl:value-of select="$diastolicBLabel"/>
+                                                                <!-- Diastolic blood pressure -->
+                                                                <xsl:call-template name="show-epSOSBloodPressure">
+                                                                    <xsl:with-param name="code" select="'8462-4'"/>
+                                                                </xsl:call-template>
                                                             </th>
                                                         </tr>
                                                         <xsl:for-each select="n1:entry">
@@ -127,7 +133,7 @@
                                                 </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-nullFlavor">
+                                                <xsl:call-template name="show-epSOSNullFlavor">
                                                     <xsl:with-param name="code" select="$physAct/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -147,26 +153,11 @@
         <xsl:param name="physicalFindingsOrganizerDate"/>
         <!-- Defining all needed variables -->
         <xsl:variable
-                name="systolicBLabel"
-                select="n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8480-6']/@displayName"/>
-        <xsl:variable
-                name="diastolicBLabel"
-                select="n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8462-4']/@displayName"/>
-        <xsl:variable
-                name="systolicBValue"
-                select="n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8480-6']/../n1:value/@value"/>
-        <xsl:variable
-                name="diastolicBValue"
-                select="n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8462-4']/../n1:value/@value"/>
-        <xsl:variable
-                name="systolicBUnit"
-                select="n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8480-6']/../n1:value/@unit"/>
-        <xsl:variable
-                name="diastolicBUnit"
-                select="n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8462-4']/../n1:value/@unit"/>
-        <xsl:variable
-                name="systolicBNode"
+                name="systolicValue"
                 select="n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8480-6']/../n1:value"/>
+        <xsl:variable
+                name="diastolicValue"
+                select="n1:organizer/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.1']/../n1:component/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.13.2']/../n1:code[@code='8462-4']/../n1:value"/>
 
         <xsl:variable name="physAct" select="n1:observation"/>
         <!-- End definition of variables-->
@@ -176,45 +167,26 @@
             <xsl:when test="not($physAct/@nullFlavor)">
                 <tr>
                     <td>
-                        <xsl:call-template name="show-time">
-                            <xsl:with-param name="datetime" select="$physicalFindingsOrganizerDate"/>
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$physicalFindingsOrganizerDate"/>
                         </xsl:call-template>&#160;
                     </td>
                     <td>
-                        <xsl:choose>
-                            <xsl:when test="not ($systolicBNode/@nullFlavor)">
-                                <xsl:choose>
-                                    <xsl:when test="$systolicBValue">
-                                        <xsl:value-of select="$systolicBValue"/>&#160;<xsl:value-of
-                                            select="$systolicBUnit"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <!-- uncoded element Problem -->
-                                        <xsl:if test="$systolicBNode/n1:originalText/n1:reference/@value">
-                                            <xsl:call-template name="show-uncodedElement">
-                                                <xsl:with-param name="code"
-                                                                select="$systolicBNode/n1:originalText/n1:reference/@value"/>
-                                            </xsl:call-template>
-                                        </xsl:if>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:call-template name="show-nullFlavor">
-                                    <xsl:with-param name="code" select="$systolicBNode/@nullFlavor"/>
-                                </xsl:call-template>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <xsl:call-template name="show-PQ">
+                            <xsl:with-param name="node" select="$systolicValue"/>
+                        </xsl:call-template>
                     </td>
                     <td>
-                        <xsl:value-of select="$diastolicBValue"/>&#160;<xsl:value-of select="$diastolicBUnit"/>
+                        <xsl:call-template name="show-PQ">
+                            <xsl:with-param name="node" select="$diastolicValue"/>
+                        </xsl:call-template>
                     </td>
                 </tr>
             </xsl:when>
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-nullFlavor">
+                        <xsl:call-template name="show-epSOSNullFlavor">
                             <xsl:with-param name="code" select="$physAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

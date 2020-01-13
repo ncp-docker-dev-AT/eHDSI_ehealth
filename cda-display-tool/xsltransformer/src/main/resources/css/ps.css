@@ -1,12 +1,24 @@
 <root><![CDATA[
 
+.container {
+    height:100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    column-gap: 10px;
+    row-gap: 10px;
+}
+
+.extended_header_block {
+    height:100%;
+}
+
 /* Translation table - table containing the coded translations */
 .translation_table{
-            width: 100%;
-            table-layout: fixed;
-        }
+    width: 100%;
+    table-layout: fixed;
+}
 .translation_table th {
-    background-color:#E6F2FF;
     color:#4A4A4A;
     font-size:12px;
     padding:6px;
@@ -15,15 +27,23 @@
     border-bottom: 1px solid #009fd1;
 }
 .translation_table td {
-    background-color:#E6F2FF;
     font-size:12px;
     vertical-align: top;
     text-align: left;
 }
 
+.translation_table tr:nth-child(even) {
+    background: #FFF;
+}
+
+.translation_table tr:nth-child(odd) {
+    background: #E6F2FF;
+}
+
 .extended_header_table{
     border: 1px solid #009fd1;
     width: 100%;
+    height: 100%;
     table-layout: fixed;
     border-radius: 3px;
 }
@@ -33,6 +53,7 @@
     font-size:12px;
     padding:6px;
     vertical-align: top;
+    height: 20%;
     text-align: left;
     border-bottom: 1px solid #009fd1;
 }
@@ -45,6 +66,8 @@
 .contact_information_table{
     border-radius: 3px;
     padding: 0px;
+    width: 100%;
+    height: 100%;
 }
 .contact_information_table th {
     background-color:#009fd1;

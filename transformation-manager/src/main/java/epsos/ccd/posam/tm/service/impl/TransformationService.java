@@ -119,11 +119,11 @@ public class TransformationService implements ITransformationService, TMConstant
         // Document type code
         String docTypeCode;
         // exactly 1 document type element should exist
-        if (nodeList.size() == 1) {
+        if (nodeList.size() == 1 && nodeList.get(0).getNodeType() == Node.ELEMENT_NODE) {
             Element docTypeCodeElement = (Element) nodeList.get(0);
             docTypeCode = docTypeCodeElement.getAttribute(CODE);
             logger.info("CDA Document Type Code: '{}'", docTypeCode);
-            if (docTypeCode == null || docTypeCode.length() == 0) {
+            if (StringUtils.isBlank(docTypeCode)) {
                 throw new TMException(TMError.ERROR_DOCUMENT_CODE_NOT_EXIST);
             }
         } else {
@@ -397,12 +397,14 @@ public class TransformationService implements ITransformationService, TMConstant
             List<Node> idElements = XmlUtil.getNodeList(document, XPATH_ALL_ELEMENTS_WITH_ID_ATTR);
             String id;
             for (Node idElement1 : idElements) {
-                Element idElement = (Element) idElement1;
-                id = idElement.getAttribute(ID);
-                if (notEmpty(id) && hmReffIdDisplayName != null && hmReffIdDisplayName.containsKey(id) && idElement.getChildNodes().getLength() == 1) {
+                if (idElement1.getNodeType() == Node.ELEMENT_NODE) {
+                    Element idElement = (Element) idElement1;
+                    id = idElement.getAttribute(ID);
+                    if (notEmpty(id) && hmReffIdDisplayName != null && hmReffIdDisplayName.containsKey(id) && idElement.getChildNodes().getLength() == 1) {
 
-                    logger.debug("replaced id: '{}' '{}' --> '{}'", id, idElement.getTextContent(), hmReffIdDisplayName.get(id));
-                    idElement.setTextContent(hmReffIdDisplayName.get(id));
+                        logger.debug("replaced id: '{}' '{}' --> '{}'", id, idElement.getTextContent(), hmReffIdDisplayName.get(id));
+                        idElement.setTextContent(hmReffIdDisplayName.get(id));
+                    }
                 }
             }
             logger.debug("replaceReferencedValues END");
@@ -461,17 +463,19 @@ public class TransformationService implements ITransformationService, TMConstant
             // find Elements with tagname "originalText"
             NodeList texts = codedElement.getElementsByTagName(TMConstants.ORIGINAL_TEXT);
             for (int i = 0; i < texts.getLength(); i++) {
-                Element text = (Element) texts.item(i);
-                // find Element with tagname "reference"
-                NodeList references = text.getElementsByTagName(TMConstants.REFERENCE);
-                if (references.getLength() > 0) {
-                    Element reference = (Element) references.item(0);
-                    String key = reference.getAttribute(VALUE);
-                    if (notEmpty(key)) {
-                        key = key.replace(HASH, EMPTY_STRING);
-                        if (!hmReffIdDisplayName.containsKey(key)) {
-                            hmReffIdDisplayName.put(key, displayName);
-                            logger.debug("remembered @reference= '{}' | '{}'", key, displayName);
+                if (texts.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                    Element text = (Element) texts.item(i);
+                    // find Element with tagname "reference"
+                    NodeList references = text.getElementsByTagName(TMConstants.REFERENCE);
+                    if (references.getLength() > 0 && references.item(0).getNodeType() == Node.ELEMENT_NODE) {
+                        Element reference = (Element) references.item(0);
+                        String key = reference.getAttribute(VALUE);
+                        if (notEmpty(key)) {
+                            key = key.replace(HASH, EMPTY_STRING);
+                            if (!hmReffIdDisplayName.containsKey(key)) {
+                                hmReffIdDisplayName.put(key, displayName);
+                                logger.debug("remembered @reference= '{}' | '{}'", key, displayName);
+                            }
                         }
                     }
                 }
@@ -513,10 +517,10 @@ public class TransformationService implements ITransformationService, TMConstant
     private String processDocument(Document document, String targetLanguageCode, List<ITMTSAMEror> errors,
                                    List<ITMTSAMEror> warnings, String cdaDocumentType, boolean isTranscode) {
 
+        //TODO: Check is an attribute shall/can also be translated anr/or transcoded like the XML element.
         logger.info("Processing Document '{}' to target Language: '{}' Transcoding: '{}", cdaDocumentType, targetLanguageCode, isTranscode);
         boolean processingOK = true;
-        // hashMap for ID of referencedValues and transcoded/translated
-        // DisplayNames
+        // hashMap for ID of referencedValues and transcoded/translated DisplayNames
         HashMap<String, String> hmReffId_DisplayName = new HashMap<>();
         boolean isProcessingSuccesful;
 
@@ -573,24 +577,25 @@ public class TransformationService implements ITransformationService, TMConstant
                     if (nodeList != null) {
 
                         for (Node aNodeList : nodeList) {
-                            // iterate elements for processing
-                            originalElement = (Element) aNodeList;
-                            // check if xsi:type is "CE" or "CD"
-                            checkCodedElementType(originalElement, warnings);
+                            // Iterate elements for processing
+                            if (aNodeList.getNodeType() == Node.ELEMENT_NODE) {
+                                originalElement = (Element) aNodeList;
+                                // Checking if xsi:type is "CE" or "CD"
+                                checkCodedElementType(originalElement, warnings);
 
-                            // call tsam transcode/translate method for each coded element
-                            // Transformation process: Transcoding or Translation for each coded elements configured according the CDA type.
-                            isProcessingSuccesful = (isTranscode ?
-                                    transcodeElement(originalElement, document, hmReffId_DisplayName, null, null, errors, warnings)
-                                    : translateElement(originalElement, document, targetLanguageCode, hmReffId_DisplayName, null, null, errors, warnings));
+                                // Calling TSAM transcode/translate method for each coded element configured according CDA type.
+                                isProcessingSuccesful = (isTranscode ?
+                                        transcodeElement(originalElement, document, hmReffId_DisplayName, null, null, errors, warnings)
+                                        : translateElement(originalElement, document, targetLanguageCode, hmReffId_DisplayName, null, null, errors, warnings));
 
-                            // if is required & processing is unsuccessful, report ERROR
-                            if (isRequired && !isProcessingSuccesful) {
-                                processingOK = false;
-                                String ctx = XmlUtil.getElementPath(originalElement);
-                                errors.add(isTranscode ? new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED, ctx)
-                                        : new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSLATED, ctx));
-                                logger.error("Required coded element was not translated");
+                                // If is required & processing is unsuccessful, report ERROR
+                                if (isRequired && !isProcessingSuccesful) {
+                                    processingOK = false;
+                                    String ctx = XmlUtil.getElementPath(originalElement);
+                                    errors.add(isTranscode ? new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED, ctx)
+                                            : new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSLATED, ctx));
+                                    logger.error("Required coded element was not translated");
+                                }
                             }
                         }
                     }
@@ -603,25 +608,28 @@ public class TransformationService implements ITransformationService, TMConstant
             logger.info("Found '{}' elements to translate/transcode", nodeList.size());
             Element originalElement;
             for (Node aNodeList : nodeList) {
-                // iterate elements for translation
-                originalElement = (Element) aNodeList;
-                // if element name is translation, don't do anything
-                if (TRANSLATION.equals(originalElement.getLocalName())) {
 
-                    CodedElement ce = new CodedElement(originalElement);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("translation element - skipping: '{}'", ce.toString());
+                if (aNodeList.getNodeType() == Node.ELEMENT_NODE) {
+                    // iterate elements for translation
+                    originalElement = (Element) aNodeList;
+                    // if element name is translation, don't do anything
+                    if (TRANSLATION.equals(originalElement.getLocalName())) {
+
+                        CodedElement ce = new CodedElement(originalElement);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("translation element - skipping: '{}'", ce.toString());
+                        }
+                        continue;
                     }
-                    continue;
-                }
-                // check if xsi:type is "CE" or "CD"
-                checkCodedElementType(originalElement, warnings);
+                    // check if xsi:type is "CE" or "CD"
+                    checkCodedElementType(originalElement, warnings);
 
-                // call TSAM transcode/translate method for each coded element
-                isProcessingSuccesful = (isTranscode ?
-                        transcodeElement(originalElement, document, hmReffId_DisplayName, null, null, errors, warnings) :
-                        translateElement(originalElement, document, targetLanguageCode, hmReffId_DisplayName, null, null, errors, warnings));
-                return (isProcessingSuccesful ? STATUS_SUCCESS : STATUS_FAILURE);
+                    // call TSAM transcode/translate method for each coded element
+                    isProcessingSuccesful = (isTranscode ?
+                            transcodeElement(originalElement, document, hmReffId_DisplayName, null, null, errors, warnings) :
+                            translateElement(originalElement, document, targetLanguageCode, hmReffId_DisplayName, null, null, errors, warnings));
+                    return (isProcessingSuccesful ? STATUS_SUCCESS : STATUS_FAILURE);
+                }
             }
         }
         return (processingOK ? STATUS_SUCCESS : STATUS_FAILURE);

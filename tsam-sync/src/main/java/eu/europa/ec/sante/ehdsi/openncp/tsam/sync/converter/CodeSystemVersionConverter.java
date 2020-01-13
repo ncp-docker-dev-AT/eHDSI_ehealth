@@ -3,16 +3,21 @@ package eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.domain.CodeSystemVersion;
 import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.CodeSystemVersionModel;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class CodeSystemVersionConverter implements Converter<CodeSystemVersionModel, CodeSystemVersion> {
 
+    private final CodeSystemConverter codeSystemConverter;
     private Map<String, CodeSystemVersion> cache = new HashMap<>();
 
-    private final CodeSystemConverter codeSystemConverter = new CodeSystemConverter();
+    public CodeSystemVersionConverter(CodeSystemConverter codeSystemConverter) {
+        this.codeSystemConverter = codeSystemConverter;
+    }
 
     @Override
     public CodeSystemVersion convert(CodeSystemVersionModel source) {

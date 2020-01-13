@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>openncp-transformation-manager</artifactId>
@@ -116,12 +116,17 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <directory>target</directory>
         <outputDirectory>target/classes</outputDirectory>
-        <finalName>${project.artifactId}-${project.version}</finalName>
         <testOutputDirectory>target/test-classes</testOutputDirectory>
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>

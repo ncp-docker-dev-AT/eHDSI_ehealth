@@ -11,11 +11,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import se.sb.epsos.shelob.ws.client.jaxws.*;
 import se.sb.epsos.web.auth.AuthenticatedUser;
@@ -74,7 +71,10 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
     }
 
     public NcpServiceFacadeImpl() {
-        this.service = new ClientConnectorServiceService(null, new QName(CLIENT_CONNECTOR_NS_URL, CLIENT_CONNECTOR_LOCAL_PART));
+        String clientConnectorWsdlUrl = System.getProperty("client-connector-wsdl-url");
+        LOGGER.info("[Portal] Initializing client-connector-wsdl-url: '{}'", clientConnectorWsdlUrl);
+        this.service = new ClientConnectorServiceService(null, new QName(CLIENT_CONNECTOR_NS_URL,
+                CLIENT_CONNECTOR_LOCAL_PART));
         this.trcServiceHandler = new TrcServiceHandler();
     }
 
@@ -132,7 +132,8 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
         });
 
         String clientConnectorWsdlUrl = System.getProperty("client-connector-wsdl-url");
-        LOGGER.info("[Portal] Initializing client-connector-wsdl-url: '{}'", clientConnectorWsdlUrl);
+        LOGGER.info("[Portal] Initializing client-connector-wsdl-url: '{}'\nServicePort Class: '{}'",
+                clientConnectorWsdlUrl, service.getClientConnectorServicePort().getClass());
         clientConnectorService = service.getClientConnectorServicePort();
         BindingProvider bindingProvider = (BindingProvider) clientConnectorService;
         bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, clientConnectorWsdlUrl);
@@ -221,34 +222,18 @@ public class NcpServiceFacadeImpl implements NcpServiceFacade {
 
         LOGGER.info("start::setTRCAssertion()");
         try {
-            LOGGER.info("Building TRC request");
-            LOGGER.info("Epsos ID: '{}'", trc.getPerson().getEpsosId());
-            LOGGER.info("Purpose: '{}'", trc.getPurpose());
+            LOGGER.info("Building TRC request: Patient ID: '{}' Purpose: '{}", trc.getPerson().getEpsosId(), trc.getPurpose());
 
             // Generate a new HCP assertion for the user
             Assertion assertion = assertionHandler.createSAMLAssertion(userDetails);
             assertionHandler.signSAMLAssertion(assertion);
             userDetails.setAssertion(assertion);
 
-            AssertionMarshaller marshaller2 = new AssertionMarshaller();
-            Element element2 = marshaller2.marshall(userDetails.getAssertion());
-            Document document2 = element2.getOwnerDocument();
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Assertion1:\n'{}'", new XmlUtil().prettyPrint(document2));
-            }
-            TRCAssertionRequest trcAssertionRequest = trcServiceHandler.buildTrcRequest(userDetails.getAssertion(), trc.getPerson().getEpsosId(),
-                    trc.getPurpose());
-            LOGGER.info("Building TRC request done");
+            TRCAssertionRequest trcAssertionRequest = trcServiceHandler.buildTrcRequest(userDetails.getAssertion(),
+                    trc.getPerson().getEpsosId(), trc.getPurpose());
+            LOGGER.info("TRC-STS request done");
             if (trcAssertionRequest != null) {
-                LOGGER.info("Making request to TRC-STS:");
                 Assertion trcAssertion = trcAssertionRequest.request();
-                LOGGER.info("TRC-STS request done");
-                AssertionMarshaller marshaller = new AssertionMarshaller();
-                Element element = marshaller.marshall(trcAssertion);
-                Document document = element.getOwnerDocument();
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("Assertion2:\n'{}'", new XmlUtil().prettyPrint(document));
-                }
                 userDetails.setTrc(trc);
                 userDetails.setTrcAssertion(trcAssertion);
             } else {

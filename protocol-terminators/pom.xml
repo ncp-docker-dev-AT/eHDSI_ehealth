@@ -6,7 +6,7 @@
     <parent>
         <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>4.0.1</version>
+        <version>4.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>openncp-protocol-terminators</artifactId>
@@ -33,7 +33,7 @@
         <dependencies>
             <dependency>
                 <groupId>eu.europa.ec.sante.ehdsi</groupId>
-                <artifactId>openncp-adc</artifactId>
+                <artifactId>openncp-eadc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

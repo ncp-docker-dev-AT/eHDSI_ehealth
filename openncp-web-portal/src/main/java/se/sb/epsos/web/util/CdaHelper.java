@@ -1,13 +1,3 @@
-/*    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
- *
- *    This file is part of epSOS-WEB.
- *
- *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
- **/
 package se.sb.epsos.web.util;
 
 import org.apache.commons.lang.StringUtils;
@@ -31,7 +21,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -289,8 +278,7 @@ public class CdaHelper {
     }
 
     private void handleInstructions(Prescription prescription, PrescriptionRow row, XPath xpath, Node entryNode)
-            throws UnsupportedEncodingException, XPathExpressionException, TransformerFactoryConfigurationError,
-            TransformerException {
+            throws XPathExpressionException, TransformerFactoryConfigurationError, TransformerException {
 
         String patientString = "";
         XPathExpression patientInstrEexpr = xpath.compile(

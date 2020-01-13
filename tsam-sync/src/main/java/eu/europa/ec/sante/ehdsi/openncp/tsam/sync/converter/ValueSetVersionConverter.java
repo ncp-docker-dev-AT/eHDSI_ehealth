@@ -10,7 +10,11 @@ import java.time.LocalDateTime;
 @Component
 public class ValueSetVersionConverter implements Converter<ValueSetVersionModel, ValueSetVersion> {
 
-    private final ValueSetConverter valueSetConverter = new ValueSetConverter();
+    private final ValueSetConverter valueSetConverter;
+
+    public ValueSetVersionConverter(ValueSetConverter valueSetConverter) {
+        this.valueSetConverter = valueSetConverter;
+    }
 
     @Override
     public ValueSetVersion convert(ValueSetVersionModel source) {

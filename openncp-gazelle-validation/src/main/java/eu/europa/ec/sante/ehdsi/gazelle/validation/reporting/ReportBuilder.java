@@ -126,7 +126,8 @@ public class ReportBuilder {
             if (GAZELLE_HTML_REPORT) {
                 File repostHtmlFile = new File(StringUtils.replace(reportFileName, ".xml", ".html"));
                 try (BufferedWriter htmlReport = new BufferedWriter(new FileWriter(repostHtmlFile.getAbsoluteFile()))) {
-                    ReportTransformer reportTransformer = new ReportTransformer(validationBody, (Base64.isBase64(validationObject) ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) : validationObject));
+                    ReportTransformer reportTransformer = new ReportTransformer(validationBody, (Base64.isBase64(validationObject)
+                            ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) : validationObject));
                     LOGGER.info("HTML:\n{}", reportTransformer.getHtmlReport());
                     htmlReport.write(reportTransformer.getHtmlReport());
                 } catch (IOException e) {
@@ -143,8 +144,8 @@ public class ReportBuilder {
                     bw.write("<validationReport>");
                     bw.write("\n");
                     bw.write("<validatedObject>");
-                    bw.write("<![CDATA[\"" + (Base64.isBase64(validationObject) ?
-                            new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) :
+                    bw.write("<![CDATA[\"" + (Base64.isBase64(validationObject)
+                            ? new String(Base64.decodeBase64(validationObject), StandardCharsets.UTF_8) :
                             validationObject) + "\"]]>");
                     bw.write("</validatedObject>");
                     bw.write("\n");

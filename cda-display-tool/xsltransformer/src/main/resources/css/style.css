@@ -8,6 +8,7 @@ body {
     font-size: 12px;
     margin: 0;
     padding: 1rem;
+    height: 100%;
     /*text-rendering: optimizeLegibility;*/
 }
 
@@ -110,13 +111,17 @@ input[type='checkbox'] {
 .lbl-toggle {
     display: block;
 
+    color: #009fd1;
     font-weight: bold;
     font-size: 13px;
     text-align: left;
 
     padding: 0.5rem;
 
-    background: #009fd1;
+    border: 2px solid #009fd1;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    background: #FFF;
 
     cursor: pointer;
 
@@ -124,9 +129,6 @@ input[type='checkbox'] {
     transition: all 0.25s ease-out;
 }
 
-.lbl-toggle:hover {
-    color: #085a9f;
-}
 
 .lbl-toggle::before {
     content: ' ';
@@ -179,12 +181,13 @@ input[type='checkbox'] {
     display: block;
 
     font-weight: bold;
-    color: white;
+    color: #FFF;
     font-size: 15px;
     text-align: left;
 
     padding: 0.5rem;
 
+    border: 2px solid #085a9f;
     background: #085a9f;
 
     cursor: pointer;
@@ -247,13 +250,17 @@ input[type='checkbox'] {
     display: block;
 
     font-weight: bold;
-    color: #009fd1;
+    color: #085a9f;
     font-size: 15px;
     text-align: left;
 
     padding: 0.5rem;
 
-    background: #085a9f;
+    border: 2px solid #085a9f;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+
+    background: #FFF;
 
     cursor: pointer;
 
@@ -262,7 +269,7 @@ input[type='checkbox'] {
 }
 
 .lbl-toggle-main:hover {
-    color: white;
+    color: #009fd1;
 }
 
 .lbl-toggle-main::before {
@@ -325,8 +332,9 @@ input[type='checkbox'] {
     padding: 5px 0;
     position: absolute;
     z-index: 1;
-    top: -5px;
-    left: 160%;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
     opacity: 0;
     transition: opacity 0.3s;
 }
@@ -334,12 +342,12 @@ input[type='checkbox'] {
 .tooltip .tooltiptext::after {
     content: "";
     position: absolute;
-    top: 50%;
-    right: 100%;
-    margin-top: -5px;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: transparent #555 transparent transparent;
+    border-color: #555 transparent transparent transparent;
 }
 
 .tooltip:hover .tooltiptext {
@@ -389,6 +397,19 @@ input[type='checkbox'] {
 
 .narrative {
     color: #085a9f;
+}
+
+.label {
+    color: white;
+    padding: 4px;
+}
+
+.otherContacts-personalRelationship {
+    background-color: #009fd1;
+}
+
+.otherContacts-roleClass {
+    background-color: #085a9f;
 }
 
 ]]></root>

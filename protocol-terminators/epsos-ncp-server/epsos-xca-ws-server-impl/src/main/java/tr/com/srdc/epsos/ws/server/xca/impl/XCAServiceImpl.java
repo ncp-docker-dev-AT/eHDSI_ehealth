@@ -15,6 +15,10 @@ import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.AssertionValidationException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
@@ -41,10 +45,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.xds.DocumentType;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.AssertionValidationException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
@@ -171,7 +171,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + Helper.getUserID(sh)
                 + "@" + Helper.getAssertionsIssuer(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
-        eventLog.setHR_RoleID(Helper.getRoleID(sh));
+        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
         eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
@@ -258,7 +258,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + Helper.getUserID(sh)
                 + "@" + Helper.getAssertionsIssuer(sh) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
-        eventLog.setHR_RoleID(Helper.getRoleID(sh));
+        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
         eventLog.setPT_PatricipantObjectID(Helper.getDocumentEntryPatientIdFromTRCAssertion(sh));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
@@ -1077,7 +1077,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      * @param omElement
      * @throws Exception
      */
-    private void RetrieveDocumentSetBuilder(RetrieveDocumentSetRequestType request, SOAPHeader soapHeader,
+    private void retrieveDocumentSetBuilder(RetrieveDocumentSetRequestType request, SOAPHeader soapHeader,
                                             EventLog eventLog, OMElement omElement) throws Exception {
 
         OMNamespace ns = factory.createOMNamespace("urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0", "");
@@ -1107,18 +1107,20 @@ public class XCAServiceImpl implements XCAServiceInterface {
             String documentId = request.getDocumentRequest().get(0).getDocumentUniqueId();
             String patientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(soapHeaderElement));
             String repositoryId = getRepositoryUniqueId(request);
-            logger.info("Retrieving Document with criteria: '{}' '{}' '{}'", patientId, documentId, repositoryId);
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+                loggerClinical.debug("Retrieving clinical document by criteria:\nPatient ID: '{}'\nDocument ID: '{}'\nRepository ID: '{}'",
+                        patientId, documentId, repositoryId);
+            }
             //try getting country code from the certificate
             String countryCode = null;
-            String DN = eventLog.getSC_UserID();
-            int cIndex = DN.indexOf("C=");
-
+            String distinguishedName = eventLog.getSC_UserID();
+            logger.info("[Certificate] Distinguished Name: '{}'", distinguishedName);
+            int cIndex = distinguishedName.indexOf("C=");
             if (cIndex > 0) {
-                countryCode = DN.substring(cIndex + 2, cIndex + 4);
+                countryCode = distinguishedName.substring(cIndex + 2, cIndex + 4);
             }
-            // Mustafa: This part is added for handling consents when the call is not https
-            // In this case, we check the country code of the signature certificate that
-            // ships within the HCP assertion
+            // Mustafa: This part is added for handling consents when the call is not https. In this case, we check
+            // the country code of the signature certificate that ships within the HCP assertion
             // TODO: Might be necessary to remove later, although it does no harm in reality!
             if (countryCode == null) {
                 logger.info("Could not get client country code from the service consumer certificate. " +
@@ -1479,7 +1481,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     public void retrieveDocument(RetrieveDocumentSetRequestType request, SOAPHeader sh, EventLog eventLog,
                                  OMElement response) throws Exception {
 
-        RetrieveDocumentSetBuilder(request, sh, eventLog, response);
+        retrieveDocumentSetBuilder(request, sh, eventLog, response);
     }
 
     /**

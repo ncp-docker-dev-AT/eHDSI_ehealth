@@ -47,16 +47,6 @@ public class DynamicDiscoveryClient {
                     .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
                             .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
                     .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)));
-
-//            if (ProxyUtil.isProxyAnthenticationMandatory()) {
-//                LOGGER.debug("Loading Proxy Credentials...");
-//                ProxyCredentials proxyCredentials = ProxyUtil.getProxyCredentials();
-//                if (proxyCredentials != null) {
-//                    builder.fetcher(new DefaultURLFetcher(new CustomProxy(proxyCredentials.getProxyHost(),
-//                            Integer.parseInt(proxyCredentials.getProxyPort()), proxyCredentials.getProxyUser(),
-//                            proxyCredentials.getProxyPassword())));
-//                }
-//            }
             LOGGER.debug("Building Dynamic Discovery...");
             INSTANCE = dynamicDiscoveryBuilder.build();
 

@@ -6,10 +6,10 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>openncp-adc</artifactId>
+    <artifactId>openncp-eadc</artifactId>
     <packaging>jar</packaging>
 
     <name>OpenNCP Automatic Data Collector</name>

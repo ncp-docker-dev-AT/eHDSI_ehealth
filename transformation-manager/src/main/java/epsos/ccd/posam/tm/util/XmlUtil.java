@@ -53,7 +53,7 @@ public class XmlUtil implements TMConstants {
             transformer.transform(source, result);
             return stringWriter.getBuffer().toString();
         } catch (TransformerException e) {
-            LOGGER.error("xmlToString error: ", e);
+            LOGGER.error("TransformerException: '{}'", e.getMessage());
         }
         return null;
     }
@@ -75,7 +75,7 @@ public class XmlUtil implements TMConstants {
 
             return stringWriter.getBuffer().toString();
         } catch (TransformerException e) {
-            LOGGER.error("xmlToString error: ", e);
+            LOGGER.error("TransformerException: '{}'", e.getMessage());
         }
         return null;
     }
@@ -89,14 +89,24 @@ public class XmlUtil implements TMConstants {
      */
     public static Document getDocument(File file, boolean namespaceAware) {
 
+        try {
+            return getDocument(new FileInputStream(file), namespaceAware);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public static Document getDocument(InputStream inputStream, boolean namespaceAware) {
+
         Document document = null;
         try {
             // Parse a XML document into a DOM tree
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
             documentFactory.setNamespaceAware(namespaceAware);
-            DocumentBuilder parser = documentFactory.newDocumentBuilder();
+            DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
 
-            document = parser.parse(file);
+            document = documentBuilder.parse(inputStream);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }

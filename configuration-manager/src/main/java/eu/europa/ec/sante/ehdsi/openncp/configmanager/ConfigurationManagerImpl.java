@@ -82,12 +82,12 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 
     @Override
     public boolean getBooleanProperty(String key) {
-        return Boolean.valueOf(getProperty(key));
+        return Boolean.parseBoolean(getProperty(key));
     }
 
     @Override
     public int getIntegerProperty(String key) {
-        return Integer.valueOf(getProperty(key));
+        return Integer.parseInt(getProperty(key));
     }
 
     @Override
@@ -177,24 +177,28 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         }
     }
 
+    /**
+     * @return
+     */
     public DynamicDiscoveryBuilder initializeDynamicDiscoveryFetcher() {
 
+        //TODO: [Specification] Is it necessary to use the nonProxyHosts feature from DynamicDiscovery module.
         try {
-            boolean proxyEnabled = getBooleanProperty("APP_BEHIND_PROXY");
-            boolean proxyAuthenticated = getBooleanProperty("APP_PROXY_AUTHENTICATED");
-            String proxyHost = getProperty("APP_PROXY_HOST");
-            int proxyPort = getIntegerProperty("APP_PROXY_PORT");
-            String proxyUsername = getProperty("APP_PROXY_USERNAME");
-            String proxyPassword = getProperty("APP_PROXY_PASSWORD");
-
             DynamicDiscoveryBuilder discoveryBuilder = DynamicDiscoveryBuilder.newInstance();
+            boolean proxyEnabled = getBooleanProperty(StandardProperties.HTTP_PROXY_USED);
+
             if (proxyEnabled) {
+                boolean proxyAuthenticated = getBooleanProperty(StandardProperties.HTTP_PROXY_AUTHENTICATED);
+                String proxyHost = getProperty(StandardProperties.HTTP_PROXY_HOST);
+                int proxyPort = getIntegerProperty(StandardProperties.HTTP_PROXY_PORT);
+
                 if (proxyAuthenticated) {
+                    String proxyUsername = getProperty(StandardProperties.HTTP_PROXY_USERNAME);
+                    String proxyPassword = getProperty(StandardProperties.HTTP_PROXY_PASSWORD);
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Configuring access through Authenticated Proxy '{}:{}' with Credentials: '{}/{}'",
                                 proxyHost, proxyPort, proxyUsername, StringUtils.isNoneBlank(proxyPassword) ? "XXXXXX" : "No Password provided");
                     }
-
                     discoveryBuilder.fetcher(new DefaultURLFetcher(new DefaultProxy(proxyHost, proxyPort, proxyUsername, proxyPassword)));
 
                 } else {
@@ -210,8 +214,8 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         }
     }
 
-    public void setServiceWSE(String ISOCountryCode, String ServiceName, String URL) {
-        setProperty(ISOCountryCode + "." + ServiceName + ".WSE", URL);
+    public void setServiceWSE(String coutryCode, String serviceName, String url) {
+        setProperty(coutryCode + "." + serviceName + ".WSE", url);
     }
 
     private Optional<String> findProperty(String key, boolean checkMap) {
