@@ -541,9 +541,9 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <echo>prop: project.name = ${project.name}</echo>
-                            </tasks>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
