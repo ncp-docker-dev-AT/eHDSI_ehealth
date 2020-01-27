@@ -248,6 +248,7 @@ public class ClientConnectorConsumer {
             ClientConnectorServiceStub clientConnectorStub = new ClientConnectorServiceStub(epr);
             clientConnectorStub._getServiceClient().getOptions().setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             clientConnectorStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
+            clientConnectorStub._getServiceClient().engageModule("addressing");
             this.registerEvidenceEmitterHandler(clientConnectorStub);
             return clientConnectorStub;
         } catch (AxisFault ex) {

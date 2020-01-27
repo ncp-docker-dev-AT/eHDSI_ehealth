@@ -46,24 +46,24 @@
     </wsdl:message>
     <wsdl:portType name="ClientConnectorServicePortType">
         <wsdl:operation name="sayHello">
-            <wsdl:input message="tns:sayHello" />
-            <wsdl:output message="tns:sayHelloResponse" />
+            <wsdl:input message="tns:sayHello" wsaw:Action="urn:ehdsi:sayHello"/>
+            <wsdl:output message="tns:sayHelloResponse" wsaw:Action="urn:ehdsi:sayHelloResponse"/>
         </wsdl:operation>
         <wsdl:operation name="queryPatient">
             <wsdl:input message="tns:queryPatient" wsaw:Action="urn:ehdsi:queryPatient"/>
             <wsdl:output message="tns:queryPatientResponse" wsaw:Action="urn:ehdsi:queryPatientResponse"/>
         </wsdl:operation>
         <wsdl:operation name="queryDocuments">
-            <wsdl:input message="tns:queryDocuments" />
-            <wsdl:output message="tns:queryDocumentsResponse" />
+            <wsdl:input message="tns:queryDocuments" wsaw:Action="urn:ehdsi:queryDocuments"/>
+            <wsdl:output message="tns:queryDocumentsResponse" wsaw:Action="urn:ehdsi:queryDocumentsResponse"/>
         </wsdl:operation>
         <wsdl:operation name="retrieveDocument">
-            <wsdl:input message="tns:retrieveDocument" />
-            <wsdl:output message="tns:retrieveDocumentResponse" />
+            <wsdl:input message="tns:retrieveDocument" wsaw:Action="urn:ehdsi:retrieveDocument"/>
+            <wsdl:output message="tns:retrieveDocumentResponse" wsaw:Action="urn:ehdsi:retrieveDocumentResponse"/>
         </wsdl:operation>
         <wsdl:operation name="submitDocument">
-            <wsdl:input message="tns:submitDocument" />
-            <wsdl:output message="tns:submitDocumentResponse" />
+            <wsdl:input message="tns:submitDocument" wsaw:Action="urn:ehdsi:submitDocument"/>
+            <wsdl:output message="tns:submitDocumentResponse" wsaw:Action="urn:ehdsi:submitDocumentResponse"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="ClientConnectorServicePortBinding" type="tns:ClientConnectorServicePortType">
@@ -79,6 +79,7 @@
         </wsdl:operation>
         <wsdl:operation name="queryPatient">
             <wsp:PolicyReference URI="#HttpsWithSAML2AssertionPolicy" />
+            <soap12:operation soapAction="urn:ehdsi:queryPatient" />
             <wsdl:input>
                 <soap12:body use="literal" />
             </wsdl:input>
