@@ -128,9 +128,9 @@
                                 <id>ant1</id>
                                 <phase>install</phase>
                                 <configuration>
-                                    <tasks>
+                                    <target>
                                         <ant dir="." target="dist"/>
-                                    </tasks>
+                                    </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>
