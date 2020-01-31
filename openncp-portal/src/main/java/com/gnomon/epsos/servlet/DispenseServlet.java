@@ -109,12 +109,12 @@ public class DispenseServlet extends HttpServlet {
 
                     if (loggerClinical.isInfoEnabled()) {
                         loggerClinical.info("[Portal] Medication dispensed: '{}'", line.toString());
-                        logger.info("dispensationid_: {}'", dispensedId);
-                        logger.info("substituted_: {}'", substituted);
-                        logger.info("measures_: {}'", measuresId);
-                        logger.info("dispensedProductValue_: {}'", dispensedProduct);
-                        logger.info("dispensedNumberOfPackages_: {}'", dispensedNumberOfPacks);
-                        logger.info("dispensedPackageSize_: {}'", dispensedPackageSize);
+                        loggerClinical.info("dispensationid_: {}'", dispensedId);
+                        loggerClinical.info("substituted_: {}'", substituted);
+                        loggerClinical.info("measures_: {}'", measuresId);
+                        loggerClinical.info("dispensedProductValue_: {}'", dispensedProduct);
+                        loggerClinical.info("dispensedNumberOfPackages_: {}'", dispensedNumberOfPacks);
+                        loggerClinical.info("dispensedPackageSize_: {}'", dispensedPackageSize);
                     }
 
                     ViewResult dispensedResult = new ViewResult(id, dispensedId, dispensedName, substitute, dispensedStrength,
