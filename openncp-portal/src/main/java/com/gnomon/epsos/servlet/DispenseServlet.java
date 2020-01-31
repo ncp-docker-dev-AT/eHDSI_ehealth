@@ -4,7 +4,6 @@ import com.gnomon.epsos.MyServletContextListener;
 import com.gnomon.epsos.model.Patient;
 import com.gnomon.epsos.model.ViewResult;
 import com.gnomon.epsos.service.EpsosHelperService;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
@@ -13,6 +12,8 @@ import epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode;
 import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentResponse;
 import eu.epsos.util.IheConstants;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,23 +34,24 @@ import java.util.Random;
 public class DispenseServlet extends HttpServlet {
 
     private static final long serialVersionUID = -4879064073530149994L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(DispenseServlet.class);
-
     private static final String TEXT_HTML = "text/html";
     private static final String CACHE_CONTROL = "Cache-Control";
     private static final String NO_CACHE = "No-Cache";
     private static final String EXPIRES = "Expires";
     private static final String PRAGMA = "Pragma";
+    private final Logger logger = LoggerFactory.getLogger(DispenseServlet.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse res) {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
-        SubmitDocumentResponse resp = null;
-        LOGGER.info("DispenseServlet...");
+        logger.info("[OpenNCP Portal] eDispense Servlet...");
+        SubmitDocumentResponse submitDocumentResponse = null;
+        Boolean substitute = Boolean.FALSE;
 
-        try (OutputStream outputStream = res.getOutputStream()) {
+        try (OutputStream outputStream = response.getOutputStream()) {
 
-            HttpSession session = req.getSession();
+            HttpSession session = request.getSession();
             String selectedCountry = (String) session.getAttribute("selectedCountry");
             Patient patient = (Patient) session.getAttribute("patient");
             Assertion hcpAssertion = (Assertion) session.getAttribute("hcpAssertion");
@@ -62,7 +64,7 @@ public class DispenseServlet extends HttpServlet {
             String[] dispensedIds = new String[lines.size()];
 
             for (int i = 0; i < lines.size(); i++) {
-                dispensedIds[i] = req.getParameter("dispensationid_" + i);
+                dispensedIds[i] = request.getParameter("dispensationid_" + i);
             }
 
             if (dispensedIds != null) {
@@ -70,25 +72,29 @@ public class DispenseServlet extends HttpServlet {
                 ArrayList<ViewResult> dispensedLines = new ArrayList<>();
 
                 for (ViewResult line : lines) {
-                    int id = line.getMainid();
 
-                    String measuresId = req.getParameter("measures_" + id);
-                    String dispensedId = req.getParameter("dispensationid_" + id); //field1
-                    String dispensedProduct = req.getParameter("dispensedProductValue_" + id);
+                    int id = line.getMainid();
+                    String substituted = request.getParameter("substituted_" + id);
+                    String measuresId = request.getParameter("measures_" + id);
+                    String dispensedId = request.getParameter("dispensationid_" + id); //field1
+                    String dispensedProduct = request.getParameter("dispensedProductValue_" + id);
 
                     if (Validator.isNull(dispensedProduct)) {
                         dispensedProduct = line.getField1() + "";
                     }
 
-                    String dispensedSubstitute = req.getParameter("dispense_" + id); // field3
-                    boolean substitute = GetterUtil.getBoolean(dispensedSubstitute, false);
+                    // TODO: Workaround related to substitute field and CDA DisplayTool.
+                    String dispensedSubstitute = request.getParameter("dispense_" + id); // field3
+                    if (StringUtils.isNotBlank(substituted)) {
+                        substitute = BooleanUtils.toBooleanObject(substituted);
+                    }
                     //  dispenseQuantity replaced by dispensedPackageSize
-                    String dispensedPackageSize = req.getParameter("dispensedPackageSize_" + id); // field7 //lathos
+                    String dispensedPackageSize = request.getParameter("dispensedPackageSize_" + id); // field7
                     if (Validator.isNull(dispensedPackageSize)) {
                         dispensedPackageSize = line.getField21() + "";
                     }
 
-                    String dispensedNumberOfPacks = req.getParameter("dispensedNumberOfPackages_" + id);
+                    String dispensedNumberOfPacks = request.getParameter("dispensedNumberOfPackages_" + id);
                     if (Validator.isNull(dispensedNumberOfPacks)) {
                         dispensedNumberOfPacks = line.getField8() + "";
                     }
@@ -100,6 +106,16 @@ public class DispenseServlet extends HttpServlet {
                     String prescriptionId = line.getField14() + ""; // field9
                     String materialId = line.getField19() + ""; // field10
                     String activeIngredient = line.getField2().toString();
+
+                    if (loggerClinical.isInfoEnabled()) {
+                        loggerClinical.info("[Portal] Medication dispensed: '{}'", line.toString());
+                        logger.info("dispensationid_: {}'", dispensedId);
+                        logger.info("substituted_: {}'", substituted);
+                        logger.info("measures_: {}'", measuresId);
+                        logger.info("dispensedProductValue_: {}'", dispensedProduct);
+                        logger.info("dispensedNumberOfPackages_: {}'", dispensedNumberOfPacks);
+                        logger.info("dispensedPackageSize_: {}'", dispensedPackageSize);
+                    }
 
                     ViewResult dispensedResult = new ViewResult(id, dispensedId, dispensedName, substitute, dispensedStrength,
                             dispensedForm, dispensedPackage, dispensedPackageSize, dispensedNumberOfPacks, prescriptionId,
@@ -138,51 +154,54 @@ public class DispenseServlet extends HttpServlet {
                     document.setFormatCode(formatCode);
                     document.setBase64Binary(edBytes);
 
-                    resp = proxy.submitDocument(hcpAssertion, trcAssertion, selectedCountry, document, patient.getPatientDemographics());
+                    submitDocumentResponse = proxy.submitDocument(hcpAssertion, trcAssertion, selectedCountry, document, patient.getPatientDemographics());
 
-                    res.setContentType(TEXT_HTML);
+                    response.setContentType(TEXT_HTML);
                     String message = "Dispensation successful";
-                    res.setHeader(CACHE_CONTROL, NO_CACHE);
-                    res.setDateHeader(EXPIRES, 0);
-                    res.setHeader(PRAGMA, NO_CACHE);
+                    response.setHeader(CACHE_CONTROL, NO_CACHE);
+                    response.setDateHeader(EXPIRES, 0);
+                    response.setHeader(PRAGMA, NO_CACHE);
 
                     outputStream.write(message.getBytes());
 
                 } else {
-                    LOGGER.error("UPLOAD DISP DOC RESPONSE ERROR");
-                    res.setContentType(TEXT_HTML);
+                    logger.error("UPLOAD DISP DOC RESPONSE ERROR");
+                    response.setContentType(TEXT_HTML);
                     String message = "Cannot upload Dispense message";
-                    res.setHeader(CACHE_CONTROL, NO_CACHE);
-                    res.setDateHeader(EXPIRES, 0);
-                    res.setHeader(PRAGMA, NO_CACHE);
+                    response.setHeader(CACHE_CONTROL, NO_CACHE);
+                    response.setDateHeader(EXPIRES, 0);
+                    response.setHeader(PRAGMA, NO_CACHE);
 
                     outputStream.write(message.getBytes());
-                    req.setAttribute("exception", "UPLOAD DISP DOC RESPONSE ERROR");
+                    request.setAttribute("exception", "UPLOAD DISP DOC RESPONSE ERROR");
                 }
             }
         } catch (Exception ex) {
 
-            LOGGER.error("UPLOAD DISP DOC RESPONSE ERROR: '{}'", ex.getMessage(), ex);
-            res.setContentType(TEXT_HTML);
+            logger.error("Exception during the dispense process: '{}'", ex.getMessage(), ex);
+            response.setContentType(TEXT_HTML);
             String message;
-            if (resp != null) {
-                message = resp.toString();
+            if (submitDocumentResponse != null) {
+                message = submitDocumentResponse.toString();
             } else {
                 message = ex.getLocalizedMessage();
             }
-            res.setHeader(CACHE_CONTROL, NO_CACHE);
-            res.setDateHeader(EXPIRES, 0);
-            res.setHeader(PRAGMA, NO_CACHE);
+            response.setHeader(CACHE_CONTROL, NO_CACHE);
+            response.setDateHeader(EXPIRES, 0);
+            response.setHeader(PRAGMA, NO_CACHE);
 
-            try (OutputStream outputStream = res.getOutputStream()) {
+            try (OutputStream outputStream = response.getOutputStream()) {
                 outputStream.write(message.getBytes());
 
             } catch (IOException e) {
-                LOGGER.error("IOException: '{}'", e.getMessage(), e);
+                logger.error("IOException: '{}'", e.getMessage(), e);
             }
         }
     }
 
+    /**
+     * @return
+     */
     private String generateIdentifierExtension() {
 
         Random r = new SecureRandom();
