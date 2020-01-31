@@ -21,8 +21,6 @@ import java.util.*;
  */
 public class PatientSearchMockImpl extends NationalConnectorGateway implements PatientSearchInterfaceWithDemographics {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PatientSearchMockImpl.class);
-
     private static final String GENDER = "administrativeGender";
     private static final String BIRTH_DATE = "birthDate";
     private static final String BIRTH_DATE_YEAR = BIRTH_DATE + ".year";
@@ -36,6 +34,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
     private static final String POSTAL_CODE = "postalCode";
     private static final String STREET = "street";
     private static final String TELEPHONE = "telephone";
+    private final Logger logger = LoggerFactory.getLogger(PatientSearchMockImpl.class);
 
     @Override
     public String getPatientId(String citizenNumber) {
@@ -46,52 +45,51 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
     @Override
     public List<PatientDemographics> getPatientDemographics(List<PatientId> idList) {
 
-        LOGGER.info("Searching patients at NI Mock...");
-
         List<PatientDemographics> result = new ArrayList<>(1);
 
-        /*
-         * Patient file
-         */
-        String patientFile = Constants.EPSOS_PROPS_PATH + "integration/";
+        // Identifying mocked Patient File.
+        StringBuilder patientFile = new StringBuilder();
+        patientFile.append(Constants.EPSOS_PROPS_PATH).append("integration/");
         PatientId id = null;
 
-        /* file path */
-        for (PatientId aux : idList) {
-            File rootDir = new File(patientFile + aux.getRoot());
+        // Building Path File.
+        for (PatientId patientId : idList) {
+            logger.info("[National Infrastructure Mock] Searching patients with ID: '{}' and Assigning Authority: '{}'", patientId.getExtension(), patientId.getRoot());
+            File rootDir = new File(patientFile + patientId.getRoot());
 
             if (rootDir.exists()) {
-                File extensionFile = new File(patientFile + aux.getRoot() + File.separator + aux.getExtension() + ".properties");
+                File extensionFile = new File(patientFile + patientId.getRoot() + File.separator + patientId.getExtension() + ".properties");
 
                 if (extensionFile.exists()) {
-                    patientFile += (aux.getRoot() + File.separator + aux.getExtension() + ".properties");
-                    id = aux;
+                    patientFile.append(patientId.getRoot()).append(File.separator).append(patientId.getExtension()).append(".properties");
+                    id = patientId;
                     break;
                 }
             }
         }
 
         if (id == null) {
-            LOGGER.info("Patient not found: " + idList.get(0));
+            logger.info("[National Infrastructure Mock] Patient with ID: '{}' not found: ", idList.get(0));
             return new ArrayList<>(0);
         }
 
-        /* read file */
+        // Load Patient properties file.
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream(patientFile));
+            logger.info("[National Infrastructure Mock] Loading Patient information from filesystem resource: '{}'", patientFile.toString());
+            properties.load(new FileInputStream(patientFile.toString()));
 
             PatientDemographics patient = new PatientDemographics();
             patient.setIdList(Collections.singletonList(id));
             patient.setAdministrativeGender(Gender.parseGender(properties.getProperty(GENDER)));
-
-            Calendar birth;
             int year = Integer.parseInt(properties.getProperty(BIRTH_DATE_YEAR));
             int month = Integer.parseInt(properties.getProperty(BIRTH_DATE_MONTH));
             int day = Integer.parseInt(properties.getProperty(BIRTH_DATE_DAY));
-            birth = new GregorianCalendar(year, month, day);
+            Calendar birth = Calendar.getInstance();
+            birth.set(Calendar.DAY_OF_MONTH, day);
+            birth.set(Calendar.YEAR, year);
+            birth.set(Calendar.MONTH, month);
             patient.setBirthDate(birth.getTime());
-
             patient.setCity(properties.getProperty(CITY));
             patient.setCountry(properties.getProperty(COUNTRY));
             patient.setEmail(properties.getProperty(EMAIL));
@@ -101,8 +99,10 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
             patient.setStreetAddress(properties.getProperty(STREET));
             patient.setTelephone(properties.getProperty(TELEPHONE));
             result.add(patient);
-        } catch (Exception ex) {
-            LOGGER.error(null, ex);
+            logger.info("[National Infrastructure Mock] Patient with ID: '{}' found.", id.getfullId());
+
+        } catch (Exception e) {
+            logger.error("[National Infrastructure Mock] Patient Not Found Exception: '{}'", e.getMessage(), e);
             return new ArrayList<>(0);
         }
 
@@ -110,7 +110,10 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
     }
 
     @Override
-    public void setPatientDemographics(PatientDemographics pd) {
-        LOGGER.info(pd.toString());
+    public void setPatientDemographics(PatientDemographics patientDemographics) {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(patientDemographics.toString());
+        }
     }
 }
