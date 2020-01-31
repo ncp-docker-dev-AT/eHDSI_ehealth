@@ -31,6 +31,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * HTTP Servler responsible for handling the eDispense Workflow.
+ */
 public class DispenseServlet extends HttpServlet {
 
     private static final long serialVersionUID = -4879064073530149994L;
@@ -123,10 +126,10 @@ public class DispenseServlet extends HttpServlet {
                     dispensedLines.add(dispensedResult);
                 }
 
-                String eDUUID = generateIdentifierExtension();
+                String eDUid = generateIdentifierExtension();
                 String edOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DISPENSATION_OID);
                 if (!dispensedLines.isEmpty()) {
-                    edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user, eDUUID);
+                    edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription2(epBytes, dispensedLines, user, eDUid);
                 }
 
                 if (Validator.isNotNull(edBytes)) {
@@ -144,11 +147,11 @@ public class DispenseServlet extends HttpServlet {
 
                     EpsosDocument1 document = EpsosDocument1.Factory.newInstance();
                     document.setAuthor(user.getFullName());
-                    Calendar cal = Calendar.getInstance();
-                    document.setCreationDate(cal);
+                    Calendar calendar = Calendar.getInstance();
+                    document.setCreationDate(calendar);
                     document.setDescription(Constants.ED_TITLE);
                     document.setTitle(Constants.ED_TITLE);
-                    document.setUuid(edOid + "^" + eDUUID);
+                    document.setUuid(edOid + "^" + eDUid);
                     document.setSubmissionSetId(EpsosHelperService.getUniqueId());
                     document.setClassCode(classCode);
                     document.setFormatCode(formatCode);
@@ -165,7 +168,7 @@ public class DispenseServlet extends HttpServlet {
                     outputStream.write(message.getBytes());
 
                 } else {
-                    logger.error("UPLOAD DISP DOC RESPONSE ERROR");
+                    logger.error("[Portal] Upload of eDispense Document response ERROR");
                     response.setContentType(TEXT_HTML);
                     String message = "Cannot upload Dispense message";
                     response.setHeader(CACHE_CONTROL, NO_CACHE);
@@ -173,12 +176,12 @@ public class DispenseServlet extends HttpServlet {
                     response.setHeader(PRAGMA, NO_CACHE);
 
                     outputStream.write(message.getBytes());
-                    request.setAttribute("exception", "UPLOAD DISP DOC RESPONSE ERROR");
+                    request.setAttribute("exception", "Upload of eDispense Document response ERROR");
                 }
             }
         } catch (Exception ex) {
 
-            logger.error("Exception during the dispense process: '{}'", ex.getMessage(), ex);
+            logger.error("[Portal] Exception during the dispense process: '{}'", ex.getMessage(), ex);
             response.setContentType(TEXT_HTML);
             String message;
             if (submitDocumentResponse != null) {
@@ -200,7 +203,9 @@ public class DispenseServlet extends HttpServlet {
     }
 
     /**
-     * @return
+     * Generates UID extension required by the eDispense.
+     *
+     * @return a String formatted UID required by CDA eD ID extension.
      */
     private String generateIdentifierExtension() {
 
