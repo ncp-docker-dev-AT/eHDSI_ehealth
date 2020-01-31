@@ -344,7 +344,7 @@ public class EpsosHelperService {
             ed.setMedicineCommercialName(dispensedLine.getField2().toString());
 
             // Setting the substitution indicator
-            ed.setSubstituted((Boolean) dispensedLine.getField3());
+            ed.setSubstituted(dispensedLine.getField3() != null ? (Boolean) dispensedLine.getField3() : false);
             edDetails.add(ed);
         }
         cda.setEDDetail(edDetails);

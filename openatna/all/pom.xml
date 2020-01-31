@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
         <artifactId>openncp-openatna</artifactId>
-        <version>4.0.2</version>
+        <version>4.0.3</version>
     </parent>
 
     <artifactId>openatna-all</artifactId>
@@ -62,10 +62,10 @@
                                 <id>ant1</id>
                                 <phase>install</phase>
                                 <configuration>
-                                    <tasks>
+                                    <target>
                                         <property name="project.version" value="${project.version}"/>
                                         <ant dir="." target="exec"/>
-                                    </tasks>
+                                    </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>
@@ -75,10 +75,10 @@
                                 <id>ant2</id>
                                 <phase>clean</phase>
                                 <configuration>
-                                    <tasks>
+                                    <target>
                                         <property name="project.version" value="${project.version}"/>
                                         <ant dir="." target="clean"/>
-                                    </tasks>
+                                    </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>
@@ -120,10 +120,10 @@
                                 <id>ant1</id>
                                 <phase>install</phase>
                                 <configuration>
-                                    <tasks>
+                                    <target>
                                         <property name="project.version" value="${project.version}"/>
                                         <ant dir="." target="dist"/>
-                                    </tasks>
+                                    </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>
@@ -133,10 +133,10 @@
                                 <id>ant2</id>
                                 <phase>clean</phase>
                                 <configuration>
-                                    <tasks>
+                                    <target>
                                         <property name="project.version" value="${project.version}"/>
                                         <ant dir="." target="cleanDist"/>
-                                    </tasks>
+                                    </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>

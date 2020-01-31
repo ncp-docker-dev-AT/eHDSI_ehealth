@@ -38,9 +38,9 @@ public class IPUtil {
             while (networkInterfaces.hasMoreElements()) {
 
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
-                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
+                Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress inetAddress = addresses.nextElement();
                     if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
                             && (inetAddress instanceof Inet4Address)) {
                         return inetAddress.getHostAddress();
@@ -48,41 +48,51 @@ public class IPUtil {
                 }
             }
         } catch (SocketException e) {
-            LOGGER.error("Unable to get current IP: '{}'", e.getMessage(), e);
+            LOGGER.error("SocketException: Unable retrieve server IP address: '{}'", e.getMessage());
         }
         return ERROR_UNKNOWN_HOST;
     }
 
-    public static boolean isThisMyIpAddress(InetAddress addr) {
+    /**
+     * @param ipAddress
+     * @return
+     */
+    public static boolean isLocalLoopbackIp(String ipAddress) {
 
-        // Check if the address is a valid special local or loop back
-        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress())
-            return true;
-
-        // Check if the address is defined on any interface
         try {
-            if (NetworkInterface.getByInetAddress(addr) != null) {
-                NetworkInterface networkInterface = NetworkInterface.getByInetAddress(addr);
-                while (networkInterface.getInetAddresses().hasMoreElements()) {
-                    InetAddress inetAddress = networkInterface.getInetAddresses().nextElement();
-                    LOGGER.debug("isThisMyIpAddress: '{}'", inetAddress.getHostName());
-                }
+            LOGGER.debug("Checking if Local IP: '{}'", ipAddress);
+            LOGGER.debug("Canonical: '{}', Host Address: '{}', Host Name: '{}'", InetAddress.getByName(ipAddress).getCanonicalHostName(),
+                    InetAddress.getByName(ipAddress).getHostAddress(), InetAddress.getByName(ipAddress).getHostName());
+            InetAddress inetAddress = InetAddress.getByName(ipAddress);
+            // Check if the address is a valid special local or loop back
+            if (inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress()) {
+                return true;
             }
-            return NetworkInterface.getByInetAddress(addr) != null;
-        } catch (SocketException e) {
-            LOGGER.error(e.getMessage());
+        } catch (UnknownHostException e) {
+            LOGGER.info("UnknownHostException: '{}'", e.getMessage());
             return false;
         }
+        return false;
     }
 
+    /**
+     * @param ipAddress
+     * @return
+     */
     public static boolean isLocalIp(String ipAddress) {
 
-        boolean isMyDesiredIp = false;
         try {
-            isMyDesiredIp = isThisMyIpAddress(InetAddress.getByName(ipAddress));
-        } catch (UnknownHostException unknownHost) {
-            LOGGER.error(unknownHost.getMessage());
+            //Check if the address is a loopback or any local address (i.e. 127.0.0.1 or localhost).
+            if (isLocalLoopbackIp(ipAddress)) {
+                return true;
+            }
+            // Check if the address is defined on any interface on the machine.
+            InetAddress inetAddress = InetAddress.getByName(ipAddress);
+            return NetworkInterface.getByInetAddress(inetAddress) != null;
+
+        } catch (UnknownHostException | SocketException e) {
+            LOGGER.info("Exception: '{}'", e.getMessage());
+            return false;
         }
-        return isMyDesiredIp;
     }
 }
