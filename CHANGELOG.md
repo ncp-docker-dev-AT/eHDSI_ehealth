@@ -3,7 +3,7 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
-## [4.0.2] - 31-01-2020
+## [4.0.3] - 31-01-2020
 The OpenNCP 4.0.3 release is the CEF eHDSI Wave 3 Third HotFix version - available for the eHDSI 2020 Formal Test Event.
 <br/>This version is fixing an issue related to the Audit Message and the network equipments.
 <br/>A fix has been applied to the CDA Display Tool for substitution purpose. 
