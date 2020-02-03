@@ -391,10 +391,12 @@ public class EventLogUtil {
             }
         }
         String clientIp = (String) messageContext.getProperty(MessageContext.REMOTE_ADDR);
-        if (IPUtil.isLocalIp(clientIp)) {
+        if (IPUtil.isLocalLoopbackIp(clientIp)) {
             HttpServletRequest servletRequest = (HttpServletRequest) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+            LOGGER.debug("Client Server Name: '{}'", servletRequest.getServerName());
             return servletRequest.getServerName();
         } else {
+            LOGGER.debug("Client IP: '{}'", clientIp);
             return clientIp;
         }
     }

@@ -369,6 +369,7 @@ public class STSService implements Provider<SOAPMessage> {
         }
         String trcCommonName = HTTPUtil.getTlsCertificateCommonName(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
         String sourceGateway = getClientIP();
+        logger.info("STS Client IP: '{}'", sourceGateway);
         MessageContext messageContext = context.getMessageContext();
         HttpServletRequest servletRequest = (HttpServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST);
         String serverName = servletRequest.getServerName();
@@ -378,7 +379,7 @@ public class STSService implements Provider<SOAPMessage> {
                 date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID, humanRequestorRole,
                 humanRequestorSubjectID, certificateCommonName, trcCommonName, ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
                 patientID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
-                IPUtil.isLocalIp(sourceGateway) ? serverName : sourceGateway, STSUtils.getSTSServerIp(), NcpSide.NCP_B);
+                IPUtil.isLocalLoopbackIp(sourceGateway) ? serverName : sourceGateway, STSUtils.getSTSServerIp(), NcpSide.NCP_B);
 
         evLogTRC.setEventType(EventType.TRC_ASSERTION);
         auditService.write(evLogTRC, "13", "2");

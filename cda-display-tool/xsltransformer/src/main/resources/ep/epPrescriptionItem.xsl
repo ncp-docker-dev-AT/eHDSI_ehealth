@@ -63,8 +63,7 @@
     </xsl:template>
 
     <xsl:template name="pure-substitution-code">
-        <xsl:variable name="code"
-                      select="n1:entryRelationship[@typeCode='SUBJ'][@inversionInd='true']/n1:observation[@classCode='OBS']"/>
+        <xsl:variable name="code" select="n1:entryRelationship[@typeCode='SUBJ'][@inversionInd='true']/n1:observation[@classCode='OBS']"/>
         <xsl:choose>
             <xsl:when test="$code/n1:code/@code='SUBST'">
                 <xsl:choose>
@@ -115,9 +114,7 @@
         <xsl:param name="strength"/>
         <tr>
             <td>
-                <xsl:if test="$code/@codeSystem and $code/@codeSystem='2.16.840.1.113883.6.73'">
-                    ATC
-                </xsl:if>
+                <xsl:if test="$code/@codeSystem and $code/@codeSystem='2.16.840.1.113883.6.73'">ATC</xsl:if>
             </td>
             <td>
                 <xsl:if test="$code/@code and $code/@codeSystem='2.16.840.1.113883.6.73'">
@@ -259,6 +256,18 @@
                                         <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:name"/>
                                     </td>
                                 </tr>
+                                <xsl:if test="n1:consumable/n1:manufacturedProduct/epsos:marketingAuthorizationHolder">
+                                    <tr>
+                                        <th>
+                                            <!-- Marketing Authorization Holder -->
+                                            <!-- TODO this label has to be included as a concept in the epSOSDisplayLabel value set -->
+                                            Marketing Authorization Holder
+                                        </th>
+                                        <td>
+                                            <xsl:value-of select="n1:consumable/n1:manufacturedProduct/epsos:marketingAuthorizationHolder/epsos:name"/>
+                                        </td>
+                                    </tr>
+                                </xsl:if>
                                 <xsl:if test="$manufacturedMaterialStrength">
                                     <tr>
                                         <th>
@@ -503,7 +512,7 @@
                                             <xsl:variable name="substitutionValue">
                                                 <xsl:call-template name="pure-substitution-code"/>
                                             </xsl:variable>
-                                            <input type="checkbox" style="display:inline">
+                                            <input type="checkbox" id="substituted_0" name="substituted_0" style="display:inline">
                                                 <xsl:choose>
                                                     <xsl:when test="$substitutionValue !='Yes'">
                                                         <xsl:attribute name="disabled"/>
