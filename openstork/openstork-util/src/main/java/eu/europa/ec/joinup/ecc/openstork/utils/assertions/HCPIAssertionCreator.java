@@ -216,7 +216,7 @@ public class HCPIAssertionCreator {
         // Set Type of HCPO
         if (true) {
             Attribute att = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
-            att.setFriendlyName("epSOS Healthcare Facility Type");
+            att.setFriendlyName("eHealth DSI Healthcare Facility Type");
             att.setName("urn:epsos:names:wp3.4:subject:healthcare-facility-type");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
