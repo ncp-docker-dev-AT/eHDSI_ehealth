@@ -139,12 +139,10 @@
 
         <xsl:variable name="negationInd"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../@negationInd"/>
-
-        <xsl:variable name="vacAct" select="n1:substanceAdministration"/>
         <!-- End definition of variables -->
 
         <xsl:choose>
-            <xsl:when test="not($vacAct/@nullFlavor)">
+            <xsl:when test="not(n1:substanceAdministration/@nullFlavor)">
                 <tr>
                     <td>
                         <!-- Vaccination -->
@@ -190,7 +188,7 @@
                 <tr>
                     <td colspan="3">
                         <xsl:call-template name="show-epSOSNullFlavor">
-                            <xsl:with-param name="code" select="$vacAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="n1:substanceAdministration/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

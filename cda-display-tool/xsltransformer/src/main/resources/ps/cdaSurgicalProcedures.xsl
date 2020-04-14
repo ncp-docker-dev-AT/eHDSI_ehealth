@@ -132,8 +132,6 @@
     <!-- FOR EACH ENTRY -->
     <xsl:template name="surgicalProceduresSectionEntry">
         <!-- Defining all needed variables -->
-        <xsl:variable name="surgicalProcedureAct"
-                      select="n1:procedure"/>
         <xsl:variable
                 name="surgicalProcedureCode"
                 select="n1:procedure/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.19']/../n1:code"/>
@@ -142,7 +140,7 @@
                 select="n1:procedure/n1:templateId[@root= '1.3.6.1.4.1.19376.1.5.3.1.4.19']/../n1:effectiveTime"/>
         <!-- End definition of variables-->
         <xsl:choose>
-            <xsl:when test="not($surgicalProcedureAct/@nullFlavor)">
+            <xsl:when test="not(n1:procedure/@nullFlavor)">
                 <xsl:choose>
                     <xsl:when test="($surgicalProcedureCode/@code='no-known-procedures' or $surgicalProcedureCode/@code='no-procedure-info')">
                         <tr>
@@ -175,7 +173,7 @@
                 <tr>
                     <td colspan="3">
                         <xsl:call-template name="show-epSOSNullFlavor">
-                            <xsl:with-param name="code" select="$surgicalProcedureAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="n1:procedure/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>
