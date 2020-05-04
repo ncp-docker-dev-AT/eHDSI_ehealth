@@ -1,10 +1,12 @@
 package epsos.ccd.posam.tsam.service;
 
+import epsos.ccd.posam.tsam.model.CodeSystemConcept;
 import epsos.ccd.posam.tsam.response.RetrievedConcept;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.util.CodedElement;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Component responsibilities:<br>
@@ -83,4 +85,16 @@ public interface ITerminologyService {
      * @return the list of LTR available languages, as a String list, containing the language codes;
      */
     List<String> getLtrLanguages();
+    
+    /**
+     * Additional method that returns all concepts of a specific version of a national CodeSystem for which there's a mapping in some ValueSet
+     * (i.e., it does not return the full national CodeSystem, since that is not available within the LTR database. What is available
+     * is the set of national concepts from a national CodeSystem that are mapped to international concepts of a ValueSet) 
+     * 
+     * @param oid The OID of the national CodeSystem
+     * @param version The version of the national CodeSystem. If no version is provided (version is null),
+     * method looks for versions of CodeSystem with status "current".
+     * @return The list of the national CodeSystem concepts 
+     */
+    Map<CodeSystemConcept,CodeSystemConcept> getNationalCodeSystemMappedConcepts(String oid, String version);
 }
