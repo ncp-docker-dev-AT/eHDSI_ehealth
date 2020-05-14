@@ -137,7 +137,7 @@
                     </xsl:call-template>
                     <xsl:if test="@use">
                         <xsl:text> (</xsl:text>
-                        <xsl:call-template name="translateTelecomCode">
+                        <xsl:call-template name="show-epSOSTelecomAddress">
                             <xsl:with-param name="code" select="@use"/>
                         </xsl:call-template>
                         <xsl:text>)</xsl:text>

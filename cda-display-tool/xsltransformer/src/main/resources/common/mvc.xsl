@@ -389,9 +389,9 @@
 
     <!-- epSOSTelecomAddress -->
     <xsl:template name="show-epSOSTelecomAddress">
-        <xsl:param name="node"/>
-        <xsl:call-template name="show-codedElement">
-            <xsl:with-param name="node" select="$node"/>
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.40.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1119'"/>
         </xsl:call-template>
