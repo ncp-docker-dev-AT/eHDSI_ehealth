@@ -896,7 +896,9 @@
     <!-- show narrative -->
     <xsl:template name="show-narrative">
         <xsl:param name="node"/>
-        <xsl:apply-templates select="$node/self::*"/>
+        <div class="narrative_wrapper">
+            <xsl:apply-templates select="$node/self::*"/>
+        </div>
     </xsl:template>
 
     <!-- paragraph -->
