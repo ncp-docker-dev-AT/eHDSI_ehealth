@@ -156,6 +156,7 @@ input[type='checkbox'] {
 
 .toggle:checked + .lbl-toggle + .collapsible-content {
     max-height: none;
+    overflow: visible;
 }
 
 .toggle:checked + .lbl-toggle {
@@ -226,6 +227,7 @@ input[type='checkbox'] {
 
 .toggle:checked + .lbl-toggle-title + .collapsible-content-title {
     max-height: none;
+    overflow: visible;
 }
 
 .toggle:checked + .lbl-toggle-title {
@@ -324,7 +326,6 @@ input[type='checkbox'] {
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 120px;
     background-color: #555;
     color: #fff;
     text-align: center;
@@ -364,12 +365,12 @@ input[type='checkbox'] {
     width: 350px;
     background-color: white;
     color: #3871A9;
-    text-align: center;
+    text-align: left;
     border-radius: 6px;
     border-style: solid;
     border-color: #3871A9;
     border-width: 1px;
-    padding: 5px 0;
+    padding: 7px 7px;
     position: absolute;
     z-index: 1;
     top: -5px;
