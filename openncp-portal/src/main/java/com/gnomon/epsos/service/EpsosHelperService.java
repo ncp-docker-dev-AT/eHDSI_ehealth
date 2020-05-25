@@ -976,7 +976,7 @@ public class EpsosHelperService {
     }
 
     /**
-     * TODO: Jerome
+     * TODO: Review this method.
      *
      * @param user
      * @param isEmergency

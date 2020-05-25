@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -46,6 +47,7 @@ public class DispenseServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
 
         logger.info("[OpenNCP Portal] eDispense Servlet...");
+        request.setCharacterEncoding(StandardCharsets.UTF_8.name());
         SubmitDocumentResponse submitDocumentResponse = null;
         Boolean substitute = Boolean.FALSE;
 
@@ -53,7 +55,6 @@ public class DispenseServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
             User user = (User) session.getAttribute("user");
-            byte[] edBytes = null;
             byte[] epBytes = (byte[]) session.getAttribute("epBytes");
             Patient patient = (Patient) session.getAttribute("patient");
             String selectedCountry = (String) session.getAttribute("selectedCountry");
@@ -119,8 +120,8 @@ public class DispenseServlet extends HttpServlet {
             String eDUid = generateIdentifierExtension();
             String edOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DISPENSATION_OID);
             if (!dispensedLines.isEmpty()) {
-                edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription(epBytes, dispensedLines, user, eDUid);
-                if (edBytes == null || edBytes.length == 0) {
+                byte[] edBytes = EpsosHelperService.generateDispensationDocumentFromPrescription(epBytes, dispensedLines, user, eDUid);
+                if (edBytes.length == 0) {
                     throw new Exception();
                 }
                 EpsosDocument1 document = buildDispenseDocument(user, edOid, eDUid, edBytes);
@@ -131,17 +132,6 @@ public class DispenseServlet extends HttpServlet {
                 String message = "Dispensation successful";
                 outputStream.write(message.getBytes());
             }
-
-            //            if (Validator.isNotNull(edBytes)) {
-            //
-            //            } else {
-            //                logger.error("[Portal] Upload of eDispense Document response ERROR");
-            //                setResponseHeaders(response);
-            //
-            //                String message = "Cannot upload Dispense message";
-            //                outputStream.write(message.getBytes());
-            //                request.setAttribute("exception", "Upload of eDispense Document response ERROR");
-            //            }
         } catch (Exception e) {
 
             logger.error("[Portal] Exception during the dispense process: '{}'", e.getMessage(), e);

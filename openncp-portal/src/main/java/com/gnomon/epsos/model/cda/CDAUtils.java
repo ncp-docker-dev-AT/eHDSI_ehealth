@@ -265,7 +265,7 @@ public class CDAUtils {
             org.dom4j.XPath xpath = org.dom4j.DocumentHelper.createXPath(expression);
             xpath.setNamespaceURIs(namespaces);
 
-            //TODO: check Jerome
+            //TODO: To be reviewed.
             //Getting the displayName node
             org.dom4j.Node displayName = xpath.selectSingleNode(doc);
             if (displayName != null) {
