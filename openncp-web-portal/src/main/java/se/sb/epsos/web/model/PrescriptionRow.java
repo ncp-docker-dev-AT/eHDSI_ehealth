@@ -1,22 +1,15 @@
-/***    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
-*
-*    This file is part of epSOS-WEB.
-*
-*    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-*
-*    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
-**/package se.sb.epsos.web.model;
+package se.sb.epsos.web.model;
 
 import java.io.Serializable;
 import java.util.List;
 
 public class PrescriptionRow implements Serializable {
+
 	private static final long serialVersionUID = -5914345465484415553L;
 
 	private String prescriptionId;
 	private String prescriptionIdRoot;
+	private String prescriptionIdExtension;
 	private String productName;
 	private String productId;
 	private String formCode;
@@ -49,6 +42,14 @@ public class PrescriptionRow implements Serializable {
 
 	public void setPrescriptionId(String prescriptionId) {
 		this.prescriptionId = prescriptionId;
+	}
+
+	public String getPrescriptionIdExtension() {
+		return prescriptionIdExtension;
+	}
+
+	public void setPrescriptionIdExtension(String prescriptionIdExtension) {
+		this.prescriptionIdExtension = prescriptionIdExtension;
 	}
 
 	public String getPrescriptionIdRoot() {
@@ -236,27 +237,27 @@ public class PrescriptionRow implements Serializable {
 	}
 
 	public String getDescription() {
-		String descr = "";
+
+		StringBuilder description = new StringBuilder();
 		if ((this.atcCode) != null && !this.atcCode.isEmpty()) {
-			descr += this.atcCode;
+			description.append(this.atcCode);
 			if ((this.atcName != null) && !this.atcName.isEmpty()) {
-				descr += " - " + this.atcName;
+				description.append(" - ").append(this.atcName);
 			}
 		} else {
 			if (this.ingredient != null) {
 				for (Ingredient in : this.ingredient) {
-					descr += (in.getActiveIngredient() != null ? (in.getActiveIngredient()) : "");
-					descr += (in.getStrength() != null ? (" " + in.getStrength()) : "");
-					descr += ", ";
+					description.append(in.getActiveIngredient() != null ? (in.getActiveIngredient()) : "");
+					description.append(in.getStrength() != null ? (" " + in.getStrength()) : "");
+					description.append(", ");
 				}
 			}
 		}
 
-		descr += (this.packageSize.getQuantityValue() != null ? ("" + this.packageSize.getQuantityValue()) : "");
-		descr += (this.packageSize.getQuantityUnit() != null ? (" " + this.packageSize.getQuantityUnit()) : "");
-		descr += (this.formName != null ? (" " + this.formName) : "");
-		descr += (this.productName != null ? (" (" + this.productName + ")") : "");
-		return descr;
+		description.append(this.packageSize.getQuantityValue() != null ? ("" + this.packageSize.getQuantityValue()) : "");
+		description.append(this.packageSize.getQuantityUnit() != null ? (" " + this.packageSize.getQuantityUnit()) : "");
+		description.append(this.formName != null ? (" " + this.formName) : "");
+		description.append(this.productName != null ? (" (" + this.productName + ")") : "");
+		return description.toString();
 	}
-
 }

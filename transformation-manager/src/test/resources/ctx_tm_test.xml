@@ -8,6 +8,7 @@
     <bean id="placeholderConfig"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
+
             <list>
                 <value>classpath:tsam.properties</value>
                 <value>classpath:tm.properties</value>

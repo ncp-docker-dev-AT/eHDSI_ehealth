@@ -1,18 +1,10 @@
-/*    Copyright 2011-2013 Apotekens Service AB <epsos@apotekensservice.se>
- *
- *    This file is part of epSOS-WEB.
- *
- *    epSOS-WEB is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- *    epSOS-WEB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License along with epSOS-WEB. If not, see http://www.gnu.org/licenses/.
- **/
 package se.sb.epsos.web.service;
 
 import epsosOrgEpMedication.COCTMT230100UVPackagedMedicine;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import hl7OrgV3.*;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
@@ -70,7 +62,7 @@ public class ePtoeDMapper {
         } else if (FileHelper.fileExists(xmlTemp + File.separator + DEFAULT_ED_XML_TEMPLATE_NAME)) {
             ED_XML_TEMPLATE_PATH = xmlTemp + File.separator + DEFAULT_ED_XML_TEMPLATE_NAME;
         }
-        LOGGER.info("Using file (" + ED_XML_TEMPLATE_PATH + ") for cda xml template.");
+        LOGGER.info("Using file ('{}') for cda xml template.", ED_XML_TEMPLATE_PATH);
 
         String pdfTemp = getConfigurationProperty(ED_PDF_TEMPLATE_PATH_DB_KEY);
         if (FileHelper.fileExists(pdfTemp)) {
@@ -78,16 +70,15 @@ public class ePtoeDMapper {
         } else if (FileHelper.fileExists(pdfTemp + File.separator + DEFAULT_ED_PDF_TEMPLATE_NAME)) {
             ED_PDF_TEMPLATE_PATH = pdfTemp + File.separator + DEFAULT_ED_PDF_TEMPLATE_NAME;
         }
-        LOGGER.info("Using file (" + ED_PDF_TEMPLATE_PATH + ") for cda pdf template.");
+        LOGGER.info("Using file ('{}') for CDA Pdf template.", ED_PDF_TEMPLATE_PATH);
     }
 
     protected String getConfigurationProperty(String key) {
         try {
             return ConfigurationManagerFactory.getConfigurationManager().getProperty(key);
-        } catch (Exception e) { // Fix for not been able to run ui with jetty;
-            // without configuration db.
-            LOGGER.warn("ConfigurationManagerDb.getProperty did throw.", e);
-            return null;
+        } catch (Exception e) {
+            LOGGER.warn("ConfigurationManagerDb.getProperty did throw: '{}'", e.getMessage());
+            return StringUtils.EMPTY;
         }
     }
 
@@ -95,8 +86,8 @@ public class ePtoeDMapper {
         return ClinicalDocumentDocument1.Factory.parse(is);
     }
 
-    public ClinicalDocumentDocument1 createDispensation_PDF(byte[] bytesPDF, Dispensation dispensation,
-                                                            AuthenticatedUser user, String cdaIdExtension, String pdfIdExtension) throws XmlException, IOException {
+    public ClinicalDocumentDocument1 createDispensation_PDF(byte[] bytesPDF, Dispensation dispensation, AuthenticatedUser user,
+                                                            String cdaIdExtension, String pdfIdExtension) throws XmlException, IOException {
         Date date = new Date();
         ClinicalDocumentDocument1 eD_PDF_Document = buildCdafromTemplate(FileHelper.getResourceFromClassPathOrFileSystem(ED_PDF_TEMPLATE_PATH));
         InputStream is = new ByteArrayInputStream(dispensation.getPrescription().getBytes());
@@ -106,15 +97,9 @@ public class ePtoeDMapper {
             // Document id
             eD_PDF_Document.getClinicalDocument().getId().setExtension(pdfIdExtension);
             // Link to the XML version
-            eD_PDF_Document.getClinicalDocument().getRelatedDocumentArray(0).getParentDocument().getIdArray(0)
-                    .setExtension(cdaIdExtension);
-            // One more link, hope to remove it later
-            eD_PDF_Document.getClinicalDocument().getRelatedDocumentArray(1).getParentDocument().getIdArray(0)
-                    .setExtension(cdaIdExtension);
-
+            eD_PDF_Document.getClinicalDocument().getRelatedDocumentArray(0).getParentDocument().getIdArray(0).setExtension(cdaIdExtension);
             // effectiveTime of the document
-            eD_PDF_Document.getClinicalDocument().getEffectiveTime()
-                    .setValue(DateUtil.formatDate(date, EpsosWebConstants.DATEFORMATSEC));
+            eD_PDF_Document.getClinicalDocument().getEffectiveTime().setValue(DateUtil.formatDate(date, EpsosWebConstants.DATEFORMATSEC));
             // Patient information
             eD_PDF_Document.getClinicalDocument().getRecordTargetArray(0)
                     .setPatientRole(eP_Document.getClinicalDocument().getRecordTargetArray(0).getPatientRole());
@@ -123,12 +108,10 @@ public class ePtoeDMapper {
             eD_PDF_Document.getClinicalDocument().getAuthorArray(0).getTime()
                     .setValue(DateUtil.formatDate(date, EpsosWebConstants.DATEFORMATSEC));
             // Pharmacist's id
-            eD_PDF_Document.getClinicalDocument().getAuthorArray(0).getAssignedAuthor().getIdArray(0)
-                    .setExtension(user.getUserId());
+            eD_PDF_Document.getClinicalDocument().getAuthorArray(0).getAssignedAuthor().getIdArray(0).setExtension(user.getUserId());
 
             // Other pharmacist data
-            POCDMT000040Person person = eD_PDF_Document.getClinicalDocument().getAuthorArray(0).getAssignedAuthor()
-                    .getAssignedPerson();
+            POCDMT000040Person person = eD_PDF_Document.getClinicalDocument().getAuthorArray(0).getAssignedAuthor().getAssignedPerson();
             createAssignedPerson(user, person);
 
             // Pharmacy info
@@ -152,26 +135,30 @@ public class ePtoeDMapper {
         return null;
     }
 
+    /**
+     * @param dispensation
+     * @param user
+     * @param cdaIdExtension
+     * @param pdfIdExtension
+     * @return
+     * @throws Exception
+     */
     public byte[] createDispensationFromPrescription(Dispensation dispensation, AuthenticatedUser user,
                                                      String cdaIdExtension, String pdfIdExtension) throws Exception {
         if (user == null || dispensation == null) {
-            throw new Exception("user or dispensation = null");
+            throw new Exception("User or dispensation = null");
         }
 
         Date date = new Date();
         InputStream is = new ByteArrayInputStream(dispensation.getPrescription().getBytes());
         ClinicalDocumentDocument1 eP_Document = buildCdafromTemplate(is);
+        ClinicalDocumentDocument1 eD_Document = buildCdafromTemplate(FileHelper.getResourceFromClassPathOrFileSystem(ED_XML_TEMPLATE_PATH));
 
-        ClinicalDocumentDocument1 eD_Document = buildCdafromTemplate(
-                FileHelper.getResourceFromClassPathOrFileSystem(ED_XML_TEMPLATE_PATH));
         // Document id
         eD_Document.getClinicalDocument().getId().setExtension(cdaIdExtension);
         // Link to the PDF version
-        eD_Document.getClinicalDocument().getRelatedDocumentArray(0).getParentDocument().getIdArray(0)
-                .setExtension(pdfIdExtension);
-        // One more link, hope to remove it later
-        eD_Document.getClinicalDocument().getRelatedDocumentArray(1).getParentDocument().getIdArray(0)
-                .setExtension(pdfIdExtension);
+        eD_Document.getClinicalDocument().getRelatedDocumentArray(0).getParentDocument().getIdArray(0).setExtension(pdfIdExtension);
+
         // Structured body section
         POCDMT000040Section eD_Document_section = eD_Document.getClinicalDocument().getComponent().getStructuredBody()
                 .getComponentArray(0).getSection();
@@ -182,25 +169,19 @@ public class ePtoeDMapper {
         eD_Document_section.getEntryArray(0).getSupply().getIdArray(0).setExtension(cdaIdExtension);
 
         // effectiveTime of the document
-        eD_Document.getClinicalDocument().getEffectiveTime()
-                .setValue(DateUtil.formatDate(date, EpsosWebConstants.DATEFORMATSEC));
+        eD_Document.getClinicalDocument().getEffectiveTime().setValue(DateUtil.formatDate(date, EpsosWebConstants.DATEFORMATSEC));
         // Patient information
         eD_Document.getClinicalDocument().getRecordTargetArray(0)
                 .setPatientRole(eP_Document.getClinicalDocument().getRecordTargetArray(0).getPatientRole());
 
-        // eD_Document.getClinicalDocument().getAuthorArray(0).getFunctionCode().setDisplayName(AssertionHandlerConfigManager.getRole(user.getRoles().get(0)));
         // Author time
-        eD_Document.getClinicalDocument().getAuthorArray(0).getTime()
-                .setValue(DateUtil.formatDate(date, EpsosWebConstants.DATEFORMATSEC));
+        eD_Document.getClinicalDocument().getAuthorArray(0).getTime().setValue(DateUtil.formatDate(date, EpsosWebConstants.DATEFORMATSEC));
         // Pharmacist's id
-        eD_Document.getClinicalDocument().getAuthorArray(0).getAssignedAuthor().getIdArray(0)
-                .setExtension(user.getUserId());
+        eD_Document.getClinicalDocument().getAuthorArray(0).getAssignedAuthor().getIdArray(0).setExtension(user.getUserId());
 
         // Other pharmacist data
-        POCDMT000040Person person = eD_Document.getClinicalDocument().getAuthorArray(0).getAssignedAuthor()
-                .getAssignedPerson();
+        POCDMT000040Person person = eD_Document.getClinicalDocument().getAuthorArray(0).getAssignedAuthor().getAssignedPerson();
         createAssignedPerson(user, person);
-
         // Pharmacy info
         POCDMT000040Organization representedOrganization = eD_Document.getClinicalDocument().getAuthorArray(0)
                 .getAssignedAuthor().getRepresentedOrganization();
@@ -215,8 +196,7 @@ public class ePtoeDMapper {
                 .setExtension(user.getUserId());
 
         // Other performer data
-        person = eD_Document_section.getEntryArray(0).getSupply().getPerformerArray(0).getAssignedEntity()
-                .getAssignedPerson();
+        person = eD_Document_section.getEntryArray(0).getSupply().getPerformerArray(0).getAssignedEntity().getAssignedPerson();
         createAssignedPerson(user, person);
 
         // Pharmacy info
@@ -224,15 +204,6 @@ public class ePtoeDMapper {
                 .getAssignedEntity().getRepresentedOrganization();
         mapPhoneNr(representedOrganization.getTelecomArray(0), user.getTelecom());
         createRepresentedOrganization(user, representedOrganization);
-
-        // This causes problems with Croatian dispensations and should not be
-        // needed anyway, as eP is not a parent document for eD
-        // if
-        // (eP_Document.getClinicalDocument().getRelatedDocumentArray(0).getParentDocument().getIdArray(0).getExtension()
-        // != null) {
-        // eD_Document.getClinicalDocument().getRelatedDocumentArray(0).getParentDocument().getIdArray(0)
-        // .setExtension(eP_Document.getClinicalDocument().getRelatedDocumentArray(0).getParentDocument().getIdArray(0).getExtension());
-        // }
 
         // Copy substance administration from eP
         copySubstanceAdministrationFromEP(eP_Document, eD_Document_section);
@@ -295,12 +266,10 @@ public class ePtoeDMapper {
             }
 
             // Number or packages
-            eD_Document_section.getEntryArray(0).getSupply().getQuantity()
-                    .setValue(dispRow.getNbrPackages().getQuantityValue());
+            eD_Document_section.getEntryArray(0).getSupply().getQuantity().setValue(dispRow.getNbrPackages().getQuantityValue());
 
-            // Dispensed Medicine Id - difficult to interpret what this means,
-            // assume it's again the id of the dispensation
-            // as the medicine code comes next anyway
+            // Dispensed Medicine Id - difficult to interpret what this means, assume it's again the id of the dispensation
+            // as the medicine code comes next anyway.
             eD_Document_material.getId().setExtension(cdaIdExtension);
 
             // VNR number
@@ -326,14 +295,16 @@ public class ePtoeDMapper {
                     .setUnit(dispRow.getPackageSize().getQuantityUnitUcum());
 
             // Link to the prescription ID (inFulfillmentOf)
-            eD_Document.getClinicalDocument().getInFulfillmentOfArray(0).getOrder().getIdArray(0)
-                    .setExtension(dispRow.getPrescriptionRow().getPrescriptionId());
+            // ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration/id@root @extension
             eD_Document.getClinicalDocument().getInFulfillmentOfArray(0).getOrder().getIdArray(0)
                     .setRoot(dispRow.getPrescriptionRow().getPrescriptionIdRoot());
+            if (StringUtils.isNotBlank(dispRow.getPrescriptionRow().getPrescriptionIdExtension())) {
+                eD_Document.getClinicalDocument().getInFulfillmentOfArray(0).getOrder().getIdArray(0)
+                        .setExtension(dispRow.getPrescriptionRow().getPrescriptionIdExtension());
+            }
 
-            // Handle substitution; Remove substitution part from template if
-            // NOT substitute
-            LOGGER.debug("Row isSubstitute: " + dispRow.isSubstitute());
+            // Handle substitution; Remove substitution part from template if NOT substitute
+            LOGGER.debug("Row isSubstitute: '{}'", dispRow.isSubstitute());
             if (!dispRow.isSubstitute()) {
                 int index = -1;
                 for (int i = 0; i < eD_Document_section.getEntryArray(0).getSupply()
@@ -344,15 +315,15 @@ public class ePtoeDMapper {
                     POCDMT000040Act act = relation.getAct();
                     if (act != null) {
                         CD cd = act.getCode();
-                        if ("SUBST".equals(cd.getCode()) && "2.16.840.1.113883.5.6".equals(cd.getCodeSystem())
-                                && "ActClass".equals(cd.getCodeSystemName())
-                                && "Substitution".equals(cd.getDisplayName())) {
+                        if (StringUtils.equals("SUBST", cd.getCode())
+                                && StringUtils.equals("2.16.840.1.113883.5.6", cd.getCodeSystem())
+                                && StringUtils.equals("ActClass", cd.getCodeSystemName())
+                                && StringUtils.equals("Substitution", cd.getDisplayName())) {
                             index = i;
                             break;
                         }
                     }
                 }
-
                 if (index != -1) {
                     eD_Document_section.getEntryArray(0).getSupply().removeEntryRelationship(index);
                     LOGGER.debug("Substitution block removed from the template");
@@ -433,9 +404,9 @@ public class ePtoeDMapper {
         Matcher matcher = pattern.matcher(eP_Document.getClinicalDocument().getComponent().getStructuredBody()
                 .getComponentArray(0).getSection().getText().toString());
         while (matcher.find()) {
-            LOGGER.info("Reference(" + matcher.group(1) + ") found");
+            LOGGER.info("Reference('{}') found", matcher.group(1));
             if (refTargetsToPreserve.contains(matcher.group(1))) {
-                LOGGER.info("Preserving reference(" + matcher.group(1) + ")");
+                LOGGER.info("Preserving reference('{}')", matcher.group(1));
                 continue;
             }
             XPath xpath = XPathFactory.newInstance().newXPath();
@@ -460,6 +431,7 @@ public class ePtoeDMapper {
     }
 
     private String fetchReference(String pattern, Document doc, ArrayList<String> refTargetsToPreserve) {
+
         XPath xpath = XPathFactory.newInstance().newXPath();
         // 1. Patient instructions
         try {
@@ -467,23 +439,23 @@ public class ePtoeDMapper {
             NodeList nodeList = (NodeList) path.evaluate(doc, XPathConstants.NODESET);
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
-                if (node != null && node.getAttributes() != null
-                        && node.getAttributes().getNamedItem("value") != null) {
+                if (node != null && node.getAttributes() != null && node.getAttributes().getNamedItem("value") != null) {
+
                     String ref = node.getAttributes().getNamedItem("value").getTextContent().substring(1);
                     refTargetsToPreserve.add(ref);
                     return ref;
                 }
             }
         } catch (XPathExpressionException e) {
-            LOGGER.error("XPathExpressionException: ", e);
+            LOGGER.error("XPathExpressionException: '{}'", e.getMessage());
         }
         return null;
     }
 
     private Document transformCDADocumenttoDomDocument(ClinicalDocumentDocument1 eD_Document) {
-        String xml = eD_Document.xmlText(new XmlOptions().setCharacterEncoding("UTF-8").setSavePrettyPrint());
-        byte[] eD_Document_bytes = null;
-        eD_Document_bytes = xml.getBytes(StandardCharsets.UTF_8);
+
+        String xml = eD_Document.xmlText(new XmlOptions().setCharacterEncoding(StandardCharsets.UTF_8.name()).setSavePrettyPrint());
+        byte[] eD_Document_bytes = xml.getBytes(StandardCharsets.UTF_8);
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document doc = null;
@@ -491,21 +463,22 @@ public class ePtoeDMapper {
             DocumentBuilder db = dbf.newDocumentBuilder();
             doc = db.parse(new ByteArrayInputStream(eD_Document_bytes));
         } catch (SAXException e) {
-            LOGGER.error("SAXException: ", e);
+            LOGGER.error("SAXException: '{}'", e.getMessage());
         } catch (IOException e) {
-            LOGGER.error("IOException: ", e);
+            LOGGER.error("IOException: '{}'", e.getMessage());
         } catch (ParserConfigurationException e) {
-            LOGGER.error("ParserConfigurationException: ", e);
+            LOGGER.error("ParserConfigurationException: '{}'", e.getMessage());
         }
         return doc;
     }
 
-    public byte[] serializeDocToByteArray(Document doc) {
-        if (doc == null) {
-            return null;
+    public byte[] serializeDocToByteArray(Document document) {
+
+        if (document == null) {
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
-        DOMSource source = new DOMSource(doc);
+        DOMSource source = new DOMSource(document);
         StringWriter xmlAsWriter = new StringWriter();
         StreamResult result = new StreamResult(xmlAsWriter);
 
@@ -514,21 +487,20 @@ public class ePtoeDMapper {
             transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             Transformer transformer = transformerFactory.newTransformer();
             transformer.transform(source, result);
+
         } catch (TransformerConfigurationException e) {
-            LOGGER.error("TransformerConfigurationException: ", e);
+            LOGGER.error("TransformerConfigurationException: '{}'", e.getMessage());
         } catch (TransformerException e) {
-            LOGGER.error("TransformerException: ", e);
+            LOGGER.error("TransformerException: '{}'", e.getMessage());
         } catch (TransformerFactoryConfigurationError e) {
-            LOGGER.error("TransformerFactoryConfigurationError: ", e);
+            LOGGER.error("TransformerFactoryConfigurationError: '{}'", e.getMessage());
         }
 
-        byte[] bytes = null;
-        bytes = xmlAsWriter.toString().getBytes(StandardCharsets.UTF_8);
-        return bytes;
+        return xmlAsWriter.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    private void copySubstanceAdministrationFromEP(ClinicalDocumentDocument1 eP_Document,
-                                                   POCDMT000040Section eD_Document_section) {
+    private void copySubstanceAdministrationFromEP(ClinicalDocumentDocument1 eP_Document, POCDMT000040Section eD_Document_section) {
+
         POCDMT000040SubstanceAdministration eP_Document_substance = eP_Document.getClinicalDocument().getComponent()
                 .getStructuredBody().getComponentArray(0).getSection().getEntryArray(0).getSubstanceAdministration();
         eD_Document_section.getEntryArray(0).getSupply().getEntryRelationshipArray(0)
@@ -545,6 +517,7 @@ public class ePtoeDMapper {
     }
 
     private void createAssignedPerson(AuthenticatedUser user, POCDMT000040Person person) {
+
         if (user.getFamilyName() != null) {
             person.getNameArray(0).getFamilyArray(0).newCursor().setTextValue(user.getFamilyName());
         } else {
@@ -558,8 +531,8 @@ public class ePtoeDMapper {
         }
     }
 
-    private void createRepresentedOrganization(AuthenticatedUser user,
-                                               POCDMT000040Organization representedOrganization) {
+    private void createRepresentedOrganization(AuthenticatedUser user, POCDMT000040Organization representedOrganization) {
+
         representedOrganization.getIdArray(0).setExtension(user.getOrganizationId());
         representedOrganization.getNameArray(0).newCursor().setTextValue(user.getOrganizationName());
 
@@ -571,8 +544,7 @@ public class ePtoeDMapper {
         }
 
         if (user.getPostalCode() != null) {
-            representedOrganization.getAddrArray(0).getPostalCodeArray(0).newCursor()
-                    .setTextValue(user.getPostalCode());
+            representedOrganization.getAddrArray(0).getPostalCodeArray(0).newCursor().setTextValue(user.getPostalCode());
         } else {
             representedOrganization.getAddrArray(0).getPostalCodeArray(0).setNullFlavor(NULLFLAVOR_UNK);
         }
