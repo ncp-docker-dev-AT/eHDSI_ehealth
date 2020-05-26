@@ -29,15 +29,15 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(NcpServiceFacadeMock.class);
 
     private NcpServiceFacade serviceFacade;
-    private ClientConnectorService webServiceClient;
+    private ClientConnectorServicePortType webServiceClient;
     private TrcServiceHandler trcServiceHandler;
     private MockSettings settings = withSettings().serializable();
 
     public NcpServiceFacadeMock() {
 
         LOGGER.info("Creating NcpServiceFacadeMock");
-        webServiceClient = mock(ClientConnectorService.class, settings);
-        ClientConnectorServiceService service = mock(ClientConnectorServiceService.class, settings);
+        webServiceClient = mock(ClientConnectorServicePortType.class, settings);
+        ClientConnectorService service = mock(ClientConnectorService.class, settings);
         mockInitUserResponse(service);
         mockQueryPatentsResponse(webServiceClient);
         mockSetTRCAssertionResponse(webServiceClient);
@@ -79,10 +79,10 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
         }
     }
 
-    private void mockSubmitDocumentResponse(ClientConnectorService webServiceClientMock) {
+    private void mockSubmitDocumentResponse(ClientConnectorServicePortType webServiceClientMock) {
     }
 
-    private void mockRetrieveDocumentResponse(ClientConnectorService webServiceClientMock) {
+    private void mockRetrieveDocumentResponse(ClientConnectorServicePortType webServiceClientMock) {
 
         when(webServiceClientMock.retrieveDocument(any(RetrieveDocumentRequest.class))).thenAnswer((Answer<EpsosDocument>) invocation -> {
             RetrieveDocumentRequest req = (RetrieveDocumentRequest) invocation.getArguments()[0];
@@ -94,7 +94,7 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
         });
     }
 
-    private void mockQueryDocumentsResponse(ClientConnectorService webServiceClientMock) {
+    private void mockQueryDocumentsResponse(ClientConnectorServicePortType webServiceClientMock) {
 
         when(webServiceClientMock.queryDocuments(any(QueryDocumentRequest.class))).thenAnswer((Answer<List<EpsosDocument>>) invocation -> {
 
@@ -113,11 +113,11 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
         });
     }
 
-    private void mockSetTRCAssertionResponse(ClientConnectorService webServiceClientMock) {
+    private void mockSetTRCAssertionResponse(ClientConnectorServicePortType webServiceClientMock) {
 
     }
 
-    private void mockQueryPatentsResponse(ClientConnectorService webServiceClientMock) {
+    private void mockQueryPatentsResponse(ClientConnectorServicePortType webServiceClientMock) {
 
         when(webServiceClientMock.queryPatient(any(QueryPatientRequest.class))).thenAnswer((Answer<List<PatientDemographics>>) invocation -> {
             List<PatientDemographics> result = new ArrayList<>();
@@ -142,8 +142,8 @@ public class NcpServiceFacadeMock implements NcpServiceFacade {
         return user;
     }
 
-    private void mockInitUserResponse(ClientConnectorServiceService service) {
-        when(service.getPort(new QName("http://cc.pt.epsos.eu", "ClientConnectorServiceHttpSoap11Endpoint"), ClientConnectorService.class)).thenReturn(webServiceClient);
+    private void mockInitUserResponse(ClientConnectorService service) {
+        when(service.getPort(new QName("http://cc.pt.epsos.eu", "ClientConnectorServiceHttpSoap11Endpoint"), ClientConnectorServicePortType.class)).thenReturn(webServiceClient);
     }
 
     @Override

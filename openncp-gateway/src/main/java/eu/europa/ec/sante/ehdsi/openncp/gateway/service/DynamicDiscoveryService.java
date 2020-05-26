@@ -47,28 +47,29 @@ import java.util.List;
 public class DynamicDiscoveryService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDiscoveryService.class);
-    /**
-     * Static constants for SMP identifiers
-     */
+    //  Static constants for SMP identifiers
     private static final String PARTICIPANT_IDENTIFIER_SCHEME = "ehealth-participantid-qns";
     private static final String PARTICIPANT_IDENTIFIER_VALUE = "urn:ehealth:%2s:ncp-idp";
     private static final String DOCUMENT_IDENTIFIER_SCHEME = "ehealth-resid-qns";
     private static final String URN_EHDSI_ISM = "http://ec.europa.eu/sante/ehncp/ism";
+    private static final String APPLICATION_BASE_DIR = System.getenv(StandardProperties.OPENNCP_BASEDIR) + "forms" + System.getProperty("file.separator");
 
     private DynamicDiscoveryService() {
     }
 
     /**
-     * @param sslContext
-     * @return
+     * Creating a HttpClient object initialized with the SSLContext using TLSv1.2 only.
+     *
+     * @param sslContext - Secured Context of the OpenNCP Gateway.
+     * @return CloseableHttpClient initialized
      */
     public static CloseableHttpClient buildHttpClient(SSLContext sslContext) {
 
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+        // Decision for hostname verification: SSLConnectionSocketFactory.getDefaultHostnameVerifier().
+        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
                 sslContext,
-                //  new String[]{"TLSv1.2"}, // Allow TLSv1.2 protocol only
-                //   null,
-                //SSLConnectionSocketFactory.getDefaultHostnameVerifier()
+                new String[]{"TLSv1.2"},
+                null,
                 new NoopHostnameVerifier());
 
         ProxyCredentials proxyCredentials = null;
@@ -86,62 +87,63 @@ public class DynamicDiscoveryService {
 
                 httpclient = HttpClients.custom()
                         .setDefaultCredentialsProvider(credentialsProvider)
-                        .setSSLSocketFactory(sslsf)
+                        .setSSLSocketFactory(sslConnectionSocketFactory)
                         .setProxy(new HttpHost(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort())))
                         .build();
             } else {
                 httpclient = HttpClients.custom()
-                        .setSSLSocketFactory(sslsf)
+                        .setSSLSocketFactory(sslConnectionSocketFactory)
                         .setProxy(new HttpHost(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort())))
                         .build();
             }
         } else {
-            httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+            httpclient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).build();
         }
         return httpclient;
     }
 
     /**
-     * @param countryCode
+     * @param countryCode - ISO Country Code of the concerned country (Format: 2 letters in lowercase).
      */
     public static void fetchInternationalSearchMask(String countryCode) {
 
-        String applicationBaseDir = System.getenv(StandardProperties.OPENNCP_BASEDIR) + "forms" + System.getProperty("file.separator");
         try {
-            DynamicDiscovery smpClient = DynamicDiscoveryClient.getInstance();
             String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
-            LOGGER.info("Querying ISM for participant identifier {}", participantIdentifierValue);
-            ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue,
-                    PARTICIPANT_IDENTIFIER_SCHEME);
-
-            ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier,
-                    new DocumentIdentifier(RegisteredService.EHEALTH_107.getUrn(), DOCUMENT_IDENTIFIER_SCHEME));
+            LOGGER.info("[Gateway] Querying ISM for participant identifier {}", participantIdentifierValue);
+            ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue, PARTICIPANT_IDENTIFIER_SCHEME);
+            DocumentIdentifier documentIdentifier = new DocumentIdentifier(RegisteredService.EHEALTH_107.getUrn(), DOCUMENT_IDENTIFIER_SCHEME);
+            DynamicDiscovery smpClient = DynamicDiscoveryClient.getInstance();
+            ServiceMetadata serviceMetadata = smpClient.getServiceMetadata(participantIdentifier, documentIdentifier);
 
             List<ProcessType> processTypes = serviceMetadata.getOriginalServiceMetadata().getServiceMetadata()
                     .getServiceInformation().getProcessList().getProcess();
 
             if (!processTypes.isEmpty()) {
+
                 List<EndpointType> endpointTypes = processTypes.get(0).getServiceEndpointList().getEndpoint();
-                LOGGER.debug("EndpointType: '{}' - '{}'", endpointTypes, endpointTypes.size());
                 if (!endpointTypes.isEmpty()) {
+
                     List<ExtensionType> extensionTypes = endpointTypes.get(0).getExtension();
-                    LOGGER.debug("ExtensionType: '{}' - '{}'", extensionTypes, extensionTypes.size());
                     if (!extensionTypes.isEmpty()) {
+
                         Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
-
-                        DOMSource source = new DOMSource(document.getElementsByTagNameNS(
-                                URN_EHDSI_ISM, "patientSearch").item(0));
-
-                        String outPath = applicationBaseDir + "InternationalSearch_" + StringUtils.upperCase(countryCode) + ".xml";
-                        LOGGER.info("International Search Mask Path: '{}", outPath);
+                        DOMSource source = new DOMSource(document.getElementsByTagNameNS(URN_EHDSI_ISM, "patientSearch").item(0));
+                        String outPath = APPLICATION_BASE_DIR + "InternationalSearch_" + StringUtils.upperCase(countryCode) + ".xml";
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("International Search Mask Path: '{}", outPath);
+                        }
                         StreamResult result = new StreamResult(outPath);
                         XMLUtil.transformDocument(source, result);
                     }
                 }
             }
-            //Audit vars
+            //  Audit variables
             URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
-            byte[] encodedObjectID = Base64.encodeBase64(smpURI.toASCIIString().getBytes());
+            URI serviceMetadataUri = smpClient.getService().getMetadataProvider().resolveServiceMetadata(smpURI, participantIdentifier, documentIdentifier);
+            byte[] encodedObjectID = Base64.encodeBase64(serviceMetadataUri.toASCIIString().getBytes());
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("[Gateway] SMP Query: '{}'", serviceMetadataUri.toASCIIString());
+            }
             AuditManager.handleDynamicDiscoveryQuery(smpURI.toASCIIString(), new String(encodedObjectID), null, null);
 
         } catch (IOException | CertificateException | KeyStoreException | TechnicalException | TransformerException | NoSuchAlgorithmException e) {
