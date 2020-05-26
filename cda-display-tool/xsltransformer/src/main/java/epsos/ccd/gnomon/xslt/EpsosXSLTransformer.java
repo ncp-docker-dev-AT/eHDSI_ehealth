@@ -26,7 +26,7 @@ public class EpsosXSLTransformer {
     private static final String MAIN_XSLT = "/resources/cda.xsl";
     private static final String STANDARD_XSLT = "/resources/def_cda.xsl";
     private final Logger logger = LoggerFactory.getLogger(EpsosXSLTransformer.class);
-    private Path path = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository");
+    private final Path path = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository");
 
     /**
      * @param xml cda xml
@@ -39,20 +39,20 @@ public class EpsosXSLTransformer {
     /**
      * @param xml
      * @param lang
-     * @param actionpath
+     * @param actionPath
      * @param path
      * @param export
      * @param showNarrative
      * @param xsl
      * @return
      */
-    private String transform(String xml, String lang, String actionpath, Path path, boolean export,
+    private String transform(String xml, String lang, String actionPath, Path path, boolean export,
                              boolean showNarrative, String xsl) {
 
         String output = "";
         checkLanguageFiles();
         logger.info("Trying to transform XML using action path for dispensation '{}' and repository path '{}' to language {}",
-                actionpath, path, lang);
+                actionPath, path, lang);
 
         try {
             URL xslUrl = this.getClass().getResource(xsl);
@@ -66,7 +66,7 @@ public class EpsosXSLTransformer {
                 logger.info("SystemID: '{}'", systemId);
                 logger.info("Path: '{}'", path);
                 logger.info("Lang: '{}'", lang);
-                logger.info("Show Narrative: '{}'", String.valueOf(showNarrative));
+                logger.info("Show Narrative: '{}'", showNarrative);
             }
 
             StreamSource xmlSource = new StreamSource(new StringReader(xml));
@@ -81,8 +81,8 @@ public class EpsosXSLTransformer {
             transformer.setParameter("userLang", lang);
             transformer.setParameter("shownarrative", String.valueOf(showNarrative));
 
-            if (StringUtils.isNotBlank(actionpath)) {
-                transformer.setParameter("actionpath", actionpath);
+            if (StringUtils.isNotBlank(actionPath)) {
+                transformer.setParameter("actionpath", actionPath);
                 transformer.setParameter("allowDispense", "true");
             } else {
                 transformer.setParameter("allowDispense", "false");
@@ -106,25 +106,25 @@ public class EpsosXSLTransformer {
     /**
      * @param xml        the source cda xml file
      * @param lang       the language you want the labels, value set to be displayed
-     * @param actionpath the url that you want to post the dispensation form. Leave it
+     * @param actionPath the url that you want to post the dispensation form. Leave it
      *                   empty to not allow dispensation
-     * @param path       the path of the epsos repository files
+     * @param path       the path of the repository containing files including translations.
      * @param export     whether to export file to temp folder or not
      * @return the cda document in html format
      */
-    private String transform(String xml, String lang, String actionpath, Path path, boolean export) {
-        return transform(xml, lang, actionpath, path, export, true, MAIN_XSLT);
+    private String transform(String xml, String lang, String actionPath, Path path, boolean export) {
+        return transform(xml, lang, actionPath, path, export, true, MAIN_XSLT);
     }
 
     /**
      * @param xml            the source cda xml file
      * @param lang           the language you want the labels, value set to be displayed
-     * @param actionpath     the url that you want to post the dispensation form
+     * @param actionPath     the url that you want to post the dispensation form
      * @param repositoryPath the path of the epsos repository files
      * @return the cda document in html format
      */
-    public String transform(String xml, String lang, String actionpath, Path repositoryPath) {
-        return transform(xml, lang, actionpath, repositoryPath, false);
+    public String transform(String xml, String lang, String actionPath, Path repositoryPath) {
+        return transform(xml, lang, actionPath, repositoryPath, false);
     }
 
     /**
@@ -132,11 +132,11 @@ public class EpsosXSLTransformer {
      *
      * @param xml        the source cda xml file
      * @param lang       the language you want the labels, value set to be displayed
-     * @param actionpath the url that you want to post the dispensation form
+     * @param actionPath the url that you want to post the dispensation form
      * @return the cda document in html format
      */
-    public String transform(String xml, String lang, String actionpath) {
-        return transform(xml, lang, actionpath, path, false);
+    public String transform(String xml, String lang, String actionPath) {
+        return transform(xml, lang, actionPath, path, false);
     }
 
     /* hides links that exist in html */
@@ -145,30 +145,30 @@ public class EpsosXSLTransformer {
     }
 
     /**
-     * This method uses the epsos repository files from user home directory and
-     * outputs the transformed xml to the temp file without deleting it
+     * This method uses the epsos repository files from user home directory and outputs the transformed xml to the temp
+     * file without deleting it.
      *
      * @param xml        the source cda xml file
      * @param lang       the language you want the labels, value set to be displayed
-     * @param actionpath the url that you want to post the dispensation form
+     * @param actionPath the url that you want to post the dispensation form
      * @return the cda document in html format
      */
-    public String transformWithOutputAndUserHomePath(String xml, String lang, String actionpath) {
-        return transform(xml, lang, actionpath, path, true);
+    public String transformWithOutputAndUserHomePath(String xml, String lang, String actionPath) {
+        return transform(xml, lang, actionPath, path, true);
     }
 
     /**
-     * This method uses the epsos repository files from user home directory and
-     * outputs the transformed xml to the temp file without deleting it
+     * This method uses the epsos repository files from user home directory and outputs the transformed xml to the temp
+     * file without deleting it
      *
      * @param xml            the source cda xml file
      * @param lang           the language you want the labels, value set to be displayed
-     * @param actionpath     the url that you want to post the dispensation form
+     * @param actionPath     the url that you want to post the dispensation form
      * @param repositoryPath the path of the epsos repository files
      * @return the cda document in html format
      */
-    public String transformWithOutputAndDefinedPath(String xml, String lang, String actionpath, Path repositoryPath) {
-        return transform(xml, lang, actionpath, repositoryPath, true);
+    public String transformWithOutputAndDefinedPath(String xml, String lang, String actionPath, Path repositoryPath) {
+        return transform(xml, lang, actionPath, repositoryPath, true);
     }
 
     public String readFile(String file) throws IOException {
@@ -179,18 +179,25 @@ public class EpsosXSLTransformer {
         return new String(Files.readAllBytes(Paths.get(file.toURI())));
     }
 
+    /**
+     *
+     */
     private void checkLanguageFiles() {
 
-        //  "epSOSDisplayLabels.xml", "NullFlavor.xml", "SNOMEDCT.xml","UCUMUnifiedCodeforUnitsofMeasure.xml"
-        final String[] filesNeeded = {"1.3.6.1.4.1.12559.11.10.1.3.1.42.17.xml", "1.3.6.1.4.1.12559.11.10.1.3.1.42.37.xml",
-                "1.3.6.1.4.1.12559.11.10.1.3.1.42.46.xml", "1.3.6.1.4.1.12559.11.10.1.3.1.42.16.xml"};
-        // get User Path
         try {
-            if (new File(path.toUri()).exists()) {
+            File file = new File(path.toUri());
+            if (file.exists() && file.isDirectory()) {
 
-                for (String aFilesNeeded : filesNeeded) {
-                    if (!new File(Paths.get(path.toString(), aFilesNeeded).toUri()).exists())
-                        throw new TerminologyFileNotFoundException("File " + aFilesNeeded + " doesn't exists");
+                String[] files = file.list();
+                if (files == null || files.length == 0) {
+                    throw new TerminologyFileNotFoundException("Files containing translations are not available into the folder: " + path.toUri());
+                } else {
+                    for (String fileName : files) {
+
+                        if (new File(Paths.get(path.toString(), fileName).toUri()).exists()) {
+                            logger.info("File '{}' available", fileName);
+                        }
+                    }
                 }
             } else {
                 throw new TerminologyFileNotFoundException("Folder " + path.toString() + " doesn't exists");

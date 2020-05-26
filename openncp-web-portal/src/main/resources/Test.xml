@@ -66,14 +66,14 @@
         </saml2:AuthnContext>
     </saml2:AuthnStatement>
     <saml2:AttributeStatement>
-        <saml2:Attribute FriendlyName="XSPA subject"
+        <saml2:Attribute FriendlyName="XSPA Subject"
                          Name="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
                          NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
             <saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                   xsi:type="xs:string">anders
             </saml2:AttributeValue>
         </saml2:Attribute>
-        <saml2:Attribute FriendlyName="XSPA role"
+        <saml2:Attribute FriendlyName="XSPA Role"
                          Name="urn:oasis:names:tc:xacml:2.0:subject:role"
                          NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
             <saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -94,7 +94,7 @@
                                   xsi:type="xs:anyURI">3333-222
             </saml2:AttributeValue>
         </saml2:Attribute>
-        <saml2:Attribute FriendlyName="epSOS Healthcare Facility Type"
+        <saml2:Attribute FriendlyName="eHealth DSI Healthcare Facility Type"
                          Name="urn:epsos:names:wp3.4:subject:healthcare-facility-type"
                          NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
             <saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -250,14 +250,14 @@
                 </saml2:AuthnContext>
             </saml2:AuthnStatement>
             <saml2:AttributeStatement>
-                <saml2:Attribute FriendlyName="XSPA subject"
+                <saml2:Attribute FriendlyName="XSPA Subject"
                                  Name="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
                                  NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
                     <saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                           xsi:type="xs:string">anders
                     </saml2:AttributeValue>
                 </saml2:Attribute>
-                <saml2:Attribute FriendlyName="XSPA role"
+                <saml2:Attribute FriendlyName="XSPA Role"
                                  Name="urn:oasis:names:tc:xacml:2.0:subject:role"
                                  NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
                     <saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -278,7 +278,7 @@
                                           xsi:type="xs:anyURI">3333-222
                     </saml2:AttributeValue>
                 </saml2:Attribute>
-                <saml2:Attribute FriendlyName="epSOS Healthcare Facility Type"
+                <saml2:Attribute FriendlyName="eHealth DSI Healthcare Facility Type"
                                  Name="urn:epsos:names:wp3.4:subject:healthcare-facility-type"
                                  NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
                     <saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

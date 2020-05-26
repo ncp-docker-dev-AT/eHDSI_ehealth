@@ -3,6 +3,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.web;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerException;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.service.DynamicDiscoveryService;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.util.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,20 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class DynamicDiscovery {
+public class DynamicDiscoveryController {
 
-    private final Logger logger = LoggerFactory.getLogger(DynamicDiscovery.class);
+    private final Logger logger = LoggerFactory.getLogger(DynamicDiscoveryController.class);
 
     @GetMapping(value = "/dynamicdiscovery/syncsearchmask")
     public String synchronizeSearchMask(Model model) {
 
-        logger.info("synchronizeSearchMask('{}')", System.currentTimeMillis());
+        logger.info("[Gateway] Synchronize Search Mask at ('{}')", DateTimeUtil.formatTimeInMillis(System.currentTimeMillis()));
         String countryList = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.countries");
         String[] countries = StringUtils.split(countryList, ",");
         List<String> synchronizedCountry = new ArrayList<>();
 
         for (String countryCode : countries) {
-            logger.info("Fetching ISM for MS: '{}'", countryCode);
             try {
                 DynamicDiscoveryService.fetchInternationalSearchMask(countryCode);
                 synchronizedCountry.add(countryCode);

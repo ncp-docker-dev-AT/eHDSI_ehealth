@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class CDAUtils {
 
@@ -109,6 +110,14 @@ public class CDAUtils {
         return refBarcode;
     }
 
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param xml
+     * @return
+     * @deprecated
+     */
+    @Deprecated
     public static String getRelativePrescriptionBarcode(String xml) {
 
         String nodeString = "";
@@ -121,14 +130,36 @@ public class CDAUtils {
         return nodeString;
     }
 
+    /**
+     * @param epDoc
+     * @param id
+     * @return
+     */
     private static String getRelativePrescriptionLineFromEP(Document epDoc, String id) {
 
-        LOGGER.debug("Converting eP SubstanceAdministration [{}] to eD format", id);
+        LOGGER.info("Converting eP SubstanceAdministration [{}] to eD format", id);
 
         try {
 
             XPath xpath = getXPathFactory();
-            XPathExpression xPathExpression = xpath.compile("//xsi:substanceAdministration[xsi:id/@extension='" + id + "']");
+            String substanceIdRoot = "";
+            String substanceIdExtension = "";
+            if (StringUtils.contains(id, "^")) {
+                String[] strings = StringUtils.split(id, "^", 2);
+                substanceIdRoot = strings[0];
+                substanceIdExtension = strings[1];
+            } else {
+                substanceIdRoot = id;
+            }
+            //  Creating an xpath expression for the manufacturedMaterial name element instead [@id='..' and @class='...]
+            String expression = "//xsi:substanceAdministration[xsi:id/@root='" + substanceIdRoot + "'";
+            if (StringUtils.isNotBlank(substanceIdExtension)) {
+                expression += " and xsi:id/@extension='" + substanceIdExtension + "'";
+            }
+            expression += "]";
+            LOGGER.info("xsi:substanceAdministration: '{}'", expression);
+
+            XPathExpression xPathExpression = xpath.compile(expression);
             Node substanceNode = (Node) xPathExpression.evaluate(epDoc, XPathConstants.NODE);
 
             if (substanceNode != null) {
@@ -153,6 +184,15 @@ public class CDAUtils {
         }
     }
 
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param epDoc
+     * @param id
+     * @return
+     * @deprecated
+     */
+    @Deprecated
     private static String getRelativeProductLineFromEP(Document epDoc, String id) {
 
         String nodeString = "";
@@ -197,10 +237,16 @@ public class CDAUtils {
      */
     private static String getSubstitutedRelativeProductLineFromEP(org.dom4j.Document doc, String id, String product, String unit, String quantity) {
 
-
+        String substanceIdRoot = "";
+        String substanceIdExtension = "";
+        if (StringUtils.contains(id, "^")) {
+            String[] strings = StringUtils.split(id, "^", 2);
+            substanceIdRoot = strings[0];
+            substanceIdExtension = strings[1];
+        } else {
+            substanceIdRoot = id;
+        }
         //TODO: Check if the ATC code needs to be retrieved from:
-        //String atcCodeExpr = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct
-        // /hl7:manufacturedMaterial/epsos:asSpecializedKind[@classCode='GEN']/epsos:generalizedMedicineClass[@classCode='MMAT']/epsos:code";
         LOGGER.info("ePrescription Substituted Product dispensed(Product:'{}', ID:'{}', Unit:'{}', Quantity:'{}')",
                 product, id, unit, quantity);
         //  Context of the substituted product
@@ -214,12 +260,12 @@ public class CDAUtils {
             namespaces.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
             //  Creating an xpath expression to retrieve the displayName attribute of the National Code Element
-            String expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code/@displayName";
+            String expression = generateSubstanceAdministrationXpath(id) + "/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code/@displayName";
             //Setting the xpath processor and the namespaces
             org.dom4j.XPath xpath = org.dom4j.DocumentHelper.createXPath(expression);
             xpath.setNamespaceURIs(namespaces);
 
-            //TODO: check Jerome
+            //TODO: To be reviewed.
             //Getting the displayName node
             org.dom4j.Node displayName = xpath.selectSingleNode(doc);
             if (displayName != null) {
@@ -228,7 +274,7 @@ public class CDAUtils {
             }
 
             //Creating an xpath expression for the name element
-            expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:name";
+            expression = generateSubstanceAdministrationXpath(id) + "/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:name";
 
             //Setting the xpath procesor and the namespaces
             xpath = org.dom4j.DocumentHelper.createXPath(expression);
@@ -242,7 +288,7 @@ public class CDAUtils {
             }
 
             //Creating an xpath expression for the epsos:name element
-            expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:name";
+            expression = generateSubstanceAdministrationXpath(id) + "/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:name";
 
             //Setting the xpath procesor and the namespaces
             xpath = org.dom4j.DocumentHelper.createXPath(expression);
@@ -256,7 +302,7 @@ public class CDAUtils {
             }
             //TODO epsos:capacityQuantity/@unit
             //Creating an xpath expression for the quantity value attribute of the epsos:capacityQuantity element
-            expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@value";
+            expression = generateSubstanceAdministrationXpath(id) + "/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@value";
 
             //Setting the xpath procesor and the namespaces
             xpath = org.dom4j.DocumentHelper.createXPath(expression);
@@ -269,7 +315,7 @@ public class CDAUtils {
                 value.setText(quantity);
             }
             //Creating an xpath expression for the manufacturedMaterial code element
-            expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code";
+            expression = generateSubstanceAdministrationXpath(id) + "/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:code";
 
             //Setting the xpath processor and the namespaces
             xpath = org.dom4j.DocumentHelper.createXPath(expression);
@@ -280,18 +326,24 @@ public class CDAUtils {
 
             //Checking if the code element is not provided
             if (pivot == null) {
-                //Creating an xpath expression for the manufacturedMaterial name element instead
-                expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:name";
-
-                //Setting the xpath procesor and the namespaces
+                LOGGER.info("CDA Pivot is null; looking for substanceAdministration ID: '{}'", id);
+                //Creating an xpath expression for the manufacturedMaterial name element instead [@id='..' and @class='...]
+                expression = "//hl7:substanceAdministration[hl7:id/@root='" + substanceIdRoot + "'";
+                if (StringUtils.isNotBlank(substanceIdExtension)) {
+                    expression += " and hl7:id/@extension='" + substanceIdExtension + "'";
+                }
+                expression += "]/hl7:consumable/hl7:manufacturedProduct/hl7:manufacturedMaterial/hl7:name";
+                LOGGER.info("hl7:substanceAdministration: '{}'", expression);
+                //Setting the xpath processor and the namespaces
                 xpath = org.dom4j.DocumentHelper.createXPath(expression);
                 xpath.setNamespaceURIs(namespaces);
 
                 //Getting the manufacturedMaterial name node
                 pivot = xpath.selectSingleNode(doc);
+                LOGGER.info("CDA Pivot:\n'{}'", pivot.asXML());
             }
 
-            //Getting the parent manufacturedMaterial element of the pivot
+            //  Getting the parent manufacturedMaterial element of the pivot
             org.dom4j.Element parent = pivot.getParent();
 
             //Creating the epsos:id element
@@ -305,9 +357,10 @@ public class CDAUtils {
             parent.elements().add(0, epsosID);
 
             //Creating a xpath expression for the manufacturedProduct element
-            expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct";
+            //expression = "//hl7:substanceAdministration[hl7:id/@extension='" + id + "']/hl7:consumable/hl7:manufacturedProduct";
+            expression = generateSubstanceAdministrationXpath(id) + "/hl7:consumable/hl7:manufacturedProduct";
 
-            //Setting the xpath procesor and the namespaces
+            //Setting the xpath processor and the namespaces
             xpath = org.dom4j.DocumentHelper.createXPath(expression);
             xpath.setNamespaceURIs(namespaces);
 
@@ -353,11 +406,19 @@ public class CDAUtils {
         return nodeString;
     }
 
-    private static String getCustodianFromEP(Document epDoc) {
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param document
+     * @return
+     * @deprecated
+     */
+    @Deprecated
+    private static String getCustodianFromEP(Document document) {
 
         String nodeString = "";
         try {
-            Node nl = epDoc.getElementsByTagName("custodian").item(0);
+            Node nl = document.getElementsByTagName("custodian").item(0);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
@@ -365,6 +426,14 @@ public class CDAUtils {
         return nodeString;
     }
 
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param epDoc
+     * @return
+     * @deprecated
+     */
+    @Deprecated
     private static String getLegalAuthFromEP(Document epDoc) {
 
         String nodeString = "";
@@ -377,11 +446,19 @@ public class CDAUtils {
         return nodeString;
     }
 
-    private static String getAuthorFromEP(Document epDoc) {
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param document
+     * @return
+     * @deprecated
+     */
+    @Deprecated
+    private static String getAuthorFromEP(Document document) {
 
         String nodeString = "";
         try {
-            Node nl = epDoc.getElementsByTagName("author").item(0);
+            Node nl = document.getElementsByTagName("author").item(0);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
@@ -389,14 +466,14 @@ public class CDAUtils {
         return nodeString;
     }
 
-    private static String getRelativePrescriptionText(Document epDoc) {
+    private static String getRelativePrescriptionText(Document document) {
 
         String nodeString = "";
         try {
-            Document doc = epDoc;
+
             XPath xpath = getXPathFactory();
             XPathExpression epExpr = xpath.compile("//xsi:component/xsi:structuredBody/xsi:component/xsi:section//xsi:text");
-            Node nl = (Node) epExpr.evaluate(doc, XPathConstants.NODE);
+            Node nl = (Node) epExpr.evaluate(document, XPathConstants.NODE);
             nodeString = Utils.nodeToString(nl);
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
@@ -420,7 +497,12 @@ public class CDAUtils {
         return refBarcode;
     }
 
-    public static String CDAModelToConsent(CDAHeader cda, String rolename) {
+    /**
+     * @param cdaHeader
+     * @param roleName
+     * @return
+     */
+    public static String transformCDAModelToConsent(CDAHeader cdaHeader, String roleName) {
 
         String edCountry = GetterUtil.getString(ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country"), "");
         String consentOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CONSENT_OID);
@@ -445,7 +527,6 @@ public class CDAUtils {
         sb.append("<templateId root=\"1.3.6.1.4.1.19376.1.5.3.1.1.7\"/>");
         sb.append("\r\n");
 
-        //String uuid = java.util.UUID.randomUUID().toString();
         String uuid = EpsosHelperService.getUniqueId();
         sb.append("<id extension=\"").append(uuid).append("\" root=\"").append(consentOid).append("\"/>");
         sb.append("\r\n");
@@ -454,30 +535,30 @@ public class CDAUtils {
         sb.append("\r\n");
         sb.append("<title>" + XML_CONSENT_TITLE + "</title>");
         sb.append("\r\n");
-        sb.append("<effectiveTime value=\"").append(cda.getEffectiveTime()).append("\" />");
+        sb.append("<effectiveTime value=\"").append(cdaHeader.getEffectiveTime()).append("\" />");
         sb.append("\r\n");
         sb.append("<confidentialityCode code=\"N\" codeSystem=\"2.16.840.1.113883.5.25\"/>");
         sb.append("\r\n");
-        sb.append("<languageCode code=\"").append(cda.getLanguageCode().replaceAll("_", "-")).append("\"/>");
+        sb.append("<languageCode code=\"").append(cdaHeader.getLanguageCode().replaceAll("_", "-")).append("\"/>");
         sb.append("\r\n");
         // Record Target
         sb.append("<recordTarget typeCode=\"RCT\">");
         sb.append("\r\n");
         sb.append("<patientRole classCode=\"PAT\">");
         sb.append("\r\n");
-        sb.append("<id extension=\"").append(cda.getPatientId()).append("\" root=\"").append(patientOid).append("\"/>");
+        sb.append("<id extension=\"").append(cdaHeader.getPatientId()).append("\" root=\"").append(patientOid).append("\"/>");
         sb.append("\r\n");
-        sb.append(addAddress(cda.getPatientAddress(), cda.getPatientCity(), cda.getPatientPostalCode(),
-                cda.getPatientCountry(), cda.getPatientTelephone(), cda.getPatientEmail(), false));
+        sb.append(addAddress(cdaHeader.getPatientAddress(), cdaHeader.getPatientCity(), cdaHeader.getPatientPostalCode(),
+                cdaHeader.getPatientCountry(), cdaHeader.getPatientTelephone(), cdaHeader.getPatientEmail(), false));
         sb.append("<patient classCode=\"PSN\" determinerCode=\"INSTANCE\">");
         sb.append("\r\n");
-        sb.append(addName(cda.getPatientFamilyName(), cda.getPatientPrefix(), cda.getPatientGivenName()));
+        sb.append(addName(cdaHeader.getPatientFamilyName(), cdaHeader.getPatientPrefix(), cdaHeader.getPatientGivenName()));
         sb.append("\r\n");
-        sb.append("<administrativeGenderCode code=\"").append(cda.getPatientSex()).append("\" codeSystem=\"2.16.840.1.113883.5.1\" />");
+        sb.append("<administrativeGenderCode code=\"").append(cdaHeader.getPatientSex()).append("\" codeSystem=\"2.16.840.1.113883.5.1\" />");
         sb.append("\r\n");
-        sb.append(addTag("birthTime", getBirthTime(cda.getPatientBirthDate())));
+        sb.append(addTag("birthTime", getBirthTime(cdaHeader.getPatientBirthDate())));
         sb.append("\r\n");
-        sb.append("<languageCommunication><languageCode code=\"").append(cda.getPatientLanguageCommunication()).append("\"/></languageCommunication>");
+        sb.append("<languageCommunication><languageCode code=\"").append(cdaHeader.getPatientLanguageCommunication()).append("\"/></languageCommunication>");
         sb.append("\r\n");
         sb.append("</patient>");
         sb.append("\r\n");
@@ -487,11 +568,11 @@ public class CDAUtils {
         sb.append("\r\n");
 
         // author
-        if (rolename.equals("doctor")) {
-            sb.append(addDoctorAuthor(cda));
+        if (roleName.equals("doctor")) {
+            sb.append(addDoctorAuthor(cdaHeader));
         }
-        if (rolename.equals("pharmacist")) {
-            sb.append(addPharmacistAuthor(cda));
+        if (roleName.equals("pharmacist")) {
+            sb.append(addPharmacistAuthor(cdaHeader));
         }
 
         // custodian
@@ -500,7 +581,7 @@ public class CDAUtils {
         sb.append(addLegalAuthenticator(legalOrgOid, legalauthenticatorfirstname, legalauthenticatorlastname,
                 legalauthenticatorcity, legalauthenticatorpostalcode, edCountry));
         // Document of
-        sb.append(addDocumentOf(cda.getConsentCode(), cda.getConsentDisplayName(), cda.getConsentStartDate(), cda.getConsentEndDate()));
+        sb.append(addDocumentOf(cdaHeader.getConsentCode(), cdaHeader.getConsentDisplayName(), cdaHeader.getConsentStartDate(), cdaHeader.getConsentEndDate()));
 
         sb.append("<component>");
         sb.append("\r\n");
@@ -516,7 +597,7 @@ public class CDAUtils {
         sb.append("\r\n");
         sb.append("<br/>");
         sb.append("\r\n");
-        sb.append("<content>Policy: ").append(cda.getConsentCode()).append(",Description: ").append(cda.getConsentDisplayName()).append(",EffectiveTime From: ").append(cda.getConsentStartDate()).append(", EffectiveTime To: ").append(cda.getConsentEndDate()).append("</content>");
+        sb.append("<content>Policy: ").append(cdaHeader.getConsentCode()).append(",Description: ").append(cdaHeader.getConsentDisplayName()).append(",EffectiveTime From: ").append(cdaHeader.getConsentStartDate()).append(", EffectiveTime To: ").append(cdaHeader.getConsentEndDate()).append("</content>");
         sb.append("\r\n");
         sb.append("</text>");
         sb.append("\r\n");
@@ -552,6 +633,7 @@ public class CDAUtils {
                 + "</assignedCustodian></custodian>" + "\r\n";
     }
 
+
     private static String addLegalAuthenticator(String legalOrgOid, String legalauthenticatorfirstname,
                                                 String legalauthenticatorlastname, String legalauthenticatorcity,
                                                 String legalauthenticatorpostalcode, String edCountry) {
@@ -559,7 +641,7 @@ public class CDAUtils {
         LOGGER.info("addLegalAuthenticator('{}', '{}', '{}', '{}', '{}', '{}')", legalOrgOid, legalauthenticatorfirstname,
                 legalauthenticatorlastname, legalauthenticatorcity, legalauthenticatorpostalcode, edCountry);
 
-        return ("<legalAuthenticator contextControlCode=\"OP\" typeCode=\"LA\">" + "\r\n" + "<time value=\"20120927112208\"/>"
+        return ("<legalAuthenticator contextControlCode=\"OP\" typeCode=\"LA\">" + "\r\n" + "<time value=\"" + createDate() + "\"/>"
                 + "\r\n" + "<signatureCode code=\"S\"/>" + "\r\n" + "<assignedEntity classCode=\"ASSIGNED\">" + "\r\n"
                 + "<id root=\"") +
                 legalOrgOid + "\"/>" + "\r\n" + "<addr><streetAddressLine>4, Breydel Street" +
@@ -580,6 +662,12 @@ public class CDAUtils {
                 + "</legalAuthenticator>" + "\r\n";
     }
 
+    /**
+     * @param ePrescriptionDocument
+     * @param eDispenseHeader
+     * @param eDispenseId
+     * @return
+     */
     private static String transformCDAModelToEDXML(Document ePrescriptionDocument, CDAHeader eDispenseHeader, String eDispenseId) {
 
         String edCountry = GetterUtil.getString(ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.country"), "");
@@ -821,39 +909,17 @@ public class CDAUtils {
             //Checking if performed a substitution
             if (detail.isSubstituted()) {
                 //Opening a substitution relationship entry
-                sb.append("<entryRelationship")
-                        .append(" ")
-                        .append("typeCode=\"COMP\"")
-                        .append(">\r\n");
-
+                sb.append("<entryRelationship").append(" ").append("typeCode=\"COMP\"").append(">\r\n");
                 //Adding an act entry
-                sb.append("<act")
-                        .append(" ")
-                        .append("classCode=\"ACT\"")
-                        .append(" ")
-                        .append("moodCode=\"EVN\"")
-                        .append(">\r\n");
-
+                sb.append("<act classCode=\"ACT\" moodCode=\"EVN\" >\n");
                 //Adding the code element
-                sb.append("<code")
-                        .append(" ")
-                        .append("code=\"SUBST\"")
-                        .append(" ")
-                        .append("codeSystem=\"2.16.840.1.113883.5.6\"")
-                        .append(" ")
-                        .append("codeSystemName=\"ActClass\"")
-                        .append(" ")
-                        .append("displayName=\"Substitution\"")
-                        .append("/>\r\n");
-
+                sb.append("<code code=\"SUBST\" codeSystem=\"2.16.840.1.113883.5.6\" codeSystemName=\"ActClass\" displayName=\"Substitution\" />\n");
                 //Closing the act entry
                 sb.append("</act>\r\n");
-
                 //Closing the substitution relationship entry
                 sb.append("</entryRelationship>\r\n");
             }
             //TBD
-
             sb.append("</supply>");
             sb.append("\r\n");
             sb.append("</entry>");
@@ -948,6 +1014,15 @@ public class CDAUtils {
         return sb.toString();
     }
 
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param code1
+     * @param value1
+     * @return
+     * @deprecated
+     */
+    @Deprecated
     private static String addEntryRelationship(String code1, String value1) {
 
         StringBuilder sb = new StringBuilder();
@@ -979,6 +1054,17 @@ public class CDAUtils {
 
     }
 
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param lowValue
+     * @param lowUnit
+     * @param highValue
+     * @param highUnit
+     * @return
+     * @deprecated
+     */
+    @Deprecated
     private static String addQuantity(String lowValue, String lowUnit, String highValue, String highUnit) {
 
         return "<epsos:quantity>" +
@@ -991,6 +1077,17 @@ public class CDAUtils {
                 "\r\n";
     }
 
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param lowValue
+     * @param lowUnit
+     * @param highValue
+     * @param highUnit
+     * @return
+     * @deprecated
+     */
+    @Deprecated
     private static String addDoseQuantity(String lowValue, String lowUnit, String highValue, String highUnit) {
 
         return "<doseQuantity>" +
@@ -1003,11 +1100,17 @@ public class CDAUtils {
                 "\r\n";
     }
 
-    /*
-     * <effectiveTime xsi:type='PIVL_TS' institutionSpecified='false' operator='A'> <period value='8' unit='h' /></effectiveTime>
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param freq
+     * @return
+     * @deprecated
      */
+    @Deprecated
     private static String addDoseFrequency(String freq) {
 
+        //  <effectiveTime xsi:type='PIVL_TS' institutionSpecified='false' operator='A'> <period value='8' unit='h' /></effectiveTime>
         String eff = "";
         if (freq.equals("5")) // Μια φορά την εβδομάδα
         {
@@ -1069,6 +1172,15 @@ public class CDAUtils {
 
     }
 
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param low
+     * @param high
+     * @return
+     * @deprecated
+     */
+    @Deprecated
     private static String addEffectiveTime(String low, String high) {
 
         return "<effectiveTime xsi:type=\"IVL_TS\">" +
@@ -1187,6 +1299,15 @@ public class CDAUtils {
         return ret;
     }
 
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param id
+     * @param extension
+     * @return
+     * @deprecated
+     */
+    @Deprecated
     private static String addTemplateIDRoot(String id, String extension) {
 
         String ext;
@@ -1201,6 +1322,15 @@ public class CDAUtils {
         return ret;
     }
 
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param sTag
+     * @param eElement
+     * @return
+     * @deprecated
+     */
+    @Deprecated
     private static String getTagValue(String sTag, Element eElement) {
 
         String ret = "";
@@ -1215,6 +1345,15 @@ public class CDAUtils {
         return ret;
     }
 
+    /**
+     * Should be checked if this method is still accurate for eHDSI Wave 3.
+     *
+     * @param dispensexml
+     * @param barcode
+     * @return
+     * @deprecated
+     */
+    @Deprecated
     public static boolean checkPrescriptionBarcode(String dispensexml, String barcode) {
 
         boolean sameBarcode = false;
@@ -1250,5 +1389,37 @@ public class CDAUtils {
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         return format.format(patientBirthDate);
+    }
+
+    private static String generateSubstanceAdministrationXpath(String id) {
+
+        String substanceIdRoot;
+        String substanceIdExtension = "";
+        if (StringUtils.contains(id, "^")) {
+            String[] strings = StringUtils.split(id, "^", 2);
+            substanceIdRoot = strings[0];
+            substanceIdExtension = strings[1];
+        } else {
+            substanceIdRoot = id;
+        }
+        String expression = "//hl7:substanceAdministration[hl7:id/@root='" + substanceIdRoot + "'";
+        if (StringUtils.isNotBlank(substanceIdExtension)) {
+            expression += " and hl7:id/@extension='" + substanceIdExtension + "'";
+        }
+        expression += "]";
+        LOGGER.info("hl7:substanceAdministration: '{}'", expression);
+        return expression;
+    }
+
+    /**
+     * @return
+     */
+    public static String createDate() {
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss.SSSSZ");
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date date = new Date();
+
+        return format.format(date);
     }
 }

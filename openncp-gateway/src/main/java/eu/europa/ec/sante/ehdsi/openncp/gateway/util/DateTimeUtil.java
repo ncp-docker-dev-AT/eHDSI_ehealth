@@ -3,6 +3,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.util;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,5 +43,13 @@ public final class DateTimeUtil {
     public static XMLGregorianCalendar timeUTC() {
 
         return DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar(TimeZone.getTimeZone(ZoneOffset.UTC)));
+    }
+
+    public static String formatTimeInMillis(long time) {
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.SSSSZ");
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date date = new Date(time);
+        return format.format(date);
     }
 }

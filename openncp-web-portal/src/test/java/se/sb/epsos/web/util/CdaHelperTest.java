@@ -64,7 +64,7 @@ public class CdaHelperTest {
         assert (row.getProductName().equals("Actrapid® Penfill®"));
         assert (row.getRoute().equals(""));
         assert (row.getProductId().equals("013509"));
-        assert (row.getPrescriptionId().equals("1.133427"));
+        assert (row.getPrescriptionIdExtension().equals("1.133427"));
         assert (row.getSubstitutionPermittedText().equals(new StringResourceModel("prescription.substitute.null",
                 null, "").getString()));
         assert (!row.isSubstitutionPermitted());

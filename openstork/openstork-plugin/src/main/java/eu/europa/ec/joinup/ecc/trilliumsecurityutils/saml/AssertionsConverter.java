@@ -364,11 +364,11 @@ public class AssertionsConverter {
             AttributeStatement attrStmt = create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
 
             // XSPA Subject
-            Attribute attrPID = createAttribute(builderFactory, "XSPA subject",
+            Attribute attrPID = createAttribute(builderFactory, "XSPA Subject",
                     "urn:oasis:names:tc:xacml:1.0:subject:subject-id", username, "", "");
             attrStmt.getAttributes().add(attrPID);
             // XSPA Role
-            Attribute attrPID_1 = createAttribute(builderFactory, "XSPA role",
+            Attribute attrPID_1 = createAttribute(builderFactory, "XSPA Role",
                     "urn:oasis:names:tc:xacml:2.0:subject:role", role, "", "");
             attrStmt.getAttributes().add(attrPID_1);
             // HITSP Clinical Speciality
@@ -392,8 +392,8 @@ public class AssertionsConverter {
             // createAttribute(builderFactory,"OnBehalfOf",
             // "urn:epsos:names:wp3.4:subject:on-behalf-of",organizationId,role,"");
             // attrStmt.getAttributes().add(attrPID_4);
-            // epSOS Healthcare Facility Type
-            Attribute attrPID_5 = createAttribute(builderFactory, "epSOS Healthcare Facility Type",
+            // eHealth DSI Healthcare Facility Type
+            Attribute attrPID_5 = createAttribute(builderFactory, "eHealth DSI Healthcare Facility Type",
                     "urn:epsos:names:wp3.4:subject:healthcare-facility-type", facilityType, "", "");
             attrStmt.getAttributes().add(attrPID_5);
             // XSPA Purpose of Use
