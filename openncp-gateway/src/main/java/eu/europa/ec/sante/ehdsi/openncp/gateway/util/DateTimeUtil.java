@@ -47,7 +47,7 @@ public final class DateTimeUtil {
 
     public static String formatTimeInMillis(long time) {
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.SSSSZ");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSZ");
         format.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = new Date(time);
         return format.format(date);
