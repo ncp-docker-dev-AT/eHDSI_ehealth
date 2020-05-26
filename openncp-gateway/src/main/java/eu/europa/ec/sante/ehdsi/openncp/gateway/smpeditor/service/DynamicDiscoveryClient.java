@@ -24,7 +24,7 @@ public class DynamicDiscoveryClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDiscoveryClient.class);
 
-    private static DynamicDiscovery INSTANCE = null;
+    private static DynamicDiscovery instance = null;
 
     private DynamicDiscoveryClient() {
     }
@@ -32,26 +32,20 @@ public class DynamicDiscoveryClient {
     public static synchronized DynamicDiscovery getInstance() throws KeyStoreException, IOException, CertificateException,
             NoSuchAlgorithmException, TechnicalException {
 
-        LOGGER.info("DynamicDiscovery getInstance()");
+        LOGGER.info("[Gateway] DynamicDiscovery getInstance()");
 
-        if (INSTANCE == null) {
-            LOGGER.debug("Initializing Dynamic Discovery...");
-
-            LOGGER.debug("Loading Truststore...");
-            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-            ks.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.NCP_TRUSTSTORE)),
+        if (instance == null) {
+            LOGGER.debug("Instantiating new instance of DynamicDiscovery");
+            KeyStore trustStore = KeyStore.getInstance("JKS");
+            trustStore.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.NCP_TRUSTSTORE)),
                     ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD).toCharArray());
 
-            LOGGER.debug("Loading Dynamic Discovery Builder...");
             DynamicDiscoveryBuilder dynamicDiscoveryBuilder = ConfigurationManagerFactory.getConfigurationManager().initializeDynamicDiscoveryFetcher()
                     .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()
                             .getProperty(StandardProperties.SMP_SML_DNS_DOMAIN), new DefaultDNSLookup()))
-                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(ks)));
-            LOGGER.debug("Building Dynamic Discovery...");
-            INSTANCE = dynamicDiscoveryBuilder.build();
-
+                    .reader(new DefaultBDXRReader(new DefaultSignatureValidator(trustStore)));
+            instance = dynamicDiscoveryBuilder.build();
         }
-        LOGGER.debug("Return Dynamic Discovery...");
-        return INSTANCE;
+        return instance;
     }
 }
