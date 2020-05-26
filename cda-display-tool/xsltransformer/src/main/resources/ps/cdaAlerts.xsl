@@ -156,8 +156,6 @@
 
     <xsl:template name="alertSectionEntry">
         <!-- Defining all needed variables -->
-        <xsl:variable name="act" select="n1:act"/>
-
         <xsl:variable name="observation"
                       select="n1:act/n1:templateId[@root= '2.16.840.1.113883.10.20.1.27']/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.19376.1.5.3.1.4.6']/.."/>
         <xsl:variable name="reactionType"
@@ -175,7 +173,7 @@
         <!-- End definition of variables-->
 
         <xsl:choose>
-            <xsl:when test="not($act/@nullFlavor)">
+            <xsl:when test="not(n1:act/@nullFlavor)">
                 <!-- No info Scenario... observation.value@code is one of the two values -->
                 <xsl:choose>
                     <xsl:when test="($obsValue/@code='no-known-allergies' or $obsValue/@code='no-allergy-info')">
@@ -230,7 +228,7 @@
                 <tr>
                     <td colspan="3">
                         <xsl:call-template name="show-epSOSNullFlavor">
-                            <xsl:with-param name="code" select="$act/@nullFlavor"/>
+                            <xsl:with-param name="code" select="n1:act/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>
