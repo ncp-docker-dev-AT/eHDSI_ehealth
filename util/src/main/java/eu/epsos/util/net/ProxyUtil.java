@@ -38,7 +38,7 @@ public class ProxyUtil {
     public static void initProxyConfiguration() {
 
         LOGGER.info("initProxyConfiguration()");
-        if (isProxyAuthenticationMandatory()) {
+        if (isBehindProxy()) {
 
             ProxyCredentials proxyCredentials = getProxyCredentials();
             CustomProxySelector ps = new CustomProxySelector(ProxySelector.getDefault(), proxyCredentials);
@@ -56,7 +56,7 @@ public class ProxyUtil {
      *
      * @return <code>true</code> if the property defined is true or null
      */
-    public static boolean isProxyAuthenticationMandatory() {
+    public static boolean isBehindProxy() {
 
         return Boolean.parseBoolean(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_USED));
     }
