@@ -165,14 +165,15 @@
                                 <xsl:call-template name="show-epSOSIllnessesandDisorders">
                                     <xsl:with-param name="node" select="$problemCondition"/>
                                 </xsl:call-template>
-
+                                <xsl:text> (</xsl:text>
+                                    <xsl:value-of select="$problemCondition/@code"/>
+                                <xsl:text>)</xsl:text>
                             </td>
                             <td>
                                 <!-- OnSet Date -->
                                 <xsl:call-template name="show-TS">
                                     <xsl:with-param name="node" select="$probOnSetDate"/>
                                 </xsl:call-template>&#160;
-
                             </td>
                         </tr>
                     </xsl:otherwise>

@@ -53,7 +53,7 @@
             select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:assignedAuthoringDevice"/>
 
 
-    <!-- Legal Othenticator -->
+    <!-- Legal Authenticator -->
     <xsl:variable
             name="LegalAuthenticator"
             select="/n1:ClinicalDocument/n1:legalAuthenticator/n1:assignedEntity/n1:assignedPerson"/>

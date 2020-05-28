@@ -137,7 +137,7 @@
                     </xsl:call-template>
                     <xsl:if test="@use">
                         <xsl:text> (</xsl:text>
-                        <xsl:call-template name="translateTelecomCode">
+                        <xsl:call-template name="show-epSOSTelecomAddress">
                             <xsl:with-param name="code" select="@use"/>
                         </xsl:call-template>
                         <xsl:text>)</xsl:text>
@@ -896,7 +896,9 @@
     <!-- show narrative -->
     <xsl:template name="show-narrative">
         <xsl:param name="node"/>
-        <xsl:apply-templates select="$node/self::*"/>
+        <div class="narrative_wrapper">
+            <xsl:apply-templates select="$node/self::*"/>
+        </div>
     </xsl:template>
 
     <!-- paragraph -->
