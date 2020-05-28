@@ -8,12 +8,6 @@ import org.openhealthtools.openatna.audit.persistence.model.codes.*;
 
 import java.util.List;
 
-/**
- * Class Description Here...
- *
- * @author Andrew Harrison
- * @version $Revision:$
- */
 public interface MessageDao extends Dao {
 
     List<? extends MessageEntity> getByQuery(Query query) throws AtnaPersistenceException;
