@@ -13,11 +13,13 @@ import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
 import epsos.ccd.posam.tsam.util.DebugUtils;
 import epsos.ccd.posam.tsam.util.TsamConfiguration;
+import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Roman Repiscak
@@ -297,5 +299,42 @@ public class TerminologyService implements ITerminologyService {
 
     public void setConfig(TsamConfiguration config) {
         this.config = config;
+    }
+    
+    public Map<CodeSystemConcept,CodeSystemConcept> getNationalCodeSystemMappedConcepts(String oid, String version) {
+        logger.debug("OID: {} | Version: {}", oid, version);
+        Map<CodeSystemConcept,CodeSystemConcept> mappedConcepts = null;
+        
+        try {
+        
+            // First we get the national CodeSystem from its OID
+            CodeSystem nationalCodeSystem = dao.getCodeSystem(oid);
+            logger.debug("National CodeSystem: ID: {} | OID: {} | Name: {}", nationalCodeSystem.getId(), nationalCodeSystem.getOid(), nationalCodeSystem.getName());
+
+            // Then we get the national CodeSystem version
+            CodeSystemVersion nationalCodeSystemVersion = dao.getVersion(version, nationalCodeSystem);
+            logger.debug("National CodeSystem version: ID: {} | FullName: {} | LocalName: {} | Status: {}", nationalCodeSystemVersion.getId(), 
+                    nationalCodeSystemVersion.getFullName(), nationalCodeSystemVersion.getLocalName(), nationalCodeSystemVersion.getStatus());
+
+            // Finally we get the concepts of that CodeSystem version
+            List<CodeSystemConcept> concepts = nationalCodeSystemVersion.getConcepts();
+            concepts.stream().forEach((concept) -> {
+                logger.debug("code: {} | definition: {}", concept.getCode(), concept.getDefinition());
+            });
+
+            // Then we get their mapped concepts
+            mappedConcepts = new HashMap<>();
+            for (CodeSystemConcept sourceConcept : concepts) {
+                CodeSystemConcept targetConcept = dao.getTargetConcept(sourceConcept);
+                mappedConcepts.put(sourceConcept,targetConcept);
+            }
+            mappedConcepts.forEach((sourceConcept, targetConcept) -> {
+                logger.debug("Mapping: {} -> {}", sourceConcept.getDefinition(), targetConcept.getCode());
+            });
+        } catch (TSAMException e) {
+            logger.error("TSAMException: '{}'", e.getMessage());
+        }
+        
+        return mappedConcepts;
     }
 }

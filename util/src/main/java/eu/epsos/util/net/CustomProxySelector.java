@@ -16,31 +16,30 @@ import java.util.List;
 public class CustomProxySelector extends ProxySelector {
 
     private final ProxySelector defaultSelector;
-    private Logger LOGGER = LoggerFactory.getLogger(CustomProxySelector.class);
-    private HashMap<SocketAddress, InnerProxy> proxies = new HashMap<>();
+    private final Logger logger = LoggerFactory.getLogger(CustomProxySelector.class);
+    private final HashMap<SocketAddress, InnerProxy> proxies = new HashMap<>();
 
-    public CustomProxySelector(ProxySelector def,
-                               final ProxyCredentials credentials) {
+    public CustomProxySelector(ProxySelector def, final ProxyCredentials credentials) {
 
         this.defaultSelector = def;
         Authenticator.setDefault(new Authenticator() {
+            @Override
             public PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(credentials.getProxyUser(),
                         credentials.getProxyPassword().toCharArray());
             }
         });
 
-        InnerProxy i = new InnerProxy(new InetSocketAddress(
-                credentials.getProxyHost(), Integer.parseInt(credentials
-                .getProxyPort())));
-        proxies.put(i.address(), i);
+        InnerProxy proxy = new InnerProxy(new InetSocketAddress(credentials.getProxyHost(),
+                Integer.parseInt(credentials.getProxyPort())));
+        proxies.put(proxy.address(), proxy);
     }
 
     @Override
     public List<Proxy> select(URI uri) {
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("select for URL : " + uri);
+        if (logger.isDebugEnabled()) {
+            logger.debug("select for URL : '{}'", uri);
         }
 
         if (uri == null) {
@@ -61,10 +60,9 @@ public class CustomProxySelector extends ProxySelector {
             return proxyList;
         }
 
-		/*
-         * For others protocols (could be SOCKS or FTP etc.) return the default
-		 * selector.
-		 */
+        /*
+         * For others protocols (could be SOCKS or FTP etc.) return the default selector.
+         */
         if (defaultSelector != null) {
             return defaultSelector.select(uri);
         } else {
@@ -98,7 +96,7 @@ public class CustomProxySelector extends ProxySelector {
     /*
      * Inner class representing a Proxy.
      */
-    class InnerProxy {
+    static class InnerProxy {
 
         Proxy proxy;
         SocketAddress socketAddress;

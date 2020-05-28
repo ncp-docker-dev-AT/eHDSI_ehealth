@@ -3,14 +3,13 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.service;
 import org.apache.xerces.dom.ElementNSImpl;
 import eu.epsos.util.net.ProxyCredentials;
 import eu.epsos.util.net.ProxyUtil;
+import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.dynamicdiscovery.model.DocumentIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.dynamicdiscovery.model.ServiceMetadata;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerException;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.*;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.DynamicDiscoveryClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -72,32 +71,35 @@ public class DynamicDiscoveryService {
                 null,
                 new NoopHostnameVerifier());
 
-        ProxyCredentials proxyCredentials = null;
-        if (ProxyUtil.isProxyAuthenticationMandatory()) {
-            proxyCredentials = ProxyUtil.getProxyCredentials();
-        }
+        ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
+        boolean proxyEnabled = configurationManager.getBooleanProperty(StandardProperties.HTTP_PROXY_USED);
         CloseableHttpClient httpclient;
-        if (proxyCredentials != null) {
 
-            if (proxyCredentials.getProxyUser() != null) {
+        if (proxyEnabled) {
+
+            boolean proxyAuthenticated = configurationManager.getBooleanProperty(StandardProperties.HTTP_PROXY_AUTHENTICATED);
+            String proxyHost = configurationManager.getProperty(StandardProperties.HTTP_PROXY_HOST);
+            int proxyPort = configurationManager.getIntegerProperty(StandardProperties.HTTP_PROXY_PORT);
+
+            if (proxyAuthenticated) {
+                String proxyUsername = configurationManager.getProperty(StandardProperties.HTTP_PROXY_USERNAME);
+                String proxyPassword = configurationManager.getProperty(StandardProperties.HTTP_PROXY_PASSWORD);
+                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(proxyUsername, proxyPassword);
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                credentialsProvider.setCredentials(
-                        new AuthScope(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort())),
-                        new UsernamePasswordCredentials(proxyCredentials.getProxyUser(), proxyCredentials.getProxyPassword()));
+                credentialsProvider.setCredentials(new AuthScope(proxyHost, proxyPort), credentials);
 
-                httpclient = HttpClients.custom()
-                        .setDefaultCredentialsProvider(credentialsProvider)
-                        .setSSLSocketFactory(sslConnectionSocketFactory)
-                        .setProxy(new HttpHost(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort())))
+                httpclient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider)
+                        .setSSLSocketFactory(sslConnectionSocketFactory).setProxy(new HttpHost(proxyHost, proxyPort))
                         .build();
             } else {
-                httpclient = HttpClients.custom()
-                        .setSSLSocketFactory(sslConnectionSocketFactory)
-                        .setProxy(new HttpHost(proxyCredentials.getProxyHost(), Integer.parseInt(proxyCredentials.getProxyPort())))
+                httpclient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory)
+                        .setProxy(new HttpHost(proxyHost, proxyPort))
                         .build();
             }
         } else {
-            httpclient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).build();
+            httpclient = HttpClients.custom()
+                    .setSSLSocketFactory(sslConnectionSocketFactory)
+                    .build();
         }
         return httpclient;
     }
