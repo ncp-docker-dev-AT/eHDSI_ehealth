@@ -8,9 +8,9 @@ import org.openhealthtools.openatna.audit.persistence.model.MessageEntity;
 import org.openhealthtools.openatna.audit.persistence.model.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,11 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
-/**
- * @author Andrew Harrison
- * @version 1.0.0
- */
-public class MessageController extends MultiActionController {
+@Controller
+public class MessageController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageController.class);
     private AuditLoggerPluginManager auditLoggerPluginManager = null;

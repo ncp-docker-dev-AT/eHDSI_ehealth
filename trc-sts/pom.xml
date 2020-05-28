@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.10</version>
+            <version>1.4.12</version>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
@@ -123,7 +123,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.56</version>
+            <version>1.65</version>
             <scope>runtime</scope>
         </dependency>
         <!--Security-->

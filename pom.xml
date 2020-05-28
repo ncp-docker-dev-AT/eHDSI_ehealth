@@ -32,8 +32,9 @@
     <modules>
         <module>configuration-manager</module>
         <module>e-sens-non-repudiation</module>
-        <module>security-manager</module>
         <module>util</module>
+        <module>security-manager</module>
+<!--        <module>util</module>-->
         <module>data-model</module>
         <module>audit-manager</module>
         <module>assertion-validator</module>
@@ -93,7 +94,7 @@
         <!-- Dependency Versions -->
         <axiom-api.version>1.2.21</axiom-api.version>
         <axis2.version>1.7.9</axis2.version>
-        <commons-beanutils.version>1.9.3</commons-beanutils.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-codec.version>1.13</commons-codec.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-configuration.version>1.10</commons-configuration.version>
@@ -107,7 +108,7 @@
         <ibatis-sqlmap.version>2.3.4.726</ibatis-sqlmap.version>
         <h2database.version>1.2.142</h2database.version>
         <herasaf-xacml.version>1.0.4.RELEASE</herasaf-xacml.version>
-        <hibernate.version>5.2.10.Final</hibernate.version>
+        <hibernate.version>5.4.16.Final</hibernate.version>
         <httpclient.version>4.5.3</httpclient.version>
         <javamelody.version>1.79.0</javamelody.version>
         <javassist.version>3.12.0.GA</javassist.version>
@@ -116,22 +117,23 @@
         <jsp-api.version>2.0</jsp-api.version>
         <jstl.version>1.2</jstl.version>
         <junit.version>4.12</junit.version>
-        <logback.version>1.1.8</logback.version>
+        <logback.version>1.2.3</logback.version>
         <mail.version>1.4.7</mail.version>
         <mariadb-connector.version>2.4.4</mariadb-connector.version>
-        <mysql-connector.version>5.1.48</mysql-connector.version>
+        <mysql-connector.version>5.1.49</mysql-connector.version>
         <naming-java.version>0.8</naming-java.version>
         <oracle-connector.version>12.2.0.1</oracle-connector.version>
-        <opensaml.version>3.3.1</opensaml.version>
+        <opensaml.version>3.4.5</opensaml.version>
         <portlet-api.version>2.0</portlet-api.version>
-        <postgresql-connector.version>42.1.4</postgresql-connector.version>
+        <postgresql-connector.version>42.2.12</postgresql-connector.version>
         <saaj-impl.version>1.3.25</saaj-impl.version>
         <saxon-he.version>9.5.1-8</saxon-he.version>
         <servlet-api.version>3.1.0</servlet-api.version>
         <slf4j.version>1.7.21</slf4j.version>
-        <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
-        <spring.version>4.3.25.RELEASE</spring.version>
-        <xerces.version>2.10.0</xerces.version>
+        <spring-boot.version>2.3.0.RELEASE</spring-boot.version>
+<!--        <spring.version>4.3.27.RELEASE</spring.version>-->
+        <spring.version>5.2.6.RELEASE</spring.version>
+        <xerces.version>2.12.0</xerces.version>
         <xmlbeans.version>2.6.0</xmlbeans.version>
         <xml-apis.version>1.4.01</xml-apis.version>
     </properties>
@@ -221,7 +223,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-configuration2</artifactId>
-                <version>2.2</version>
+                <version>2.7</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
@@ -434,6 +436,18 @@
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
                     <version>3.4.1.1168</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>5.3.2</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
