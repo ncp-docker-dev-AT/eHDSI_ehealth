@@ -10,6 +10,8 @@ atlassian-ide-plugin.xml
 .classpath
 .project
 .settings
+
+# Ignore all project files from NetBeans
 /openncp-gateway/nb-configuration.xml
 /cda-display-tool/nb-configuration.xml
 /cda-display-tool/cdautils/nb-configuration.xml
