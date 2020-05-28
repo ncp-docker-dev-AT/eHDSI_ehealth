@@ -14,51 +14,123 @@
     <!-- eHDSI-AbsentOrUnknownAllergies -->
     <xsl:template name="show-eHDSI-AbsentOrUnknownAllergies">
         <xsl:param name="node"/>
-        <xsl:call-template name="show-codedElement">
-            <xsl:with-param name="node" select="$node"/>
-            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.47.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
-        </xsl:call-template>
+        <div class="tooltip-right">
+            <xsl:choose>
+                <xsl:when test="($node/@code='no-allergy-info')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">There is no information available regarding the subject's allergy conditions.</span>
+                </xsl:when>
+                <xsl:when test="($node/@code='no-known-allergies')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">The subject has no known allergy conditions.</span>
+                </xsl:when>
+                <xsl:when test="($node/@code='no-known-medication-allergies')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">The subject has no known medication allergy conditions.</span>
+                </xsl:when>
+                <xsl:when test="($node/@code='no-known-environmental-allergies')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">The subject has no known environmental allergy conditions.</span>
+                </xsl:when>
+                <xsl:when test="($node/@code='no-known-food-allergies')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">The subject has no known food allergy conditions.</span>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:call-template name="show-codedElement">
+                <xsl:with-param name="node" select="$node"/>
+                <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.47.xml'"/>
+                <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+            </xsl:call-template>
+        </div>
     </xsl:template>
 
     <!-- eHDSI-AbsentOrUnknownDevices -->
     <xsl:template name="show-eHDSI-AbsentOrUnknownDevices">
         <xsl:param name="node"/>
-        <xsl:call-template name="show-codedElement">
-            <xsl:with-param name="node" select="$node"/>
-            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.48.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
-        </xsl:call-template>
+        <div class="tooltip-right">
+            <xsl:choose>
+                <xsl:when test="($node/@code='no-device-info')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">There is no information available regarding implanted or external devices for the subject.</span>
+                </xsl:when>
+                <xsl:when test="($node/@code='no-known-devices')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">There are no devices known to be implanted in or used by the subject that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record.</span>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:call-template name="show-codedElement">
+                <xsl:with-param name="node" select="$node"/>
+                <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.48.xml'"/>
+                <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+            </xsl:call-template>
+        </div>
     </xsl:template>
 
     <!-- eHDSI-AbsentOrUnknownMedication -->
     <xsl:template name="show-eHDSI-AbsentOrUnknownMedication">
         <xsl:param name="node"/>
-        <xsl:call-template name="show-codedElement">
-            <xsl:with-param name="node" select="$node"/>
-            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.49.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
-        </xsl:call-template>
+        <div class="tooltip-right">
+            <xsl:choose>
+                <xsl:when test="($node/@code='no-medication-info')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">There is no information available about the subject's medication use or administration.</span>
+                </xsl:when>
+                <xsl:when test="($node/@code='no-known-medications')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">There are no medications for the subject that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record.</span>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:call-template name="show-codedElement">
+                <xsl:with-param name="node" select="$node"/>
+                <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.49.xml'"/>
+                <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+            </xsl:call-template>
+        </div>
     </xsl:template>
 
     <!-- eHDSI-AbsentOrUnknownProblems -->
     <xsl:template name="show-eHDSI-AbsentOrUnknownProblems">
         <xsl:param name="node"/>
-        <xsl:call-template name="show-codedElement">
-            <xsl:with-param name="node" select="$node"/>
-            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.50.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
-        </xsl:call-template>
+        <div class="tooltip-right">
+            <xsl:choose>
+                <xsl:when test="($node/@code='no-problem-info')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">There is no information available about the subject's health problems or disabilities.</span>
+                </xsl:when>
+                <xsl:when test="($node/@code='no-known-problems')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">The subject is not known to have any health problems or disabilities that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record.</span>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:call-template name="show-codedElement">
+                <xsl:with-param name="node" select="$node"/>
+                <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.50.xml'"/>
+                <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+            </xsl:call-template>
+        </div>
     </xsl:template>
 
     <!-- eHDSI-AbsentOrUnknownProcedures -->
     <xsl:template name="show-eHDSI-AbsentOrUnknownProcedures">
         <xsl:param name="node"/>
-        <xsl:call-template name="show-codedElement">
-            <xsl:with-param name="node" select="$node"/>
-            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.51.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
-        </xsl:call-template>
+        <div class="tooltip-right">
+            <xsl:choose>
+                <xsl:when test="($node/@code='no-procedure-info')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">There is no information available about the subject's past history of procedures.</span>
+                </xsl:when>
+                <xsl:when test="($node/@code='no-known-procedures')">
+                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
+                    <span class="tooltiptext">The subject has no history of procedures that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record.</span>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:call-template name="show-codedElement">
+                <xsl:with-param name="node" select="$node"/>
+                <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.51.xml'"/>
+                <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1150.1'"/>
+            </xsl:call-template>
+        </div>
     </xsl:template>
 
     <!-- epSOSActiveIngredient -->
@@ -245,7 +317,7 @@
     <!-- epSOSNullFlavor -->
     <xsl:template name="show-epSOSNullFlavor">
         <xsl:param name="code"/>
-        <div class="tooltip">
+        <div class="tooltip-right">
             <i class="fas fa-exclamation-circle" style="color:#085a9f" aria-hidden="true"/>
             <span class="tooltiptext">Missing information</span>
         </div>
@@ -389,9 +461,9 @@
 
     <!-- epSOSTelecomAddress -->
     <xsl:template name="show-epSOSTelecomAddress">
-        <xsl:param name="node"/>
-        <xsl:call-template name="show-codedElement">
-            <xsl:with-param name="node" select="$node"/>
+        <xsl:param name="code"/>
+        <xsl:call-template name="show-code-value">
+            <xsl:with-param name="code" select="$code"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.40.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1119'"/>
         </xsl:call-template>
@@ -433,31 +505,31 @@
         <xsl:param name="codeSystem"/>
 
         <xsl:choose>
-        <xsl:when test="not($node/@nullFlavor)">
-            <xsl:choose>
-                <xsl:when test="$node/@code">
-                    <xsl:call-template name="show-code-value">
-                        <xsl:with-param name="code" select="$node/@code"/>
-                        <xsl:with-param name="xmlFile" select="$xmlFile"/>
-                        <xsl:with-param name="codeSystem" select="$codeSystem"/>
-                    </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                    <!-- narrative -->
-                    <xsl:if test="$node/n1:originalText/n1:reference/@value">
-                        <xsl:call-template name="show-uncodedElement">
-                            <xsl:with-param name="code"
-                                            select="$node/n1:originalText/n1:reference/@value"/>
+            <xsl:when test="not($node/@nullFlavor)">
+                <xsl:choose>
+                    <xsl:when test="$node/@code">
+                        <xsl:call-template name="show-code-value">
+                            <xsl:with-param name="code" select="$node/@code"/>
+                            <xsl:with-param name="xmlFile" select="$xmlFile"/>
+                            <xsl:with-param name="codeSystem" select="$codeSystem"/>
                         </xsl:call-template>
-                    </xsl:if>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-            <xsl:call-template name="show-epSOSNullFlavor">
-                <xsl:with-param name="code" select="$node/@nullFlavor"/>
-            </xsl:call-template>
-        </xsl:otherwise>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- narrative -->
+                        <xsl:if test="$node/n1:originalText/n1:reference/@value">
+                            <xsl:call-template name="show-uncodedElement">
+                                <xsl:with-param name="code"
+                                                select="$node/n1:originalText/n1:reference/@value"/>
+                            </xsl:call-template>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="show-epSOSNullFlavor">
+                    <xsl:with-param name="code" select="$node/@nullFlavor"/>
+                </xsl:call-template>
+            </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 

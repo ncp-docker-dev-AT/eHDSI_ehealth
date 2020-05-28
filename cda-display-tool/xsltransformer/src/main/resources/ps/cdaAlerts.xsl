@@ -201,12 +201,21 @@
                             </td>
                             <td>
                                 <!-- Agent -->
-                                <xsl:call-template name="show-epSOSAllergenNoDrugs">
-                                    <xsl:with-param name="node" select="$agentCode"/>
-                                </xsl:call-template>
-                                <xsl:call-template name="show-epSOSActiveIngredient">
-                                    <xsl:with-param name="node" select="$agentCode"/>
-                                </xsl:call-template>
+                                <xsl:choose>
+                                    <xsl:when test="not($agentCode/@nullFlavor)">
+                                        <xsl:call-template name="show-epSOSAllergenNoDrugs">
+                                            <xsl:with-param name="node" select="$agentCode"/>
+                                        </xsl:call-template>
+                                        <xsl:call-template name="show-epSOSActiveIngredient">
+                                            <xsl:with-param name="node" select="$agentCode"/>
+                                        </xsl:call-template>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:call-template name="show-epSOSNullFlavor">
+                                            <xsl:with-param name="code" select="$agentCode/@nullFlavor"/>
+                                        </xsl:call-template>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </td>
                             <td>
                                 <!-- OnSet Date -->
