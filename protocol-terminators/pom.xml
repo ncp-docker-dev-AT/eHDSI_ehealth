@@ -225,6 +225,16 @@
                 <artifactId>axis2-webapp</artifactId>
                 <version>${axis2.version}</version>
                 <type>war</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xalan</groupId>
+                        <artifactId>xalan</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.xmlbeans</groupId>
@@ -234,12 +244,12 @@
             <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>serializer</artifactId>
-                <version>2.7.1</version>
+                <version>${xalan.version}</version>
             </dependency>
             <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
-                <version>2.7.1</version>
+                <version>${xalan.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-configuration</groupId>
@@ -249,7 +259,7 @@
             <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
-                <version>3.2.1</version>
+                <version>${commons-collections.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-lang</groupId>
@@ -279,7 +289,7 @@
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
-                <version>2.10.0</version>
+                <version>${xerces.version}</version>
             </dependency>
             <dependency>
                 <groupId>xml-apis</groupId>

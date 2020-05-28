@@ -20,7 +20,7 @@
     </modules>
 
     <properties>
-        <jersey.version>1.18.1</jersey.version>
+        <jersey.version>1.19.4</jersey.version>
         <stork-commons.version>1.4.2</stork-commons.version>
         <stork-saml.version>1.4.2</stork-saml.version>
     </properties>

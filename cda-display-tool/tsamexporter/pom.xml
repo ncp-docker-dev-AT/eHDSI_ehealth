@@ -15,7 +15,7 @@
     <name>OpenNCP TSAM Exporter</name>
 
     <properties>
-        <spring.version>5.1.9.RELEASE</spring.version>
+        <spring.version>5.2.6.RELEASE</spring.version>
     </properties>
 
     <dependencies>
@@ -28,20 +28,7 @@
                     <groupId>org.apache.tomcat</groupId>
                     <artifactId>tomcat-jdbc</artifactId>
                 </exclusion>
-                <exclusion>
-                    <artifactId>spring-jdbc</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-aop</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>5.2.6.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

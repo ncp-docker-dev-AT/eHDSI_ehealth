@@ -348,7 +348,7 @@
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
-            <version>5.0.1</version>
+            <version>5.0.4</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-collections</artifactId>
@@ -359,6 +359,11 @@
                     <groupId>bouncycastle</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.65</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.htmlcleaner</groupId>
@@ -378,7 +383,7 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>serializer</artifactId>
-            <version>2.7.1</version>
+            <version>${xalan.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -404,9 +409,9 @@
             <version>${jstl.version}</version>
         </dependency>
         <dependency>
-            <groupId>c3p0</groupId>
+            <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
-            <version>0.9.1.1</version>
+            <version>0.9.5.5</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -447,7 +452,7 @@
                     <dependency>
                         <groupId>net.sf.jasperreports</groupId>
                         <artifactId>jasperreports</artifactId>
-                        <version>5.0.1</version>
+                        <version>5.0.4</version>
                     </dependency>
                 </dependencies>
             </plugin>

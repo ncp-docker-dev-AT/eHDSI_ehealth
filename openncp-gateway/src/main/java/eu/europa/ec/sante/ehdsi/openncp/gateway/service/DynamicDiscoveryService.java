@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.service;
 
-import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
+import org.apache.xerces.dom.ElementNSImpl;
 import eu.epsos.util.net.ProxyCredentials;
 import eu.epsos.util.net.ProxyUtil;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
