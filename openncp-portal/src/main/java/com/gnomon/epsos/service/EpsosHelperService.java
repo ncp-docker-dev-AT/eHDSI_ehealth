@@ -15,7 +15,7 @@ import com.liferay.util.portlet.PortletProps;
 import edu.mayo.trilliumbridge.core.TrilliumBridgeTransformer;
 import edu.mayo.trilliumbridge.core.xslt.XsltTrilliumBridgeTransformer;
 import epsos.ccd.gnomon.auditmanager.*;
-import epsos.ccd.gnomon.xslt.EpsosXSLTransformer;
+import epsos.ccd.gnomon.xslt.CdaXSLTransformer;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
@@ -1653,7 +1653,6 @@ public class EpsosHelperService {
 
                 String translation = LiferayUtils.getPortalTranslation(country.getCode(), lang);
                 country.setName(translation);
-                LOGGER.info("Country is: '{}'", country.getName());
             }
         } catch (Exception ex) {
             LOGGER.error("getCountriesNamesFromCS: " + ex.getMessage());
@@ -1705,7 +1704,7 @@ public class EpsosHelperService {
         List<SearchMask> searchMaskList = new ArrayList<>();
         String filename = "InternationalSearch_" + country + ".xml";
         path = getSearchMaskPath() + "forms" + File.separator + filename;
-        LOGGER.info("#### Path is: '{}'", path);
+        LOGGER.debug("Path for InternationalSearchMask is: '{}'", path);
 
         try {
             File file = new File(path);
@@ -2372,14 +2371,13 @@ public class EpsosHelperService {
     public static String styleDoc(String input, String lang, boolean commonStyle, String actionUrl, boolean showNarrative) {
 
         String convertedCda;
-        EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
 
         if (commonStyle) {
             LOGGER.info("Transform the document using standard stylesheet as this is CCDA");
-            convertedCda = xlsClass.transformUsingStandardCDAXsl(input);
+            convertedCda = CdaXSLTransformer.getInstance().transformUsingStandardCDAXsl(input);
         } else {
             LOGGER.info("Transform the document using CDA Display Tool as this is eHDSI CDA");
-            convertedCda = xlsClass.transform(input, lang, actionUrl);
+            convertedCda = CdaXSLTransformer.getInstance().transform(input, lang, actionUrl);
         }
 
         return convertedCda;

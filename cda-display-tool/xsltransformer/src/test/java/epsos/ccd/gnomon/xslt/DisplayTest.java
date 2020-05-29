@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -18,37 +19,34 @@ public class DisplayTest {
     //	@Test
     private void fileTest(String input, TRANSFORMATION type) throws IOException {
 
-        EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
         LOGGER.info("Transforming file: " + input);
 
         String cda = "";
         try {
-            cda = xlsClass.readFile(input);
+            cda = CdaXSLTransformer.getInstance().readFile(input);
         } catch (Exception e) {
             LOGGER.error("File not found");
         }
         String out = "";
         switch (type) {
             case ForPDF:
-                out = xlsClass.transformForPDF(cda, "fr-BE", false);
+                out = CdaXSLTransformer.getInstance().transformForPDF(cda, "fr-BE", false);
                 break;
             case UsingStandardCDAXsl:
-                out = xlsClass.transformUsingStandardCDAXsl(cda);
+                out = CdaXSLTransformer.getInstance().transformUsingStandardCDAXsl(cda);
             case WithOutputAndDefinedPath:
-                out = xlsClass.transformWithOutputAndDefinedPath(cda, "fr-BE", "", Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository"));
+                out = CdaXSLTransformer.getInstance().transformWithOutputAndDefinedPath(cda, "fr-BE", "",
+                        Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository"));
             case WithOutputAndUserHomePath:
-                out = xlsClass.transformWithOutputAndUserHomePath(cda, "fr-BE", "");
+                out = CdaXSLTransformer.getInstance().transformWithOutputAndUserHomePath(cda, "fr-BE", "");
 
         }
         String filename = Paths.get(input).getFileName().toString();
         String stripExt = filename.substring(0, filename.lastIndexOf("."));
-        String pt = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository", "out", stripExt + ".html")
-                .toString();
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), "utf-8"))) {
+        String pt = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository", "out", stripExt + ".html").toString();
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), StandardCharsets.UTF_8))) {
             writer.write(out);
         }
-
-        // xlsClass.transformForPDF(cda, "el-GR",true);
     }
 
     //	@Test
@@ -77,12 +75,10 @@ public class DisplayTest {
 
     @Test
     public void readFile() throws Exception {
-        EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
-        //String out = xlsClass.readFile("samples/2-4567.xml");
-        String out = xlsClass.readFile("samples/1-5678.xml");
-        String pt = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository", "out", "readfile.txt")
-                .toString();
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), "utf-8"))) {
+
+        String out = CdaXSLTransformer.getInstance().readFile("samples/1-5678.xml");
+        String pt = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository", "out", "readfile.txt").toString();
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), StandardCharsets.UTF_8))) {
             writer.write(out);
         }
     }
@@ -90,9 +86,4 @@ public class DisplayTest {
     private enum TRANSFORMATION {
         WithOutputAndUserHomePath, ForPDF, UsingStandardCDAXsl, WithOutputAndDefinedPath
     }
-
-//	@Test
-//	public void runFolder() throws Exception {
-//		folderTest("samples", TRANSFORMATION.WithOutputAndUserHomePath);
-//	}
 }
