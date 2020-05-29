@@ -13,9 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class EpsosXSLTransformerTest {
+public class CdaXSLTransformerTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EpsosXSLTransformerTest.class);
+    private final Logger logger = LoggerFactory.getLogger(CdaXSLTransformerTest.class);
 
     @Test
     public void testPatientSummaryHtmlTransformation() throws Exception {
@@ -88,20 +88,20 @@ public class EpsosXSLTransformerTest {
     }
 
     private String executeXslTransformation(String cda, TransformationType transformationType) throws IOException {
-        final EpsosXSLTransformer xslTransformer = new EpsosXSLTransformer();
+
         switch (transformationType) {
             case WITH_OUTPUT_AND_DEFINED_PATH:
                 final Path path = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository");
                 Assert.assertTrue(Files.exists(path));
-                return xslTransformer.transformWithOutputAndDefinedPath(cda, "en-GB", "", path);
+                return CdaXSLTransformer.getInstance().transformWithOutputAndDefinedPath(cda, "en-GB", "", path);
             case WITH_OUTPUT_AND_USER_HOME_PATH:
-                return xslTransformer.transformWithOutputAndUserHomePath(cda, "en-GB", "");
+                return CdaXSLTransformer.getInstance().transformWithOutputAndUserHomePath(cda, "en-GB", "");
             case USING_STANDARD_CDA_XSL:
-                return xslTransformer.transformUsingStandardCDAXsl(cda);
+                return CdaXSLTransformer.getInstance().transformUsingStandardCDAXsl(cda);
             case FOR_PDF:
-                return xslTransformer.transformForPDF(cda, "en-GB", false);
+                return CdaXSLTransformer.getInstance().transformForPDF(cda, "en-GB", false);
             case PORTAL_HTML:
-                return xslTransformer.transform(cda, "en-GB", "dispenseServlet");
+                return CdaXSLTransformer.getInstance().transform(cda, "en-GB", "dispenseServlet");
             default:
                 return null;
         }
@@ -126,7 +126,7 @@ public class EpsosXSLTransformerTest {
             out.write(content);
             out.close();
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -144,7 +144,7 @@ public class EpsosXSLTransformerTest {
         WITH_OUTPUT_AND_DEFINED_PATH("html"),
         PORTAL_HTML("html");
 
-        private String extension;
+        private final String extension;
 
         TransformationType(String extension) {
             this.extension = extension;

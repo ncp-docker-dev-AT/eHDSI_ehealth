@@ -6,7 +6,7 @@ import com.gnomon.epsos.service.EpsosHelperService;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
-import epsos.ccd.gnomon.xslt.EpsosXSLTransformer;
+import epsos.ccd.gnomon.xslt.CdaXSLTransformer;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.DocumentId;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +27,7 @@ import javax.servlet.http.HttpSession;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 public class CCDServlet extends HttpServlet {
 
@@ -35,7 +35,7 @@ public class CCDServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(CCDServlet.class);
 
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) {
 
         String exportType = ParamUtil.getString(req, "exportType");
 
@@ -99,7 +99,7 @@ public class CCDServlet extends HttpServlet {
             selectedEpsosDocument.setDescription(eps.getDescription());
             selectedEpsosDocument.setTitle(eps.getTitle());
 
-            String xmlFile = new String(eps.getBase64Binary(), "UTF-8");
+            String xmlFile = new String(eps.getBase64Binary(), StandardCharsets.UTF_8);
             LOGGER.info("#### CDA XML Start: \n '{}' \n #### CDA XML End", xmlFile);
 
             boolean isCDA;
@@ -109,15 +109,14 @@ public class CCDServlet extends HttpServlet {
 
             // Transform to CCD
             String mayoTransformed = "";
-            EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
 
             if (isCDA) {
                 LOGGER.info("########### Styling the document that is CDA: '{}' using standard xsl", true);
-                cda = xlsClass.transformUsingStandardCDAXsl(mayoTransformed);
+                cda = CdaXSLTransformer.getInstance().transformUsingStandardCDAXsl(mayoTransformed);
             } else {
                 LOGGER.info("########### Styling the document that is CDA: '{}' using EPSOS xsl", false);
                 mayoTransformed = xmlFile;
-                cda = xlsClass.transform(mayoTransformed, lang1, "");
+                cda = CdaXSLTransformer.getInstance().transform(mayoTransformed, lang1, "");
             }
 
             // Visualize as HTML using standard stylesheet

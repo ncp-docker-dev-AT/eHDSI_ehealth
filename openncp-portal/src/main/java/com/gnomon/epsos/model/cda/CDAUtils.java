@@ -338,9 +338,11 @@ public class CDAUtils {
                 xpath = org.dom4j.DocumentHelper.createXPath(expression);
                 xpath.setNamespaceURIs(namespaces);
 
-                //Getting the manufacturedMaterial name node
+                //  Getting the manufacturedMaterial name node
                 pivot = xpath.selectSingleNode(doc);
-                LOGGER.info("CDA Pivot:\n'{}'", pivot.asXML());
+                if (pivot != null) {
+                    LOGGER.info("CDA Pivot:\n'{}'", pivot.asXML());
+                }
             }
 
             //  Getting the parent manufacturedMaterial element of the pivot

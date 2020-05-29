@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -37,37 +38,35 @@ public class DisplayIntegrationTest extends TestCase {
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     if (!attrs.isDirectory()) {
                         String input = file.toString();
-
-                        EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
                         LOGGER.info("Transforming file: " + input);
 
                         String cda = "";
                         try {
-                            cda = xlsClass.readFile(input);
+                            cda = CdaXSLTransformer.getInstance().readFile(input);
                         } catch (Exception e) {
                             LOGGER.error("File not found");
                         }
                         String out = "";
                         switch (TRANSFORMATION.WithOutputAndUserHomePath) {
                             case ForPDF:
-                                out = xlsClass.transformForPDF(cda, "el_GR", false);
+                                out = CdaXSLTransformer.getInstance().transformForPDF(cda, "el_GR", false);
                                 break;
                             case UsingStandardCDAXsl:
-                                out = xlsClass.transformUsingStandardCDAXsl(cda);
+                                out = CdaXSLTransformer.getInstance().transformUsingStandardCDAXsl(cda);
                                 break;
                             case WithOutputAndDefinedPath:
-                                out = xlsClass.transformWithOutputAndDefinedPath(cda, "el_GR", "",
+                                out = CdaXSLTransformer.getInstance().transformWithOutputAndDefinedPath(cda, "el_GR", "",
                                         Paths.get(System.getenv(EPSOS_PROPS_ENV_PROPERTY), "EpsosRepository"));
                                 break;
                             case WithOutputAndUserHomePath:
-                                out = xlsClass.transformWithOutputAndUserHomePath(cda, "el_GR", "");
+                                out = CdaXSLTransformer.getInstance().transformWithOutputAndUserHomePath(cda, "el_GR", "");
                                 break;
                         }
                         String filename = Paths.get(input).getFileName().toString();
                         String stripExt = filename.substring(0, filename.lastIndexOf("."));
                         String pt = Paths.get(System.getenv(EPSOS_PROPS_ENV_PROPERTY), "EpsosRepository", "out", stripExt + ".html")
                                 .toString();
-                        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), "utf-8"))) {
+                        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), StandardCharsets.UTF_8))) {
                             writer.write(out);
                         }
                     }
@@ -91,35 +90,34 @@ public class DisplayIntegrationTest extends TestCase {
 
         // Frequency
         String input = "samples/multiingredient.xml";
-        EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
         LOGGER.info("Transforming file: " + input);
 
         String cda = "";
         try {
-            cda = xlsClass.readFile(input);
+            cda = CdaXSLTransformer.getInstance().readFile(input);
         } catch (Exception e) {
             LOGGER.error("File not found");
         }
         String out = "";
         switch (TRANSFORMATION.WithOutputAndUserHomePath) {
             case ForPDF:
-                out = xlsClass.transformForPDF(cda, "el_GR", false);
+                out = CdaXSLTransformer.getInstance().transformForPDF(cda, "el_GR", false);
                 break;
             case UsingStandardCDAXsl:
-                out = xlsClass.transformUsingStandardCDAXsl(cda);
+                out = CdaXSLTransformer.getInstance().transformUsingStandardCDAXsl(cda);
                 break;
             case WithOutputAndDefinedPath:
-                out = xlsClass.transformWithOutputAndDefinedPath(cda, "el_GR", "",
+                out = CdaXSLTransformer.getInstance().transformWithOutputAndDefinedPath(cda, "el_GR", "",
                         Paths.get(System.getenv(EPSOS_PROPS_ENV_PROPERTY), "EpsosRepository"));
                 break;
             case WithOutputAndUserHomePath:
-                out = xlsClass.transformWithOutputAndUserHomePath(cda, "el_GR", "");
+                out = CdaXSLTransformer.getInstance().transformWithOutputAndUserHomePath(cda, "el_GR", "");
                 break;
         }
         String filename = Paths.get(input).getFileName().toString();
         String stripExt = filename.substring(0, filename.lastIndexOf("."));
         String pt = Paths.get(System.getenv(EPSOS_PROPS_ENV_PROPERTY), "EpsosRepository", "out", stripExt + ".html").toString();
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), "utf-8"))) {
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), StandardCharsets.UTF_8))) {
             writer.write(out);
         }
 
@@ -129,10 +127,9 @@ public class DisplayIntegrationTest extends TestCase {
     @Test
     public void readFile() throws Exception {
 
-        EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
-        String out = xlsClass.readFile("samples/multiingredient.xml");
+        String out = CdaXSLTransformer.getInstance().readFile("samples/multiingredient.xml");
         String pt = Paths.get(System.getenv(EPSOS_PROPS_ENV_PROPERTY), "EpsosRepository", "out", "readfile.txt").toString();
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), "utf-8"))) {
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pt), StandardCharsets.UTF_8))) {
             writer.write(out);
         }
     }
