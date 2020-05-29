@@ -43,7 +43,7 @@ public class UdpProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        logger.error("exceptionCaught: '{}'", cause.getMessage(), cause);
+        logger.warn("Error: '{}'", cause.getMessage(), cause);
         session.close();
     }
 

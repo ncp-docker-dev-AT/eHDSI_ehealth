@@ -18,11 +18,11 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class MessageQueue {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageQueue.class);
+    private final Logger logger = LoggerFactory.getLogger(MessageQueue.class);
 
-    private ExecutorService exec = Executors.newSingleThreadExecutor();
+    private final ExecutorService exec = Executors.newSingleThreadExecutor();
     private boolean running = false;
-    private Runner runner;
+    private final Runner runner;
 
     public MessageQueue(SyslogListener listener) {
         this.runner = new Runner(listener);
@@ -39,7 +39,7 @@ public class MessageQueue {
 
     public void stop() {
 
-        LOGGER.debug("Message Queue shutting down...");
+        logger.debug("Message Queue shutting down...");
         running = false;
         exec.shutdown();
     }
@@ -54,8 +54,8 @@ public class MessageQueue {
 
     private class Runner implements Runnable {
 
-        private SyslogListener listener;
-        private BlockingQueue messageQueue = new LinkedBlockingQueue();
+        private final SyslogListener listener;
+        private final BlockingQueue messageQueue = new LinkedBlockingQueue();
 
         private Runner(SyslogListener listener) {
             this.listener = listener;
@@ -78,7 +78,7 @@ public class MessageQueue {
                     try {
                         Thread.sleep(25);
                     } catch (InterruptedException e) {
-                        LOGGER.error("InterruptedException: '{}'", e.getMessage(), e);
+                        logger.error("InterruptedException: '{}'", e.getMessage(), e);
                         Thread.currentThread().interrupt();
                     }
                 } else {
@@ -110,8 +110,8 @@ public class MessageQueue {
                 listener.messageArrived(message);
             } else {
                 try {
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error("MessageQueue was unable to persist message: '{}'", new String(message.toByteArray()));
+                    if (logger.isErrorEnabled()) {
+                        logger.error("MessageQueue was unable to persist message: '{}'", new String(message.toByteArray()));
                     }
                 } catch (SyslogException e) {
                     handleSysLogException(e);
