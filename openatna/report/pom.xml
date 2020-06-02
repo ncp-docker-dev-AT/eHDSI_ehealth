@@ -23,7 +23,7 @@
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
-            <version>5.0.4</version>
+            <version>${jasperreports.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
@@ -51,7 +51,7 @@
                     <dependency>
                         <groupId>net.sf.jasperreports</groupId>
                         <artifactId>jasperreports</artifactId>
-                        <version>5.0.4</version>
+                        <version>${jasperreports.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>xerces</groupId>
