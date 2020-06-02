@@ -58,6 +58,7 @@ public class DispenseServlet extends HttpServlet {
             byte[] epBytes = (byte[]) session.getAttribute("epBytes");
             Patient patient = (Patient) session.getAttribute("patient");
             String selectedCountry = (String) session.getAttribute("selectedCountry");
+            //  Checking validity of the assertions (HCP and TRC)
             Assertion hcpAssertion = (Assertion) session.getAttribute("hcpAssertion");
             Assertion trcAssertion = (Assertion) session.getAttribute("trcAssertion");
 

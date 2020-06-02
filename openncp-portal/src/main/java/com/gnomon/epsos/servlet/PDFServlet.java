@@ -22,15 +22,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 public class PDFServlet extends HttpServlet {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PDFServlet.class);
+    private static final long serialVersionUID = 6369869846522286618L;
+    private final Logger logger = LoggerFactory.getLogger(PDFServlet.class);
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) {
 
-        LOGGER.info("Getting PDF document");
+        logger.info("Getting PDF document");
         byte[] pdf;
 
         try {
@@ -38,10 +40,10 @@ public class PDFServlet extends HttpServlet {
             String repositoryId = req.getParameter("repositoryid");
             String hcid = req.getParameter("hcid");
 
-            LOGGER.debug("Retrieving PDF document");
-            LOGGER.debug("uuid: '{}'", uuid);
-            LOGGER.debug("repositoryId: '{}'", repositoryId);
-            LOGGER.debug("hcid: '{}'", hcid);
+            logger.debug("Retrieving PDF document");
+            logger.debug("uuid: '{}'", uuid);
+            logger.debug("repositoryId: '{}'", repositoryId);
+            logger.debug("hcid: '{}'", hcid);
 
             EpsosDocument selectedEpsosDocument = new EpsosDocument();
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
@@ -50,6 +52,7 @@ public class PDFServlet extends HttpServlet {
 
             HttpSession session = req.getSession();
 
+            //  Checking validity of the assertions (HCP and TRC)
             Assertion hcpAssertion = (Assertion) session.getAttribute("hcpAssertion");
             Assertion trcAssertion = (Assertion) session.getAttribute("trcAssertion");
             String selectedCountry = (String) session.getAttribute("selectedCountry");
@@ -91,13 +94,13 @@ public class PDFServlet extends HttpServlet {
                 lang = ltrlang;
             }
 
-            LOGGER.info("User Language: '{}' - Parameter Request Language: '{}' - Translated Language: {}", userLanguage, ltrlang, lang);
+            logger.info("User Language: '{}' - Parameter Request Language: '{}' - Translated Language: {}", userLanguage, ltrlang, lang);
 
             String lang1 = lang.replace("_", "-");
             lang1 = lang1.replace("en-US", "en-GB");
             lang1 = lang1.replace("en_US", "en-GB");
 
-            LOGGER.info("Portal language is : '{} - {}'", lang, lang1);
+            logger.info("Portal language is : '{} - {}'", lang, lang1);
 
             EpsosDocument1 eps = clientConnectorConsumer.retrieveDocument(hcpAssertion, trcAssertion, selectedCountry,
                     documentId, hcid, classCode, lang1);
@@ -107,13 +110,13 @@ public class PDFServlet extends HttpServlet {
             selectedEpsosDocument.setDescription(eps.getDescription());
             selectedEpsosDocument.setTitle(eps.getTitle());
 
-            String xmlfile = new String(eps.getBase64Binary(), "UTF-8");
-            LOGGER.debug("The requested XML-PDF file for '{}':\n'{}", uuid, xmlfile);
+            String xmlfile = new String(eps.getBase64Binary(), StandardCharsets.UTF_8);
+            logger.debug("The requested XML-PDF file for '{}':\n'{}", uuid, xmlfile);
 
             pdf = EpsosHelperService.extractPdfPartOfDocument(eps.getBase64Binary());
             writeOutputstream(res, pdf);
         } catch (Exception ex) {
-            LOGGER.error(ExceptionUtils.getStackTrace(ex));
+            logger.error(ExceptionUtils.getStackTrace(ex));
         }
     }
 
@@ -127,11 +130,11 @@ public class PDFServlet extends HttpServlet {
 
         try (OutputStream stream = response.getOutputStream()) {
 
-            LOGGER.info("##########3 Serve pdf file");
+            logger.info("##########3 Serve pdf file");
             stream.write(bytes);
             stream.flush();
         } catch (IOException e) {
-            LOGGER.error("IOException: '{}'", e.getMessage(), e);
+            logger.error("IOException: '{}'", e.getMessage(), e);
             response.setContentType("text/html");
             response.setHeader("Cache-Control", "no-cache");
             response.setDateHeader("Expires", 0);
@@ -140,7 +143,7 @@ public class PDFServlet extends HttpServlet {
 
                 stream.write(e.getMessage().getBytes());
             } catch (IOException ex) {
-                LOGGER.error("IOException: '{}'", ex.getMessage(), ex);
+                logger.error("IOException: '{}'", ex.getMessage(), ex);
             }
         }
     }

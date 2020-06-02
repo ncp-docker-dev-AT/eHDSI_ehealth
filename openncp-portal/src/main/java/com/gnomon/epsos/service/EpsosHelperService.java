@@ -1086,7 +1086,7 @@ public class EpsosHelperService {
 
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.AUDIT_REPOSITORY_URL.getValue()));
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    LOGGER_CLINICAL.debug("[Audit Portal] Sending Audit Message 'epsos-91' for User: '{}'", user.getFullName());
+                    LOGGER_CLINICAL.debug("[Audit Portal] Sending Audit Message 'EHDSI-91' for User: '{}'", user.getFullName());
                 }
                 String auditPointOfCare;
                 if (StringUtils.isNotBlank(orgName)) {

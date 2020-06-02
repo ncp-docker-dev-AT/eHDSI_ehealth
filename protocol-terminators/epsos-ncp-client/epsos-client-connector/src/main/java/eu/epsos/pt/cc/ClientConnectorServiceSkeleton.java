@@ -37,16 +37,12 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     private final Logger logger = LoggerFactory.getLogger(ClientConnectorServiceSkeleton.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
-    /*
-     * XCPD
-     */
-
     /**
      * Performs international search for a patient, filtering by a set of demographics.
      * This method is an adapter for usage of a XCPD client.
      *
-     * @param queryPatient axis wrapper for element: <code>queryPatient</code>.
-     *                     This encapsulates, destination Country Code and Patient's demographics.
+     * @param queryPatient axis wrapper for element: <code>queryPatient</code>. This encapsulates, destination Country
+     *                     Code and Patient's demographics.
      * @return a QueryPatientResponseDocument containing the query response(s).
      * @throws ParseException Exception thrown while the Payload cannot be parsed.
      */
@@ -96,20 +92,13 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         return result;
     }
 
-    /*
-     * XCA
-     */
-
     /**
-     * Performs international search for documents.
-     * Filtering by patient and document code.
+     * Performs international search for documents. Filtering by patient and document code.
      * This method is an adapter for the usage of a XCA client.
      *
-     * @param queryDocuments axis wrapper for * * * * * * *
-     *                       element: <code>queryDocuments</code>. This encapsulates, destination
+     * @param queryDocuments axis wrapper for element: <code>queryDocuments</code>. This encapsulates, destination
      *                       Country Code, patient's identification and documents class code.
-     * @return a QueryDocumentsResponseDocument containing the query
-     * response(s).
+     * @return a QueryDocumentsResponseDocument containing the query response(s).
      */
     @Override
     public QueryDocumentsResponseDocument queryDocuments(QueryDocumentsDocument queryDocuments, Assertion hcpAssertion,
@@ -163,8 +152,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             throw ex;
         }
 
-
-        /* create return wrapper */
+        // create return wrapper
         QueryDocumentsResponseDocument wapper = QueryDocumentsResponseDocument.Factory.newInstance();
         wapper.setQueryDocumentsResponse(result);
 
@@ -178,8 +166,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
      * <p>
      * It makes use of the XCA Service Client library.
      *
-     * @param retrieveDocument axis wrapper for * * * * * * *
-     *                         element: <code>retrieveDocument</code>. This encapsulates, destination
+     * @param retrieveDocument axis wrapper for element: <code>retrieveDocument</code>. This encapsulates, destination
      *                         Country Code, patient's identification and document's identification.
      * @return the retrieved document.
      */
@@ -243,24 +230,19 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             throw ex;
         }
 
-        /* create return wrapper */
+        // create return wrapper
         RetrieveDocumentResponseDocument wrapper = RetrieveDocumentResponseDocument.Factory.newInstance();
         wrapper.setRetrieveDocumentResponse(result);
         LoggingSlf4j.end(logger, methodName);
         return wrapper;
     }
 
-    /*
-     * XDR
-     */
-
     /**
      * Submits a document to a foreign country. This method is an adapter for usage of a XDR client.
      * <p>
      * This method makes use of the XDR Service Client library.
      *
-     * @param submitDocument axis wrapper for * * * * * * *
-     *                       element: <code>submitDocument</code>. This encapsulates, destination
+     * @param submitDocument axis wrapper for element: <code>submitDocument</code>. This encapsulates, destination
      *                       Country Code and the document to submit with some Metadata.
      * @return a SubmitDocumentResponseDocument object.
      * @throws ParseException Exception thrown while the Payload cannot be parsed.
@@ -323,11 +305,9 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     }
 
     /**
-     * Greets someone by saying hello. This is an auxiliary operation for
-     * diagnosis purposes.
+     * Greets someone by saying hello. This is an auxiliary operation for diagnosis purposes.
      *
-     * @param sayHello axis wrapper for element: <code>sayHello</code>. This
-     *                 encapsulates a <code>String</code>.
+     * @param sayHello axis wrapper for element: <code>sayHello</code>. This encapsulates a <code>String</code>.
      * @return a text in the format: Hello + <code>sayHello</code>.
      */
     @Override

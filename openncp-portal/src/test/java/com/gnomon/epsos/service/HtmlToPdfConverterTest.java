@@ -17,10 +17,6 @@ public class HtmlToPdfConverterTest {
         ByteArrayOutputStream outputStream = HtmlToPdfConverter.createPdf(html);
         Assert.assertNotNull(outputStream);
         Assert.assertTrue(outputStream.toByteArray().length > 0);
-//        String filename = "C:\\LocalData\\Share\\openncp-configuration\\EpsosRepository\\out\\output.pdf";
-//        FileOutputStream output = new FileOutputStream(filename);
-//        output.write(outputStream.toByteArray());
-//        output.close();
     }
 
     private String readFile(File file) throws IOException {
