@@ -105,31 +105,27 @@ public class XcaInitGateway {
 
         LOGGER.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}', '{}')", document.getDocumentUniqueId(),
                 homeCommunityId, countryCode, targetLanguage, idAssertion.getID(), trcAssertion.getID(), service);
-
         DocumentResponse result = null;
         RetrieveDocumentSetResponseType queryResponse;
         String classCode = null;
 
         try {
 
-            /* Request */
-            RetrieveDocumentSetRequestType queryRequest;
-            queryRequest = new RetrieveDocumentSetRequestTypeCreator().createRetrieveDocumentSetRequestType(
+            RetrieveDocumentSetRequestType queryRequest = new RetrieveDocumentSetRequestTypeCreator().createRetrieveDocumentSetRequestType(
                     document.getDocumentUniqueId(), homeCommunityId, document.getRepositoryUniqueId());
 
-            /* Stub */
             RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub();
             DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
-            String epr;
+            String endpointReference;
             if (service.equals(Constants.MroService)) {
 
-                epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE);
+                endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE);
             } else {
 
-                epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
+                endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
             }
-            stub.setAddr(epr);
-            stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
+            stub.setAddr(endpointReference);
+            stub._getServiceClient().getOptions().setTo(new EndpointReference(endpointReference));
             stub.setCountryCode(countryCode);
             EventLogClientUtil.createDummyMustUnderstandHandler(stub);
             // This is a rather dirty hack, but document.getClassCode() returns null for some reason.
@@ -147,8 +143,6 @@ public class XcaInitGateway {
                     LOGGER.error("Service Not Supported");
                     //TODO: Has to be managed as an error.
             }
-
-            /* Request */
             queryResponse = stub.respondingGateway_CrossGatewayRetrieve(queryRequest, idAssertion, trcAssertion, classCode);
 
             if (queryResponse.getRegistryResponse() != null) {

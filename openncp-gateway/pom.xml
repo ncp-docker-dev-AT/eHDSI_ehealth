@@ -17,9 +17,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet-api.version>3.0.1</servlet-api.version>
-        <spring-security.version>4.2.7.RELEASE</spring-security.version>
-        <thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
-        <thymeleaf-security.version>3.0.2.RELEASE</thymeleaf-security.version>
+        <spring-security.version>4.2.16.RELEASE</spring-security.version>
+        <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
+        <thymeleaf-security.version>3.0.4.RELEASE</thymeleaf-security.version>
     </properties>
 
     <dependencies>
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
-            <version>1.11.14.RELEASE</version>
+            <version>2.3.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -185,31 +185,18 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.10</version>
-        </dependency>
-        <dependency>
-            <groupId>com.matthewcasperson</groupId>
-            <artifactId>parameter_validation_filter</artifactId>
-            <version>1.2.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-beanutils</groupId>
-                    <artifactId>commons-beanutils-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-httpclient</artifactId>
-                    <groupId>commons-httpclient</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.owasp.esapi</groupId>
-                    <artifactId>esapi</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${xstream.version}</version>
         </dependency>
         <dependency>
             <groupId>org.owasp.esapi</groupId>
             <artifactId>esapi</artifactId>
             <version>${esapi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

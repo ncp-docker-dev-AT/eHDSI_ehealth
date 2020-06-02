@@ -63,6 +63,10 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="org.hibernate.orm.deprecation" level="ERROR" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="org.hibernate.SQL" level="WARN" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>

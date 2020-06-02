@@ -5,9 +5,12 @@ import org.openhealthtools.openatna.audit.persistence.dao.ErrorDao;
 import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,23 +20,27 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author Andrew Harrison
- * @version 1.0.0
- */
-public class ErrorController extends MultiActionController {
+@Controller
+public class ErrorController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorController.class);
-    private ErrorDao errorDao;
+    private final Logger logger = LoggerFactory.getLogger(ErrorController.class);
 
-    public ErrorDao getErrorDao() {
-        return errorDao;
-    }
+    private final ErrorDao errorDao;
 
-    public void setErrorDao(ErrorDao errorDao) {
+    @Autowired
+    public ErrorController(ErrorDao errorDao) {
         this.errorDao = errorDao;
     }
 
+    @GetMapping(value = "/errors")
+    public String errors(ModelMap model) {
+
+        QueryBean bean = new QueryBean();
+        model.addAttribute("queryBean", bean);
+        return "errorForm";
+    }
+
+    @PostMapping(value = "/errors")
     public ModelAndView errors(HttpServletRequest request, HttpServletResponse response, QueryBean queryBean) throws Exception {
 
         ModelMap modelMap = new ModelMap();
@@ -54,14 +61,14 @@ public class ErrorController extends MultiActionController {
     private List<? extends ErrorEntity> query(QueryBean bean) throws AtnaPersistenceException {
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        List<? extends ErrorEntity> ents = null;
+        List<? extends ErrorEntity> errorEntities = null;
         Date startDate = null;
         if (bean.getStartDate() != null && bean.getStartDate().length() > 0) {
             String date = bean.getStartDate();
             try {
                 startDate = format.parse(date + " " + bean.getStartHour() + ":" + bean.getStartMin());
             } catch (ParseException e) {
-                LOGGER.error("ParseException: '{}'", e.getMessage(), e);
+                logger.error("ParseException: '{}'", e.getMessage(), e);
             }
         }
         Date endDate = null;
@@ -75,7 +82,7 @@ public class ErrorController extends MultiActionController {
                     }
                 }
             } catch (ParseException e) {
-                LOGGER.error("ParseException: '{}'", e.getMessage(), e);
+                logger.error("ParseException: '{}'", e.getMessage(), e);
             }
         }
         String ip = null;
@@ -85,18 +92,18 @@ public class ErrorController extends MultiActionController {
         if (ip != null) {
             if (startDate != null) {
                 if (endDate != null) {
-                    ents = errorDao.getBetween(ip, startDate, endDate);
+                    errorEntities = errorDao.getBetween(ip, startDate, endDate);
                 } else {
-                    ents = errorDao.getAfter(ip, startDate);
+                    errorEntities = errorDao.getAfter(ip, startDate);
                 }
             } else {
                 if (endDate != null) {
-                    ents = errorDao.getBefore(ip, endDate);
+                    errorEntities = errorDao.getBefore(ip, endDate);
                 } else {
-                    ents = errorDao.getBySourceIp(ip);
+                    errorEntities = errorDao.getBySourceIp(ip);
                 }
             }
         }
-        return ents;
+        return errorEntities;
     }
 }
