@@ -13,6 +13,7 @@ The OpenNCP 4.1.0 release is the CEF eHDSI Wave 3 HotFix version - available for
 ### Added
 - [EHNCP-1938] - Central Services - SML/SMP server upgrade.
 - [EHNCP-1924] - Add the possibility of TSAM returning semantic mappings from LTR.
+- [EHNCP-1923] - OpenNCP Gateway - loading properties from database should be trimmed.
 - [EHNCP-1919] - OpenNCP Java Dependencies Security analysis.
 - [EHNCP-1863] - Enforce Soap 1.2 communication between National Connector B and Client Connector.
 - [EHNCP-1746] - Display the description of the IPS Absent and Unknown Data concepts in the CDA Display.
