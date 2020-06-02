@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author DG-Sante A4
@@ -23,9 +24,9 @@ import java.util.Map;
 public class OidUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OidUtil.class);
-    // This configuration service is also responsible for accessing country code
-    // <-> OID mappings.
+    // This configuration service is also responsible for accessing country code <-> OID mappings.
     private static final String PN_OID_FILE_NAME = "pn-oid.xml";
+    private static final Pattern OID_PATTERN = Pattern.compile("[1-9][0-9]*(\\.(0|([1-9][0-9]*)))+");
     private static HashMap<String, String> oid2CountryCodeMap;
 
     static {
@@ -50,13 +51,19 @@ public class OidUtil {
      * @return foreign HomeCommunityId
      */
     public static String getHomeCommunityId(String countryCode) {
+
         for (Map.Entry<String, String> entry : oid2CountryCodeMap.entrySet()) {
             if (entry.getValue().equals(countryCode)) {
                 return entry.getKey();
             }
         }
-
         return null;
+    }
+
+    public static boolean isValidHomeCommunityId(String homeCommunityId) {
+
+        //  return oid2CountryCodeMap.containsKey(homeCommunityId);
+        return OID_PATTERN.matcher(homeCommunityId).matches();
     }
 
     /**
@@ -116,7 +123,7 @@ public class OidUtil {
      */
     public static String convertUuidToOid(String uuid) {
 
-        String identifier = uuid.replaceAll("-", "");
+        String identifier = uuid.replace("-", "");
         BigInteger integer = new BigInteger(identifier, 16);
         return "2.25." + integer.toString();
     }
