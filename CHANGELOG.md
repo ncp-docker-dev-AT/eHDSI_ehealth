@@ -3,6 +3,44 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [4.1.0] - 03-06-2020
+The OpenNCP 4.1.0 release is the CEF eHDSI Wave 3 HotFix version - available for the eHDSI 2020 Re-Test Event.
+<br/>This version is mainly improving the vulnerabilities frmo the JAR dependencies (Spring, Hibernate and SAML).
+<br/>CDA Display Tool improvements according the Formal Test Event feedback. 
+<br/>Web Services communication is using SOAP 1.2 between all the components.
+<br/>eHDSI Central Services (SMP Server) has been upgraded to 4.1.1-EC with Dynamic Discovery Client 1.11.
+<br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/qoKSDg
+### Added
+- [EHNCP-1938] - Central Services - SML/SMP server upgrade.
+- [EHNCP-1924] - Add the possibility of TSAM returning semantic mappings from LTR.
+- [EHNCP-1919] - OpenNCP Java Dependencies Security analysis.
+- [EHNCP-1863] - Enforce Soap 1.2 communication between National Connector B and Client Connector.
+- [EHNCP-1746] - Display the description of the IPS Absent and Unknown Data concepts in the CDA Display.
+
+### Changed
+- [EHNCP-1934] - OpenNCP-Gateway demands username and password for non-authenticated proxy.
+- [EHNCP-1933] - Move "units per intake" above the "frequency of intakes" in the prescription details.
+- [EHNCP-1931] - Extended header, telecom types are hard coded, where they should come from the epSOSTelecomAddress VS.
+- [EHNCP-1930] - Fix narrative text display if a large table is provided.
+- [EHNCP-1928] - Allergies and Intolerances section - NullFlavor is displayed twice for the Agent.
+- [EHNCP-1920] - OpenNCP minor improvements.
+- [EHNCP-1917] - Medication Summary section - NullFlavor check doesn't work for substanceAdministration.
+- [EHNCP-1916] - The ICD-10 code is no longer displayed in the Problem section.
+- [EHNCP-1911] - Input fields during dispense process have encoding issues.
+- [EHNCP-1907] - OpenNCP Portal should ignore unnecessary LivingSubjectID with value " ".
+- [EHNCP-1906] - XCA Retrieve Document produces response with no valid HCID if the request contains wrong HCID.
+- [EHNCP-1902] - Dispensation ID is null when there is no extension in ID of ePrescription.
+- [EHNCP-1898] - Minor hot fix on HCP and TRC SAML assertions.
+- [EHNCP-1897] - Problem (no fatal) retrieving cda document due to terminology file missing.
+- [EHNCP-1893] - eHDSI SAML specification and OpenNCP incoherent for element healthcare facility type.
+- [EHNCP-1887] - CDA validation issue of effectiveTime element for SubstanceAdministration.
+
+### Deprecated
+- [N/A].
+
+### Removed
+- [EHNCP-1885] - Patient summary portal consent checkboxes.
+
 ## [4.0.3] - 31-01-2020
 The OpenNCP 4.0.3 release is the CEF eHDSI Wave 3 Third HotFix version - available for the eHDSI 2020 Formal Test Event.
 <br/>This version is fixing an issue related to the Audit Message and the network equipments.
