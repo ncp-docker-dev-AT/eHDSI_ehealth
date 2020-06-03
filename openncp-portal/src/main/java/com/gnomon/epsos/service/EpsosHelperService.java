@@ -15,7 +15,7 @@ import com.liferay.util.portlet.PortletProps;
 import edu.mayo.trilliumbridge.core.TrilliumBridgeTransformer;
 import edu.mayo.trilliumbridge.core.xslt.XsltTrilliumBridgeTransformer;
 import epsos.ccd.gnomon.auditmanager.*;
-import epsos.ccd.gnomon.xslt.EpsosXSLTransformer;
+import epsos.ccd.gnomon.xslt.CdaXSLTransformer;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
@@ -276,7 +276,7 @@ public class EpsosHelperService {
         cda.setPatientTelephone(patient.getTelephone());
         cda.setPatientEmail(patient.getEmail());
         cda.setPatientPostalCode(patient.getPostalCode());
-        String consent = CDAUtils.CDAModelToConsent(cda, rolename);
+        String consent = CDAUtils.transformCDAModelToConsent(cda, rolename);
         LOGGER.info("Consent CDA Start:\n'{}'\nConsent CDA End", consent);
 
         return consent;
@@ -321,31 +321,38 @@ public class EpsosHelperService {
         return pd;
     }
 
-    public static byte[] generateDispensationDocumentFromPrescription2(byte[] bytes, List<ViewResult> dispensedLines,
-                                                                       User user, String eDuuid) {
+    /**
+     * @param bytes
+     * @param dispensedLines
+     * @param user
+     * @param eDuuid
+     * @return
+     */
+    public static byte[] generateDispensationDocumentFromPrescription(byte[] bytes, List<ViewResult> dispensedLines,
+                                                                      User user, String eDuuid) {
 
-        PersonDetail pd = getUserInfo("", user);
-        String edDoc = "";
+        PersonDetail personDetail = getUserInfo("", user);
+        String dispenseStream = "";
         CDAHeader cda = new CDAHeader();
         Date now = new Date();
         String language = user.getLanguageId().replace("_", "-");
         cda.setEffectiveTime(EpsosHelperService.formatDateHL7(now));
         cda.setLanguageCode(language);
-        populatePharmacistInfo(cda, pd);
+        populatePharmacistInfo(cda, personDetail);
 
         List<EDDetail> edDetails = new ArrayList<>();
         for (ViewResult dispensedLine : dispensedLines) {
 
-            EDDetail ed = new EDDetail();
-            ed.setRelativePrescriptionLineId(dispensedLine.getField1().toString());
-            ed.setDispensedQuantity(dispensedLine.getField7().toString());
-            ed.setDispensedNumberOfPackages(dispensedLine.getField8().toString());
-            ed.setMedicineFormCode(dispensedLine.getField5().toString());
-            ed.setMedicineCommercialName(dispensedLine.getField2().toString());
+            EDDetail dispenseDetails = new EDDetail();
+            dispenseDetails.setRelativePrescriptionLineId(dispensedLine.getField1().toString());
+            dispenseDetails.setDispensedQuantity(dispensedLine.getField7().toString());
+            dispenseDetails.setDispensedNumberOfPackages(dispensedLine.getField8().toString());
+            dispenseDetails.setMedicineFormCode(dispensedLine.getField5().toString());
+            dispenseDetails.setMedicineCommercialName(dispensedLine.getField2().toString());
 
             // Setting the substitution indicator
-            ed.setSubstituted(dispensedLine.getField3() != null ? (Boolean) dispensedLine.getField3() : false);
-            edDetails.add(ed);
+            dispenseDetails.setSubstituted(dispensedLine.getField3() != null ? (Boolean) dispensedLine.getField3() : Boolean.FALSE);
+            edDetails.add(dispenseDetails);
         }
         cda.setEDDetail(edDetails);
         try {
@@ -354,10 +361,10 @@ public class EpsosHelperService {
             Document epDoc = db.parse(new ByteArrayInputStream(bytes));
             cda.setPrescriptionBarcode(CDAUtils.getRelativePrescriptionBarcode(epDoc));
             cda.setDispensationId("D-" + CDAUtils.getRelativePrescriptionBarcode(epDoc));
-            edDoc = CDAUtils.createDispensation(epDoc, cda, eDuuid);
+            dispenseStream = CDAUtils.createDispensation(epDoc, cda, eDuuid);
 
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                Document document = XMLUtil.parseContent(edDoc);
+                Document document = XMLUtil.parseContent(dispenseStream);
                 LOGGER_CLINICAL.info("### DISPENSATION START ###\n'{}'\n ### DISPENSATION END ###",
                         XMLUtil.prettyPrintForValidation(document.getDocumentElement()));
             }
@@ -366,7 +373,7 @@ public class EpsosHelperService {
             LOGGER.error("error creating disp doc");
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
-        return edDoc.getBytes(StandardCharsets.UTF_8);
+        return dispenseStream.getBytes(StandardCharsets.UTF_8);
     }
 
     /**
@@ -512,11 +519,12 @@ public class EpsosHelperService {
                     Node sectionNode = prescriptionIDNodes.item(p);
                     Node pIDNode = (Node) idExpr.evaluate(sectionNode, XPathConstants.NODE);
                     if (pIDNode != null) {
-                        try {
-                            prescriptionID = pIDNode.getAttributes().getNamedItem("extension").getNodeValue();
-                        } catch (Exception e) {
-                            LOGGER.error(ExceptionUtils.getStackTrace(e));
-                        }
+                        prescriptionID = processCDAIdentifier(pIDNode);
+//                        try {
+//                            prescriptionID = pIDNode.getAttributes().getNamedItem("extension").getNodeValue();
+//                        } catch (Exception e) {
+//                            LOGGER.error(ExceptionUtils.getStackTrace(e));
+//                        }
                     } else {
                         prescriptionID = "";
                     }
@@ -550,7 +558,8 @@ public class EpsosHelperService {
 
                             if (materialIDNode != null) {
                                 try {
-                                    materialID = materialIDNode.getAttributes().getNamedItem("extension").getNodeValue();
+                                    //materialID = materialIDNode.getAttributes().getNamedItem("extension").getNodeValue();
+                                    materialID = processCDAIdentifier(materialIDNode);
                                 } catch (Exception e) {
                                     LOGGER.error("Error getting material");
                                     LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -871,6 +880,22 @@ public class EpsosHelperService {
         return lines;
     }
 
+    private static String processCDAIdentifier(Node node) {
+
+        if (node.getAttributes() != null) {
+            if (node.getAttributes().getNamedItem("root") == null) {
+                return StringUtils.EMPTY;
+            } else {
+                String identifier = node.getAttributes().getNamedItem("root").getNodeValue();
+                if (node.getAttributes().getNamedItem("extension") != null) {
+                    identifier += "^" + node.getAttributes().getNamedItem("extension").getNodeValue();
+                }
+                return identifier;
+            }
+        }
+        return StringUtils.EMPTY;
+    }
+
     /**
      * Mock Utility method providing as signed Assertion from the Portal
      *
@@ -951,7 +976,7 @@ public class EpsosHelperService {
     }
 
     /**
-     * TODO: Jerome
+     * TODO: Review this method.
      *
      * @param user
      * @param isEmergency
@@ -1061,7 +1086,7 @@ public class EpsosHelperService {
 
                 LOGGER.info("AUDIT URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.AUDIT_REPOSITORY_URL.getValue()));
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    LOGGER_CLINICAL.debug("[Audit Portal] Sending Audit Message 'epsos-91' for User: '{}'", user.getFullName());
+                    LOGGER_CLINICAL.debug("[Audit Portal] Sending Audit Message 'EHDSI-91' for User: '{}'", user.getFullName());
                 }
                 String auditPointOfCare;
                 if (StringUtils.isNotBlank(orgName)) {
@@ -1468,13 +1493,13 @@ public class EpsosHelperService {
             AttributeStatement attrStmt = create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
 
             // XSPA Subject
-            Attribute attrPID = createAttribute(builderFactory, "XSPA subject",
+            Attribute attrPID = createAttribute(builderFactory, "XSPA Subject",
                     "urn:oasis:names:tc:xacml:1.0:subject:subject-id",
                     fullName, "", "");
             attrStmt.getAttributes().add(attrPID);
 
             // XSPA Role
-            Attribute structuralRole = createAttribute(builderFactory, "XSPA role",
+            Attribute structuralRole = createAttribute(builderFactory, "XSPA Role",
                     "urn:oasis:names:tc:xacml:2.0:subject:role", role, "", "");
             attrStmt.getAttributes().add(structuralRole);
 
@@ -1504,8 +1529,8 @@ public class EpsosHelperService {
                 attrStmt.getAttributes().add(attrPID_41);
             }
 
-            // epSOS Healthcare Facility Type
-            Attribute attrPID_5 = createAttribute(builderFactory, "epSOS Healthcare Facility Type",
+            // eHealth DSI Healthcare Facility Type
+            Attribute attrPID_5 = createAttribute(builderFactory, "eHealth DSI Healthcare Facility Type",
                     "urn:epsos:names:wp3.4:subject:healthcare-facility-type", facilityType, "", "");
             attrStmt.getAttributes().add(attrPID_5);
 
@@ -1628,7 +1653,6 @@ public class EpsosHelperService {
 
                 String translation = LiferayUtils.getPortalTranslation(country.getCode(), lang);
                 country.setName(translation);
-                LOGGER.info("Country is: '{}'", country.getName());
             }
         } catch (Exception ex) {
             LOGGER.error("getCountriesNamesFromCS: " + ex.getMessage());
@@ -1680,7 +1704,7 @@ public class EpsosHelperService {
         List<SearchMask> searchMaskList = new ArrayList<>();
         String filename = "InternationalSearch_" + country + ".xml";
         path = getSearchMaskPath() + "forms" + File.separator + filename;
-        LOGGER.info("#### Path is: '{}'", path);
+        LOGGER.debug("Path for InternationalSearchMask is: '{}'", path);
 
         try {
             File file = new File(path);
@@ -2347,14 +2371,13 @@ public class EpsosHelperService {
     public static String styleDoc(String input, String lang, boolean commonStyle, String actionUrl, boolean showNarrative) {
 
         String convertedCda;
-        EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
 
         if (commonStyle) {
             LOGGER.info("Transform the document using standard stylesheet as this is CCDA");
-            convertedCda = xlsClass.transformUsingStandardCDAXsl(input);
+            convertedCda = CdaXSLTransformer.getInstance().transformUsingStandardCDAXsl(input);
         } else {
             LOGGER.info("Transform the document using CDA Display Tool as this is eHDSI CDA");
-            convertedCda = xlsClass.transform(input, lang, actionUrl);
+            convertedCda = CdaXSLTransformer.getInstance().transform(input, lang, actionUrl);
         }
 
         return convertedCda;

@@ -3,6 +3,10 @@ package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PolicyAssertionManager;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidationException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.common.xml.SAMLSchemaBuilder;
@@ -12,10 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidationException;
 
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -89,9 +89,8 @@ public class SAML2Validator {
             policyManager.XCPDPermissionValidator(hcpAssertion);
 
         } catch (IOException | UnmarshallingException e) {
-            LOGGER.error("{}: '{}'", e.getMessage(), e);
+            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage());
         } catch (SAXException e) {
-            LOGGER.error("SAXException: '{}'", e.getMessage(), e);
             throw new XSDValidationException(e.getMessage());
         }
 

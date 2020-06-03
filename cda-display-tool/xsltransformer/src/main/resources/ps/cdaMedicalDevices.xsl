@@ -131,7 +131,6 @@
     <!--  FOR EACH ENTRY -->
     <xsl:template name="medicalDevicesSectionEntry">
         <!-- Defining all needed variables -->
-        <xsl:variable name="medDevAct" select="n1:supply"/>
         <xsl:variable name="medDeviceImplantDescription"
                       select="n1:supply/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.5']/../n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code"/>
         <xsl:variable name="medDeviceImplantDate"
@@ -140,7 +139,7 @@
 
         <!-- null flavor act -->
         <xsl:choose>
-            <xsl:when test="not($medDevAct/@nullFlavor)">
+            <xsl:when test="not(n1:supply/@nullFlavor)">
                 <xsl:choose>
                     <xsl:when test="($medDeviceImplantDescription/@code='no-known-devices' or $medDeviceImplantDescription/@code='no-device-info')">
                         <tr>
@@ -173,7 +172,7 @@
                 <tr>
                     <td colspan="3">
                         <xsl:call-template name="show-epSOSNullFlavor">
-                            <xsl:with-param name="code" select="$medDevAct/@nullFlavor"/>
+                            <xsl:with-param name="code" select="n1:supply/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
                 </tr>

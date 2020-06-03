@@ -35,6 +35,10 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
+    <logger name="org.hibernate.orm.deprecation" level="ERROR" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="epsos.ccd.netsmart.securitymanager.sts" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>

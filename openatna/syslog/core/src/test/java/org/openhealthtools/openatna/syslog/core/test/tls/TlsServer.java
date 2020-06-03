@@ -27,14 +27,12 @@ import java.util.concurrent.Executors;
  */
 public class TlsServer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TlsServer.class);
-
+    private final Logger logger = LoggerFactory.getLogger(TlsServer.class);
+    private final Executor exec = Executors.newFixedThreadPool(10);
+    private final Set<SyslogListener> listeners = new HashSet<>();
     private TlsConfig tlsconfig;
-    private Executor exec = Executors.newFixedThreadPool(5);
     private boolean stopped = false;
     private ServerThread thread;
-
-    private Set<SyslogListener> listeners = new HashSet<>();
 
     public void configure(TlsConfig config) {
         this.tlsconfig = config;
@@ -50,15 +48,14 @@ public class TlsServer {
         ServerSocket serverSocket;
         if (f != null) {
             boolean auth = tlsconfig.isRequireClientAuth();
-            LOGGER.info("USING TLS...");
+            logger.info("Using TLS communication protocol");
             serverSocket = f.createServerSocket(tlsconfig.getPort(), auth);
         } else {
             serverSocket = new ServerSocket(tlsconfig.getPort());
         }
         thread = new ServerThread(serverSocket);
         thread.start();
-        LOGGER.info("server started on port " + tlsconfig.getPort());
-
+        logger.info("Server started on port " + tlsconfig.getPort());
     }
 
     public void stop() {
@@ -74,12 +71,11 @@ public class TlsServer {
         listeners.remove(listener);
     }
 
-
     protected void notifyListeners(final SyslogMessage msg) {
 
         exec.execute(() -> {
             for (SyslogListener listener : listeners) {
-                LOGGER.info("notifying listener...");
+                logger.info("notifying listener...");
                 listener.messageArrived(msg);
             }
         });
@@ -89,7 +85,7 @@ public class TlsServer {
 
         exec.execute(() -> {
             for (SyslogListener listener : listeners) {
-                LOGGER.info("notifying exception...");
+                logger.info("Notifying exception...");
                 listener.exceptionThrown(ex);
             }
         });
@@ -98,7 +94,7 @@ public class TlsServer {
 
     private class ServerThread extends Thread {
 
-        private ServerSocket server;
+        private final ServerSocket server;
 
         public ServerThread(ServerSocket server) {
             this.server = server;
@@ -111,7 +107,7 @@ public class TlsServer {
                     Socket s = server.accept();
                     exec.execute(new WorkerThread(s));
                 } catch (IOException e) {
-                    LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
+                    logger.error("{}: '{}'", e.getClass(), e.getMessage(), e);
                 }
             }
         }
@@ -119,7 +115,7 @@ public class TlsServer {
 
     private class WorkerThread extends Thread {
 
-        private Socket socket;
+        private final Socket socket;
 
         private WorkerThread(Socket socket) {
             this.socket = socket;

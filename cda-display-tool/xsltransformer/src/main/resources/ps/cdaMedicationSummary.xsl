@@ -193,7 +193,6 @@
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:low"/>
         <xsl:variable name="medEndDate"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:high"/>
-        <xsl:variable name="medAct" select="n1:act"/>
         <xsl:variable name="medCode"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:code/@code"/>
         <xsl:for-each
@@ -207,7 +206,7 @@
 
             <!-- nullflavored act -->
             <xsl:choose>
-                <xsl:when test="not($medAct/@nullFlavor)">
+                <xsl:when test="not(n1:substanceAdministration/@nullFlavor)">
                     <!-- no info scenario code is one of the three values -->
                     <xsl:if test="not($medCode='no-known-medications' or $medCode='no-medication-info')">
                         <tr>
@@ -311,7 +310,7 @@
                     <tr>
                         <td colspan="5">
                             <xsl:call-template name="show-epSOSNullFlavor">
-                                <xsl:with-param name="code" select="$medAct/@nullFlavor"/>
+                                <xsl:with-param name="code" select="n1:medSubstanceAdministration/@nullFlavor"/>
                             </xsl:call-template>
                         </td>
                     </tr>

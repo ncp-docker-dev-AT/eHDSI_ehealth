@@ -18,48 +18,48 @@ import java.io.OutputStream;
 public class ConsentServlet extends HttpServlet {
 
     private static final long serialVersionUID = 5646088170034248115L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsentServlet.class);
+    private final Logger logger = LoggerFactory.getLogger(ConsentServlet.class);
 
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse res) {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
-        LOGGER.info("Servlet Consent Document");
+        logger.info("Servlet Consent Document");
 
-        try (OutputStream outputStream = res.getOutputStream()) {
+        try (OutputStream outputStream = response.getOutputStream()) {
             byte[] pdf;
-            HttpSession session = req.getSession();
-
+            HttpSession session = request.getSession();
+            //  Checking validity of the assertions (HCP and TRC)
             Assertion hcpAssertion = (Assertion) session.getAttribute("hcpAssertion");
-            LOGGER.info("HCP Assertions: '{}'", hcpAssertion.getID());
+            logger.info("HCP Assertions: '{}'", hcpAssertion.getID());
 
             User user = (User) session.getAttribute("user");
-            LOGGER.info("User: '{}'", user.getEmailAddress());
+            logger.info("User: '{}'", user.getEmailAddress());
 
             Patient patient = (Patient) session.getAttribute("patient");
             pdf = EpsosHelperService.getConsentReport(user.getLanguageId(), user.getFullName(), patient);
 
-            res.setContentType("application/pdf");
-            res.setHeader("Content-Disposition", "inline; filename=architect.pdf");
-            res.setHeader("Cache-Control", "no-cache");
-            res.setDateHeader("Expires", 0);
-            res.setHeader("Pragma", "No-cache");
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "inline; filename=architect.pdf");
+            response.setHeader("Cache-Control", "no-cache");
+            response.setDateHeader("Expires", 0);
+            response.setHeader("Pragma", "No-cache");
 
             outputStream.write(pdf);
             outputStream.flush();
 
         } catch (Exception ex) {
 
-            LOGGER.error("Exception: '{}'", ex.getMessage(), ex);
-            res.setContentType("text/html");
-            res.setHeader("Cache-Control", "no-cache");
-            res.setDateHeader("Expires", 0);
-            res.setHeader("Pragma", "No-cache");
+            logger.error("Exception: '{}'", ex.getMessage(), ex);
+            response.setContentType("text/html");
+            response.setHeader("Cache-Control", "no-cache");
+            response.setDateHeader("Expires", 0);
+            response.setHeader("Pragma", "No-cache");
 
-            try (OutputStream outputStream = res.getOutputStream()) {
+            try (OutputStream outputStream = response.getOutputStream()) {
                 outputStream.write(ex.getMessage().getBytes());
                 outputStream.flush();
             } catch (IOException e) {
-                LOGGER.error(ExceptionUtils.getStackTrace(e));
+                logger.error(ExceptionUtils.getStackTrace(e));
             }
         }
     }

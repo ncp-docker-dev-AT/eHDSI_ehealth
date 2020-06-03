@@ -92,9 +92,6 @@ public class XMLUtil {
 
     public static Document parseContent(String content) throws ParserConfigurationException, SAXException, IOException {
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XMLUtil: parse String content: \n'{}'", content);
-        }
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -130,7 +127,7 @@ public class XMLUtil {
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "no");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
 
         transformer.transform(new DOMSource(node), new StreamResult(stringWriter));
         return stringWriter.toString();
@@ -170,7 +167,7 @@ public class XMLUtil {
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
 
         transformer.transform(new DOMSource(node), new StreamResult(stringWriter));
         return stringWriter.toString();
@@ -188,7 +185,7 @@ public class XMLUtil {
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
         transformer.transform(source, result);
     }
 
@@ -197,10 +194,10 @@ public class XMLUtil {
      * @return
      */
     public static Map<String, String> parseNamespaceBindings(String namespaceBindings) {
+
         if (namespaceBindings == null) {
             return null;
         }
-        //remove { and }
         namespaceBindings = namespaceBindings.substring(1, namespaceBindings.length() - 1);
         String[] bindings = namespaceBindings.split(",");
         Map<String, String> namespaces = new HashMap<>();
@@ -208,8 +205,6 @@ public class XMLUtil {
             String[] pair = binding.trim().split("=");
             String prefix = pair[0].trim();
             String namespace = pair[1].trim();
-            //Remove ' and '
-            //namespace = namespace.substring(1,namespace.length()-1);
             namespaces.put(prefix, namespace);
         }
         return namespaces;
@@ -222,6 +217,7 @@ public class XMLUtil {
      * @return
      */
     public static Document marshall(Object object, String context, String schemaLocation) {
+
         Locale oldLocale = Locale.getDefault();
         Locale.setDefault(new Locale("en"));
         try {
@@ -252,6 +248,7 @@ public class XMLUtil {
      * @return
      */
     public static Object unmarshall(String context, String schemaLocation, String content) {
+
         Locale oldLocale = Locale.getDefault();
         Locale.setDefault(new Locale("en"));
         try {

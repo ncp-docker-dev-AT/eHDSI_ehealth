@@ -101,6 +101,8 @@ public class ViewDispensationPage extends WebPage {
 				item.add(new Label("prescriptionRow.route"));
 				item.add(new Label("prescriptionRow.productId"));
 				item.add(new Label("prescriptionRow.prescriptionId"));
+				item.add(new Label("prescriptionRow.prescriptionIdRoot"));
+				item.add(new Label("prescriptionRow.prescriptionIdExtension"));
 				
 				item.add(new Label("prescriptionRow.substitutionPermittedText"));
 				                    

@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
         <artifactId>openncp-openatna</artifactId>
-        <version>4.0.3</version>
+        <version>4.1.0</version>
     </parent>
 
     <artifactId>openatna-jaxb</artifactId>
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.apache.santuario</groupId>
             <artifactId>xmlsec</artifactId>
-            <version>1.4.4</version>
+            <version>${xmlsec.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

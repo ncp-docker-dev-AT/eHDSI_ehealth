@@ -32,10 +32,17 @@ public class CdaHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CdaHelper.class);
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(new Locale("sv"));
+    private static final String XML_PRESCRIPTION_ENTRY_TEMPLATE_ID = "1.3.6.1.4.1.12559.11.10.1.3.1.2.1";
     private static final String CHAR_FORWARD_SLASH = "/";
     private static final String CHAR_SPACE = " ";
     private static final String CHAR_ONE = "1";
 
+    /**
+     * Helper method extracting required information from the ePrescription document <code>prescription.getBytes()</code>
+     * and set the values to the <code>Prescription</code> object attributes.
+     *
+     * @param prescription - ePrescription model object.
+     */
     public void parsePrescriptionFromDocument(Prescription prescription) {
 
         ArrayList<PrescriptionRow> rows = new ArrayList<>();
@@ -52,7 +59,7 @@ public class CdaHelper {
 
             // for each prescription component, search for its entries and make up the list
             XPathExpression prescriptionIDExpr = xpath.compile(
-                    "/hl7:ClinicalDocument/hl7:component/hl7:structuredBody/hl7:component/hl7:section[hl7:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']");
+                    "/hl7:ClinicalDocument/hl7:component/hl7:structuredBody/hl7:component/hl7:section[hl7:templateId/@root='" + XML_PRESCRIPTION_ENTRY_TEMPLATE_ID + "']");
 
             NodeList prescriptionIDNodes = (NodeList) prescriptionIDExpr.evaluate(dom, XPathConstants.NODESET);
             if (prescriptionIDNodes != null && prescriptionIDNodes.getLength() > 0) {
@@ -61,15 +68,17 @@ public class CdaHelper {
                 for (int p = 0; p < prescriptionIDNodes.getLength(); p++) {
                     String prescriptionID = "";
                     String prescriptionIDRoot = "";
+                    String prescriptionIDExtension = "";
                     Node sectionNode = prescriptionIDNodes.item(p);
                     Node pIDNode = (Node) idExpr.evaluate(sectionNode, XPathConstants.NODE);
                     if (pIDNode != null) {
+                        prescriptionIDRoot = pIDNode.getAttributes().getNamedItem("root").getNodeValue();
                         if (pIDNode.getAttributes().getNamedItem("extension") != null) {
-                            prescriptionID = pIDNode.getAttributes().getNamedItem("extension").getNodeValue();
+                            prescriptionIDExtension = pIDNode.getAttributes().getNamedItem("extension").getNodeValue();
+                            prescriptionID = prescriptionIDRoot + "^" + prescriptionIDExtension;
                         } else {
                             prescriptionID = pIDNode.getAttributes().getNamedItem("root").getNodeValue();
                         }
-                        prescriptionIDRoot = pIDNode.getAttributes().getNamedItem("root").getNodeValue();
                     }
 
                     XPathExpression prefixExpr = xpath.compile("hl7:author/hl7:assignedAuthor/hl7:assignedPerson/hl7:name/hl7:prefix");
@@ -262,6 +271,7 @@ public class CdaHelper {
                             // entry header information
                             row.setPrescriptionId(prescriptionID);
                             row.setPrescriptionIdRoot(prescriptionIDRoot);
+                            row.setPrescriptionIdExtension(prescriptionIDExtension);
                             row.setMaterialId(materialID);
                             row.setSubstitutionPermittedText(sp.getSubstitutionPermittedText());
                             row.setSubstitutionPermitted(sp.isSubstitutionPermitted());

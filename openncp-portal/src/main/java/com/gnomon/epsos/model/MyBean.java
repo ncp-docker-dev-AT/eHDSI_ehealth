@@ -174,14 +174,13 @@ public class MyBean implements Serializable {
     public void searchPatientsRequest(ActionEvent event) {
 
         checkButtonPermissions();
-        logger.info("searchPatientORequest ::: Selected country is : '{}'", selectedCountry);
         String country = (String) event.getComponent().getAttributes().get("selectedCountry");
         identifiers = (List<Identifier>) event.getComponent().getAttributes().get("identifiers");
         demographics = (List<Demographics>) event.getComponent().getAttributes().get("demographics");
         if (Validator.isNotNull(country)) {
             selectedCountry = country;
         }
-        logger.info("searchPatientsRequest ::: Selected country is : '{}'", selectedCountry);
+        logger.info("[Portal] Search Patient Request to selected country: '{}'", selectedCountry);
         searchPatients();
     }
 
@@ -234,15 +233,15 @@ public class MyBean implements Serializable {
     public void searchPatients() {
 
         logger.info("Searching for patients (creating assertions)...");
-        Object obj = EpsosHelperService.getUserAssertion(emergency);
+        Object userAssertion = EpsosHelperService.getUserAssertion(emergency);
 
-        if (obj instanceof Assertion) {
-            hcpAssertion = (Assertion) obj;
-        } else if (obj instanceof String) {
+        if (userAssertion instanceof Assertion) {
+            hcpAssertion = (Assertion) userAssertion;
+        } else if (userAssertion instanceof String) {
             FacesContext.getCurrentInstance().addMessage(
                     null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "ASSERTION", obj.toString()));
-            errorUserAssertion = (String) obj;
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "ASSERTION", userAssertion.toString()));
+            errorUserAssertion = (String) userAssertion;
         }
         logger.info("Searching for patients (demographics) '{}' (Identifiers) '{}'", demographics.size(), identifiers.size());
         logger.info("Purpose Of Use: '{}'", emergency);
@@ -428,7 +427,7 @@ public class MyBean implements Serializable {
             String serviceUrl = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CLIENT_CONNECTOR_URL);
 
             logger.info("Client Connector URL: '{}'", serviceUrl);
-            ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
+            ClientConnectorConsumer clientConnectorConsumer = MyServletContextListener.getClientConnectorConsumer();
 
             patientId = PatientId.Factory.newInstance();
             patientId.setExtension(selectedPatient.getExtension());
@@ -441,7 +440,7 @@ public class MyBean implements Serializable {
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.info("MRO QUERY: Getting mro documents for: '{}' from '{}'", patientId.getExtension(), selectedCountry);
             }
-            List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion, selectedCountry, patientId, classCode);
+            List<EpsosDocument1> queryDocuments = clientConnectorConsumer.queryDocuments(hcpAssertion, trcAssertion, selectedCountry, patientId, classCode);
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.info("MRO QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(), patientId.getExtension(), selectedCountry);
             }
@@ -489,7 +488,7 @@ public class MyBean implements Serializable {
             PatientId patientId = null;
             try {
                 patientDocuments = new ArrayList<>();
-                ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
+                ClientConnectorConsumer clientConnectorConsumer = MyServletContextListener.getClientConnectorConsumer();
                 patientId = PatientId.Factory.newInstance();
                 patientId.setExtension(selectedPatient.getExtension());
                 patientId.setRoot(selectedPatient.getRoot());
@@ -505,7 +504,7 @@ public class MyBean implements Serializable {
                     loggerClinical.info("patientId: '{}'", patientId);
                     loggerClinical.info("classCode: '{}'", classCode);
                 }
-                List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion,
+                List<EpsosDocument1> queryDocuments = clientConnectorConsumer.queryDocuments(hcpAssertion, trcAssertion,
                         selectedCountry, patientId, classCode);
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     loggerClinical.info("PS QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(), patientId.getExtension(), selectedCountry);
@@ -751,7 +750,7 @@ public class MyBean implements Serializable {
         PatientId patientId = null;
         try {
             patientPrescriptions = new ArrayList<>();
-            ClientConnectorConsumer clientConectorConsumer = MyServletContextListener.getClientConnectorConsumer();
+            ClientConnectorConsumer clientConnectorConsumer = MyServletContextListener.getClientConnectorConsumer();
 
             patientId = PatientId.Factory.newInstance();
             patientId.setExtension(selectedPatient.getExtension());
@@ -765,7 +764,7 @@ public class MyBean implements Serializable {
                 loggerClinical.info("EP QUERY: Getting ePrescription documents for: {} from {}.",
                         patientId.getExtension(), selectedCountry);
             }
-            List<EpsosDocument1> queryDocuments = clientConectorConsumer.queryDocuments(hcpAssertion, trcAssertion, selectedCountry, patientId, classCode);
+            List<EpsosDocument1> queryDocuments = clientConnectorConsumer.queryDocuments(hcpAssertion, trcAssertion, selectedCountry, patientId, classCode);
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.info("EP QUERY: Found '{}' for: '{}' from: '{}'", queryDocuments.size(),
                         patientId.getExtension(), selectedCountry);

@@ -1,6 +1,7 @@
 package org.openhealthtools.openatna.web;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openhealthtools.openatna.all.logging.AuditLoggerPluginManager;
 import org.openhealthtools.openatna.anom.Timestamp;
 import org.openhealthtools.openatna.audit.persistence.dao.MessageDao;
@@ -8,45 +9,45 @@ import org.openhealthtools.openatna.audit.persistence.model.MessageEntity;
 import org.openhealthtools.openatna.audit.persistence.model.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
-/**
- * @author Andrew Harrison
- * @version 1.0.0
- */
-public class MessageController extends MultiActionController {
+@Controller
+public class MessageController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageController.class);
-    private AuditLoggerPluginManager auditLoggerPluginManager = null;
-    private MessageDao messageDao;
+    private final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
-    public MessageDao getMessageDao() {
-        return messageDao;
-    }
+    private final AuditLoggerPluginManager auditLoggerPluginManager;
 
-    public void setMessageDao(MessageDao messageDao) {
+    private final MessageDao messageDao;
+
+    @Autowired
+    public MessageController(AuditLoggerPluginManager auditLoggerPluginManager, MessageDao messageDao) {
+        this.auditLoggerPluginManager = auditLoggerPluginManager;
         this.messageDao = messageDao;
     }
 
-    public AuditLoggerPluginManager getAuditLoggerPluginManager() {
-        return auditLoggerPluginManager;
+    @GetMapping(value = "/query")
+    public String home(ModelMap model) {
+
+        QueryBean bean = new QueryBean();
+        model.addAttribute("queryBean", bean);
+        return "messageForm";
     }
 
-    public void setAuditLoggerPluginManager(AuditLoggerPluginManager auditLoggerPluginManager) {
-        this.auditLoggerPluginManager = auditLoggerPluginManager;
-    }
-
-    public ModelAndView query(HttpServletRequest request, HttpServletResponse response, QueryBean queryBean) {
+    @PostMapping(value = "/query")
+    public ModelAndView query(HttpServletRequest request, QueryBean queryBean) {
 
         try {
             ModelMap modelMap = new ModelMap();
@@ -64,20 +65,19 @@ public class MessageController extends MultiActionController {
                     }
 
                 } catch (NumberFormatException e) {
-                    LOGGER.debug("error for start offset value=" + start, e);
+                    logger.debug("error for start offset value=" + start, e);
                 }
             }
             modelMap.addAttribute("offset", offset);
             queryBean.setStartOffset((offset) * queryBean.getMaxResults());
-            Query q = createQuery(queryBean);
-            List<? extends MessageEntity> ment = messageDao.getByQuery(q);
-            List<StringifiedMessage> list = new ArrayList<StringifiedMessage>();
-            if (q.hasConditionals()) {
-                if (ment != null) {
-                    getAuditLoggerPluginManager().handleAuditEvent(request, getBeanMap(queryBean), createIdList(ment));
-                    for (MessageEntity ent : ment) {
-                        list.add(new StringifiedMessage(ent));
-                    }
+            Query query = createQuery(queryBean);
+            List<? extends MessageEntity> messageEntities = messageDao.getByQuery(query);
+            List<StringifiedMessage> list = new ArrayList<>();
+            if (query.hasConditionals() && messageEntities != null) {
+
+                auditLoggerPluginManager.handleAuditEvent(request, getBeanMap(queryBean), createIdList(messageEntities));
+                for (MessageEntity ent : messageEntities) {
+                    list.add(new StringifiedMessage(ent));
                 }
             }
             modelMap.addAttribute("messages", list);
@@ -85,10 +85,10 @@ public class MessageController extends MultiActionController {
 
             return new ModelAndView("messageForm", modelMap);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            ModelMap mm = new ModelMap();
-            mm.addAttribute("errorBean", new ErrorBean(e.getMessage()));
-            return new ModelAndView("errorPage", mm);
+            logger.error(e.getMessage(), e);
+            ModelMap modelMap = new ModelMap();
+            modelMap.addAttribute("errorBean", new ErrorBean(e.getMessage()));
+            return new ModelAndView("errorPage", modelMap);
         }
     }
 
@@ -96,25 +96,19 @@ public class MessageController extends MultiActionController {
             NoSuchMethodException {
 
         Map<String, String> fields = BeanUtils.describe(qb);
-        Map<String, String> ret = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
 
-        Iterator<Entry<String, String>> it = fields.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String, String> entry = it.next();
-            if (!isEmpty(entry.getKey()) && !isEmpty(entry.getValue())) {
-                if (!"class".equals(entry.getKey())) { // class is a BeanUtils internal entry defining the Bean class
-                    ret.put(entry.getKey(), entry.getValue());
-                }
+        for (Entry<String, String> entry : fields.entrySet()) {
+            if (StringUtils.isNotBlank(entry.getKey()) && StringUtils.isNotBlank(entry.getValue()) && !"class".equals(entry.getKey())) {
+                // class is a BeanUtils internal entry defining the Bean class
+                map.put(entry.getKey(), entry.getValue());
             }
         }
-        return ret;
-    }
-
-    private boolean isEmpty(String s) {
-        return s == null || s.length() == 0;
+        return map;
     }
 
     private List<Long> createIdList(List<? extends MessageEntity> messageEntities) {
+
         List<Long> ids = new ArrayList<>();
         for (MessageEntity me : messageEntities) {
             ids.add(me.getId());
@@ -146,38 +140,38 @@ public class MessageController extends MultiActionController {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Query query = new Query();
 
-        if (bean.getEventIdCode() != null && bean.getEventIdCode().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getEventIdCode())) {
             query.addConditional(Query.Conditional.EQUALS, bean.getEventIdCode(), Query.Target.EVENT_ID_CODE);
         }
-        if (bean.getEventOutcome() != null && bean.getEventOutcome().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getEventOutcome())) {
             query.addConditional(Query.Conditional.EQUALS, Integer.parseInt(bean.getEventOutcome()), Query.Target.EVENT_OUTCOME);
         }
-        if (bean.getObjectId() != null && bean.getObjectId().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getObjectId())) {
             query.addConditional(getConditionalForString(bean.getObjectId()), convertStars(bean.getObjectId()), Query.Target.OBJECT_ID);
         }
-        if (bean.getSourceId() != null && bean.getSourceId().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getSourceId())) {
             query.addConditional(getConditionalForString(bean.getSourceId()), convertStars(bean.getSourceId()), Query.Target.SOURCE_ID);
         }
-        if (bean.getParticipantTypeCode() != null && bean.getParticipantTypeCode().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getParticipantTypeCode())) {
             query.addConditional(getConditionalForString(bean.getParticipantTypeCode()), convertStars(bean.getParticipantTypeCode()),
                     Query.Target.PARTICIPANT_TYPE_CODE);
         }
-        if (bean.getSourceTypeCode() != null && bean.getSourceTypeCode().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getSourceTypeCode())) {
             query.addConditional(getConditionalForString(bean.getSourceTypeCode()), convertStars(bean.getSourceTypeCode()),
                     Query.Target.SOURCE_TYPE_CODE);
         }
-        if (bean.getObjectTypeCode() != null && bean.getObjectTypeCode().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getObjectTypeCode())) {
             query.addConditional(getConditionalForString(bean.getObjectTypeCode()), convertStars(bean.getObjectTypeCode()),
                     Query.Target.OBJECT_TYPE_CODE);
         }
-        if (bean.getParticipantId() != null && bean.getParticipantId().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getParticipantId())) {
             query.addConditional(getConditionalForString(bean.getParticipantId()), convertStars(bean.getParticipantId()),
                     Query.Target.PARTICIPANT_ID);
         }
-        if (bean.getEventAction() != null && bean.getEventAction().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getEventAction())) {
             query.addConditional(Query.Conditional.EQUALS, bean.getEventAction(), Query.Target.EVENT_ACTION);
         }
-        if (bean.getEventTime() != null && bean.getEventTime().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getEventTime())) {
             Date ts = Timestamp.parseToDate(bean.getEventTime());
 
             if (ts != null) {
@@ -185,17 +179,17 @@ public class MessageController extends MultiActionController {
             }
         }
         Date startDate = null;
-        if (bean.getStartDate() != null && bean.getStartDate().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getStartDate())) {
             String date = bean.getStartDate();
             try {
                 startDate = format.parse(date + " " + bean.getStartHour() + ":" + bean.getStartMin());
                 query.after(startDate);
             } catch (ParseException e) {
-                LOGGER.error("ParseException: '{}'", e.getMessage(), e);
+                logger.error("ParseException: '{}'", e.getMessage(), e);
             }
 
         }
-        if (bean.getEndDate() != null && bean.getEndDate().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getEndDate())) {
             String date = bean.getEndDate();
             try {
                 Date dt = format.parse(date + " " + bean.getEndHour() + ":" + bean.getEndMin());
@@ -207,20 +201,20 @@ public class MessageController extends MultiActionController {
                     query.before(dt);
                 }
             } catch (ParseException e) {
-                LOGGER.error("ParseException: '{}'", e.getMessage(), e);
+                logger.error("ParseException: '{}'", e.getMessage(), e);
             }
 
         }
-        if (bean.getEventTypeCode() != null && bean.getEventTypeCode().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getEventTypeCode())) {
             query.addConditional(Query.Conditional.EQUALS, bean.getEventTypeCode(), Query.Target.EVENT_TYPE_CODE);
         }
-        if (bean.getSourceAddress() != null && bean.getSourceAddress().length() > 0) {
+        if (StringUtils.isNotBlank(bean.getSourceAddress())) {
             query.addConditional(Query.Conditional.EQUALS, bean.getSourceAddress(), Query.Target.SOURCE_ADDRESS);
         }
-
         query.setMaxResults(bean.getMaxResults());
         query.setStartOffset(bean.getStartOffset());
         query.orderAscending(Query.Target.ID);
+
         return query;
     }
 }

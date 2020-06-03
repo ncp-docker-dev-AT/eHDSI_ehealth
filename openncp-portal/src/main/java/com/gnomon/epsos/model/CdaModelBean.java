@@ -2,7 +2,7 @@ package com.gnomon.epsos.model;
 
 import com.gnomon.LiferayUtils;
 import com.gnomon.epsos.service.EpsosHelperService;
-import epsos.ccd.gnomon.xslt.EpsosXSLTransformer;
+import epsos.ccd.gnomon.xslt.CdaXSLTransformer;
 import epsos.openncp.protocolterminator.ClientConnectorConsumer;
 import epsos.openncp.protocolterminator.clientconnector.DocumentId;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
@@ -17,17 +17,18 @@ import tr.com.srdc.epsos.util.Constants;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 
 @ManagedBean
 @RequestScoped
 public class CdaModelBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger("cdaModelBean");
+    private final Logger logger = LoggerFactory.getLogger(CdaModelBean.class);
     private String cda;
 
     public CdaModelBean() {
-        LOGGER.info("CDA MODEL BEAN requesting");
+        logger.info("CDA MODEL BEAN requesting");
         cda = null;
     }
 
@@ -54,10 +55,10 @@ public class CdaModelBean implements Serializable {
             String repositoryId = document.getRepositoryId();
             String hcid = document.getHcid();
 
-            LOGGER.info("Retrieving CDA document");
-            LOGGER.info("UUID: '{}'", uuid);
-            LOGGER.info("repositoryId: '{}'", repositoryId);
-            LOGGER.info("hcid: '{}'", hcid);
+            logger.info("Retrieving CDA document");
+            logger.info("UUID: '{}'", uuid);
+            logger.info("repositoryId: '{}'", repositoryId);
+            logger.info("hcid: '{}'", hcid);
             DocumentId documentId = DocumentId.Factory.newInstance();
             documentId.setDocumentUniqueId(uuid);
             documentId.setRepositoryUniqueId(repositoryId);
@@ -82,15 +83,14 @@ public class CdaModelBean implements Serializable {
             selectedEpsosDocument.setDescription(eps.getDescription());
             selectedEpsosDocument.setTitle(eps.getTitle());
 
-            String xmlfile = new String(eps.getBase64Binary(), "UTF-8");
-            EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
+            String xmlfile = new String(eps.getBase64Binary(), StandardCharsets.UTF_8);
             String lang1 = LiferayUtils.getPortalLanguage().replace("_", "-");
             String actionURL = "someurl";
-            cda = xlsClass.transform(xmlfile, lang1, actionURL);
+            cda = CdaXSLTransformer.getInstance().transform(xmlfile, lang1, actionURL);
 
         } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error(ExceptionUtils.getStackTrace(ex));
+            logger.error(ex.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(ex));
         }
 
         return "cda";

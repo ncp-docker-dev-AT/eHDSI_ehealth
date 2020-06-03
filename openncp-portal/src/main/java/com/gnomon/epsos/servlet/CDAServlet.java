@@ -57,7 +57,7 @@ public class CDAServlet extends HttpServlet {
             ClientConnectorConsumer clientConnectorConsumer = MyServletContextListener.getClientConnectorConsumer();
 
             HttpSession session = req.getSession();
-            LOGGER.info("Getting assertions from session");
+            //  Checking validity of the assertions (HCP and TRC)
             Assertion hcpAssertion = (Assertion) session.getAttribute("hcpAssertion");
             Assertion trcAssertion = (Assertion) session.getAttribute("trcAssertion");
             String selectedCountry = (String) session.getAttribute("selectedCountry");

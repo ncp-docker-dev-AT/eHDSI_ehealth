@@ -42,8 +42,8 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
             logger.debug("HCP Identity Assertion Healthcare Facility Type: '{}'", facilityType);
         } else {
-            logger.warn("InvalidFieldException: epSOS HealthCare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
-            throw new InvalidFieldException("epSOS Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
+            logger.warn("InvalidFieldException: eHealth DSI Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
+            throw new InvalidFieldException("eHealth DSI Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
         }
     }
 
@@ -140,7 +140,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
         String resourceId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_1_0_RESOURCE_RESOURCE_ID);
         if (StringUtils.isBlank(resourceId)) {
-            throw new InvalidFieldException("XSPA subject 'urn:oasis:names:tc:xacml:1.0:resource:resource-id' attribute in assertion should be filled.");
+            throw new InvalidFieldException("XSPA Subject 'urn:oasis:names:tc:xacml:1.0:resource:resource-id' attribute in assertion should be filled.");
         }
     }
 

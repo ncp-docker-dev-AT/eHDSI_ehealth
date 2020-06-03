@@ -133,13 +133,13 @@ public class AssertionHandler implements Serializable {
 
         AttributeStatement attributeStatement = create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
 
-        Attribute attrPID = createAttribute(builderFactory, "XSPA subject",
+        Attribute attrPID = createAttribute(builderFactory, "XSPA Subject",
                 "urn:oasis:names:tc:xacml:1.0:subject:subject-id", userDetails.getCommonName(), "", "");
         attributeStatement.getAttributes().add(attrPID);
 
         //  TODO fix multiple roles??
         String role = AssertionHandlerConfigManager.getRole(userDetails.getRoles().get(0));
-        Attribute attrPID_1 = createAttribute(builderFactory, "XSPA role", URN_OASIS_NAMES_TC_XSPA_2_0_ROLE, role, "", "");
+        Attribute attrPID_1 = createAttribute(builderFactory, "XSPA Role", URN_OASIS_NAMES_TC_XSPA_2_0_ROLE, role, "", "");
         attributeStatement.getAttributes().add(attrPID_1);
 
         String functionalRole = AssertionHandlerConfigManager.getFunctionalRole(userDetails.getRoles().get(0));
@@ -154,7 +154,7 @@ public class AssertionHandler implements Serializable {
                 "urn:oasis:names:tc:xspa:1.0:subject:organization-id", Constants.OID_PREFIX + userDetails.getOrganizationId(), "AA", "");
         attributeStatement.getAttributes().add(attrPID_4);
 
-        Attribute attrPID_5 = createAttribute(builderFactory, "epSOS Healthcare Facility Type",
+        Attribute attrPID_5 = createAttribute(builderFactory, "eHealth DSI Healthcare Facility Type",
                 "urn:epsos:names:wp3.4:subject:healthcare-facility-type", AssertionHandlerConfigManager.getFacilityType(userDetails.getRoles().get(0)), "", "");
         attributeStatement.getAttributes().add(attrPID_5);
 

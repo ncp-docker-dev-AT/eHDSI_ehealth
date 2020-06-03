@@ -243,11 +243,9 @@ public class HTTPUtil {
     /**
      * @return
      */
-    public static boolean isProxyAuthenticationMandatory() {
+    public static boolean isBehindProxy() {
 
-        ConfigurationManager configService = ConfigurationManagerFactory.getConfigurationManager();
-
-        return Boolean.parseBoolean(configService.getProperty(StandardProperties.HTTP_PROXY_USED));
+        return Boolean.parseBoolean(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_USED));
     }
 
     /**
@@ -271,7 +269,7 @@ public class HTTPUtil {
     public CustomProxySelector setCustomProxyServerForURLConnection() {
 
         CustomProxySelector ps;
-        if (isProxyAuthenticationMandatory()) {
+        if (isBehindProxy()) {
             ProxyCredentials proxyCredentials = getProxyCredentials();
             ps = new CustomProxySelector(ProxySelector.getDefault(), proxyCredentials);
             return ps;

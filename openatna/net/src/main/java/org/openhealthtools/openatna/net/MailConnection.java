@@ -1,25 +1,5 @@
-/**
- * Copyright (c) 2009-2011 Misys Open Source Solutions (MOSS) and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * Misys Open Source Solutions - initial API and implementation
- * -
- */
 package org.openhealthtools.openatna.net;
 
-import org.bouncycastle.cms.RecipientId;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -42,14 +22,14 @@ import java.util.Properties;
 
 public class MailConnection {
 
-    static Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.net.MailConnection");
+    private final Logger logger = LoggerFactory.getLogger(MailConnection.class);
 
-    IConnectionDescription description = null;
-    PropertySet smtp = null;
-    PropertySet pop3 = null;
-    PropertySet senderKeystore = null;
-    Session session = null;
-    Transport transport = null;
+    IConnectionDescription description;
+    PropertySet smtp;
+    PropertySet pop3;
+    PropertySet senderKeystore;
+    Session session;
+    Transport transport;
     Store store = null;
     Folder inbox = null;
     String senderKeystoreFile = null;
@@ -68,14 +48,14 @@ public class MailConnection {
         try {
             transport = session.getTransport("smtp");
         } catch (NoSuchProviderException e) {
-            log.error("Transport misconfigured, no smtp provider.", e);
+            logger.error("Transport misconfigured, no smtp provider.", e);
             transport = null;
             smtp = null;
         }
         try {
             store = session.getStore("pop3");
         } catch (NoSuchProviderException e) {
-            log.error("Transport misconfigured, no smtp provider.");
+            logger.error("Transport misconfigured, no smtp provider.");
             transport = null;
             smtp = null;
         }
@@ -87,13 +67,13 @@ public class MailConnection {
             transport.sendMessage(message, message.getAllRecipients());
             transport.close();
         } else {
-            log.error("Transport and smtp must be set before sending messages.");
+            logger.error("Transport and smtp must be set before sending messages.");
             throw new MessagingException("Attempt to send to invalid smtp connection.");
         }
     }
 
     public Message[] retrieveAllMessages() throws MessagingException {
-        Message messages[] = null;
+        Message[] messages = null;
         if (store != null && pop3 != null) {
             if (inbox == null) {
                 store.connect(pop3.getValue("HOSTNAME"), pop3.getValue("USERNAME"), pop3.getValue("PASSWORD"));
@@ -102,7 +82,7 @@ public class MailConnection {
             }
             messages = inbox.getMessages();
         } else {
-            log.error("Store and pop3 must be set before retrieving messages.");
+            logger.error("Store and pop3 must be set before retrieving messages.");
             throw new MessagingException("Attempt to retrieve from invalid pop3 connection.");
         }
         return messages;
@@ -120,30 +100,26 @@ public class MailConnection {
             /* Add BC */
             Security.addProvider(new BouncyCastleProvider());
             // Open the key store
-            KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(stream, getSenderKeystorePassword().toCharArray());
+            KeyStore keyStore = KeyStore.getInstance("PKCS12", "BC");
+            keyStore.load(stream, getSenderKeystorePassword().toCharArray());
 
-            // find the certificate for the private key and generate a
-            // suitable recipient identifier.
-            X509Certificate cert = (X509Certificate) ks.getCertificate(getSenderKeyAlias());
-            RecipientId recId = new RecipientId();
-
-            recId.setSerialNumber(cert.getSerialNumber());
-            recId.setIssuer(cert.getIssuerX500Principal().getEncoded());
+            // find the certificate for the private key and generate a suitable recipient identifier.
+            X509Certificate cert = (X509Certificate) keyStore.getCertificate(getSenderKeyAlias());
+            //RecipientId recId = new RecipientId();
+//            recId.setSerialNumber(cert.getSerialNumber());
+//            recId.setIssuer(cert.getIssuerX500Principal().getEncoded());
 
             SMIMEEnveloped m = new SMIMEEnveloped((MimeMessage) message);
             RecipientInformationStore recipients = m.getRecipientInfos();
             // TODO figure out why this doesn't work...
             //RecipientInformation        recipient = recipients.get(recId);
-            RecipientInformation recipient = (RecipientInformation) recipients.getRecipients().iterator().next();
+            RecipientInformation recipient = recipients.getRecipients().iterator().next();
 
-            Key key = ks.getKey(getSenderKeyAlias(), getSenderKeystorePassword().toCharArray());
-            byte[] byteContent = recipient.getContent(key, "BC");
-            MimeBodyPart res = SMIMEUtil.toMimeBodyPart(byteContent);
-            return res;
+            Key key = keyStore.getKey(getSenderKeyAlias(), getSenderKeystorePassword().toCharArray());
+            //byte[] byteContent = recipient.getContent(key, "BC");
+            return SMIMEUtil.toMimeBodyPart(new byte[]{});
 
         } catch (Exception e) {
-            log.error("Problem decrypting message: ", e);
             throw new MessagingException(e.getMessage());
         }
     }
@@ -152,10 +128,8 @@ public class MailConnection {
 
         try {
             SMIMESigned s = new SMIMESigned((MimeMultipart) message.getContent());
-            MimeBodyPart content = s.getContent();
-            return content;
+            return s.getContent();
         } catch (Exception e) {
-            log.error("Problem decrypting message: ", e);
             throw new MessagingException(e.getMessage());
         }
     }

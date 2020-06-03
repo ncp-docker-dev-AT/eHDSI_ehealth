@@ -187,6 +187,30 @@
         </xsl:attribute>
     </xsl:template>
 
+    <xsl:template name="inputformID">
+        <xsl:param name="txt"/>
+        <xsl:param name="root"/>
+        <xsl:param name="extension"/>
+        <xsl:attribute name="id">
+            <xsl:value-of select="$txt"/>
+            <xsl:value-of select="position()-1"/>
+        </xsl:attribute>
+        <xsl:attribute name="name">
+            <xsl:value-of select="$txt"/>
+            <xsl:value-of select="position()-1"/>
+        </xsl:attribute>
+        <xsl:attribute name="value">
+            <xsl:choose>
+                <xsl:when test="$extension">
+                    <xsl:value-of select="concat($root, '^', $extension)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="$root"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:attribute>
+    </xsl:template>
+
     <xsl:template name="add-newUnitMeasure">
         <xsl:param name="unit"/>
         <xsl:text disable-output-escaping="yes">&lt;option value=&quot;</xsl:text>
@@ -378,6 +402,19 @@
                                 </tr>
                                 <tr>
                                     <th>
+                                        <!-- Units per intake -->
+                                        <xsl:call-template name="show-epSOSDisplayLabels">
+                                            <xsl:with-param name="code" select="'78'"/>
+                                        </xsl:call-template>
+                                    </th>
+                                    <td>
+                                        <xsl:call-template name="show-IVL_PQ">
+                                            <xsl:with-param name="node" select="n1:doseQuantity"/>
+                                        </xsl:call-template>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
                                         <!-- Frequency of Intakes -->
                                         <xsl:call-template name="show-epSOSDisplayLabels">
                                             <xsl:with-param name="code" select="'32'"/>
@@ -472,19 +509,6 @@
                                     </th>
                                     <td>
                                         <xsl:call-template name="substitution-code"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>
-                                        <!-- Units per intake -->
-                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                            <xsl:with-param name="code" select="'78'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <td>
-                                        <xsl:call-template name="show-IVL_PQ">
-                                            <xsl:with-param name="node" select="n1:doseQuantity"/>
-                                        </xsl:call-template>
                                     </td>
                                 </tr>
                             </table>
@@ -638,9 +662,10 @@
                                                 </xsl:attribute>
                                             </input>
                                             <input type="hidden">
-                                                <xsl:call-template name="inputform">
+                                                <xsl:call-template name="inputformID">
                                                     <xsl:with-param name="txt" select="'dispensationid_'"/>
-                                                    <xsl:with-param name="val" select="n1:id/@extension"/>
+                                                    <xsl:with-param name="root" select="n1:id/@root"/>
+                                                    <xsl:with-param name="extension" select="n1:id/@extension"/>
                                                 </xsl:call-template>
                                             </input>
                                             <xsl:variable name="currentPackageFormName">

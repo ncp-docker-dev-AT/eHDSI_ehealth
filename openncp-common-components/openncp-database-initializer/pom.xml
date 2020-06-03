@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp-common-components</artifactId>
-        <version>4.0.3</version>
+        <version>4.1.0</version>
     </parent>
 
     <artifactId>openncp-database-initializer</artifactId>
@@ -14,7 +14,7 @@
     <name>OpenNCP Database Initializer</name>
 
     <properties>
-        <liquibase.version>3.6.3</liquibase.version>
+        <liquibase.version>3.9.0</liquibase.version>
     </properties>
 
     <build>

@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>4.0.3</version>
+        <version>4.1.0</version>
     </parent>
 
     <artifactId>openncp-web-portal</artifactId>
@@ -69,13 +69,13 @@
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itextpdf</artifactId>
-            <version>5.4.0</version>
+            <version>5.5.13.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.itextpdf.tool</groupId>
             <artifactId>xmlworker</artifactId>
-            <version>5.4.0</version>
+            <version>5.5.13.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.wicket</groupId>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.2</version>
+            <version>${commons-beanutils.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-configuration</groupId>
@@ -120,7 +120,7 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>serializer</artifactId>
-            <version>2.7.1</version>
+            <version>${xalan.version}</version>
         </dependency>
         <!-- JETTY DEPENDENCIES FOR TESTING -->
         <dependency>
@@ -186,11 +186,11 @@
             <artifactId>spring-instrument</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-instrument-tomcat</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework</groupId>-->
+<!--            <artifactId>spring-instrument-tomcat</artifactId>-->
+<!--            <version>${spring.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
@@ -226,11 +226,11 @@
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc-portlet</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework</groupId>-->
+<!--            <artifactId>spring-webmvc-portlet</artifactId>-->
+<!--            <version>${spring.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
@@ -310,6 +310,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.65</version>
+        </dependency>
+        <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
             <version>${saxon-he.version}</version>
@@ -324,7 +329,7 @@
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-            <version>2.9.1</version>
+            <version>${xerces.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -332,6 +337,12 @@
             <artifactId>selenium-java</artifactId>
             <version>2.37.0</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>xalan</artifactId>
+                    <groupId>xalan</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -442,7 +453,9 @@
                         <goals>
                             <goal>wsimport</goal>
                         </goals>
+                        <phase>generate-sources</phase>
                         <configuration>
+                            <extension>true</extension>
                             <wsdlFiles>
                                 <wsdlFile>ClientConnectorService.wsdl</wsdlFile>
                             </wsdlFiles>
