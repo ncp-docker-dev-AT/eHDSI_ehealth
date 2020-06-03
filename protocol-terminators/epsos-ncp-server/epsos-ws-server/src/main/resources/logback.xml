@@ -27,10 +27,6 @@
         <appender-ref ref="FILE_CLINICAL"/>
     </logger>
 
-    <logger name="ee.affecto.epsos.util" level="INFO" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
     <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
@@ -45,6 +41,14 @@
     <!-- End Spring Web Service Logging-->
 
     <logger name="org.apache.axis2" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="ee.affecto.epsos.util" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="ee.affecto.epsos.ws.handler" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

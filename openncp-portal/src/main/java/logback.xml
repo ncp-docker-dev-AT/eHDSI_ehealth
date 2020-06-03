@@ -39,6 +39,10 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
+    <logger name="ee.affecto.epsos.ws.handler" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="com.gnomon.epsos" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
