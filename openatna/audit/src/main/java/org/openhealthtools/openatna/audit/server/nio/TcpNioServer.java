@@ -23,16 +23,12 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-/**
- * @author Andrew Harrison
- * @version 1.0.0 Sep 28, 2010
- */
 public class TcpNioServer implements Notifier, Server {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TcpNioServer.class);
+    private final Logger logger = LoggerFactory.getLogger(TcpNioServer.class);
 
-    private AtnaServer atnaServer;
-    private IConnectionDescription tlsConnection;
+    private final AtnaServer atnaServer;
+    private final IConnectionDescription tlsConnection;
     private IoAcceptor acceptor;
 
 
@@ -62,15 +58,15 @@ public class TcpNioServer implements Notifier, Server {
             chain.addLast("codec", new ProtocolCodecFilter(new SyslogProtocolCodecFactory()));
             acceptor.setFilterChainBuilder(chain);
             acceptor.bind(new InetSocketAddress(tlsConnection.getHostname(), tlsConnection.getPort()), new SyslogProtocolHandler(this));
-            LOGGER.info("TLS Server '{}' running on port: '{}'", tlsConnection.getHostname(), tlsConnection.getPort());
+            logger.info("TLS Server '{}' running on port: '{}'", tlsConnection.getHostname(), tlsConnection.getPort());
 
         } catch (IOException e) {
-            LOGGER.error("IoException: '{}'", e.getMessage(), e);
+            logger.error("IoException: '{}'", e.getMessage(), e);
         }
     }
 
     public void stop() {
-        LOGGER.info("TLS Server shutting down...");
+        logger.info("TLS Server shutting down...");
         if (acceptor != null) {
             acceptor.unbindAll();
         }

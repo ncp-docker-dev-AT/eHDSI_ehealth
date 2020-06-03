@@ -30,23 +30,18 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author Andrew Harrison
- * @version 1.0.0
- * @date Feb 6, 2010: 7:11:49 PM
- */
 public class StringifiedMessage {
 
     private Long id;
-    private Set<MessageParticipantEntity> messageParticipants = new HashSet<>();
-    private Set<MessageSourceEntity> messageSources = new HashSet<>();
-    private Set<MessageObjectEntity> messageObjects = new HashSet<>();
+    private Set<MessageParticipantEntity> messageParticipants;
+    private Set<MessageSourceEntity> messageSources;
+    private Set<MessageObjectEntity> messageObjects;
     private EventIdCodeEntity eventId;
-    private Set<EventTypeCodeEntity> eventTypeCodes = new HashSet<>();
-    private String eventActionCode = "";
+    private Set<EventTypeCodeEntity> eventTypeCodes;
+    private String eventActionCode;
     private Date eventDateTime;
     private Integer eventOutcome;
-    private String sourceAddress = "";
+    private String sourceAddress;
     private String messageContent = "";
 
     public StringifiedMessage(MessageEntity messageEntity) {
@@ -55,10 +50,11 @@ public class StringifiedMessage {
 
         if (messageEntity.getMessageContent() != null) {
             this.messageContent = new String(messageEntity.getMessageContent(), StandardCharsets.UTF_8);
-            this.messageContent = this.messageContent.replaceAll("<", "&lt;");
+            this.messageContent = this.messageContent.replace("<", "&lt;");
         }
         this.messageParticipants = messageEntity.getMessageParticipants();
         this.messageSources = messageEntity.getMessageSources();
+        messageObjects = new HashSet<>();
         this.messageObjects = messageEntity.getMessageObjects();
         this.eventId = messageEntity.getEventId();
         this.eventTypeCodes = messageEntity.getEventTypeCodes();
@@ -68,21 +64,17 @@ public class StringifiedMessage {
         this.sourceAddress = messageEntity.getSourceAddress();
     }
 
-
     public Long getId() {
         return id;
     }
-
 
     public void setId(Long id) {
         this.id = id;
     }
 
-
     public Set<MessageParticipantEntity> getMessageParticipants() {
         return messageParticipants;
     }
-
 
     public void setMessageParticipants(
             Set<MessageParticipantEntity> messageParticipants) {

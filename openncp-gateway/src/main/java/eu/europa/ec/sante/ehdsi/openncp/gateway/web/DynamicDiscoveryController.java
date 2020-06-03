@@ -22,9 +22,12 @@ public class DynamicDiscoveryController {
     @GetMapping(value = "/dynamicdiscovery/syncsearchmask")
     public String synchronizeSearchMask(Model model) {
 
-        logger.info("[Gateway] Synchronize Search Mask at ('{}')", DateTimeUtil.formatTimeInMillis(System.currentTimeMillis()));
+        if (logger.isInfoEnabled()) {
+            logger.info("[Gateway] Synchronize Search Mask at ('{}')", DateTimeUtil.formatTimeInMillis(System.currentTimeMillis()));
+        }
         String countryList = ConfigurationManagerFactory.getConfigurationManager().getProperty("ncp.countries");
         String[] countries = StringUtils.split(countryList, ",");
+        countries = StringUtils.stripAll(countries);
         List<String> synchronizedCountry = new ArrayList<>();
 
         for (String countryCode : countries) {

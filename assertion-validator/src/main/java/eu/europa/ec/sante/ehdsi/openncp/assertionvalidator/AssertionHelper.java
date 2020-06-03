@@ -81,4 +81,14 @@ public class AssertionHelper {
             throw new InsufficientRightsException(4703);
         }
     }
+
+    public static boolean isExpired(Assertion assertion) {
+
+        if (assertion.getConditions().getNotBefore() != null && assertion.getConditions().getNotBefore().isAfterNow()) {
+            return true;
+        }
+
+        return assertion.getConditions().getNotOnOrAfter() != null
+                && (assertion.getConditions().getNotOnOrAfter().isBeforeNow() || assertion.getConditions().getNotOnOrAfter().isEqualNow());
+    }
 }

@@ -29,11 +29,11 @@ import java.util.concurrent.Executors;
  */
 public class UdpServer implements Notifier {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UdpServer.class);
+    private final Logger logger = LoggerFactory.getLogger(UdpServer.class);
 
-    private ExecutorService exec = Executors.newFixedThreadPool(5);
+    private final ExecutorService exec = Executors.newFixedThreadPool(10);
+    private final Set<SyslogListener> listeners = new HashSet<>();
     private UdpConfig udpconfig;
-    private Set<SyslogListener> listeners = new HashSet<>();
     private DatagramAcceptor acceptor;
 
     public void configure(UdpConfig config) {
@@ -54,9 +54,9 @@ public class UdpServer implements Notifier {
 
             acceptor.setFilterChainBuilder(chain);
             acceptor.bind(new InetSocketAddress(host, udpconfig.getPort()), new UdpProtocolHandler(this, udpconfig.getMtu()));
-            LOGGER.info("Server has been started on port '{}'", udpconfig.getPort());
+            logger.info("Server has been started on port '{}'", udpconfig.getPort());
         } catch (IOException e) {
-            LOGGER.error("IOException: '{}'", e.getMessage(), e);
+            logger.error("IOException: '{}'", e.getMessage(), e);
         }
     }
 
@@ -67,7 +67,6 @@ public class UdpServer implements Notifier {
 
         exec.shutdown();
     }
-
 
     public void addSyslogListener(SyslogListener listener) {
         listeners.add(listener);

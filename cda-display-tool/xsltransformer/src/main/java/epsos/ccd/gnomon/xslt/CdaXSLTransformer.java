@@ -21,19 +21,66 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class EpsosXSLTransformer {
+public class CdaXSLTransformer {
 
     private static final String MAIN_XSLT = "/resources/cda.xsl";
     private static final String STANDARD_XSLT = "/resources/def_cda.xsl";
-    private final Logger logger = LoggerFactory.getLogger(EpsosXSLTransformer.class);
-    private final Path path = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository");
+    private static final Path PATH = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository");
+    private static final Logger LOGGER = LoggerFactory.getLogger(CdaXSLTransformer.class);
+    private static CdaXSLTransformer instance = null;
+
+    private CdaXSLTransformer() {
+        // Private constructor of the singleton.
+    }
+
+    public static synchronized CdaXSLTransformer getInstance() {
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Getting Instance of CdaXSLTransformer...");
+        }
+        if (instance == null) {
+            checkLanguageFiles();
+            instance = new CdaXSLTransformer();
+        }
+        return instance;
+    }
+
+    /**
+     * Util method checking if the eHDSI Translation Repository has been initialized and the number of files available.
+     */
+    private static void checkLanguageFiles() {
+
+        try {
+            File file = new File(PATH.toUri());
+            if (file.exists() && file.isDirectory()) {
+
+                String[] files = file.list();
+                if (files == null || files.length == 0) {
+                    throw new TerminologyFileNotFoundException("Files containing translations are not available into the folder: " + PATH.toUri());
+                } else {
+                    int count = 0;
+                    for (String fileName : files) {
+
+                        if (new File(Paths.get(PATH.toString(), fileName).toUri()).exists()) {
+                            count++;
+                        }
+                    }
+                    LOGGER.info("eHDSI Translation repository initialized with '{}' files", count);
+                }
+            } else {
+                throw new TerminologyFileNotFoundException("Folder " + PATH.toString() + " doesn't exists");
+            }
+        } catch (Exception e) {
+            LOGGER.error("FATAL ERROR: '{}'", e.getMessage(), e);
+        }
+    }
 
     /**
      * @param xml cda xml
      * @return
      */
     public String transformUsingStandardCDAXsl(String xml) {
-        return transform(xml, "en-US", null, path, true, false, STANDARD_XSLT);
+        return transform(xml, "en-US", null, PATH, true, false, STANDARD_XSLT);
     }
 
     /**
@@ -50,8 +97,7 @@ public class EpsosXSLTransformer {
                              boolean showNarrative, String xsl) {
 
         String output = "";
-        checkLanguageFiles();
-        logger.info("Trying to transform XML using action path for dispensation '{}' and repository path '{}' to language {}",
+        LOGGER.info("Trying to transform XML using action path for dispensation '{}' and repository path '{}' to language {}",
                 actionPath, path, lang);
 
         try {
@@ -60,13 +106,13 @@ public class EpsosXSLTransformer {
 
             String systemId = xslUrl.toExternalForm();
             System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
-            if (logger.isInfoEnabled()) {
-                logger.info("XSL: '{}'", xsl);
-                logger.info("Main XSL: '{}'", xslUrl);
-                logger.info("SystemID: '{}'", systemId);
-                logger.info("Path: '{}'", path);
-                logger.info("Lang: '{}'", lang);
-                logger.info("Show Narrative: '{}'", showNarrative);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("XSL: '{}'", xsl);
+                LOGGER.info("Main XSL: '{}'", xslUrl);
+                LOGGER.info("SystemID: '{}'", systemId);
+                LOGGER.info("Path: '{}'", path);
+                LOGGER.info("Lang: '{}'", lang);
+                LOGGER.info("Show Narrative: '{}'", showNarrative);
             }
 
             StreamSource xmlSource = new StreamSource(new StringReader(xml));
@@ -90,15 +136,15 @@ public class EpsosXSLTransformer {
 
             File resultFile = File.createTempFile("Streams", ".html");
             Result result = new StreamResult(resultFile);
-            logger.info("Temp file goes to : '{}'", resultFile.getAbsolutePath());
+            LOGGER.info("Temp file goes to : '{}'", resultFile.getAbsolutePath());
             transformer.transform(xmlSource, result);
             output = readFile(resultFile.getAbsolutePath());
             if (!export) {
                 Files.delete(Paths.get(resultFile.getCanonicalPath()));
-                logger.debug("Deleting temp file '{}' successfully", resultFile.getAbsolutePath());
+                LOGGER.debug("Deleting temp file '{}' successfully", resultFile.getAbsolutePath());
             }
         } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
         return output;
     }
@@ -106,8 +152,7 @@ public class EpsosXSLTransformer {
     /**
      * @param xml        the source cda xml file
      * @param lang       the language you want the labels, value set to be displayed
-     * @param actionPath the url that you want to post the dispensation form. Leave it
-     *                   empty to not allow dispensation
+     * @param actionPath the url that you want to post the dispensation form. Leave it empty to not allow dispensation
      * @param path       the path of the repository containing files including translations.
      * @param export     whether to export file to temp folder or not
      * @return the cda document in html format
@@ -136,12 +181,12 @@ public class EpsosXSLTransformer {
      * @return the cda document in html format
      */
     public String transform(String xml, String lang, String actionPath) {
-        return transform(xml, lang, actionPath, path, false);
+        return transform(xml, lang, actionPath, PATH, false);
     }
 
     /* hides links that exist in html */
     public String transformForPDF(String xml, String lang, boolean export) {
-        return transform(xml, lang, "", path, export, false, MAIN_XSLT);
+        return transform(xml, lang, "", PATH, export, false, MAIN_XSLT);
     }
 
     /**
@@ -154,7 +199,7 @@ public class EpsosXSLTransformer {
      * @return the cda document in html format
      */
     public String transformWithOutputAndUserHomePath(String xml, String lang, String actionPath) {
-        return transform(xml, lang, actionPath, path, true);
+        return transform(xml, lang, actionPath, PATH, true);
     }
 
     /**
@@ -177,33 +222,5 @@ public class EpsosXSLTransformer {
 
     public String readFile(File file) throws IOException {
         return new String(Files.readAllBytes(Paths.get(file.toURI())));
-    }
-
-    /**
-     *
-     */
-    private void checkLanguageFiles() {
-
-        try {
-            File file = new File(path.toUri());
-            if (file.exists() && file.isDirectory()) {
-
-                String[] files = file.list();
-                if (files == null || files.length == 0) {
-                    throw new TerminologyFileNotFoundException("Files containing translations are not available into the folder: " + path.toUri());
-                } else {
-                    for (String fileName : files) {
-
-                        if (new File(Paths.get(path.toString(), fileName).toUri()).exists()) {
-                            logger.info("File '{}' available", fileName);
-                        }
-                    }
-                }
-            } else {
-                throw new TerminologyFileNotFoundException("Folder " + path.toString() + " doesn't exists");
-            }
-        } catch (Exception e) {
-            logger.error("FATAL ERROR: '{}'", e.getMessage(), e);
-        }
     }
 }

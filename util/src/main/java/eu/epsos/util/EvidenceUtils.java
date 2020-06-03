@@ -477,6 +477,7 @@ public class EvidenceUtils {
         //ISO 8601 format: 2017-11-25T10:59:53Z
         String date = ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT);
         date = StringUtils.replace(date, ":", "-");
+        uuid = StringUtils.replace(uuid, ":", "_");
         return date + "_" + evidenceType + "_" + (StringUtils.isNotBlank(uuid) ? uuid : "NO-UUID") + "_" + title;
     }
 

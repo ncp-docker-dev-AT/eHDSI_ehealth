@@ -49,9 +49,4 @@ public interface ConfigurationManager {
      * @param value
      */
     void setProperty(String key, String value);
-
-    /**
-     * @param countryCode
-     */
-    void fetchInternationalSearchMask(String countryCode);
 }

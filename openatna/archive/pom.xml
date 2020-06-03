@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
         <artifactId>openncp-openatna</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>openatna-archive</artifactId>
@@ -15,11 +15,6 @@
     <name>OpenNCP OpenATNA Archive</name>
 
     <dependencies>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-        </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
             <artifactId>openatna-anom</artifactId>

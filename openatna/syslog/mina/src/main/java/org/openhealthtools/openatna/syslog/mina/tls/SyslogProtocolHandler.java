@@ -22,7 +22,7 @@ public class SyslogProtocolHandler extends IoHandlerAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(SyslogProtocolHandler.class);
 
-    private Notifier server;
+    private final Notifier server;
 
     public SyslogProtocolHandler(Notifier server) {
         this.server = server;
@@ -48,7 +48,7 @@ public class SyslogProtocolHandler extends IoHandlerAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
 
-        logger.error("Exception: '{}'", cause.getMessage(), cause);
+        logger.warn("Error: '{}'", cause.getMessage(), cause);
         session.close();
     }
 

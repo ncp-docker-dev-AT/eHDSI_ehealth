@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import epsos.ccd.gnomon.xslt.EpsosXSLTransformer;
+import epsos.ccd.gnomon.xslt.CdaXSLTransformer;
 import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
 import epsos.openncp.protocolterminator.clientconnector.PatientId;
 import org.apache.commons.codec.binary.Base64;
@@ -36,7 +36,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -59,7 +58,7 @@ public class EpsosRestService {
     private static final String PURPOSE_OF_USE_TREATMENT = "TREATMENT";
     @Context
     private static HttpServletRequest servletRequest;
-    private static JAXBContext jaxbContext;
+    private static final JAXBContext jaxbContext;
 
     static {
         try {
@@ -330,8 +329,7 @@ public class EpsosRestService {
         try {
             Document doc = Utils.readXml(streamSource);
             soapMessage = Utils.transformDomToString(doc);
-            EpsosXSLTransformer xlsClass = new EpsosXSLTransformer();
-            convertedcda = xlsClass.transformUsingStandardCDAXsl(soapMessage);
+            convertedcda = CdaXSLTransformer.getInstance().transformUsingStandardCDAXsl(soapMessage);
         } catch (Exception e) {
             LOGGER.error("Error processing request");
             LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -339,7 +337,6 @@ public class EpsosRestService {
         }
 
         return Response.ok().entity(convertedcda).build();
-
     }
 
     @POST

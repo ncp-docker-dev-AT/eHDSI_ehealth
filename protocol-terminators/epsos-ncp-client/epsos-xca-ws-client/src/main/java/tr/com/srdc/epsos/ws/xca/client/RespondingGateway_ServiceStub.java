@@ -86,16 +86,16 @@ public class RespondingGateway_ServiceStub extends Stub {
     }
 
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-    protected AxisOperation[] _operations;
     //hashmaps to keep the fault mapping
-    private java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
-    private java.util.HashMap faultExceptionClassNameMap = new java.util.HashMap();
-    private java.util.HashMap faultMessageMap = new java.util.HashMap();
+    private final java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
+    private final java.util.HashMap faultExceptionClassNameMap = new java.util.HashMap();
+    private final java.util.HashMap faultMessageMap = new java.util.HashMap();
+    private final QName[] opNameArray = null;
+    protected AxisOperation[] _operations;
     private String addr;
     private String countryCode;
     private Date transactionStartTime;
     private Date transactionEndTime;
-    private QName[] opNameArray = null;
 
     /**
      * Constructor that takes in a configContext
@@ -588,8 +588,6 @@ public class RespondingGateway_ServiceStub extends Stub {
             OMNode node = factory.createOMText(XCAConstants.SOAP_HEADERS.RETRIEVE.REQUEST_ACTION);
             action.addChild(node);
 
-            //OMAttribute att1 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
-            //action.addAttribute(att1);
             OMElement id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("MessageID", ns2);
             OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
             id.addChild(node2);
@@ -598,8 +596,6 @@ public class RespondingGateway_ServiceStub extends Stub {
             OMNode node3 = factory.createOMText(addr);
             to.addChild(node3);
 
-            //OMAttribute att2 = factory.createOMAttribute(XCAConstants.SOAP_HEADERS.MUST_UNDERSTAND, env.getNamespace(), "1");
-            //to.addAttribute(att2);
             OMElement replyTo = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("ReplyTo", ns2);
             OMElement address = OMAbstractFactory.getSOAP12Factory().createOMElement("Address", ns2);
             OMNode node4 = factory.createOMText(XCAConstants.SOAP_HEADERS.ADDRESSING_NAMESPACE);
@@ -1051,11 +1047,11 @@ public class RespondingGateway_ServiceStub extends Stub {
         /**
          * Namespace
          */
-        private String nsuri;
+        private final String nsuri;
         /**
          * Local name
          */
-        private String name;
+        private final String name;
 
         /**
          * Constructor from object and marshaller.

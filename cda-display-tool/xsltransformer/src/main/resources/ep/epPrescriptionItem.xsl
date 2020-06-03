@@ -202,9 +202,7 @@
         <xsl:attribute name="value">
             <xsl:choose>
                 <xsl:when test="$extension">
-                    <xsl:value-of select="$root"/>
-                    ^
-                    <xsl:value-of select="$extension"/>
+                    <xsl:value-of select="concat($root, '^', $extension)"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:value-of select="$root"/>

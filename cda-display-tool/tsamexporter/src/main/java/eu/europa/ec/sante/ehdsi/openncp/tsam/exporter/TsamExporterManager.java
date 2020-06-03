@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.*;
 import java.nio.file.Paths;
@@ -33,14 +34,13 @@ public class TsamExporterManager {
 
     @SuppressWarnings("WeakerAccess")
     public void export() {
-        String epsosPropsPath = environment.getRequiredProperty("openncp.root.path");
-        //String epsosPropsPath = System.getenv("EPSOS_PROPS_PATH");
-        if (StringUtils.isBlank(epsosPropsPath)) {
+
+        String applicationPath = environment.getRequiredProperty("openncp.root.path");
+        if (StringUtils.isBlank(applicationPath)) {
             throw new TsamExporterException("Environment variable 'EPSOS_PROPS_PATH' is not defined!");
         }
 
-        logger.debug("Retrieving value sets ...");
-
+        logger.debug("[TSAM Exporter] Retrieving Terminology Value Sets...");
         List<ValueSet> valueSets = jdbcTemplate.query(
                 "SELECT id, oid, epsos_name FROM value_set",
                 (resultSet, i) -> new ValueSet(
@@ -49,14 +49,16 @@ public class TsamExporterManager {
                         resultSet.getString(3)));
 
         logger.info("{} value sets retrieved from the database", valueSets.size());
-
+        File terminologyRepository = Paths.get(applicationPath, "EpsosRepository").toFile();
+        if (terminologyRepository.exists()) {
+            logger.info("[TSAM Exporter] Deleting previous Local Terminology Repository");
+            FileSystemUtils.deleteRecursively(terminologyRepository);
+        }
+        boolean directoryCreated = terminologyRepository.mkdir();
+        logger.info("[TSAM Exporter] Local Terminology Repository folder created: '{}'", directoryCreated);
         valueSets.forEach(valueSet -> {
-            File epsosRepository = Paths.get(epsosPropsPath, "EpsosRepository").toFile();
-            if (!epsosRepository.exists()) {
-                epsosRepository.mkdir();
-            }
 
-            try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(epsosRepository, valueSet.getOid() + ".xml"))))) {
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(terminologyRepository, valueSet.getOid() + ".xml"))))) {
                 out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
                 out.println("");
                 out.println("<ValueSet oid=\"" + valueSet.getOid() + "\" name=\"" + valueSet.getName() + "\">");
@@ -96,7 +98,6 @@ public class TsamExporterManager {
 
                     out.println("    </concept>");
                 });
-
                 out.println("</ValueSet>");
             } catch (IOException e) {
                 throw new TsamExporterException("An IOException has occurred!", e);

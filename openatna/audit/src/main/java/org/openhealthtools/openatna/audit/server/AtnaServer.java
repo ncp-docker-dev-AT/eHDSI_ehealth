@@ -19,14 +19,14 @@ public class AtnaServer {
 
     private final Logger logger = LoggerFactory.getLogger(AtnaServer.class);
 
-    private IConnectionDescription tlsConnection;
-    private IConnectionDescription udpConnection;
+    private final IConnectionDescription tlsConnection;
+    private final IConnectionDescription udpConnection;
     private Server tcpServer = null;
     private Server udpServer = null;
-    private boolean nio = false;
+    private final boolean nio;
     private MessageQueue queue = null;
 
-    private ExecutorService exec;
+    private final ExecutorService exec;
 
     public AtnaServer(IConnectionDescription tlsConnection, IConnectionDescription udpConnection, int threads, boolean nio) {
         this.tlsConnection = tlsConnection;
@@ -36,7 +36,7 @@ public class AtnaServer {
     }
 
     public AtnaServer(IConnectionDescription tlsConnection, IConnectionDescription udpConnection) {
-        this(tlsConnection, udpConnection, 5, false);
+        this(tlsConnection, udpConnection, 10, false);
     }
 
     public void start(SyslogListener listener) {

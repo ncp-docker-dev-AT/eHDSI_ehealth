@@ -30,6 +30,10 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="org.hibernate.orm.deprecation" level="ERROR" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <!-- Spring Web Service Payload Logging - Uncomment to enable MessageTracing Request/Response-->
     <!--<logger name="org.springframework.ws.client.MessageTracing" level="TRACE" additivity="false">-->
     <!--<appender-ref ref="FILE_CLINICAL"/>-->
