@@ -195,9 +195,21 @@
                             </td>
                             <td>
                                 <!-- Clinical Manifestation -->
-                                <xsl:call-template name="show-epSOSReactionAllergy">
-                                    <xsl:with-param name="node" select="$clinicalManifestation"/>
-                                </xsl:call-template>
+                                <xsl:choose>
+                                    <xsl:when test="not($clinicalManifestation/@nullFlavor)">
+                                        <xsl:call-template name="show-epSOSReactionAllergy">
+                                            <xsl:with-param name="node" select="$clinicalManifestation"/>
+                                        </xsl:call-template>
+                                        <xsl:call-template name="show-epSOSIllnessesandDisorders">
+                                            <xsl:with-param name="node" select="$clinicalManifestation"/>
+                                        </xsl:call-template>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:call-template name="show-epSOSNullFlavor">
+                                            <xsl:with-param name="code" select="$clinicalManifestation/@nullFlavor"/>
+                                        </xsl:call-template>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </td>
                             <td>
                                 <!-- Agent -->
