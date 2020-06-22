@@ -39,13 +39,11 @@ import java.util.*;
  */
 public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorServiceMessageReceiverInOut.class);
-
     static {
-        LOGGER.debug("Loading the WS-Security init libraries in ClientConnectorServiceMessageReceiverInOut 2009");
         org.apache.xml.security.Init.init();
     }
 
+    private final Logger logger = LoggerFactory.getLogger(ClientConnectorServiceMessageReceiverInOut.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     @Override
@@ -63,23 +61,22 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 loggerClinical.debug("Incoming '{}' request message from portal:\n{}", operationName, logRequestMsg);
 
             } catch (Exception ex) {
-                LOGGER.debug(ex.getLocalizedMessage(), ex);
+                logger.debug(ex.getLocalizedMessage(), ex);
             }
         }
 
         try {
 
             // Retrieving the implementation class for the Web Service.
-            ClientConnectorServiceSkeletonInterface clientConnectorServiceSkeletonInterface;
             Object implementationObject = getTheImplementationObject(msgContext);
-            clientConnectorServiceSkeletonInterface = (ClientConnectorServiceSkeletonInterface) implementationObject;
+            ClientConnectorServiceSkeletonInterface clientConnectorServiceSkeletonInterface = (ClientConnectorServiceSkeletonInterface) implementationObject;
 
             /* Out Envelop */
             SOAPEnvelope envelope;
 
             /* Find the axisOperation that has been set by the Dispatch phase. */
             AxisOperation axisOperation = msgContext.getOperationContext().getAxisOperation();
-            LOGGER.info("[ClientConnector] Axis Operation: '{}:{}:{}' - WSAddressing Action: '{}'", msgContext.getOperationContext().getAxisOperation().getName().getPrefix(),
+            logger.info("[ClientConnector] Axis Operation: '{}:{}:{}' - WSAddressing Action: '{}'", msgContext.getOperationContext().getAxisOperation().getName().getPrefix(),
                     msgContext.getOperationContext().getAxisOperation().getName().getLocalPart(),
                     msgContext.getOperationContext().getAxisOperation().getName().getNamespaceURI(),
                     msgContext.getOptions().getAction());
@@ -223,7 +220,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                         loggerClinical.info("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);
 
                     } catch (Exception ex) {
-                        LOGGER.error(ex.getLocalizedMessage(), ex);
+                        logger.error(ex.getLocalizedMessage(), ex);
                     }
                 }
                 // Soap message: HTTP header set.
