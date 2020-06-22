@@ -94,7 +94,7 @@
                     id="urn:uuid:5e7d012c-a212-496b-a316-e2c13405f352" nodeRepresentation="urn:epSOS:ep:dis:2010">
                     <Slot name="codingScheme">
                         <ValueList>
-                            <Value>epSOS formatCodes</Value>
+                            <Value>eHDSI formatCodes</Value>
                         </ValueList>
                     </Slot>
                     <Name>
