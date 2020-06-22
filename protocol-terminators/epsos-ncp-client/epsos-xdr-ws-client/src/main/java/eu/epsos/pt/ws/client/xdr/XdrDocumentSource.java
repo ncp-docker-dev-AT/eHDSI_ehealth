@@ -51,7 +51,6 @@ public final class XdrDocumentSource {
         } catch (RemoteException ex) {
             throw new RuntimeException(ex);
         } catch (RuntimeException ex) {
-            LOGGER.error("RuntimeException: '{}'", ex.getMessage());
             throw ex;
         }
         return XdrResponseDts.newInstance(response);
@@ -77,7 +76,6 @@ public final class XdrDocumentSource {
         } catch (RemoteException ex) {
             throw new RuntimeException(ex);
         } catch (RuntimeException ex) {
-            LOGGER.error("RuntimeException: '{}'", ex.getMessage());
             throw ex;
         }
         return XdrResponseDts.newInstance(response);
