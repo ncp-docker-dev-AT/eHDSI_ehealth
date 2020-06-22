@@ -166,13 +166,13 @@ public class DocumentCatalog {
     private static EpsosDocument createPrescription(String patientId, String documentId, String description, String author, String createDate) {
         EpsosDocument epDoc = createDocument(patientId, documentId,
                 "2.16.17.710.807.1000.990.1", "EP", "CDA", "57833-6", "ePrescription", "2.16.840.1.113883.6.1",
-                "urn:epSOS:ep:pre:2010", "epSOS coded ePrescription", "epSOS formatCodes",
+                "urn:epSOS:ep:pre:2010", "epSOS coded ePrescription", "eHDSI formatCodes",
                 "ePrescription",
                 description, author, getDate(createDate));
 
         EpsosDocument pdf = createDocument(patientId, documentId,
                 "2.16.17.710.807.1000.990.1", "EP", "PDF", "57833-6", "ePrescription", "2.16.840.1.113883.6.1",
-                "urn:ihe:iti:xds-sd:pdf:2008", "PDF/A coded document", "epSOS formatCodes",
+                "urn:ihe:iti:xds-sd:pdf:2008", "PDF/A coded document", "eHDSI formatCodes",
                 "ePrescription",
                 description, author, getDate(createDate));
 
@@ -183,13 +183,13 @@ public class DocumentCatalog {
     private static EpsosDocument createPatientSummary(String patientId, String documentId, String description, String author, String createDate) {
         EpsosDocument psDoc = createDocument(patientId, documentId,
                 "2.16.17.710.807.1000.990.1", "PS", "CDA", "60591-5", "Patient Summary", "2.16.840.1.113883.6.1",
-                "urn:epSOS:ps:ps:2010", "epSOS coded Patient Summary", "epSOS formatCodes",
+                "urn:epSOS:ps:ps:2010", "epSOS coded Patient Summary", "eHDSI formatCodes",
                 "Patient Summary",
                 description, author, getDate(createDate));
 
         EpsosDocument pdf = createDocument(patientId, documentId,
                 "2.16.17.710.807.1000.990.1", "PS", "PDF", "60591-5", "Patient Summary", "2.16.840.1.113883.6.1",
-                "urn:ihe:iti:xds-sd:pdf:2008", "PDF/A coded document", "epSOS formatCodes",
+                "urn:ihe:iti:xds-sd:pdf:2008", "PDF/A coded document", "eHDSI formatCodes",
                 "Patient Summary",
                 description, author, getDate(createDate));
 
