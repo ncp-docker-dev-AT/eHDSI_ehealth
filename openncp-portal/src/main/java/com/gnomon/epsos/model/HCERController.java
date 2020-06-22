@@ -156,7 +156,7 @@ public class HCERController {
             //TBM
             formatCode.setSchema("epSOS coded healthcare encounter report"); //HCER_FORMATCODE_DISPLAYNAME = epSOS coded healthcare encounter report
             formatCode.setNodeRepresentation("urn:epsos:hcer:hcer:2012"); //DISPENSATION_FORMATCODE_NODEREPRESENTATION = urn:epsos:hcer:hcer:2012
-            formatCode.setValue("epSOS formatCodes"); //DISPENSATION_FORMATCODE_CODINGSCHEMA = epSOS formatCodes
+            formatCode.setValue("eHDSI formatCodes"); //DISPENSATION_FORMATCODE_CODINGSCHEMA = eHDSI formatCodes
             //TBM
             document.setFormatCode(formatCode);
 
