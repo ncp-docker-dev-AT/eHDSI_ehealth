@@ -7,8 +7,8 @@ package epsos.ccd.gnomon.auditmanager;
  * EHDSI-11:    epsosIdentificationService
  * EHDSI-21:    epsosPatientService
  * EHDSI-31:    epsosOrderService
- * EHDSI-41:    epsosDispensationServuceInitialize
- * EHDSI-42:    epsosDispensationServuceDiscard
+ * EHDSI-41:    epsosDispensationServiceInitialize
+ * EHDSI-42:    epsosDispensationServiceDiscard
  * EHDSI-51:    epsosConsentServicePut
  * EHDSI-52:    epsosConsentServiceDiscard
  * EHDSI-53:    epsosConsentServicePin
@@ -19,11 +19,6 @@ package epsos.ccd.gnomon.auditmanager;
  * EHDSI-CF:    epsosCommunicationFailure
  * EHDSI-193:   SMP::Query
  * EHDSI-194:   SMP::Push
- *
- * @author Kostas Karkaletsis
- * @author Organization: Gnomon
- * @author mail:k.karkaletsis@gnomon.com.gr
- * @version 1.0, 2010, 30 Jun
  */
 public enum IHETransactionName {
 
@@ -49,7 +44,7 @@ public enum IHETransactionName {
     SMP_QUERY("SMP::Query"),
     SMP_PUSH("SMP::Push");
 
-    private String code;
+    private final String code;
 
     IHETransactionName(String c) {
         code = c;
