@@ -43,7 +43,7 @@
                     <input id="collapsible-pregnancy-history-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-pregnancy-history-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'10162-6'"/>
                         </xsl:call-template>
                     </label>
@@ -81,7 +81,7 @@
                                                     <tbody>
                                                         <tr>
                                                             <th>
-                                                                <xsl:call-template name="show-epSOSPregnancyInformation">
+                                                                <xsl:call-template name="show-eHDSIPregnancyInformation">
                                                                     <xsl:with-param name="node" select="$pregnancyHistoryObservation/n1:code"/>
                                                                 </xsl:call-template>
                                                             </th>
@@ -95,7 +95,7 @@
                                             <xsl:otherwise>
                                                 <tr>
                                                     <td>
-                                                        <xsl:call-template name="show-epSOSNullFlavor">
+                                                        <xsl:call-template name="show-eHDSINullFlavor">
                                                             <xsl:with-param name="code" select="$pregnancyHistoryObservation/@nullFlavor"/>
                                                         </xsl:call-template>
                                                     </td>

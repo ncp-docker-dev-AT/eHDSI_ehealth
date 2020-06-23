@@ -11,8 +11,8 @@
     <xsl:param name="epsosLangDir" select="'../EpsosRepository'"/>
     <xsl:param name="defaultUserLang" select="'en-GB'"/>
 
-    <!-- eHDSI-AbsentOrUnknownAllergies -->
-    <xsl:template name="show-eHDSI-AbsentOrUnknownAllergies">
+    <!-- eHDSIAbsentOrUnknownAllergy -->
+    <xsl:template name="show-eHDSIAbsentOrUnknownAllergy">
         <xsl:param name="node"/>
         <div class="tooltip-right">
             <xsl:choose>
@@ -45,8 +45,8 @@
         </div>
     </xsl:template>
 
-    <!-- eHDSI-AbsentOrUnknownDevices -->
-    <xsl:template name="show-eHDSI-AbsentOrUnknownDevices">
+    <!-- eHDSIAbsentOrUnknownDevice -->
+    <xsl:template name="show-eHDSIAbsentOrUnknownDevice">
         <xsl:param name="node"/>
         <div class="tooltip-right">
             <xsl:choose>
@@ -67,8 +67,8 @@
         </div>
     </xsl:template>
 
-    <!-- eHDSI-AbsentOrUnknownMedication -->
-    <xsl:template name="show-eHDSI-AbsentOrUnknownMedication">
+    <!-- eHDSIAbsentOrUnknownMedication -->
+    <xsl:template name="show-eHDSIAbsentOrUnknownMedication">
         <xsl:param name="node"/>
         <div class="tooltip-right">
             <xsl:choose>
@@ -89,8 +89,8 @@
         </div>
     </xsl:template>
 
-    <!-- eHDSI-AbsentOrUnknownProblems -->
-    <xsl:template name="show-eHDSI-AbsentOrUnknownProblems">
+    <!-- eHDSIAbsentOrUnknownProblem -->
+    <xsl:template name="show-eHDSIAbsentOrUnknownProblem">
         <xsl:param name="node"/>
         <div class="tooltip-right">
             <xsl:choose>
@@ -111,8 +111,8 @@
         </div>
     </xsl:template>
 
-    <!-- eHDSI-AbsentOrUnknownProcedures -->
-    <xsl:template name="show-eHDSI-AbsentOrUnknownProcedures">
+    <!-- eHDSIAbsentOrUnknownProcedure -->
+    <xsl:template name="show-eHDSIAbsentOrUnknownProcedure">
         <xsl:param name="node"/>
         <div class="tooltip-right">
             <xsl:choose>
@@ -133,8 +133,8 @@
         </div>
     </xsl:template>
 
-    <!-- epSOSActiveIngredient -->
-    <xsl:template name="show-epSOSActiveIngredient">
+    <!-- eHDSIActiveIngredient -->
+    <xsl:template name="show-eHDSIActiveIngredient">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -143,8 +143,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSAdministrativeGender -->
-    <xsl:template name="show-epSOSAdministrativeGender">
+    <!-- eHDSIAdministrativeGender -->
+    <xsl:template name="show-eHDSIAdministrativeGender">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -153,8 +153,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSAdverseEventType -->
-    <xsl:template name="show-epSOSAdverseEventType">
+    <!-- eHDSIAdverseEventType -->
+    <xsl:template name="show-eHDSIAdverseEventType">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -163,8 +163,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSAllergenNoDrugs -->
-    <xsl:template name="show-epSOSAllergenNoDrugs">
+    <!-- eHDSIAllergenNoDrug -->
+    <xsl:template name="show-eHDSIAllergenNoDrug">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -173,8 +173,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSBloodGroup -->
-    <xsl:template name="show-epSOSBloodGroup">
+    <!-- eHDSIBloodGroup -->
+    <xsl:template name="show-eHDSIBloodGroup">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -183,8 +183,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSBloodPressure -->
-    <xsl:template name="show-epSOSBloodPressure">
+    <!-- eHDSIBloodPressure -->
+    <xsl:template name="show-eHDSIBloodPressure">
         <xsl:param name="code"/>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
@@ -193,8 +193,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSCodeProb -->
-    <xsl:template name="show-epSOSCodeProb">
+    <!-- eHDSICodeProb -->
+    <xsl:template name="show-eHDSICodeProb">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -203,8 +203,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSConfidentiality -->
-    <xsl:template name="show-epSOSConfidentiality">
+    <!-- eHDSIConfidentiality -->
+    <xsl:template name="show-eHDSIConfidentiality">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -213,8 +213,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSCountry -->
-    <xsl:template name="show-epSOSCountry">
+    <!-- eHDSICountry -->
+    <xsl:template name="show-eHDSICountry">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -223,8 +223,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSDisplayLabels -->
-    <xsl:template name="show-epSOSDisplayLabels">
+    <!-- eHDSIDisplayLabel -->
+    <xsl:template name="show-eHDSIDisplayLabel">
         <xsl:param name="code"/>
         <xsl:variable name="dirFile"
                       select="concat($epsosLangDir,'/1.3.6.1.4.1.12559.11.10.1.3.1.42.46.xml')"/>
@@ -254,8 +254,8 @@
         </xsl:choose>
     </xsl:template>
 
-    <!-- epSOSDocumentCode -->
-    <xsl:template name="show-epSOSDocumentCode">
+    <!-- eHDSIDocumentCode -->
+    <xsl:template name="show-eHDSIDocumentCode">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -264,8 +264,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSDoseForm -->
-    <xsl:template name="show-epSOSDoseForm">
+    <!-- eHDSIDoseForm -->
+    <xsl:template name="show-eHDSIDoseForm">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -274,8 +274,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSHealthcareProfessionalRoles -->
-    <xsl:template name="show-epSOSHealthcareProfessionalRoles">
+    <!-- eHDSIHealthcareProfessionalRole -->
+    <xsl:template name="show-eHDSIHealthcareProfessionalRole">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -284,8 +284,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSIllnessesandDisorders -->
-    <xsl:template name="show-epSOSIllnessesandDisorders">
+    <!-- eHDSIIllnessesandDisorder -->
+    <xsl:template name="show-eHDSIIllnessandDisorder">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -294,8 +294,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSLanguage -->
-    <xsl:template name="show-epSOSLanguage">
+    <!-- eHDSILanguage -->
+    <xsl:template name="show-eHDSILanguage">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -304,8 +304,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSMedicalDevices -->
-    <xsl:template name="show-epSOSMedicalDevices">
+    <!-- eHDSIMedicalDevice -->
+    <xsl:template name="show-eHDSIMedicalDevice">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -314,8 +314,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSNullFlavor -->
-    <xsl:template name="show-epSOSNullFlavor">
+    <!-- eHDSINullFlavor -->
+    <xsl:template name="show-eHDSINullFlavor">
         <xsl:param name="code"/>
         <div class="tooltip-right">
             <i class="fas fa-exclamation-circle" style="color:#085a9f" aria-hidden="true"/>
@@ -329,8 +329,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSPackage -->
-    <xsl:template name="show-epSOSPackage">
+    <!-- eHDSIPackage -->
+    <xsl:template name="show-eHDSIPackage">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -339,8 +339,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSPersonalRelationship -->
-    <xsl:template name="show-epSOSPersonalRelationship">
+    <!-- eHDSIPersonalRelationship -->
+    <xsl:template name="show-eHDSIPersonalRelationship">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -349,8 +349,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSPregnancyInformation -->
-    <xsl:template name="show-epSOSPregnancyInformation">
+    <!-- eHDSIPregnancyInformation -->
+    <xsl:template name="show-eHDSIPregnancyInformation">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -359,8 +359,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSProcedures -->
-    <xsl:template name="show-epSOSProcedures">
+    <!-- eHDSIProcedure -->
+    <xsl:template name="show-eHDSIProcedure">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -369,8 +369,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSReactionAllergy -->
-    <xsl:template name="show-epSOSReactionAllergy">
+    <!-- eHDSIReactionAllergy -->
+    <xsl:template name="show-eHDSIReactionAllergy">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -379,8 +379,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSResolutionOutcome -->
-    <xsl:template name="show-epSOSResolutionOutcome">
+    <!-- eHDSIResolutionOutcome -->
+    <xsl:template name="show-eHDSIResolutionOutcome">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -389,8 +389,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSRoleClass -->
-    <xsl:template name="show-epSOSRoleClass">
+    <!-- eHDSIRoleClass -->
+    <xsl:template name="show-eHDSIRoleClass">
         <xsl:param name="code"/>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
@@ -399,8 +399,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSRouteOfAdministration -->
-    <xsl:template name="show-epSOSRouteOfAdministration">
+    <!-- eHDSIRouteOfAdministration -->
+    <xsl:template name="show-eHDSIRouteOfAdministration">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -409,8 +409,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSSections -->
-    <xsl:template name="show-epSOSSections">
+    <!-- eHDSISection -->
+    <xsl:template name="show-eHDSISection">
         <xsl:param name="code"/>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
@@ -419,8 +419,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSSeverity -->
-    <xsl:template name="show-epSOSSeverity">
+    <!-- eHDSISeverity -->
+    <xsl:template name="show-eHDSISeverity">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -429,8 +429,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSSocialHistory -->
-    <xsl:template name="show-epSOSSocialHistory">
+    <!-- eHDSISocialHistory -->
+    <xsl:template name="show-eHDSISocialHistory">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -439,8 +439,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSStatusnode -->
-    <xsl:template name="show-epSOSStatusCode">
+    <!-- eHDSIStatusCode -->
+    <xsl:template name="show-eHDSIStatusCode">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -449,8 +449,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSSubstitutionCode -->
-    <xsl:template name="show-epSOSSubstitutionCode">
+    <!-- eHDSISubstitutionCode -->
+    <xsl:template name="show-eHDSISubstitutionCode">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -459,8 +459,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSTelecomAddress -->
-    <xsl:template name="show-epSOSTelecomAddress">
+    <!-- eHDSITelecomAddress -->
+    <xsl:template name="show-eHDSITelecomAddress">
         <xsl:param name="code"/>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
@@ -469,8 +469,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSTimingEvent -->
-    <xsl:template name="show-epSOSTimingEvent">
+    <!-- eHDSITimingEvent -->
+    <xsl:template name="show-eHDSITimingEvent">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -479,8 +479,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSUnits -->
-    <xsl:template name="show-epSOSUnits">
+    <!-- eHDSIUnit -->
+    <xsl:template name="show-eHDSIUnit">
         <xsl:param name="code"/>
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
@@ -489,8 +489,8 @@
         </xsl:call-template>
     </xsl:template>
 
-    <!-- epSOSVaccine -->
-    <xsl:template name="show-epSOSVaccine">
+    <!-- eHDSIVaccine -->
+    <xsl:template name="show-eHDSIVaccine">
         <xsl:param name="node"/>
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
@@ -526,7 +526,7 @@
                 </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$node/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:otherwise>

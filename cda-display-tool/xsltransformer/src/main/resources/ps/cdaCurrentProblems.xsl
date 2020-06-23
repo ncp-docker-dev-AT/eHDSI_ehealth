@@ -24,7 +24,7 @@
             <xsl:otherwise>
                 <span class="sectionTitle">
                     <!-- The Active Problem section is missing ! -->
-                    <xsl:call-template name="show-epSOSDisplayLabels">
+                    <xsl:call-template name="show-eHDSIDisplayLabel">
                         <xsl:with-param name="code" select="'72'"/>
                     </xsl:call-template>
                 </span>
@@ -57,7 +57,7 @@
                     <input id="collapsible-current-problems-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-current-problems-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'11450-4'"/>
                         </xsl:call-template>
                     </label>
@@ -97,13 +97,13 @@
                                                             <tr>
                                                                 <th>
                                                                     <!-- Active Problem -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'2'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- OnSet Date -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'45'"/>
                                                                     </xsl:call-template>
                                                                 </th>
@@ -116,7 +116,7 @@
                                                 </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-epSOSNullFlavor">
+                                                <xsl:call-template name="show-eHDSINullFlavor">
                                                     <xsl:with-param name="data" select="$probAct/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -152,7 +152,7 @@
                     <xsl:when test="($problemCondition/@code='no-known-problems' or $problemCondition/@code='no-problem-info')">
                         <tr>
                             <td colspan="3">
-                                <xsl:call-template name="show-eHDSI-AbsentOrUnknownProblems">
+                                <xsl:call-template name="show-eHDSIAbsentOrUnknownProblem">
                                     <xsl:with-param name="node" select="$problemCondition"/>
                                 </xsl:call-template>
                             </td>
@@ -162,7 +162,7 @@
                         <tr>
                             <td>
                                 <!-- Active Problem -->
-                                <xsl:call-template name="show-epSOSIllnessesandDisorders">
+                                <xsl:call-template name="show-eHDSIIllnessandDisorder">
                                     <xsl:with-param name="node" select="$problemCondition"/>
                                 </xsl:call-template>
                                 <xsl:text> (</xsl:text>
@@ -182,7 +182,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-epSOSNullFlavor">
+                        <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="n1:act/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

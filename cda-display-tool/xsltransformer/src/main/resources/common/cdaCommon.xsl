@@ -137,7 +137,7 @@
                     </xsl:call-template>
                     <xsl:if test="@use">
                         <xsl:text> (</xsl:text>
-                        <xsl:call-template name="show-epSOSTelecomAddress">
+                        <xsl:call-template name="show-eHDSITelecomAddress">
                             <xsl:with-param name="code" select="@use"/>
                         </xsl:call-template>
                         <xsl:text>)</xsl:text>
@@ -612,7 +612,7 @@
         <xsl:variable name="denominator" select="$node/epsos:denominator"/>
         <xsl:variable name="numeratorValue" select="$numerator/@value"/>
         <xsl:variable name="numeratorUnit">
-            <xsl:call-template name="show-epSOSUnits">
+            <xsl:call-template name="show-eHDSIUnit">
                 <xsl:with-param name="code" select="$numerator/@unit"/>
             </xsl:call-template>
         </xsl:variable>
@@ -625,7 +625,7 @@
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="($numerator/@nullFlavor)">
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$numerator/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -636,7 +636,7 @@
                 <xsl:text> </xsl:text>
                 /
                 <xsl:text> </xsl:text>
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$denominator/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -645,7 +645,7 @@
                 <xsl:text> </xsl:text>
                 <xsl:value-of select="$numeratorUnit"/>
                 <xsl:text> </xsl:text>
-                <xsl:call-template name="show-epSOSDisplayLabels">
+                <xsl:call-template name="show-eHDSIDisplayLabel">
                     <xsl:with-param name="code" select="'53'"/>
                 </xsl:call-template>
             </xsl:when>
@@ -721,12 +721,12 @@
                 </xsl:call-template>
             </xsl:when>
             <xsl:when test="$medUnitIntakeEndpoint/@nullFlavor">
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$medUnitIntakeEndpoint/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:when test="$medUnitIntakeGlobal/@nullFlavor">
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$medUnitIntakeGlobal/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -738,7 +738,7 @@
         <xsl:param name="value"/>
         <xsl:choose>
             <xsl:when test="contains($value, '{')">
-                <xsl:call-template name="show-epSOSUnits">
+                <xsl:call-template name="show-eHDSIUnit">
                     <xsl:with-param name="code" select="substring-before($value, '{')"/>
                 </xsl:call-template>
                 <xsl:if test = "substring-before($value, '{')">
@@ -748,7 +748,7 @@
                 <xsl:if test = "substring-after($value, '}')">
                     <xsl:text>&#160;</xsl:text>
                 </xsl:if>
-                <xsl:call-template name="show-epSOSUnits">
+                <xsl:call-template name="show-eHDSIUnit">
                     <xsl:with-param name="code" select="substring-after($value, '}')"/>
                 </xsl:call-template>
             </xsl:when>
@@ -756,7 +756,7 @@
                 <xsl:value-of select="$value"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="show-epSOSUnits">
+                <xsl:call-template name="show-eHDSIUnit">
                     <xsl:with-param name="code" select="$value"/>
                 </xsl:call-template>
             </xsl:otherwise>
@@ -775,7 +775,7 @@
         <xsl:choose>
             <xsl:when test="not($medUnitIntakeUnit) or $medUnitIntakeUnit='1'">
                 <xsl:text> </xsl:text>
-                <xsl:call-template name="show-epSOSDisplayLabels">
+                <xsl:call-template name="show-eHDSIDisplayLabel">
                     <xsl:with-param name="code" select="'77'"/>
                 </xsl:call-template>
             </xsl:when>

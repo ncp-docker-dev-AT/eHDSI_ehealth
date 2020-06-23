@@ -13,7 +13,7 @@
         <xsl:param name="telecomParam"/>
         <xsl:choose>
             <xsl:when test="$telecomParam/@nullFlavor">
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$telecomParam/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -27,7 +27,7 @@
         <xsl:param name="name"/>
         <xsl:choose>
             <xsl:when test="$name/@nullFlavor">
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$name/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -41,7 +41,7 @@
         <xsl:param name="id"/>
         <xsl:choose>
             <xsl:when test="$id/@nullFlavor">
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$id/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -55,7 +55,7 @@
         <xsl:param name="name"/>
         <xsl:choose>
             <xsl:when test="$name/@nullFlavor">
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$name/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -69,7 +69,7 @@
         <xsl:param name="name"/>
         <xsl:choose>
             <xsl:when test="$name/@nullFlavor">
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$name/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:when>
@@ -84,7 +84,7 @@
             <input id="collapsible-prescriber-header" class="toggle" type="checkbox"/>
             <label for="collapsible-prescriber-header" class="lbl-toggle-main">
                 <!-- Prescriber -->
-                <xsl:call-template name="show-epSOSDisplayLabels">
+                <xsl:call-template name="show-eHDSIDisplayLabel">
                     <xsl:with-param name="code" select="'56'"/>
                 </xsl:call-template>
             </label>
@@ -97,13 +97,13 @@
                         <tr>
                             <th>
                                 <!--  Prescriber: -->
-                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                     <xsl:with-param name="code" select="'56'"/>
                                 </xsl:call-template>
                             </th>
                             <th>
                                 <!--  Profession: -->
-                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                     <xsl:with-param name="code" select="'64'"/>
                                 </xsl:call-template>
                             </th>
@@ -127,7 +127,7 @@
                     <div class="wrap-collabsible">
                         <input id="collapsible-extended-prescriber" class="toggle" type="checkbox"/>
                         <label for="collapsible-extended-prescriber" class="lbl-toggle">
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'68'"/>
                             </xsl:call-template>
                         </label>
@@ -148,7 +148,7 @@
                                             <tr>
                                                 <th>
                                                     <!--  Specialty: -->
-                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                         <xsl:with-param name="code" select="'69'"/>
                                                     </xsl:call-template>
                                                 </th>
@@ -157,7 +157,7 @@
                                                 </td>
                                                 <th>
                                                     <!--  Contact Information: -->
-                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                         <xsl:with-param name="code" select="'12'"/>
                                                     </xsl:call-template>
                                                 </th>
@@ -171,7 +171,7 @@
                                             <tr>
                                                 <th>
                                                     <!-- Facility ID -->
-                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                         <xsl:with-param name="code" select="'28'"/>
                                                     </xsl:call-template>
                                                 </th>
@@ -183,7 +183,7 @@
                                                 </td>
                                                 <th>
                                                     <!-- Facility Name:-->
-                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                         <xsl:with-param name="code" select="'29'"/>
                                                     </xsl:call-template>
                                                 </th>
@@ -197,7 +197,7 @@
                                             <tr>
                                                 <th>
                                                     <!-- Country: -->
-                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                         <xsl:with-param name="code" select="'13'"/>
                                                     </xsl:call-template>
                                                 </th>
@@ -209,7 +209,7 @@
                                                 </td>
                                                 <th>
                                                     <!--  Address: -->
-                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                         <xsl:with-param name="code" select="'3'"/>
                                                     </xsl:call-template>
                                                 </th>
@@ -222,7 +222,7 @@
                                             <tr>
                                                 <th>
                                                     <!--  Organisation Name: -->
-                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                         <xsl:with-param name="code" select="'47'"/>
                                                     </xsl:call-template>
                                                 </th>
@@ -234,7 +234,7 @@
                                                 </td>
                                                 <th>
                                                     <!--  Organisation Identifier: -->
-                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                         <xsl:with-param name="code" select="'46'"/>
                                                     </xsl:call-template>
                                                 </th>

@@ -28,7 +28,7 @@
                     <!-- The Allergies, adverse reactions, alerts section is missing ! -->
                     <xsl:choose>
                         <xsl:when test=" ($documentCode='60591-5')">
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'73'"/>
                             </xsl:call-template>
                         </xsl:when>
@@ -60,7 +60,7 @@
                     <input id="collapsible-alerts-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-alerts-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'48765-2'"/>
                         </xsl:call-template>
                     </label>
@@ -100,31 +100,31 @@
                                                             <tr>
                                                                 <th>
                                                                     <!-- Reaction Type header -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'65'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Clinical Manifestation header -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'10'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Agent header -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'5'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- OnSet Date header -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'45'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Severity header -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'123'"/>
                                                                     </xsl:call-template>
                                                                 </th>
@@ -138,7 +138,7 @@
                                                 </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-epSOSNullFlavor">
+                                                <xsl:call-template name="show-eHDSINullFlavor">
                                                     <xsl:with-param name="code" select="$act/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -179,7 +179,7 @@
                     <xsl:when test="($obsValue/@code='no-known-allergies' or $obsValue/@code='no-allergy-info')">
                         <tr>
                             <td colspan="4">
-                                <xsl:call-template name="show-eHDSI-AbsentOrUnknownAllergies">
+                                <xsl:call-template name="show-eHDSIAbsentOrUnknownAllergy">
                                     <xsl:with-param name="node" select="$obsValue"/>
                                 </xsl:call-template>
                             </td>
@@ -189,13 +189,13 @@
                         <tr>
                             <td>
                                 <!-- Reaction Type -->
-                                <xsl:call-template name="show-epSOSAdverseEventType">
+                                <xsl:call-template name="show-eHDSIAdverseEventType">
                                     <xsl:with-param name="node" select="$reactionType"/>
                                 </xsl:call-template>
                             </td>
                             <td>
                                 <!-- Clinical Manifestation -->
-                                <xsl:call-template name="show-epSOSReactionAllergy">
+                                <xsl:call-template name="show-eHDSIReactionAllergy">
                                     <xsl:with-param name="node" select="$clinicalManifestation"/>
                                 </xsl:call-template>
                             </td>
@@ -203,15 +203,15 @@
                                 <!-- Agent -->
                                 <xsl:choose>
                                     <xsl:when test="not($agentCode/@nullFlavor)">
-                                        <xsl:call-template name="show-epSOSAllergenNoDrugs">
+                                        <xsl:call-template name="show-eHDSIAllergenNoDrug">
                                             <xsl:with-param name="node" select="$agentCode"/>
                                         </xsl:call-template>
-                                        <xsl:call-template name="show-epSOSActiveIngredient">
+                                        <xsl:call-template name="show-eHDSIActiveIngredient">
                                             <xsl:with-param name="node" select="$agentCode"/>
                                         </xsl:call-template>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:call-template name="show-epSOSNullFlavor">
+                                        <xsl:call-template name="show-eHDSINullFlavor">
                                             <xsl:with-param name="code" select="$agentCode/@nullFlavor"/>
                                         </xsl:call-template>
                                     </xsl:otherwise>
@@ -225,7 +225,7 @@
                             </td>
                             <td>
                                 <!-- Severity -->
-                                <xsl:call-template name="show-epSOSSeverity">
+                                <xsl:call-template name="show-eHDSISeverity">
                                     <xsl:with-param name="node" select="$severity"/>
                                 </xsl:call-template>
                             </td>
@@ -236,7 +236,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-epSOSNullFlavor">
+                        <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="n1:act/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
