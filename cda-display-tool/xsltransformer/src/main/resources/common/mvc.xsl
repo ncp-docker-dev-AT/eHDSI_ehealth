@@ -17,24 +17,44 @@
         <div class="tooltip-right">
             <xsl:choose>
                 <xsl:when test="($node/@code='no-allergy-info')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">There is no information available regarding the subject's allergy conditions.</span>
+                    <!-- There is no information available regarding the subject's allergy conditions -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'133'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
                 <xsl:when test="($node/@code='no-known-allergies')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">The subject has no known allergy conditions.</span>
+                    <!-- The subject has no known allergy conditions -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'134'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
                 <xsl:when test="($node/@code='no-known-medication-allergies')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">The subject has no known medication allergy conditions.</span>
+                    <!-- The subject has no known medication allergy conditions -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'135'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
                 <xsl:when test="($node/@code='no-known-environmental-allergies')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">The subject has no known environmental allergy conditions.</span>
+                    <!-- The subject has no known environmental allergy conditions -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'136'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
                 <xsl:when test="($node/@code='no-known-food-allergies')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">The subject has no known food allergy conditions.</span>
+                    <!-- The subject has no known food allergy conditions -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'137'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
             </xsl:choose>
             <xsl:call-template name="show-codedElement">
@@ -51,12 +71,20 @@
         <div class="tooltip-right">
             <xsl:choose>
                 <xsl:when test="($node/@code='no-device-info')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">There is no information available regarding implanted or external devices for the subject.</span>
+                    <!-- There is no information available regarding implanted or external devices for the subject -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'138'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
                 <xsl:when test="($node/@code='no-known-devices')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">There are no devices known to be implanted in or used by the subject that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record.</span>
+                    <!-- There are no devices known to be implanted in or used by the subject that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'139'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
             </xsl:choose>
             <xsl:call-template name="show-codedElement">
@@ -73,12 +101,20 @@
         <div class="tooltip-right">
             <xsl:choose>
                 <xsl:when test="($node/@code='no-medication-info')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">There is no information available about the subject's medication use or administration.</span>
+                    <!-- There is no information available about the subject's medication use or administration -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'140'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
                 <xsl:when test="($node/@code='no-known-medications')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">There are no medications for the subject that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record.</span>
+                    <!-- There are no medications for the subject that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'141'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
             </xsl:choose>
             <xsl:call-template name="show-codedElement">
@@ -95,12 +131,20 @@
         <div class="tooltip-right">
             <xsl:choose>
                 <xsl:when test="($node/@code='no-problem-info')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">There is no information available about the subject's health problems or disabilities.</span>
+                    <!-- There is no information available about the subject's current health problems or disability -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'142'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
                 <xsl:when test="($node/@code='no-known-problems')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">The subject is not known to have any health problems or disabilities that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record.</span>
+                    <!-- The subject is not known to have any health problems or disabilities that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'143'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
             </xsl:choose>
             <xsl:call-template name="show-codedElement">
@@ -117,12 +161,20 @@
         <div class="tooltip-right">
             <xsl:choose>
                 <xsl:when test="($node/@code='no-procedure-info')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">There is no information available about the subject's past history of procedures.</span>
+                    <!-- There is no information available about the subject's past history of procedures -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'144'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
                 <xsl:when test="($node/@code='no-known-procedures')">
-                    <!-- TODO: add label to eHDSIDisplayLabel value set -->
-                    <span class="tooltiptext">The subject has no history of procedures that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record.</span>
+                    <!-- The subject has no history of procedures that have to be reported in this record. This can mean either that there are none known, or that those known are not relevant for the purpose of this record -->
+                    <span class="tooltiptext">
+                        <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:with-param name="code" select="'145'"/>
+                        </xsl:call-template>
+                    </span>
                 </xsl:when>
             </xsl:choose>
             <xsl:call-template name="show-codedElement">
@@ -319,7 +371,11 @@
         <xsl:param name="code"/>
         <div class="tooltip-right">
             <i class="fas fa-exclamation-circle" style="color:#085a9f" aria-hidden="true"/>
-            <span class="tooltiptext">Missing information</span>
+            <span class="tooltiptext">
+                <xsl:call-template name="show-epSOSDisplayLabels">
+                    <xsl:with-param name="code" select="'146'"/>
+                </xsl:call-template>
+            </span>
         </div>
         <xsl:text> </xsl:text>
         <xsl:call-template name="show-code-value">

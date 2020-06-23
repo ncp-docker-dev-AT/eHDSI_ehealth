@@ -29,9 +29,9 @@
             <tbody>
                 <tr class="td_creation_date">
                     <th>
-                        <!-- Creation Date: -->
+                        <!-- Creation Date of the Document -->
                         <xsl:call-template name="show-epSOSDisplayLabels">
-                            <xsl:with-param name="code" select="'15'"/>
+                            <xsl:with-param name="code" select="'131'"/>
                         </xsl:call-template>
                     </th>
                     <td>
@@ -40,9 +40,9 @@
                         </xsl:call-template>
                     </td>
                     <th>
-                        <!-- Last Update:-->
+                        <!-- Last Update of the Information-->
                         <xsl:call-template name="show-epSOSDisplayLabels">
-                            <xsl:with-param name="code" select="'39'"/>
+                            <xsl:with-param name="code" select="'132'"/>
                         </xsl:call-template>
                     </th>
                     <td>
@@ -98,9 +98,10 @@
                             </tr>
                             <tr>
                                 <th style="width:140px;">
-                                    <!-- Primary Patient ID -->
-                                    <!-- TODO Add concept to epSOSDisplayLabels value set -->
-                                    Primary Patient ID
+                                    <!-- Primary Patient Identifier -->
+                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                        <xsl:with-param name="code" select="'125'"/>
+                                    </xsl:call-template>
                                 </th>
                                 <td>
                                     <xsl:call-template name="show-id">
@@ -109,9 +110,10 @@
                                 </td>
                                 <xsl:if test="$secondaryPatientId">
                                     <th style="width:140px;">
-                                        <!-- Secondary Patient ID -->
-                                        <!-- TODO Add concept to epSOSDisplayLabels value set -->
-                                        Secondary Patient ID
+                                        <!-- Secondary Patient Identifier -->
+                                        <xsl:call-template name="show-epSOSDisplayLabels">
+                                            <xsl:with-param name="code" select="'126'"/>
+                                        </xsl:call-template>
                                     </th>
                                     <td>
                                         <xsl:call-template name="show-id">

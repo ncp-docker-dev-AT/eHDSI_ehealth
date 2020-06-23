@@ -270,8 +270,10 @@
                                 <table class="contact_information_table">
                                     <tr>
                                         <th>
-                                            <!-- TODO: add label to epSOSDisplayLabel value set -->
-                                            Represented organization
+                                            <!-- Represented organization -->
+                                            <xsl:call-template name="show-epSOSDisplayLabels">
+                                                <xsl:with-param name="code" select="'127'"/>
+                                            </xsl:call-template>
                                         </th>
                                     </tr>
                                     <tr>
