@@ -253,10 +253,14 @@
             <table>
                 <tr>
                     <td>
-                        <!-- TODO Add label to epSOSDisplayLabels value set -->
-                        <!-- Medicinal Product -->
+                        <!-- Medicinal Product block -->
                         <fieldset style="min-height:100px;">
-                            <legend>Medicinal product</legend>
+                            <legend>
+                                <!-- Medicinal Product -->
+                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                    <xsl:with-param name="code" select="'128'"/>
+                                </xsl:call-template>
+                            </legend>
                             <table class="ep_table">
                                 <tr>
                                     <th>
@@ -284,8 +288,9 @@
                                     <tr>
                                         <th>
                                             <!-- Marketing Authorization Holder -->
-                                            <!-- TODO this label has to be included as a concept in the epSOSDisplayLabel value set -->
-                                            Marketing Authorization Holder
+                                            <xsl:call-template name="show-epSOSDisplayLabels">
+                                                <xsl:with-param name="code" select="'124'"/>
+                                            </xsl:call-template>
                                         </th>
                                         <td>
                                             <xsl:value-of select="n1:consumable/n1:manufacturedProduct/epsos:marketingAuthorizationHolder/epsos:name"/>
@@ -367,10 +372,14 @@
                         </fieldset>
                     </td>
                     <td>
-                        <!-- Prescription details -->
+                        <!-- Prescription details block -->
                         <fieldset style="min-height:100px;">
-                            <!-- TODO Add label to epSOSDisplayLabels value set -->
-                            <legend>Prescription details</legend>
+                            <legend>
+                                <!-- Prescription Details -->
+                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                    <xsl:with-param name="code" select="'129'"/>
+                                </xsl:call-template>
+                            </legend>
                             <table class="ep_table">
                                 <tr>
                                     <th>
@@ -517,10 +526,14 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <!-- TODO Add label to epSOSDisplayLabels value set -->
-                        <!-- Dispensation details -->
+                        <!-- Dispensation details block -->
                         <fieldset style="min-height:100px;">
-                            <legend>Dispensation details</legend>
+                            <legend>
+                                <!-- Dispensation details -->
+                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                    <xsl:with-param name="code" select="'130'"/>
+                                </xsl:call-template>
+                            </legend>
                             <table class="ep_table">
                                 <tbody>
                                     <tr>
