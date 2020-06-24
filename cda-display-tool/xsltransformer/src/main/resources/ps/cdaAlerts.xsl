@@ -200,7 +200,7 @@
                                         <xsl:call-template name="show-eHDSIReactionAllergy">
                                             <xsl:with-param name="node" select="$clinicalManifestation"/>
                                         </xsl:call-template>
-                                        <xsl:call-template name="show-eHDSIIllnessesandDisorders">
+                                        <xsl:call-template name="show-eHDSIIllnessandDisorders">
                                             <xsl:with-param name="node" select="$clinicalManifestation"/>
                                         </xsl:call-template>
                                     </xsl:when>
