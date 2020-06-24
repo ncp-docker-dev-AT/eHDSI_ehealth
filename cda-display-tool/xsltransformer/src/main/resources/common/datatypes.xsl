@@ -39,7 +39,7 @@
                 </xsl:call-template>&#160;
             </xsl:when>
             <xsl:when test="$nullFlavor">
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$nullFlavor"/>
                 </xsl:call-template>&#160;
             </xsl:when>
@@ -68,7 +68,7 @@
                         <xsl:text> </xsl:text>
                         <xsl:choose>
                             <xsl:when test="$unit='1'">
-                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                     <xsl:with-param name="code" select="'77'"/>
                                 </xsl:call-template>
                             </xsl:when>
@@ -89,7 +89,7 @@
                 </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$node/@nullFlavor"/>
                 </xsl:call-template>
             </xsl:otherwise>
@@ -129,7 +129,7 @@
                 </xsl:call-template>&#160;
             </xsl:when>
             <xsl:when test="$nullFlavor">
-                <xsl:call-template name="show-epSOSNullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$nullFlavor"/>
                 </xsl:call-template>&#160;
             </xsl:when>
@@ -156,7 +156,7 @@
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="show-epSOSNullFlavor">
+                        <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="$node/@nullFlavor"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -175,14 +175,14 @@
         <xsl:variable name="medPhaseLow"
                       select="$medPhase/n1:low"/>
         <!-- Every -->
-        <xsl:call-template name="show-epSOSDisplayLabels">
+        <xsl:call-template name="show-eHDSIDisplayLabel">
             <xsl:with-param name="code" select="'27'"/>
         </xsl:call-template>
         <xsl:text>&#160;</xsl:text>
         <xsl:value-of select="$medPeriod/@value"/>
         <xsl:text>&#160;</xsl:text>
         <xsl:if test="$medPeriod/@unit">
-            <xsl:call-template name="show-epSOSUnits">
+            <xsl:call-template name="show-eHDSIUnit">
                 <xsl:with-param name="code" select="$medPeriod/@unit"/>
             </xsl:call-template>
         </xsl:if>
@@ -190,19 +190,19 @@
         <xsl:if test="$medPhaseWidth">
             <xsl:text>&#160;</xsl:text>
             <!--for -->
-            <xsl:call-template name="show-epSOSDisplayLabels">
+            <xsl:call-template name="show-eHDSIDisplayLabel">
                 <xsl:with-param name="code" select="'31'"/>
             </xsl:call-template>
             <xsl:text>&#160;</xsl:text>
             <xsl:value-of select="$medPhaseWidth/@value"/>
             &#160;
-            <xsl:call-template name="show-epSOSUnits">
+            <xsl:call-template name="show-eHDSIUnit">
                 <xsl:with-param name="code" select="$medPhaseWidth/@unit"/>
             </xsl:call-template>
         </xsl:if>
         <xsl:if test="$medPhaseLow">
             <!-- xsl:text> at </xsl:text -->
-            <xsl:call-template name="show-epSOSDisplayLabels">
+            <xsl:call-template name="show-eHDSIDisplayLabel">
                 <xsl:with-param name="code" select="'6'"/>
             </xsl:call-template>
             <xsl:call-template name="show-TS">
@@ -227,18 +227,18 @@
             <xsl:value-of select="$medOffsetLow/@unit"/>
             &#160;
         </xsl:if>
-        <xsl:call-template name="show-epSOSTimingEvent">
+        <xsl:call-template name="show-eHDSITimingEvent">
             <xsl:with-param name="node" select="$medEvent"/>
         </xsl:call-template>
         <xsl:if test="$medOffsetWidth">
             <xsl:text>&#160; </xsl:text>
-            <xsl:call-template name="show-epSOSDisplayLabels">
+            <xsl:call-template name="show-eHDSIDisplayLabel">
                 <xsl:with-param name="code" select="'31'"/>
             </xsl:call-template>
             <xsl:text> &#160;</xsl:text>
             <xsl:value-of select="$medOffsetWidth/@value"/>
             &#160;
-            <xsl:call-template name="show-epSOSUnits">
+            <xsl:call-template name="show-eHDSIUnit">
                 <xsl:with-param name="code" select="$medOffsetWidth/@unit"/>
             </xsl:call-template>
         </xsl:if>

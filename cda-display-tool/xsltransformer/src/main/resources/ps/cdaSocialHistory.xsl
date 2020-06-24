@@ -47,7 +47,7 @@
                     <input id="collapsible-social-history-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-social-history-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'29762-2'"/>
                         </xsl:call-template>
                     </label>
@@ -85,26 +85,26 @@
                                                         <tr>
                                                             <th>
                                                                 <!-- Observation Type -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'44'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
                                                                 <!-- Date From  -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'85'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
                                                                 <!-- Date To -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'18'"/>
                                                                 </xsl:call-template>
 
                                                             </th>
                                                             <th>
                                                                 <!--  Observation Value -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'84'"/>
                                                                 </xsl:call-template>
                                                             </th>
@@ -119,7 +119,7 @@
                                             <xsl:otherwise>
                                                 <tr>
                                                     <td colspan="3">
-                                                        <xsl:call-template name="show-epSOSNullFlavor">
+                                                        <xsl:call-template name="show-eHDSINullFlavor">
                                                             <xsl:with-param name="code" select="$socHistAct/@nullFlavor"/>
                                                         </xsl:call-template>
                                                     </td>
@@ -161,7 +161,7 @@
                 <tr>
                     <td>
                         <!-- Observation Type -->
-                        <xsl:call-template name="show-epSOSSocialHistory">
+                        <xsl:call-template name="show-eHDSISocialHistory">
                             <xsl:with-param name="node" select="$socialHistoryObservationType"/>
                         </xsl:call-template>
                     </td>
@@ -188,7 +188,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-epSOSNullFlavor">
+                        <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="$socHistAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

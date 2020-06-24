@@ -38,7 +38,7 @@
                     <input id="collapsible-diagnostic-test-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-diagnostic-test-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'30954-2'"/>
                         </xsl:call-template>
                     </label>
@@ -76,13 +76,13 @@
                                                         <tr>
                                                             <th>
                                                                 <!-- Diagnostic Date -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'118'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
                                                                 <!-- Blood Group -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'119'"/>
                                                                 </xsl:call-template>
                                                             </th>
@@ -94,7 +94,7 @@
                                                 </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-epSOSNullFlavor">
+                                                <xsl:call-template name="show-eHDSINullFlavor">
                                                     <xsl:with-param name="code" select="$nullEntry/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -134,7 +134,7 @@
                         </xsl:call-template>
                     </td>
                     <td>
-                        <xsl:call-template name="show-epSOSBloodGroup">
+                        <xsl:call-template name="show-eHDSIBloodGroup">
                             <xsl:with-param name="node" select="$bloodGroup"/>
                         </xsl:call-template>
                     </td>
@@ -143,7 +143,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="2">
-                        <xsl:call-template name="show-epSOSNullFlavor">
+                        <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="$nullEntry/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
