@@ -186,7 +186,7 @@
                         <!-- Dose number in series -->
                         <xsl:choose>
                             <xsl:when test="$vaccinationsPosition/@nullFlavor">
-                                <xsl:call-template name="show-epSOSNullFlavor">
+                                <xsl:call-template name="show-eHDSINullFlavor">
                                     <xsl:with-param name="code" select="$vaccinationsPosition/@nullFlavor"/>
                                 </xsl:call-template>
                             </xsl:when>

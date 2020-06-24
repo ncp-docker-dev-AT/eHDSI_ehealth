@@ -257,7 +257,7 @@
                         <fieldset style="min-height:100px;">
                             <legend>
                                 <!-- Medicinal Product -->
-                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                     <xsl:with-param name="code" select="'128'"/>
                                 </xsl:call-template>
                             </legend>
@@ -288,7 +288,7 @@
                                     <tr>
                                         <th>
                                             <!-- Marketing Authorization Holder -->
-                                            <xsl:call-template name="show-epSOSDisplayLabels">
+                                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                                 <xsl:with-param name="code" select="'124'"/>
                                             </xsl:call-template>
                                         </th>
@@ -376,7 +376,7 @@
                         <fieldset style="min-height:100px;">
                             <legend>
                                 <!-- Prescription Details -->
-                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                     <xsl:with-param name="code" select="'129'"/>
                                 </xsl:call-template>
                             </legend>
@@ -530,7 +530,7 @@
                         <fieldset style="min-height:100px;">
                             <legend>
                                 <!-- Dispensation details -->
-                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                     <xsl:with-param name="code" select="'130'"/>
                                 </xsl:call-template>
                             </legend>

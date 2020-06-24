@@ -271,7 +271,7 @@
                                     <tr>
                                         <th>
                                             <!-- Represented organization -->
-                                            <xsl:call-template name="show-epSOSDisplayLabels">
+                                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                                 <xsl:with-param name="code" select="'127'"/>
                                             </xsl:call-template>
                                         </th>
