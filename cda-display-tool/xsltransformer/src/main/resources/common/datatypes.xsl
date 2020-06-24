@@ -108,7 +108,30 @@
             <xsl:when test="$width">
                 <xsl:call-template name="show-PQ">
                     <xsl:with-param name="node" select="$width"/>
-                </xsl:call-template>&#160;
+                </xsl:call-template>
+                <xsl:choose>
+                    <xsl:when test="$low">
+                        <!--TODO add label to eHDSIDisplayLabel value set -->
+                        <xsl:text> from </xsl:text>
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$low"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:when test="$high">
+                        <!--TODO add label to eHDSIDisplayLabel value set -->
+                        <xsl:text> until </xsl:text>
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$high"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:when test="$center">
+                        <!--TODO add label to eHDSIDisplayLabel value set -->
+                        <xsl:text> around </xsl:text>
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$center"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                </xsl:choose>
             </xsl:when>
             <xsl:when test="$low and $high">
                 <xsl:call-template name="show-TS">
@@ -121,22 +144,22 @@
             <xsl:when test="$low">
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$low"/>
-                </xsl:call-template>&#160;
+                </xsl:call-template>
             </xsl:when>
             <xsl:when test="$high">
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$high"/>
-                </xsl:call-template>&#160;
+                </xsl:call-template>
             </xsl:when>
             <xsl:when test="$nullFlavor">
                 <xsl:call-template name="show-eHDSINullFlavor">
                     <xsl:with-param name="code" select="$nullFlavor"/>
-                </xsl:call-template>&#160;
+                </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$node"/>
-                </xsl:call-template>&#160;
+                </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

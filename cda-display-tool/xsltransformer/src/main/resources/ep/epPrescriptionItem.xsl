@@ -383,29 +383,13 @@
                             <table class="ep_table">
                                 <tr>
                                     <th>
-                                        <!-- Onset Date -->
-                                        <xsl:call-template name="show-eHDSIDisplayLabel">
-                                            <xsl:with-param name="code" select="'45'"/>
-                                        </xsl:call-template>
+                                        <!-- TODO add label to eHDSIDisplayLabel value set -->
+                                        Duration of treatment
                                     </th>
                                     <td>
-                                        <xsl:call-template name="show-TS">
+                                        <xsl:call-template name="show-IVL_TS">
                                             <xsl:with-param name="node"
-                                                            select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:low"/>
-                                        </xsl:call-template>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>
-                                        <!-- End Date -->
-                                        <xsl:call-template name="show-eHDSIDisplayLabel">
-                                            <xsl:with-param name="code" select="'26'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <td>
-                                        <xsl:call-template name="show-TS">
-                                            <xsl:with-param name="node"
-                                                            select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:high"/>
+                                                            select="n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']"/>
                                         </xsl:call-template>
                                     </td>
                                 </tr>
@@ -518,6 +502,19 @@
                                     </th>
                                     <td>
                                         <xsl:call-template name="substitution-code"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <!-- Units per intake -->
+                                        <xsl:call-template name="show-epSOSDisplayLabels">
+                                            <xsl:with-param name="code" select="'78'"/>
+                                        </xsl:call-template>
+                                    </th>
+                                    <td>
+                                        <xsl:call-template name="show-IVL_PQ">
+                                            <xsl:with-param name="node" select="n1:doseQuantity"/>
+                                        </xsl:call-template>
                                     </td>
                                 </tr>
                             </table>
