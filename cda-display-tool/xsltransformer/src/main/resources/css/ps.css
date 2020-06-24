@@ -94,4 +94,29 @@
     text-align: left;
 }
 
+.activeingredient {
+    width: 15%;
+}
+.strength {
+    width: 15%;
+}
+.doseform {
+    width: 15%;
+}
+.unitsperintake {
+    width: 10%;
+}
+.frequencyofintakes {
+    width: 15%;
+}
+.routeofadministration {
+    width: 14%;
+}
+.onsetdate {
+    width: 8%;
+}
+.enddate {
+    width: 8%;
+}
+
 ]]></root>
