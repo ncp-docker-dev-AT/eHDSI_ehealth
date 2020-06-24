@@ -507,7 +507,7 @@
                                 <tr>
                                     <th>
                                         <!-- Units per intake -->
-                                        <xsl:call-template name="show-epSOSDisplayLabels">
+                                        <xsl:call-template name="show-eHDSIDisplayLabel">
                                             <xsl:with-param name="code" select="'78'"/>
                                         </xsl:call-template>
                                     </th>
