@@ -114,6 +114,7 @@
                                                             <tr bgcolor="#E6F2FF">
                                                                 <th>
                                                                     <!-- Medicinal product -->
+                                                                    <!-- TODO Add concept to eHDSIDisplayLabel value set -->
                                                                     Medicinal product
                                                                 </th>
                                                                 <th>
