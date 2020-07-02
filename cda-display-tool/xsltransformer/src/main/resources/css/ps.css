@@ -43,7 +43,11 @@
 }
 
 .translation_table tr:nth-child(even) {
-    background: #FFF;
+    background: #FFFFFF;
+}
+
+.translation_table tr:nth-child(odd) {
+    background: #E6F2FF;
 }
 
 /* Medication summary table - table containing the coded translations */
