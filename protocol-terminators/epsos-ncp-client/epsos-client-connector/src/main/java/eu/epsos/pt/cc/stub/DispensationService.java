@@ -5,7 +5,10 @@ import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
 import eu.epsos.exceptions.XdrException;
 import eu.epsos.pt.cc.dts.axis2.XdrRequestDts;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
+import eu.europa.ec.sante.ehdsi.gazelle.validation.util.Constant;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 import tr.com.srdc.epsos.data.model.XdrResponse;
 
@@ -15,6 +18,8 @@ import java.text.ParseException;
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class DispensationService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DispensationService.class);
 
     private DispensationService() {
     }
@@ -59,25 +64,23 @@ public class DispensationService {
     }
 
     /**
-     * Notify the patient’s country of affiliation on an erroneous eDispensation
-     * notification, in order to allow it to roll back any changes made on its
-     * internal data that were triggered by the erroneous notification.
+     * Notify the patient’s country of affiliation on an erroneous eDispensation notification, in order to allow it
+     * to roll back any changes made on its internal data that were triggered by the erroneous notification.
      * <p>
-     * <br/> <dl> <dt><b>Preconditions: </b> <dd>Service consumer and service
-     * provider share a common identifier for the patient <dd>The service
-     * consumer has previously retrieved the list of the patient’s available
-     * ePrescriptions and dispensed the identified medicine </dl> <dl>
-     * <dt><b>Fault Conditions: </b> <dd>Preconditions for a success scenario
-     * are not met <dd>The HCP has insufficient rights to process the patient’s
-     * ePrescription data <dd>The HCP was not the original dispenser of the
-     * identified medication item <dd>The identified item had not been dispensed
-     * previously <dd>Temporary failure (e.g. service provider is temporarily
-     * unable to access an internal service) </dl> <dl> <dt><b>Warning
-     * Conditions: </b> <dd>eDispensation data is not processed by the country
-     * of affiliation <dd>eDispensations are not rolled back automatically by
-     * the country of affiliation </dl>
+     * <br/> <dl> <dt><b>Preconditions: </b> <dd>Service consumer and service provider share a common identifier for the patient
+     * <dd>The service consumer has previously retrieved the list of the patient’s available ePrescriptions and dispensed the identified medicine</dl>
+     * <dl><dt><b>Fault Conditions: </b> <dd>Preconditions for a success scenario are not met
+     * <dd>The HCP has insufficient rights to process the patient’s ePrescription data <dd>The HCP was not the original
+     * dispenser of the identified medication item <dd>The identified item had not been dispensed previously
+     * <dd>Temporary failure (e.g. service provider is temporarily unable to access an internal service) </dl>
+     * <dl> <dt><b>Warning Conditions: </b> <dd>eDispensation data is not processed by the country of affiliation
+     * <dd>eDispensations are not rolled back automatically by the country of affiliation </dl>
      */
-    public static XdrResponse discard() {
-        throw new UnsupportedOperationException("Operation not supported.");
+    public static XdrResponse discard(final EpsosDocument1 document, final PatientDemographics patient, final String countryCode,
+                                      final Assertion hcpAssertion, final Assertion trcAssertion) throws XdrException, ParseException {
+        LOGGER.info("[CC] Dispense Service: DISCARD");
+        XdrRequest request;
+        request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
+        return XdrDocumentSource.provideAndRegisterDocSet(request, countryCode, "XXX-" + Constant.ED_CLASSCODE);
     }
 }

@@ -21,7 +21,10 @@ public class XDRConstants {
     public static final String SUBMISSION_SET_STATUS_STR = "SubmissionSetStatus";
     public static final String ORIGINAL_STR = "Original";
 
-    public class SOAP_HEADERS {
+    private XDRConstants() {
+    }
+
+    public static class SOAP_HEADERS {
 
         public static final String REQUEST_ACTION = "urn:ihe:iti:2007:ProvideAndRegisterDocumentSet-b";
         public static final String NAMESPACE_REQUEST_LOCAL_PART = "documentRecipient_ProvideAndRegisterDocumentSetB";
@@ -36,7 +39,7 @@ public class XDRConstants {
         }
     }
 
-    public class LOG {
+    public static class LOG {
 
         /* ProvideAndRegister */
         public static final String OUTGOING_XDR_PROVIDEANDREGISTER_MESSAGE = "Outgoing XDR request message to NCP-A:";
@@ -46,7 +49,7 @@ public class XDRConstants {
         }
     }
 
-    public class EXCEPTIONS {
+    public static class EXCEPTIONS {
 
         public static final String ERROR_JAXB_MARSHALLING = "Error in JAXB marshalling";
         public static final String UNABLE_CREATE_JAXB_CONTEXT = "Unable to create JAXBContext:";
@@ -55,7 +58,7 @@ public class XDRConstants {
         }
     }
 
-    public class EXTRINSIC_OBJECT {
+    public static class EXTRINSIC_OBJECT {
 
         public static final String DATE_FORMAT = "yyyyMMddhhmmss";
         public static final String CREATION_TIME = "creationTime";
@@ -69,7 +72,7 @@ public class XDRConstants {
         public static final String HEALTHCAREFACILITY_CODE_VALUE = "1.0.3166.1";
         /* PracticeSetting Code */
         public static final String PRACTICE_SETTING_CODE_SCHEME = "urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead";
-        public static final String PRACTICE_SETTING_CODE_NODEREPR = "epSOS Practice Setting Codes-Not Used";
+        public static final String PRACTICE_SETTING_CODE_NODEREPR = "eHDSI Practice Setting Codes-Not Used";
         /* Confidentiality Code */
         public static final String CONFIDENTIALITY_CODE_SCHEME = "urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f";
         public static final String CONFIDENTIALITY_CODE_NODEREPR = "N";
@@ -78,7 +81,7 @@ public class XDRConstants {
         /* Class Code */
         public static final String CLASS_CODE_SCHEME = "urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a";
         public static final String CLASS_CODE_VALUE = "2.16.840.1.113883.6.1";
-        public static final String CLASS_CODE_ED_STR = "ePrescription";
+        public static final String CLASS_CODE_ED_STR = "Medication dispensed";
         public static final String CLASS_CODE_CONS_STR = "Privacy Policy Acknowledgement Document";
         public static final String CLASS_CODE_HCER_STR = "Summarization of Episode Note";
         /* Event Code */
@@ -89,7 +92,6 @@ public class XDRConstants {
         public static final String EVENT_CODE_NODE_REPRESENTATION_OPT_OUT = "1.3.6.1.4.1.12559.11.10.1.3.2.4.1.2";
         public static final String EVENT_CODE_NODE_NAME_OPT_IN = "Opt-in";
         public static final String EVENT_CODE_NODE_NAME_OPT_OUT = "Opt-out";
-
         /* XDSDocumentEntry.PatientID */
         public static final String XDSDOCENTRY_PATID_SCHEME = "urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427";
         public static final String XDSDOCENTRY_PATID_STR = "XDSDocumentEntry.patientId";
@@ -99,12 +101,18 @@ public class XDRConstants {
         public static final String VERSION_INFO = "1.1";
         public static final String SRC_PATIENT_INFO_STR = "sourcePatientInfo";
 
+        private EXTRINSIC_OBJECT() {
+        }
+
         /* Type Code */
-        public final class TypeCode {
+        public static final class TypeCode {
 
             public static final String TYPE_CODE_SCHEME = IheConstants.TYPE_CODE_SCHEME;
 
-            public final class EDispensation {
+            private TypeCode() {
+            }
+
+            public static final class EDispensation {
 
                 public static final String DISPLAY_NAME = "eDispensation";
                 public static final String NODE_REPRESENTATION = "60593-1";
@@ -114,7 +122,7 @@ public class XDRConstants {
                 }
             }
 
-            public final class Consent {
+            public static final class Consent {
 
                 public static final String DISPLAY_NAME = "Privacy Policy Acknowledgement Document";
                 public static final String NODE_REPRESENTATION = "57016-8";
@@ -124,7 +132,7 @@ public class XDRConstants {
                 }
             }
 
-            public final class Hcer {
+            public static final class Hcer {
 
                 public static final String DISPLAY_NAME = "Summarization of Episode Note";
                 public static final String NODE_REPRESENTATION = "34133-9";
@@ -136,36 +144,64 @@ public class XDRConstants {
         }
 
         /* Format Code */
-        public final class FormatCode {
+        public static final class FormatCode {
 
             public static final String FORMAT_CODE_SCHEME = IheConstants.FORMAT_CODE_SCHEME;
 
-            public final class EDispensation {
+            private FormatCode() {
+            }
 
-                public final class EpsosPivotCoded {
+            public static final class Dispensation {
 
-                    public static final String DISPLAY_NAME = "epSOS coded eDispensation";
-                    public static final String NODE_REPRESENTATION = "urn:epSOS:ep:dis:2010";
-                    public static final String CODING_SCHEME = "epSOS formatCodes";
-
-                    private EpsosPivotCoded() {
-                    }
+                private Dispensation() {
                 }
 
-                public final class PdfSourceCoded {
+                public static final class PdfSourceCoded {
 
                     public static final String DISPLAY_NAME = "PDF/A coded document";
                     public static final String NODE_REPRESENTATION = "urn:ihe:iti:xds-sd:pdf:2008";
-                    public static final String CODING_SCHEME = "epSOS formatCodes";
+                    public static final String CODING_SCHEME = "eHDSI formatCodes";
 
                     private PdfSourceCoded() {
                     }
                 }
+
+                public static final class EpsosPivotCoded {
+
+                    public static final String DISPLAY_NAME = "eHDSI coded eDispensation";
+                    public static final String NODE_REPRESENTATION = "urn:epSOS:ep:dis:2010";
+                    public static final String CODING_SCHEME = "eHDSI formatCodes";
+
+                    private EpsosPivotCoded() {
+                    }
+                }
             }
 
-            public final class Consent {
+            /**
+             * TODO: Implements CP-036
+             */
+            public static final class DispensationDiscard {
 
-                public final class ScannedDocument {
+                private DispensationDiscard() {
+                }
+
+                public static final class PivotCoded {
+
+                    public static final String DISPLAY_NAME = "eHDSI coded eDispensation Discard";
+                    public static final String NODE_REPRESENTATION = "urn:eHDSI:ed:discard:2020";
+                    public static final String CODING_SCHEME = "eHDSI formatCodes";
+
+                    private PivotCoded() {
+                    }
+                }
+            }
+
+            public static final class Consent {
+
+                private Consent() {
+                }
+
+                public static final class ScannedDocument {
 
                     public static final String DISPLAY_NAME = "Consent";
                     public static final String NODE_REPRESENTATION = "urn:ihe:iti:bppc-sd:2007";
@@ -175,7 +211,7 @@ public class XDRConstants {
                     }
                 }
 
-                public final class NotScannedDocument {
+                public static final class NotScannedDocument {
 
                     public static final String DISPLAY_NAME = "Consent";
                     public static final String NODE_REPRESENTATION = "urn:ihe:iti:bppc:2007";
@@ -186,13 +222,16 @@ public class XDRConstants {
                 }
             }
 
-            public final class Hcer {
+            public static final class Hcer {
 
-                public final class EpsosPivotCoded {
+                private Hcer() {
+                }
+
+                public static final class EpsosPivotCoded {
 
                     public static final String DISPLAY_NAME = "epSOS Coded HCER";
                     public static final String NODE_REPRESENTATION = "urn:epSOS:hcer:hcer:2013";
-                    public static final String CODING_SCHEME = "epSOS formatCodes";
+                    public static final String CODING_SCHEME = "eHDSI formatCodes";
 
                     private EpsosPivotCoded() {
                     }
@@ -201,7 +240,7 @@ public class XDRConstants {
         }
     }
 
-    public class REGISTRY_PACKAGE {
+    public static class REGISTRY_PACKAGE {
 
         public static final String SUBMISSION_SET_STR = "SubmissionSet";
         public static final String AUTHOR_INSTITUTION_STR = "authorInstitution";
@@ -236,7 +275,7 @@ public class XDRConstants {
         }
     }
 
-    public class SUBMISSION_SET_CLASSIFICATION {
+    public static class SUBMISSION_SET_CLASSIFICATION {
 
         public static final String CLASSIFICATION_NODE_UUID = "urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd";
 
