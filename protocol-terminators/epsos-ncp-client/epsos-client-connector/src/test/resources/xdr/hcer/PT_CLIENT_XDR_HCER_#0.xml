@@ -32,7 +32,7 @@
             <description>Description</description>
             <formatCode>
                 <nodeRepresentation>urn:epSOS:hcer:2013</nodeRepresentation>
-                <schema>epSOS formatCodes</schema>
+                <schema>eHDSI formatCodes</schema>
                 <value>urn:epSOS:hcer:2013</value>
             </formatCode>
             <mimeType>text/xml</mimeType>

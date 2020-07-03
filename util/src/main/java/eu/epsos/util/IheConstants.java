@@ -49,9 +49,9 @@ public final class IheConstants {
 
     public static final String ClASSCODE_SCHEME = "2.16.840.1.113883.6.1";
 
-    public static final String DISPENSATION_FORMATCODE_DISPLAYNAME = "epSOS coded eDispensation";
+    public static final String DISPENSATION_FORMATCODE_DISPLAYNAME = "eHDSI coded eDispensation";
     public static final String DISPENSATION_FORMATCODE_NODEREPRESENTATION = "urn:epsos:ep:dis:2010";
-    public static final String DISPENSATION_FORMATCODE_CODINGSCHEMA = "epSOS formatCodes";
+    public static final String DISPENSATION_FORMATCODE_CODINGSCHEMA = "eHDSI formatCodes";
 
 
     public static final String CONSENT_FORMATCODE_DISPLAYNAME = "Consent";

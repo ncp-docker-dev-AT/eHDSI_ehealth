@@ -10,6 +10,7 @@ import eu.epsos.util.IheConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -267,13 +268,14 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             String countryCode = arg0.getCountryCode();
             EpsosDocument1 document = arg0.getDocument();
             PatientDemographics patient = arg0.getPatientDemographics();
-
+            logger.info("INFO Discard: '{}'", document.getFormatCode().getNodeRepresentation());
             String classCodeNode;
             GenericDocumentCode classCode = document.getClassCode();
             if (!classCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
                 throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + classCode.getSchema());
             }
             classCodeNode = classCode.getNodeRepresentation();
+            String nodeRepresentation = document.getFormatCode().getNodeRepresentation();
 
             //TODO: CDA as input needs to be validated according XSD, Schematron or Validators.
             switch (classCodeNode) {
@@ -284,11 +286,18 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                     break;
                 // call XDR Client for eP
                 case Constants.ED_CLASSCODE:
-                    response = DispensationService.initialize(document, patient, countryCode, hcpAssertion, trcAssertion);
+                    if (StringUtils.equals(nodeRepresentation, "urn:eHDSI:ed:discard:2020")) {
+                        response = DispensationService.discard(document, patient, countryCode, hcpAssertion, trcAssertion);
+                    } else {
+                        response = DispensationService.initialize(document, patient, countryCode, hcpAssertion, trcAssertion);
+                    }
                     break;
                 // call XDR Client for HCER
                 case Constants.HCER_CLASSCODE:
                     response = HcerService.submit(document, patient, countryCode, hcpAssertion, trcAssertion);
+                    break;
+                case "XXX-" + Constants.ED_CLASSCODE:
+                    response = DispensationService.discard(document, patient, countryCode, hcpAssertion, trcAssertion);
                     break;
                 default:
                     throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + classCodeNode);

@@ -197,14 +197,14 @@ public class RespondingGateway_ServiceStub_Mock {
                     "urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
                     uuid,
                     "urn:ihe:iti:xds-sd:pdf:2008",
-                    "epSOS formatCodes",
+                    "eHDSI formatCodes",
                     "PDF/A coded document"));
         } else {
             eot.getClassification().add(makeClassification(
                     "urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
                     uuid,
                     "urn:epSOS:ps:ps:2010",
-                    "epSOS formatCodes",
+                    "eHDSI formatCodes",
                     "epSOS coded Patient Summary"));
         }
         // Healthcare facility code
@@ -222,7 +222,7 @@ public class RespondingGateway_ServiceStub_Mock {
                 "urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
                 uuid,
                 "Not Used",
-                "epSOS Practice Setting Codes-Not Used",
+                "eHDSI Practice Setting Codes-Not Used",
                 "Not Used"));
 
         // External Identifiers
