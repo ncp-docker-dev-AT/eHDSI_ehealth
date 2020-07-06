@@ -131,9 +131,9 @@ public class STSService implements Provider<SOAPMessage> {
             String patientID = getPatientID(body);
             String mid = getMessageIdFromHeader(header);
 
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder builder = dbf.newDocumentBuilder();
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setNamespaceAware(true);
+            DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
 
             // The response TRC Assertion Issuer.
             SamlTRCIssuer samlTRCIssuer = new SamlTRCIssuer();

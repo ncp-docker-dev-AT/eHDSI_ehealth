@@ -1847,6 +1847,25 @@ public class EpsosHelperService {
                 dem.setType("calendar");
                 demographicsList.add(dem);
             }
+            nodeLst = doc.getElementsByTagNameNS("*", "documentId");
+            for (int s = 0; s < nodeLst.getLength(); s++) {
+                Element link = (Element) nodeLst.item(s);
+                Demographics dem = new Demographics();
+                dem.setLabel(link.getAttribute("label"));
+                dem.setKey(link.getAttribute("label"));
+                dem.setType("text");
+                demographicsList.add(dem);
+            }
+
+            nodeLst = doc.getElementsByTagNameNS("*", "pinCode");
+            for (int s = 0; s < nodeLst.getLength(); s++) {
+                Element link = (Element) nodeLst.item(s);
+                Demographics dem = new Demographics();
+                dem.setLabel(link.getAttribute("label"));
+                dem.setKey(link.getAttribute("label"));
+                dem.setType("text");
+                demographicsList.add(dem);
+            }
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
@@ -1899,9 +1918,9 @@ public class EpsosHelperService {
         }
         LOGGER.info("Assertion ID: '{}'", idAs.getID());
         LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
-        TRCAssertionRequest req1 = new TRCAssertionRequest.Builder(idAs, pat).purposeOfUse(purpose).build();
-        LOGGER.info("TRCAssertionRequest: '{}", req1);
-        trc = req1.request();
+        TRCAssertionRequest trcAssertionRequest = new TRCAssertionRequest.Builder(idAs, pat).purposeOfUse(purpose).pinCode("1234").prescriptionId("ABCDE").build();
+        LOGGER.info("TRCAssertionRequest: '{}", trcAssertionRequest);
+        trc = trcAssertionRequest.request();
 
         AssertionMarshaller marshaller = new AssertionMarshaller();
         Element element = marshaller.marshall(trc);

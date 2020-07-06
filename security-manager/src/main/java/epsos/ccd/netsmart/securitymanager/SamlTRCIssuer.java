@@ -213,12 +213,11 @@ public class SamlTRCIssuer {
         XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
         //Doing an indirect copy so, because when cloning, signatures are lost.
-        SignatureManager sman = new SignatureManager(ksm);
+        SignatureManager signatureManager = new SignatureManager(ksm);
 
         try {
-            sman.verifySAMLAssertion(hcpIdentityAssertion);
+            signatureManager.verifySAMLAssertion(hcpIdentityAssertion);
         } catch (SMgrException ex) {
-            logger.error(null, ex);
             throw new SMgrException("SAML Assertion Validation Failed: " + ex.getMessage());
         }
 
@@ -356,6 +355,24 @@ public class SamlTRCIssuer {
         }
         attrStmt.getAttributes().add(attrPoU);
 
+        Attribute attributePinCode = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
+        attributePinCode.setFriendlyName("Pin Code");
+        attributePinCode.setName("urn:ehdsi:names:document:document-id:pinCode");
+        attributePinCode.setNameFormat(Attribute.URI_REFERENCE);
+        XSString attrValPinCode = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
+        attrValPinCode.setValue("1234");
+        attributePinCode.getAttributeValues().add(attrValPinCode);
+        attrStmt.getAttributes().add(attributePinCode);
+
+        Attribute attributeDocumentId = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
+        attributeDocumentId.setFriendlyName("Prescription ID");
+        attributeDocumentId.setName("urn:ehdsi:names:document:document-id:prescriptionId");
+        attributeDocumentId.setNameFormat(Attribute.URI_REFERENCE);
+        XSString attrValDocumentId = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
+        attrValDocumentId.setValue("ABCDEF");
+        attributeDocumentId.getAttributeValues().add(attrValDocumentId);
+        attrStmt.getAttributes().add(attributeDocumentId);
+
         Attribute pointOfCareAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization");
         if (pointOfCareAttr != null) {
@@ -391,7 +408,7 @@ public class SamlTRCIssuer {
 
         auditDataMap.put("facilityType", facilityType);
 
-        sman.signSAMLAssertion(trc);
+        signatureManager.signSAMLAssertion(trc);
         if (logger.isDebugEnabled()) {
             logger.debug("Assertion generated at '{}'", trc.getIssueInstant().toString());
         }
