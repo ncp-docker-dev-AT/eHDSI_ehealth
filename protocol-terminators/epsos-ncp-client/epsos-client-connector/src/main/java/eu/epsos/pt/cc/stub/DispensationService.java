@@ -58,8 +58,8 @@ public class DispensationService {
      */
     public static XdrResponse initialize(final EpsosDocument1 document, final PatientDemographics patient, final String countryCode,
                                          final Assertion hcpAssertion, final Assertion trcAssertion) throws XdrException, ParseException {
-        XdrRequest request;
-        request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
+        LOGGER.info("[CC] Dispense Service: Initialize");
+        XdrRequest request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
         return XdrDocumentSource.initialize(request, countryCode);
     }
 
@@ -81,6 +81,6 @@ public class DispensationService {
         LOGGER.info("[CC] Dispense Service: DISCARD");
         XdrRequest request;
         request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
-        return XdrDocumentSource.provideAndRegisterDocSet(request, countryCode, "XXX-" + Constant.ED_CLASSCODE);
+        return XdrDocumentSource.provideAndRegisterDocSet(request, countryCode, "DISCARD-" + Constant.ED_CLASSCODE);
     }
 }

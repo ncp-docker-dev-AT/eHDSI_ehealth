@@ -47,6 +47,7 @@ public class DiscardDispenseServlet extends HttpServlet {
         EpsosDocument1 document = buildDispenseDocument(user, edOid, eDUid, edBytes);
         //  2.16.470.1.100.1.1.1000.990.1^gOADaWyE/RZ5p1ra
         ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
+        logger.info("Discard Operation Debug: '{}', '{}', '{}', '{}', '{}'", hcpAssertion.getID(), trcAssertion.getID(), selectedCountry, document.getRepositoryId(), patient.getRoot());
         SubmitDocumentResponse submitDocumentResponse = proxy.submitDocument(hcpAssertion, trcAssertion, selectedCountry, document, patient.getPatientDemographics());
         if (logger.isInfoEnabled()) {
             logger.info("[Portal] Discard operation: '{}'", submitDocumentResponse.toString());
@@ -76,7 +77,7 @@ public class DiscardDispenseServlet extends HttpServlet {
     private EpsosDocument1 buildDispenseDocument(User user, String dispenseRoot, String dispenseExtension, byte[] dispense) {
 
         GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
-        classCode.setNodeRepresentation("XXX-" + Constants.ED_CLASSCODE);
+        classCode.setNodeRepresentation("DISCARD-" + Constants.ED_CLASSCODE);
         classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
         classCode.setValue(Constants.ED_TITLE);
 

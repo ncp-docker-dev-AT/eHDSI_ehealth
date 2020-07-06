@@ -5,13 +5,10 @@
 
 <h:head/>
 <body>
-
 <f:view locale="#{facesContext.externalContext.requestLocale}"/>
-
 <p:ajaxStatus style="width:16px;height:16px;position:fixed;top:63px;right:120px;" id="ajaxStatusPanel">
     <f:facet name="start">
-        <h:graphicImage value="/images/loading.gif"
-                        style="text-align:center;width:40px;height:40px;"/>
+        <h:graphicImage value="/images/loading.gif" style="text-align:center;width:40px;height:40px;"/>
     </f:facet>
     <f:facet name="complete">
         <h:outputText value=""/>
@@ -24,12 +21,9 @@
                    action="/view.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal">
         <p:graphicImage value="/images/Home-Button.png"/>
     </p:commandLink>
-    <p:commandLink ajax="false"
-                   actionListener="#{myBean.showForm}">
-        <f:setPropertyActionListener value="#{myBean.selectedCountry}"
-                                     target="#{myBean.selectedCountry}"/>
-        <p:graphicImage value="/images/flags/#{myBean.selectedCountry}.png"
-                        style="text-align:center;width:30px;height:30px;"/>
+    <p:commandLink ajax="false" actionListener="#{myBean.showForm}">
+        <f:setPropertyActionListener value="#{myBean.selectedCountry}" target="#{myBean.selectedCountry}"/>
+        <p:graphicImage value="/images/flags/#{myBean.selectedCountry}.png" style="text-align:center;width:30px;height:30px;"/>
     </p:commandLink>
     <ui:include src="patient.xhtml"/>
     <ui:include src="confirmation.xhtml"/>
@@ -41,10 +35,8 @@
     <p:panel id="confirmationPanel">
         <p:commandButton id="submitButton" value="#{msg['trca.confirm']}" ajax="false"
                          action="/viewPrescriptions.xhtml?faces-redirect=true&amp;javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal">
-            <f:setPropertyActionListener value="#{confirmationBean.purposeOfUse}"
-                                         target="#{myBean.purposeOfUseForEP}"/>
-            <f:setPropertyActionListener value="#{confirmationBean.confirm}"
-                                         target="#{myBean.specificConsent}"/>
+            <f:setPropertyActionListener value="#{confirmationBean.purposeOfUse}" target="#{myBean.purposeOfUseForEP}"/>
+            <f:setPropertyActionListener value="#{confirmationBean.confirm}" target="#{myBean.specificConsent}"/>
             <p:resetInput target="confirmationPanel"/>
         </p:commandButton>
         <p:commandButton id="cancelButton" value="#{msg['trca.cancel']}" ajax="false"

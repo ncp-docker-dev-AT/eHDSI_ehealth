@@ -23,9 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.*;
@@ -47,6 +45,8 @@ public class DispenseServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
 
         logger.info("[OpenNCP Portal] eDispense Servlet...");
+
+
         request.setCharacterEncoding(StandardCharsets.UTF_8.name());
         SubmitDocumentResponse submitDocumentResponse = null;
         Boolean substitute = Boolean.FALSE;
@@ -128,10 +128,11 @@ public class DispenseServlet extends HttpServlet {
                 EpsosDocument1 document = buildDispenseDocument(user, edOid, eDUid, edBytes);
                 ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
                 submitDocumentResponse = proxy.submitDocument(hcpAssertion, trcAssertion, selectedCountry, document, patient.getPatientDemographics());
-
                 setResponseHeaders(response);
                 String message = "Dispensation successful";
                 outputStream.write(message.getBytes());
+                //  Serialize medication dispense as XML
+                writeFile(eDUid, document.getBase64Binary());
             }
         } catch (Exception e) {
 
@@ -210,5 +211,28 @@ public class DispenseServlet extends HttpServlet {
         response.setHeader(CACHE_CONTROL, NO_CACHE);
         response.setDateHeader(EXPIRES, 0);
         response.setHeader(PRAGMA, NO_CACHE);
+    }
+
+    private void writeFile(String dispenseId, byte[] document) {
+
+        StringBuilder patientFile = new StringBuilder();
+        patientFile.append(Constants.EPSOS_PROPS_PATH).append("integration/");
+        String directoryName = patientFile.append(Constants.HOME_COMM_ID).append("/medication").toString();
+        String fileName = dispenseId + ".xml";
+
+        File directory = new File(directoryName);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+
+        File file = new File(directoryName + "/" + fileName);
+        String dispense = new String(document, StandardCharsets.UTF_8);
+        try (FileWriter fileWriter = new FileWriter(file.getAbsoluteFile())) {
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(dispense);
+            bufferedWriter.close();
+        } catch (IOException e) {
+            logger.error("IOException: '{}'", e.getMessage(), e);
+        }
     }
 }
