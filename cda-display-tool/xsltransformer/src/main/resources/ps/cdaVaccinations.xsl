@@ -40,7 +40,7 @@
                     <input id="collapsible-vaccinations-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-vaccinations-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'11369-6'"/>
                         </xsl:call-template>
                     </label>
@@ -79,25 +79,32 @@
                                                         <tr>
                                                             <th>
                                                                 <!-- Vaccination header -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'79'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
                                                                 <!-- Brand name header -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'9'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
                                                                 <!-- Vaccination Date header -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'80'"/>
                                                                 </xsl:call-template>
                                                             </th>
+                                                            <xsl:if test="$vacAct/n1:entryRelationship/n1:observation[@classCode='OBS'][@moodCode='EVN']/n1:code[@codeSystem='2.16.840.1.113883.6.1'][@code ='30973-2']">
+                                                            <th>
+                                                                <!-- Dose number in series header -->
+                                                                <!-- TODO Add label to eHDSIDisplayLabel value set-->
+                                                                Dose number in series
+                                                            </th>
+                                                            </xsl:if>
                                                             <th>
                                                                 <!-- Administered header -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'122'"/>
                                                                 </xsl:call-template>
                                                             </th>
@@ -110,7 +117,7 @@
                                                 </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-epSOSNullFlavor">
+                                                <xsl:call-template name="show-eHDSINullFlavor">
                                                     <xsl:with-param name="code" select="$vacAct/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -137,6 +144,9 @@
         <xsl:variable name="vaccinationsDate"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:effectiveTime"/>
 
+        <xsl:variable name="vaccinationsPosition"
+                      select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../n1:entryRelationship/n1:observation[@classCode='OBS'][@moodCode='EVN']/n1:code[@codeSystem='2.16.840.1.113883.6.1'][@code ='30973-2']"/>
+
         <xsl:variable name="negationInd"
                       select="n1:substanceAdministration/n1:templateId[@root= '2.16.840.1.113883.10.20.1.24']/../@negationInd"/>
         <!-- End definition of variables -->
@@ -146,7 +156,7 @@
                 <tr>
                     <td>
                         <!-- Vaccination -->
-                                <xsl:call-template name="show-epSOSVaccine">
+                                <xsl:call-template name="show-eHDSIVaccine">
                                     <xsl:with-param name="node" select="$vaccination"/>
                                 </xsl:call-template>
                     </td>
@@ -154,7 +164,7 @@
                         <!-- Brand Name -->
                         <xsl:choose>
                             <xsl:when test="$vaccinationsBrandName/@nullFlavor">
-                                <xsl:call-template name="show-epSOSNullFlavor">
+                                <xsl:call-template name="show-eHDSINullFlavor">
                                     <xsl:with-param name="code"
                                                     select="$vaccinationsBrandName/@nullFlavor"/>
                                 </xsl:call-template>
@@ -171,6 +181,22 @@
                         </xsl:call-template>
                         &#160;
                     </td>
+                    <xsl:if test="$vaccinationsPosition">
+                    <td>
+                        <!-- Dose number in series -->
+                        <xsl:choose>
+                            <xsl:when test="$vaccinationsPosition/@nullFlavor">
+                                <xsl:call-template name="show-eHDSINullFlavor">
+                                    <xsl:with-param name="code" select="$vaccinationsPosition/@nullFlavor"/>
+                                </xsl:call-template>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$vaccinationsPosition/../n1:value/@value"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+
+                    </td>
+                    </xsl:if>
                     <td>
                         <!-- Administered -->
                         <xsl:choose>
@@ -187,7 +213,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-epSOSNullFlavor">
+                        <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="n1:substanceAdministration/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

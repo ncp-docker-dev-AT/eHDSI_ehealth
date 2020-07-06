@@ -27,7 +27,7 @@
                     <!-- The Medical devices and implants section is missing -->
                     <xsl:choose>
                         <xsl:when test=" ($documentCode='60591-5')">
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'74'"/>
                             </xsl:call-template>
                         </xsl:when>
@@ -53,7 +53,7 @@
                     <input id="collapsible-medication-medical-devices-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-medication-medical-devices-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'46264-8'"/>
                         </xsl:call-template>
                     </label>
@@ -92,13 +92,13 @@
                                                             <tr>
                                                                 <th>
                                                                     <!-- Device Implant -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'21'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Implant Date -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'36'"/>
                                                                     </xsl:call-template>
                                                                 </th>
@@ -113,7 +113,7 @@
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <br/>
-                                                <xsl:call-template name="show-epSOSNullFlavor">
+                                                <xsl:call-template name="show-eHDSINullFlavor">
                                                     <xsl:with-param name="code" select="$medDevAct/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -144,7 +144,7 @@
                     <xsl:when test="($medDeviceImplantDescription/@code='no-known-devices' or $medDeviceImplantDescription/@code='no-device-info')">
                         <tr>
                             <td colspan="2">
-                                <xsl:call-template name="show-eHDSI-AbsentOrUnknownDevices">
+                                <xsl:call-template name="show-eHDSIAbsentOrUnknownDevice">
                                     <xsl:with-param name="node" select="$medDeviceImplantDescription"/>
                                 </xsl:call-template>
                             </td>
@@ -154,7 +154,7 @@
                         <tr>
                             <td>
                                 <!-- Device Implant -->
-                                <xsl:call-template name="show-epSOSMedicalDevices">
+                                <xsl:call-template name="show-eHDSIMedicalDevice">
                                     <xsl:with-param name="node" select="$medDeviceImplantDescription"/>
                                 </xsl:call-template>
                             </td>
@@ -171,7 +171,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-epSOSNullFlavor">
+                        <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="n1:supply/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

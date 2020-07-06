@@ -41,7 +41,7 @@
                     <input id="collapsible-social-history-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-social-history-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'47420-5'"/>
                         </xsl:call-template>
                     </label>

@@ -41,7 +41,7 @@
                     <input id="collapsible-history-illness-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-history-illness-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'11348-0'"/>
                         </xsl:call-template>
                     </label>
@@ -81,19 +81,19 @@
                                                             <tr>
                                                                 <th>
                                                                     <!-- xsl:text>Closed Inactive Problem</xsl:text-->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'11'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- xsl:text>Onset Date</xsl:text-->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'45'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- xsl:text>End Date</xsl:text-->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'26'"/>
                                                                     </xsl:call-template>
                                                                 </th>
@@ -107,7 +107,7 @@
                                                 </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-epSOSNullFlavor">
+                                                <xsl:call-template name="show-eHDSINullFlavor">
                                                     <xsl:with-param name="code" select="$historyAct/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -138,7 +138,7 @@
             <xsl:when test="not(n1:act/@nullFlavor)">
                 <xsl:choose>
                     <xsl:when test="($problemCondition='no-known-problems' or $problemCondition='no-problem-info')">
-                        <xsl:call-template name="show-eHDSI-AbsentOrUnknownProblems">
+                        <xsl:call-template name="show-eHDSIAbsentOrUnknownProblem">
                             <xsl:with-param name="code" select="$problemCondition/@code"/>
                         </xsl:call-template>
                     </xsl:when>
@@ -146,7 +146,7 @@
                         <tr>
                             <td>
                                 <!-- Closed/Inactive problem -->
-                                <xsl:call-template name="show-epSOSIllnessesandDisorders">
+                                <xsl:call-template name="show-eHDSIIllnessandDisorder">
                                     <xsl:with-param name="node" select="$problemCondition"/>
                                 </xsl:call-template>
                             </td>
@@ -169,7 +169,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-epSOSNullFlavor">
+                        <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="n1:act/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

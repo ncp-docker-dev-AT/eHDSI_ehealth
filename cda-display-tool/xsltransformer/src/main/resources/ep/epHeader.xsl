@@ -13,43 +13,43 @@
                     <tr>
                         <th>
                             <!--  Prefix : -->
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'55'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  Family Name : -->
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'30'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  Given Name:-->
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'34'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  Date of Birth: -->
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'19'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  Gender: -->
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'33'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  Regional/National Health ID: -->
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'66'"/>
                             </xsl:call-template>
                         </th>
                         <th>
                             <!--  National Insurance number: -->
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'41'"/>
                             </xsl:call-template>
                         </th>

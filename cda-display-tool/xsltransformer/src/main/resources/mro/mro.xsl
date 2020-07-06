@@ -29,7 +29,7 @@
         <fieldset>
             <legend>
                 <a href="javascript: showhide('extendedCdaHeader'); self.focus(); void(0);">
-                    <xsl:call-template name="show-epSOSDisplayLabels">
+                    <xsl:call-template name="show-eHDSIDisplayLabel">
                         <xsl:with-param name="code" select="'68'"/>
                     </xsl:call-template>
                 </a>

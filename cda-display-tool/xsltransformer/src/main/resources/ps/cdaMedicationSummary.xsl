@@ -27,7 +27,7 @@
                     <!-- Medications Summary non present! -->
                     <xsl:choose>
                         <xsl:when test=" ($documentCode='60591-5')">
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'75'"/>
                             </xsl:call-template>
                         </xsl:when>
@@ -53,7 +53,7 @@
                     <input id="collapsible-medication-summary-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-medication-summary-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'10160-0'"/>
                         </xsl:call-template>
                     </label>
@@ -87,82 +87,94 @@
                                     <div class="content-inner">
                                         <xsl:choose>
                                             <xsl:when test="not($medAct/@nullFlavor)">
-                                                <table class="translation_table">
-                                                    <tbody>
-                                                        <xsl:choose>
-                                                            <xsl:when test="$medCode/@code='no-known-medications' or $medCode/@code='no-medication-info'">
-                                                                <tr>
-                                                                    <td colspan="6">
-                                                                        <span class="tdtext">
-                                                                            <xsl:call-template name="show-eHDSI-AbsentOrUnknownMedication">
-                                                                                <xsl:with-param name="node" select="$medCode"/>
-                                                                            </xsl:call-template>
-                                                                        </span>
-                                                                        <br/>
-                                                                    </td>
-                                                                </tr>
-                                                            </xsl:when>
-                                                            <xsl:otherwise>
-                                                                <tr>
-                                                                    <th>
-                                                                        <!-- Active ingredient -->
-                                                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                                                            <xsl:with-param name="code" select="'1'"/>
+                                                <table class="medication_summary_table">
+                                                    <colgroup class="medicinalproduct"/>
+                                                    <colgroup class="activeingredient"/>
+                                                    <colgroup class="strength"/>
+                                                    <colgroup class="doseform"/>
+                                                    <colgroup class="unitsperintake"/>
+                                                    <colgroup class="frequencyofintakes"/>
+                                                    <colgroup class="routeofadministration"/>
+                                                    <colgroup class="onsetdate"/>
+                                                    <colgroup class="enddate"/>
+                                                    <xsl:choose>
+                                                        <xsl:when test="$medCode/@code='no-known-medications' or $medCode/@code='no-medication-info'">
+                                                            <tr bgcolor="#E6F2FF">
+                                                                <td colspan="8">
+                                                                    <span class="tdtext">
+                                                                        <xsl:call-template name="show-eHDSIAbsentOrUnknownMedication">
+                                                                            <xsl:with-param name="node" select="$medCode"/>
                                                                         </xsl:call-template>
-                                                                    </th>
-                                                                    <th>
-                                                                        <!-- Strength -->
-                                                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                                                            <xsl:with-param name="code" select="'70'"/>
-                                                                        </xsl:call-template>
-                                                                    </th>
-                                                                    <th>
-                                                                        <!-- Dose form -->
-                                                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                                                            <xsl:with-param name="code" select="'25'"/>
-                                                                        </xsl:call-template>
-                                                                    </th>
-                                                                    <th>
-                                                                        <!-- Units per intake -->
-                                                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                                                            <xsl:with-param name="code" select="'78'"/>
-                                                                        </xsl:call-template>
-                                                                    </th>
-                                                                    <th>
-                                                                        <!-- Frequency of intakes -->
-                                                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                                                            <xsl:with-param name="code" select="'32'"/>
-                                                                        </xsl:call-template>
-                                                                    </th>
-                                                                    <th>
-                                                                        <!-- Route of Administration -->
-                                                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                                                            <xsl:with-param name="code" select="'67'"/>
-                                                                        </xsl:call-template>
-                                                                    </th>
-                                                                    <th>
-                                                                        <!-- Onset Date -->
-                                                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                                                            <xsl:with-param name="code" select="'45'"/>
-                                                                        </xsl:call-template>
-                                                                    </th>
-                                                                    <th>
-                                                                        <!-- End Date -->
-                                                                        <xsl:call-template name="show-epSOSDisplayLabels">
-                                                                            <xsl:with-param name="code" select="'26'"/>
-                                                                        </xsl:call-template>
-                                                                    </th>
-                                                                </tr>
-                                                                <xsl:for-each select="n1:entry">
-                                                                    <xsl:call-template name="medicationSummarySectionEntry"/>
-                                                                </xsl:for-each>
-                                                            </xsl:otherwise>
-                                                        </xsl:choose>
-                                                    </tbody>
+                                                                    </span>
+                                                                    <br/>
+                                                                </td>
+                                                            </tr>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <tr bgcolor="#E6F2FF">
+                                                                <th>
+                                                                    <!-- Medicinal product -->
+                                                                    <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                                    Medicinal product
+                                                                </th>
+                                                                <th>
+                                                                    <!-- Active ingredient -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'1'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                                <th>
+                                                                    <!-- Strength -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'70'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                                <th>
+                                                                    <!-- Dose form -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'25'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                                <th>
+                                                                    <!-- Units per intake -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'78'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                                <th>
+                                                                    <!-- Frequency of intakes -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'32'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                                <th>
+                                                                    <!-- Route of Administration -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'67'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                                <th>
+                                                                    <!-- Onset Date -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'45'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                                <th>
+                                                                    <!-- End Date -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'26'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                            </tr>
+                                                            <xsl:for-each select="n1:entry">
+                                                                <xsl:call-template name="medicationSummarySectionEntry"/>
+                                                            </xsl:for-each>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
                                                 </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-epSOSNullFlavor">
+                                                <xsl:call-template name="show-eHDSINullFlavor">
                                                     <xsl:with-param name="code" select="$medAct/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -195,127 +207,192 @@
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:high"/>
         <xsl:variable name="medCode"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:code/@code"/>
-        <xsl:for-each
-                select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']">
 
-            <xsl:variable name="medActiveIngredientNode" select="epsos:ingredient"/>
-            <xsl:variable name="medActiveIngredientNodeCode" select = "$medActiveIngredientNode/epsos:code"/>
-            <xsl:variable name="medActiveIngredient" select="$medActiveIngredientNodeCode"/>
-            <xsl:variable name="medActiveIngredientID" select="$medActiveIngredientNodeCode/@code"/>
-            <xsl:variable name="medStrength" select="epsos:quantity"/>
 
-            <!-- nullflavored act -->
-            <xsl:choose>
-                <xsl:when test="not(n1:substanceAdministration/@nullFlavor)">
-                    <!-- no info scenario code is one of the three values -->
-                    <xsl:if test="not($medCode='no-known-medications' or $medCode='no-medication-info')">
-                        <tr>
-                            <td>
-                                <!-- Active ingredient -->
-                                <xsl:choose>
-                                    <xsl:when test="not ($medActiveIngredientNodeCode/@nullFlavor)">
-                                        <xsl:choose>
-                                            <xsl:when test="$medActiveIngredient">
-                                                <xsl:call-template name="show-epSOSActiveIngredient">
-                                                    <xsl:with-param name="node" select="$medActiveIngredientNodeCode"/>
-                                                </xsl:call-template>
-                                                <br/>
-                                                (
-                                                <xsl:value-of select="$medActiveIngredientID"/>
-                                                )
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <!-- uncoded element Problem -->
-                                                <xsl:if test="$medActiveIngredientNodeCode/n1:originalText/n1:reference/@value">
-                                                    <xsl:call-template name="show-uncodedElement">
-                                                        <xsl:with-param name="code"
-                                                                        select="$medActiveIngredientNodeCode/n1:originalText/n1:reference/@value"/>
-                                                    </xsl:call-template>
-                                                </xsl:if>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:choose>
-                                            <xsl:when test="$medActiveIngredientNode/epsos:name">
-                                                <xsl:value-of select="$medActiveIngredientNode/epsos:name"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <xsl:call-template name="show-epSOSNullFlavor">
-                                                    <xsl:with-param name="code"
-                                                                    select="$medActiveIngredientNodeCode/@nullFlavor"/>
-                                                </xsl:call-template>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </td>
-                            <td>
-                                <!-- Strength -->
-                                <xsl:call-template name="show-strength">
-                                    <xsl:with-param name="node" select="$medStrength"/>
-                                </xsl:call-template>
-                            </td>
-                            <td>
-                                <!-- Dose form -->
-                                <xsl:call-template name="show-epSOSDoseForm">
-                                    <xsl:with-param name="node" select="$medDose"/>
-                                </xsl:call-template>
-                            </td>
-                            <td>
-                                <!-- Units per intake -->
-                                <xsl:call-template name="show-IVL_PQ">
-                                    <xsl:with-param name="node" select="$medUnitIntake"/>
-                                </xsl:call-template>
-                            </td>
-                            <td>
-                                <!-- Frequency of intakes -->
-                                <xsl:choose>
-                                    <xsl:when test="not ($medFrequencyIntake/@nullFlavor)">
-                                        <xsl:call-template name="show-frequencyIntake">
-                                            <xsl:with-param name="medFrequencyIntakeType" select="$medFrequencyIntakeType"/>
-                                            <xsl:with-param name="medFrequencyIntake" select="$medFrequencyIntake"/>
-                                        </xsl:call-template>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:call-template name="show-epSOSNullFlavor">
-                                            <xsl:with-param name="code" select="$medFrequencyIntake/@nullFlavor"/>
-                                        </xsl:call-template>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </td>
-                            <td>
-                                <!-- Route of Administration -->
-                                <xsl:call-template name="show-epSOSRouteOfAdministration">
-                                    <xsl:with-param name="node" select="$medRouteAdministration"/>
-                                </xsl:call-template>
-                            </td>
-                            <td>
-                                <!-- Onset Date -->
-                                <xsl:call-template name="show-TS">
-                                    <xsl:with-param name="node" select="$medOnSetDate"/>
-                                </xsl:call-template>
-                            </td>
-                            <td>
-                                <!-- End Date -->
-                                <xsl:call-template name="show-TS">
-                                    <xsl:with-param name="node" select="$medEndDate"/>
-                                </xsl:call-template>
-                                &#160;
-                            </td>
-                        </tr>
-                    </xsl:if>
-                </xsl:when>
-                <xsl:otherwise>
-                    <tr>
-                        <td colspan="5">
-                            <xsl:call-template name="show-epSOSNullFlavor">
-                                <xsl:with-param name="code" select="n1:medSubstanceAdministration/@nullFlavor"/>
+        <!-- nullflavored act -->
+        <xsl:choose>
+            <xsl:when test="not(n1:substanceAdministration/@nullFlavor)">
+                <!-- no info scenario code is one of the three values -->
+                <xsl:if test="not($medCode='no-known-medications' or $medCode='no-medication-info')">
+                    <xsl:variable name="backgroundColor"
+                                  select="'#E6F2FF'"/>
+                    <xsl:for-each
+                            select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <b><xsl:call-template name="show-medicinalProduct"/></b>
+                                </td>
+                                <td>
+                                    <xsl:for-each select="epsos:ingredient[@classCode='ACTI']">
+                                        <xsl:if test="position()=1">
+                                            <xsl:call-template name="show-activeIngredient"/>
+                                        </xsl:if>
+                                    </xsl:for-each>
+                                </td>
+                                <td>
+                                    <!-- Strength -->
+                                    <xsl:for-each select="epsos:ingredient[@classCode='ACTI']">
+                                        <xsl:if test="position()=1">
+                                            <xsl:variable name="medStrength" select="epsos:quantity"/>
+                                            <xsl:call-template name="show-strength">
+                                                <xsl:with-param name="node" select="$medStrength"/>
+                                            </xsl:call-template>
+                                        </xsl:if>
+                                    </xsl:for-each>
+                                </td>
+                                <td>
+                                    <!-- Dose form -->
+                                    <xsl:call-template name="show-eHDSIDoseForm">
+                                        <xsl:with-param name="node" select="$medDose"/>
+                                    </xsl:call-template>
+                                </td>
+                                <td>
+                                    <!-- Units per intake -->
+                                    <xsl:call-template name="show-IVL_PQ">
+                                        <xsl:with-param name="node" select="$medUnitIntake"/>
+                                    </xsl:call-template>
+                                </td>
+                                <td>
+                                    <!-- Frequency of intakes -->
+                                    <xsl:choose>
+                                        <xsl:when test="not ($medFrequencyIntake/@nullFlavor)">
+                                            <xsl:call-template name="show-frequencyIntake">
+                                                <xsl:with-param name="medFrequencyIntakeType" select="$medFrequencyIntakeType"/>
+                                                <xsl:with-param name="medFrequencyIntake" select="$medFrequencyIntake"/>
+                                            </xsl:call-template>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:call-template name="show-eHDSINullFlavor">
+                                                <xsl:with-param name="code" select="$medFrequencyIntake/@nullFlavor"/>
+                                            </xsl:call-template>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </td>
+                                <td>
+                                    <!-- Route of Administration -->
+                                    <xsl:call-template name="show-eHDSIRouteOfAdministration">
+                                        <xsl:with-param name="node" select="$medRouteAdministration"/>
+                                    </xsl:call-template>
+                                </td>
+                                <td>
+                                    <!-- Onset Date -->
+                                    <xsl:call-template name="show-TS">
+                                        <xsl:with-param name="node" select="$medOnSetDate"/>
+                                    </xsl:call-template>
+                                </td>
+                                <td>
+                                    <!-- End Date -->
+                                    <xsl:call-template name="show-TS">
+                                        <xsl:with-param name="node" select="$medEndDate"/>
+                                    </xsl:call-template>
+                                    &#160;
+                                </td>
+                            </tr>
+                            <xsl:for-each select="epsos:ingredient[@classCode='ACTI']">
+                                <xsl:if test="position()!=1">
+                                    <tr>
+                                        <td/>
+                                        <td>
+                                            <xsl:call-template name="show-activeIngredient"/>
+                                        </td>
+                                        <td>
+                                            <xsl:variable name="medStrength" select="epsos:quantity"/>
+                                            <xsl:call-template name="show-strength">
+                                                <xsl:with-param name="node" select="$medStrength"/>
+                                            </xsl:call-template>
+                                        </td>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                </xsl:if>
+                            </xsl:for-each>
+                        </tbody>
+                    </xsl:for-each>
+                </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+                <tr>
+                    <td colspan="8">
+                        <xsl:call-template name="show-eHDSINullFlavor">
+                            <xsl:with-param name="code" select="n1:medSubstanceAdministration/@nullFlavor"/>
+                        </xsl:call-template>
+                    </td>
+                </tr>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="show-medicinalProduct">
+        <xsl:variable name="generalizedMedicineClassCode"
+                      select="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:code"/>
+        <xsl:choose>
+            <xsl:when test="$generalizedMedicineClassCode and not($generalizedMedicineClassCode/@nullFlavor)">
+                <xsl:call-template name="show-eHDSIActiveIngredient">
+                    <xsl:with-param name="node" select="$generalizedMedicineClassCode"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:choose>
+                    <xsl:when test="n1:name and not (n1:name/@nullFlavor)">
+                        <xsl:value-of select="n1:name"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:if test="epsos:asContent/epsos:containerPackagedMedicine/epsos:name and not (epsos:asContent/epsos:containerPackagedMedicine/epsos:name/@nullFlavor)">
+                            <xsl:value-of select="epsos:asContent/epsos:containerPackagedMedicine/epsos:name"/>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="show-activeIngredient">
+        <xsl:variable name="medActiveIngredientNode" select="epsos:ingredient"/>
+        <xsl:variable name="medActiveIngredientNodeCode" select = "$medActiveIngredientNode/epsos:code"/>
+        <xsl:variable name="medActiveIngredient" select="$medActiveIngredientNodeCode"/>
+        <xsl:variable name="medActiveIngredientID" select="$medActiveIngredientNodeCode/@code"/>
+        <xsl:variable name="medStrength" select="epsos:quantity"/>
+        <!-- Active ingredient -->
+        <xsl:choose>
+            <xsl:when test="not ($medActiveIngredientNodeCode/@nullFlavor)">
+                <xsl:choose>
+                    <xsl:when test="$medActiveIngredient">
+                        <xsl:call-template name="show-eHDSIActiveIngredient">
+                            <xsl:with-param name="node" select="$medActiveIngredientNodeCode"/>
+                        </xsl:call-template>
+                        <xsl:text> (</xsl:text>
+                        <xsl:value-of select="$medActiveIngredientID"/>
+                        <xsl:text>)</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- uncoded element Problem -->
+                        <xsl:if test="$medActiveIngredientNodeCode/n1:originalText/n1:reference/@value">
+                            <xsl:call-template name="show-uncodedElement">
+                                <xsl:with-param name="code"
+                                                select="$medActiveIngredientNodeCode/n1:originalText/n1:reference/@value"/>
                             </xsl:call-template>
-                        </td>
-                    </tr>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:for-each>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:choose>
+                    <xsl:when test="$medActiveIngredientNode/epsos:name">
+                        <xsl:value-of select="$medActiveIngredientNode/epsos:name"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="show-eHDSINullFlavor">
+                            <xsl:with-param name="code"
+                                            select="$medActiveIngredientNodeCode/@nullFlavor"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 </xsl:stylesheet>

@@ -24,7 +24,7 @@
                     <!-- The Procedures section is missing! -->
                     <xsl:choose>
                         <xsl:when test=" ($documentCode='60591-5')">
-                            <xsl:call-template name="show-epSOSDisplayLabels">
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
                                 <xsl:with-param name="code" select="'76'"/>
                             </xsl:call-template>
                         </xsl:when>
@@ -53,7 +53,7 @@
                     <input id="collapsible-surgical-procedures-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-surgical-procedures-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'47519-4'"/>
                         </xsl:call-template>
                     </label>
@@ -93,13 +93,13 @@
                                                             <tr>
                                                                 <th>
                                                                     <!--  Procedure -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'62'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!--  Procedure Date -->
-                                                                    <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'63'"/>
                                                                     </xsl:call-template>
                                                                 </th>
@@ -114,7 +114,7 @@
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <br/>
-                                                <xsl:call-template name="show-epSOSNullFlavor">
+                                                <xsl:call-template name="show-eHDSINullFlavor">
                                                     <xsl:with-param name="code" select="$surgicalProcedure/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -145,7 +145,7 @@
                     <xsl:when test="($surgicalProcedureCode/@code='no-known-procedures' or $surgicalProcedureCode/@code='no-procedure-info')">
                         <tr>
                             <td colspan="2">
-                                <xsl:call-template name="show-eHDSI-AbsentOrUnknownProcedures">
+                                <xsl:call-template name="show-eHDSIAbsentOrUnknownProcedure">
                                     <xsl:with-param name="node" select="$surgicalProcedureCode"/>
                                 </xsl:call-template>
                             </td>
@@ -155,7 +155,7 @@
                         <tr>
                             <td>
                                 <!--  Procedure -->
-                                <xsl:call-template name="show-epSOSProcedures">
+                                <xsl:call-template name="show-eHDSIProcedure">
                                     <xsl:with-param name="node" select="$surgicalProcedureCode"/>
                                 </xsl:call-template>
                             </td>
@@ -172,7 +172,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-epSOSNullFlavor">
+                        <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="n1:procedure/@nullFlavor"/>
                         </xsl:call-template>
                     </td>

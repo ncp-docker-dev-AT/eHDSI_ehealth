@@ -55,7 +55,7 @@
                     <input id="collapsible-physical-findings-section-original" class="toggle" type="checkbox" checked="true" />
                     <label for="collapsible-physical-findings-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
-                        <xsl:call-template name="show-epSOSSections">
+                        <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'8716-3'"/>
                         </xsl:call-template>
                     </label>
@@ -107,19 +107,19 @@
                                                         <tr>
                                                             <th>
                                                                 <!--  Date -->
-                                                                <xsl:call-template name="show-epSOSDisplayLabels">
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                     <xsl:with-param name="code" select="'17'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
                                                                 <!-- Systolic blood pressure -->
-                                                                <xsl:call-template name="show-epSOSBloodPressure">
+                                                                <xsl:call-template name="show-eHDSIBloodPressure">
                                                                     <xsl:with-param name="code" select="'8480-6'"/>
                                                                 </xsl:call-template>
                                                             </th>
                                                             <th>
                                                                 <!-- Diastolic blood pressure -->
-                                                                <xsl:call-template name="show-epSOSBloodPressure">
+                                                                <xsl:call-template name="show-eHDSIBloodPressure">
                                                                     <xsl:with-param name="code" select="'8462-4'"/>
                                                                 </xsl:call-template>
                                                             </th>
@@ -133,7 +133,7 @@
                                                 </table>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:call-template name="show-epSOSNullFlavor">
+                                                <xsl:call-template name="show-eHDSINullFlavor">
                                                     <xsl:with-param name="code" select="$physAct/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:otherwise>
@@ -186,7 +186,7 @@
             <xsl:otherwise>
                 <tr>
                     <td colspan="3">
-                        <xsl:call-template name="show-epSOSNullFlavor">
+                        <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="$physAct/@nullFlavor"/>
                         </xsl:call-template>
                     </td>
