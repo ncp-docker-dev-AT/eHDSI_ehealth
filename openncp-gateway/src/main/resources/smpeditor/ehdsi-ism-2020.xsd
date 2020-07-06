@@ -29,7 +29,7 @@
             <xs:element ref="birthDate" minOccurs="0"/>
             <xs:element ref="sex" minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute name="scope" type="scope" default="0" use="required"/>
+        <xs:attribute name="scope" type="scope" default="0" />
     </xs:complexType>
 
     <xs:complexType name="documentSearch">
@@ -39,7 +39,7 @@
         </xs:sequence>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" use="required"/>
+        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
     </xs:complexType>
 
     <!-- Patient element - LivingSubjectID -->
@@ -50,8 +50,8 @@
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string" use="required"/>
-        <xs:attribute name="scope" type="scope" default="0" use="required"/>
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" use="required"/>
+        <xs:attribute name="scope" type="scope" default="0" />
+        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
     </xs:complexType>
 
     <!-- Patient element - LivingSubjectBirthTime -->
@@ -60,8 +60,8 @@
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="scope" type="scope" default="0" use="required"/>
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" use="required"/>
+        <xs:attribute name="scope" type="scope" default="0" />
+        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
     </xs:complexType>
 
     <!-- Deprecated Element -->
@@ -70,8 +70,8 @@
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="scope" type="scope" default="0" use="required"/>
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" use="required"/>
+        <xs:attribute name="scope" type="scope" default="0" />
+        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
     </xs:complexType>
 
     <!-- Patient element - LivingSubjectGender -->
@@ -80,8 +80,8 @@
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="scope" type="scope" default="0" use="required"/>
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" use="required"/>
+        <xs:attribute name="scope" type="scope" default="0" />
+        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
     </xs:complexType>
 
     <!-- Patient element  generic Identity Traits- LivingSubjectName, PatientAddress -->
@@ -90,8 +90,8 @@
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="scope" type="scope" default="0" use="required"/>
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" use="required"/>
+        <xs:attribute name="scope" type="scope" default="0" />
+        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
     </xs:complexType>
 
     <xs:simpleType name="scope">
