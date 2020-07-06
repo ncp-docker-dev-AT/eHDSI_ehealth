@@ -60,7 +60,7 @@ public class XDSbRepositoryServiceInvoker {
         DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
 
         switch (docClassCode) {
-            case "XXX-" + Constants.ED_CLASSCODE:
+            case "DISCARD-" + Constants.ED_CLASSCODE:
                 endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE);
                 break;
             case Constants.ED_CLASSCODE:
@@ -296,14 +296,19 @@ public class XDSbRepositoryServiceInvoker {
         // Class code
         logger.info("makeExtrinsicObject: '{}'", docClassCode);
         switch (docClassCode) {
-            case Constants.CONSENT_CLASSCODE:
-                result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
-                        Constants.CONSENT_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_CONS_STR));
-                break;
             case Constants.ED_CLASSCODE:
                 //  urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
                         Constants.ED_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_ED_STR));
+                break;
+            case "DISCARD-" + Constants.ED_CLASSCODE:
+                result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
+                        "DISCARD-" + Constants.ED_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE,
+                        XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_CONS_STR));
+                break;
+            case Constants.CONSENT_CLASSCODE:
+                result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
+                        Constants.CONSENT_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_CONS_STR));
                 break;
             case Constants.HCER_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
@@ -314,8 +319,6 @@ public class XDSbRepositoryServiceInvoker {
                 break;
         }
 
-        // FormatCode
-        logger.info("Document Class Code: '{}' '{}'", request.getDocumentCode().getSchema(), request.getDocumentCode().getValue());
         switch (docClassCode) {
             //  urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d - eHDSI Format Code
             case Constants.CONSENT_CLASSCODE:

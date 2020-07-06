@@ -268,7 +268,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             String countryCode = arg0.getCountryCode();
             EpsosDocument1 document = arg0.getDocument();
             PatientDemographics patient = arg0.getPatientDemographics();
-            logger.info("INFO Discard: '{}'", document.getFormatCode().getNodeRepresentation());
             String classCodeNode;
             GenericDocumentCode classCode = document.getClassCode();
             if (!classCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
@@ -276,7 +275,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             }
             classCodeNode = classCode.getNodeRepresentation();
             String nodeRepresentation = document.getFormatCode().getNodeRepresentation();
-
+            logger.info("Document ClassCode: '{}'", classCodeNode);
             //TODO: CDA as input needs to be validated according XSD, Schematron or Validators.
             switch (classCodeNode) {
 
@@ -296,7 +295,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                 case Constants.HCER_CLASSCODE:
                     response = HcerService.submit(document, patient, countryCode, hcpAssertion, trcAssertion);
                     break;
-                case "XXX-" + Constants.ED_CLASSCODE:
+                case "DISCARD-" + Constants.ED_CLASSCODE:
                     response = DispensationService.discard(document, patient, countryCode, hcpAssertion, trcAssertion);
                     break;
                 default:
