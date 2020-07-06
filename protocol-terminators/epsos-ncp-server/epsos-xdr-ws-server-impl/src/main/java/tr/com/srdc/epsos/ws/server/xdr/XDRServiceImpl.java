@@ -13,11 +13,18 @@ import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.AssertionValidationException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import fi.kela.se.epsos.data.model.DocumentFactory;
 import fi.kela.se.epsos.data.model.EPSOSDocument;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.Document;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.ClassificationType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExtrinsicObjectType;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
@@ -32,12 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.AssertionValidationException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
@@ -54,13 +55,12 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     private static final String HL7_NAMESPACE = "urn:hl7-org:v3";
     private final Logger logger = LoggerFactory.getLogger(XDRServiceImpl.class);
-    private oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
-    private ServiceLoader<DocumentSubmitInterface> serviceLoader;
-    private DocumentSubmitInterface documentSubmitService;
+    private final oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
+    private final DocumentSubmitInterface documentSubmitService;
 
     public XDRServiceImpl() {
 
-        serviceLoader = ServiceLoader.load(DocumentSubmitInterface.class);
+        ServiceLoader<DocumentSubmitInterface> serviceLoader = ServiceLoader.load(DocumentSubmitInterface.class);
         try {
             logger.info("Loading National implementation of DocumentSubmitInterface...");
             documentSubmitService = serviceLoader.iterator().next();
@@ -69,7 +69,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
             logger.error("Failed to load implementation of documentSubmitService: " + e.getMessage(), e);
             throw e;
         }
-
         ofRs = new oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory();
     }
 
@@ -161,12 +160,15 @@ public class XDRServiceImpl implements XDRServiceInterface {
     }
 
     /**
-     * Prepare audit log for the consent service, put() operation, i.e. consent submission
+     * Prepare audit log for the consent service, put() operation, i.e. consent submission.
      *
-     * @author konstantin.hypponen@kela.fi TODO: check the audit logs in
-     * Gazelle, fix if needed
+     * @param eventLog
+     * @param request
+     * @param response
+     * @param soapHeader
      */
-    public void prepareEventLogForConsentPut(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request, RegistryResponseType response, Element sh) {
+    public void prepareEventLogForConsentPut(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request,
+                                             RegistryResponseType response, Element soapHeader) {
 
         eventLog.setEventType(EventType.CONSENT_SERVICE_PUT);
         eventLog.setEI_TransactionName(TransactionName.CONSENT_SERVICE_PUT);
@@ -203,11 +205,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
         } else {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         }
-        String userIdAlias = Helper.getAssertionsSPProvidedId(sh);
+        String userIdAlias = Helper.getAssertionsSPProvidedId(soapHeader);
         eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : ""
-                + "<" + Helper.getUserID(sh) + "@" + Helper.getAssertionsIssuer(sh) + ">");
-        eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
-        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
+                + "<" + Helper.getUserID(soapHeader) + "@" + Helper.getAssertionsIssuer(soapHeader) + ">");
+        eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(soapHeader));
+        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(soapHeader));
 
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
 
@@ -256,6 +258,14 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return patientId.substring(0, patientId.indexOf("^^^"));
     }
 
+    public RegistryResponseType discardMedicationDispensed(ProvideAndRegisterDocumentSetRequestType request,
+                                                           SOAPHeader soapHeader, EventLog eventLog) throws Exception {
+
+        RegistryResponseType response = new RegistryResponseType();
+
+        return response;
+    }
+
     /**
      * @param request
      * @param soapHeader
@@ -263,7 +273,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
      * @return
      * @throws Exception
      */
-    public RegistryResponseType saveDispensation(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader soapHeader,
+    public RegistryResponseType saveDispensation(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader
+            soapHeader,
                                                  EventLog eventLog) throws Exception {
 
         RegistryResponseType response = new RegistryResponseType();
@@ -418,44 +429,56 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     /**
      * @param request
-     * @param sh
+     * @param soapHeader
      * @param eventLog
      * @return
      * @throws Exception
      */
-    public RegistryResponseType saveDocument(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader sh,
+    public RegistryResponseType saveDocument(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader soapHeader,
                                              EventLog eventLog) throws Exception {
 
+        logger.info("[WS] XDR Service: Save Document");
         // Traverse all ExtrinsicObjects
         for (int i = 0; i < request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().size(); i++) {
 
-            if (!(request.getSubmitObjectsRequest().getRegistryObjectList()
-                    .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
+            if (!(request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
                 continue;
             }
-            ExtrinsicObjectType eot = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
+            ExtrinsicObjectType extrinsicObject = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
                     .getIdentifiable().get(i).getValue();
 
             // Traverse all Classification blocks in the ExtrinsicObject selected
-            for (int j = 0; j < eot.getClassification().size(); j++) {
+            //for (int j = 0; j < extrinsicObject.getClassification().size(); j++) {
+            for (ClassificationType classification : extrinsicObject.getClassification()) {
 
-                // If classified as eDispensation, process as eDispensation
-                if (eot.getClassification().get(j).getNodeRepresentation().compareTo(Constants.ED_CLASSCODE) == 0) {
+                logger.info("[WS] XDR Service: Classification: '{}'", classification.getNodeRepresentation());
+                if (StringUtils.equals(classification.getClassificationScheme(), "urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d")) {
+                    if (StringUtils.equals(classification.getNodeRepresentation(), "urn:epSOS:ep:dis:2010")) {
+                        //  urn:epSOS:ep:dis:2010
+                        logger.info("Dispense Medication");
+                        return saveDispensation(request, soapHeader, eventLog);
 
-                    logger.info("Processing an eDispensation message");
-                    return saveDispensation(request, sh, eventLog);
-
-                } // TODO: check the right LOINC code, currently coded as in
-                // example 3.4.2 ver. 2.2 p. 82
-                else if (eot.getClassification().get(j).getNodeRepresentation().compareTo(Constants.CONSENT_CLASSCODE) == 0) {
-
-                    logger.info("Processing a consent");
-                    return saveConsent(request, sh, eventLog);
-                } else if (eot.getClassification().get(j).getNodeRepresentation().equals(Constants.HCER_CLASSCODE)) {
-
-                    logger.info("Processing HCER document");
-                    return saveHCER(request, sh, eventLog);
+                    } else if (StringUtils.equals(classification.getNodeRepresentation(), "urn:eHDSI:ed:discard:2020")) {
+                        //  "urn:eHDSI:ed:discard:2020"
+                        logger.info("Discard Dispense Medication");
+                        return discardMedicationDispensed(request, soapHeader, eventLog);
+                    }
                 }
+//                if (classification.getNodeRepresentation().compareTo(Constants.ED_CLASSCODE) == 0) {
+//                    // If classified as eDispensation, process as eDispensation
+//                    logger.info("Processing an eDispensation message");
+//                    return saveDispensation(request, soapHeader, eventLog);
+//                }
+//                // TODO: check the right LOINC code, currently coded as in example 3.4.2 ver. 2.2 p. 82
+//                else if (classification.getNodeRepresentation().compareTo(Constants.CONSENT_CLASSCODE) == 0) {
+//                    //  Use case not supported in eHDSI
+//                    logger.info("Processing a consent");
+//                    return saveConsent(request, soapHeader, eventLog);
+//                } else if (classification.getNodeRepresentation().equals(Constants.HCER_CLASSCODE)) {
+//                    //  Use case not supported in eHDSI
+//                    logger.info("Processing HCER document");
+//                    return saveHCER(request, soapHeader, eventLog);
+//                }
             }
             break;
         }
@@ -469,7 +492,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
      * @param eventLog
      * @return
      */
-    public RegistryResponseType saveConsent(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader sh, EventLog eventLog) {
+    public RegistryResponseType saveConsent(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader
+            sh, EventLog eventLog) {
 
         RegistryResponseType response = new RegistryResponseType();
         String sigCountryCode = null;
@@ -593,7 +617,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return response;
     }
 
-    protected String validateXDRHeader(Element sh, String classCode) throws MissingFieldException, InvalidFieldException,
+    protected String validateXDRHeader(Element sh, String classCode) throws
+            MissingFieldException, InvalidFieldException,
             SMgrException, InsufficientRightsException {
 
         return SAML2Validator.validateXDRHeader(sh, classCode);
@@ -605,7 +630,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
      * @param eventLog
      * @return
      */
-    public RegistryResponseType saveHCER(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader sh, EventLog eventLog) {
+    public RegistryResponseType saveHCER(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader sh, EventLog
+            eventLog) {
 
         RegistryResponseType response = new RegistryResponseType();
         String sigCountryCode = null;

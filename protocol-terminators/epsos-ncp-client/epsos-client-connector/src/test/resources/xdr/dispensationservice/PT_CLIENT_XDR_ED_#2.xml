@@ -32,7 +32,7 @@
             <description>Description</description>
             <formatCode>
                 <nodeRepresentation>urn:epSOS:ep:dis:2010</nodeRepresentation>
-                <schema>epSOS formatCodes</schema>
+                <schema>eHDSI formatCodes</schema>
                 <value>urn:epSOS:ep:dis:2010</value>
             </formatCode>
             <mimeType>text/xml</mimeType>

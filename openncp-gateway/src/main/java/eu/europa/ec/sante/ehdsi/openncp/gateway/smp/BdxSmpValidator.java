@@ -23,7 +23,7 @@ public class BdxSmpValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BdxSmpValidator.class);
     private static final String BDX_SMP_XSD = "/bdx-smp-201605.xsd";
-    private static final String EHDSI_ISM_XSD = "/ehdsi-ism-2018.xsd";
+    private static final String EHDSI_ISM_XSD = "/ehdsi-ism-2020.xsd";
     private static final String NS_BDXR_SMP = "http://docs.oasis-open.org/bdxr/ns/SMP/2016/05";
     private static final String NS_PREFIX_BDXR_SMP = "bdxr";
     private static final String ISM_DOCUMENT_ID = "urn:ehealth:ISM::InternationalSearchMask##ehealth-107";

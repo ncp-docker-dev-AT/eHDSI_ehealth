@@ -49,9 +49,17 @@
         <servlet-class>com.gnomon.epsos.servlet.DispenseServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>discardDispenseServlet</servlet-name>
+        <servlet-class>com.gnomon.epsos.servlet.DiscardDispenseServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ccdServlet</servlet-name>
         <servlet-class>com.gnomon.epsos.servlet.CCDServlet</servlet-class>
     </servlet>
+    <servlet-mapping>
+        <servlet-name>discardDispenseServlet</servlet-name>
+        <url-pattern>/discardDispenseServlet</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>cdaServlet</servlet-name>
         <url-pattern>/cdaServlet</url-pattern>

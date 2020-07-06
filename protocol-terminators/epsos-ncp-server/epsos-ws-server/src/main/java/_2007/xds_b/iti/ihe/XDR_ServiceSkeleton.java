@@ -23,12 +23,12 @@ public class XDR_ServiceSkeleton {
      * @param provideAndRegisterDocumentSetRequest
      */
     public RegistryResponseType documentRecipient_ProvideAndRegisterDocumentSetB(ProvideAndRegisterDocumentSetRequestType provideAndRegisterDocumentSetRequest,
-                                                                                 SOAPHeader sh, EventLog eventLog) throws Exception {
+                                                                                 SOAPHeader soapHeader, EventLog eventLog) throws Exception {
 
         if (service == null) {
             service = new XDRServiceImpl();
         }
 
-        return service.saveDocument(provideAndRegisterDocumentSetRequest, sh, eventLog);
+        return service.saveDocument(provideAndRegisterDocumentSetRequest, soapHeader, eventLog);
     }
 }

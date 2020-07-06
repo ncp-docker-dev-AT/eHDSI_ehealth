@@ -76,7 +76,6 @@ public class Utils {
             LOGGER.error(e.getMessage(), e);
         }
         return doc;
-
     }
 
     /**
@@ -159,22 +158,22 @@ public class Utils {
      * Thus, available() on the returned InputStream will return the full number of bytes the file contains
      * </p>
      *
-     * @param fname The filename
+     * @param fileName The filename
      * @return The filled InputStream
      * @throws IOException , if the Streams couldn't be created.
      **/
-    public static InputStream fullStream(String fname) throws IOException {
+    public static InputStream fullStream(String fileName) throws IOException {
 
-        ByteArrayInputStream bais = null;
+        ByteArrayInputStream inputStream = null;
 
-        try (FileInputStream fis = new FileInputStream(fname); DataInputStream dis = new DataInputStream(fis)) {
+        try (FileInputStream fileInputStream = new FileInputStream(fileName); DataInputStream dis = new DataInputStream(fileInputStream)) {
 
             byte[] bytes = new byte[dis.available()];
             dis.readFully(bytes);
-            bais = new ByteArrayInputStream(bytes);
-            return bais;
+            inputStream = new ByteArrayInputStream(bytes);
+            return inputStream;
         } finally {
-            close(bais);
+            close(inputStream);
         }
     }
 
