@@ -19,6 +19,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.util.Calendar;
 import java.util.Random;
@@ -30,13 +33,14 @@ public class DiscardDispenseServlet extends HttpServlet {
     private final Logger logger = LoggerFactory.getLogger(DiscardDispenseServlet.class);
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         logger.info("[Portal] Discard Dispense Operation");
+        String documentId = request.getParameter("documentId");
+        File file = loadMedication(documentId);
+        byte[] fileContent = Files.readAllBytes(file.toPath());
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        //byte[] edBytes = (byte[]) session.getAttribute("edBytes");
-        byte[] edBytes = new byte[]{};
         Patient patient = (Patient) session.getAttribute("patient");
         String selectedCountry = (String) session.getAttribute("selectedCountry");
         //  Checking validity of the assertions (HCP and TRC)
@@ -44,8 +48,7 @@ public class DiscardDispenseServlet extends HttpServlet {
         Assertion trcAssertion = (Assertion) session.getAttribute("trcAssertion");
         String eDUid = generateIdentifierExtension();
         String edOid = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_DISPENSATION_OID);
-        EpsosDocument1 document = buildDispenseDocument(user, edOid, eDUid, edBytes);
-        //  2.16.470.1.100.1.1.1000.990.1^gOADaWyE/RZ5p1ra
+        EpsosDocument1 document = buildDispenseDocument(user, edOid, eDUid, fileContent);
         ClientConnectorConsumer proxy = MyServletContextListener.getClientConnectorConsumer();
         logger.info("Discard Operation Debug: '{}', '{}', '{}', '{}', '{}'", hcpAssertion.getID(), trcAssertion.getID(), selectedCountry, document.getRepositoryId(), patient.getRoot());
         SubmitDocumentResponse submitDocumentResponse = proxy.submitDocument(hcpAssertion, trcAssertion, selectedCountry, document, patient.getPatientDemographics());
@@ -109,5 +112,23 @@ public class DiscardDispenseServlet extends HttpServlet {
         document.setBase64Binary(dispense);
 
         return document;
+    }
+
+    private File loadMedication(String documentId) {
+
+        String directoryName = Constants.EPSOS_PROPS_PATH + "integration/" +
+                Constants.HOME_COMM_ID + "/medication/" + documentId;
+        File medication = new File(directoryName);
+//        File[] listOfFiles = folder.listFiles();
+//
+//        List<String> medicationList = new ArrayList<>();
+//        if (listOfFiles != null) {
+//            for (File file : listOfFiles) {
+//                if (file.isFile()) {
+//                    medicationList.add(file.getName());
+//                }
+//            }
+//        }
+        return medication;
     }
 }

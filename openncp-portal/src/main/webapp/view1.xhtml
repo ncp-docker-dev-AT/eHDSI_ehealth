@@ -114,10 +114,14 @@
                 <f:setPropertyActionListener value="#{patient}" target="#{myBean.selectedPatient}"/>
                 #{msg['ui.ep.info']}<br/>
             </p:commandLink>
-            <a href="/epsosportal/discardDispenseServlet">
-                Medication Dispensed list
-            </a>
-            <br/>
+            <p:commandLink
+                    action="/viewMedicationsDispensed.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal"
+                    ajax="false" id="p5" title="#{msg['patient.data.agreement.title']}"
+                    rendered="#{myBean.assertionNotExists}"
+                    disabled="#{!myBean.enablePatientDocuments}">
+                <f:setPropertyActionListener value="#{patient}" target="#{myBean.selectedPatient}"/>
+                Medications Dispensed List<br/>
+            </p:commandLink>
             <p:commandLink
                     action="/viewPatientConfirmationForConsent.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal"
                     ajax="false" id="p6" title="#{msg['patient.data.agreement.title']}"

@@ -293,7 +293,7 @@ public class XDSbRepositoryServiceInvoker {
                 XDRConstants.EXTRINSIC_OBJECT.CONFIDENTIALITY_CODE_NODEREPR, XDRConstants.EXTRINSIC_OBJECT.CONFIDENTIALITY_CODE_VALUE,
                 XDRConstants.EXTRINSIC_OBJECT.CONFIDENTIALITY_CODE_STR));
 
-        // Class code
+        // eHDSI Class Code
         logger.info("makeExtrinsicObject: '{}'", docClassCode);
         switch (docClassCode) {
             case Constants.ED_CLASSCODE:
@@ -319,8 +319,8 @@ public class XDSbRepositoryServiceInvoker {
                 break;
         }
 
+        //  eHDSI Format Code - urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d
         switch (docClassCode) {
-            //  urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d - eHDSI Format Code
             case Constants.CONSENT_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.FormatCode.FORMAT_CODE_SCHEME, uuid,
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.Consent.NotScannedDocument.NODE_REPRESENTATION,
@@ -332,6 +332,12 @@ public class XDSbRepositoryServiceInvoker {
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.Dispensation.EpsosPivotCoded.NODE_REPRESENTATION,
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.Dispensation.EpsosPivotCoded.CODING_SCHEME,
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.Dispensation.EpsosPivotCoded.DISPLAY_NAME));
+                break;
+            case "DISCARD-" + Constants.ED_CLASSCODE:
+                result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.FormatCode.FORMAT_CODE_SCHEME, uuid,
+                        XDRConstants.EXTRINSIC_OBJECT.FormatCode.DispensationDiscard.PivotCoded.NODE_REPRESENTATION,
+                        XDRConstants.EXTRINSIC_OBJECT.FormatCode.DispensationDiscard.PivotCoded.CODING_SCHEME,
+                        XDRConstants.EXTRINSIC_OBJECT.FormatCode.DispensationDiscard.PivotCoded.DISPLAY_NAME));
                 break;
             case Constants.HCER_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.FormatCode.FORMAT_CODE_SCHEME, uuid,
@@ -355,7 +361,7 @@ public class XDSbRepositoryServiceInvoker {
         result.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.EXTRINSIC_OBJECT.XDSDOCENTRY_PATID_SCHEME,
                 uuid, patientId.toString(), XDRConstants.EXTRINSIC_OBJECT.XDSDOCENTRY_PATID_STR));
 
-        /* XDSDocument.EntryUUID */
+        //  XDSDocument.EntryUUID
         if (docClassCode.equals(Constants.CONSENT_CLASSCODE)) {
             // TODO: missing XDSDocument.EntryUUID for Consent
             logger.warn("Patient Consent not supported!!!");
@@ -378,7 +384,7 @@ public class XDSbRepositoryServiceInvoker {
         slId.getValueList().getValue().add("PID-7|" + new SimpleDateFormat("yyyyMMddkkmmss.SSSZZZZ", Locale.ENGLISH).format(patient.getBirthDate()));
         result.getSlot().add(slId);
 
-        // Type code (not written in 3.4.2)
+        // eHDSI Type Code
         switch (docClassCode) {
             case Constants.CONSENT_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.TypeCode.TYPE_CODE_SCHEME,
@@ -387,6 +393,7 @@ public class XDSbRepositoryServiceInvoker {
                         XDRConstants.EXTRINSIC_OBJECT.TypeCode.Consent.DISPLAY_NAME));
                 break;
             case Constants.ED_CLASSCODE:
+            case "DISCARD-" + Constants.ED_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.TypeCode.TYPE_CODE_SCHEME,
                         uuid, XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensation.NODE_REPRESENTATION,
                         XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensation.CODING_SCHEME,
@@ -421,7 +428,7 @@ public class XDSbRepositoryServiceInvoker {
 
         rpt.getSlot().add(makeSlot(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_TIME_STR, DateUtil.getDateByDateFormat(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_TIME_FORMAT)));
         rpt.setName(makeInternationalString(getNameFromClassCode(docClassCode)));
-        rpt.setDescription(makeInternationalString(getDescrFromClassCode(docClassCode)));
+        rpt.setDescription(makeInternationalString(getDescriptionFromClassCode(docClassCode)));
 
         ClassificationType classification;
         classification = makeClassification0(XDRConstants.REGISTRY_PACKAGE.AUTHOR_CLASSIFICATION_UUID, submissionSetUuid, "");
@@ -430,7 +437,7 @@ public class XDSbRepositoryServiceInvoker {
         rpt.getClassification().add(classification);
 
         rpt.getClassification().add(makeClassification(XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_UUID, submissionSetUuid,
-                docClassCode, XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_VALUE, getSbmsSetFromClassCode(docClassCode)));
+                docClassCode, XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_VALUE, getSubmissionSetFromClassCode(docClassCode)));
 
         rpt.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_UNIQUEID_SCHEME,
                 submissionSetUuid, request.getSubmissionSetId(), XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_UNIQUEID_STR));
@@ -582,7 +589,7 @@ public class XDSbRepositoryServiceInvoker {
             return XDRConstants.EXTRINSIC_OBJECT.EVENT_CODE_NODE_NAME_OPT_IN;
         } else {
             logger.error("Event Code not found in consent document!");
-            return null;
+            return "Event Code not found in consent document!";
         }
     }
 
@@ -600,7 +607,7 @@ public class XDSbRepositoryServiceInvoker {
             return XDRConstants.EXTRINSIC_OBJECT.EVENT_CODE_NODE_REPRESENTATION_OPT_IN;
         } else {
             logger.error("Event Code not found in consent document!");
-            return null;
+            return "Event Code not found in consent document!";
         }
     }
 
@@ -610,35 +617,16 @@ public class XDSbRepositoryServiceInvoker {
      */
     private String getNameFromClassCode(String classCode) {
 
-        if (classCode.equals(Constants.HCER_CLASSCODE)) {
-            return XDRConstants.REGISTRY_PACKAGE.NAME_HCER;
-        } else if (classCode.equals(Constants.CONSENT_CLASSCODE)) {
-            return XDRConstants.REGISTRY_PACKAGE.NAME_CONSENT;
-        }
-        if (classCode.equals(Constants.ED_CLASSCODE)) {
-            return XDRConstants.REGISTRY_PACKAGE.NAME_ED;
-        } else {
-            logger.error("Class code does not have a matching name!");
-            return null;
-        }
-    }
-
-    /**
-     * @param classCode
-     * @return
-     */
-    private String getDescrFromClassCode(String classCode) {
-
-        if (classCode.equals(Constants.HCER_CLASSCODE)) {
-            return XDRConstants.REGISTRY_PACKAGE.DESCRIPTION_HCER;
-        } else if (classCode.equals(Constants.CONSENT_CLASSCODE)) {
-            return XDRConstants.REGISTRY_PACKAGE.DESCRIPTION_CONSENT;
-        }
-        if (classCode.equals(Constants.ED_CLASSCODE)) {
-            return XDRConstants.REGISTRY_PACKAGE.DESCRIPTION_ED;
-        } else {
-            logger.error("Class code does not have a matching description!");
-            return null;
+        switch (classCode) {
+            case Constants.HCER_CLASSCODE:
+                return XDRConstants.REGISTRY_PACKAGE.NAME_HCER;
+            case Constants.CONSENT_CLASSCODE:
+                return XDRConstants.REGISTRY_PACKAGE.NAME_CONSENT;
+            case Constants.ED_CLASSCODE:
+                return XDRConstants.REGISTRY_PACKAGE.NAME_ED;
+            default:
+                logger.error("Class code does not have a matching name!");
+                return null;
         }
     }
 
@@ -646,18 +634,37 @@ public class XDSbRepositoryServiceInvoker {
      * @param classCode
      * @return
      */
-    private String getSbmsSetFromClassCode(String classCode) {
+    private String getDescriptionFromClassCode(String classCode) {
 
-        if (classCode.equals(Constants.HCER_CLASSCODE)) {
-            return XDRConstants.REGISTRY_PACKAGE.NAME_HCER;
-        } else if (classCode.equals(Constants.CONSENT_CLASSCODE)) {
-            return XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_CONS_STR;
+        switch (classCode) {
+            case Constants.HCER_CLASSCODE:
+                return XDRConstants.REGISTRY_PACKAGE.DESCRIPTION_HCER;
+            case Constants.CONSENT_CLASSCODE:
+                return XDRConstants.REGISTRY_PACKAGE.DESCRIPTION_CONSENT;
+            case Constants.ED_CLASSCODE:
+                return XDRConstants.REGISTRY_PACKAGE.DESCRIPTION_ED;
+            default:
+                logger.error("Class code does not have a matching description!");
+                return "Class Code does not have a matching description!";
         }
-        if (classCode.equals(Constants.ED_CLASSCODE)) {
-            return XDRConstants.REGISTRY_PACKAGE.NAME_ED;
-        } else {
-            logger.error("Class code does not have a matching submission set designation!");
-            return null;
+    }
+
+    /**
+     * @param classCode
+     * @return
+     */
+    private String getSubmissionSetFromClassCode(String classCode) {
+
+        switch (classCode) {
+            case Constants.HCER_CLASSCODE:
+                return XDRConstants.REGISTRY_PACKAGE.NAME_HCER;
+            case Constants.CONSENT_CLASSCODE:
+                return XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_CONS_STR;
+            case Constants.ED_CLASSCODE:
+                return XDRConstants.REGISTRY_PACKAGE.NAME_ED;
+            default:
+                logger.error("Class Code does not have a matching submission set designation!");
+                return "Class Code does not have a matching submission set designation!";
         }
     }
 }

@@ -25,7 +25,7 @@ public interface DocumentSubmitInterface extends NationalConnectorInterface {
      *
      * @param dispensationToDiscard - Metadata of the dispensation to be discarded (XML and PDF versions)
      */
-    void cancelDispensation(DocumentAssociation<EDDocumentMetaData> dispensationToDiscard) throws NIException, InsufficientRightsException;
+    void cancelDispensation(EPSOSDocument dispensationToDiscard) throws NIException, InsufficientRightsException;
 
     /**
      * Stores a patient consent in the national infrastructure

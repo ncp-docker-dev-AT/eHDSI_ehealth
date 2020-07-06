@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-GB" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<f:view locale="#{facesContext.externalContext.requestLocale}"/>
+<h:head>
+    <title>Medications Dispensed List</title>
+</h:head>
+<h:body>
+    <h3>Medications Dispensed List</h3>
+    <p:panel header="#{msg['navi.report.summary']}">
+        <table>
+            <tr>
+                <td><strong><h:outputText value="#{msg['patient.data.givenname']}"/></strong></td>
+                <td>&nbsp;</td>
+                <td><h:outputText value="#{myBean.selectedPatient.name}"/></td>
+            </tr>
+            <tr>
+                <td><strong><h:outputText value="#{msg['patient.data.surname']}"/></strong></td>
+                <td>&nbsp;</td>
+                <td><h:outputText value="#{myBean.selectedPatient.familyName}"/></td>
+            </tr>
+            <tr>
+                <td><strong><h:outputText value="#{msg['patient.data.street.address']}"/></strong></td>
+                <td>&nbsp;</td>
+                <td><h:outputText value="#{myBean.selectedPatient.address}"/></td>
+            </tr>
+            <tr>
+                <td><strong><h:outputText value="#{msg['patient.data.code']}"/></strong></td>
+                <td>&nbsp;</td>
+                <td><h:outputText value="#{myBean.selectedPatient.postalCode}"/></td>
+            </tr>
+            <tr>
+                <td><strong><h:outputText value="#{msg['patient.data.city']}"/></strong></td>
+                <td>&nbsp;</td>
+                <td><h:outputText value="#{myBean.selectedPatient.city}"/></td>
+            </tr>
+            <tr>
+                <td><strong><h:outputText value="#{msg['patient.data.country']}"/></strong></td>
+                <td>&nbsp;</td>
+                <td><h:outputText value="#{myBean.selectedPatient.country}"/></td>
+            </tr>
+        </table>
+    </p:panel>
+    <p:dataTable var="medications" value="#{medicationsDispensed.medicationDispensedList}">
+        <p:column headerText="Name">
+            <h:outputText value="#{medications.document}"/>
+        </p:column>
+        <p:column headerText="Version">
+            <h:outputLink
+                    value="/epsosportal/discardDispenseServlet?documentId=#{medications.document}&amp;repositoryid=#{medications.document}&amp;hcid=#{medications.document}"
+                    target="_blank">
+                <p:graphicImage value="/images/pdf_icon.png" style="text-align:center;width:30px;height:30px;"/>Test
+            </h:outputLink>
+        </p:column>
+    </p:dataTable>
+</h:body>
+</html>

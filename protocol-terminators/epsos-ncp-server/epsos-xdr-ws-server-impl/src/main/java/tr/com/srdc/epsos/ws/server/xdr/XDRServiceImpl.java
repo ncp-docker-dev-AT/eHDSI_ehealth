@@ -260,9 +260,50 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     public RegistryResponseType discardMedicationDispensed(ProvideAndRegisterDocumentSetRequestType request,
                                                            SOAPHeader soapHeader, EventLog eventLog) throws Exception {
+        RegistryErrorList rel = ofRs.createRegistryErrorList();
+        Element shElement;
+        try {
+            shElement = XMLUtils.toDOM(soapHeader);
+        } catch (Exception e) {
+            logger.error("Cannot retrieve SoapHeader from incoming request");
+            throw e;
+        }
+        documentSubmitService.setSOAPHeader(shElement);
 
         RegistryResponseType response = new RegistryResponseType();
-
+        String patientId = getPatientId(request);
+        String documentId = "";
+        logger.info("Received an eDispensation document for patient: '{}'", patientId);
+        try {
+            org.w3c.dom.Document domDocument = TMServices.byteToDocument(request.getDocument().get(0).getValue());
+            EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.ED_CLASSCODE, domDocument);
+            documentId = getDocumentId(epsosDocument.getDocument());
+            // Evidence for call to NI for XDR submit (dispensation)
+            // Joao: here we have a Document so we can generate the mandatory NRO
+            try {
+                EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(), Constants.NCP_SIG_KEYSTORE_PATH,
+                        Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                        Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
+                        Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH,
+                        Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
+                        IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode(), new DateTime(),
+                        EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XDR_DISP_REQ",
+                        Objects.requireNonNull(Helper.getTRCAssertion(shElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
+            } catch (Exception e) {
+                logger.error(ExceptionUtils.getStackTrace(e));
+            }
+            // Call to National Connector
+            documentSubmitService.cancelDispensation(epsosDocument);
+        } catch (NationalInfrastructureException e) {
+            logger.error("DocumentSubmitException: '{}'-'{}'", e.getCode(), e.getMessage());
+            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", documentId, false));
+        } catch (NIException e) {
+            logger.error("NIException: '{}'", e.getMessage());
+            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+        } catch (Exception e) {
+            logger.error("Generic Exception: '{}'", e.getMessage(), e);
+            rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+        }
         return response;
     }
 
@@ -448,10 +489,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     .getIdentifiable().get(i).getValue();
 
             // Traverse all Classification blocks in the ExtrinsicObject selected
-            //for (int j = 0; j < extrinsicObject.getClassification().size(); j++) {
             for (ClassificationType classification : extrinsicObject.getClassification()) {
 
-                logger.info("[WS] XDR Service: Classification: '{}'", classification.getNodeRepresentation());
+                logger.info("[WS] XDR Service: Classification: '{}'-'{}'", classification.getClassificationScheme(), classification.getNodeRepresentation());
                 if (StringUtils.equals(classification.getClassificationScheme(), "urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d")) {
                     if (StringUtils.equals(classification.getNodeRepresentation(), "urn:epSOS:ep:dis:2010")) {
                         //  urn:epSOS:ep:dis:2010
