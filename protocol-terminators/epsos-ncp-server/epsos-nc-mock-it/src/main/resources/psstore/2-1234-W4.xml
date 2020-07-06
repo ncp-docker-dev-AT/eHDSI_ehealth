@@ -28,7 +28,7 @@ Although being real choices for the different diseases and conditions, the selec
     <recordTarget>
         <patientRole>
             <!-- Primary Patient Identifier -->
-            <id extension="2-1234-W3" root="2.16.17.710.820.1000.990.1"/>
+            <id extension="2-1234-W4" root="2.16.17.710.820.1000.990.1"/>
             <addr>
                 <streetAddressLine>155, Avenida da Liberdade</streetAddressLine>
                 <postalCode>1250-141</postalCode>
