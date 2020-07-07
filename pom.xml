@@ -34,7 +34,6 @@
         <module>e-sens-non-repudiation</module>
         <module>util</module>
         <module>security-manager</module>
-<!--        <module>util</module>-->
         <module>data-model</module>
         <module>audit-manager</module>
         <module>assertion-validator</module>
