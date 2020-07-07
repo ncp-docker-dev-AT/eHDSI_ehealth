@@ -69,7 +69,7 @@ public class XdrRequest {
         return countryCode;
     }
 
-    public void setcountryCode(String policyCountryCode) {
+    public void setCountryCode(String policyCountryCode) {
         this.countryCode = policyCountryCode;
     }
 

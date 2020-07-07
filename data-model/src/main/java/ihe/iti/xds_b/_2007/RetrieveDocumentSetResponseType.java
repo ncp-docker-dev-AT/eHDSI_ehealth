@@ -1,37 +1,19 @@
-/**
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik Tic. Ltd. Sti. <epsos@srdc.com.tr>
- * 
- * This file is part of SRDC epSOS NCP.
- * 
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * SRDC epSOS NCP is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with SRDC epSOS NCP. If not, see <http://www.gnu.org/licenses/>.
- */
 package ihe.iti.xds_b._2007;
 
-import java.util.ArrayList;
-import java.util.List;
+import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Java class for RetrieveDocumentSetResponseType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="RetrieveDocumentSetResponseType">
  *   &lt;complexContent>
@@ -60,13 +42,11 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RetrieveDocumentSetResponseType", propOrder = {
-    "registryResponse",
-    "documentResponse"
+        "registryResponse",
+        "documentResponse"
 })
 public class RetrieveDocumentSetResponseType {
 
@@ -77,11 +57,9 @@ public class RetrieveDocumentSetResponseType {
 
     /**
      * Gets the value of the registryResponse property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link RegistryResponseType }
-     *     
+     *
+     * @return possible object is
+     * {@link RegistryResponseType }
      */
     public RegistryResponseType getRegistryResponse() {
         return registryResponse;
@@ -89,11 +67,9 @@ public class RetrieveDocumentSetResponseType {
 
     /**
      * Sets the value of the registryResponse property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link RegistryResponseType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link RegistryResponseType }
      */
     public void setRegistryResponse(RegistryResponseType value) {
         this.registryResponse = value;
@@ -101,25 +77,23 @@ public class RetrieveDocumentSetResponseType {
 
     /**
      * Gets the value of the documentResponse property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the documentResponse property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getDocumentResponse().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link RetrieveDocumentSetResponseType.DocumentResponse }
-     * 
-     * 
      */
     public List<RetrieveDocumentSetResponseType.DocumentResponse> getDocumentResponse() {
         if (documentResponse == null) {
@@ -131,9 +105,9 @@ public class RetrieveDocumentSetResponseType {
 
     /**
      * <p>Java class for anonymous complex type.
-     * 
+     *
      * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
+     *
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
@@ -149,16 +123,14 @@ public class RetrieveDocumentSetResponseType {
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     * 
-     * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "homeCommunityId",
-        "repositoryUniqueId",
-        "documentUniqueId",
-        "mimeType",
-        "document"
+            "homeCommunityId",
+            "repositoryUniqueId",
+            "documentUniqueId",
+            "mimeType",
+            "document"
     })
     public static class DocumentResponse {
 
@@ -175,11 +147,9 @@ public class RetrieveDocumentSetResponseType {
 
         /**
          * Gets the value of the homeCommunityId property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getHomeCommunityId() {
             return homeCommunityId;
@@ -187,11 +157,9 @@ public class RetrieveDocumentSetResponseType {
 
         /**
          * Sets the value of the homeCommunityId property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setHomeCommunityId(String value) {
             this.homeCommunityId = value;
@@ -199,11 +167,9 @@ public class RetrieveDocumentSetResponseType {
 
         /**
          * Gets the value of the repositoryUniqueId property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getRepositoryUniqueId() {
             return repositoryUniqueId;
@@ -211,11 +177,9 @@ public class RetrieveDocumentSetResponseType {
 
         /**
          * Sets the value of the repositoryUniqueId property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setRepositoryUniqueId(String value) {
             this.repositoryUniqueId = value;
@@ -223,11 +187,9 @@ public class RetrieveDocumentSetResponseType {
 
         /**
          * Gets the value of the documentUniqueId property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getDocumentUniqueId() {
             return documentUniqueId;
@@ -235,11 +197,9 @@ public class RetrieveDocumentSetResponseType {
 
         /**
          * Sets the value of the documentUniqueId property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setDocumentUniqueId(String value) {
             this.documentUniqueId = value;
@@ -247,11 +207,9 @@ public class RetrieveDocumentSetResponseType {
 
         /**
          * Gets the value of the mimeType property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getMimeType() {
             return mimeType;
@@ -259,11 +217,9 @@ public class RetrieveDocumentSetResponseType {
 
         /**
          * Sets the value of the mimeType property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setMimeType(String value) {
             this.mimeType = value;
@@ -271,10 +227,9 @@ public class RetrieveDocumentSetResponseType {
 
         /**
          * Gets the value of the document property.
-         * 
-         * @return
-         *     possible object is
-         *     byte[]
+         *
+         * @return possible object is
+         * byte[]
          */
         public byte[] getDocument() {
             return document;
@@ -282,15 +237,12 @@ public class RetrieveDocumentSetResponseType {
 
         /**
          * Sets the value of the document property.
-         * 
-         * @param value
-         *     allowed object is
-         *     byte[]
+         *
+         * @param value allowed object is
+         *              byte[]
          */
         public void setDocument(byte[] value) {
-            this.document = ((byte[]) value);
+            this.document = value;
         }
-
     }
-
 }

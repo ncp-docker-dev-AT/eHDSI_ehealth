@@ -2,8 +2,6 @@ package ee.affecto.epsos.ws.handler;
 
 import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import eu.epsos.util.EvidenceUtils;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
-import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
@@ -14,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
-import tr.com.srdc.epsos.util.XMLUtil;
 
 /**
  * OutFlowEvidenceEmitter
@@ -29,7 +26,6 @@ import tr.com.srdc.epsos.util.XMLUtil;
 public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 
     private final Logger logger = LoggerFactory.getLogger(OutFlowEvidenceEmitterHandler.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     @Override
     public Handler.InvocationResponse invoke(MessageContext messageContext) {
@@ -54,7 +50,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //        logger.debug("LOGGING TEST VALUES");
 //        logger.debug("MessageContext properties: " + msgcontext.getProperties());
 //        logger.debug("MessageContext messageID: " + msgcontext.getMessageID());
-//        
+//
 //        SessionContext sessionCtx = msgcontext.getSessionContext();
 //        if (sessionCtx != null) {
 //            logger.debug("SessionContext CookieID: " + sessionCtx.getCookieID());
@@ -94,7 +90,7 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
 //                logger.debug("AxisService EPRs: " + Arrays.toString((String[]) axisService.getEPRs()));
 //                logger.debug("AxisService name: " + axisService.getName());
 //                logger.debug("AxisService isClientSide: " + axisService.isClientSide());
-//            } 
+//            }
 //        } else {
 //            logger.debug("ServiceGroupContext is null!");
 //        }
@@ -111,9 +107,6 @@ public class OutFlowEvidenceEmitterHandler extends AbstractHandler {
         try {
             // Canonicalization of the full SOAP message
             Document canonicalDocument = evidenceEmitterHandlerUtils.canonicalizeAxiomSoapEnvelope(messageContext.getEnvelope());
-            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-                loggerClinical.debug("Pretty printing Canonicalize:\n'{}'", XMLUtil.prettyPrint(canonicalDocument));
-            }
             SOAPBody soapBody = messageContext.getEnvelope().getBody();
             String eventType;
             String title;

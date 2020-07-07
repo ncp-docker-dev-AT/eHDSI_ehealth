@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012  SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.util;
 
 /**
@@ -49,9 +30,9 @@ public final class IheConstants {
 
     public static final String ClASSCODE_SCHEME = "2.16.840.1.113883.6.1";
 
-    public static final String DISPENSATION_FORMATCODE_DISPLAYNAME = "epSOS coded eDispensation";
+    public static final String DISPENSATION_FORMATCODE_DISPLAYNAME = "eHDSI coded eDispensation";
     public static final String DISPENSATION_FORMATCODE_NODEREPRESENTATION = "urn:epsos:ep:dis:2010";
-    public static final String DISPENSATION_FORMATCODE_CODINGSCHEMA = "epSOS formatCodes";
+    public static final String DISPENSATION_FORMATCODE_CODINGSCHEMA = "eHDSI formatCodes";
 
 
     public static final String CONSENT_FORMATCODE_DISPLAYNAME = "Consent";
@@ -59,7 +40,7 @@ public final class IheConstants {
     public static final String CONSENT_FORMATCODE_CODINGSCHEMA = "2.16.840.1.113883.6.1";
 
 
-    public class SOAP_HEADERS {
+    public static class SOAP_HEADERS {
 
         public static final String SECURITY_XSD = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 

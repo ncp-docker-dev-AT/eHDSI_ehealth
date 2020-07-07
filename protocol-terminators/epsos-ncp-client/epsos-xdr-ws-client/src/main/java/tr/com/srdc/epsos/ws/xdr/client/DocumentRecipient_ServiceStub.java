@@ -77,12 +77,12 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         }
     }
 
-    private org.apache.axis2.description.AxisOperation[] _operations;
+    private AxisOperation[] _operations;
     // hashmaps to keep the fault mapping
-    private java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
-    private java.util.HashMap faultExceptionClassNameMap = new java.util.HashMap();
-    private java.util.HashMap faultMessageMap = new java.util.HashMap();
-    private javax.xml.namespace.QName[] opNameArray = null;
+    private final java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
+    private final java.util.HashMap faultExceptionClassNameMap = new java.util.HashMap();
+    private final java.util.HashMap faultMessageMap = new java.util.HashMap();
+    private final QName[] opNameArray = null;
     private String countryCode;
     private Date transactionStartTime;
     private Date transactionEndTime;
@@ -579,11 +579,11 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         /**
          * Namespace
          */
-        private String nsuri;
+        private final String nsuri;
         /**
          * Local name
          */
-        private String name;
+        private final String name;
 
         /**
          * Constructor from object and marshaller.

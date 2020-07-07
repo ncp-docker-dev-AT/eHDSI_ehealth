@@ -2,14 +2,14 @@
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
-    <!--
-        Allow the user of properties from application.properties throughout this configuration file(s)
-    -->
-    <bean id="placeholderConfig"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <!-- Import Transformation Service Access Managed configuration files -->
+    <import resource="ctx_tsam.xml"/>
+
+    <!-- Allow the user of properties from application.properties throughout this configuration file(s) -->
+    <bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <!-- Mustafa: Since I do not want to change tsl synch, here I assume that EPSOS_PROPS_PATH will end with a "/" -->
+                <!-- Assumption is that EPSOS_PROPS_PATH SHALL end with a "/" -->
                 <value>file:${EPSOS_PROPS_PATH}tm.properties</value>
                 <value>file:${EPSOS_PROPS_PATH}tsam.properties</value>
             </list>
@@ -84,7 +84,7 @@
             <value>${EPSOS_PROPS_PATH}${tm.mda.value_set_repository_path}</value>
         </property>
         <property name="ncpSide">
-            <value>NCP_B</value>
+            <value>NCP_A</value>
         </property>
     </bean>
 
@@ -100,8 +100,7 @@
         </property>
     </bean>
 
-    <bean id="schematronValidator" class="epsos.ccd.posam.tm.util.SchematronValidator"
-          factory-method="getInstance">
+    <bean id="schematronValidator" class="epsos.ccd.posam.tm.util.SchematronValidator" factory-method="getInstance">
         <property name="xslDirectoryPath">
             <value>${EPSOS_PROPS_PATH}${tm.schematron.path.xsldir}</value>
         </property>
@@ -111,9 +110,6 @@
     <bean class="epsos.ccd.posam.tm.util.ModelBasedValidator" factory-method="getInstance">
         <property name="config" ref="tmConfiguration"/>
     </bean>
-
-    <!-- ::: Service ::: -->
-    <import resource="ctx_tsam.xml"/>
 
     <bean class="epsos.ccd.posam.tm.service.impl.TransformationService"
           id="epsos.ccd.posam.tm.service.ITransformationService">

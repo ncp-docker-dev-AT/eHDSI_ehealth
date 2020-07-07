@@ -1,22 +1,3 @@
-/*
- * This file is part of epSOS OpenNCP implementation
- * Copyright (C) 2012 SPMS (Serviços Partilhados do Ministério da Saúde - Portugal)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact email: epsos@iuz.pt
- */
 package eu.epsos.pt.cc.dts.axis2;
 
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
@@ -46,9 +27,9 @@ public class XdrRequestDts {
         XdrRequest result = new XdrRequest();
         result.setCda(new String(document.getBase64Binary(), StandardCharsets.UTF_8));
         result.setCdaId(document.getUuid());
-        result.setSubmissionSetId(document.getSubmissionSetId()); 
+        result.setSubmissionSetId(document.getSubmissionSetId());
         result.setPatient(eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(patient));
-        result.setcountryCode(Constants.COUNTRY_CODE);
+        result.setCountryCode(Constants.COUNTRY_CODE);
         result.setCountryName(Constants.COUNTRY_NAME);
         result.setIdAssertion(idAssertion);
         result.setTrcAssertion(trcAssertion);

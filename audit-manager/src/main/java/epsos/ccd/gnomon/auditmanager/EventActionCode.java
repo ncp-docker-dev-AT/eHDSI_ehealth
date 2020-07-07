@@ -1,13 +1,10 @@
 package epsos.ccd.gnomon.auditmanager;
 
 /**
- * Enumeration for populating the EventActionCode of the AuditMessage
- * C:create, R:Read,View,Print,Query, U:Update, D:Delete, E:Execute
+ * Enumeration for populating the EventActionCode of the AuditMessage.
+ * C:create; R:{Read,View,Print,Query}; U:Update; D:Delete; E:Execute.
  *
  * @author Kostas Karkaletsis
- * @author Organization: Gnomon
- * @author mail:k.karkaletsis@gnomon.com.gr
- * @version 1.0, 2010, 30 Jun
  */
 public enum EventActionCode {
 
@@ -20,7 +17,7 @@ public enum EventActionCode {
     DELETE("D"),
     EXECUTE("E");
 
-    private String code;
+    private final String code;
 
     EventActionCode(String c) {
         code = c;

@@ -48,6 +48,14 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="ee.affecto.epsos.util" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="ee.affecto.epsos.ws.handler" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="org.hibernate.orm.deprecation" level="ERROR" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
@@ -72,7 +80,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="tr.com.srdc.epsos.ws.server.xca.impl" level="INFO" additivity="false">
+    <logger name="tr.com.srdc.epsos.ws.server" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

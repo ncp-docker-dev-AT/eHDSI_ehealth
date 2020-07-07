@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>4.1.0</version>
+        <version>5.0.0</version>
     </parent>
 
     <artifactId>openncp-gateway</artifactId>
@@ -219,7 +219,7 @@
                     <include>logback.xml</include>
                     <include>smpeditor.properties</include>
                     <include>application.properties</include>
-                    <include>ehdsi-ism-2018.xsd</include>
+                    <include>ehdsi-ism-2020.xsd</include>
                 </includes>
             </resource>
         </resources>

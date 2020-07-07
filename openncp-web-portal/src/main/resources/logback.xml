@@ -35,7 +35,7 @@
     <!--</logger>-->
     <!-- End Spring Web Service Logging-->
 
-    <logger name="org.hibernate.orm.deprecation" level="ERROR" additivity="false">
+    <logger name="ee.affecto.epsos.ws.handler" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

@@ -54,7 +54,7 @@ public enum EventType {
     MRO_RETRIEVE("ITI-39"),
     COMMUNICATION_FAILURE("EHDSI-CF");
 
-    private String code;
+    private final String code;
 
     EventType(String c) {
         code = c;

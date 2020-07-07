@@ -50,7 +50,7 @@
                id="urn:uuid:6a1217b3-fcd7-4e51-a642-d223755688ee" nodeRepresentation="Not Used">
                <Slot name="codingScheme">
                   <ValueList>
-                     <Value>epSOS Practice Setting Codes-Not Used</Value>
+                     <Value>eHDSI Practice Setting Codes-Not Used</Value>
                   </ValueList>
                </Slot>
                <Name>
@@ -89,7 +89,7 @@
                id="urn:uuid:6ee9b5d3-3fdf-42b7-b82f-20068675054b" nodeRepresentation="urn:epSOS:hcer:hcer:2013">
                <Slot name="codingScheme">
                   <ValueList>
-                     <Value>epSOS formatCodes</Value>
+                     <Value>eHDSI formatCodes</Value>
                   </ValueList>
                </Slot>
                <Name>

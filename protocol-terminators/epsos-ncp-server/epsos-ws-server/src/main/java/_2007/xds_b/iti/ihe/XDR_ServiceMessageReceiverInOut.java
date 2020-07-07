@@ -170,8 +170,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND,
                         ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
             }
-        } catch (java.lang.Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+        } catch (Exception e) {
             throw AxisFault.makeFault(e);
         }
     }
@@ -303,11 +302,11 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         /**
          * Namespace
          */
-        private String nsuri;
+        private final String nsuri;
         /**
          * Local name
          */
-        private String name;
+        private final String name;
 
         /**
          * Constructor from object and marshaller.

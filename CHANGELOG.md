@@ -3,9 +3,41 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [5.0.0] - 07-07-2020
+The OpenNCP 5.0.0 release is the CEF eHDSI Wave 4 Initial Release.
+<br/>This version is the first release supporting the Change Proposals 36 and 42.
+<br/>Improvement of the International Search Mask (CP-042). 
+<br/>Dispensation workflow extension - discard operation (CP-036).
+<br/>CDA Display Tool supporting the Wave 4 - CDA Implementation Guidelines.
+<br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/sQFnDw
+### Added
+- [EHNCP-1954] - Support implementation of CP-036.
+- [EHNCP-1953] - Support implementation of CP-042.
+- [EHNCP-1951] - Provide CDA mock messages for Wave 4.
+- [EHNCP-1896] - Add implementation for international search mask.
+- [EHNCP-1892] - Add implementation for dispensation discard operation.
+
+### Changed
+- [EHNCP-1950] - Align xslt method names with new value set names.
+- [EHNCP-1945] - Code quality - minor refactoring and logging improvements.
+- [EHNCP-1944] - Adapt Audit Messages to Wave 4 specifications.
+- [EHNCP-1941] - Display descriptions from ICD-10 for the clinical manifestations of allergic reactions.
+- [EHNCP-1936] - Display the position of a vaccination in a series of immunizations when provided in the PS.
+- [EHNCP-1935] - Improve the presentation of multi-ingredient medicinal products in the Medication Summary.
+- [EHNCP-1927] - Replace hardcoded labels by concepts from the eHDSIDisplayLabel value set.
+- [EHNCP-1926] - Improve the way the datatype IVL_TS is displayed in the CDA Display Tool.
+- [EHNCP-1921] - Improve the labels in the display of the PS for 'creation date' and 'last update'.
+- [EHNCP-1859] - Evidence Emitter - source code refactoring and improvements.
+
+### Deprecated
+- [N/A].
+
+### Removed
+- [N/A].
+
 ## [4.1.0] - 03-06-2020
 The OpenNCP 4.1.0 release is the CEF eHDSI Wave 3 HotFix version - available for the eHDSI 2020 Re-Test Event.
-<br/>This version is mainly improving the vulnerabilities frmo the JAR dependencies (Spring, Hibernate and SAML).
+<br/>This version is mainly improving the vulnerabilities from the JAR dependencies (Spring, Hibernate and SAML).
 <br/>CDA Display Tool improvements according the Formal Test Event feedback. 
 <br/>Web Services communication is using SOAP 1.2 between all the components.
 <br/>eHDSI Central Services (SMP Server) has been upgraded to 4.1.1-EC with Dynamic Discovery Client 1.11.

@@ -2,7 +2,7 @@ package epsos.ccd.gnomon.auditmanager;
 
 /**
  * Enumeration for populating the EventType of the AuditMessage.
- * One of the available EPSOS event ids.
+ * One of the available eHDSI event IDs.
  * <p>
  * EHDSI-11: IdentificationService
  * EHDSI-21: PatientService

@@ -73,7 +73,9 @@ public class TRCAssertionRequest {
 
     private final Assertion idAssert;
     private final String purposeOfUse;
+    private final String prescriptionId;
     private final String patientId;
+    private final String pinCode;
     private final SOAPMessage rstMsg;
     private final String messageId;
     private final DocumentBuilder builder;
@@ -89,6 +91,8 @@ public class TRCAssertionRequest {
 
         this.idAssert = builder.idAssert;
         this.patientId = builder.patientId;
+        this.pinCode = builder.pinCode;
+        this.prescriptionId = builder.prescriptionId;
         this.purposeOfUse = builder.purposeOfUse;
         this.location = builder.location;
 
@@ -103,7 +107,6 @@ public class TRCAssertionRequest {
             createRSTHeader(rstMsg.getSOAPHeader());
             createRSTBody(rstMsg.getSOAPBody());
         } catch (SOAPException ex) {
-            LOGGER.error(null, ex);
             throw new Exception("Unable to create RST Message");
         }
     }
@@ -202,6 +205,10 @@ public class TRCAssertionRequest {
             SOAPElement patientIdElem = trcParamsElem.addChildElement(patientIdName);
             patientIdElem.addTextNode(patientId);
 
+            Name pinCodeName = fac.createName("PinCode", "trc", TRC_NS);
+            SOAPElement pinCodeElement = trcParamsElem.addChildElement(pinCodeName);
+            pinCodeElement.addTextNode(pinCode);
+
         } catch (SOAPException ex) {
             LOGGER.error(null, ex);
         }
@@ -227,7 +234,7 @@ public class TRCAssertionRequest {
 
             LOGGER.info("Checking SSL Hostname Verifier: '{}'", CHECK_FOR_HOSTNAME);
             if (httpConnection instanceof HttpsURLConnection) {  // Going SSL
-                ((HttpsURLConnection) httpConnection).setSSLSocketFactory(getEpsosSSLSocketFactory());
+                ((HttpsURLConnection) httpConnection).setSSLSocketFactory(getSSLSocketFactory());
                 if (StringUtils.equals(CHECK_FOR_HOSTNAME, "false"))
                     ((HttpsURLConnection) httpConnection).setHostnameVerifier(
                             (hostname, sslSession) -> true);
@@ -253,10 +260,8 @@ public class TRCAssertionRequest {
             return extractTRCAssertionFromRSTC(response);
 
         } catch (SOAPException ex) {
-            LOGGER.error(null, ex);
             throw new Exception("SOAP Exception: " + ex.getMessage());
         } catch (UnsupportedOperationException ex) {
-            LOGGER.error(null, ex);
             throw new Exception("Unsupported Operation: " + ex.getMessage());
         }
     }
@@ -288,12 +293,11 @@ public class TRCAssertionRequest {
             return trcAssertion;
 
         } catch (Exception ex) {
-            LOGGER.error(null, ex);
             throw new Exception("Error while trying to extract the SAML TRC Assertion from RSTRC Body: " + ex.getMessage());
         }
     }
 
-    public SSLSocketFactory getEpsosSSLSocketFactory() {
+    public SSLSocketFactory getSSLSocketFactory() {
 
         SSLContext ctx;
         try {
@@ -328,6 +332,8 @@ public class TRCAssertionRequest {
         private final String patientId;
         //  Optional attributes
         private String purposeOfUse = "TREATMENT";
+        private String prescriptionId;
+        private String pinCode;
         private URL location = null;
 
         /**
@@ -346,6 +352,18 @@ public class TRCAssertionRequest {
             } catch (MalformedURLException ex) {
                 LOGGER.error(null, ex);
             }
+        }
+
+        public Builder prescriptionId(String prescriptionId) {
+
+            this.prescriptionId = prescriptionId;
+            return this;
+        }
+
+        public Builder pinCode(String pinCode) {
+
+            this.pinCode = pinCode;
+            return this;
         }
 
         /**

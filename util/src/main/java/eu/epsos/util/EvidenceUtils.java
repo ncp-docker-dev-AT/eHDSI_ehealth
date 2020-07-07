@@ -166,10 +166,7 @@ public class EvidenceUtils {
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title, msguuid);
         }
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isInfoEnabled()) {
-            LOGGER_CLINICAL.info("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingMsg));
-            LOGGER_CLINICAL.info("MSGUUID: '{}'", msguuid);
-        }
+
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
             statusmsg = "success";
@@ -350,10 +347,7 @@ public class EvidenceUtils {
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title, msguuid);
         }
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.info("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingSoap));
-            LOGGER_CLINICAL.info("MSGUUID: '{}'", msguuid);
-        }
+
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
 

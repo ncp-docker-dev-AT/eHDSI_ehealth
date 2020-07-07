@@ -518,7 +518,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     uuid, "urn:ihe:iti:xds-sd:pdf:2008", "IHE PCC", "PDF/A coded document"));
         } else {
             eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
-                    uuid, nodeRepresentation, "epSOS formatCodes", displayName));
+                    uuid, nodeRepresentation, "eHDSI formatCodes", displayName));
         }
 
         /*
@@ -530,7 +530,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Practice Setting code
         eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
-                uuid, "Not Used", "epSOS Practice Setting Codes-Not Used", "Not Used"));
+                uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
 
         // External Identifiers
         eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
@@ -626,7 +626,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     uuid, "urn:ihe:iti:xds-sd:pdf:2008", "IHE PCC", "PDF/A coded document"));
         } else {
             eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
-                    uuid, "urn:epSOS:ep:pre:2010", "epSOS formatCodes", "epSOS coded ePrescription"));
+                    uuid, "urn:epSOS:ep:pre:2010", "eHDSI formatCodes", "epSOS coded ePrescription"));
         }
         // Healthcare facility code
         // TODO: Get healthcare facility info from national implementaition
@@ -635,7 +635,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
         // Practice Setting code
         eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
-                uuid, "Not Used", "epSOS Practice Setting Codes-Not Used", "Not Used"));
+                uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
 
         // Author Person
         ClassificationType authorClassification = makeClassification(

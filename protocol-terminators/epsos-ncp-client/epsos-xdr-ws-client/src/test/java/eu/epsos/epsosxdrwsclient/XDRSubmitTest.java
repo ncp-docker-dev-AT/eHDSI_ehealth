@@ -84,7 +84,7 @@ public class XDRSubmitTest {
         XdrRequest request = new XdrRequest();
         request.setCda(cda);
         request.setCdaId(CDA_EDISP_ID);
-        request.setcountryCode(PATIENT_COUNTRY);
+        request.setCountryCode(PATIENT_COUNTRY);
         request.setCountryName(PATIENT_COUNTRY_NAME);
         request.setIdAssertion(idAssertion);
         request.setPatient(patientDemographics);

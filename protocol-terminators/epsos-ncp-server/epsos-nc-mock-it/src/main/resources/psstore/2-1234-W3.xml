@@ -19,7 +19,7 @@ Although being real choices for the different diseases and conditions, the selec
     <!-- title used for display purposes -->
     <title>Patient Summary</title>
     <effectiveTime value="20191122143500+0200" />
-    <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+    <confidentialityCode code="N" displayName="normal" codeSystem="2.16.840.1.113883.5.25"/>
     <!-- document language code -->
     <languageCode code="en-GB"/>
     <!-- setID (optional): remains unchanged among all the existing transformations -->
@@ -42,7 +42,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <family>Ferreira</family>
                     <given>Diana</given>
                 </name>
-                <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
+                <administrativeGenderCode code="F" displayName="female" codeSystem="2.16.840.1.113883.5.1"/>
                 <birthTime value="19820508"/>
                 <!-- guardian (optional) -->
                 <guardian classCode="GUARD">
@@ -74,13 +74,13 @@ Although being real choices for the different diseases and conditions, the selec
     </recordTarget>
     <!-- Author Information: Health Professional -->
     <author>
-        <functionCode code="221" codeSystem="2.16.840.1.113883.2.9.6.2.7"/>
+        <functionCode code="221" displayName="Medical doctors" codeSystem="2.16.840.1.113883.2.9.6.2.7"/>
         <!-- start time of the author’s participation in the creation of the clinical document -->
         <time value="20100701000000-0200"/>
         <assignedAuthor>
             <!-- HCP identifier -->
             <id root="2.999" extension="12345678"/>
-            <code code="2211" codeSystem="2.16.840.1.113883.2.9.6.2.7"/>
+            <code code="2211" displayName="Generalist medical practitioners" codeSystem="2.16.840.1.113883.2.9.6.2.7"/>
             <addr>
                 <streetAddressLine>3, Alameda Santo António dos Capuchos</streetAddressLine>
                 <city>Lisbon</city>
@@ -195,7 +195,7 @@ Although being real choices for the different diseases and conditions, the selec
                 <high value="20101001"/>
             </effectiveTime>
             <performer typeCode="PPRF">
-                <functionCode code="221" codeSystem="2.16.840.1.113883.2.9.6.2.7"/>
+                <functionCode code="221" displayName="Medical doctors" codeSystem="2.16.840.1.113883.2.9.6.2.7"/>
                 <assignedEntity>
                     <id extension="nnn" root="2.999"/>
                     <addr>
@@ -247,7 +247,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <templateId root="2.16.840.1.113883.10.20.1.8"/>
                     <id root="2.999.1"/>
                     <!-- CCD 3.9 -->
-                    <code code="10160-0" codeSystem="2.16.840.1.113883.6.1"/>
+                    <code code="10160-0" displayName="History of medication use" codeSystem="2.16.840.1.113883.6.1"/>
                     <!-- History of medication use -->
                     <title>History of Medication use</title>
                     <text>
@@ -394,7 +394,7 @@ Although being real choices for the different diseases and conditions, the selec
                                 <low value="19971006"/>
                             </effectiveTime>
                             <effectiveTime xsi:type="EIVL_TS" operator="A">
-                                <event code="ACM"/>
+                                <event code="ACM" codeSystem="2.16.840.1.113883.5.139"/>
                             </effectiveTime>
                             <routeCode code="20053000" codeSystem="0.4.0.127.0.16.1.1.2.1">
                                 <originalText><reference value="#route-1"/></originalText>
@@ -419,7 +419,7 @@ Although being real choices for the different diseases and conditions, the selec
                                         </epsos:formCode>
                                         <epsos:asContent classCode="CONT">
                                             <epsos:containerPackagedMedicine classCode="CONT" determinerCode="INSTANCE">
-                                                <epsos:formCode code="10100500" codeSystem="0.4.0.127.0.16.1.1.2.1"/>
+                                                <epsos:formCode code="10100500" displayName="Concentrate for oral suspension" codeSystem="0.4.0.127.0.16.1.1.2.1"/>
                                                 <epsos:capacityQuantity value="1" unit="g"/>
                                             </epsos:containerPackagedMedicine>
                                         </epsos:asContent>
@@ -455,7 +455,7 @@ Although being real choices for the different diseases and conditions, the selec
                                 <!-- high: end of pregnancy TBD -->
                             </effectiveTime>
                             <effectiveTime xsi:type="EIVL_TS" operator="A">
-                                <event code="ACM"/>
+                                <event code="ACM" codeSystem="2.16.840.1.113883.5.139"/>
                             </effectiveTime>
                             <doseQuantity value="2" unit="1"/>
                             <consumable>
@@ -700,7 +700,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <templateId root="2.16.840.1.113883.10.20.1.2"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.13"/>
                     <id root="2.999.2"/>
-                    <code code="48765-2" codeSystem="2.16.840.1.113883.6.1"/>
+                    <code code="48765-2" displayName="Allergies, adverse reactions, alerts" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>Allergies and adverse reactions</title>
                     <text>
                         <paragraph ID="obs-1">Food allergy to Kiwi fruit, Reaction: Eczema</paragraph><paragraph ID="obs-3">Food intolerance to Lactose, Reaction: Diarrhea</paragraph><paragraph ID="obs-5">Medication allergy to acetylsalicylic acid, Reaction: Asthma</paragraph><paragraph ID="obs-7">Allergy to Latex, Reaction: Urticaria</paragraph>
@@ -780,7 +780,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
                                             <text><reference value="#code-9"/></text>
                                             <statusCode code="completed"/>
-                                            <value xsi:type="CD" code="371924009" codeSystem="2.16.840.1.113883.6.96"/>
+                                            <value xsi:type="CD" code="371924009" displayName="Moderate to severe" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -850,7 +850,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
                                             <text><reference value="#code-9"/></text>
                                             <statusCode code="completed"/>
-                                            <value xsi:type="CD" code="371924009" codeSystem="2.16.840.1.113883.6.96"/>
+                                            <value xsi:type="CD" code="371924009" displayName="Moderate to severe" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -921,7 +921,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
                                             <text><reference value="#code-9"/></text>
                                             <statusCode code="completed"/>
-                                            <value xsi:type="CD" code="371924009" codeSystem="2.16.840.1.113883.6.96"/>
+                                            <value xsi:type="CD" code="371924009" displayName="Moderate to severe" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -999,7 +999,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <code code="SEV" codeSystem="2.16.840.1.113883.5.4"/>
                                             <text><reference value="#code-9"/></text>
                                             <statusCode code="completed"/>
-                                            <value xsi:type="CD" code="371924009" codeSystem="2.16.840.1.113883.6.96"/>
+                                            <value xsi:type="CD" code="371924009" displayName="Moderate to severe" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -1014,7 +1014,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.12"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.11"/>
                     <id root="2.999.3"/>
-                    <code code="47519-4" codeSystem="2.16.840.1.113883.6.1"/>
+                    <code code="47519-4" displayName="History of Procedures" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>History of Procedures</title>
                     <text>
                         <paragraph ID="pro-1">Implantation of heart assist system, 2014-10-20</paragraph><paragraph ID="pro-2">Cesarean section, 2012-04-14</paragraph><paragraph ID="pro-3">Thyroidectomy, 1997-06-05</paragraph>
@@ -1065,7 +1065,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.6"/>
                     <templateId root="2.16.840.1.113883.10.20.1.11"/>
                     <id root="2.999.4"/>
-                    <code code="11450-4" codeSystem="2.16.840.1.113883.6.1"/>
+                    <code code="11450-4" displayName="Problem list" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>Problem list</title>
                     <text>
                         <paragraph ID="pca-1">Predominantly allergic asthma since 1994-10-03</paragraph><paragraph ID="pca-2">Postprocedural hypothyroidism since 1997-10-06</paragraph><paragraph ID="pca-3">Other specified cardiac arrhythmias since 2013-01-09</paragraph><paragraph ID="pca-4">Type 2 diabetes mellitus since 2013-01-09</paragraph><paragraph ID="pca-5">Severe pre-eclampsia since 2017-05-06 active</paragraph><paragraph ID="pca-6">Acute tubulo-interstitial nephritis (Moderate to severe) since 2017-05-07</paragraph>
@@ -1116,12 +1116,12 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="2.16.840.1.113883.10.20.1.57"/>
                                             <templateId root="2.16.840.1.113883.10.20.1.50"/>
                                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1.1"/>
-                                            <code code="33999-4" codeSystem="2.16.840.1.113883.6.1"/>
+                                            <code code="33999-4" codeSystem="2.16.840.1.113883.6.1" displayName="Status" codeSystemName="LOINC"/>
                                             <text>
                                                 <reference value="#pca-1"/>
                                             </text>
                                             <statusCode code="completed"/>
-                                            <value xsi:type="CE" code="55561003" codeSystem="2.16.840.1.113883.6.96"/>
+                                            <value xsi:type="CE" displayName="Active" code="55561003" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                     <entryRelationship typeCode="REFR">
@@ -1133,7 +1133,7 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <reference value="#pca-1"/>
                                             </text>
                                             <statusCode code="completed"/>
-                                            <value xsi:type="CE" code="21134002" codeSystem="2.16.840.1.113883.6.96"/>
+                                            <value xsi:type="CE" code="21134002" displayName="Disability" codeSystem="2.16.840.1.113883.6.96"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -1328,7 +1328,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <code code="SEV" codeSystem="2.16.840.1.113883.5.4" codeSystemName="ActCode"/>
                                             <text><reference value="#obs-16"/></text>
                                             <statusCode code="completed"/>
-                                            <value xsi:type="CD" code="371924009" codeSystem="2.16.840.1.113883.6.96">
+                                            <value xsi:type="CD" code="371924009" displayName="Moderate to severe" codeSystem="2.16.840.1.113883.6.96">
                                                 <originalText><reference value="#val-16"/></originalText>
                                             </value>
                                         </observation>
@@ -1346,7 +1346,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <templateId root="2.16.840.1.113883.10.20.1.7"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.5.3.5"/>
                     <id root="2.999.5"/>
-                    <code code="46264-8" codeSystem="2.16.840.1.113883.6.1"/>
+                    <code code="46264-8" displayName="History of medical device use" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>History of medical device use </title>
                     <text>
                         <paragraph ID="sup-1">2014-10-20: Implantable defibrillator (Serial number: ABC-Device-ID, OID: 2.999)</paragraph>
@@ -1376,7 +1376,7 @@ Although being real choices for the different diseases and conditions, the selec
                 <section>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.8"/>
                     <id root="2.999.6"/>
-                    <code code="11348-0" codeSystem="2.16.840.1.113883.6.1"/>
+                    <code code="11348-0" displayName="History of past illness" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>History of Past illness</title>
                     <text>
                         <paragraph ID="code-45">Health Status</paragraph>
@@ -1426,7 +1426,7 @@ Although being real choices for the different diseases and conditions, the selec
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="2.16.840.1.113883.10.20.1.51"/>
                                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1.2"/>
-                                            <code code="11323-3" codeSystem="2.16.840.1.113883.6.1">
+                                            <code code="11323-3" codeSystem="2.16.840.1.113883.6.1" displayName="Health Status" codeSystemName="LOINC">
                                                 <originalText><reference value="#code-45"/></originalText>
                                             </code>
                                             <text><reference value="#obs-18"/></text>
@@ -1474,7 +1474,7 @@ Although being real choices for the different diseases and conditions, the selec
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="2.16.840.1.113883.10.20.1.51"/>
                                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1.2"/>
-                                            <code code="11323-3" codeSystem="2.16.840.1.113883.6.1">
+                                            <code code="11323-3" codeSystem="2.16.840.1.113883.6.1" displayName="Health Status" codeSystemName="LOINC">
                                                 <originalText><reference value="#code-45"/></originalText>
                                             </code>
                                             <text><reference value="#obs-20"/></text>
@@ -1497,7 +1497,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.23"/>
                     <templateId root="2.16.840.1.113883.10.20.1.6"/>
                     <id root="2.999.7"/>
-                    <code code="11369-6" codeSystem="2.16.840.1.113883.6.1" />
+                    <code code="11369-6" displayName="History of immunization" codeSystem="2.16.840.1.113883.6.1" />
                     <title>History of Immunization</title>
                     <text>
                         <paragraph ID="sub-6">Hepatitis B virus vaccine Engerix B (2294189) 1983-01-02</paragraph><paragraph ID="sub-7">Diphtheria + tetanus + pertussis + poliomyelitis vaccine Tetravac (2782480) 1983-01-02</paragraph><paragraph ID="sub-8">Haemophilus influenzae Type b vaccine Hiberix (2751881) 1983-01-02</paragraph><paragraph ID="sub-9">Human papillomavirus vaccine Cervarix (5055173) 1994-05-20</paragraph>
@@ -1511,7 +1511,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id root="2.999.7.1"/>
-                            <code code="IMMUNIZ" codeSystem="1.3.5.1.4.1.19376.1.5.3.2"/>
+                            <code code="IMMUNIZ" displayName="Immunization" codeSystem="1.3.5.1.4.1.19376.1.5.3.2"/>
                             <text><reference value="#sub-6"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime value="19830102"/>
@@ -1534,7 +1534,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id root="2.999.7.2"/>
-                            <code code="IMMUNIZ" codeSystem="1.3.5.1.4.1.19376.1.5.3.2"/>
+                            <code code="IMMUNIZ" displayName="Immunization" codeSystem="1.3.5.1.4.1.19376.1.5.3.2"/>
                             <text><reference value="#sub-7"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime value="19830102"/>
@@ -1557,7 +1557,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id root="2.999.7.3"/>
-                            <code code="IMMUNIZ" codeSystem="1.3.5.1.4.1.19376.1.5.3.2"/>
+                            <code code="IMMUNIZ" displayName="Immunization" codeSystem="1.3.5.1.4.1.19376.1.5.3.2"/>
                             <text><reference value="#sub-8"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime value="19830102"/>
@@ -1580,7 +1580,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id root="2.999.7.4"/>
-                            <code code="IMMUNIZ" codeSystem="1.3.5.1.4.1.19376.1.5.3.2"/>
+                            <code code="IMMUNIZ" displayName="Immunization" codeSystem="1.3.5.1.4.1.19376.1.5.3.2"/>
                             <text><reference value="#sub-9"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime value="19940520"/>
@@ -1605,7 +1605,7 @@ Although being real choices for the different diseases and conditions, the selec
                 <section>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.5.3.4"/>
                     <id root="2.999.8"/>
-                    <code code="10162-6" codeSystem="2.16.840.1.113883.6.1"/>
+                    <code code="10162-6" displayName="History of pregnancies" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>History of pregnancies</title>
                     <text>
                         <paragraph ID="obs-21">Delivery date estimated: 2018-01-01</paragraph>
@@ -1634,7 +1634,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.16"/>
                     <templateId root="2.16.840.1.113883.10.20.1.15"/>
                     <id root="2.999.9"/>
-                    <code code="29762-2" codeSystem="2.16.840.1.113883.6.1"/>
+                    <code code="29762-2" displayName="Social history" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>Social history</title>
                     <text>
                         <paragraph ID="obs-22">Tobacco use and exposure: 0.5 {pack}/d since 2017-04-15</paragraph>
@@ -1691,7 +1691,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.5.3.2"/>
                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.25"/>
                     <id root="2.999.10"/>
-                    <code code="8716-3" codeSystem="2.16.840.1.113883.6.1"/>
+                    <code code="8716-3" displayName="Physical findings" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>Physical findings</title>
                     <text>
                         <paragraph ID="code-64">Vital Signs</paragraph>
@@ -1757,7 +1757,7 @@ Although being real choices for the different diseases and conditions, the selec
                 <section>
                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.5"/>
                     <id root="2.999.11"/>
-                    <code code="30954-2" codeSystem="2.16.840.1.113883.6.1"/>
+                    <code code="30954-2" displayName="Relevant diagnostic tests/laboratory data" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>Coded Results</title>
                     <text>
                         <paragraph ID="code-69">Coded Results</paragraph>
@@ -1772,7 +1772,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <text><reference value="#obs-26"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime value="20191122"/>
-                            <value xsi:type="CE" code="278147001" codeSystem="2.16.840.1.113883.6.96" />
+                            <value xsi:type="CV" code="278147001" displayName="Blood group O Rh(D) positive" codeSystem="2.16.840.1.113883.6.96" />
                         </observation>
                     </entry>
                 </section>

@@ -6,7 +6,6 @@
 <h:head/>
 <body>
 <f:view locale="#{facesContext.externalContext.requestLocale}"/>
-
 <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
 
 <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
@@ -66,37 +65,37 @@
         <ui:repeat value="#{myBean.patients}" var="patient" id="patui">
             <table>
                 <tr>
-                    <td><b><h:outputText value="#{msg['patient.data.givenname']}"/></b></td>
+                    <td><strong><h:outputText value="#{msg['patient.data.givenname']}"/></strong></td>
                     <td>&nbsp;</td>
                     <td><h:outputText value="#{patient.name}"/></td>
                 </tr>
                 <tr>
-                    <td><b><h:outputText value="#{msg['patient.data.surname']}"/></b></td>
+                    <td><strong><h:outputText value="#{msg['patient.data.surname']}"/></strong></td>
                     <td>&nbsp;</td>
                     <td><h:outputText value="#{patient.familyName}"/></td>
                 </tr>
                 <tr>
-                    <td><b><h:outputText value="#{msg['patient.data.birth.date']}"/></b></td>
+                    <td><strong><h:outputText value="#{msg['patient.data.birth.date']}"/></strong></td>
                     <td>&nbsp;</td>
                     <td><h:outputText value="#{patient.birthDate}"/></td>
                 </tr>
                 <tr>
-                    <td><b><h:outputText value="#{msg['patient.data.street.address']}"/></b></td>
+                    <td><strong><h:outputText value="#{msg['patient.data.street.address']}"/></strong></td>
                     <td>&nbsp;</td>
                     <td><h:outputText value="#{patient.address}"/></td>
                 </tr>
                 <tr>
-                    <td><b><h:outputText value="#{msg['patient.data.code']}"/></b></td>
+                    <td><strong><h:outputText value="#{msg['patient.data.code']}"/></strong></td>
                     <td>&nbsp;</td>
                     <td><h:outputText value="#{patient.postalCode}"/></td>
                 </tr>
                 <tr>
-                    <td><b><h:outputText value="#{msg['patient.data.city']}"/></b></td>
+                    <td><strong><h:outputText value="#{msg['patient.data.city']}"/></strong></td>
                     <td>&nbsp;</td>
                     <td><h:outputText value="#{patient.city}"/></td>
                 </tr>
                 <tr>
-                    <td><b><h:outputText value="#{msg['patient.data.country']}"/></b></td>
+                    <td><strong><h:outputText value="#{msg['patient.data.country']}"/></strong></td>
                     <td>&nbsp;</td>
                     <td><h:outputText value="#{patient.country}"/></td>
                 </tr>
@@ -114,6 +113,14 @@
                     disabled="#{!myBean.enablePrescriptionDocuments}">
                 <f:setPropertyActionListener value="#{patient}" target="#{myBean.selectedPatient}"/>
                 #{msg['ui.ep.info']}<br/>
+            </p:commandLink>
+            <p:commandLink
+                    action="/viewMedicationsDispensed.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal"
+                    ajax="false" id="p5" title="#{msg['patient.data.agreement.title']}"
+                    rendered="#{myBean.assertionNotExists}"
+                    disabled="#{!myBean.enablePatientDocuments}">
+                <f:setPropertyActionListener value="#{patient}" target="#{myBean.selectedPatient}"/>
+                Medications Dispensed List<br/>
             </p:commandLink>
             <p:commandLink
                     action="/viewPatientConfirmationForConsent.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal"

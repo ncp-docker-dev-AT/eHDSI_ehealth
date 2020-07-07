@@ -10,7 +10,6 @@ import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import fi.kela.se.epsos.data.model.ConsentDocumentMetaData;
 import fi.kela.se.epsos.data.model.DocumentAssociation;
-import fi.kela.se.epsos.data.model.EDDocumentMetaData;
 import fi.kela.se.epsos.data.model.EPSOSDocument;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -79,8 +78,9 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
      * @param dispensationToDiscard Id of the dispensation to be discarded
      */
     @Override
-    public void cancelDispensation(DocumentAssociation<EDDocumentMetaData> dispensationToDiscard) {
-        logger.info("eDispensation to be discarded: '{}'", dispensationToDiscard.getXMLDocumentMetaData().getId());
+    public void cancelDispensation(EPSOSDocument dispensationToDiscard) {
+        //  logger.info("eDispensation to be discarded: '{}'", dispensationToDiscard.getXMLDocumentMetaData().getId());
+        logger.info("eDispensation to be discarded: '{}' for Patient: '{}'", dispensationToDiscard.getClassCode(), dispensationToDiscard.getPatientId());
     }
 
     /**
